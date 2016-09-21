@@ -145,11 +145,10 @@ static u16 crc(u8 *data, u8 len) {
   return crc;
 }
 
-static void initialize_data(u8 adr)
-{
+static void initialize_data(u8 bind) {
   CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);  // Frequency offset hack 
   CC2500_WriteReg(CC2500_18_MCSM0,    0x8); 
-  CC2500_WriteReg(CC2500_09_ADDR, adr ? 0x03 : (fixed_id & 0xff));
+  CC2500_WriteReg(CC2500_09_ADDR, bind ? 0x03 : (fixed_id & 0xff));
   CC2500_WriteReg(CC2500_07_PKTCTRL1,0x05);
 }
 
@@ -824,14 +823,13 @@ static void initialize(int bind)
 
     frskyX_init(); 
     CC2500_SetTxRxMode(TX_EN);  // enable PA 
+    initialize_data(bind);
 
     if (bind) {
         PROTOCOL_SetBindState(0xFFFFFFFF);
         state = FRSKY_BIND;
-        initialize_data(1);
     } else {
         state = FRSKY_DATA1;
-        initialize_data(0);
     }
 
 #ifndef EMULATOR
