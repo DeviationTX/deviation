@@ -59,7 +59,6 @@ ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 // Statics are not initialized on 7e so in initialize() if necessary
 static u8 chanskip;
-static u8 calData[48][3];
 static u8 channr;
 static u8 counter_rst;
 static u8 ctr;
@@ -147,16 +146,12 @@ static u16 crc(u8 *data, u8 len) {
 
 static void initialize_data(u8 bind) {
   CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);  // Frequency offset hack 
-  CC2500_WriteReg(CC2500_18_MCSM0,    0x8); 
   CC2500_WriteReg(CC2500_09_ADDR, bind ? 0x03 : (fixed_id & 0xff));
 }
 
 
 static void set_start(u8 ch) {
   CC2500_Strobe(CC2500_SIDLE);
-  CC2500_WriteReg(CC2500_23_FSCAL3, calData[ch][0]);
-  CC2500_WriteReg(CC2500_24_FSCAL2, calData[ch][1]);
-  CC2500_WriteReg(CC2500_25_FSCAL1, calData[ch][2]);
   CC2500_WriteReg(CC2500_0A_CHANNR, ch == 47 ? 0 : hop_data[ch]);
 }   
 
@@ -659,7 +654,7 @@ static u16 frskyx_cb() {
       initialize_data(0);
       channr = 0;
       state++;      
-      break;    
+      // fall through
     case FRSKY_DATA1:
       CC2500_SetTxRxMode(TX_EN);
       set_start(channr);
@@ -751,24 +746,6 @@ static void frskyX_init() {
   CC2500_WriteReg(CC2500_26_FSCAL0, 0x11);
   CC2500_WriteReg(CC2500_09_ADDR, 0x00);
   CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);
-
-  //calibrate hop channels
-  for (u8 c = 0; c < 47; c++) {
-      CC2500_Strobe(CC2500_SIDLE);    
-      CC2500_WriteReg(CC2500_0A_CHANNR, hop_data[c]);
-      CC2500_Strobe(CC2500_SCAL);
-      usleep(900);
-      calData[c][0] = CC2500_ReadReg(CC2500_23_FSCAL3);
-      calData[c][1] = CC2500_ReadReg(CC2500_24_FSCAL2); 
-      calData[c][2] = CC2500_ReadReg(CC2500_25_FSCAL1);
-  }
-  CC2500_Strobe(CC2500_SIDLE);      
-  CC2500_WriteReg(CC2500_0A_CHANNR, 0x00);
-  CC2500_Strobe(CC2500_SCAL);
-  usleep(900);
-  calData[47][0] = CC2500_ReadReg(CC2500_23_FSCAL3);
-  calData[47][1] = CC2500_ReadReg(CC2500_24_FSCAL2);  
-  calData[47][2] = CC2500_ReadReg(CC2500_25_FSCAL1);
 }
 
 
