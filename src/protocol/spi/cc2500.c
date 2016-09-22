@@ -68,11 +68,12 @@ void CC2500_ReadData(u8 *dpbuffer, int len)
     CC2500_ReadRegisterMulti(CC2500_3F_RXFIFO, dpbuffer, len);
 }
 
-void CC2500_Strobe(u8 state)
+u8 CC2500_Strobe(u8 state)
 {
     CS_LO();
-    PROTOSPI_xfer(state);
+    u8 data = PROTOSPI_xfer(state);
     CS_HI();
+    return data;
 }
 
 
