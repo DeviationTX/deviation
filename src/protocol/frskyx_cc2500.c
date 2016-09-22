@@ -634,6 +634,7 @@ static const u8 telem_test[][17] = {
   
 static u16 frskyx_cb() {
   u8 len;
+static u8 cc_count;  //TODO
 
   switch(state) { 
     default: 
@@ -666,27 +667,27 @@ static u16 frskyx_cb() {
       channr = (channr + chanskip) % 47;
       state++;
 #ifndef EMULATOR
-      return 5500;
+      return 500;
 #else
-      return 55;
+      return 5;
 #endif
     case FRSKY_DATA2:
-      CC2500_SetTxRxMode(RX_EN);
-      CC2500_Strobe(CC2500_SIDLE);
-      state++;
 #ifndef EMULATOR
+cc_count++;  //TODO debug
+      if ((CC2500_Strobe(CC2500_SNOP) & CC2500_STATUS_STATE_BM) == CC2500_STATE_RX) {
+#if HAS_EXTENDED_TELEMETRY
+set_telemetry(TELEM_FRSKY_TEMP2, cc_count);
+#endif
+cc_count = 0;
+          CC2500_SetTxRxMode(RX_EN);
+          state++;
+          return 8000;
+      }
       return 200;
 #else
       return 2;
 #endif
     case FRSKY_DATA3:   
-      CC2500_Strobe(CC2500_SRX);
-      state++;
-#ifndef EMULATOR
-      return 3000;
-#else
-      return 30;
-#endif
     case FRSKY_DATA4:
       len = CC2500_ReadReg(CC2500_3B_RXBYTES | CC2500_READ_BURST) & 0x7F; 
 #ifndef EMULATOR
@@ -705,6 +706,7 @@ static u16 frskyx_cb() {
       packet[2] = fixed_id >> 8;
       frsky_check_telemetry(packet, sizeof(telem_test[0]));
 #endif
+      CC2500_Strobe(CC2500_SIDLE);    
       state = FRSKY_DATA1;
 #ifndef EMULATOR
       return 300;
@@ -718,7 +720,7 @@ static u16 frskyx_cb() {
 static void frskyX_init() {
   CC2500_Reset();
 
-  CC2500_WriteReg(CC2500_17_MCSM1, 0x00);
+  CC2500_WriteReg(CC2500_17_MCSM1, 0x03);
   CC2500_WriteReg(CC2500_18_MCSM0, 0x18);
   CC2500_WriteReg(CC2500_06_PKTLEN, 0x1E);
   CC2500_WriteReg(CC2500_07_PKTCTRL1, 0x05);
