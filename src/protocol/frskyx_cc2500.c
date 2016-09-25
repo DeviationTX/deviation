@@ -59,7 +59,7 @@ ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 // Statics are not initialized on 7e so in initialize() if necessary
 static u8 chanskip;
-static u8 calData[48];
+static u8 calData[48][3];
 static u8 channr;
 static u8 counter_rst;
 static u8 ctr;
@@ -145,15 +145,20 @@ static u16 crc(u8 *data, u8 len) {
   return crc;
 }
 
-static void initialize_data(u8 bind) {
+static void initialize_data(u8 adr)
+{
   CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);  // Frequency offset hack 
-  CC2500_WriteReg(CC2500_09_ADDR, bind ? 0x03 : (fixed_id & 0xff));
+  CC2500_WriteReg(CC2500_18_MCSM0,    0x8); 
+  CC2500_WriteReg(CC2500_09_ADDR, adr ? 0x03 : (fixed_id & 0xff));
+  CC2500_WriteReg(CC2500_07_PKTCTRL1,0x05);
 }
 
 
 static void set_start(u8 ch) {
   CC2500_Strobe(CC2500_SIDLE);
-  CC2500_WriteReg(CC2500_25_FSCAL1, calData[ch]);
+  CC2500_WriteReg(CC2500_23_FSCAL3, calData[ch][0]);
+  CC2500_WriteReg(CC2500_24_FSCAL2, calData[ch][1]);
+  CC2500_WriteReg(CC2500_25_FSCAL1, calData[ch][2]);
   CC2500_WriteReg(CC2500_0A_CHANNR, ch == 47 ? 0 : hop_data[ch]);
 }   
 
@@ -663,7 +668,7 @@ static u16 frskyx_cb() {
       initialize_data(0);
       channr = 0;
       state++;      
-      // fall through
+      break;    
     case FRSKY_DATA1:
       CC2500_SetTxRxMode(TX_EN);
       set_start(channr);
@@ -726,17 +731,19 @@ static u16 frskyx_cb() {
 
 static void frskyX_init() {
   CC2500_Reset();
-
-  CC2500_WriteReg(CC2500_17_MCSM1, 0x0c);
-  CC2500_WriteReg(CC2500_18_MCSM0, 0x08);
+  CC2500_WriteReg(CC2500_02_IOCFG0, 0x06);    
+  CC2500_WriteReg(CC2500_00_IOCFG2, 0x06);
+  CC2500_WriteReg(CC2500_17_MCSM1, 0x0C);
+  CC2500_WriteReg(CC2500_18_MCSM0, 0x18);
   CC2500_WriteReg(CC2500_06_PKTLEN, 0x1E);
-  CC2500_WriteReg(CC2500_07_PKTCTRL1, 0x05);
+  CC2500_WriteReg(CC2500_07_PKTCTRL1, 0x04);
   CC2500_WriteReg(CC2500_08_PKTCTRL0, 0x01);
   CC2500_WriteReg(CC2500_3E_PATABLE, 0xff);
   CC2500_WriteReg(CC2500_0B_FSCTRL1, 0x0A);
   CC2500_WriteReg(CC2500_0C_FSCTRL0, 0x00);
   CC2500_WriteReg(CC2500_0D_FREQ2, 0x5c);
   CC2500_WriteReg(CC2500_0E_FREQ1, 0x76);
+//  CC2500_WriteReg(CC2500_0F_FREQ0, 0x27); 
   CC2500_WriteReg(CC2500_0F_FREQ0, 0x27);
   CC2500_WriteReg(CC2500_10_MDMCFG4, 0x7B); 
   CC2500_WriteReg(CC2500_11_MDMCFG3, 0x61);
@@ -746,15 +753,41 @@ static void frskyX_init() {
   CC2500_WriteReg(CC2500_15_DEVIATN, 0x51);
   CC2500_WriteReg(CC2500_19_FOCCFG, 0x16);
   CC2500_WriteReg(CC2500_1A_BSCFG, 0x6c); 
-  CC2500_WriteReg(CC2500_1B_AGCCTRL2,0x03);
+  CC2500_WriteReg(CC2500_1B_AGCCTRL2,0x43);
+  CC2500_WriteReg(CC2500_1C_AGCCTRL1,0x40);
+  CC2500_WriteReg(CC2500_1D_AGCCTRL0,0x91);
   CC2500_WriteReg(CC2500_21_FREND1, 0x56);
   CC2500_WriteReg(CC2500_22_FREND0, 0x10);
   CC2500_WriteReg(CC2500_23_FSCAL3, 0xa9);
   CC2500_WriteReg(CC2500_24_FSCAL2, 0x0A);
   CC2500_WriteReg(CC2500_25_FSCAL1, 0x00);
   CC2500_WriteReg(CC2500_26_FSCAL0, 0x11);
+  CC2500_WriteReg(CC2500_29_FSTEST, 0x59);
+  CC2500_WriteReg(CC2500_2C_TEST2, 0x88);
+  CC2500_WriteReg(CC2500_2D_TEST1, 0x31);
+  CC2500_WriteReg(CC2500_2E_TEST0, 0x0B);
+  CC2500_WriteReg(CC2500_03_FIFOTHR, 0x07);
   CC2500_WriteReg(CC2500_09_ADDR, 0x00);
+  CC2500_WriteReg(CC2500_07_PKTCTRL1, 0x04);      
   CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);
+  CC2500_Strobe(CC2500_SIDLE);    
+  //calibrate hop channels
+  for (u8 c = 0; c < 47; c++) {
+      CC2500_Strobe(CC2500_SIDLE);    
+      CC2500_WriteReg(CC2500_0A_CHANNR, hop_data[c]);
+      CC2500_Strobe(CC2500_SCAL);
+      usleep(900);
+      calData[c][0] = CC2500_ReadReg(CC2500_23_FSCAL3);
+      calData[c][1] = CC2500_ReadReg(CC2500_24_FSCAL2); 
+      calData[c][2] = CC2500_ReadReg(CC2500_25_FSCAL1);
+  }
+  CC2500_Strobe(CC2500_SIDLE);      
+  CC2500_WriteReg(CC2500_0A_CHANNR, 0x00);
+  CC2500_Strobe(CC2500_SCAL);
+  usleep(900);
+  calData[47][0] = CC2500_ReadReg(CC2500_23_FSCAL3);
+  calData[47][1] = CC2500_ReadReg(CC2500_24_FSCAL2);  
+  calData[47][2] = CC2500_ReadReg(CC2500_25_FSCAL1);
 }
 
 
@@ -798,13 +831,14 @@ static void initialize(int bind)
 
     frskyX_init(); 
     CC2500_SetTxRxMode(TX_EN);  // enable PA 
-    initialize_data(bind);
 
     if (bind) {
         PROTOCOL_SetBindState(0xFFFFFFFF);
         state = FRSKY_BIND;
+        initialize_data(1);
     } else {
         state = FRSKY_DATA1;
+        initialize_data(0);
     }
 
 #ifndef EMULATOR
