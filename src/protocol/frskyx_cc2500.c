@@ -59,6 +59,7 @@ ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 // Statics are not initialized on 7e so in initialize() if necessary
 static u8 chanskip;
+static u8 calData[48];
 static u8 channr;
 static u8 counter_rst;
 static u8 ctr;
@@ -152,6 +153,7 @@ static void initialize_data(u8 bind) {
 
 static void set_start(u8 ch) {
   CC2500_Strobe(CC2500_SIDLE);
+  CC2500_WriteReg(CC2500_25_FSCAL1, calData[ch]);
   CC2500_WriteReg(CC2500_0A_CHANNR, ch == 47 ? 0 : hop_data[ch]);
 }   
 
@@ -341,6 +343,8 @@ static void frskyX_data_frame() {
   [12] STRM6  D1 D1 D0 D0
   [13] CHKSUM1
   [14] CHKSUM2
+  [15] RSSI
+  [16] LQI
 */
 
 #define START_STOP              0x7e
@@ -569,8 +573,12 @@ static void frsky_parse_sport_stream(u8 data) {
 #endif // HAS_EXTENDED_TELEMETRY
 
 static void frsky_check_telemetry(u8 *pkt, u8 len) {
-    // only process packets with the required id and packet length
-    if (pkt[1] == (fixed_id & 0xff) && pkt[2] == (fixed_id >> 8) && pkt[0] == len-3) {
+    // only process packets with the required id and packet length and good crc
+    if (   pkt[1] == (fixed_id & 0xff)
+        && pkt[2] == (fixed_id >> 8)
+        && pkt[0] == len-3
+        && crc(&pkt[3], len-5) == (pkt[len-4] << 8 | pkt[len-3])
+       ) {
         if (pkt[4] > 0x36) {   // distinguish RSSI from VOLT1 (maybe bit 7 always set for RSSI?)
             Telemetry.value[TELEM_FRSKY_RSSI] = pkt[4] / 2; 	// Value in Db
             TELEMETRY_SetUpdated(TELEM_FRSKY_RSSI);
@@ -596,8 +604,9 @@ static void frsky_check_telemetry(u8 *pkt, u8 len) {
         }
 
 #if HAS_EXTENDED_TELEMETRY
-        for (u8 i=0; i < pkt[6]; i++)
-            frsky_parse_sport_stream(pkt[7+i]);
+        if (len > 7 && pkt[6] <= len-7)
+            for (u8 i=0; i < pkt[6]; i++)
+                frsky_parse_sport_stream(pkt[7+i]);
 #endif // HAS_EXTENDED_TELEMETRY
     }
 }
@@ -634,7 +643,6 @@ static const u8 telem_test[][17] = {
   
 static u16 frskyx_cb() {
   u8 len;
-static u8 cc_count;  //TODO
 
   switch(state) { 
     default: 
@@ -667,27 +675,27 @@ static u8 cc_count;  //TODO
       channr = (channr + chanskip) % 47;
       state++;
 #ifndef EMULATOR
-      return 500;
+      return 5500;
 #else
-      return 5;
+      return 55;
 #endif
     case FRSKY_DATA2:
+      CC2500_SetTxRxMode(RX_EN);
+      CC2500_Strobe(CC2500_SIDLE);
+      state++;
 #ifndef EMULATOR
-cc_count++;  //TODO debug
-      if ((CC2500_Strobe(CC2500_SNOP) & CC2500_STATUS_STATE_BM) == CC2500_STATE_RX) {
-#if HAS_EXTENDED_TELEMETRY
-set_telemetry(TELEM_FRSKY_TEMP2, cc_count);
-#endif
-cc_count = 0;
-          CC2500_SetTxRxMode(RX_EN);
-          state++;
-          return 8000;
-      }
       return 200;
 #else
       return 2;
 #endif
     case FRSKY_DATA3:   
+      CC2500_Strobe(CC2500_SRX);
+      state++;
+#ifndef EMULATOR
+      return 3000;
+#else
+      return 30;
+#endif
     case FRSKY_DATA4:
       len = CC2500_ReadReg(CC2500_3B_RXBYTES | CC2500_READ_BURST) & 0x7F; 
 #ifndef EMULATOR
@@ -706,7 +714,6 @@ cc_count = 0;
       packet[2] = fixed_id >> 8;
       frsky_check_telemetry(packet, sizeof(telem_test[0]));
 #endif
-      CC2500_Strobe(CC2500_SIDLE);    
       state = FRSKY_DATA1;
 #ifndef EMULATOR
       return 300;
@@ -720,8 +727,8 @@ cc_count = 0;
 static void frskyX_init() {
   CC2500_Reset();
 
-  CC2500_WriteReg(CC2500_17_MCSM1, 0x03);
-  CC2500_WriteReg(CC2500_18_MCSM0, 0x18);
+  CC2500_WriteReg(CC2500_17_MCSM1, 0x0c);
+  CC2500_WriteReg(CC2500_18_MCSM0, 0x08);
   CC2500_WriteReg(CC2500_06_PKTLEN, 0x1E);
   CC2500_WriteReg(CC2500_07_PKTCTRL1, 0x05);
   CC2500_WriteReg(CC2500_08_PKTCTRL0, 0x01);
