@@ -582,7 +582,7 @@ static void frsky_check_telemetry(u8 *pkt, u8 len) {
     if (   pkt[1] == (fixed_id & 0xff)
         && pkt[2] == (fixed_id >> 8)
         && pkt[0] == len-3
-        && crc(&pkt[3], len-5) == (pkt[len-4] << 8 | pkt[len-3])
+        && crc(&pkt[3], len-7) == (pkt[len-4] << 8 | pkt[len-3])
        ) {
         if (pkt[4] > 0x36) {   // distinguish RSSI from VOLT1 (maybe bit 7 always set for RSSI?)
             Telemetry.value[TELEM_FRSKY_RSSI] = pkt[4] / 2; 	// Value in Db
