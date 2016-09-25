@@ -68,12 +68,11 @@ void CC2500_ReadData(u8 *dpbuffer, int len)
     CC2500_ReadRegisterMulti(CC2500_3F_RXFIFO, dpbuffer, len);
 }
 
-u8 CC2500_Strobe(u8 state)
+void CC2500_Strobe(u8 state)
 {
     CS_LO();
-    u8 data = PROTOSPI_xfer(state);
+    PROTOSPI_xfer(state);
     CS_HI();
-    return data;
 }
 
 
@@ -106,8 +105,8 @@ void CC2500_SetTxRxMode(enum TXRX_State mode)
     }
 
     if(mode == TX_EN) {
-        CC2500_WriteReg(R2, 0x2F);
         CC2500_WriteReg(R0, 0x2F | 0x40);
+        CC2500_WriteReg(R2, 0x2F);
     } else if (mode == RX_EN) {
         CC2500_WriteReg(R0, 0x2F);
         CC2500_WriteReg(R2, 0x2F | 0x40);
