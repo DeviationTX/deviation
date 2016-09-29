@@ -356,6 +356,7 @@ static void frskyX_data_frame() {
 #define BYTESTUFF               0x7d
 #define STUFF_MASK              0x20
 #define FRSKY_SPORT_PACKET_SIZE    8
+#define TELEM_PKT_SIZE            17
 
 // FrSky PRIM IDs (1 byte)
 #define DATA_FRAME                0x10
@@ -579,10 +580,11 @@ static void frsky_parse_sport_stream(u8 data) {
 
 static void frsky_check_telemetry(u8 *pkt, u8 len) {
     // only process packets with the required id and packet length and good crc
-    if (   pkt[1] == (fixed_id & 0xff)
+    if (len == TELEM_PKT_SIZE
+        && pkt[0] == TELEM_PKT_SIZE - 3
+        && pkt[1] == (fixed_id & 0xff)
         && pkt[2] == (fixed_id >> 8)
-        && pkt[0] == len-3
-        && crc(&pkt[3], len-7) == (pkt[len-4] << 8 | pkt[len-3])
+        && crc(&pkt[3], TELEM_PKT_SIZE-7) == (pkt[TELEM_PKT_SIZE-4] << 8 | pkt[TELEM_PKT_SIZE-3])
        ) {
         if (pkt[4] > 0x36) {   // distinguish RSSI from VOLT1 (maybe bit 7 always set for RSSI?)
             Telemetry.value[TELEM_FRSKY_RSSI] = pkt[4] / 2; 	// Value in Db
@@ -609,7 +611,7 @@ static void frsky_check_telemetry(u8 *pkt, u8 len) {
         }
 
 #if HAS_EXTENDED_TELEMETRY
-        if (len > 7 && pkt[6] <= len-7)
+        if (pkt[6] <= 6)
             for (u8 i=0; i < pkt[6]; i++)
                 frsky_parse_sport_stream(pkt[7+i]);
 #endif // HAS_EXTENDED_TELEMETRY
