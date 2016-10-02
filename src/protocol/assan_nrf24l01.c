@@ -67,9 +67,8 @@ enum {
 
 u8 hopping_frequency[2];
 u8 hopping_frequency_no;
-u8 packet[PACKET_SIZE];
+u8 packet[32];
 u8 tx_power;
-u8 tx_address[2][ADDRESS_LENGTH];
 u8 state;
 u32 packet_count;
 
@@ -170,7 +169,7 @@ u16 ASSAN_callback()
                     memset(packet,0x05,PACKET_SIZE-5);
                     packet[15]=0x99;
                     for(u8 i=0;i<4;i++)
-                        packet[16+i] = tx_address[1][ADDRESS_LENGTH-i-1];
+                        packet[16+i]=packet[23-i];
                     packet_count=0;
                     return 10000;
                 }
@@ -210,7 +209,7 @@ u16 ASSAN_callback()
         case DATA1:
         case DATA4:
             // Change ID and RF channel
-            NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR,tx_address[hopping_frequency_no], ADDRESS_LENGTH);
+            NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, packet+20+4*hopping_frequency_no, ADDRESS_LENGTH);
             NRF24L01_WriteReg(NRF24L01_05_RF_CH, hopping_frequency[hopping_frequency_no]);
             hopping_frequency_no^=0x01;
             state=DATA2;
@@ -250,8 +249,8 @@ static void initialize_txid()
     for(u8 i=0;i<4;i++)
     {
         u8 temp=lfsr & 0xff;
-        tx_address[0][i]=temp;
-        tx_address[1][i]=temp+1;
+        packet[i+20]=temp;
+        packet[i+24]=temp+1;
         freq+=temp;
     }
 
