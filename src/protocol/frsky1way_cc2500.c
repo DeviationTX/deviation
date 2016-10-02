@@ -228,6 +228,7 @@ static u8 calc_channel()
 
 static void build_data_packet_1way()
 {
+    int idx = 0; // transmit lower channels
     packet[0] = 0x0e;
     packet[1] = fixed_id & 0xff;
     packet[2] = fixed_id >> 8;
@@ -236,10 +237,12 @@ static void build_data_packet_1way()
     if (state == FRSKY_DATA1 || state == FRSKY_DATA3)
         packet[5] = 0x0f;
     else if(state == FRSKY_DATA2 || state == FRSKY_DATA4)
+    {
         packet[5] = 0xf0;
+        idx=4; // transmit upper channels
+    }
     else
         packet[5] = 0x00;
-    int idx = 0; //= (state == FRSKY_DATA1) ? 4 : 0;
     for(int i = 0; i < 4; i++) {
         if(idx + i >= Model.num_channels) {
             packet[2*i + 6] = 0xc8;
@@ -305,7 +308,7 @@ static void get_tx_id()
     }
     for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
         rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
-    fixed_id = rand32_r(&lfsr, 0) & 0xffff;
+    fixed_id = rand32_r(&lfsr, 0) & 0x7fff;
     //fixed_id = 0x1257;
     u8 data[2] = {(fixed_id >> 8) & 0xff, fixed_id & 0xff};
     crc = crc8_le(0x6b, data, 2);
@@ -341,7 +344,7 @@ const void *FRSKY1WAY_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_CHECK_AUTOBIND: return 0; //Never Autobind
         case PROTOCMD_BIND:  initialize(1); return 0;
         case PROTOCMD_NUMCHAN: return (void *)8L;
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)4L;
+        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
         default: break;
