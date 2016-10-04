@@ -152,7 +152,8 @@ u16 ASSAN_callback()
             NRF24L01_WriteReg(NRF24L01_05_RF_CH, RF_BIND_CHANNEL);
             NRF24L01_SetBitrate(NRF24L01_BR_1M);                    // 1Mbps
             NRF24L01_SetTxRxMode(RX_EN);
-            state++;
+            state = BIND1;
+            /* FALLTHROUGH */
         case BIND1:
             //Wait for receiver to send the frames
             if( NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR))
@@ -160,8 +161,7 @@ u16 ASSAN_callback()
                 NRF24L01_ReadPayload(packet, PACKET_SIZE);
                 if(packet[19]==0x13)
                 { //Last frame received
-                    state++;
-                    state |= WAIT;
+                    state = BIND2 | WAIT;
                     //Switch to TX
                     NRF24L01_SetTxRxMode(TXRX_OFF);
                     NRF24L01_SetTxRxMode(TX_EN);
@@ -190,8 +190,7 @@ u16 ASSAN_callback()
             NRF24L01_WritePayload(packet, PACKET_SIZE);
             if(packet_count==20)
             {
-                state++;
-                state |= WAIT;
+                state = DATA0 | WAIT;
                 packet_count = 0;
             }
             return 22520;
@@ -206,6 +205,7 @@ u16 ASSAN_callback()
             NRF24L01_SetBitrate(NRF24L01_BR_250K);                  // 250Kbps
             NRF24L01_SetTxRxMode(TXRX_OFF);
             NRF24L01_SetTxRxMode(TX_EN);
+            /* FALLTHROUGH */
         case DATA1:
         case DATA4:
             // Change ID and RF channel
