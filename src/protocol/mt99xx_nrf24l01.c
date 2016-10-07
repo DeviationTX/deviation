@@ -87,6 +87,7 @@ enum {
 };
 
 #define CHANNEL_LIGHT    CHANNEL5
+#define CHANNEL_INVERT   CHANNEL5
 #define CHANNEL_FLIP     CHANNEL6
 #define CHANNEL_SNAPSHOT CHANNEL7
 #define CHANNEL_VIDEO    CHANNEL8
@@ -96,9 +97,19 @@ enum{
     // flags going to packet[6] (MT99xx, H7)
     FLAG_MT_RATE1   = 0x01, // (H7 high rate)
     FLAG_MT_RATE2   = 0x02, // (MT9916 only)
-    FLAG_MT_VIDEO   = 0x10, // HeadLess on LS114
+    FLAG_MT_VIDEO   = 0x10,
     FLAG_MT_SNAPSHOT= 0x20,
     FLAG_MT_FLIP    = 0x80,
+};
+
+enum{
+    // flags going to packet[6] for LS
+    FLAG_LS_INVERT  = 0x01,
+    FLAG_LS_RATE    = 0x02,
+    FLAG_LS_HEADLESS= 0x10,
+    FLAG_LS_SNAPSHOT= 0x20,
+    FLAG_LS_VIDEO   = 0x40,
+    FLAG_LS_FLIP    = 0x80,
 };
 
 enum {
@@ -188,8 +199,11 @@ static void mt99xx_send_packet()
                           | GET_FLAG( CHANNEL_VIDEO, FLAG_MT_VIDEO); // max rate on MT99xx
             }
             else if (Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_LS) {
-                packet[6] |= FLAG_MT_RATE2; // max rate
-                packet[6] |= GET_FLAG( CHANNEL_HEADLESS, 0x10);
+                packet[6] |= FLAG_LS_RATE // max rate
+                          | GET_FLAG( CHANNEL_HEADLESS, FLAG_LS_HEADLESS)
+                          | GET_FLAG( CHANNEL_INVERT,   FLAG_LS_INVERT)
+                          | GET_FLAG( CHANNEL_SNAPSHOT, FLAG_LS_SNAPSHOT)
+                          | GET_FLAG( CHANNEL_VIDEO,    FLAG_LS_VIDEO);
                 packet[7] = ls_mys_byte[ls_counter++];
                 if(ls_counter >= sizeof(ls_mys_byte))
                     ls_counter = 0;
