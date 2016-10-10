@@ -460,7 +460,7 @@ static void processSportPacket(u8 *packet) {
         set_telemetry(TELEM_FRSKY_RPM, data);
         break;
     case FUEL_FIRST_ID & 0xfff0:
-        set_telemetry(TELEM_FRSKY_FUEL, data * 60);
+        set_telemetry(TELEM_FRSKY_FUEL, data);
         break;
 
     case GPS_LONG_LATI_FIRST_ID & 0xfff0:{
