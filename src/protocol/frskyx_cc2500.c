@@ -484,11 +484,11 @@ static void processSportPacket(u8 *packet) {
         break;}
 
     case GPS_ALT_FIRST_ID & 0xfff0:
-        Telemetry.gps.altitude = data / 100;
+        Telemetry.gps.altitude = data * 10;
         TELEMETRY_SetUpdated(TELEM_GPS_ALT);
         break;
     case GPS_SPEED_FIRST_ID & 0xfff0:
-        Telemetry.gps.velocity = data * 5556 / 1080;
+        Telemetry.gps.velocity = data * 5556 / 10800;
         TELEMETRY_SetUpdated(TELEM_GPS_SPEED);
         break;
     case GPS_COURS_FIRST_ID & 0xfff0:
@@ -504,8 +504,8 @@ static void processSportPacket(u8 *packet) {
             Telemetry.gps.time = ( (u32)fr_gps.year & 0x3f)            << 26
                                | (((u32)fr_gps.day_month >> 8) & 0x0f) << 22
                                | ( (u32)fr_gps.day_month & 0x1f)       << 17
-                               | ( (u32)fr_gps.hour_min & 0x1f)        << 12
-                               | (((u32)fr_gps.hour_min >> 8) & 0x3f)  << 6
+                               | (((u32)fr_gps.hour_min >> 8) & 0x1f)  << 12
+                               | ( (u32)fr_gps.hour_min & 0x3f)        << 6
                                | ( (u32)fr_gps.second & 0x3f);
             TELEMETRY_SetUpdated(TELEM_GPS_TIME);
         }
