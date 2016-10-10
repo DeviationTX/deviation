@@ -381,11 +381,14 @@ static void update_cell(u8 cell, s32 value) {
     }
 }
 
+#define MIN(a,b) ((a) < (b) ? a : b)
 static void update_min_cell(u8 num_cells) {
-    for (int i=0; i < num_cells; i++) {
+    Telemetry.value[TELEM_FRSKY_MIN_CELL] = Telemetry.value[TELEM_FRSKY_CELL1];
+    for (int i=1; i < MIN(num_cells, 6); i++) {
         if (Telemetry.value[TELEM_FRSKY_CELL1 + i] < Telemetry.value[TELEM_FRSKY_MIN_CELL])
-            set_telemetry(TELEM_FRSKY_MIN_CELL, Telemetry.value[TELEM_FRSKY_CELL1 + i]);
+            Telemetry.value[TELEM_FRSKY_MIN_CELL] = Telemetry.value[TELEM_FRSKY_CELL1 + i];
     }
+    TELEMETRY_SetUpdated(TELEM_FRSKY_MIN_CELL);
 }
 
 
@@ -824,6 +827,7 @@ static void initialize(int bind)
     ctr = 0;
     seq_last_sent = 0;
     seq_last_rcvd = 8;
+    Telemetry.value[TELEM_FRSKY_MIN_CELL] = TELEMETRY_GetMaxValue(TELEM_FRSKY_MIN_CELL);
 
     while (!chanskip)
         chanskip = (get_tx_id() & 0xfefefefe) % 47;
