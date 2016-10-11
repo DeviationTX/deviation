@@ -51,7 +51,7 @@ static void processHubPacket(u8 id, u16 value) {
         set_telemetry(TELEM_FRSKY_TEMP1, (s16)value);
         break;
     case 0x03: //RPM   0-60000
-        Telemetry.value[TELEM_FRSKY_RPM] = value * 60;
+        Telemetry.value[TELEM_FRSKY_RPM] = value;
         TELEMETRY_SetUpdated(TELEM_FRSKY_RPM);
         break;
     case 0x04: //Fuel  0, 25, 50, 75, 100
