@@ -63,14 +63,15 @@ static void processHubPacket(u8 id, u16 value) {
         break;
     case 0x06: { //Battery voltages - CELL# and VOLT
         u8 cell = (value >> 4) & 0x0f;
-        value = (((u16)(value & 0x0F) << 8) + (value & 0xff00)) / 5;
-        if (cell < 6 || value == 0) {
+        value = (((value & 0x0F) << 8) + (value >> 8)) / 5;
+        if (cell < 6) {
             Telemetry.value[TELEM_FRSKY_ALL_CELL] +=
               value - Telemetry.value[TELEM_FRSKY_CELL1 + cell];
             TELEMETRY_SetUpdated(TELEM_FRSKY_ALL_CELL);
 
             Telemetry.value[TELEM_FRSKY_CELL1 + cell] = value;
             TELEMETRY_SetUpdated(TELEM_FRSKY_CELL1 + cell);
+
             if (Telemetry.value[TELEM_FRSKY_MIN_CELL] == 0 ||
                 (value < Telemetry.value[TELEM_FRSKY_MIN_CELL])) {
                 Telemetry.value[TELEM_FRSKY_MIN_CELL] = value;
