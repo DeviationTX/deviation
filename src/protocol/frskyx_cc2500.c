@@ -825,8 +825,9 @@ static void initialize(int bind)
     seq_last_sent = 0;
     seq_last_rcvd = 8;
 
+    u32 seed = get_tx_id();
     while (!chanskip)
-        chanskip = (get_tx_id() & 0xfefefefe) % 47;
+        chanskip = (rand32_r(&seed, 0) & 0xfefefefe) % 47;
     while((chanskip - ctr) % 4)
         ctr = (ctr+1) % 4;
     counter_rst = (chanskip - ctr) >> 2;
