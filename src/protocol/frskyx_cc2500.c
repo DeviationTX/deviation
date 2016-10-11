@@ -827,7 +827,9 @@ static void initialize(int bind)
     ctr = 0;
     seq_last_sent = 0;
     seq_last_rcvd = 8;
+#if HAS_EXTENDED_TELEMETRY
     Telemetry.value[TELEM_FRSKY_MIN_CELL] = TELEMETRY_GetMaxValue(TELEM_FRSKY_MIN_CELL);
+#endif
 
     while (!chanskip)
         chanskip = (get_tx_id() & 0xfefefefe) % 47;
