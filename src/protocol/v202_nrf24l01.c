@@ -70,7 +70,11 @@ enum {
     // flags going to byte 10
     FLAG_HEADLESS  = 0x0200,
     FLAG_MAG_CAL_X = 0x0800,
-    FLAG_MAG_CAL_Y = 0x2000
+    FLAG_MAG_CAL_Y = 0x2000,
+    FLAG_START_STOP= 0x0040, // arm / disarm JXD-506
+    FLAG_EMERGENCY = 0x8000, // JXD-506
+    FLAG_CAMERA_UP = 0x0001, // JXD-506   
+    FLAG_CAMERA_DN = 0x0002, // JXD-506
 };
 
 // For code readability
@@ -116,6 +120,7 @@ enum {
 //#define USE_BLINK_OPTION
 
 static const char * const v202_opts[] = {
+  _tr_noop("Format"), "V202", "JXD-506", NULL,
   _tr_noop("Re-bind"),  _tr_noop("No"), _tr_noop("Yes"), NULL,
   _tr_noop("250kbps"),  _tr_noop("No"), _tr_noop("Yes"), NULL,
 #if defined(USE_BLINK_OPTION)
@@ -124,7 +129,8 @@ static const char * const v202_opts[] = {
   NULL
 };
 enum {
-    PROTOOPTS_STARTBIND = 0,
+    PROTOOPTS_FORMAT = 0,
+    PROTOOPTS_STARTBIND,
     PROTOOPTS_BITRATE,
 #if defined(USE_BLINK_OPTION)
     PROTOOPTS_USEBLINK,
@@ -132,6 +138,11 @@ enum {
     LAST_PROTO_OPT,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
+
+enum{
+    FORMAT_V202 = 0,
+    FORMAT_JXD506,
+};
 
 enum {
     STARTBIND_NO  = 0,
@@ -386,13 +397,32 @@ static void read_controls(u8* throttle, u8* rudder, u8* elevator, u8* aileron,
     if (num_channels < 9 || Channels[CHANNEL9] <= 0) *flags &= ~FLAG_HEADLESS;
     else *flags |= FLAG_HEADLESS;
 
-    // Channel 10
-    if (num_channels < 10 || Channels[CHANNEL10] <= 0) *flags &= ~FLAG_MAG_CAL_X;
-    else *flags |= FLAG_MAG_CAL_X;
+    if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_JXD506) {
+        // Channel 10
+        if (num_channels < 10 || Channels[CHANNEL10] <= 0) *flags &= ~FLAG_START_STOP;
+        else *flags |= FLAG_START_STOP;
 
-    // Channel 10
-    if (num_channels < 11 || Channels[CHANNEL11] <= 0) *flags &= ~FLAG_MAG_CAL_Y;
-    else *flags |= FLAG_MAG_CAL_Y;
+        // Channel 11
+        if (num_channels < 11 || Channels[CHANNEL11] <= 0) *flags &= ~FLAG_EMERGENCY;
+        else *flags |= FLAG_EMERGENCY;
+        
+        // Channel 12 down
+        if (num_channels < 11 || Channels[CHANNEL11] >= CHAN_MIN_VALUE/2) *flags &= ~FLAG_CAMERA_DN;
+        else *flags |= FLAG_CAMERA_DN;
+        
+        // Channel 12 up
+        if (num_channels < 11 || Channels[CHANNEL11] <= CHAN_MAX_VALUE/2) *flags &= ~FLAG_CAMERA_UP;
+        else *flags |= FLAG_CAMERA_UP;
+    }
+    else {
+        // Channel 10
+        if (num_channels < 10 || Channels[CHANNEL10] <= 0) *flags &= ~FLAG_MAG_CAL_X;
+        else *flags |= FLAG_MAG_CAL_X;
+
+        // Channel 11
+        if (num_channels < 11 || Channels[CHANNEL11] <= 0) *flags &= ~FLAG_MAG_CAL_Y;
+        else *flags |= FLAG_MAG_CAL_Y;
+    }
 
     // Print channels every second or so
     if ((packet_counter & 0xFF) == 1) {
@@ -592,7 +622,7 @@ const void *V202_Cmds(enum ProtoCmds cmd)
             return (void *)(NRF24L01_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return (void *)0L; //Never Autobind
         case PROTOCMD_BIND:  initialize(1); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 11L; // T, R, E, A, LED (on/off/blink), Auto flip, camera, video, headless, X-Y calibration
+        case PROTOCMD_NUMCHAN: return (void *) 12L; // T, R, E, A, LED (on/off/blink), Auto flip, camera, video, headless, X-Y calibration
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)6L;
         // TODO: return id correctly
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
