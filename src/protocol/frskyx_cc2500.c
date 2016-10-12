@@ -371,26 +371,6 @@ static void frskyX_data_frame() {
 
 #include "frsky_d_telem._c"
 
-// helper functions
-static void update_cell(u8 cell, s32 value) {
-    if (cell < 6) {
-        Telemetry.value[TELEM_FRSKY_ALL_CELL] += value - Telemetry.value[TELEM_FRSKY_CELL1 + cell];
-        TELEMETRY_SetUpdated(TELEM_FRSKY_ALL_CELL);    // battery total
-
-        set_telemetry(TELEM_FRSKY_CELL1 + cell, value);
-    }
-}
-
-#define MIN(a,b) ((a) < (b) ? a : b)
-static void update_min_cell(u8 num_cells) {
-    Telemetry.value[TELEM_FRSKY_MIN_CELL] = Telemetry.value[TELEM_FRSKY_CELL1];
-    for (int i=1; i < MIN(num_cells, 6); i++) {
-        if (Telemetry.value[TELEM_FRSKY_CELL1 + i] < Telemetry.value[TELEM_FRSKY_MIN_CELL])
-            Telemetry.value[TELEM_FRSKY_MIN_CELL] = Telemetry.value[TELEM_FRSKY_CELL1 + i];
-    }
-    TELEMETRY_SetUpdated(TELEM_FRSKY_MIN_CELL);
-}
-
 
 static void processSportPacket(u8 *packet) {
 //    u8  instance = (packet[0] & 0x1F) + 1;    // all instances of same sensor write to same telemetry value
