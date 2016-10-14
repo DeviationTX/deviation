@@ -110,6 +110,7 @@ enum {
 
 static const char * const yd717_opts[] = {
   _tr_noop("Format"),  "YD717", "Sky Wlkr", "XinXun", "Ni Hui", "SymaX4", NULL,
+  _tr_noop("USE A.ACK"),  _tr_noop("Yes"), _tr_noop("No"), NULL,
 #ifdef YD717_TELEMETRY
   _tr_noop("Telemetry"),  _tr_noop("Off"), _tr_noop("On"), NULL,
 #endif
@@ -117,6 +118,7 @@ static const char * const yd717_opts[] = {
 };
 enum {
     PROTOOPTS_FORMAT = 0,
+    PROTOOPTS_SKIPAACK,
 #ifdef YD717_TELEMETRY
     PROTOOPTS_TELEMETRY,
 #endif
@@ -129,6 +131,9 @@ ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 #define FORMAT_XINXUN  2
 #define FORMAT_NI_HUI  3
 #define FORMAT_SYMAX2  4
+
+#define AUTO_ACK_ENABLE   0
+#define AUTO_ACK_DISSABLE 1
 
 #ifdef YD717_TELEMETRY
 #define TELEM_OFF 0
@@ -147,6 +152,9 @@ enum {
 
 static u8 packet_ack()
 {
+    if (Model.proto_opts[PROTOOPTS_SKIPAACK] == AUTO_ACK_DISSABLE)
+        return PKT_ACKED;
+
     switch (NRF24L01_ReadReg(NRF24L01_07_STATUS) & (BV(NRF24L01_07_TX_DS) | BV(NRF24L01_07_MAX_RT))) {
     case BV(NRF24L01_07_TX_DS):
         return PKT_ACKED;
@@ -299,7 +307,12 @@ static void yd717_init()
     // CRC, radio on
     NRF24L01_SetTxRxMode(TX_EN);
     NRF24L01_WriteReg(NRF24L01_00_CONFIG, BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_PWR_UP)); 
-    NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x3F);      // Auto Acknoledgement on all data pipes
+    
+    if (Model.proto_opts[PROTOOPTS_SKIPAACK] == AUTO_ACK_DISSABLE)
+        NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);      // No- Auto Acknoledgement
+    else    
+        NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x3F);      // Auto Acknoledgement on all data pipes
+    
     NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x3F);  // Enable all data pipes
     NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x03);   // 5-byte RX/TX address
     NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0x1A); // 500uS retransmit t/o, 10 tries

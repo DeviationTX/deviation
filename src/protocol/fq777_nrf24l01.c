@@ -39,21 +39,20 @@
 #include "iface_nrf24l01.h"
 
 #ifdef EMULATOR
-#define USE_FIXED_MFGID
-#define BIND_COUNT 20
-#define dbgprintf printf
+    #define USE_FIXED_MFGID
+    #define BIND_COUNT 20
+    #define dbgprintf printf
 #else
-#define BIND_COUNT 1000
-//printf inside an interrupt handler is really dangerous
-//this shouldn't be enabled even in debug builds without explicitly
-//turning it on
-#define dbgprintf if(0) printf
+    #define BIND_COUNT 1000
+    //printf inside an interrupt handler is really dangerous
+    //this shouldn't be enabled even in debug builds without explicitly
+    //turning it on
+    #define dbgprintf if(0) printf
 #endif
 
 #define INITIAL_WAIT    500
 #define PACKET_PERIOD   2000
 #define PACKET_SIZE     8
-#define BIND_COUNT      1000
 #define NUM_RF_CHANNELS 4
 
 enum {
