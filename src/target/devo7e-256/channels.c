@@ -31,24 +31,57 @@
 #define SWITCH_3x2  ((1 << INP_SWA0) | (1 << INP_SWA1) | (1 << INP_SWA2) \
                    | (1 << INP_SWB0) | (1 << INP_SWB1) | (1 << INP_SWB2))
 #define SWITCH_3x1  ((1 << INP_SWA0) | (1 << INP_SWA1) | (1 << INP_SWA2))
-#define SWITCH_2x2  ((1 << INP_SWE0) | (1 << INP_SWE1) \
+#define SWITCH_2x8  ((1 << INP_SWH0) | (1 << INP_SWH1) \
+                   | (1 << INP_SWG0) | (1 << INP_SWG1) \
+                   | (1 << INP_SWF0) | (1 << INP_SWF1) \
+                   | (1 << INP_SWE0) | (1 << INP_SWE1) \
+                   | (1 << INP_SWD0) | (1 << INP_SWD1) \
+                   | (1 << INP_SWC0) | (1 << INP_SWC1) \
+                   | (1 << INP_SWB0) | (1 << INP_SWB1) \
+                   | (1 << INP_SWA0) | (1 << INP_SWA1))
+#define SWITCH_2x7  ((1 << INP_SWH0) | (1 << INP_SWH1) \
+                   | (1 << INP_SWG0) | (1 << INP_SWG1) \
+                   | (1 << INP_SWF0) | (1 << INP_SWF1) \
+                   | (1 << INP_SWE0) | (1 << INP_SWE1) \
+                   | (1 << INP_SWD0) | (1 << INP_SWD1) \
+                   | (1 << INP_SWC0) | (1 << INP_SWC1) \
+                   | (1 << INP_SWB0) | (1 << INP_SWB1))
+#define SWITCH_2x6  ((1 << INP_SWH0) | (1 << INP_SWH1) \
+                   | (1 << INP_SWG0) | (1 << INP_SWG1) \
+                   | (1 << INP_SWF0) | (1 << INP_SWF1) \
+                   | (1 << INP_SWE0) | (1 << INP_SWE1) \
+                   | (1 << INP_SWD0) | (1 << INP_SWD1) \
+                   | (1 << INP_SWC0) | (1 << INP_SWC1))
+#define SWITCH_2x5  ((1 << INP_SWH0) | (1 << INP_SWH1) \
+                   | (1 << INP_SWG0) | (1 << INP_SWG1) \
+                   | (1 << INP_SWF0) | (1 << INP_SWF1) \
+                   | (1 << INP_SWE0) | (1 << INP_SWE1) \
+                   | (1 << INP_SWD0) | (1 << INP_SWD1))
+#define SWITCH_2x4  ((1 << INP_SWH0) | (1 << INP_SWH1) \
+                   | (1 << INP_SWG0) | (1 << INP_SWG1) \
+                   | (1 << INP_SWF0) | (1 << INP_SWF1) \
+                   | (1 << INP_SWE0) | (1 << INP_SWE1))
+#define SWITCH_2x3  ((1 << INP_SWH0) | (1 << INP_SWH1) \
+                   | (1 << INP_SWG0) | (1 << INP_SWG1) \
                    | (1 << INP_SWF0) | (1 << INP_SWF1))
-#define SWITCH_2x1  ((1 << INP_SWE0) | (1 << INP_SWE1))
+#define SWITCH_2x2  ((1 << INP_SWH0) | (1 << INP_SWH1) \
+                   | (1 << INP_SWG0) | (1 << INP_SWG1))
+#define SWITCH_2x1  ((1 << INP_SWH0) | (1 << INP_SWH1))
 #define SWITCH_STOCK ((1 << INP_HOLD0) | (1 << INP_HOLD1) \
                     | (1 << INP_FMOD0) | (1 << INP_FMOD1))
 
 //Duplicated in tx_buttons.c
 enum {
-  SW_A0 = 23,
-  SW_A2,
-  SW_B0,
-  SW_B2,
-  SW_C0,
-  SW_C2,
-  SW_D0,
-  SW_D2,
-  SW_E0,
-  SW_F0
+  SW_01 = 23,
+  SW_02,
+  SW_03,
+  SW_04,
+  SW_05,
+  SW_06,
+  SW_07,
+  SW_08,
+  SW_09,
+  SW_10
 };
 
 #define POT_2  ((1 << INP_AUX4) | (1 << INP_AUX5))
@@ -82,17 +115,15 @@ void CHAN_Init()
     gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO4);
 
     /* configure switches for digital I/O */
-    if ((~Transmitter.ignore_src & SWITCH_3x3) == SWITCH_3x3) {
-      gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN,
-                     GPIO10 | GPIO11);
-      gpio_set(GPIOC, GPIO10 | GPIO11);
-    }
+    gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN,
+                   GPIO10 | GPIO11);
+    gpio_set(GPIOC, GPIO10 | GPIO11);
 }
 
 s32 CHAN_ReadRawInput(int channel)
 {
     s32 value = 0;
-    if ((~Transmitter.ignore_src & SWITCH_3x3) != SWITCH_3x3) {
+    if ((~Transmitter.ignore_src & SWITCH_STOCK) == SWITCH_STOCK) {
       switch(channel) {
         case INP_HOLD0:    value = gpio_get(GPIOC, GPIO11); break;
         case INP_HOLD1:    value = ! gpio_get(GPIOC, GPIO11); break;
@@ -104,29 +135,93 @@ s32 CHAN_ReadRawInput(int channel)
         case INP_SWB0:     value = global_extra_switches   & 0x01;  break;
         case INP_SWB1:     value = !(global_extra_switches & 0x03); break;
         case INP_SWB2:     value = global_extra_switches   & 0x02;  break;
-        case INP_SWE0:     value = global_extra_switches   & 0x04;  break;
-        case INP_SWE1:     value = !(global_extra_switches & 0x0c); break;
-        case INP_SWF0:     value = global_extra_switches   & 0x01;  break;
-        case INP_SWF1:     value = !(global_extra_switches & 0x03); break;
+        case INP_SWG0:     value = global_extra_switches   & 0x04;  break;
+        case INP_SWG1:     value = !(global_extra_switches & 0x0c); break;
+        case INP_SWH0:     value = global_extra_switches   & 0x01;  break;
+        case INP_SWH1:     value = !(global_extra_switches & 0x03); break;
       }
     } else {
+      if ((~Transmitter.ignore_src & SWITCH_3x1) == SWITCH_3x1) {
+        switch(channel) {
+          case INP_SWA0:  value = (global_extra_switches & (1 << (SW_01 - 1))); break;
+          case INP_SWA1:  value = (!(global_extra_switches & (1 << (SW_01 - 1))) && !(global_extra_switches & (1 << (SW_02 - 1)))); break;
+          case INP_SWA2:  value = (global_extra_switches & (1 << (SW_02 - 1))); break;
+        }
+      } else if ((~Transmitter.ignore_src & SWITCH_2x8) == SWITCH_2x8) {
+        switch(channel) {
+          case INP_SWA0:  value = !(global_extra_switches & (1 << (SW_03 - 1))); break;
+          case INP_SWA1:  value = (global_extra_switches & (1 << (SW_03 - 1))); break;
+        }
+      }
+      if ((~Transmitter.ignore_src & SWITCH_3x2) == SWITCH_3x2) {
+        switch(channel) {
+          case INP_SWB0:  value = (global_extra_switches & (1 << (SW_03 - 1))); break;
+          case INP_SWB1:  value = (!(global_extra_switches & (1 << (SW_03 - 1))) && !(global_extra_switches & (1 << (SW_04 - 1)))); break;
+          case INP_SWB2:  value = (global_extra_switches & (1 << (SW_04 - 1))); break;
+        }
+      } else if ((~Transmitter.ignore_src & SWITCH_2x7) == SWITCH_2x7) {
+        switch(channel) {
+          case INP_SWB0:  value = !(global_extra_switches & (1 << (SW_04 - 1))); break;
+          case INP_SWB1:  value = (global_extra_switches & (1 << (SW_04 - 1))); break;
+        }
+      }
+      if ((~Transmitter.ignore_src & SWITCH_3x3) == SWITCH_3x3) {
+        switch(channel) {
+          case INP_SWC0:  value = (global_extra_switches & (1 << (SW_05 - 1))); break;
+          case INP_SWC1:  value = (!(global_extra_switches & (1 << (SW_05 - 1))) && !(global_extra_switches & (1 << (SW_06 - 1)))); break;
+          case INP_SWC2:  value = (global_extra_switches & (1 << (SW_06 - 1))); break;
+        }
+      } else if ((~Transmitter.ignore_src & SWITCH_2x6) == SWITCH_2x6) {
+        switch(channel) {
+          case INP_SWC0:  value = !(global_extra_switches & (1 << (SW_05 - 1))); break;
+          case INP_SWC1:  value = (global_extra_switches & (1 << (SW_05 - 1))); break;
+        }
+      }
+      if ((~Transmitter.ignore_src & SWITCH_3x4) == SWITCH_3x4) {
+        switch(channel) {
+          case INP_SWD0:  value = (global_extra_switches & (1 << (SW_07 - 1))); break;
+          case INP_SWD1:  value = (!(global_extra_switches & (1 << (SW_07 - 1))) && !(global_extra_switches & (1 << (SW_08 - 1)))); break;
+          case INP_SWD2:  value = (global_extra_switches & (1 << (SW_08 - 1))); break;
+        }
+      } else if ((~Transmitter.ignore_src & SWITCH_2x5) == SWITCH_2x5) {
+        switch(channel) {
+          case INP_SWD0:  value = !(global_extra_switches & (1 << (SW_06 - 1))); break;
+          case INP_SWD1:  value = (global_extra_switches & (1 << (SW_06 - 1))); break;
+        }
+      }
+      if ((~Transmitter.ignore_src & SWITCH_2x4) == SWITCH_2x4) {
+        switch(channel) {
+          case INP_SWE0:  value = !(global_extra_switches & (1 << (SW_07 - 1))); break;
+          case INP_SWE1:  value = (global_extra_switches & (1 << (SW_07 - 1))); break;
+        }
+      }
+      if ((~Transmitter.ignore_src & SWITCH_2x3) == SWITCH_2x3) {
+        switch(channel) {
+          case INP_SWF0:  value = !(global_extra_switches & (1 << (SW_08 - 1))); break;
+          case INP_SWF1:  value = (global_extra_switches & (1 << (SW_08 - 1))); break;
+        }
+      }
+      if ((~Transmitter.ignore_src & SWITCH_2x2) == SWITCH_2x2) {
+        switch(channel) {
+          case INP_SWG0:  value = !(global_extra_switches & (1 << (SW_09 - 1))); break;
+          case INP_SWG1:  value = (global_extra_switches & (1 << (SW_09 - 1))); break;
+        }
+      }
+      if ((~Transmitter.ignore_src & SWITCH_2x1) == SWITCH_2x1) {
+        switch(channel) {
+          case INP_SWH0:  value = !(global_extra_switches & (1 << (SW_10 - 1))); break;
+          case INP_SWH1:  value = (global_extra_switches & (1 << (SW_10 - 1))); break;
+        }
+      }
+    }
+    if ((~Transmitter.ignore_src & POT_1) == POT_1) {
       switch(channel) {
-        case INP_SWA0:  value = (global_extra_switches & (1 << (SW_A0 - 1))); break;
-        case INP_SWA1:  value = (!(global_extra_switches & (1 << (SW_A0 - 1))) && !(global_extra_switches & (1 << (SW_A2 - 1)))); break;
-        case INP_SWA2:  value = (global_extra_switches & (1 << (SW_A2 - 1))); break;
-        case INP_SWB0:  value = (global_extra_switches & (1 << (SW_B0 - 1))); break;
-        case INP_SWB1:  value = (!(global_extra_switches & (1 << (SW_B0 - 1))) && !(global_extra_switches & (1 << (SW_B2 - 1)))); break;
-        case INP_SWB2:  value = (global_extra_switches & (1 << (SW_B2 - 1))); break;
-        case INP_SWC0:  value = (global_extra_switches & (1 << (SW_C0 - 1))); break;
-        case INP_SWC1:  value = (!(global_extra_switches & (1 << (SW_C0 - 1))) && !(global_extra_switches & (1 << (SW_C2 - 1)))); break;
-        case INP_SWC2:  value = (global_extra_switches & (1 << (SW_C2 - 1))); break;
-        case INP_SWD0:  value = (global_extra_switches & (1 << (SW_D0 - 1))); break;
-        case INP_SWD1:  value = (!(global_extra_switches & (1 << (SW_D0 - 1))) && !(global_extra_switches & (1 << (SW_D2 - 1)))); break;
-        case INP_SWD2:  value = (global_extra_switches & (1 << (SW_D2 - 1))); break;
-        case INP_SWE0:  value = !(global_extra_switches & (1 << (SW_E0 - 1))); break;
-        case INP_SWE1:  value = (global_extra_switches & (1 << (SW_E0 - 1))); break;
-        case INP_SWF0:  value = !(global_extra_switches & (1 << (SW_F0 - 1))); break;
-        case INP_SWF1:  value = (global_extra_switches & (1 << (SW_F0 - 1))); break;
+        case INP_AUX4: value = adc_array_raw[4]; break;
+      }
+    }
+    if ((~Transmitter.ignore_src & POT_2) == POT_2) {
+      switch(channel) {
+        case INP_AUX5:  value = adc_array_raw[5]; break;
       }
     }
     switch(channel) {
@@ -134,8 +229,6 @@ s32 CHAN_ReadRawInput(int channel)
       case INP_AILERON:   value = adc_array_raw[1]; break;  // bug fix: right horizon
       case INP_RUDDER: value = adc_array_raw[2]; break;  // bug fix: left horizon
       case INP_ELEVATOR:  value = adc_array_raw[3]; break;  // bug fix: left vertical
-      case INP_AUX4: value = adc_array_raw[4]; break;  // bug fix: left horizon
-      case INP_AUX5:  value = adc_array_raw[5]; break;  // bug fix: left vertical
     }
     return value;
 }
@@ -181,6 +274,18 @@ void CHAN_SetSwitchCfg(const char *str)
         Transmitter.ignore_src &= ~SWITCH_3x2;
     } else if(strcmp(str, "3x1") == 0) {
         Transmitter.ignore_src &= ~SWITCH_3x1;
+    } else if(strcmp(str, "2x8") == 0) {
+        Transmitter.ignore_src &= ~SWITCH_2x8;
+    } else if(strcmp(str, "2x7") == 0) {
+        Transmitter.ignore_src &= ~SWITCH_2x7;
+    } else if(strcmp(str, "2x6") == 0) {
+        Transmitter.ignore_src &= ~SWITCH_2x6;
+    } else if(strcmp(str, "2x5") == 0) {
+        Transmitter.ignore_src &= ~SWITCH_2x5;
+    } else if(strcmp(str, "2x4") == 0) {
+        Transmitter.ignore_src &= ~SWITCH_2x4;
+    } else if(strcmp(str, "2x3") == 0) {
+        Transmitter.ignore_src &= ~SWITCH_2x3;
     } else if(strcmp(str, "2x2") == 0) {
         Transmitter.ignore_src &= ~SWITCH_2x2;
     } else if(strcmp(str, "2x1") == 0) {
@@ -189,10 +294,9 @@ void CHAN_SetSwitchCfg(const char *str)
         Transmitter.ignore_src &= ~POT_2;
     } else if(strcmp(str, "potx1") == 0) {
         Transmitter.ignore_src &= ~POT_1;
+    } else if(strcmp(str, "nostock") == 0) {
+        Transmitter.ignore_src |= SWITCH_STOCK;
     } else {
         Transmitter.ignore_src = ~IGNORE_MASK & ~SWITCH_STOCK;
-    }
-    if ((~Transmitter.ignore_src & SWITCH_3x3) == SWITCH_3x3) {
-        Transmitter.ignore_src |= SWITCH_STOCK;
     }
 }
