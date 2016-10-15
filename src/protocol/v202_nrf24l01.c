@@ -71,10 +71,14 @@ enum {
     FLAG_HEADLESS  = 0x0200,
     FLAG_MAG_CAL_X = 0x0800,
     FLAG_MAG_CAL_Y = 0x2000,
-    FLAG_START_STOP= 0x0040, // arm / disarm JXD-506
     FLAG_EMERGENCY = 0x8000, // JXD-506
-    FLAG_CAMERA_UP = 0x0001, // JXD-506   
-    FLAG_CAMERA_DN = 0x0002, // JXD-506
+};
+
+enum {
+    // flags going to byte 11 (JXD-506)
+    FLAG_START_STOP = 0x40,
+    FLAG_CAMERA_UP = 0x0001,   
+    FLAG_CAMERA_DN = 0x0002,
 };
 
 // For code readability
@@ -89,7 +93,8 @@ enum {
     CHANNEL8,
     CHANNEL9,
     CHANNEL10,
-    CHANNEL11
+    CHANNEL11,
+    CHANNEL12
 };
 
 #define PAYLOADSIZE 16
@@ -398,21 +403,9 @@ static void read_controls(u8* throttle, u8* rudder, u8* elevator, u8* aileron,
     else *flags |= FLAG_HEADLESS;
 
     if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_JXD506) {
-        // Channel 10
-        if (num_channels < 10 || Channels[CHANNEL10] <= 0) *flags &= ~FLAG_START_STOP;
-        else *flags |= FLAG_START_STOP;
-
         // Channel 11
         if (num_channels < 11 || Channels[CHANNEL11] <= 0) *flags &= ~FLAG_EMERGENCY;
         else *flags |= FLAG_EMERGENCY;
-        
-        // Channel 12 down
-        if (num_channels < 11 || Channels[CHANNEL11] >= CHAN_MIN_VALUE/2) *flags &= ~FLAG_CAMERA_DN;
-        else *flags |= FLAG_CAMERA_DN;
-        
-        // Channel 12 up
-        if (num_channels < 11 || Channels[CHANNEL11] <= CHAN_MAX_VALUE/2) *flags &= ~FLAG_CAMERA_UP;
-        else *flags |= FLAG_CAMERA_UP;
     }
     else {
         // Channel 10
@@ -435,6 +428,7 @@ static void read_controls(u8* throttle, u8* rudder, u8* elevator, u8* aileron,
     }
 }
 
+#define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
 static void send_packet(u8 bind)
 {
     if (bind) {
@@ -469,6 +463,17 @@ static void send_packet(u8 bind)
     packet[11] = 0x00;
     packet[12] = 0x00;
     packet[13] = 0x00;
+    if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_JXD506) {
+        packet[11] = GET_FLAG(CHANNEL10, FLAG_START_STOP);
+        if(Model.num_channels >= 12) {
+            if(Channels[CHANNEL12] <= CHAN_MIN_VALUE / 2)
+                packet[11] |= FLAG_CAMERA_DN;
+            else if(Channels[CHANNEL12] >= CHAN_MAX_VALUE / 2)
+                packet[11] |= FLAG_CAMERA_UP;
+        }
+        packet[12] = 0x40; // ?
+        packet[13] = 0x40; // ?
+    }
     //
     packet[14] = flags & 0xff;
     add_pkt_checksum();
