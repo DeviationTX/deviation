@@ -371,23 +371,6 @@ static void frskyX_data_frame() {
 
 #include "frsky_d_telem._c"
 
-// helper functions
-static void update_cell(u8 cell, s32 value) {
-    if (cell < 6) {
-        Telemetry.value[TELEM_FRSKY_ALL_CELL] += value - Telemetry.value[TELEM_FRSKY_CELL1 + cell];
-        TELEMETRY_SetUpdated(TELEM_FRSKY_ALL_CELL);    // battery total
-
-        set_telemetry(TELEM_FRSKY_CELL1 + cell, value);
-    }
-}
-
-static void update_min_cell(u8 num_cells) {
-    for (int i=0; i < num_cells; i++) {
-        if (Telemetry.value[TELEM_FRSKY_CELL1 + i] < Telemetry.value[TELEM_FRSKY_MIN_CELL])
-            set_telemetry(TELEM_FRSKY_MIN_CELL, Telemetry.value[TELEM_FRSKY_CELL1 + i]);
-    }
-}
-
 
 static void processSportPacket(u8 *packet) {
 //    u8  instance = (packet[0] & 0x1F) + 1;    // all instances of same sensor write to same telemetry value
@@ -454,10 +437,10 @@ static void processSportPacket(u8 *packet) {
         set_telemetry(TELEM_FRSKY_TEMP2, data);
         break;
     case RPM_FIRST_ID & 0xfff0:
-        set_telemetry(TELEM_FRSKY_RPM, data * 60);
+        set_telemetry(TELEM_FRSKY_RPM, data);
         break;
     case FUEL_FIRST_ID & 0xfff0:
-        set_telemetry(TELEM_FRSKY_FUEL, data * 60);
+        set_telemetry(TELEM_FRSKY_FUEL, data);
         break;
 
     case GPS_LONG_LATI_FIRST_ID & 0xfff0:{
@@ -481,11 +464,11 @@ static void processSportPacket(u8 *packet) {
         break;}
 
     case GPS_ALT_FIRST_ID & 0xfff0:
-        Telemetry.gps.altitude = data / 100;
+        Telemetry.gps.altitude = data * 10;
         TELEMETRY_SetUpdated(TELEM_GPS_ALT);
         break;
     case GPS_SPEED_FIRST_ID & 0xfff0:
-        Telemetry.gps.velocity = data * 5556 / 1080;
+        Telemetry.gps.velocity = data * 5556 / 10800;
         TELEMETRY_SetUpdated(TELEM_GPS_SPEED);
         break;
     case GPS_COURS_FIRST_ID & 0xfff0:
@@ -501,8 +484,8 @@ static void processSportPacket(u8 *packet) {
             Telemetry.gps.time = ( (u32)fr_gps.year & 0x3f)            << 26
                                | (((u32)fr_gps.day_month >> 8) & 0x0f) << 22
                                | ( (u32)fr_gps.day_month & 0x1f)       << 17
-                               | ( (u32)fr_gps.hour_min & 0x1f)        << 12
-                               | (((u32)fr_gps.hour_min >> 8) & 0x3f)  << 6
+                               | (((u32)fr_gps.hour_min >> 8) & 0x1f)  << 12
+                               | ( (u32)fr_gps.hour_min & 0x3f)        << 6
                                | ( (u32)fr_gps.second & 0x3f);
             TELEMETRY_SetUpdated(TELEM_GPS_TIME);
         }
@@ -824,6 +807,9 @@ static void initialize(int bind)
     ctr = 0;
     seq_last_sent = 0;
     seq_last_rcvd = 8;
+#if HAS_EXTENDED_TELEMETRY
+    Telemetry.value[TELEM_FRSKY_MIN_CELL] = TELEMETRY_GetMaxValue(TELEM_FRSKY_MIN_CELL);
+#endif
 
     u32 seed = get_tx_id();
     while (!chanskip)
