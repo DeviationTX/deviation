@@ -61,7 +61,12 @@
 #endif //_PWM_PIN
 
 #ifndef _USART
-    #define _USART USART1
+    #define _USART               USART1
+    #define _USART_DR            USART1_DR
+    #define _USART_DMA           DMA1
+    #define _USART_DMA_CHANNEL   DMA_CHANNEL4
+    #define _USART_DMA_ISR       dma1_channel4_isr
+    #define _USART_NVIC_DMA_CHANNEL_IRQ   NVIC_DMA1_CHANNEL4_IRQ
 #endif
 
 #ifndef SYSCLK_TIM // System-clock timer

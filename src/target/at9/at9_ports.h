@@ -11,7 +11,15 @@
     #define _SPI_FLASH_MISO_PIN      {GPIOB, GPIO14}
     #define _SPI_FLASH_MOSI_PIN      {GPIOB, GPIO15}
 
-#define _USART USART1
+#ifndef _USART
+    #define _USART               USART1
+    #define _USART_DR            USART1_DR
+    #define _USART_DMA           DMA1
+    #define _USART_DMA_CHANNEL   DMA_CHANNEL4
+    #define _USART_DMA_ISR       dma1_channel4_isr
+    #define _USART_NVIC_DMA_CHANNEL_IRQ   NVIC_DMA1_CHANNEL4_IRQ
+#endif
+
 #define ADC_OVERSAMPLE_WINDOW_COUNT 1
     #define _ADC                    ADC1
     #define _RCC_APB2ENR_ADCEN      RCC_APB2ENR_ADC1EN
