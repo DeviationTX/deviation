@@ -72,7 +72,6 @@ enum{
 };
 
 static const char * const afhds2a_opts[] = {
-    //_tr_noop("PPM"), _tr_noop("Off"), _tr_noop("On"), NULL,
     _tr_noop("Outputs"), "PWM/IBUS", "PPM/IBUS", "PWM/SBUS", "PPM/SBUS", NULL,
     _tr_noop("Servo Hz"), "50", "400", "5", NULL,
     "RX ID", "-32768", "32767", "1", NULL, // todo: store that elsewhere
@@ -88,7 +87,6 @@ enum {
 };
 
 enum {
-    //PROTOOPTS_PPM = 0,
     PROTOOPTS_OUTPUTS = 0,
     PROTOOPTS_SERVO_HZ,
     PROTOOPTS_RXID, // todo: store that elsewhere
@@ -234,7 +232,6 @@ static void build_settings_packet()
     packet[10]= 0xff;
     packet[11]= Model.proto_opts[PROTOOPTS_SERVO_HZ] & 0xff;
     packet[12]= (Model.proto_opts[PROTOOPTS_SERVO_HZ] >> 8) & 0xff;
-    //packet[13]= Model.proto_opts[PROTOOPTS_PPM];
     if(Model.proto_opts[PROTOOPTS_OUTPUTS] == PPM_IBUS || Model.proto_opts[PROTOOPTS_OUTPUTS] == PPM_SBUS)
         packet[13] = 0x01; // PPM output enabled
     else
