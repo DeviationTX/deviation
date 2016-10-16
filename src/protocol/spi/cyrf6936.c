@@ -289,14 +289,14 @@ void CYRF_FindBestChannels(u8 *channels, u8 len, u8 minspace, u8 min, u8 max)
     #define NUM_FREQ 80
     #define FREQ_OFFSET 4
     u8 rssi[NUM_FREQ];
+    int i;
+    int j;
 
     if (min < FREQ_OFFSET)
         min = FREQ_OFFSET;
     if (max > NUM_FREQ)
         max = NUM_FREQ;
 
-    int i;
-    int j;
     memset(channels, 0, sizeof(u8) * len);
     CYRF_ConfigCRCSeed(0x0000);
     CYRF_SetTxRxMode(RX_EN);
@@ -304,10 +304,14 @@ void CYRF_FindBestChannels(u8 *channels, u8 len, u8 minspace, u8 min, u8 max)
     Delay(1000);
     for(i = 0; i < NUM_FREQ; i++) {
         CYRF_ConfigRFChannel(i);
-        CYRF_ReadRegister(CYRF_13_RSSI);
-        CYRF_StartReceive();
-        Delay(10);
-        rssi[i] = CYRF_ReadRegister(CYRF_13_RSSI);
+        Delay(270); //slow channel require 270usec for synthesizer to settle
+        if ( !(CYRF_ReadRegister(CYRF_05_RX_CTRL) & 0x80)) {
+            CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x80); //Prepare to receive
+            Delay(10);
+            CYRF_ReadRegister(CYRF_13_RSSI); //dummy read
+            Delay(15); //conversion can occur as often as once every 12us
+        }
+        rssi[i] = CYRF_ReadRegister(CYRF_13_RSSI) & 0x1F;        
     }
 
     for (i = 0; i < len; i++) {
@@ -315,8 +319,7 @@ void CYRF_FindBestChannels(u8 *channels, u8 len, u8 minspace, u8 min, u8 max)
         for (j = min; j < max; j++) {
             if (rssi[j] < rssi[channels[i]]) {
                 channels[i] = j;
-            }
-            
+            }            
         }
         for (j = channels[i] - minspace; j < channels[i] + minspace; j++) {
             //Ensure we don't reuse any channels within minspace of the selected channel again
