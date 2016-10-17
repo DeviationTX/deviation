@@ -392,10 +392,11 @@ static void serial_echo(u8 *packet) {
 
 static void processSportPacket(u8 *packet) {
 //    u8  instance = (packet[0] & 0x1F) + 1;    // all instances of same sensor write to same telemetry value
-    u8  prim                = packet[1];
-    u16 id                  = *((u16 *)(packet+2));
+    u8  prim = packet[1];
+    u16 id = *((u16 *)(packet+2));
 
-    serial_echo(packet);   // echo to trainer port
+    if (!PPMin_Mode())
+        serial_echo(packet);   // echo to trainer port
 
     if (prim != DATA_FRAME)
         return;
