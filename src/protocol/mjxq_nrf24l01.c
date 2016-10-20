@@ -92,6 +92,7 @@ enum {
     CHANNEL12,    // Camera tilt
 };
 #define CHANNEL_LED         CHANNEL5
+#define CHANNEL_ARM         CHANNEL5  // H26WH
 #define CHANNEL_FLIP        CHANNEL6
 #define CHANNEL_PICTURE     CHANNEL7
 #define CHANNEL_VIDEO       CHANNEL8
@@ -209,8 +210,8 @@ static void send_packet(u8 bind)
                        | GET_FLAG(CHANNEL_VIDEO, 0x10)
                        | GET_FLAG_INV(CHANNEL_LED, 0x20); // air/ground mode
             if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H26WH) {
-                packet[14] &= ~0x04;
-                packet[14] |= 0x02;
+                packet[14] &= ~0x24;
+                packet[14] |= GET_FLAG(CHANNEL_ARM, 0x04);
             }
         }
         break;
