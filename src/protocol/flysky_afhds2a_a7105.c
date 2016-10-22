@@ -109,6 +109,7 @@ static int afhds2a_init()
             A7105_WriteReg(i, AFHDS2A_regs[i]);
 
     A7105_Strobe(A7105_STANDBY);
+    A7105_SetTxRxMode(TX_EN);
 
     //IF Filter Bank Calibration
     A7105_WriteReg(0x02, 1);
@@ -178,6 +179,7 @@ static int afhds2a_init()
     A7105_SetPower(Model.tx_power);
 
     A7105_Strobe(A7105_STANDBY);
+    A7105_SetTxRxMode(TX_EN);
     return 1;
 }
 
@@ -416,6 +418,7 @@ static u16 afhds2a_cb()
         case BIND2:
         case BIND3:    
             A7105_Strobe(A7105_STANDBY);
+            A7105_SetTxRxMode(TX_EN);
             build_bind_packet();
             A7105_WriteData(packet, 38, packet_count%2 ? 0x0d : 0x8c);
             if(A7105_ReadReg(0) == 0x1b) { // todo: replace with check crc+fec
@@ -438,6 +441,7 @@ static u16 afhds2a_cb()
         case BIND1|WAIT_WRITE:
         case BIND2|WAIT_WRITE:
         case BIND3|WAIT_WRITE:
+            A7105_SetTxRxMode(RX_EN);
             A7105_Strobe(A7105_RX);
             state &= ~WAIT_WRITE;
             state++;
@@ -447,6 +451,7 @@ static u16 afhds2a_cb()
         
         case BIND4:
             A7105_Strobe(A7105_STANDBY);
+            A7105_SetTxRxMode(TX_EN);
             build_bind_packet();
             A7105_WriteData(packet, 38, packet_count%2 ? 0x0d : 0x8c);
             packet_count++;
@@ -461,12 +466,14 @@ static u16 afhds2a_cb()
             return 1700;
             
         case BIND4|WAIT_WRITE:
+            A7105_SetTxRxMode(RX_EN);
             A7105_Strobe(A7105_RX);
             state &= ~WAIT_WRITE;
             return 2150;
         
         case DATA1:    
             A7105_Strobe(A7105_STANDBY);
+            A7105_SetTxRxMode(TX_EN);
             build_packet(packet_type);
             A7105_WriteData(packet, 38, hopping_frequency[channel++]);
             if(channel >= 16)
@@ -503,6 +510,7 @@ static u16 afhds2a_cb()
             
         case DATA1|WAIT_WRITE:
             state &= ~WAIT_WRITE;
+            A7105_SetTxRxMode(RX_EN);
             A7105_Strobe(A7105_RX);
             return 2150;
     }
