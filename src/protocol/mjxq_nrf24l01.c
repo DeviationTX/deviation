@@ -125,6 +125,20 @@ static const struct {
                      {{0xC8, 0x6E, 0x02}, {0x0A, 0x3C, 0x36, 0x3F}},
                      {{0x48, 0x6A, 0x40}, {0x0A, 0x43, 0x36, 0x3F}}};
 
+// captured from E010, H36 and H26WH stock transmitters
+static const struct {
+    u8 txid[2];
+    u8 rfchan[RF_NUM_CHANNELS];
+}
+e010_tx_rf_map[] = {{{0x4F, 0x1C}, {0x3A, 0x35, 0x4A, 0x45}},
+                    {{0x90, 0x1C}, {0x2E, 0x36, 0x3E, 0x46}}, 
+                    {{0x24, 0x36}, {0x32, 0x3E, 0x42, 0x4E}},
+                    {{0x7A, 0x40}, {0x2E, 0x3C, 0x3E, 0x4C}},
+                    {{0x61, 0x31}, {0x2F, 0x3B, 0x3F, 0x4B}},
+                    {{0x5D, 0x37}, {0x33, 0x3B, 0x43, 0x4B}},
+                    {{0xFD, 0x4F}, {0x33, 0x3B, 0x43, 0x4B}}, 
+                    {{0x86, 0x3C}, {0x34, 0x3E, 0x44, 0x4E}}};                     
+
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
 
@@ -364,13 +378,21 @@ static void mjxq_init()
 }
 
 static void mjxq_init2()
-{
-    if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H26D) {
-        memcpy(rf_channels, "\x32\x3e\x42\x4e", sizeof(rf_channels));
-    } else if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H26WH) {
-        memcpy(rf_channels, "\x47\x42\x37\x32", sizeof(rf_channels));
-    } else if (Model.proto_opts[PROTOOPTS_FORMAT] != FORMAT_WLH08 && Model.proto_opts[PROTOOPTS_FORMAT] != FORMAT_E010) {
-        memcpy(rf_channels, mjx_tx_rf_map[Model.fixed_id % (sizeof(mjx_tx_rf_map)/sizeof(mjx_tx_rf_map[0]))].rfchan, sizeof(rf_channels));
+{    
+    switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
+        case FORMAT_H26WH:
+        case FORMAT_E010:
+            memcpy(rf_channels, e010_tx_rf_map[Model.fixed_id % (sizeof(e010_tx_rf_map)/sizeof(e010_tx_rf_map[0]))].rfchan, sizeof(rf_channels));
+            break;
+        case FORMAT_H26D:
+            memcpy(rf_channels, "\x32\x3e\x42\x4e", sizeof(rf_channels));
+            break;
+        case FORMAT_WLH08:
+            // do nothing
+            break;
+        default:
+            memcpy(rf_channels, mjx_tx_rf_map[Model.fixed_id % (sizeof(mjx_tx_rf_map)/sizeof(mjx_tx_rf_map[0]))].rfchan, sizeof(rf_channels));
+            break;
     }
 }
 
@@ -426,22 +448,20 @@ static void initialize_txid()
     // Pump zero bytes for LFSR to diverge more
     for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
     
-    if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H26WH) {
-        memcpy(txid, "\xa4\x03\x00", sizeof(txid));
-    }
-    else if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_E010) {
-        // txid must be multiple of 8
-        txid[0] = (lfsr >> 16) & 0xf8;
-        txid[1] = ((lfsr >> 8 ) & 0xf0) | 0x0c;
-        txid[2] = lfsr & 0xf0;
-    }
-    else if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_WLH08) {
-        // txid must be multiple of 8
-        txid[0] = (lfsr >> 16) & 0xf8;
-        txid[1] = (lfsr >> 8 ) & 0xff;
-        txid[2] = lfsr & 0xff; 
-    } else {
-        memcpy(txid, mjx_tx_rf_map[Model.fixed_id % (sizeof(mjx_tx_rf_map)/sizeof(mjx_tx_rf_map[0]))].txid, sizeof(txid));
+    switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
+        case FORMAT_H26WH:
+        case FORMAT_E010:
+            memcpy(txid, e010_tx_rf_map[Model.fixed_id % (sizeof(e010_tx_rf_map)/sizeof(e010_tx_rf_map[0]))].txid, 2);
+            break;
+        case FORMAT_WLH08:
+            // txid must be multiple of 8
+            txid[0] = (lfsr >> 16) & 0xf8;
+            txid[1] = (lfsr >> 8 ) & 0xff;
+            txid[2] = lfsr & 0xff; 
+            break;
+        default:
+            memcpy(txid, mjx_tx_rf_map[Model.fixed_id % (sizeof(mjx_tx_rf_map)/sizeof(mjx_tx_rf_map[0]))].txid, sizeof(txid));
+            break;
     }
 }
 
