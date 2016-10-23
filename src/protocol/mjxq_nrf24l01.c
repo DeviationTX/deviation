@@ -456,6 +456,7 @@ static void initialize_txid()
             break;
         case FORMAT_E010:
             memcpy(txid, e010_tx_rf_map[Model.fixed_id % (sizeof(e010_tx_rf_map)/sizeof(e010_tx_rf_map[0]))].txid, 2);
+            txid[2] = 0x00;
             break;
         case FORMAT_WLH08:
             // txid must be multiple of 8
