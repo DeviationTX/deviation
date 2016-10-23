@@ -125,7 +125,7 @@ static const struct {
                      {{0xC8, 0x6E, 0x02}, {0x0A, 0x3C, 0x36, 0x3F}},
                      {{0x48, 0x6A, 0x40}, {0x0A, 0x43, 0x36, 0x3F}}};
 
-// captured from E010, H36 and H26WH stock transmitters
+// captured from E010 and H36 stock transmitters
 static const struct {
     u8 txid[2];
     u8 rfchan[RF_NUM_CHANNELS];
