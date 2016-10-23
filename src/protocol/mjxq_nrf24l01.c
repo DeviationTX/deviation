@@ -381,6 +381,8 @@ static void mjxq_init2()
 {    
     switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
         case FORMAT_H26WH:
+            memcpy(rf_channels, "\x47\x42\x37\x32", sizeof(rf_channels));
+            break;
         case FORMAT_E010:
             memcpy(rf_channels, e010_tx_rf_map[Model.fixed_id % (sizeof(e010_tx_rf_map)/sizeof(e010_tx_rf_map[0]))].rfchan, sizeof(rf_channels));
             break;
@@ -450,6 +452,8 @@ static void initialize_txid()
     
     switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
         case FORMAT_H26WH:
+            memcpy(txid, "\xa4\x03\x00", sizeof(txid));
+            break;
         case FORMAT_E010:
             memcpy(txid, e010_tx_rf_map[Model.fixed_id % (sizeof(e010_tx_rf_map)/sizeof(e010_tx_rf_map[0]))].txid, 2);
             break;
