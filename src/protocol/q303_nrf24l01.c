@@ -147,7 +147,7 @@ static void send_packet(u8 bind)
 {
     if(bind) {
         packet[0] = 0xaa;
-        memcpy(txid, &packet[1], 4);
+        memcpy(&packet[1], txid, 4);
         memset(&packet[5], 0, 5);
     }
     else {
