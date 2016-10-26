@@ -577,12 +577,18 @@ static void frsky_check_telemetry(u8 *pkt, u8 len) {
             TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT1);
         }
 
+        Telemetry.value[TELEM_FRSKY_LQI] = pkt[len-1] & 0x7f;
+        TELEMETRY_SetUpdated(TELEM_FRSKY_LQI);
+
+        Telemetry.value[TELEM_FRSKY_RRSSI] = pkt[len-2];
+        TELEMETRY_SetUpdated(TELEM_FRSKY_RRSSI);
+
         if ((pkt[5] >> 4 & 0x0f) == 0x08) {   // restart or somesuch
             seq_last_sent = 8;
             seq_last_rcvd = 0;
 #if HAS_EXTENDED_TELEMETRY
             dataState = STATE_DATA_IDLE;    // reset sport decoder
-#endif // HAS_EXTENDED_TELEMETRY
+#endif
         } else {
             if ((pkt[5] >> 4 & 0x03) == (seq_last_rcvd + 1) % 4) {
                 seq_last_rcvd = (seq_last_rcvd + 1) % 4;
@@ -590,14 +596,14 @@ static void frsky_check_telemetry(u8 *pkt, u8 len) {
 #if HAS_EXTENDED_TELEMETRY
             else 
                 dataState = STATE_DATA_IDLE;    // reset sport decoder if sequence number wrong
-#endif // HAS_EXTENDED_TELEMETRY
+#endif
         }
 
 #if HAS_EXTENDED_TELEMETRY
         if (pkt[6] <= 6)
             for (u8 i=0; i < pkt[6]; i++)
                 frsky_parse_sport_stream(pkt[7+i]);
-#endif // HAS_EXTENDED_TELEMETRY
+#endif
     }
 }
 
