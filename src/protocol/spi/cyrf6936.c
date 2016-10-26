@@ -12,9 +12,11 @@
     You should have received a copy of the GNU General Public License
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
 */
+
 #ifdef MODULAR
   #pragma long_calls
 #endif
+
 #include "common.h"
 #include "config/tx.h"
 //Some versions of gcc applythis to definitions, others to calls
@@ -24,22 +26,22 @@
 #include "protospi.h"
 
 #ifdef PROTO_HAS_CYRF6936
+    #if ! HAS_MULTIMOD_SUPPORT && (!defined(HAS_CYRF_RESET) || HAS_CYRF_RESET)
+	      //GPIOB.11
+    #if defined(HAS_4IN1_FLASH) && HAS_4IN1_FLASH
+        #define RS_HI() SPISwitch_CYRF6936_RESET(1)
+        #define RS_LO() SPISwitch_CYRF6936_RESET(0)
+    #else
+        #define RS_HI() PROTOSPI_pin_set(CYRF_RESET_PIN)
+        #define RS_LO() PROTOSPI_pin_clear(CYRF_RESET_PIN)
+    #endif
+#endif
 
-#if ! HAS_MULTIMOD_SUPPORT && (!defined(HAS_CYRF_RESET) || HAS_CYRF_RESET)
-	//GPIOB.11
-#if defined(HAS_4IN1_FLASH) && HAS_4IN1_FLASH
-#define RS_HI() SPISwitch_CYRF6936_RESET(1)
-#define RS_LO() SPISwitch_CYRF6936_RESET(0)
-#else
-#define RS_HI() PROTOSPI_pin_set(CYRF_RESET_PIN)
-#define RS_LO() PROTOSPI_pin_clear(CYRF_RESET_PIN)
-#endif
-#endif
-	
 //Disable AWA24S
 #define AWA24S 0
 
 #define Delay usleep
+
 static void CS_HI() {
     PROTO_CS_HI(CYRF6936);
 }
@@ -110,7 +112,7 @@ int CYRF_Reset()
         CYRF_SetTxRxMode(TXRX_OFF);
         //Verify the CYRD chip is responding
         int res = CYRF_ReadRegister(CYRF_10_FRAMING_CFG) == 0xa5;
-        printf("CYRF6936 reset %s\n", res ? "succeded" : "failed");
+        //printf("CYRF6936 reset %s\n", res ? "succeded" : "failed");
         return res;
 }
 
@@ -133,7 +135,7 @@ void CYRF_GetMfgData(u8 data[])
     ReadRegisterMulti(CYRF_25_MFG_ID, data, 6);
 
     /* Fuses power off */
-    CYRF_WriteRegister(CYRF_25_MFG_ID, 0x00); 
+    CYRF_WriteRegister(CYRF_25_MFG_ID, 0x00);
 }
 
 #if HAS_MULTIMOD_SUPPORT
@@ -169,7 +171,7 @@ static void BUYCHINA_SetTxRxMode(enum TXRX_State mode)
 void CYRF_SetTxRxMode(enum TXRX_State mode)
 {
     if(mode==TXRX_OFF) {
-        CYRF_WriteRegister(CYRF_0F_XACT_CFG, 0x24);							// 4=IDLE, 8=TX, C=RX
+        CYRF_WriteRegister(CYRF_0F_XACT_CFG, 0x24);                         // 4=IDLE, 8=TX, C=RX
     } else {
         CYRF_WriteRegister(CYRF_0F_XACT_CFG, mode == TX_EN ? 0x28 : 0x2C);	// 4=IDLE, 8=TX, C=RX
     }
@@ -248,7 +250,7 @@ void CYRF_WritePreamble(u32 preamble)
  */
 void CYRF_StartReceive()
 {
-    CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x87);
+    CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x80);
 }
 
 void CYRF_ReadDataPacketLen(u8 dpbuffer[], u8 length)
@@ -259,9 +261,9 @@ void CYRF_ReadDataPacketLen(u8 dpbuffer[], u8 length)
 void CYRF_WriteDataPacketLen(const u8 dpbuffer[], u8 len)
 {
     CYRF_WriteRegister(CYRF_01_TX_LENGTH, len);
-    CYRF_WriteRegister(CYRF_02_TX_CTRL, 0x40);
+    CYRF_WriteRegister(CYRF_02_TX_CTRL, 0x40); //clear the transmit buffer
     WriteRegisterMulti(CYRF_20_TX_BUFFER, dpbuffer, len);
-    CYRF_WriteRegister(CYRF_02_TX_CTRL, 0xBF);
+    CYRF_WriteRegister(CYRF_02_TX_CTRL, 0x80); //start transmission
 }
 void CYRF_WriteDataPacket(const u8 dpbuffer[])
 {
@@ -311,7 +313,7 @@ void CYRF_FindBestChannels(u8 *channels, u8 len, u8 minspace, u8 min, u8 max)
             CYRF_ReadRegister(CYRF_13_RSSI); //dummy read
             Delay(15); //conversion can occur as often as once every 12us
         }
-        rssi[i] = CYRF_ReadRegister(CYRF_13_RSSI) & 0x1F;        
+        rssi[i] = CYRF_ReadRegister(CYRF_13_RSSI) & 0x1F;
     }
 
     for (i = 0; i < len; i++) {
@@ -319,7 +321,7 @@ void CYRF_FindBestChannels(u8 *channels, u8 len, u8 minspace, u8 min, u8 max)
         for (j = min; j < max; j++) {
             if (rssi[j] < rssi[channels[i]]) {
                 channels[i] = j;
-            }            
+            }
         }
         for (j = channels[i] - minspace; j < channels[i] + minspace; j++) {
             //Ensure we don't reuse any channels within minspace of the selected channel again
