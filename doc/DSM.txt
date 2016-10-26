@@ -1,13 +1,13 @@
-Virtually all of the inofrmation in this document was provided by hammer22.  So Thanks!
+Virtually all of the information in this document was provided by hammer22.  So Thanks!
 DSM2:
 
-DSM2 data packets consist of 7 channels each.  the packets are formatted as 16bit MSB-1st values
+DSM2 data packets consist of 7 channels each.  The packets are formatted as 16bit MSB-1st values.
 Data can be either 10 or 11 bits.
 6-channel DSM2 = 10bit
 8-channel DSM2 = 11bit
 All DSMx appears to be 11bit
 
-A packet consists of a Tx ID + upto 7 channels of data
+A packet consists of a Tx ID + up to 7 channels of data,
 each 16bit data value is defined as:
 10bit:
 a 0 bbbb cccccccccc
@@ -46,8 +46,8 @@ iiii: Channel
 
 Each packet is sent twice, once on channel 'a' and 4msec later on channel 'b'
 If there are more than 7 channels to transmit, the upper channels are transmitted using the same
-packet format 11mec after the the low-channel packet.
-New channel data is transmitted each 22msec
+packet format 11mec after the low-channel packet.
+New channel data is transmitted each 22msec.
 
 For example:
  0msec: Transmit channels 0-7 on channel 'a'
@@ -79,12 +79,12 @@ ii   : Unknown (value = 0x00)
 jjjj : eeee + sum of bytes 8 through 13
 The bind channel can be any odd channel between 0x01 and 0x4f
 The SOP and CRC are set as below for the chosen bind channel
-the DATA code is 32 bytes.  The 1st 16 bytes are as defined below for the bind channel.
+The DATA code is 32 bytes.  The 1st 16 bytes are as defined below for the bind channel.
 The 2nd 16 bytes are always:
 D7A154B15E89AE86 C69422FE48E6574E
 
-Once the Rx detectes that the bind packet is no longer being sent, it
-will transmit a confirmation on the same channel using the fillowing 16byte DATA code:
+Once the Rx detects that the bind packet is no longer being sent, it
+will transmit a confirmation on the same channel using the following 16byte DATA code:
 98881BE430790384 060C12181E247110
 It is not required that the Tx receives or acts upon this packet
 
@@ -104,11 +104,11 @@ gg: requested packet type
 hh: byte[13] of bind packet (always 0x00)
 
 SOP/Data/CRC code selection:
-there is one set of SOP, Data, and CRC codes for each transmit channel.
+There is one set of SOP, Data, and CRC codes for each transmit channel.
 The SOP and DATA codes come from the Cypress recommended SOP table.  the codes are documented here:
 http://www.cypress.com/?docID=15229
 
-They are organized in 5 rows of 9 columns with the contenst of each 'cell' being an 8-byte PN code
+They are organized in 5 rows of 9 columns with the content of each 'cell' being an 8-byte PN code
 The row is determined by the transmit channel as:
 row = channel modulo 5
 The columns are determined from the mfgid as follows:
@@ -129,7 +129,7 @@ Note: Values are LSB 1st
 5    07BD9F26C8310FB8  3D707C94DC84AD95  0C3CFAF9F0F210C9  9B75F7E0148DB580  F1C6FE5C9DA54FB7
 6    EF039589B471619D  1E6AF037527B11D4  F4DA06DBBF4E6FB3  BF5498B9B7305A88  58B5B3DD0E28F1B0
 7    40BA97D5864FCCD1  62F52BAAFC33BFAF  9E08D1AE595EE8F0  35D1FC9723D4C988  5F303B569645F4A1
-8    D7A154B15E89AE86  405632D90FD95D97  C0908FBB7C8E2B8E  88E1D631265FBD40  03BC6E8AEFBDFEF8
+8    D7A154B15E89AE86  405632D90FD95D97  C0908FBB7C8E2B8E  E1D631265FBD4093  03BC6E8AEFBDFEF8
 
 
 The DSM-X channel hopping algorithm was found by Alexandr Alexandrov and Sergey Gimaev.
