@@ -46,15 +46,22 @@
 #define NUM_WAIT_LOOPS (100 / 5) //each loop is ~5us.  Do not wait more than 100us
 
 static const char * const dsm_opts[] = {
-    _tr_noop("Telemetry"),  _tr_noop("Off"), _tr_noop("On"), NULL,
+    _tr_noop("Telemetry"),  _tr_noop("Off"), _tr_noop("On"), NULL, 
     _tr_noop("OrangeRx"),  _tr_noop("No"), _tr_noop("Yes"), NULL, 
-    _tr_noop("HighSpeed"),  _tr_noop("Off"), _tr_noop("On"), NULL, NULL
+    _tr_noop("HighSpeed"),  _tr_noop("Off"), _tr_noop("On"), NULL, 
+#ifndef _DEVO7E_TARGET_H_
+    _tr_noop("F.Log filter"),  _tr_noop("Off"), _tr_noop("On"), NULL, 
+#endif
+    NULL
 };
 
 enum {
     PROTOOPTS_TELEMETRY = 0,
     PROTOOPTS_ORANGERX,
     PROTOOPTS_HIGHSPEED,
+#ifndef _DEVO7E_TARGET_H_
+    PROTOOPTS_FLOGFILTER,
+#endif
     LAST_PROTO_OPT,
 };
 
@@ -66,6 +73,10 @@ ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 #define ORANGERX_NO 0
 #define HIGHSPEED_ON 1
 #define HIGHSPEED_OFF 0
+#ifndef _DEVO7E_TARGET_H_
+    #define FLOGFILTER_ON 1
+    #define FLOGFILTER_OFF 0
+#endif
 
 //During binding we will send BIND_COUNT/2 packets
 //One packet each 10msec
@@ -285,13 +296,13 @@ static const u8 init_vals[][2] = {
     //{CYRF_39_ANALOG_CTRL, 0x01},    //ALL SLOW
     {CYRF_01_TX_LENGTH, 0x10},      //TX Length = 16 byte packet
     {CYRF_28_CLK_EN, 0x02},         //RXF, force receive clock enable ???
-    //{CYRF_0F_XACT_CFG, 0x28},       //Force end state = Synth Mode (TX) - by means CYRF_SetTxRxMode()
 };
 
 static void cyrf_startup_config()
 {
     for(u32 i = 0; i < sizeof(init_vals) / 2; i++)
         CYRF_WriteRegister(init_vals[i][0], init_vals[i][1]);
+    //If using 64-SDR, set number of preamble repetitions to four for optimum performance
     CYRF_WritePreamble(0x333304);
     //CYRF_ConfigRFChannel(0x61); // it's way out from used channels (0-79) and don't needed 
 }
@@ -302,7 +313,6 @@ static const u8 bind_vals[][2] = {
     {CYRF_1E_RX_OVERRIDE, 0x14}, //FRC RXDR + DIS RXCRC (disable rx CRC)
     {CYRF_1F_TX_OVERRIDE, 0x04}, //DIS TXCRC (disable tx CRC)
     {CYRF_14_EOP_CTRL, 0x02},    //EOP = 2 (set EOP sync = 2)
-    //{CYRF_0F_XACT_CFG, 0x28},    //Force end state = Synth Mode (TX) - by means CYRF_SetTxRxMode()
 };
 
 static void cyrf_bind_config()
@@ -315,6 +325,7 @@ void initialize_bind_state()
 {
     cyrf_bind_config();
     CYRF_ConfigRFChannel(BIND_CHANNEL); //This seems to be random?
+    //In 64-SDR mode, only the first eight bytes are used, but all sixteen bytes must be writed.
     CYRF_ConfigDataCode(pn_bind, 16);
     build_bind_packet();
 }
@@ -327,7 +338,6 @@ static const u8 transfer_vals[][2] = {
     {CYRF_10_FRAMING_CFG, 0xea}, //SOP EN + SOP LEN = 64 chips + LEN EN + SOP TH = 0Ah (0Eh???)
     {CYRF_1E_RX_OVERRIDE, 0x00}, //Reset RX overrides
     {CYRF_1F_TX_OVERRIDE, 0x00}, //Reset TX overrides
-    //{CYRF_0F_XACT_CFG, 0x28},    //Force end state = Synth Mode (TX) - by means CYRF_SetTxRxMode()
 };
 
 static void cyrf_transfer_config()
@@ -350,6 +360,7 @@ static void set_sop_data_crc()
     } else {
         memcpy(data_code + 8, pncodes[pn_row][data_col + 1], 8);
     }
+    //In 64-8DR mode, all sixteen bytes are used.
     CYRF_ConfigDataCode(data_code, 16);
     /* setup for next iteration */
     if(Model.protocol == PROTOCOL_DSMX)
@@ -478,23 +489,25 @@ NO_INLINE static void parse_telemetry_packet()
             // therefore A, B, L, R, F, H -> not valid (must be filtered).
             // Fades A is an 8-bit value, B, R, and L are 16-bit values. 
             //=================================================================
-            if(pktTelem[6] > 15) { //holds
-                break;
-            } else if(pktTelem[6] > (u16)Telemetry.value[TELEM_DSM_FLOG_HOLDS]) {
-                update = update7f; //refresh "Flight Log" in case "Hold" state
-                break;
+            if (Model.proto_opts[PROTOOPTS_FLOGFILTER] == FLOGFILTER_ON) {
+                if(pktTelem[6] > 15) { //holds
+                    break;
+                } else if(pktTelem[6] > (u16)Telemetry.value[TELEM_DSM_FLOG_HOLDS]) {
+                    update = update7f; //refresh "Flight Log" in case "Hold" state
+                    break;
+                }
+                //if(pktTelem[1] > 255) //fadesA - unknown if it's right for third party Rx, so will use generic condition
+                if((pktTelem[1] != 0xFFFF) && (pktTelem[1] > (u16)Telemetry.value[TELEM_DSM_FLOG_FADESA] + 510)) //fadesA
+                    break;
+                if((pktTelem[2] != 0xFFFF) && (pktTelem[2] > (u16)Telemetry.value[TELEM_DSM_FLOG_FADESB] + 510)) //fadesB
+                    break;
+                if((pktTelem[3] != 0xFFFF) && (pktTelem[3] > (u16)Telemetry.value[TELEM_DSM_FLOG_FADESL] + 510)) //fadesL
+                    break;
+                if((pktTelem[4] != 0xFFFF) && (pktTelem[4] > (u16)Telemetry.value[TELEM_DSM_FLOG_FADESR] + 510)) //fadesR
+                    break;
+                if(pktTelem[5] > (u16)Telemetry.value[TELEM_DSM_FLOG_FRAMELOSS] + 510) //frLoss
+                    break;
             }
-            //if(pktTelem[1] > 255) //fadesA - unknown if it's right for third party Rx, so will use generic contition
-            if((pktTelem[1] != 0xFFFF) && (pktTelem[1] > (u16)Telemetry.value[TELEM_DSM_FLOG_FADESA] + 510)) //fadesA
-                break;
-            if((pktTelem[2] != 0xFFFF) && (pktTelem[2] > (u16)Telemetry.value[TELEM_DSM_FLOG_FADESB] + 510)) //fadesB
-                break;
-            if((pktTelem[3] != 0xFFFF) && (pktTelem[3] > (u16)Telemetry.value[TELEM_DSM_FLOG_FADESL] + 510)) //fadesL
-                break;
-            if((pktTelem[4] != 0xFFFF) && (pktTelem[4] > (u16)Telemetry.value[TELEM_DSM_FLOG_FADESR] + 510)) //fadesR
-                break;
-            if(pktTelem[5] > (u16)Telemetry.value[TELEM_DSM_FLOG_FRAMELOSS] + 510) //frLoss
-                break;
 #endif
             update = update7f;
             break;
@@ -555,7 +568,7 @@ NO_INLINE static void parse_telemetry_packet()
             Telemetry.value[TELEM_DSM_JETCAT_PACKVOLT] = bcd_to_int(pktTelem[2]); //In 1/100 of Volts
             Telemetry.value[TELEM_DSM_JETCAT_PUMPVOLT] = bcd_to_int(pktTelem[3]); //In 1/100 of Volts (low voltage)
             Telemetry.value[TELEM_DSM_JETCAT_RPM] =      bcd_to_int(pktTelem[4] & 0x0fff); //RPM up to 999999
-            Telemetry.value[TELEM_DSM_JETCAT_TEMPEGT] =  bcd_to_int(pktTelem[6]); //EGT temp up to 999В°C
+            Telemetry.value[TELEM_DSM_JETCAT_TEMPEGT] =  bcd_to_int(pktTelem[6]); //EGT temp up to 999°C
             Telemetry.value[TELEM_DSM_JETCAT_OFFCOND] = end_byte;
             break;
         case 0x20: //Electronic Speed Control
@@ -676,7 +689,7 @@ static u16 dsm2_cb()
         }
         if (state == DSM2_CH2_CHECK_A) {
             //Keep transmit power in sync
-            CYRF_WriteRegister(CYRF_03_TX_CFG, 0x28 | Model.tx_power);
+            CYRF_WriteRegister(CYRF_03_TX_CFG, 0x28 | Model.tx_power); //Data Code Length = 64 chip codes + Data Mode = 8DR Mode + tx_power
         }
 #ifndef MODULAR
         if (Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_OFF) {
@@ -713,6 +726,7 @@ static u16 dsm2_cb()
         }
         if (state == DSM2_CH2_READ_A && num_channels < 8) {
             state = DSM2_CH2_READ_B;
+            //Reseat RX mode just in case any error
             CYRF_WriteRegister(CYRF_0F_XACT_CFG, (CYRF_ReadRegister(CYRF_0F_XACT_CFG) | 0x20));  // Force end state
             int i = 0;
             while (CYRF_ReadRegister(CYRF_0F_XACT_CFG) & 0x20) {
