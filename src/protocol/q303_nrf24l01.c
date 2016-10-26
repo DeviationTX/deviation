@@ -179,6 +179,11 @@ static void send_packet(u8 bind)
             packet[9] |= FLAG_GIMBAL_DN;
         else if(Channels[CHANNEL_GIMBAL] > CHAN_MAX_VALUE / 2)
             packet[9] |= FLAG_GIMBAL_UP;
+        // set low rate for first packets
+        if(bind_counter != 0) {
+            packet[8] &= ~0x03;
+            bind_counter--;
+        }
     }
     
     // Power on, TX mode, CRC enabled
@@ -266,6 +271,7 @@ static u16 q303_callback()
                 memcpy(&tx_addr[1], txid, 4);
                 XN297_SetTXAddr(tx_addr, 5);
                 phase = DATA;
+                bind_counter = BIND_COUNT;
                 PROTOCOL_SetBindState(0);
             } else {
                 send_packet(1);
