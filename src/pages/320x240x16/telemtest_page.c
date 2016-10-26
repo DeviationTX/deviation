@@ -78,7 +78,7 @@ const struct telem_layout frsky_layout[] = {
           {{215, 220, 40, 18}, {260, 220, 40, 18}, TELEM_FRSKY_VARIO},
 
           {{275, 40, 40, 18}, {275, 60, 40, 18}, TELEM_FRSKY_LQI},
-          {{275, 80, 40, 18}, {275, 100, 40, 18}, TELEM_FRSKY_RRSSI},
+          {{275, 80, 40, 18}, {275, 100, 40, 18}, TELEM_FRSKY_LRSSI},
 
           {{0, 140, 55, 18}, {60, 140, 140, 18}, TELEM_GPS_LAT},
           {{0, 160, 55, 18}, {60, 160, 140, 18}, TELEM_GPS_LONG},

@@ -218,7 +218,7 @@ const struct telem_layout frsky_layout_basic[] = {
 #if HAS_EXTENDED_TELEMETRY
     {TYPE_VALUE | 1, FRSKY3_X, FRSKY1_WIDTH, TELEM_FRSKY_CELL2},
 #else
-    {TYPE_VALUE | 1, FRSKY3_X, FRSKY1_WIDTH, TELEM_FRSKY_RRSSI},
+    {TYPE_VALUE | 1, FRSKY3_X, FRSKY1_WIDTH, TELEM_FRSKY_LRSSI},
 #endif
 
 #if HAS_EXTENDED_TELEMETRY
@@ -249,7 +249,7 @@ const struct telem_layout frsky_layout_basic[] = {
 
     {TYPE_INDEX | 7, LBL1_X, LBL1_WIDTH, 8},
     {TYPE_VALUE | 7, FRSKY1_X, FRSKY1_WIDTH, TELEM_FRSKY_LQI},
-    {TYPE_VALUE | 7, FRSKY2_X, FRSKY1_WIDTH, TELEM_FRSKY_RRSSI},
+    {TYPE_VALUE | 7, FRSKY2_X, FRSKY1_WIDTH, TELEM_FRSKY_LRSSI},
 #endif
 
     {0, 0, 0, 0},

@@ -24,7 +24,7 @@ const char * _frsky_str_by_value(char *str, u8 telem, s32 value)
         case TELEM_FRSKY_VOLT1:
         case TELEM_FRSKY_VOLT2: _get_value_str(str, value, 2, 'V'); break;
         case TELEM_FRSKY_RSSI:  _get_value_str(str, value, 0, 'd'); break;
-        case TELEM_FRSKY_RRSSI: _get_value_str(str, value, 0, 'd'); break;
+        case TELEM_FRSKY_LRSSI: _get_value_str(str, value, 0, 'd'); break;
         case TELEM_FRSKY_LQI: _get_value_str(str, value, 0, 0); break;
 #if HAS_EXTENDED_TELEMETRY
         case TELEM_FRSKY_VOLT3:
@@ -59,7 +59,7 @@ const char * _frsky_short_name(char *str, u8 telem)
         case TELEM_FRSKY_VOLT1:
         case TELEM_FRSKY_VOLT2: sprintf(str, "%s%d", _tr("Volt"), telem - TELEM_FRSKY_VOLT1 + 1); break;
         case TELEM_FRSKY_RSSI:  strcpy(str, _tr("RSSI")); break;
-        case TELEM_FRSKY_RRSSI: strcpy(str, _tr("RRSSI")); break;
+        case TELEM_FRSKY_LRSSI: strcpy(str, _tr("LRSSI")); break;
         case TELEM_FRSKY_LQI: strcpy(str, _tr("LQI")); break;
 #if HAS_EXTENDED_TELEMETRY
         case TELEM_FRSKY_VOLT3: sprintf(str, "%s%d", _tr("Volt"), telem - TELEM_FRSKY_VOLT1 + 1); break;
@@ -125,7 +125,7 @@ s32 _frsky_get_max_value(u8 telem)
         case TELEM_FRSKY_VOLT2:     return 8538; //should be 33 * AD2gain, but ugh
         case TELEM_FRSKY_RSSI:      return 60000;
         case TELEM_FRSKY_LQI:       return 127;
-        case TELEM_FRSKY_RRSSI:     return 255; break;
+        case TELEM_FRSKY_LRSSI:     return 255; break;
 #if HAS_EXTENDED_TELEMETRY
         case TELEM_FRSKY_RPM:       return 60000;
         case TELEM_FRSKY_VOLT3:
