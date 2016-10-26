@@ -300,7 +300,7 @@ static void frsky2way_parse_telem(u8 *pkt, int len)
     Telemetry.value[TELEM_FRSKY_LQI] = pkt[len-1] & 0x7f;
     TELEMETRY_SetUpdated(TELEM_FRSKY_LQI);
 
-    Telemetry.value[TELEM_FRSKY_LRSSI] = pkt[len-2];
+    Telemetry.value[TELEM_FRSKY_LRSSI] = (s8)pkt[len-2] / 2 - 70; 	// Value in Db
     TELEMETRY_SetUpdated(TELEM_FRSKY_LRSSI);
 
 #if HAS_EXTENDED_TELEMETRY

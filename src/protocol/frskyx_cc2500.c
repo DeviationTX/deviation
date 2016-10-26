@@ -580,7 +580,7 @@ static void frsky_check_telemetry(u8 *pkt, u8 len) {
         Telemetry.value[TELEM_FRSKY_LQI] = pkt[len-1] & 0x7f;
         TELEMETRY_SetUpdated(TELEM_FRSKY_LQI);
 
-        Telemetry.value[TELEM_FRSKY_LRSSI] = pkt[len-2];
+        Telemetry.value[TELEM_FRSKY_LRSSI] = (s8)pkt[len-2] / 2 - 70; 	// Value in Db
         TELEMETRY_SetUpdated(TELEM_FRSKY_LRSSI);
 
         if ((pkt[5] >> 4 & 0x0f) == 0x08) {   // restart or somesuch
