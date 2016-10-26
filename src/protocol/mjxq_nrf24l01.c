@@ -58,7 +58,7 @@
 #define ADDRESS_LENGTH     5
 
 static const char * const mjxq_opts[] = {
-  _tr_noop("Format"), "WLH08", "X600", "X800", "H26D", "E010", NULL,
+  _tr_noop("Format"), "WLH08", "X600", "X800", "H26D", "H26WH", "E010", NULL,
   NULL
 };
 enum {
@@ -70,6 +70,7 @@ enum {
     FORMAT_X600,
     FORMAT_X800,
     FORMAT_H26D,
+    FORMAT_H26WH,
     FORMAT_E010,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
@@ -91,6 +92,7 @@ enum {
     CHANNEL12,    // Camera tilt
 };
 #define CHANNEL_LED         CHANNEL5
+#define CHANNEL_ARM         CHANNEL5  // H26WH
 #define CHANNEL_FLIP        CHANNEL6
 #define CHANNEL_PICTURE     CHANNEL7
 #define CHANNEL_VIDEO       CHANNEL8
@@ -122,6 +124,20 @@ static const struct {
 } mjx_tx_rf_map[] = {{{0xF8, 0x4F, 0x1C}, {0x0A, 0x46, 0x3A, 0x42}},
                      {{0xC8, 0x6E, 0x02}, {0x0A, 0x3C, 0x36, 0x3F}},
                      {{0x48, 0x6A, 0x40}, {0x0A, 0x43, 0x36, 0x3F}}};
+
+// captured from E010 and H36 stock transmitters
+static const struct {
+    u8 txid[2];
+    u8 rfchan[RF_NUM_CHANNELS];
+}
+e010_tx_rf_map[] = {{{0x4F, 0x1C}, {0x3A, 0x35, 0x4A, 0x45}},
+                    {{0x90, 0x1C}, {0x2E, 0x36, 0x3E, 0x46}}, 
+                    {{0x24, 0x36}, {0x32, 0x3E, 0x42, 0x4E}},
+                    {{0x7A, 0x40}, {0x2E, 0x3C, 0x3E, 0x4C}},
+                    {{0x61, 0x31}, {0x2F, 0x3B, 0x3F, 0x4B}},
+                    {{0x5D, 0x37}, {0x33, 0x3B, 0x43, 0x4B}},
+                    {{0xFD, 0x4F}, {0x33, 0x3B, 0x43, 0x4B}}, 
+                    {{0x86, 0x3C}, {0x34, 0x3E, 0x44, 0x4E}}};                     
 
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
@@ -194,6 +210,7 @@ static void send_packet(u8 bind)
     packet[14] = 0xc0;  // bind value
     switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
     case FORMAT_H26D:
+    case FORMAT_H26WH:
         packet[10] = pan_tilt_value();
         // fall through on purpose - no break
     case FORMAT_WLH08:
@@ -206,9 +223,13 @@ static void send_packet(u8 bind)
                        | GET_FLAG(CHANNEL_PICTURE, 0x08)
                        | GET_FLAG(CHANNEL_VIDEO, 0x10)
                        | GET_FLAG_INV(CHANNEL_LED, 0x20); // air/ground mode
+            if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H26WH) {
+                packet[10] |= 0x40;  // high rate
+                packet[14] &= ~0x24; // unset air/ground & arm flags
+                packet[14] |= GET_FLAG(CHANNEL_ARM, 0x02);
+            }
         }
         break;
-
     case FORMAT_X600:
         packet[10] = GET_FLAG_INV(CHANNEL_LED, 0x02);
         packet[11] = GET_FLAG(CHANNEL_RTH, 0x01);
@@ -234,24 +255,23 @@ static void send_packet(u8 bind)
     }
     packet[15] = checksum();
 
-    
-    // Power on, TX mode, 2byte CRC
-    if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H26D) {
-        NRF24L01_SetTxRxMode(TX_EN);
-    } else {
-        XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
-    }
-
     NRF24L01_WriteReg(NRF24L01_05_RF_CH, rf_channels[rf_chan++ / 2]);
     rf_chan %= 2 * sizeof(rf_channels);  // channels repeated
 
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
     NRF24L01_FlushTx();
-
-    if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H26D) {
-        NRF24L01_WritePayload(packet, PACKET_SIZE);
-    } else {
-        XN297_WritePayload(packet, PACKET_SIZE);
+    
+    // Power on, TX mode, 2byte CRC
+    switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
+        case FORMAT_H26D:
+        case FORMAT_H26WH:
+            NRF24L01_SetTxRxMode(TX_EN);
+            NRF24L01_WritePayload(packet, PACKET_SIZE);
+            break;
+        default:
+            XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
+            XN297_WritePayload(packet, PACKET_SIZE);
+            break;
     }
 
     // Check and adjust transmission power. We do this after
@@ -275,30 +295,39 @@ static void mjxq_init()
 {
     u8 rx_tx_addr[ADDRESS_LENGTH];
 
-    memcpy(rx_tx_addr, "\x6d\x6a\x77\x77\x77", sizeof(rx_tx_addr));
-    if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_WLH08) {
-        memcpy(rf_channels, "\x12\x22\x32\x42", sizeof(rf_channels));
-    } else if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H26D || Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_E010) {
-        memcpy(rf_channels, "\x36\x3e\x46\x2e", sizeof(rf_channels));
-    } else {
-        memcpy(rf_channels, "\x0a\x35\x42\x3d", sizeof(rf_channels));
-        memcpy(rx_tx_addr, "\x6d\x6a\x73\x73\x73", sizeof(rx_tx_addr));
-    }
-
-
     NRF24L01_Initialize();
     NRF24L01_SetTxRxMode(TX_EN);
+    
+    memcpy(rx_tx_addr, "\x6d\x6a\x77\x77\x77", sizeof(rx_tx_addr));
+    switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
+        case FORMAT_WLH08:
+            memcpy(rf_channels, "\x12\x22\x32\x42", sizeof(rf_channels));
+            break;
+        case FORMAT_H26D:
+        case FORMAT_H26WH:
+        case FORMAT_E010:
+            memcpy(rf_channels, "\x36\x3e\x46\x2e", sizeof(rf_channels));
+            break;
+        default:
+            memcpy(rf_channels, "\x0a\x35\x42\x3d", sizeof(rf_channels));
+            memcpy(rx_tx_addr, "\x6d\x6a\x73\x73\x73", sizeof(rx_tx_addr));
+            break;
+    }
 
     // SPI trace of stock TX has these writes to registers that don't appear in
     // nRF24L01 or Beken 2421 datasheets.  Uncomment if you have an XN297 chip?
     // NRF24L01_WriteRegisterMulti(0x3f, "\x4c\x84\x67,\x9c,\x20", 5); 
     // NRF24L01_WriteRegisterMulti(0x3e, "\xc9\x9a\xb0,\x61,\xbb,\xab,\x9c", 7); 
     // NRF24L01_WriteRegisterMulti(0x39, "\x0b\xdf\xc4,\xa7,\x03,\xab,\x9c", 7); 
-
-    if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H26D) {
-        NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, rx_tx_addr, sizeof(rx_tx_addr));
-    } else {
-        XN297_SetTXAddr(rx_tx_addr, sizeof(rx_tx_addr));
+    
+    switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
+        case FORMAT_H26D:
+        case FORMAT_H26WH:
+            NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, rx_tx_addr, sizeof(rx_tx_addr));
+            break;
+        default:
+            XN297_SetTXAddr(rx_tx_addr, sizeof(rx_tx_addr));
+            break;
     }
 
     NRF24L01_FlushTx();
@@ -349,11 +378,23 @@ static void mjxq_init()
 }
 
 static void mjxq_init2()
-{
-    if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H26D) {
-        memcpy(rf_channels, "\x32\x3e\x42\x4e", sizeof(rf_channels));
-    } else if (Model.proto_opts[PROTOOPTS_FORMAT] != FORMAT_WLH08 && Model.proto_opts[PROTOOPTS_FORMAT] != FORMAT_E010) {
-        memcpy(rf_channels, mjx_tx_rf_map[Model.fixed_id % (sizeof(mjx_tx_rf_map)/sizeof(mjx_tx_rf_map[0]))].rfchan, sizeof(rf_channels));
+{    
+    switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
+        case FORMAT_H26WH:
+            memcpy(rf_channels, "\x47\x42\x37\x32", sizeof(rf_channels));
+            break;
+        case FORMAT_E010:
+            memcpy(rf_channels, e010_tx_rf_map[Model.fixed_id % (sizeof(e010_tx_rf_map)/sizeof(e010_tx_rf_map[0]))].rfchan, sizeof(rf_channels));
+            break;
+        case FORMAT_H26D:
+            memcpy(rf_channels, "\x32\x3e\x42\x4e", sizeof(rf_channels));
+            break;
+        case FORMAT_WLH08:
+            // do nothing
+            break;
+        default:
+            memcpy(rf_channels, mjx_tx_rf_map[Model.fixed_id % (sizeof(mjx_tx_rf_map)/sizeof(mjx_tx_rf_map[0]))].rfchan, sizeof(rf_channels));
+            break;
     }
 }
 
@@ -409,19 +450,23 @@ static void initialize_txid()
     // Pump zero bytes for LFSR to diverge more
     for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
     
-    if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_E010) {
-        // txid must be multiple of 8
-        txid[0] = (lfsr >> 16) & 0xf8;
-        txid[1] = ((lfsr >> 8 ) & 0xf0) | 0x0c;
-        txid[2] = lfsr & 0xf0;
-    }
-    else if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_WLH08) {
-        // txid must be multiple of 8
-        txid[0] = (lfsr >> 16) & 0xf8;
-        txid[1] = (lfsr >> 8 ) & 0xff;
-        txid[2] = lfsr & 0xff; 
-    } else {
-        memcpy(txid, mjx_tx_rf_map[Model.fixed_id % (sizeof(mjx_tx_rf_map)/sizeof(mjx_tx_rf_map[0]))].txid, sizeof(txid));
+    switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
+        case FORMAT_H26WH:
+            memcpy(txid, "\xa4\x03\x00", sizeof(txid));
+            break;
+        case FORMAT_E010:
+            memcpy(txid, e010_tx_rf_map[Model.fixed_id % (sizeof(e010_tx_rf_map)/sizeof(e010_tx_rf_map[0]))].txid, 2);
+            txid[2] = 0x00;
+            break;
+        case FORMAT_WLH08:
+            // txid must be multiple of 8
+            txid[0] = (lfsr >> 16) & 0xf8;
+            txid[1] = (lfsr >> 8 ) & 0xff;
+            txid[2] = lfsr & 0xff; 
+            break;
+        default:
+            memcpy(txid, mjx_tx_rf_map[Model.fixed_id % (sizeof(mjx_tx_rf_map)/sizeof(mjx_tx_rf_map[0]))].txid, sizeof(txid));
+            break;
     }
 }
 
