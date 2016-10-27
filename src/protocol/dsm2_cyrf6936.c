@@ -432,11 +432,11 @@ NO_INLINE static void parse_telemetry_packet()
                                    TELEM_DSM_JETCAT_PACKVOLT, TELEM_DSM_JETCAT_PUMPVOLT,
                                    TELEM_DSM_JETCAT_RPM, TELEM_DSM_JETCAT_TEMPEGT,
                                    TELEM_DSM_JETCAT_OFFCOND, 0};
-    static const u8 update20[] = { TELEM_DSM_HYPOTHETIC_RPM, TELEM_DSM_HYPOTHETIC_VOLT1,
-                                   TELEM_DSM_HYPOTHETIC_TEMP1, TELEM_DSM_HYPOTHETIC_AMPS1,
-                                   TELEM_DSM_HYPOTHETIC_TEMP2, TELEM_DSM_HYPOTHETIC_AMPS2,
-                                   TELEM_DSM_HYPOTHETIC_VOLT2, TELEM_DSM_HYPOTHETIC_THROTTLE,
-                                   TELEM_DSM_HYPOTHETIC_OUTPUT, 0};
+    static const u8 update20[] = { TELEM_DSM_ESC_RPM, TELEM_DSM_ESC_VOLT1,
+                                   TELEM_DSM_ESC_TEMP1, TELEM_DSM_ESC_AMPS1,
+                                   TELEM_DSM_ESC_TEMP2, TELEM_DSM_ESC_AMPS2,
+                                   TELEM_DSM_ESC_VOLT2, TELEM_DSM_ESC_THROTTLE,
+                                   TELEM_DSM_ESC_OUTPUT, 0};
     static const u8 update18[] = { TELEM_DSM_RXPCAP_AMPS, TELEM_DSM_RXPCAP_CAPACITY, TELEM_DSM_RXPCAP_VOLT, 0};
     static const u8 update34[] = { TELEM_DSM_FPCAP_AMPS, TELEM_DSM_FPCAP_CAPACITY, TELEM_DSM_FPCAP_TEMP, 0};
 #endif
@@ -573,15 +573,15 @@ NO_INLINE static void parse_telemetry_packet()
             break;
         case 0x20: //Electronic Speed Control
             update = update20;
-            Telemetry.value[TELEM_DSM_HYPOTHETIC_RPM] =   pktTelem[1]; //In 10 rpm, 0-655340 (0xFFFF --> No data)
-            Telemetry.value[TELEM_DSM_HYPOTHETIC_VOLT1] = pktTelem[2]; //Batt in 1/100 of Volts (Volt2) (0-655.34V) (0xFFFF --> No data)
-            Telemetry.value[TELEM_DSM_HYPOTHETIC_TEMP1] = pktTelem[3]; //FET Temp in 1/10 of C degree (0-999.8C) (0xFFFF --> No data)
-            Telemetry.value[TELEM_DSM_HYPOTHETIC_AMPS1] = pktTelem[4]; //In 1/100 Amp (0-655.34A) (0xFFFF --> No data)
-            Telemetry.value[TELEM_DSM_HYPOTHETIC_TEMP2] = pktTelem[5]; //BEC Temp in 1/10 of C degree (0-999.8C) (0xFFFF --> No data)
-            Telemetry.value[TELEM_DSM_HYPOTHETIC_AMPS2] = packet[12];  //BEC current in 1/10 Amp (0-25.4A) (0xFF ----> No data)
-            Telemetry.value[TELEM_DSM_HYPOTHETIC_VOLT2] = packet[13] * 5; //BEC voltage in 0.05V (0-12.70V) (0xFF ----> No data)
-            Telemetry.value[TELEM_DSM_HYPOTHETIC_THROTTLE] = packet[14]* 5; //Throttle % in 0.5% (0-127%) (0xFF ----> No data)
-            Telemetry.value[TELEM_DSM_HYPOTHETIC_OUTPUT] = end_byte * 5;  //Power Output % in 0.5% (0-127%) (0xFF ----> No data)
+            Telemetry.value[TELEM_DSM_ESC_RPM]   = pktTelem[1];      //In 10 rpm, 0-655340 (0xFFFF --> No data)
+            Telemetry.value[TELEM_DSM_ESC_VOLT1] = pktTelem[2];      //Batt in 1/100 of Volts (Volt2) (0-655.34V) (0xFFFF --> No data)
+            Telemetry.value[TELEM_DSM_ESC_TEMP1] = pktTelem[3];      //FET Temp in 1/10 of C degree (0-999.8C) (0xFFFF --> No data)
+            Telemetry.value[TELEM_DSM_ESC_AMPS1] = pktTelem[4];      //In 1/100 Amp (0-655.34A) (0xFFFF --> No data)
+            Telemetry.value[TELEM_DSM_ESC_TEMP2] = pktTelem[5];      //BEC Temp in 1/10 of C degree (0-999.8C) (0xFFFF --> No data)
+            Telemetry.value[TELEM_DSM_ESC_AMPS2] = packet[12];       //BEC current in 1/10 Amp (0-25.4A) (0xFF ----> No data)
+            Telemetry.value[TELEM_DSM_ESC_VOLT2] = packet[13] * 5;   //BEC voltage in 0.05V (0-12.70V) (0xFF ----> No data)
+            Telemetry.value[TELEM_DSM_ESC_THROTTLE] = packet[14]* 5; //Throttle % in 0.5% (0-127%) (0xFF ----> No data)
+            Telemetry.value[TELEM_DSM_ESC_OUTPUT] = end_byte * 5;    //Power Output % in 0.5% (0-127%) (0xFF ----> No data)
             break;
 #endif //HAS_EXTENDED_TELEMETRY
         case 0x16: //GPS sensor (always second GPS packet)
