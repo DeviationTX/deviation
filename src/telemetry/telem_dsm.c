@@ -169,24 +169,24 @@ const char * _dsm_str_by_value(char *str, u8 telem, s32 value)
         case TELEM_DSM_JETCAT_PUMPVOLT: _get_value_str(str, value, 2, 'V'); break;
         case TELEM_DSM_JETCAT_THROTTLE: _get_value_str(str, value, 0, '%'); break;
         case TELEM_DSM_JETCAT_RPM:      _get_value_str(str, _dsm_rpm(telem, value), 0, '\0'); break;
-        case TELEM_DSM_JETCAT_TEMPEGT:  _get_temp_str(str, value, 0, 'F'); break;
+        case TELEM_DSM_JETCAT_TEMPEGT:  _get_temp_str(str, value, 0, 'C'); break;
         case TELEM_DSM_JETCAT_STATUS:   strcpy(str, _dsm_jetcat_status(value)); break;
         case TELEM_DSM_JETCAT_OFFCOND:  strcpy(str, _dsm_jetcat_offcond(value)); break;
-        case TELEM_DSM_HYPOTHETIC_AMPS1:    _get_value_str(str, _dsm_amps(value), 2, 'A'); break;
-        case TELEM_DSM_HYPOTHETIC_AMPS2:    _get_value_str(str, _dsm_amps(value), 1, 'A'); break;
-        case TELEM_DSM_HYPOTHETIC_VOLT1:
-        case TELEM_DSM_HYPOTHETIC_VOLT2:    _get_value_str(str, value, 2, 'V'); break;
-        case TELEM_DSM_HYPOTHETIC_TEMP1:
-        case TELEM_DSM_HYPOTHETIC_TEMP2:    _get_temp_str(str, value, 1, 'F'); break;
-        case TELEM_DSM_HYPOTHETIC_RPM:      _get_value_str(str, _dsm_rpm(telem, value*10), 0, '\0'); break;
-        case TELEM_DSM_HYPOTHETIC_THROTTLE:
-        case TELEM_DSM_HYPOTHETIC_OUTPUT:   _get_value_str(str, value, 1, '%'); break;
+        case TELEM_DSM_ESC_AMPS1:       _get_value_str(str, _dsm_amps(value), 2, 'A'); break;
+        case TELEM_DSM_ESC_AMPS2:       _get_value_str(str, _dsm_amps(value), 1, 'A'); break;
+        case TELEM_DSM_ESC_VOLT1:
+        case TELEM_DSM_ESC_VOLT2:       _get_value_str(str, value, 2, 'V'); break;
+        case TELEM_DSM_ESC_TEMP1:
+        case TELEM_DSM_ESC_TEMP2:       _get_temp_str(str, value, 1, 'C'); break;
+        case TELEM_DSM_ESC_RPM:         _get_value_str(str, _dsm_rpm(telem, value*10), 0, '\0'); break;
+        case TELEM_DSM_ESC_THROTTLE:
+        case TELEM_DSM_ESC_OUTPUT:      _get_value_str(str, value, 1, '%'); break;
         case TELEM_DSM_RXPCAP_AMPS:     _get_value_str(str, value, 2, 'A'); break;
         case TELEM_DSM_RXPCAP_CAPACITY: _get_value_str(str, value, 1, '\0'); break;
         case TELEM_DSM_RXPCAP_VOLT:     _get_value_str(str, value, 2, 'V'); break;
         case TELEM_DSM_FPCAP_AMPS:      _get_value_str(str, value, 1, 'A'); break;
         case TELEM_DSM_FPCAP_CAPACITY:  _get_value_str(str, value, 0, '\0'); break;
-        case TELEM_DSM_FPCAP_TEMP:      _get_temp_str(str, value, 1, 'F'); break;
+        case TELEM_DSM_FPCAP_TEMP:      _get_temp_str(str, value, 1, 'C'); break;
 #endif
         case TELEM_DSM_VARIO_ALTITUDE:
         case TELEM_DSM_VARIO_CLIMBRATE1:
@@ -240,15 +240,15 @@ const char * _dsm_name(char *str, u8 telem)
         case TELEM_DSM_JETCAT_RPM:      sprintf(str, "%s%s", _tr("Jc"), _tr("RPM")); break;
         case TELEM_DSM_JETCAT_TEMPEGT:  sprintf(str, "%s%s", _tr("Jc"), _tr("Temp")); break;
         case TELEM_DSM_JETCAT_OFFCOND:  sprintf(str, "%s%s", _tr("Jc"), _tr("Off")); break;
-        case TELEM_DSM_HYPOTHETIC_AMPS1:
-        case TELEM_DSM_HYPOTHETIC_AMPS2:sprintf(str, "%s%s%d", _tr("Ht"), _tr("Amps"), telem - TELEM_DSM_HYPOTHETIC_AMPS1 + 1); break;
-        case TELEM_DSM_HYPOTHETIC_VOLT1:
-        case TELEM_DSM_HYPOTHETIC_VOLT2:sprintf(str, "%s%s%d", _tr("Ht"), _tr("Volt"), telem - TELEM_DSM_HYPOTHETIC_VOLT1 + 1); break;
-        case TELEM_DSM_HYPOTHETIC_TEMP1:
-        case TELEM_DSM_HYPOTHETIC_TEMP2:sprintf(str, "%s%s%d", _tr("Ht"), _tr("Temp"), telem - TELEM_DSM_HYPOTHETIC_TEMP1 + 1); break;
-        case TELEM_DSM_HYPOTHETIC_RPM:      sprintf(str, "%s%s", _tr("Ht"), _tr("RPM")); break;
-        case TELEM_DSM_HYPOTHETIC_THROTTLE: sprintf(str, "%s%s", _tr("Ht"), _tr("THR")); break;
-        case TELEM_DSM_HYPOTHETIC_OUTPUT:   sprintf(str, "%s%s", _tr("Ht"), _tr("Output")); break;
+        case TELEM_DSM_ESC_AMPS1:
+        case TELEM_DSM_ESC_AMPS2:       sprintf(str, "%s%s%d", _tr("ESC"), _tr("Amps"), telem - TELEM_DSM_ESC_AMPS1 + 1); break;
+        case TELEM_DSM_ESC_VOLT1:
+        case TELEM_DSM_ESC_VOLT2:       sprintf(str, "%s%s%d", _tr("ESC"), _tr("Volt"), telem - TELEM_DSM_ESC_VOLT1 + 1); break;
+        case TELEM_DSM_ESC_TEMP1:
+        case TELEM_DSM_ESC_TEMP2:       sprintf(str, "%s%s%d", _tr("ESC"), _tr("Temp"), telem - TELEM_DSM_ESC_TEMP1 + 1); break;
+        case TELEM_DSM_ESC_RPM:         sprintf(str, "%s%s", _tr("ESC"), _tr("RPM")); break;
+        case TELEM_DSM_ESC_THROTTLE:    sprintf(str, "%s%s", _tr("ESC"), _tr("THR")); break;
+        case TELEM_DSM_ESC_OUTPUT:      sprintf(str, "%s%s", _tr("ESC"), _tr("Output")); break;
         case TELEM_DSM_RXPCAP_AMPS:     sprintf(str, "%s%s", _tr("RxPc"), _tr("Amps")); break;
         case TELEM_DSM_RXPCAP_CAPACITY: sprintf(str, "%s%s mAh", _tr("RxPc"), _tr("Bat")); break;
         case TELEM_DSM_RXPCAP_VOLT:     sprintf(str, "%s%s", _tr("RxPc"), _tr("Volt")); break;
@@ -309,16 +309,16 @@ s32 _dsm_get_max_value(u8 telem)
         case TELEM_DSM_RXPCAP_VOLT:
         case TELEM_DSM_JETCAT_PACKVOLT:
         case TELEM_DSM_JETCAT_PUMPVOLT:
-        case TELEM_DSM_HYPOTHETIC_VOLT1:
-        case TELEM_DSM_HYPOTHETIC_VOLT2:    return 6000;
+        case TELEM_DSM_ESC_VOLT1:
+        case TELEM_DSM_ESC_VOLT2:       return 6000;
         case TELEM_DSM_JETCAT_RPM:
-        case TELEM_DSM_HYPOTHETIC_RPM:      return 999999;
-        case TELEM_DSM_HYPOTHETIC_THROTTLE:
-        case TELEM_DSM_HYPOTHETIC_OUTPUT:   return 1000;
-        case TELEM_DSM_HYPOTHETIC_AMPS1:    return 9999;
-        case TELEM_DSM_HYPOTHETIC_AMPS2:
-        case TELEM_DSM_HYPOTHETIC_TEMP1:
-        case TELEM_DSM_HYPOTHETIC_TEMP2:
+        case TELEM_DSM_ESC_RPM:         return 999999;
+        case TELEM_DSM_ESC_THROTTLE:
+        case TELEM_DSM_ESC_OUTPUT:      return 1270;
+        case TELEM_DSM_ESC_AMPS1:       return 9999;
+        case TELEM_DSM_ESC_AMPS2:
+        case TELEM_DSM_ESC_TEMP1:
+        case TELEM_DSM_ESC_TEMP2:
         case TELEM_DSM_JETCAT_TEMPEGT:
         case TELEM_DSM_RXPCAP_AMPS:
         case TELEM_DSM_FPCAP_AMPS:
