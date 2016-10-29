@@ -511,10 +511,6 @@ NO_INLINE static void parse_telemetry_packet()
 #endif
             update = update7f;
             break;
-        case 0x7e: //TM1000
-        case 0xfe: //TM1100
-            update = update7e;
-            break;
         case 0x03: //High Current sensor
             update = update03;
             break;
@@ -563,17 +559,17 @@ NO_INLINE static void parse_telemetry_packet()
             break;
         case 0x15: //JetCat sensor
             update = update15;
-            Telemetry.value[TELEM_DSM_JETCAT_STATUS] = packet[2];
+            Telemetry.value[TELEM_DSM_JETCAT_STATUS]   = packet[2];
             Telemetry.value[TELEM_DSM_JETCAT_THROTTLE] = bcd_to_int(packet[3]);   //up to 159% (the upper nibble is 0-f, the lower nibble 0-9)
             Telemetry.value[TELEM_DSM_JETCAT_PACKVOLT] = bcd_to_int(pktTelem[2]); //In 1/100 of Volts
             Telemetry.value[TELEM_DSM_JETCAT_PUMPVOLT] = bcd_to_int(pktTelem[3]); //In 1/100 of Volts (low voltage)
-            Telemetry.value[TELEM_DSM_JETCAT_RPM] =      bcd_to_int(pktTelem[4] & 0x0fff); //RPM up to 999999
-            Telemetry.value[TELEM_DSM_JETCAT_TEMPEGT] =  bcd_to_int(pktTelem[6]); //EGT temp up to 999°C
-            Telemetry.value[TELEM_DSM_JETCAT_OFFCOND] = end_byte;
+            Telemetry.value[TELEM_DSM_JETCAT_RPM]      = bcd_to_int(pktTelem[4] & 0x0fff); //RPM up to 999999
+            Telemetry.value[TELEM_DSM_JETCAT_TEMPEGT]  = bcd_to_int(pktTelem[6]); //EGT temp up to 999°C
+            Telemetry.value[TELEM_DSM_JETCAT_OFFCOND]  = end_byte;
             break;
         case 0x20: //Electronic Speed Control
             update = update20;
-            Telemetry.value[TELEM_DSM_ESC_RPM]   = pktTelem[1];      //In 10 rpm, 0-655340 (0xFFFF --> No data)
+            Telemetry.value[TELEM_DSM_ESC_RPM]   = pktTelem[1] * 10; //In rpm, 0-655340 (0xFFFF --> No data)
             Telemetry.value[TELEM_DSM_ESC_VOLT1] = pktTelem[2];      //Batt in 1/100 of Volts (Volt2) (0-655.34V) (0xFFFF --> No data)
             Telemetry.value[TELEM_DSM_ESC_TEMP1] = pktTelem[3];      //FET Temp in 1/10 of C degree (0-999.8C) (0xFFFF --> No data)
             Telemetry.value[TELEM_DSM_ESC_AMPS1] = pktTelem[4];      //In 1/100 Amp (0-655.34A) (0xFFFF --> No data)
@@ -584,6 +580,13 @@ NO_INLINE static void parse_telemetry_packet()
             Telemetry.value[TELEM_DSM_ESC_OUTPUT] = end_byte * 5;    //Power Output % in 0.5% (0-127%) (0xFF ----> No data)
             break;
 #endif //HAS_EXTENDED_TELEMETRY
+        case 0x7e: //TM1000
+        case 0xfe: //TM1100
+            update = update7e;
+            Telemetry.value[TELEM_DSM_FLOG_RPM1]  = (pktTelem[1] == 0xffff || pktTelem[1] < 200) ?  0 : (120000000 / 2 / pktTelem[1]);
+            Telemetry.value[TELEM_DSM_FLOG_VOLT2] =  pktTelem[2];
+            Telemetry.value[TELEM_DSM_FLOG_TEMP1] = (pktTelem[3] - 32) * 5 / 9; //Convert to °C
+            break;
         case 0x16: //GPS sensor (always second GPS packet)
             update = update16;
             Telemetry.gps.altitude  = (bcd_to_int((altitude << 24) | ((u32)pktTelem[1] << 8))) 
