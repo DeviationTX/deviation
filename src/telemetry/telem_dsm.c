@@ -272,9 +272,9 @@ s32 _dsm_get_max_value(u8 telem)
         case TELEM_DSM_FLOG_FADESL:
         case TELEM_DSM_FLOG_FADESR:
         case TELEM_DSM_FLOG_FRAMELOSS:
-        case TELEM_DSM_FLOG_HOLDS:      //return 999;
-        case TELEM_DSM_FLOG_TEMP1:      //return 538;
-        case TELEM_DSM_FLOG_VOLT1:      return 999; //return 800;
+        case TELEM_DSM_FLOG_HOLDS:      return 999;
+        case TELEM_DSM_FLOG_TEMP1:      return 538;
+        case TELEM_DSM_FLOG_VOLT1:      return 800;
         case TELEM_DSM_FLOG_VOLT2:      return 6000;
         case TELEM_DSM_FLOG_RPM1:       return 65500;
         case TELEM_DSM_AMPS1:           return 762;
