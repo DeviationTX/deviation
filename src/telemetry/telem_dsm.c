@@ -99,8 +99,9 @@ s32 _dsm_value(struct Telemetry *t, int idx)
         case TELEM_DSM_GFORCE_ZMIN:
 #if HAS_EXTENDED_TELEMETRY
         case TELEM_DSM_RXPCAP_AMPS:
+        case TELEM_DSM_RXPCAP_CAPACITY:
         case TELEM_DSM_FPCAP_AMPS:
-        case TELEM_DSM_FPCAP_TEMP:
+        case TELEM_DSM_FPCAP_CAPACITY:
 #endif
         case TELEM_DSM_VARIO_ALTITUDE:
         case TELEM_DSM_VARIO_CLIMBRATE1:
@@ -216,36 +217,36 @@ const char * _dsm_name(char *str, u8 telem)
         case TELEM_DSM_PBOX_ALARMV2:    sprintf(str, "%s%d", "PboxAV", telem - TELEM_DSM_PBOX_ALARMV1 + 1); break;
         case TELEM_DSM_PBOX_ALARMC1:
         case TELEM_DSM_PBOX_ALARMC2:    sprintf(str, "%s%d", "PboxAC", telem - TELEM_DSM_PBOX_ALARMC1 + 1); break;
-        case TELEM_DSM_JETCAT_STATUS:   sprintf(str, "%s", "Jc.Stat"); break;
-        case TELEM_DSM_JETCAT_THROTTLE: sprintf(str, "%s", "Jc.THR"); break;
+        case TELEM_DSM_JETCAT_STATUS:   strcpy(str, "Jc.Stat"); break;
+        case TELEM_DSM_JETCAT_THROTTLE: strcpy(str, "Jc.THR"); break;
         case TELEM_DSM_JETCAT_PACKVOLT:
         case TELEM_DSM_JETCAT_PUMPVOLT: sprintf(str, "%s%d", "Jc.V", telem - TELEM_DSM_JETCAT_PACKVOLT + 1); break;
-        case TELEM_DSM_JETCAT_RPM:      sprintf(str, "%s", "Jc.RPM"); break;
-        case TELEM_DSM_JETCAT_TEMPEGT:  sprintf(str, "%s", "Jc.Temp"); break;
-        case TELEM_DSM_JETCAT_OFFCOND:  sprintf(str, "%s", "Jc.Off"); break;
+        case TELEM_DSM_JETCAT_RPM:      strcpy(str, "Jc.RPM"); break;
+        case TELEM_DSM_JETCAT_TEMPEGT:  strcpy(str, "Jc.Temp"); break;
+        case TELEM_DSM_JETCAT_OFFCOND:  strcpy(str, "Jc.Off"); break;
         case TELEM_DSM_ESC_AMPS1:
         case TELEM_DSM_ESC_AMPS2:       sprintf(str, "%s%d", "ESC.A", telem - TELEM_DSM_ESC_AMPS1 + 1); break;
         case TELEM_DSM_ESC_VOLT1:
         case TELEM_DSM_ESC_VOLT2:       sprintf(str, "%s%d", "ESC.V", telem - TELEM_DSM_ESC_VOLT1 + 1); break;
         case TELEM_DSM_ESC_TEMP1:
         case TELEM_DSM_ESC_TEMP2:       sprintf(str, "%s%d", "ESC.T", telem - TELEM_DSM_ESC_TEMP1 + 1); break;
-        case TELEM_DSM_ESC_RPM:         sprintf(str, "%s", "ESC.RPM"); break;
-        case TELEM_DSM_ESC_THROTTLE:    sprintf(str, "%s", "ESC.THR"); break;
-        case TELEM_DSM_ESC_OUTPUT:      sprintf(str, "%s", "ESC.PWR"); break;
-        case TELEM_DSM_RXPCAP_AMPS:     sprintf(str, "%s", "RxCap.A"); break;
-        case TELEM_DSM_RXPCAP_CAPACITY: sprintf(str, "%s", "RxCap.C"); break;
-        case TELEM_DSM_RXPCAP_VOLT:     sprintf(str, "%s", "RxCap.V"); break;
-        case TELEM_DSM_FPCAP_AMPS:      sprintf(str, "%s", "BtCap.A"); break;
-        case TELEM_DSM_FPCAP_CAPACITY:  sprintf(str, "%s", "BtCap.C"); break;
-        case TELEM_DSM_FPCAP_TEMP:      sprintf(str, "%s", "BtCap.T"); break;
+        case TELEM_DSM_ESC_RPM:         strcpy(str, "ESC.RPM"); break;
+        case TELEM_DSM_ESC_THROTTLE:    strcpy(str, "ESC.THR"); break;
+        case TELEM_DSM_ESC_OUTPUT:      strcpy(str, "ESC.PWR"); break;
+        case TELEM_DSM_RXPCAP_AMPS:     strcpy(str, "RxCap.A"); break;
+        case TELEM_DSM_RXPCAP_CAPACITY: strcpy(str, "RxCap.C"); break;
+        case TELEM_DSM_RXPCAP_VOLT:     strcpy(str, "RxCap.V"); break;
+        case TELEM_DSM_FPCAP_AMPS:      strcpy(str, "BtCap.A"); break;
+        case TELEM_DSM_FPCAP_CAPACITY:  strcpy(str, "BtCap.C"); break;
+        case TELEM_DSM_FPCAP_TEMP:      strcpy(str, "BtCap.T"); break;
 #endif
-        case TELEM_DSM_VARIO_ALTITUDE:  strcpy(str, _tr("Var.Alt")); break;
+        case TELEM_DSM_VARIO_ALTITUDE:  strcpy(str, "Var.Alt"); break;
         case TELEM_DSM_VARIO_CLIMBRATE1:
         case TELEM_DSM_VARIO_CLIMBRATE2:
         case TELEM_DSM_VARIO_CLIMBRATE3:
         case TELEM_DSM_VARIO_CLIMBRATE4:
         case TELEM_DSM_VARIO_CLIMBRATE5:
-        case TELEM_DSM_VARIO_CLIMBRATE6:sprintf(str, "%s%d", _tr("Var.CR"), telem - TELEM_DSM_VARIO_CLIMBRATE1 + 1); break;
+        case TELEM_DSM_VARIO_CLIMBRATE6:sprintf(str, "%s%d", "Var.CR", telem - TELEM_DSM_VARIO_CLIMBRATE1 + 1); break;
         default:
             return "";
     }
@@ -336,10 +337,16 @@ s32 _dsm_get_min_value(u8 telem)
         case TELEM_DSM_AMPS1:           return -762;
         case TELEM_DSM_GFORCE_X:
         case TELEM_DSM_GFORCE_Y:
-        case TELEM_DSM_GFORCE_Z:        return -4000;
+        case TELEM_DSM_GFORCE_Z:
+        case TELEM_DSM_GFORCE_XMAX:
+        case TELEM_DSM_GFORCE_YMAX:
+        case TELEM_DSM_GFORCE_ZMAX:
+        case TELEM_DSM_GFORCE_ZMIN:     return -4000;
 #if HAS_EXTENDED_TELEMETRY
-        case TELEM_DSM_FPCAP_AMPS:
-        case TELEM_DSM_RXPCAP_AMPS:     return -999;
+        case TELEM_DSM_FPCAP_AMPS:      return -1400;
+        case TELEM_DSM_RXPCAP_AMPS:     return -1800;
+        case TELEM_DSM_FPCAP_CAPACITY:
+        case TELEM_DSM_RXPCAP_CAPACITY: return -32766;
 #endif
         default: return 0;
     }
