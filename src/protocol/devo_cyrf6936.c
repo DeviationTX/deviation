@@ -14,9 +14,9 @@
  */
 
 #ifdef MODULAR
-  //Allows the linker to properly relocate
-  #define DEVO_Cmds PROTO_Cmds
-  #pragma long_calls
+    //Allows the linker to properly relocate
+    #define DEVO_Cmds PROTO_Cmds
+    #pragma long_calls
 #endif
 
 #include "common.h"
@@ -26,11 +26,11 @@
 #include "config/model.h"
 
 #ifdef MODULAR
-  //Some versions of gcc applythis to definitions, others to calls
-  //So just use long_calls everywhere
-  //#pragma no_long_calls
-  extern unsigned _data_loadaddr;
-  const unsigned long protocol_type = (unsigned long)&_data_loadaddr;
+    //Some versions of gcc applythis to definitions, others to calls
+    //So just use long_calls everywhere
+    //#pragma no_long_calls
+    extern unsigned _data_loadaddr;
+    const unsigned long protocol_type = (unsigned long)&_data_loadaddr;
 #endif
 
 #ifdef PROTO_HAS_CYRF6936
@@ -41,23 +41,25 @@
 #define PKTS_PER_CHANNEL 4
 
 #ifdef EMULATOR
-#include <stdlib.h>
-#define BIND_COUNT 4
+    #include <stdlib.h>
+    #define BIND_COUNT 4
 #else
-#define BIND_COUNT 0x1388
+    #define BIND_COUNT 0x1388
 #endif
 
 #define TELEMETRY_ENABLE 0x30
-
 #define NUM_WAIT_LOOPS (100 / 5) //each loop is ~5us.  Do not wait more than 100us
+
 static const char * const devo_opts[] = {
   _tr_noop("Telemetry"),  _tr_noop("On"), _tr_noop("Off"), NULL,
   NULL
 };
+
 enum {
     PROTOOPTS_TELEMETRY = 0,
     LAST_PROTO_OPT,
 };
+
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 #define TELEM_ON 0
@@ -227,6 +229,7 @@ static s32 float_to_int(u8 *ptr)
     }
     return value;
 }
+
 static u32 text_to_int(u8 *ptr, u8 len)
 {
     u32 value = 0;
@@ -235,6 +238,7 @@ static u32 text_to_int(u8 *ptr, u8 len)
     }
     return value;
 }
+
 static void parse_telemetry_packet()
 {
     static const u8 voltpkt[] = {
@@ -346,42 +350,39 @@ static void cyrf_set_bound_sop_code()
     CYRF_SetTxRxMode(TX_EN);
     CYRF_ConfigCRCSeed((crc << 8) + crc);
     CYRF_ConfigSOPCode(sopcodes[sopidx]);
-    CYRF_WriteRegister(CYRF_03_TX_CFG, 0x08 | Model.tx_power);
+    CYRF_SetPower(Model.tx_power);
 }
 
 static void cyrf_init()
 {
     /* Initialise CYRF chip */
-    CYRF_WriteRegister(CYRF_1D_MODE_OVERRIDE, 0x38);
-    CYRF_WriteRegister(CYRF_03_TX_CFG, 0x08 | Model.tx_power);
-    CYRF_WriteRegister(CYRF_06_RX_CFG, 0x4A);
-    CYRF_WriteRegister(CYRF_0B_PWR_CTRL, 0x00);
-    CYRF_WriteRegister(CYRF_10_FRAMING_CFG, 0xA4);
-    CYRF_WriteRegister(CYRF_11_DATA32_THOLD, 0x05);
-    CYRF_WriteRegister(CYRF_12_DATA64_THOLD, 0x0E);
-    CYRF_WriteRegister(CYRF_1B_TX_OFFSET_LSB, 0x55);
-    CYRF_WriteRegister(CYRF_1C_TX_OFFSET_MSB, 0x05);
-    CYRF_WriteRegister(CYRF_32_AUTO_CAL_TIME, 0x3C);
-    CYRF_WriteRegister(CYRF_35_AUTOCAL_OFFSET, 0x14);
-    CYRF_WriteRegister(CYRF_39_ANALOG_CTRL, 0x01);
-    CYRF_WriteRegister(CYRF_1E_RX_OVERRIDE, 0x10);
-    CYRF_WriteRegister(CYRF_1F_TX_OVERRIDE, 0x00);
-    CYRF_WriteRegister(CYRF_01_TX_LENGTH, 0x10);
-    CYRF_WriteRegister(CYRF_0F_XACT_CFG, 0x10);
-    CYRF_WriteRegister(CYRF_27_CLK_OVERRIDE, 0x02);
-    CYRF_WriteRegister(CYRF_28_CLK_EN, 0x02);
-    CYRF_WriteRegister(CYRF_0F_XACT_CFG, 0x28);
+    CYRF_WriteRegister(CYRF_1D_MODE_OVERRIDE, 0x38);  //FRC SEN (forces the synthesizer to start) + FRC AWAKE (force the oscillator to keep running at all times)
+    CYRF_WriteRegister(CYRF_03_TX_CFG, 0x08 | 7);     //Data Code Length = 32 chip codes + Data Mode = 8DR Mode + max-power(+4 dBm)
+    CYRF_WriteRegister(CYRF_06_RX_CFG, 0x4A);         //LNA + FAST TURN EN + RXOW EN, enable low noise amplifier, fast turning, overwrite enable
+    CYRF_WriteRegister(CYRF_0B_PWR_CTRL, 0x00);       //Reset power control
+    CYRF_WriteRegister(CYRF_10_FRAMING_CFG, 0xA4);    //SOP EN + SOP LEN = 32 chips + LEN EN + SOP TH = 04h
+    CYRF_WriteRegister(CYRF_11_DATA32_THOLD, 0x05);   //TH32 = 0x05
+    CYRF_WriteRegister(CYRF_12_DATA64_THOLD, 0x0E);   //TH64 = 0Eh, set pn correlation threshold
+    CYRF_WriteRegister(CYRF_1B_TX_OFFSET_LSB, 0x55);  //STRIM LSB = 0x55, typical configuration
+    CYRF_WriteRegister(CYRF_1C_TX_OFFSET_MSB, 0x05);  //STRIM MSB = 0x05, typical configuration
+    CYRF_WriteRegister(CYRF_32_AUTO_CAL_TIME, 0x3C);  //AUTO_CAL_TIME = 3Ch, typical configuration
+    CYRF_WriteRegister(CYRF_35_AUTOCAL_OFFSET, 0x14); //AUTO_CAL_OFFSET = 14h, typical configuration
+    CYRF_WriteRegister(CYRF_39_ANALOG_CTRL, 0x01);    //ALL SLOW
+    CYRF_WriteRegister(CYRF_1E_RX_OVERRIDE, 0x10);    //FRC RXDR (Force Receive Data Rate)
+    CYRF_WriteRegister(CYRF_1F_TX_OVERRIDE, 0x00);    //Reset TX overrides
+    CYRF_WriteRegister(CYRF_01_TX_LENGTH, 0x10);      //TX Length = 16 byte packet
+    CYRF_WriteRegister(CYRF_27_CLK_OVERRIDE, 0x02);   //RXF, force receive clock
+    CYRF_WriteRegister(CYRF_28_CLK_EN, 0x02);         //RXF, force receive clock enable
 }
 
 static void set_radio_channels()
 {
-    int i;
     CYRF_FindBestChannels(radio_ch, 3, 4, 4, 80);
-    printf("Radio Channels:");
-    for (i = 0; i < 3; i++) {
-        printf(" %02x", radio_ch[i]);
-    }
-    printf("\n");
+    //printf("Radio Channels:");
+    //for (int i = 0; i < 3; i++) {
+    //    printf(" %02x", radio_ch[i]);
+    //}
+    //printf("\n");
     //Makes code a little easier to duplicate these here
     radio_ch[3] = radio_ch[0];
     radio_ch[4] = radio_ch[1];
@@ -389,9 +390,9 @@ static void set_radio_channels()
 
 void DEVO_BuildPacket()
 {
-    static unsigned cnt = 0;
-    char foo[20];
-    snprintf(foo, 20, "%d: %d", cnt++, state);
+    //static unsigned cnt = 0;
+    //char foo[20];
+    //snprintf(foo, 20, "%d: %d", cnt++, state);
     switch(state) {
         case DEVO_BIND:
             bind_counter--;
@@ -439,6 +440,7 @@ void DEVO_BuildPacket()
     if(pkt_num == PKTS_PER_CHANNEL)
         pkt_num = 0;
 }
+
 MODULE_CALLTYPE
 static u16 devo_telemetry_cb()
 {
@@ -480,7 +482,7 @@ static u16 devo_telemetry_cb()
         }
         if(pkt_num == 0) {
             //Keep tx power updated
-            CYRF_WriteRegister(CYRF_03_TX_CFG, 0x08 | Model.tx_power);
+            CYRF_SetPower(Model.tx_power);
             radio_ch_ptr = radio_ch_ptr == &radio_ch[2] ? radio_ch : radio_ch_ptr + 1;
             CYRF_ConfigRFChannel(*radio_ch_ptr);
         }
@@ -535,7 +537,7 @@ static u16 devo_cb()
     }   
     if(pkt_num == 0) {
         //Keep tx power updated
-        CYRF_WriteRegister(CYRF_03_TX_CFG, 0x08 | Model.tx_power);
+        CYRF_SetPower(Model.tx_power);
         radio_ch_ptr = radio_ch_ptr == &radio_ch[2] ? radio_ch : radio_ch_ptr + 1;
         CYRF_ConfigRFChannel(*radio_ch_ptr);
     }
@@ -565,13 +567,6 @@ static void initialize()
     radio_ch_ptr = radio_ch;
     memset(&Telemetry, 0, sizeof(Telemetry));
     TELEMETRY_SetType(TELEM_DEVO);
-    /*
-    parse_telemetry_packet("203020.8270E\0");
-    parse_telemetry_packet("35954.776N\0\0");
-    parse_telemetry_packet("412.8\0\0\0MMNE\0");
-    parse_telemetry_packet("5\0\0\0\0\0\00.00\0\0");
-    parse_telemetry_packet("6182552151012");
-    */
     CYRF_ConfigRFChannel(*radio_ch_ptr);
     //FIXME: Properly setnumber of channels;
     num_channels = ((Model.num_channels + 3) >> 2) * 4;
