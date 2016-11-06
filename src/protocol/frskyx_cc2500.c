@@ -830,6 +830,7 @@ static void initialize(int bind)
     seq_last_rcvd = 8;
 #if HAS_EXTENDED_TELEMETRY
     Telemetry.value[TELEM_FRSKY_MIN_CELL] = TELEMETRY_GetMaxValue(TELEM_FRSKY_MIN_CELL);
+    UART_SetDataRate(57600);    // set for s.port compatibility
 #endif
 
     u32 seed = get_tx_id();
@@ -874,6 +875,9 @@ const void *FRSKYX_Cmds(enum ProtoCmds cmd)
             return (void *)1L;
         case PROTOCMD_RESET:
         case PROTOCMD_DEINIT:
+#if HAS_EXTENDED_TELEMETRY
+            UART_SetDataRate(0);  // restore data rate to default
+#endif
             CLOCK_StopTimer();
             return (void *)(CC2500_Reset() ? 1L : -1L);
         default: break;

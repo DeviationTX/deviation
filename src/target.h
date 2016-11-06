@@ -178,6 +178,7 @@ void VIBRATINGMOTOR_Stop();
 void UART_Initialize();
 void UART_Stop();
 u8 UART_Send(u8 *data, u16 len);
+void UART_SetDataRate(u32 bps);
 
 /* USB*/
 void USB_Enable(unsigned type, unsigned use_interrupt);

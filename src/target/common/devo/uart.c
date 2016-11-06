@@ -53,6 +53,19 @@ void UART_Stop()
     usart_disable(_USART);
 }
 
+void UART_SetDataRate(u32 bps)
+{
+    switch (bps) {
+    case  57600:
+    case 115200:
+      break;
+    default:
+      bps = 115200;
+    }
+
+    usart_set_baudrate(_USART, bps);
+}
+
 static volatile u8 busy;
 u8 UART_Send(u8 *data, u16 len) {
     if (busy) return 1;
