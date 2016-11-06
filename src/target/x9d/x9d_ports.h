@@ -19,20 +19,7 @@
 #define _PWM_EXTI EXTI8
 //End PWM Port
 
-#ifndef _USART
-    #define _USART                        USART3
-    #define _USART_DR                     USART3_DR
-    #define _USART_DMA                    DMA1
-    #define _USART_DMA_CHANNEL            DMA_CHANNEL2
-    #define _USART_DMA_ISR                dma1_channel2_isr
-    #define _USART_NVIC_DMA_CHANNEL_IRQ   NVIC_DMA1_CHANNEL2_IRQ
-    #define _USART_RCC_APB_ENR_IOP        RCC_APB2ENR
-    #define _USART_RCC_APB_ENR_IOP_EN     RCC_APB2ENR_IOPBEN
-    #define _USART_RCC_APB_ENR_USART      RCC_APB1ENR
-    #define _USART_RCC_APB_ENR_USART_EN   RCC_APB1ENR_USART3EN
-    #define _USART_GPIO                   GPIOB
-    #define _USART_GPIO_USART_TX          GPIO_USART3_TX
-#endif
+#define _USART USART3
 
 //SD Card
 #define RCC_GPIO_CP                     RCC_AHB1ENR_IOPDEN
