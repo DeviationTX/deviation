@@ -12,13 +12,5 @@
 #define SWITCH_ADDRESS 0xFFFFFFFF
 #define HAS_CYRF_RESET 0
 
-#ifndef _USART
-    #define _USART               USART4
-    #define _USART_DR            USART4_DR
-    #define _USART_DMA           DMA2
-    #define _USART_DMA_CHANNEL   DMA_CHANNEL5
-    #define _USART_DMA_ISR       dma2_channel5_isr
-    #define _USART_NVIC_DMA_CHANNEL_IRQ   NVIC_DMA2_CHANNEL5_IRQ
-#endif
-
+#define _USART USART4
 #endif /*_UNIVERSALTX_TARGET_H_ */
