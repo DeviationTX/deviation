@@ -25,24 +25,24 @@
 
 void UART_Initialize()
 {
-    /* Enable clocks for GPIO port A (for GPIO_USART1_TX) and USART1. */
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPAEN);
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_USART1EN);
+    /* Enable clocks for GPIO port containing _USART and USART */
+    rcc_peripheral_enable_clock(&_USART_RCC_APB_ENR_IOP,   _USART_RCC_APB_ENR_IOP_EN);
+    rcc_peripheral_enable_clock(&_USART_RCC_APB_ENR_USART, _USART_RCC_APB_ENR_USART_EN);
 
-    /* Setup GPIO pin GPIO_USART1_TX/GPIO9 on GPIO port A for transmit. */
-    gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
-                    GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO_USART1_TX);
+    /* Setup GPIO pin GPIO_USARTX_TX on USART GPIO port for transmit. */
+    gpio_set_mode(_USART_GPIO, GPIO_MODE_OUTPUT_50_MHZ,
+                    GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, _USART_GPIO_USART_TX);
 
     /* Setup UART parameters. */
-    usart_set_baudrate(USART1, 115200);
-    usart_set_databits(USART1, 8);
-    usart_set_stopbits(USART1, USART_STOPBITS_1);
-    usart_set_mode(USART1, USART_MODE_TX);
-    usart_set_parity(USART1, USART_PARITY_NONE);
-    usart_set_flow_control(USART1, USART_FLOWCONTROL_NONE);
+    usart_set_baudrate(_USART, 115200);
+    usart_set_databits(_USART, 8);
+    usart_set_stopbits(_USART, USART_STOPBITS_1);
+    usart_set_mode(_USART, USART_MODE_TX);
+    usart_set_parity(_USART, USART_PARITY_NONE);
+    usart_set_flow_control(_USART, USART_FLOWCONTROL_NONE);
 
     /* Finally enable the USART. */
-    usart_enable(USART1);
+    usart_enable(_USART);
 
     nvic_set_priority(_USART_NVIC_DMA_CHANNEL_IRQ, 3);
     nvic_enable_irq(_USART_NVIC_DMA_CHANNEL_IRQ);
@@ -50,7 +50,7 @@ void UART_Initialize()
 
 void UART_Stop()
 {
-    usart_disable(USART1);
+    usart_disable(_USART);
 }
 
 static volatile u8 busy;
