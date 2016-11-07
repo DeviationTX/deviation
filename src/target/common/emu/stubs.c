@@ -78,6 +78,7 @@ u8 *BOOTLOADER_Read(int idx) {
 }
 void UART_Initialize() {}
 u8 UART_Send(u8 *data, u16 len) { (void)data; (void)len; return 0;}
+void UART_SetDataRate(u32 bps) { (void)bps;}
 void init_err_handler() {}
 #if EMULATOR == USE_NATIVE_FS
 void SPIFlash_Init() {}
