@@ -163,8 +163,8 @@ static void processHubPacket(u8 id, u16 value) {
         Telemetry.gps.time = ( (u32)fr_gps.year & 0x3f)            << 26
                            | (((u32)fr_gps.day_month >> 8) & 0x0f) << 22
                            | ( (u32)fr_gps.day_month & 0x1f)       << 17
-                           | ( (u32)fr_gps.hour_min & 0x1f)        << 12
-                           | (((u32)fr_gps.hour_min >> 8) & 0x3f)  << 6
+                           | (((u32)fr_gps.hour_min >> 8) & 0x3f)  << 12
+                           | ( (u32)fr_gps.hour_min & 0x1f)        << 6
                            | ( (u32)fr_gps.second & 0x3f);
         TELEMETRY_SetUpdated(TELEM_GPS_TIME);
         break;

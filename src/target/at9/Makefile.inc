@@ -34,6 +34,7 @@ SRC_C    = $(wildcard $(SDIR)/target/$(TARGET)/*.c) \
            $(wildcard $(SDIR)/target/common/devo/msc2/lib/*.c) \
            $(wildcard $(SDIR)/target/common/devo/hid/*.c) \
            $(wildcard $(SDIR)/target/common/devo/protocol/*.c) \
+           $(wildcard $(SDIR)/target/common/devo/uart.c) \
            $(SDIR)/target/devo8/ili9341.c
 
 CFLAGS   = -D"assert_param(x)=" -DSTM32F10X_HD -DSTM32F1 -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -fdata-sections -ffunction-sections -I$(SDIR)/target/common/devo/msc2/lib -I$(SDIR)/target/common/devo/msc2 -I$(SDIR)/libopencm3/include -I$(SDIR)/target/common/filesystems -fno-builtin-printf -Os --specs=nano.specs
