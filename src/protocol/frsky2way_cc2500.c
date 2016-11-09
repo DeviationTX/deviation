@@ -294,13 +294,13 @@ static void frsky2way_parse_telem(u8 *pkt, int len)
     Telemetry.value[TELEM_FRSKY_VOLT2] = pkt[4] * (132*AD2gain) / 1000; //In 1/100 of Volts *(A2gain/10)
     TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT2);
 
-    Telemetry.value[TELEM_FRSKY_RSSI] = pkt[5]; 	// Value in Db
+    Telemetry.value[TELEM_FRSKY_RSSI] = pkt[5];
     TELEMETRY_SetUpdated(TELEM_FRSKY_RSSI);
 
     Telemetry.value[TELEM_FRSKY_LQI] = pkt[len-1] & 0x7f;
     TELEMETRY_SetUpdated(TELEM_FRSKY_LQI);
 
-    Telemetry.value[TELEM_FRSKY_LRSSI] = (s8)pkt[len-2] / 2 - 70; 	// Value in Db
+    Telemetry.value[TELEM_FRSKY_LRSSI] = (s8)pkt[len-2] / 2 - 70; 	// Value in dBm
     TELEMETRY_SetUpdated(TELEM_FRSKY_LRSSI);
 
 #if HAS_EXTENDED_TELEMETRY
