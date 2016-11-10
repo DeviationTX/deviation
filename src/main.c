@@ -210,6 +210,7 @@ void EventLoop()
     debug_timing(0, 0);
 #endif
     priority_ready &= ~(1 << MEDIUM_PRIORITY);
+#if !defined(HAS_HARD_POWER_OFF) || !HAS_HARD_POWER_OFF
     if(PWR_CheckPowerSwitch()) {
         if(! (BATTERY_Check() & BATTERY_CRITICAL)) {
             PAGE_Test();
@@ -225,6 +226,7 @@ void EventLoop()
 
         PWR_Shutdown();
     }
+#endif
     BUTTON_Handler();
     TOUCH_Handler();
     INPUT_CheckChanges();
@@ -244,6 +246,10 @@ void EventLoop()
         VIDEO_Update();
 #endif
         GUI_RefreshScreen();
+#if defined(HAS_HARD_POWER_OFF) && HAS_HARD_POWER_OFF
+        CONFIG_SaveModelIfNeeded();
+        CONFIG_SaveTxIfNeeded();
+#endif
     }
 #ifdef TIMING_DEBUG
     debug_timing(0, 1);
