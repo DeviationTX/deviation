@@ -1,6 +1,18 @@
 #ifndef _PORTS_H_
 #define _PORTS_H_
 
+#include <libopencm3/stm32/gpio.h> /* For GPIO* definitions */
+
+struct mcu_pin {
+    u32 port;
+    u16 pin;
+};
+#define PORT_mode_setup(io, mode, pullup) gpio_set_mode(io.port, mode, pullup, io.pin)
+#define PORT_pin_set(io)                  gpio_set(io.port,io.pin)
+#define PORT_pin_clear(io)                gpio_clear(io.port,io.pin)
+#define PORT_pin_get(io)                  gpio_get(io.port,io.pin)
+
+
 //SPI Flash
 #ifndef _SPI_FLASH_PORT
     #define _SPI_FLASH_PORT          1 //SPI1
@@ -9,9 +21,27 @@
     #define _SPI_FLASH_MISO_PIN      {GPIOA, GPIO6}
     #define _SPI_FLASH_MOSI_PIN      {GPIOA, GPIO7}
 #endif
+static const struct mcu_pin FLASH_CSN_PIN   = _SPI_FLASH_CSN_PIN;
+static const struct mcu_pin FLASH_SCK_PIN   = _SPI_FLASH_SCK_PIN;
+static const struct mcu_pin FLASH_MISO_PIN  = _SPI_FLASH_MISO_PIN;
+static const struct mcu_pin FLASH_MOSI_PIN  = _SPI_FLASH_MOSI_PIN;
 #ifndef SPIFLASH_TYPE
     #define SPIFLASH_TYPE SST25VFxxxB
 #endif
+
+#ifndef _SPI_PROTO_PORT
+    #define _SPI_PROTO_PORT          2 //SPI2
+    #define _SPI_PROTO_RST_PIN       {GPIOB, GPIO11}
+    #define _SPI_PROTO_CSN_PIN       {GPIOB, GPIO12}
+    #define _SPI_PROTO_SCK_PIN       {GPIOB, GPIO13}
+    #define _SPI_PROTO_MISO_PIN      {GPIOB, GPIO14}
+    #define _SPI_PROTO_MOSI_PIN      {GPIOB, GPIO15}
+#endif
+static const struct mcu_pin PROTO_RST_PIN   = _SPI_PROTO_RST_PIN;
+static const struct mcu_pin PROTO_CSN_PIN   = _SPI_PROTO_CSN_PIN;
+static const struct mcu_pin PROTO_SCK_PIN   = _SPI_PROTO_SCK_PIN;
+static const struct mcu_pin PROTO_MISO_PIN  = _SPI_PROTO_MISO_PIN;
+static const struct mcu_pin PROTO_MOSI_PIN  = _SPI_PROTO_MOSI_PIN;
 
 #ifndef _ADC
 #define ADC_OVERSAMPLE_WINDOW_COUNT 1
@@ -32,7 +62,7 @@
     #define _PWRSW_PORT               GPIOA
     #define _PWRSW_PIN                GPIO3
     #define _PWRSW_RCC_APB2ENR_IOPEN  RCC_APB2ENR_IOPAEN
-#endif //_SWITCH_PORT
+#endif //_PWRSW_PORT
 #ifndef _PWREN_PORT
     #define _PWREN_PORT                GPIOA
     #define _PWREN_PIN                 GPIO2

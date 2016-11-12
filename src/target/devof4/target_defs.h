@@ -2,10 +2,10 @@
 #define _DEVO7E_TARGET_H_
 
 #define USE_DEVOFS 1 //Must be before common_devo include
+#define SPIFLASH_TYPE SST25VFxxxA
 #include "../common/devo/common_devo.h"
 
-#define TXID 0xF7
-#define SPIFLASH_TYPE SST25VFxxxA
+#define TXID 0xF4
 #define VECTOR_TABLE_LOCATION 0x3000 //0x3000
 #define SPIFLASH_SECTOR_OFFSET 0
 #define SPIFLASH_SECTORS 16

@@ -28,6 +28,20 @@
 #include "protocol/interface.h"
 #include <stdlib.h>
 
+#if _SPI_PROTO_PORT == 1
+    #define SPIx        SPI1
+    #define SPIxEN      RCC_APB2ENR_SPI1EN
+    #define APB_SPIxEN  RCC_APB2ENR
+#elif _SPI_PROTO_PORT == 2
+    #define SPIx        SPI2
+    #define SPIxEN      RCC_APB1ENR_SPI2EN
+    #define APB_SPIxEN  RCC_APB1ENR
+#endif
+
+#ifndef HAS_4IN1_FLASH
+    #define HAS_4IN1_FLASH 0
+#endif
+
 #if HAS_MULTIMOD_SUPPORT
 int SPI_ConfigSwitch(unsigned csn_high, unsigned csn_low)
 {
@@ -37,7 +51,7 @@ int SPI_ConfigSwitch(unsigned csn_high, unsigned csn_low)
     //SCK is now on output
     gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
                   GPIO_CNF_OUTPUT_PUSHPULL, GPIO13);
-    spi_disable(SPI2);
+    spi_disable(SPIx);
     for(i = 0; i < 100; i++)
         asm volatile ("nop");
     gpio_set(GPIOB, GPIO13);
@@ -47,18 +61,18 @@ int SPI_ConfigSwitch(unsigned csn_high, unsigned csn_low)
     //Switch back to SPI
     gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
                   GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO13);
-    spi_set_baudrate_prescaler(SPI2, SPI_CR1_BR_FPCLK_DIV_128);
-    spi_enable(SPI2);
+    spi_set_baudrate_prescaler(SPIx, SPI_CR1_BR_FPCLK_DIV_128);
+    spi_enable(SPIx);
     //Finally ready to send a command
     
-    int byte1 = spi_xfer(SPI2, csn_high); //Set all other pins high
-    int byte2 = spi_xfer(SPI2, csn_low); //Toggle related pin with CSN
+    int byte1 = spi_xfer(SPIx, csn_high); //Set all other pins high
+    int byte2 = spi_xfer(SPIx, csn_low); //Toggle related pin with CSN
     for(i = 0; i < 100; i++)
         asm volatile ("nop");
     //Reset transfer speed
-    spi_disable(SPI2);
-    spi_set_baudrate_prescaler(SPI2, SPI_CR1_BR_FPCLK_DIV_16);
-    spi_enable(SPI2);
+    spi_disable(SPIx);
+    spi_set_baudrate_prescaler(SPIx, SPI_CR1_BR_FPCLK_DIV_16);
+    spi_enable(SPIx);
     return byte1 == 0xa5 ? byte2 : 0;
 }
 
@@ -89,25 +103,19 @@ int SPI_ProtoGetPinConfig(int module, int state) {
 
 void SPI_ProtoInit()
 {
-    /* Enable SPI2 */
-    rcc_peripheral_enable_clock(&RCC_APB1ENR, RCC_APB1ENR_SPI2EN);
+    /* Enable SPIx */
+    rcc_peripheral_enable_clock(&APB_SPIxEN, SPIxEN);
     /* Enable GPIOA */
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPAEN);
     /* Enable GPIOB */
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPBEN);
 
-    /* SCK, MOSI */
-    gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO13 | GPIO15);
-    /* MISO */
-    gpio_set_mode(GPIOB, GPIO_MODE_INPUT,
-                  GPIO_CNF_INPUT_FLOAT, GPIO14);
-
-    /*CYRF cfg */
-    /* Reset and CS */
-    gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_PUSHPULL, GPIO11);
-    gpio_clear(GPIOB, GPIO11);
+    PORT_mode_setup(PROTO_RST_PIN,  GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_PUSHPULL);
+    PORT_mode_setup(PROTO_SCK_PIN,  GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL);
+    PORT_mode_setup(PROTO_MOSI_PIN, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL);
+    PORT_mode_setup(PROTO_MISO_PIN, GPIO_MODE_INPUT,         GPIO_CNF_INPUT_FLOAT);
+    
+    PORT_pin_clear(PROTO_RST_PIN);
 
 #if 0 //In power.c
     //Disable JTAG and SWD and set both pins high
@@ -141,15 +149,19 @@ void SPI_ProtoInit()
         }
     }
     /* Includes enable? */
-    spi_init_master(SPI2, 
+    spi_init_master(SPIx, 
                     SPI_CR1_BAUDRATE_FPCLK_DIV_16,
                     SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE,
                     SPI_CR1_CPHA_CLK_TRANSITION_1, 
                     SPI_CR1_DFF_8BIT,
                     SPI_CR1_MSBFIRST);
-    spi_enable_software_slave_management(SPI2);
-    spi_set_nss_high(SPI2);
-    spi_enable(SPI2);
+    spi_enable_software_slave_management(SPIx);
+    spi_set_nss_high(SPIx);
+    spi_enable(SPIx);
+
+    if (HAS_4IN1_FLASH && _SPI_FLASH_PORT != _SPI_PROTO_PORT) {
+        SPISwitch_Init();
+    }
 
     PROTO_Stubs(0);
 }
@@ -157,19 +169,19 @@ void SPI_ProtoInit()
 void SPI_AVRProgramInit()
 {
     rcc_set_ppre1(RCC_CFGR_PPRE1_HCLK_DIV16);  //72 / 16 = 4.5MHz
-    spi_disable(SPI2);
-    spi_set_baudrate_prescaler(SPI2, SPI_CR1_BR_FPCLK_DIV_256);// 4.5 / 256 = 17.5kHz
-    spi_enable(SPI2);
+    spi_disable(SPIx);
+    spi_set_baudrate_prescaler(SPIx, SPI_CR1_BR_FPCLK_DIV_256);// 4.5 / 256 = 17.5kHz
+    spi_enable(SPIx);
 }
 
 void MCU_InitModules()
 {
-    //CSN
-    gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_PUSHPULL, GPIO12);
-    gpio_set(GPIOB, GPIO12);
-    Transmitter.module_enable[CYRF6936].port = GPIOB;
-    Transmitter.module_enable[CYRF6936].pin = GPIO12;
+    //CSN                               
+    PORT_mode_setup(PROTO_CSN_PIN,  GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_PUSHPULL);
+    PORT_pin_set(PROTO_CSN_PIN);
+    Transmitter.module_enable[CYRF6936] = PROTO_CSN_PIN;
+    //Transmitter.module_enable[CYRF6936].port = GPIOB;
+    //Transmitter.module_enable[CYRF6936].pin = GPIO12;
     Transmitter.module_poweramp = (1 << CYRF6936);
 }
 

@@ -42,24 +42,9 @@
     #define HAS_4IN1_FLASH 0
 #endif
 
-struct mcu_pin {
-    u32 port;
-    u16 pin;
-};
-#define PORT_mode_setup(io, mode, pullup) gpio_set_mode(io.port, mode, pullup, io.pin)
-#define PORT_pin_set(io)                  gpio_set(io.port,io.pin)
-#define PORT_pin_clear(io)                gpio_clear(io.port,io.pin)
-#define PORT_pin_get(io)                  gpio_get(io.port,io.pin)
-
-static const struct mcu_pin FLASH_CSN_PIN           = _SPI_FLASH_CSN_PIN;
-static const struct mcu_pin FLASH_SCK_PIN           = _SPI_FLASH_SCK_PIN;
-static const struct mcu_pin FLASH_MISO_PIN          = _SPI_FLASH_MISO_PIN;
-static const struct mcu_pin FLASH_MOSI_PIN          = _SPI_FLASH_MOSI_PIN;
-
-
 void CS_HI()
 {
-    if (HAS_4IN1_FLASH) {
+    if (HAS_4IN1_FLASH && _SPI_PROTO_PORT == _SPI_FLASH_PORT) {
         cm_enable_interrupts();
     }
     PORT_pin_set(FLASH_CSN_PIN);
@@ -67,7 +52,7 @@ void CS_HI()
 
 void CS_LO()
 {
-    if (HAS_4IN1_FLASH) {
+    if (HAS_4IN1_FLASH && _SPI_PROTO_PORT == _SPI_FLASH_PORT) {
         cm_disable_interrupts();
         SPISwitch_UseFlashModule();
     }
@@ -79,7 +64,7 @@ void CS_LO()
  */
 void SPIFlash_Init()
 {
-    /* Enable SPI1 */
+    /* Enable SPIx */
     rcc_peripheral_enable_clock(&APB_SPIxEN,  SPIxEN);
     /* Enable GPIOA */
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPAEN);
@@ -103,7 +88,7 @@ void SPIFlash_Init()
     spi_set_nss_high(SPIx);
 
     spi_enable(SPIx);
-    if (HAS_4IN1_FLASH) {
+    if (HAS_4IN1_FLASH && _SPI_FLASH_PORT == _SPI_PROTO_PORT) {
         SPISwitch_Init();
     }
 #if 0 //4IN1DEBUG
@@ -116,6 +101,7 @@ void SPIFlash_Init()
     spi_xfer(SPIx, cmd);
     PORT_pin_set(FLASH_RESET_PIN);
 #endif
+    /* Detect flash memory here */
 }
 
 static void SPIFlash_SetAddr(unsigned cmd, u32 address)

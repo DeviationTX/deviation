@@ -22,6 +22,10 @@
 
 #include <stdlib.h>
 
+#if !defined(HAS_4IN1_FLASH)
+#define HAS_4IN1_FLASH 0
+#endif
+
 extern struct FAT FontFAT; //defined in screen/lcd_string.c
 
 //Not static because we need it in mixer.c
@@ -357,25 +361,33 @@ int PROTOCOL_HasModule(int idx)
 // If you need to enable hardware.ini [modules] to
 // enable/disable individual modules for 4-in-1 flash
 // replace the condition with #if 0.
-#if defined(HAS_4IN1_FLASH) && HAS_4IN1_FLASH
-    return 1;
-#else    
+#if HAS_4IN1_FLASH
+    if (SPISwitch_Present()) {
+        return 1;
+    } else {
+#endif        
     int m = get_module(idx);
     if(m == TX_MODULE_LAST || Transmitter.module_enable[m].port != 0)
         return 1;
     return 0;
+#if HAS_4IN1_FLASH
+    }
 #endif
 }
 
 int PROTOCOL_HasPowerAmp(int idx)
 {
-#if defined(HAS_4IN1_FLASH) && HAS_4IN1_FLASH
-    return 1;
-#else
+#if HAS_4IN1_FLASH
+    if (SPISwitch_Present()) {
+        return 1;
+    } else {
+#endif        
     int m = get_module(idx);
     if(m != TX_MODULE_LAST && Transmitter.module_poweramp & (1 << m))
         return 1;
     return 0;
+#if HAS_4IN1_FLASH
+    }
 #endif
 }
 
@@ -472,9 +484,11 @@ void PROTOCOL_InitModules()
 
 void PROTO_CS_HI(int module)
 {
-#if defined(HAS_4IN1_FLASH) && HAS_4IN1_FLASH
-    SPISwitch_CS_HI(module);
-#else
+#if HAS_4IN1_FLASH
+    if (SPISwitch_Present()) {
+        SPISwitch_CS_HI(module);
+    } else {
+#endif        
 #if HAS_MULTIMOD_SUPPORT
     if (MODULE_ENABLE[MULTIMOD].port) {
         //We need to set the multimodule CSN even if we don't use it
@@ -488,14 +502,18 @@ void PROTO_CS_HI(int module)
     }
 #endif
     PROTOSPI_pin_set(MODULE_ENABLE[module]);
+#if HAS_4IN1_FLASH
+    }
 #endif
 }
 
 void PROTO_CS_LO(int module)
 {
-#if defined(HAS_4IN1_FLASH) && HAS_4IN1_FLASH
-    SPISwitch_CS_LO(module);
-#else
+#if HAS_4IN1_FLASH
+    if (SPISwitch_Present()) {
+        SPISwitch_CS_LO(module);
+    } else {
+#endif
 #if HAS_MULTIMOD_SUPPORT
     if (MODULE_ENABLE[MULTIMOD].port) {
         //We need to set the multimodule CSN even if we don't use it
@@ -509,5 +527,7 @@ void PROTO_CS_LO(int module)
     }
 #endif
     PROTOSPI_pin_clear(MODULE_ENABLE[module]);
+#if HAS_4IN1_FLASH
+    }
 #endif
 }
