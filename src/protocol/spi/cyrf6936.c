@@ -92,7 +92,7 @@ u8 CYRF_ReadRegister(u8 address)
  */
 int CYRF_Reset()
 {
-#if HAS_4IN1_FLASH && !MODULAR
+#if HAS_4IN1_FLASH && !defined(MODULAR)
     if (SPISwitch_Present()) {
         SPISwitch_CYRF6936_RESET(1);
         Delay(100);
@@ -110,7 +110,7 @@ int CYRF_Reset()
         PROTOSPI_pin_clear(CYRF_RESET_PIN);
         Delay(100);
 #endif
-#if HAS_4IN1_FLASH && !MODULAR
+#if HAS_4IN1_FLASH && !defined(MODULAR)
     }
 #endif
     CYRF_WriteRegister(CYRF_0C_XTAL_CTRL, 0xC0); //Enable XOUT as GPIO

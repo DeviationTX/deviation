@@ -41,6 +41,27 @@
 #ifndef HAS_4IN1_FLASH
     #define HAS_4IN1_FLASH 0
 #endif
+#ifndef HAS_FLASH_DETECT
+    #define HAS_FLASH_DETECT 0
+#endif
+
+#if HAS_FLASH_DETECT
+#undef SPIFLASH_SR_ENABLE   
+#undef SPIFLASH_PROTECT_MASK
+#undef SPIFLASH_WRITE_SIZE  
+#undef SPIFLASH_WRITE_CMD   
+#undef SPIFLASH_FAST_READ   
+#undef SPIFLASH_USE_AAI     
+
+// Defaults for SST25VFxxxB, Devo 10 original memory
+static u8 SPIFLASH_SR_ENABLE    = 0x50;
+static u8 SPIFLASH_PROTECT_MASK = 0x3C;
+static u8 SPIFLASH_WRITE_SIZE   = 2;
+static u8 SPIFLASH_WRITE_CMD    = 0xAD;
+static u8 SPIFLASH_FAST_READ    = 0;
+static u8 SPIFLASH_USE_AAI      = 1;
+#endif
+
 
 void CS_HI()
 {
@@ -58,6 +79,87 @@ void CS_LO()
     }
     PORT_pin_clear(FLASH_CSN_PIN);
 }
+
+#if HAS_FLASH_DETECT
+extern uint32_t Mass_Block_Count[2];
+/*
+ * Detect flash memory type and set variables controlling
+ * access accordingly.
+ */
+void detect_memory_type()
+{
+    /* When we have an amount of 4096-byte sectors, fill out Structure for file
+     * system
+     */
+    u32 spiflash_sectors = 0; 
+    u8 mfg_id, memtype, capacity;
+    u32 id;
+    CS_LO();
+    spi_xfer(SPIx, 0x9F);
+    mfg_id  = (u8)spi_xfer(SPIx, 0);
+    memtype = (u8)spi_xfer(SPIx, 0);
+    capacity = (u8)spi_xfer(SPIx, 0);
+    CS_HI();
+    switch (mfg_id) {
+    case 0xBF: // Microchip
+        if (memtype == 0x25) {
+            printf("Microchip SST25VFxxxB SPI Flash found\n");
+            spiflash_sectors = 1 << ((capacity & 0x07) + 7);
+        }
+        break;
+    case 0xEF: // Winbond
+        if (memtype == 0x40) {
+            printf("Winbond SPI Flash found\n");
+            SPIFLASH_PROTECT_MASK = 0x1C;
+            SPIFLASH_WRITE_SIZE   = 1;
+            SPIFLASH_WRITE_CMD    = 0x02;
+            SPIFLASH_FAST_READ    = 1;
+            SPIFLASH_USE_AAI      = 0;
+            spiflash_sectors      = 1 << ((capacity & 0x0f) + 3);
+        }
+        break;
+    case 0x7F: // Extension code, older ISSI, maybe some others
+        if (memtype == 0x9D && capacity == 0x46) {
+            printf("ISSI IS25CQ032 SPI Flash found\n");
+            // ISSI IS25CQ032
+            SPIFLASH_SR_ENABLE    = 0x06;  //No EWSR, use standard WREN
+            SPIFLASH_PROTECT_MASK = 0x3C;
+            SPIFLASH_WRITE_SIZE   = 1;
+            SPIFLASH_WRITE_CMD    = 0x02;
+            SPIFLASH_FAST_READ    = 1;
+            SPIFLASH_USE_AAI      = 0;
+            spiflash_sectors      = 512;
+        }
+        break;
+    case 0x9D: // ISSI
+        if (memtype == 0x40 || memtype == 0x30) {
+            printf("ISSI SPI Flash found\n");
+            SPIFLASH_SR_ENABLE    = 0x06;  //No EWSR, use standard WREN
+            SPIFLASH_PROTECT_MASK = 0x3C;
+            SPIFLASH_WRITE_SIZE   = 1;
+            SPIFLASH_WRITE_CMD    = 0x02;
+            SPIFLASH_FAST_READ    = 1;
+            SPIFLASH_USE_AAI      = 0;
+            spiflash_sectors      = 1 << ((capacity & 0x0f) + 3);
+        }
+        break;
+    case 0x01: // Cypress
+        break;
+    default:
+        /* Check older READ ID command */
+        id = SPIFlash_ReadID();
+        if (id == 0xBF48BF48) {
+            printf("Microchip SST25VFxxxA SPI Flash found\n");
+            SPIFLASH_PROTECT_MASK = 0x0C;
+            SPIFLASH_WRITE_SIZE   = 1;
+            SPIFLASH_WRITE_CMD    = 0xAF;
+            spiflash_sectors      = 16;
+        }
+        break;
+    }
+    Mass_Block_Count[0] = spiflash_sectors - SPIFLASH_SECTOR_OFFSET;
+}
+#endif
 
 /*
  *
@@ -101,7 +203,9 @@ void SPIFlash_Init()
     spi_xfer(SPIx, cmd);
     PORT_pin_set(FLASH_RESET_PIN);
 #endif
-    /* Detect flash memory here */
+#if HAS_FLASH_DETECT
+    detect_memory_type();
+#endif
 }
 
 static void SPIFlash_SetAddr(unsigned cmd, u32 address)
