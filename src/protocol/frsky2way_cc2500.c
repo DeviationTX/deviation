@@ -294,10 +294,17 @@ static void frsky2way_parse_telem(u8 *pkt, int len)
     Telemetry.value[TELEM_FRSKY_VOLT2] = pkt[4] * (132*AD2gain) / 1000; //In 1/100 of Volts *(A2gain/10)
     TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT2);
 
-    Telemetry.value[TELEM_FRSKY_RSSI] = pkt[5]; 	// Value in Db
+    Telemetry.value[TELEM_FRSKY_RSSI] = pkt[5];
     TELEMETRY_SetUpdated(TELEM_FRSKY_RSSI);
 
+    Telemetry.value[TELEM_FRSKY_LQI] = pkt[len-1] & 0x7f;
+    TELEMETRY_SetUpdated(TELEM_FRSKY_LQI);
+
+    Telemetry.value[TELEM_FRSKY_LRSSI] = (s8)pkt[len-2] / 2 - 70; 	// Value in dBm
+    TELEMETRY_SetUpdated(TELEM_FRSKY_LRSSI);
+
 #if HAS_EXTENDED_TELEMETRY
+
     static u8 sequence;
 
     if (pkt[0] < 7) return;   // be paranoid about packet length
@@ -362,8 +369,6 @@ static u16 frsky2way_cb()
             unsigned len = CC2500_ReadReg(CC2500_3B_RXBYTES | CC2500_READ_BURST);
             if (len && len < sizeof(packet)) {
                 CC2500_ReadData(packet, len);
-                //CC2500_WriteReg(CC2500_0C_FSCTRL0, CC2500_ReadReg(CC2500_32_FREQEST));
-                //parse telemetry packet here
                 frsky2way_parse_telem(packet, len);
             }
 #ifdef EMULATOR

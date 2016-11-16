@@ -23,14 +23,13 @@ static struct range_obj * const gui = &gui_objs.u.range;
 
 static unsigned action_cb(u32 button, unsigned flags, void *data) {
     (void)data;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_Pop();
-        } else if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
+    if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
+        if (flags & BUTTON_RELEASE) {
             RANGE_test(!mp->testing);
         }
+        return 1;
     }
-    return 1;
+    return default_button_action_cb(button, flags, data);
 }
 
 static void _draw_page(int has_pa) {

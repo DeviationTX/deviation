@@ -643,8 +643,8 @@ unsigned handle_buttons(u32 button, unsigned flags, void *data)
              return GUI_ObjButton(objSELECTED, button, flags) || modalActive;
         return modalActive;
     }
-    if (flags & BUTTON_RELEASE) {
-       if (flags & BUTTON_HAD_LONGPRESS) {
+    if (flags & (BUTTON_LONGPRESS | BUTTON_RELEASE)) {
+       if ((flags & BUTTON_HAD_LONGPRESS) & (flags & BUTTON_RELEASE)) {
             //ignore long-press release
             return modalActive;
         }
@@ -657,7 +657,7 @@ unsigned handle_buttons(u32 button, unsigned flags, void *data)
             if (obj && obj != objSELECTED) {
                 GUI_SetSelected(obj);
             }
-        } else if (objSELECTED && CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+        } else if (! (flags & BUTTON_LONGPRESS) && objSELECTED && CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             if (objDIALOG) {
                 //Why doesn't the dialog handle its own buttons?
                 DialogClose(objDIALOG, 0);

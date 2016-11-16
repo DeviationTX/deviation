@@ -48,6 +48,8 @@ void SPISwitch_Init()
 {
     last_module_used = -1;
     extra_bits = NRF24L01_CE;
+    /* Enable GPIOB */
+    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPBEN);
     /* CS for switch */
     gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
                   GPIO_CNF_OUTPUT_PUSHPULL, GPIO11);

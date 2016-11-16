@@ -15,11 +15,11 @@ DFU_ARGS    := -D 0x0483:0xdf12 -b 0x08003000
 ifndef BUILD_TARGET
 CROSS    = arm-none-eabi-
 
-ALL = $(LIBOPENCM3) $(TARGET).dfu
 ifneq "$(HAS_4IN1_FLASH)" "1"
-ALL += $(TARGET)-fs.dfu
+EXTRA_DFUS = $(TARGET)-fs.dfu
 endif
 
+ALL = $(LIBOPENCM3) $(TARGET).dfu $(EXTRA_DFUS)
 NUM_MODELS ?= 10
 
 LINKFILE = $(SDIR)/target/$(TARGET)/$(TARGET).ld
@@ -34,6 +34,7 @@ SRC_C    = $(wildcard $(SDIR)/target/$(TARGET)/*.c) \
            $(wildcard $(SDIR)/target/common/devo/msc2/lib/*.c) \
            $(wildcard $(SDIR)/target/common/devo/hid/*.c) \
            $(wildcard $(SDIR)/target/common/devo/protocol/*.c) \
+           $(wildcard $(SDIR)/target/common/devo/uart.c) \
            $(SDIR)/target/devo8/ili9341.c
 
 CFLAGS   = -D"assert_param(x)=" -DSTM32F10X_HD -DSTM32F1 -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -fdata-sections -ffunction-sections -I$(SDIR)/target/common/devo/msc2/lib -I$(SDIR)/target/common/devo/msc2 -I$(SDIR)/libopencm3/include -I$(SDIR)/target/common/filesystems -fno-builtin-printf -Os --specs=nano.specs
@@ -67,4 +68,16 @@ $(TARGET)-fs.dfu: $(ODIR)/devo.fs
 
 $(TARGET).fs_wrapper: $(LAST_MODEL)
 	rm filesystem/$(FILESYSTEM)/datalog.bin
+
+$(TARGET).zip: $(ALL)
+	cp -f $(TARGET).dfu deviation-$(HGVERSION).dfu
+	rm -f deviation-$(HGVERSION).zip
+	rm -f debug-$(HGVERSION).zip
+	zip debug-$(HGVERSION).zip $(TARGET).elf
+	# make zipping more compatible with other distributions
+	zip deviation-$(HGVERSION).zip deviation-$(HGVERSION).dfu $(EXTRA_DFUS)
+	zip -u deviation-$(HGVERSION).zip debug-$(HGVERSION).zip
+	rm -f debug-$(HGVERSION).zip
+	rm -f deviation-$(HGVERSION).dfu
+
 endif #BUILD_TARGET

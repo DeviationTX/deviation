@@ -39,6 +39,7 @@ static char * const AUDIO_PLAYER[AUDIO_LAST] = {
 static const char SECTION_MODULES[] = "modules";
 static const char MODULE_ENABLE_PIN[] = "enable";
 static const char MODULE_HAS_PA[] = "has_pa";
+static const char MODULE_CONFIG[] = "config";
 const char * const MODULE_NAME[TX_MODULE_LAST] = {
       [CYRF6936] = "CYRF6936",
       [A7105]    = "A7105",
@@ -121,6 +122,13 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             if(pin >= 0) {
                int v = value_int ? 1 : 0;
                Transmitter.module_poweramp = (Transmitter.module_poweramp & ~(1 << pin)) | (v << pin);
+               return 1;
+            }
+        }
+        if(MATCH_START(name, MODULE_CONFIG)) {
+            int module = get_module_index(name+sizeof(MODULE_CONFIG));
+            if(module >= 0) {
+               Transmitter.module_config[module] = strtol(value, NULL, 16);
                return 1;
             }
         }

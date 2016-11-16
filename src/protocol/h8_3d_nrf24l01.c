@@ -336,16 +336,14 @@ static void initialize_txid()
     for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
 
     // tx id
-    txid[0] = 0xa0 + (((lfsr >> 24) & 0xFF) % 0x10);
-    txid[1] = 0xb0 + (((lfsr >> 16) & 0xFF) % 0x20);
-    txid[2] = ((lfsr >> 8) & 0xFF) % 0x20;
-    txid[3] = (lfsr & 0xFF) % 0x11;
+    txid[0] = (lfsr >> 24) & 0xFF;
+    txid[1] = (lfsr >> 16) & 0xFF;
+    txid[2] = (lfsr >> 8) & 0xFF;
+    txid[3] = lfsr & 0xFF;
     
     // rf channels
-    rf_channels[0] = 0x06 + (((txid[0]>>8) + (txid[0]&0x0f)) % 0x0f);
-    rf_channels[1] = 0x15 + (((txid[1]>>8) + (txid[1]&0x0f)) % 0x0f);
-    rf_channels[2] = 0x24 + (((txid[2]>>8) + (txid[2]&0x0f)) % 0x0f);
-    rf_channels[3] = 0x33 + (((txid[3]>>8) + (txid[3]&0x0f)) % 0x0f);
+    for(u8 ch=0; ch<4; ch++)
+        rf_channels[ch] = 6 + (0x0f*ch) + (((txid[ch] >> 4) + (txid[ch] & 0x0f)) % 0x0f);
 }
 
 static void initialize()

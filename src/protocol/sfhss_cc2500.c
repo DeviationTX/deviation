@@ -35,7 +35,7 @@
 
 #include "iface_cc2500.h"
 
-//#define USE_TUNE_FREQ
+#define USE_TUNE_FREQ
 
 #ifdef USE_TUNE_FREQ
 static const char * const SFHSS_opts[] = {
@@ -267,6 +267,9 @@ static u16 SFHSS_cb()
         state = SFHSS_TUNE;
         return 2000;
     case SFHSS_TUNE:
+#ifdef USE_TUNE_FREQ
+        tune_freq();
+#endif
         tune_power();
         state = SFHSS_DATA1;
         return 3150;
@@ -337,8 +340,9 @@ static void initialize()
 {
     CLOCK_StopTimer();
 #ifdef USE_TUNE_FREQ
-    coarse = (int)Model.proto_opts[PROTO_OPTS_FREQCOARSE];
-    fine = Model.proto_opts[PROTO_OPTS_FREQFINE];
+    /* Initialize to neutral values so tune_freq will work */
+    coarse = 0;
+    fine   = 0;
 #endif
     get_tx_id();
     u32 r = rand32_r(0, 0);

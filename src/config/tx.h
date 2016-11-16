@@ -11,6 +11,13 @@
 #define MAX_BATTERY_WARNING_INTERVAL 60
 #define DEFAULT_SPLASH_DELAY 35 //3.5sec
 
+enum {
+    CYRF6936_DEVO       = 0x00,
+    CYRF6936_AWA24S     = 0x01,
+    CYRF6936_BUYCHINA   = 0x02,
+    CC2500_REVERSE_GD02 = 0x01,
+};
+
 struct StickCalibration {
     u16 max;
     u16 min;
@@ -72,6 +79,7 @@ struct Transmitter {
     #endif
     u32 ignore_buttons;
     struct mcu_pin module_enable[TX_MODULE_LAST];
+    u8 module_config[TX_MODULE_LAST];
     u32 txid;
     struct StickCalibration calibration[INP_HAS_CALIBRATION];
     struct TouchCalibration touch;

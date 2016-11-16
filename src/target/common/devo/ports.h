@@ -1,6 +1,18 @@
 #ifndef _PORTS_H_
 #define _PORTS_H_
 
+//SPI Flash
+#ifndef _SPI_FLASH_PORT
+    #define _SPI_FLASH_PORT          1 //SPI1
+    #define _SPI_FLASH_CSN_PIN       {GPIOB, GPIO2}
+    #define _SPI_FLASH_SCK_PIN       {GPIOA, GPIO5}
+    #define _SPI_FLASH_MISO_PIN      {GPIOA, GPIO6}
+    #define _SPI_FLASH_MOSI_PIN      {GPIOA, GPIO7}
+#endif
+#ifndef SPIFLASH_TYPE
+    #define SPIFLASH_TYPE SST25VFxxxB
+#endif
+
 #ifndef _ADC
 #define ADC_OVERSAMPLE_WINDOW_COUNT 1
     #define _ADC                    ADC1
@@ -49,7 +61,18 @@
 #endif //_PWM_PIN
 
 #ifndef _USART
-    #define _USART USART1
+    #define _USART                        USART1
+    #define _USART_DR                     USART1_DR
+    #define _USART_DMA                    DMA1
+    #define _USART_DMA_CHANNEL            DMA_CHANNEL4
+    #define _USART_DMA_ISR                dma1_channel4_isr
+    #define _USART_NVIC_DMA_CHANNEL_IRQ   NVIC_DMA1_CHANNEL4_IRQ
+    #define _USART_RCC_APB_ENR_IOP        RCC_APB2ENR
+    #define _USART_RCC_APB_ENR_IOP_EN     RCC_APB2ENR_IOPAEN
+    #define _USART_RCC_APB_ENR_USART      RCC_APB2ENR
+    #define _USART_RCC_APB_ENR_USART_EN   RCC_APB2ENR_USART1EN
+    #define _USART_GPIO                   GPIOA
+    #define _USART_GPIO_USART_TX          GPIO_USART1_TX
 #endif
 
 #ifndef SYSCLK_TIM // System-clock timer

@@ -348,12 +348,15 @@ static void frskyX_data_frame() {
   [12] STRM6  D1 D1 D0 D0
   [13] CHKSUM1
   [14] CHKSUM2
+  [15] RSSI
+  [16] LQI
 */
 
 #define START_STOP              0x7e
 #define BYTESTUFF               0x7d
 #define STUFF_MASK              0x20
 #define FRSKY_SPORT_PACKET_SIZE    8
+#define TELEM_PKT_SIZE            17
 
 // FrSky PRIM IDs (1 byte)
 #define DATA_FRAME                0x10
@@ -368,28 +371,32 @@ static void frskyX_data_frame() {
 
 #include "frsky_d_telem._c"
 
-// helper functions
-static void update_cell(u8 cell, s32 value) {
-    if (cell < 6) {
-        Telemetry.value[TELEM_FRSKY_ALL_CELL] += value - Telemetry.value[TELEM_FRSKY_CELL1 + cell];
-        TELEMETRY_SetUpdated(TELEM_FRSKY_ALL_CELL);    // battery total
-
-        set_telemetry(TELEM_FRSKY_CELL1 + cell, value);
+static u8 sport_crc(u8 *data) {
+    u16 crc = 0;
+    for (int i=1; i < FRSKY_SPORT_PACKET_SIZE-1; ++i) {
+        crc += data[i];
+        crc += crc >> 8;
+        crc &= 0x00ff;
     }
+    return 0x00ff - crc;
 }
 
-static void update_min_cell(u8 num_cells) {
-    for (int i=0; i < num_cells; i++) {
-        if (Telemetry.value[TELEM_FRSKY_CELL1 + i] < Telemetry.value[TELEM_FRSKY_MIN_CELL])
-            set_telemetry(TELEM_FRSKY_MIN_CELL, Telemetry.value[TELEM_FRSKY_CELL1 + i]);
-    }
+static void serial_echo(u8 *packet) {
+  static u8 outbuf[FRSKY_SPORT_PACKET_SIZE+2] = {0x7e};
+
+  memcpy(outbuf+1, packet, FRSKY_SPORT_PACKET_SIZE);
+  outbuf[FRSKY_SPORT_PACKET_SIZE+1] = sport_crc(outbuf+2);
+  UART_Send(outbuf, FRSKY_SPORT_PACKET_SIZE+2);
 }
 
 
 static void processSportPacket(u8 *packet) {
 //    u8  instance = (packet[0] & 0x1F) + 1;    // all instances of same sensor write to same telemetry value
-    u8  prim                = packet[1];
-    u16 id                  = *((u16 *)(packet+2));
+    u8  prim = packet[1];
+    u16 id = *((u16 *)(packet+2));
+
+    if (!PPMin_Mode())
+        serial_echo(packet);   // echo to trainer port
 
     if (prim != DATA_FRAME)
         return;
@@ -451,10 +458,10 @@ static void processSportPacket(u8 *packet) {
         set_telemetry(TELEM_FRSKY_TEMP2, data);
         break;
     case RPM_FIRST_ID & 0xfff0:
-        set_telemetry(TELEM_FRSKY_RPM, data * 60);
+        set_telemetry(TELEM_FRSKY_RPM, data);
         break;
     case FUEL_FIRST_ID & 0xfff0:
-        set_telemetry(TELEM_FRSKY_FUEL, data * 60);
+        set_telemetry(TELEM_FRSKY_FUEL, data);
         break;
 
     case GPS_LONG_LATI_FIRST_ID & 0xfff0:{
@@ -478,11 +485,11 @@ static void processSportPacket(u8 *packet) {
         break;}
 
     case GPS_ALT_FIRST_ID & 0xfff0:
-        Telemetry.gps.altitude = data / 100;
+        Telemetry.gps.altitude = data * 10;
         TELEMETRY_SetUpdated(TELEM_GPS_ALT);
         break;
     case GPS_SPEED_FIRST_ID & 0xfff0:
-        Telemetry.gps.velocity = data * 5556 / 1080;
+        Telemetry.gps.velocity = data * 5556 / 10800;
         TELEMETRY_SetUpdated(TELEM_GPS_SPEED);
         break;
     case GPS_COURS_FIRST_ID & 0xfff0:
@@ -498,8 +505,8 @@ static void processSportPacket(u8 *packet) {
             Telemetry.gps.time = ( (u32)fr_gps.year & 0x3f)            << 26
                                | (((u32)fr_gps.day_month >> 8) & 0x0f) << 22
                                | ( (u32)fr_gps.day_month & 0x1f)       << 17
-                               | ( (u32)fr_gps.hour_min & 0x1f)        << 12
-                               | (((u32)fr_gps.hour_min >> 8) & 0x3f)  << 6
+                               | (((u32)fr_gps.hour_min >> 8) & 0x1f)  << 12
+                               | ( (u32)fr_gps.hour_min & 0x3f)        << 6
                                | ( (u32)fr_gps.second & 0x3f);
             TELEMETRY_SetUpdated(TELEM_GPS_TIME);
         }
@@ -576,22 +583,33 @@ static void frsky_parse_sport_stream(u8 data) {
 #endif // HAS_EXTENDED_TELEMETRY
 
 static void frsky_check_telemetry(u8 *pkt, u8 len) {
-    // only process packets with the required id and packet length
-    if (pkt[1] == (fixed_id & 0xff) && pkt[2] == (fixed_id >> 8) && pkt[0] == len-3) {
+    // only process packets with the required id and packet length and good crc
+    if (len == TELEM_PKT_SIZE
+        && pkt[0] == TELEM_PKT_SIZE - 3
+        && pkt[1] == (fixed_id & 0xff)
+        && pkt[2] == (fixed_id >> 8)
+        && crc(&pkt[3], TELEM_PKT_SIZE-7) == (pkt[TELEM_PKT_SIZE-4] << 8 | pkt[TELEM_PKT_SIZE-3])
+       ) {
         if (pkt[4] > 0x36) {   // distinguish RSSI from VOLT1 (maybe bit 7 always set for RSSI?)
-            Telemetry.value[TELEM_FRSKY_RSSI] = pkt[4] / 2; 	// Value in Db
+            Telemetry.value[TELEM_FRSKY_RSSI] = pkt[4] / 2;
             TELEMETRY_SetUpdated(TELEM_FRSKY_RSSI);
         } else {
             Telemetry.value[TELEM_FRSKY_VOLT1] = pkt[4] * 10;      // In 1/100 of Volts
             TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT1);
         }
 
+        Telemetry.value[TELEM_FRSKY_LQI] = pkt[len-1] & 0x7f;
+        TELEMETRY_SetUpdated(TELEM_FRSKY_LQI);
+
+        Telemetry.value[TELEM_FRSKY_LRSSI] = (s8)pkt[len-2] / 2 - 70; 	// Value in dBm
+        TELEMETRY_SetUpdated(TELEM_FRSKY_LRSSI);
+
         if ((pkt[5] >> 4 & 0x0f) == 0x08) {   // restart or somesuch
             seq_last_sent = 8;
             seq_last_rcvd = 0;
 #if HAS_EXTENDED_TELEMETRY
             dataState = STATE_DATA_IDLE;    // reset sport decoder
-#endif // HAS_EXTENDED_TELEMETRY
+#endif
         } else {
             if ((pkt[5] >> 4 & 0x03) == (seq_last_rcvd + 1) % 4) {
                 seq_last_rcvd = (seq_last_rcvd + 1) % 4;
@@ -599,13 +617,14 @@ static void frsky_check_telemetry(u8 *pkt, u8 len) {
 #if HAS_EXTENDED_TELEMETRY
             else 
                 dataState = STATE_DATA_IDLE;    // reset sport decoder if sequence number wrong
-#endif // HAS_EXTENDED_TELEMETRY
+#endif
         }
 
 #if HAS_EXTENDED_TELEMETRY
-        for (u8 i=0; i < pkt[6]; i++)
-            frsky_parse_sport_stream(pkt[7+i]);
-#endif // HAS_EXTENDED_TELEMETRY
+        if (pkt[6] <= 6)
+            for (u8 i=0; i < pkt[6]; i++)
+                frsky_parse_sport_stream(pkt[7+i]);
+#endif
     }
 }
 
@@ -815,9 +834,14 @@ static void initialize(int bind)
     ctr = 0;
     seq_last_sent = 0;
     seq_last_rcvd = 8;
+#if HAS_EXTENDED_TELEMETRY
+    Telemetry.value[TELEM_FRSKY_MIN_CELL] = TELEMETRY_GetMaxValue(TELEM_FRSKY_MIN_CELL);
+    UART_SetDataRate(57600);    // set for s.port compatibility
+#endif
 
+    u32 seed = get_tx_id();
     while (!chanskip)
-        chanskip = (get_tx_id() & 0xfefefefe) % 47;
+        chanskip = (rand32_r(&seed, 0) & 0xfefefefe) % 47;
     while((chanskip - ctr) % 4)
         ctr = (ctr+1) % 4;
     counter_rst = (chanskip - ctr) >> 2;
@@ -857,6 +881,9 @@ const void *FRSKYX_Cmds(enum ProtoCmds cmd)
             return (void *)1L;
         case PROTOCMD_RESET:
         case PROTOCMD_DEINIT:
+#if HAS_EXTENDED_TELEMETRY
+            UART_SetDataRate(0);  // restore data rate to default
+#endif
             CLOCK_StopTimer();
             return (void *)(CC2500_Reset() ? 1L : -1L);
         default: break;

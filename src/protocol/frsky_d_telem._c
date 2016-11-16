@@ -33,6 +33,28 @@ static struct s_fr_gps {
 
 #define VFAS_D_HIPREC_OFFSET      2000
 
+
+// helper functions
+static void update_cell(u8 cell, s32 value) {
+    if (cell < 6) {
+        Telemetry.value[TELEM_FRSKY_ALL_CELL] += value - Telemetry.value[TELEM_FRSKY_CELL1 + cell];
+        TELEMETRY_SetUpdated(TELEM_FRSKY_ALL_CELL);    // battery total
+
+        set_telemetry(TELEM_FRSKY_CELL1 + cell, value);
+    }
+}
+
+#define MIN(a,b) ((a) < (b) ? a : b)
+static void update_min_cell(u8 num_cells) {
+    Telemetry.value[TELEM_FRSKY_MIN_CELL] = Telemetry.value[TELEM_FRSKY_CELL1];
+    for (int i=1; i < MIN(num_cells, 6); i++) {
+        if (Telemetry.value[TELEM_FRSKY_CELL1 + i] < Telemetry.value[TELEM_FRSKY_MIN_CELL])
+            Telemetry.value[TELEM_FRSKY_MIN_CELL] = Telemetry.value[TELEM_FRSKY_CELL1 + i];
+    }
+    TELEMETRY_SetUpdated(TELEM_FRSKY_MIN_CELL);
+}
+
+
 static void processHubPacket(u8 id, u16 value) {
     static u8 varioHighPrecision = 0;
     static u8 last_id;
@@ -48,11 +70,10 @@ static void processHubPacket(u8 id, u16 value) {
         TELEMETRY_SetUpdated(TELEM_GPS_ALT);
         break;
     case 0x02: //TEMP1 -30C-250C (1C/ count)
-        Telemetry.value[TELEM_FRSKY_TEMP1] = value;
-        TELEMETRY_SetUpdated(TELEM_FRSKY_TEMP1);
+        set_telemetry(TELEM_FRSKY_TEMP1, (s16)value);
         break;
     case 0x03: //RPM   0-60000
-        Telemetry.value[TELEM_FRSKY_RPM] = value * 60;
+        Telemetry.value[TELEM_FRSKY_RPM] = value;
         TELEMETRY_SetUpdated(TELEM_FRSKY_RPM);
         break;
     case 0x04: //Fuel  0, 25, 50, 75, 100
@@ -60,25 +81,18 @@ static void processHubPacket(u8 id, u16 value) {
         TELEMETRY_SetUpdated(TELEM_FRSKY_FUEL);
         break;
     case 0x05: //TEMP2 -30C-250C (1C/ count)
-        Telemetry.value[TELEM_FRSKY_TEMP2] = value;
-        TELEMETRY_SetUpdated(TELEM_FRSKY_TEMP2);
+        set_telemetry(TELEM_FRSKY_TEMP2, (s16)value);
         break;
     case 0x06: { //Battery voltages - CELL# and VOLT
+        static u8 last_cell;
         u8 cell = (value >> 4) & 0x0f;
-        value = (((u16)(value & 0x0F) << 8) + (value & 0xff00)) / 5;
-        if (cell < 6 || value == 0) {
-            Telemetry.value[TELEM_FRSKY_ALL_CELL] +=
-              value - Telemetry.value[TELEM_FRSKY_CELL1 + cell];
-            TELEMETRY_SetUpdated(TELEM_FRSKY_ALL_CELL);
+        value = (((value & 0x0F) << 8) + (value >> 8)) / 5;
 
-            Telemetry.value[TELEM_FRSKY_CELL1 + cell] = value;
-            TELEMETRY_SetUpdated(TELEM_FRSKY_CELL1 + cell);
-            if (Telemetry.value[TELEM_FRSKY_MIN_CELL] == 0 ||
-                (value < Telemetry.value[TELEM_FRSKY_MIN_CELL])) {
-                Telemetry.value[TELEM_FRSKY_MIN_CELL] = value;
-                TELEMETRY_SetUpdated(TELEM_FRSKY_MIN_CELL);
-            }
-        }
+        update_cell(cell, value);
+
+        if (cell < 6 && cell > last_cell) last_cell = cell;
+        update_min_cell(last_cell+1);
+
         break;
         }
     case 0x10: //ALT (whole number & sign) -500m-9000m (.01m/count)

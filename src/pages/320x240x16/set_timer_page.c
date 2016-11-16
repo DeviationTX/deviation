@@ -52,13 +52,6 @@ void add_set_button_cb(struct guiObject *obj, const void *data)
     GUI_Redraw(&guiset->newvalue);
 }
 
-void PAGE_SetTimerExit()
-{
-    TIMER_SetValue(permanent.index, permanent.newvalue);
-    Model.timer[permanent.index].val = permanent.newvalue;
-    //TIMERPAGE_Show(obj, (void *)(long)(LCD_WIDTH == 480 ? 0 : (permanent.index / 2)));   // 2 timers per page on 320x240-screen - show page 2 for timer 3 and 4
-}
-
 static void _show_settimer_page(u8 index)
 {
     memset(&permanent, 0, sizeof(permanent));

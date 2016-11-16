@@ -206,6 +206,8 @@ const struct telem_layout frsky_layout_basic[] = {
     {TYPE_VALUE | 0, FRSKY2_X, FRSKY1_WIDTH, TELEM_FRSKY_VOLT1},
 #if HAS_EXTENDED_TELEMETRY
     {TYPE_VALUE | 0, FRSKY3_X, FRSKY1_WIDTH, TELEM_FRSKY_CELL1},
+#else
+    {TYPE_VALUE | 0, FRSKY3_X, FRSKY1_WIDTH, TELEM_FRSKY_LQI},
 #endif
 
     {TYPE_INDEX | 1, LBL1_X, LBL1_WIDTH,  2},
@@ -215,7 +217,11 @@ const struct telem_layout frsky_layout_basic[] = {
     {TYPE_VALUE | 1, FRSKY2_X, FRSKY1_WIDTH, TELEM_FRSKY_VOLT2},
 #if HAS_EXTENDED_TELEMETRY
     {TYPE_VALUE | 1, FRSKY3_X, FRSKY1_WIDTH, TELEM_FRSKY_CELL2},
+#else
+    {TYPE_VALUE | 1, FRSKY3_X, FRSKY1_WIDTH, TELEM_FRSKY_LRSSI},
+#endif
 
+#if HAS_EXTENDED_TELEMETRY
     {TYPE_INDEX | 2, LBL1_X, LBL1_WIDTH,  3},
     {TYPE_VALUE | 2, FRSKY1_X, FRSKY1_WIDTH, TELEM_FRSKY_TEMP2},
     {TYPE_VALUE | 2, FRSKY2_X, FRSKY1_WIDTH, TELEM_FRSKY_VOLT3},
@@ -240,6 +246,10 @@ const struct telem_layout frsky_layout_basic[] = {
     {TYPE_VALUE | 6, FRSKY1_X, FRSKY1_WIDTH, TELEM_FRSKY_VARIO},
     {TYPE_VALUE | 6, FRSKY2_X, FRSKY1_WIDTH, TELEM_FRSKY_CURRENT},
     {TYPE_VALUE | 6, FRSKY3_X, FRSKY1_WIDTH, TELEM_FRSKY_DISCHARGE},
+
+    {TYPE_INDEX | 7, LBL1_X, LBL1_WIDTH, 8},
+    {TYPE_VALUE | 7, FRSKY1_X, FRSKY1_WIDTH, TELEM_FRSKY_LQI},
+    {TYPE_VALUE | 7, FRSKY2_X, FRSKY1_WIDTH, TELEM_FRSKY_LRSSI},
 #endif
 
     {0, 0, 0, 0},
@@ -255,7 +265,7 @@ const struct telem_layout2 dsm_page[] = {
 };
 const struct telem_layout2 frsky_page[] = {
 #if HAS_EXTENDED_TELEMETRY
-    {frsky_header_basic, frsky_layout_basic, 7, 1},
+    {frsky_header_basic, frsky_layout_basic, 8, 1},
 #else
     {frsky_header_basic, frsky_layout_basic, 2, 1},
 #endif
@@ -279,7 +289,11 @@ static const char *header_cb(guiObject_t *obj, const void *data)
         case RXV_LABEL: return "RxV";
         case BATT_LABEL: return "Bat";
         case DSM_LABEL: return "DSM";
+#if HAS_EXTENDED_TELEMETRY
         case CELLS_LABEL:return "Cells";
+#else
+        case CELLS_LABEL:return "Signl";
+#endif
         case MISC_LABEL: return "Misc";
         case ARROW_LABEL: return current_page== telemetry_gps ? "<-" : "->";
     }
@@ -439,28 +453,15 @@ static void _navigate_pages(s8 direction)
 
 static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
-    (void)data;
-    if (flags & BUTTON_PRESS) {
-        if (CHAN_ButtonIsPressed(button, BUT_ENTER) || CHAN_ButtonIsPressed(button, BUT_EXIT))
-            TELEMETRY_MuteAlarm();
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            labelDesc.font = DEFAULT_FONT.font;  // set it back to 12x12 font
-            PAGE_Pop();
-        } else if (current_page != telemetry_off) {
-            // this indicates whether telem is off or not supported
-            if (CHAN_ButtonIsPressed(button, BUT_RIGHT)) {
-                _navigate_pages(1);
-            } else if (CHAN_ButtonIsPressed(button, BUT_LEFT)) {
-                _navigate_pages(-1);
-            } else {
-                return 0;
-            }
+    if (current_page != telemetry_off && (CHAN_ButtonIsPressed(button, BUT_RIGHT) || CHAN_ButtonIsPressed(button, BUT_LEFT))) {
+        if (flags & BUTTON_RELEASE) {
+            _navigate_pages(CHAN_ButtonIsPressed(button, BUT_RIGHT) ? 1 : -1);
         }
-        else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
+        return 1;
     }
-    return 1;
+    if (flags & BUTTON_PRESS && (CHAN_ButtonIsPressed(button, BUT_ENTER) || CHAN_ButtonIsPressed(button, BUT_EXIT))) {
+        TELEMETRY_MuteAlarm();
+    }
+    return default_button_action_cb(button, flags, data);
 }
 #endif //HAS_TELEMETRY
