@@ -43,7 +43,7 @@
     #define BIND_COUNT 4
     #define dbgprintf printf
 #else
-    #define BIND_COUNT 1200
+    #define BIND_COUNT 2335
     //printf inside an interrupt handler is really dangerous
     //this shouldn't be enabled even in debug builds without explicitly
     //turning it on
@@ -69,7 +69,8 @@ static u8 rf_chans[4];
 static const struct {
     u8 txid[sizeof(txid)];
     u8 rfchan[NUM_RF_CHANNELS];
-} q303_tx_rf_map[] = {{{0xAE, 0x89, 0x97, 0x87}, {0x4A, 0x4C, 0x4E, 0x48}}};
+} q303_tx_rf_map[] =  //{{{0xb8, 0x69, 0x64, 0x67}, {0x48, 0x4a, 0x4c, 0x46}}}; // tx2
+                    {{{0xAE, 0x89, 0x97, 0x87}, {0x4A, 0x4C, 0x4E, 0x48}}}; // tx1
 
 enum {
     BIND,
@@ -186,6 +187,13 @@ static void send_packet(u8 bind)
         }
     }
     
+#ifdef EMULATOR
+    uint8_t pos;
+    dbgprintf("\nCh: %02x    ", bind ? 0x02 : rf_chans[current_chan]);
+    for(pos=0; pos<sizeof(packet); pos++)
+        dbgprintf("%02x ", packet[pos]);
+#endif
+    
     // Power on, TX mode, CRC enabled
     XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
     if (bind) {
@@ -213,24 +221,26 @@ static void send_packet(u8 bind)
 
 static void q303_init()
 {
+    const u8 bind_address[] = {0xcc,0xcc,0xcc,0xcc,0xcc};
+    
     NRF24L01_Initialize();
     NRF24L01_SetTxRxMode(TX_EN);
-
-    XN297_SetTXAddr((u8 *) "\xCC\xCC\xCC\xCC\xCC", 5);
+    XN297_SetScrambledMode(XN297_UNSCRAMBLED);
+    XN297_SetTXAddr(bind_address, 5);
     NRF24L01_FlushTx();
+    NRF24L01_FlushRx();
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);     // Clear data ready, data sent, and retransmit
     NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);      // No Auto Acknowldgement on all data pipes
-    NRF24L01_WriteReg(NRF24L01_05_RF_CH, RF_BIND_CHANNEL);
+    NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x01);
+    NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x03);
+    NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0x00); // no retransmits
     NRF24L01_SetBitrate(NRF24L01_BR_250K);
     NRF24L01_SetPower(Model.tx_power);
-    
-    // this sequence necessary for module from stock tx
-    NRF24L01_ReadReg(NRF24L01_1D_FEATURE);
     NRF24L01_Activate(0x73);                          // Activate feature register
-    NRF24L01_ReadReg(NRF24L01_1D_FEATURE);
     NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 0x00);       // Disable dynamic payload length on all pipes
-    NRF24L01_WriteReg(NRF24L01_1D_FEATURE, 0x00);     // Set feature bits on
-
+    NRF24L01_WriteReg(NRF24L01_1D_FEATURE, 0x01);     // Set feature bits on
+    NRF24L01_Activate(0x73);
+    
     // Check for Beken BK2421/BK2423 chip
     // It is done by using Beken specific activate code, 0x53
     // and checking that status register changed appropriately
@@ -264,11 +274,25 @@ static void q303_init()
 MODULE_CALLTYPE
 static u16 q303_callback()
 {
+#ifdef EMULATOR
+    uint8_t pos;
+#endif
     switch (phase) {
         case BIND:
             if (bind_counter == 0) {
                 tx_addr[0] = 0x55;
                 memcpy(&tx_addr[1], txid, 4);
+#ifdef EMULATOR
+                dbgprintf("\ntxid: ");
+                for(pos=0; pos<sizeof(txid); pos++)
+                    dbgprintf("%02x ", txid[pos]);
+                dbgprintf("\ntx_addr: ");
+                for(pos=0; pos<sizeof(tx_addr); pos++)
+                    dbgprintf("%02x ", tx_addr[pos]);
+                dbgprintf("\nrf_chans: ");
+                for(pos=0; pos<sizeof(rf_chans); pos++)
+                    dbgprintf("%02x ", rf_chans[pos]);
+#endif
                 XN297_SetTXAddr(tx_addr, 5);
                 phase = DATA;
                 bind_counter = BIND_COUNT;
