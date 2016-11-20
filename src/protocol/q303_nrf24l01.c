@@ -69,8 +69,8 @@ static u8 rf_chans[4];
 static const struct {
     u8 txid[sizeof(txid)];
     u8 rfchan[NUM_RF_CHANNELS];
-} q303_tx_rf_map[] =  //{{{0xb8, 0x69, 0x64, 0x67}, {0x48, 0x4a, 0x4c, 0x46}}}; // tx2
-                    {{{0xAE, 0x89, 0x97, 0x87}, {0x4A, 0x4C, 0x4E, 0x48}}}; // tx1
+} q303_tx_rf_map[] =  {{{0xb8, 0x69, 0x64, 0x67}, {0x48, 0x4a, 0x4c, 0x46}}, // tx2
+                       {{0xAE, 0x89, 0x97, 0x87}, {0x4A, 0x4C, 0x4E, 0x48}}}; // tx1
 
 enum {
     BIND,
@@ -152,10 +152,10 @@ static void send_packet(u8 bind)
         memset(&packet[5], 0, 5);
     }
     else {
-        u16 aileron  = convert_channel(CHANNEL1);
+        u16 aileron  = 1000 - convert_channel(CHANNEL1);
         u16 elevator = 1000 - convert_channel(CHANNEL2);
         u16 throttle = convert_channel(CHANNEL3);
-        u16 rudder   = 1000 - convert_channel(CHANNEL4);
+        u16 rudder   = convert_channel(CHANNEL4);
         
         packet[0] = 0x55;
         packet[1] = aileron >> 2     ;     // 8 bits
