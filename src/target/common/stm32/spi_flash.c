@@ -81,7 +81,7 @@ void CS_LO()
 }
 
 #if HAS_FLASH_DETECT
-extern uint32_t Mass_Block_Count[2];
+extern uint32_t Mass_Block_Count[2]; // see mass_mal.c
 /*
  * Detect flash memory type and set variables controlling
  * access accordingly.
@@ -104,7 +104,7 @@ void detect_memory_type()
     case 0xBF: // Microchip
         if (memtype == 0x25) {
             printf("Microchip SST25VFxxxB SPI Flash found\n");
-            spiflash_sectors = 1 << ((capacity & 0x07) + 7);
+            spiflash_sectors = 1 << ((capacity & 0x07) + 8);
         }
         break;
     case 0xEF: // Winbond
@@ -115,7 +115,7 @@ void detect_memory_type()
             SPIFLASH_WRITE_CMD    = 0x02;
             SPIFLASH_FAST_READ    = 1;
             SPIFLASH_USE_AAI      = 0;
-            spiflash_sectors      = 1 << ((capacity & 0x0f) + 3);
+            spiflash_sectors      = 1 << ((capacity & 0x0f) + 4);
         }
         break;
     case 0x7F: // Extension code, older ISSI, maybe some others
@@ -140,13 +140,15 @@ void detect_memory_type()
             SPIFLASH_WRITE_CMD    = 0x02;
             SPIFLASH_FAST_READ    = 1;
             SPIFLASH_USE_AAI      = 0;
-            spiflash_sectors      = 1 << ((capacity & 0x0f) + 3);
+            spiflash_sectors      = 1 << ((capacity & 0x0f) + 4);
         }
         break;
     case 0x01: // Cypress
         break;
     default:
         /* Check older READ ID command */
+        printf("Unknown mfg %02X, type %02X, capacity %02X\n",
+            mfg_id, memtype, capacity);
         id = SPIFlash_ReadID();
         if (id == 0xBF48BF48) {
             printf("Microchip SST25VFxxxA SPI Flash found\n");
@@ -157,6 +159,22 @@ void detect_memory_type()
         }
         break;
     }
+
+    printf("Flash params:\n\
+SPIFLASH_SR_ENABLE    = %02X\n\
+SPIFLASH_PROTECT_MASK = %02X\n\
+SPIFLASH_WRITE_SIZE   = %d\n\
+SPIFLASH_WRITE_CMD    = %02X\n\
+SPIFLASH_FAST_READ    = %d\n\
+SPIFLASH_USE_AAI      = %d\n",
+        SPIFLASH_SR_ENABLE,   
+        SPIFLASH_PROTECT_MASK,
+        SPIFLASH_WRITE_SIZE,  
+        SPIFLASH_WRITE_CMD,   
+        SPIFLASH_FAST_READ,   
+        SPIFLASH_USE_AAI);     
+        
+    printf("%d free sectors\n", spiflash_sectors - SPIFLASH_SECTOR_OFFSET);
     Mass_Block_Count[0] = spiflash_sectors - SPIFLASH_SECTOR_OFFSET;
 }
 #endif

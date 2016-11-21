@@ -99,7 +99,7 @@ static void detect()
     }
     /* Switch to flash module */
     UseModule(MODULE_FLASH);
-    /* Check that JEDEC ID command returns non-zero */
+    /* Check that JEDEC ID command returns non-zero and not all bits high */
     PORT_pin_clear(PROTO_CSN_PIN);
     spi_xfer(SPIx, 0x9F);
     res  = (u8)spi_xfer(SPIx, 0);
@@ -108,7 +108,7 @@ static void detect()
     res <<= 8;
     res |= (u8)spi_xfer(SPIx, 0);
     PORT_pin_set(PROTO_CSN_PIN);
-    if (res) {
+    if (res && res != 0xFFFFFF) {
         printf("Flash detected, JEDEC ID: '%X'\n", res);
         flash_present = 1;
     }
