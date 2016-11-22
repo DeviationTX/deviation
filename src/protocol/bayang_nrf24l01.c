@@ -280,8 +280,8 @@ static void check_rx( void)
                 //delayMicroseconds(50);
                 NRF24L01_WriteReg(NRF24L01_07_STATUS, 255);
                 //delayMicroseconds(50);
-                //NRF24L01_FlushRx();
-				MUSIC_Play(MUSIC_DONE_BINDING);
+                NRF24L01_FlushRx();
+				//MUSIC_Play(MUSIC_DONE_BINDING);
                 // decode data
                 if (  packet[0] == 133 )
                 {
@@ -307,7 +307,7 @@ static void check_rx( void)
 				   	TELEMETRY_SetUpdated(TELEM_DSM_FLOG_VOLT1);
 					TELEMETRY_SetUpdated(TELEM_DSM_FLOG_VOLT2);
 				   
-				   MUSIC_Play(MUSIC_DONE_BINDING);
+				   //MUSIC_Play(MUSIC_DONE_BINDING);
                 } // end tel received
 
                 
@@ -407,7 +407,7 @@ static u16 bay_callback()
         } else {
             if ( bay_count == 0 ) send_packet(1);
 			bay_count++;
-			bay_count&=4;
+			bay_count%=4;
             counter -= 1;
         }
         break;
@@ -435,12 +435,11 @@ static u16 bay_callback()
 		}
 		if ( bay_count == 3 )
 		{
-		
+			check_rx();
 		}
 		bay_count++;
-		bay_count&=4;
-		check_rx();
-
+		bay_count%=4;
+		
 		
         break;
     }
