@@ -25,7 +25,6 @@
 #include "config/model.h"
 #include "config/tx.h" // for Transmitter
 #include "music.h"
-#include "telemetry.h"
 
 #ifdef MODULAR
   //Some versions of gcc apply this to definitions, others to calls
@@ -44,8 +43,8 @@
 #define PACKET_PERIOD    450
 #define dbgprintf printf
 #else
-#define BIND_COUNT       2000
-#define PACKET_PERIOD    1000UL // Timeout for callback in uSec
+#define BIND_COUNT       1000
+#define PACKET_PERIOD    4000UL // Timeout for callback in uSec
 //printf inside an interrupt handler is really dangerous
 //this shouldn't be enabled even in debug builds without explicitly
 //turning it on
@@ -57,8 +56,6 @@
 #define RF_NUM_CHANNELS    4
 #define RF_BIND_CHANNEL    0
 #define ADDRESS_LENGTH     5
-
-
 
 // For code readability
 enum {
@@ -137,141 +134,10 @@ static void send_packet(u8 bind)
         memcpy(&packet[6], rf_channels, 4);
         packet[10] = txid[0];
         packet[11] = txid[1];
-    }
- else 
-	{	
-
-	
-	
-        packet[0] = 0xa5;
-        packet[1] = 0xfa;   // normal mode is 0xf7, expert 0xfa
-        packet[2] = GET_FLAG(CHANNEL_FLIP, 0x08)
-                  | GET_FLAG(CHANNEL_HEADLESS, 0x02)
-                  | GET_FLAG(CHANNEL_RTH, 0x01)
-                  | GET_FLAG(CHANNEL_VIDEO, 0x10)
-                  | GET_FLAG(CHANNEL_PICTURE, 0x20);
-        packet[3] = GET_FLAG(CHANNEL_INVERTED, 0x80);
-        chanval.value = scale_channel(CHANNEL1, 0x3ff, 0);   // aileron
-        packet[4] = chanval.bytes.msb + DYNTRIM(chanval.value);
-        packet[5] = chanval.bytes.lsb;
-        chanval.value = scale_channel(CHANNEL2, 0, 0x3ff);   // elevator
-        packet[6] = chanval.bytes.msb + DYNTRIM(chanval.value);
-        packet[7] = chanval.bytes.lsb;
-        chanval.value = scale_channel(CHANNEL3, 0, 0x3ff);   // throttle
-        packet[8] = chanval.bytes.msb + 0x7c;
-        packet[9] = chanval.bytes.lsb;
-        chanval.value = scale_channel(CHANNEL4, 0x3ff, 0);   // rudder
-        packet[10] = chanval.bytes.msb + DYNTRIM(chanval.value);
-        packet[11] = chanval.bytes.lsb;
-    }
-    packet[12] = txid[2];
-    packet[13] = 0x0a;
-    packet[14] = checksum();
- 
- 
- //MUSIC_Play(MUSIC_DONE_BINDING);
- 
-if (1)
-{
-
-  // old code 
-    // Power on, TX mode, 2byte CRC
-    // Why CRC0? xn297 does not interpret it - either 16-bit CRC or nothing
-	NRF24L01_WriteReg(NRF24L01_05_RF_CH, bind ? RF_BIND_CHANNEL : rf_channels[rf_chan++]);
-    rf_chan %= sizeof(rf_channels);
-
-    NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x20);
-    NRF24L01_FlushTx();
-
-    XN297_WritePayload(packet, PACKET_SIZE);
-
-	NRF24L01_SetTxRxMode(TXRX_OFF);
-    NRF24L01_SetTxRxMode(TX_EN); 
-	
-	XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
-	
-	while( !(NRF24L01_ReadReg(NRF24L01_07_STATUS) & (1<<5)) )  usleep(50);
-/*	
-	NRF24L01_SetTxRxMode(TXRX_OFF);
-    NRF24L01_FlushRx();
-    NRF24L01_SetTxRxMode(RX_EN);
-    XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP) | BV(NRF24L01_00_PRIM_RX)); 
-	
-	NRF24L01_WriteReg(NRF24L01_07_STATUS, BV(NRF24L01_07_RX_DR));
-*/	
-// set rx mode
-//XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP) | BV(NRF24L01_00_PRIM_RX)); 
-NRF24L01_WriteReg(0, 0x03);
-//	NRF24L01_SetTxRxMode(TXRX_OFF);
-  //  NRF24L01_SetTxRxMode(RX_EN);
-}
-if(0)
-{
-// new code
-    NRF24L01_WriteReg(NRF24L01_05_RF_CH, bind ? RF_BIND_CHANNEL : rf_channels[rf_chan++]);
-    rf_chan %= sizeof(rf_channels);
-	
-	NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x20);
-    NRF24L01_FlushTx();
-   
-    // Power on, TX mode, 2byte CRC
-    // Why CRC0? xn297 does not interpret it - either 16-bit CRC or nothing
-
-    NRF24L01_SetTxRxMode(TX_EN);  
-    XN297_Configure( (1<<NRF24L01_00_EN_CRC) | (1<<NRF24L01_00_CRCO) | (1<<NRF24L01_00_PWR_UP));
-
- //   NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
- //   NRF24L01_FlushTx();
-
-    XN297_WritePayload(packet, PACKET_SIZE);
-
-
-    // Check and adjust transmission power. We do this after
-    // transmission to not bother with timeout after power
-    // settings change -  we have plenty of time until next
-    // packet.
-//int x = 0;
- //   while( !(NRF24L01_ReadReg(NRF24L01_07_STATUS) & (1<<5)) && x<1000)
+    } else 
 	{
-	//volatile int x = 200;
-	//while(x--);
-	//x++;
-	}
-	
-// set rx mode
-//NRF24L01_WriteReg(0, 0x03);
-}
-
-    // Check and adjust transmission power. We do this after
-    // transmission to not bother with timeout after power
-    // settings change -  we have plenty of time until next
-    // packet.
-    if (tx_power != Model.tx_power) {
-        //Keep transmit power updated
-        tx_power = Model.tx_power;
-        NRF24L01_SetPower(tx_power);
-    }
-
-#ifdef EMULATOR
-    dbgprintf("next chan 0x%02x, bind %d, data %02x", bind ? RF_BIND_CHANNEL : rf_channels[rf_chan], bind, packet[0]);
-    for(int i=1; i < PACKET_SIZE; i++) dbgprintf(" %02x", packet[i]);
-    dbgprintf("\n");
-#endif
-}
-
-
-static void check_rx( void)
-{
-
-    union {
-        u16 value;
-        struct {
-            u8 lsb;
-            u8 msb;
-        } bytes;
-    } chanval;
-
-	if( NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR) ) 
+	// check telemety received
+	   if( 0 && NRF24L01_ReadReg(NRF24L01_07_STATUS) & (1<<6) ) 
           { // data received from aircraft
            
               XN297_ReadPayload(packet, PACKET_SIZE);
@@ -281,7 +147,7 @@ static void check_rx( void)
                 NRF24L01_WriteReg(NRF24L01_07_STATUS, 255);
                 //delayMicroseconds(50);
                 //NRF24L01_FlushRx();
-				MUSIC_Play(MUSIC_DONE_BINDING);
+
                 // decode data
                 if (  packet[0] == 133 )
                 {
@@ -303,11 +169,6 @@ static void check_rx( void)
 				   chanval.bytes.msb = packet[5]&0x7;
 				   chanval.bytes.lsb = packet[6]&0xff;
 				   Telemetry.value[TELEM_DSM_FLOG_VOLT2] = chanval.value;
-				   
-				   	TELEMETRY_SetUpdated(TELEM_DSM_FLOG_VOLT1);
-					TELEMETRY_SetUpdated(TELEM_DSM_FLOG_VOLT2);
-				   
-				   MUSIC_Play(MUSIC_DONE_BINDING);
                 } // end tel received
 
                 
@@ -315,6 +176,91 @@ static void check_rx( void)
           //return 1;
               //break;
           }
+	
+        packet[0] = 0xa5;
+        packet[1] = 0xfa;   // normal mode is 0xf7, expert 0xfa
+        packet[2] = GET_FLAG(CHANNEL_FLIP, 0x08)
+                  | GET_FLAG(CHANNEL_HEADLESS, 0x02)
+                  | GET_FLAG(CHANNEL_RTH, 0x01)
+                  | GET_FLAG(CHANNEL_VIDEO, 0x10)
+                  | GET_FLAG(CHANNEL_PICTURE, 0x20);
+        packet[3] = GET_FLAG(CHANNEL_INVERTED, 0x80);
+        chanval.value = scale_channel(CHANNEL1, 0x3ff, 0);   // aileron
+        packet[4] = chanval.bytes.msb + 0x7c;// + DYNTRIM(chanval.value);
+        packet[5] = chanval.bytes.lsb;
+        chanval.value = scale_channel(CHANNEL2, 0, 0x3ff);   // elevator
+        packet[6] = chanval.bytes.msb + 0x7c;// + DYNTRIM(chanval.value);
+        packet[7] = chanval.bytes.lsb;
+        chanval.value = scale_channel(CHANNEL3, 0, 0x3ff);   // throttle
+        packet[8] = chanval.bytes.msb + 0x7c;
+        packet[9] = chanval.bytes.lsb;
+        chanval.value = scale_channel(CHANNEL4, 0x3ff, 0);   // rudder
+        packet[10] = chanval.bytes.msb + 0x7c;// + DYNTRIM(chanval.value);
+        packet[11] = chanval.bytes.lsb;
+    }
+    packet[12] = txid[2];
+    packet[13] = 0x0a;
+    packet[14] = checksum();
+/* 
+    NRF24L01_WriteReg(NRF24L01_05_RF_CH, bind ? RF_BIND_CHANNEL : rf_channels[rf_chan++]);
+    rf_chan %= sizeof(rf_channels);
+	
+	NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x20);
+    NRF24L01_FlushTx();
+   
+    // Power on, TX mode, 2byte CRC
+    // Why CRC0? xn297 does not interpret it - either 16-bit CRC or nothing
+
+    NRF24L01_SetTxRxMode(TX_EN);  
+    XN297_Configure( (1<<NRF24L01_00_EN_CRC) | (1<<NRF24L01_00_CRCO) | (1<<NRF24L01_00_PWR_UP));
+
+ //   NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
+ //   NRF24L01_FlushTx();
+
+    XN297_WritePayload(packet, PACKET_SIZE);
+*/
+
+    // Check and adjust transmission power. We do this after
+    // transmission to not bother with timeout after power
+    // settings change -  we have plenty of time until next
+    // packet.
+
+ //   while( ! (NRF24L01_ReadReg(NRF24L01_07_STATUS) & (1<<5)) )
+//	{
+//	volatile int x = 200;
+//	while(x--);
+//	}
+	
+// set rx mode
+//NRF24L01_WriteReg(0, 0x03);
+if ( 1 ) 
+{
+// old code
+   
+    // Power on, TX mode, 2byte CRC
+    // Why CRC0? xn297 does not interpret it - either 16-bit CRC or nothing
+    XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
+
+    NRF24L01_WriteReg(NRF24L01_05_RF_CH, bind ? RF_BIND_CHANNEL : rf_channels[rf_chan++]);
+    rf_chan %= sizeof(rf_channels);
+
+    NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
+    NRF24L01_FlushTx();
+
+    XN297_WritePayload(packet, PACKET_SIZE);
+	
+}
+    if (tx_power != Model.tx_power) {
+        //Keep transmit power updated
+        tx_power = Model.tx_power;
+        NRF24L01_SetPower(tx_power);
+    }
+
+#ifdef EMULATOR
+    dbgprintf("next chan 0x%02x, bind %d, data %02x", bind ? RF_BIND_CHANNEL : rf_channels[rf_chan], bind, packet[0]);
+    for(int i=1; i < PACKET_SIZE; i++) dbgprintf(" %02x", packet[i]);
+    dbgprintf("\n");
+#endif
 }
 
 static void bay_init()
@@ -330,19 +276,13 @@ static void bay_init()
     // NRF24L01_WriteRegisterMulti(0x3e, "\xc9\x9a\xb0,\x61,\xbb,\xab,\x9c", 7); 
     // NRF24L01_WriteRegisterMulti(0x39, "\x0b\xdf\xc4,\xa7,\x03,\xab,\x9c", 7); 
 
-XN297_SetScrambledMode(1);
-
     XN297_SetTXAddr(bind_address, ADDRESS_LENGTH);
-	XN297_SetRXAddr(bind_address, ADDRESS_LENGTH);
-	
+
     NRF24L01_FlushTx();
     NRF24L01_FlushRx();
     NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);      // No Auto Acknowldgement on all data pipes
     NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x01);
-//    NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x03);
-
-    NRF24L01_WriteReg(NRF24L01_11_RX_PW_P0, 15);
-	
+    NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x03);
     NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0x00); // no retransmits
     NRF24L01_SetBitrate(NRF24L01_BR_1M);             // 1Mbps
     NRF24L01_SetPower(Model.tx_power);
@@ -379,13 +319,13 @@ XN297_SetScrambledMode(1);
         dbgprintf("nRF24L01 detected\n");
     }
     NRF24L01_Activate(0x53); // switch bank back
-	
-	NRF24L01_SetTxRxMode(TX_EN);	
 }
 
+static void bay_init2()
+{
+    XN297_SetTXAddr(rx_tx_addr, ADDRESS_LENGTH);
+}
 
-
-u8 bay_count = 0;
 
 MODULE_CALLTYPE
 static u16 bay_callback()
@@ -398,50 +338,18 @@ static u16 bay_callback()
 
     case Bayang_BIND2:
         if (counter == 0) {
-            //bay_init2();
-			XN297_SetTXAddr(rx_tx_addr, ADDRESS_LENGTH);
-			XN297_SetRXAddr(rx_tx_addr, ADDRESS_LENGTH);
+            bay_init2();
             phase = Bayang_DATA;
             PROTOCOL_SetBindState(0);
             MUSIC_Play(MUSIC_DONE_BINDING);
         } else {
-            if ( bay_count == 0 ) send_packet(1);
-			bay_count++;
-			bay_count&=4;
+            send_packet(1);
             counter -= 1;
         }
         break;
 
     case Bayang_DATA:
-        if ( bay_count == 0 )
-		{
-		
-		
-		send_packet(0);
-		}
-		if ( bay_count == 1 )
-		{
-		// set rx
-	//	NRF24L01_WriteReg(0, 0x03);
-	//	NRF24L01_SetTxRxMode(RX_EN);
-	//	XN297_Configure(  BV(NRF24L01_00_PWR_UP) | BV(NRF24L01_00_PRIM_RX));
-		/*
-		NRF24L01_SetTxRxMode(TXRX_OFF);
-        NRF24L01_FlushRx();
-        NRF24L01_SetTxRxMode(RX_EN);
-        XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP) | BV(NRF24L01_00_PRIM_RX)); 
-		*/
-		
-		}
-		if ( bay_count == 3 )
-		{
-		
-		}
-		bay_count++;
-		bay_count&=4;
-		check_rx();
-
-		
+        send_packet(0);
         break;
     }
     return PACKET_PERIOD;
@@ -488,24 +396,22 @@ static void initialize_txid()
 static void initialize()
 {
     CLOCK_StopTimer();
-    tx_power = Model.tx_power;   
+    tx_power = Model.tx_power;
+
+ memset(&Telemetry, 0, sizeof(Telemetry));
+TELEMETRY_SetType(TELEM_DSM);
+
+//TELEM_DSM_FLOG_FADESA, TELEM_DSM_FLOG_FADESB,
+//TELEM_DSM_FLOG_FADESL, TELEM_DSM_FLOG_FADESR,
+//TELEM_DSM_FLOG_FRAMELOSS, TELEM_DSM_FLOG_HOLDS,
+//TELEM_DSM_FLOG_VOLT1
+// TELEM_DSM_FLOG_RPM1, TELEM_DSM_FLOG_VOLT2, TELEM_DSM_FLOG_TEMP1
+
+Telemetry.value[TELEM_DSM_FLOG_VOLT1] = 1000; //In 1/100 of Volts
+Telemetry.value[TELEM_DSM_FLOG_VOLT2] = 1100; //In 1/100 of Volts
+
+
     counter = BIND_COUNT;
-	
-	
-	memset(&Telemetry, 0, sizeof(Telemetry));
-	TELEMETRY_SetType(TELEM_DSM);
-
-	//TELEM_DSM_FLOG_FADESA, TELEM_DSM_FLOG_FADESB,
-	//TELEM_DSM_FLOG_FADESL, TELEM_DSM_FLOG_FADESR,
-	//TELEM_DSM_FLOG_FRAMELOSS, TELEM_DSM_FLOG_HOLDS,
-	//TELEM_DSM_FLOG_VOLT1
-	// TELEM_DSM_FLOG_RPM1, TELEM_DSM_FLOG_VOLT2, TELEM_DSM_FLOG_TEMP1
-
-	Telemetry.value[TELEM_DSM_FLOG_VOLT1] = 1000; //In 1/100 of Volts
-	Telemetry.value[TELEM_DSM_FLOG_VOLT2] = 1100; //In 1/100 of Volts
-	
-
-	
     initialize_txid();
     bay_init();
     phase = Bayang_INIT1;
