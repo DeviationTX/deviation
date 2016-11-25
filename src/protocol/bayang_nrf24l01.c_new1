@@ -100,13 +100,9 @@ enum {
 
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
-#define TELEM_OFF 0
-#define TELEM_ON 1
-
 static u16 counter;
 static u8 phase;
-static u8 telemetry;
-static u8 packet[PACKET_SIZE+2];
+static u8 packet[PACKET_SIZE];
 static u8 tx_power;
 static u8 txid[3];
 static u8 rf_chan; 
@@ -148,11 +144,7 @@ static void send_packet(u8 bind)
     } chanval;
 
     if (bind) {
-	if ( telemetry)
-		packet[0] = 0xa3;
-	else
-		packet[0] = 0xa4;
-    
+        packet[0] = 0xa4;
         memcpy(&packet[1], rx_tx_addr, 5);
         memcpy(&packet[6], rf_channels, 4);
         packet[10] = txid[0];
@@ -160,6 +152,9 @@ static void send_packet(u8 bind)
     }
  else 
 	{	
+
+	
+	
         packet[0] = 0xa5;
         packet[1] = 0xfa;   // normal mode is 0xf7, expert 0xfa
         packet[2] = GET_FLAG(CHANNEL_FLIP, 0x08)
@@ -186,13 +181,18 @@ static void send_packet(u8 bind)
     packet[14] = checksum();
  
  
+ //MUSIC_Play(MUSIC_DONE_BINDING);
+ 
+if (1)
+{
+
   // old code 
     // Power on, TX mode, 2byte CRC
     // Why CRC0? xn297 does not interpret it - either 16-bit CRC or nothing
 	NRF24L01_WriteReg(NRF24L01_05_RF_CH, bind ? RF_BIND_CHANNEL : rf_channels[rf_chan++]);
     rf_chan %= sizeof(rf_channels);
 
-    NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
+    NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x20);
     NRF24L01_FlushTx();
 
     XN297_WritePayload(packet, PACKET_SIZE);
@@ -203,14 +203,14 @@ static void send_packet(u8 bind)
 	XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
 
 int x = 1;	
-//	while( !(NRF24L01_ReadReg(NRF24L01_07_STATUS) & (1<<5))  )  
-//	{ 
-//	usleep(50);
-//	x++;
-//	}
+	while( !(NRF24L01_ReadReg(NRF24L01_07_STATUS) & (1<<5))  )  
+	{ 
+	usleep(50);
+	x++;
+	}
 	
-//Telemetry.value[TELEM_DSM_FLOG_FADESA]  = x;
-//TELEMETRY_SetUpdated(TELEM_DSM_FLOG_FADESA);	
+Telemetry.value[TELEM_DSM_FLOG_FADESA]  = x;
+TELEMETRY_SetUpdated(TELEM_DSM_FLOG_FADESA);	
 /*	
 	NRF24L01_SetTxRxMode(TXRX_OFF);
     NRF24L01_FlushRx();
@@ -221,19 +221,46 @@ int x = 1;
 */	
 // set rx mode
 //XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP) | BV(NRF24L01_00_PRIM_RX)); 
-if ( telemetry )
-{
-//	NRF24L01_SetTxRxMode(TXRX_OFF);
-//    NRF24L01_SetTxRxMode(RX_EN);
-//	XN297_Configure( BV(NRF24L01_00_PWR_UP) | BV(NRF24L01_00_PRIM_RX)); 
-	
 NRF24L01_WriteReg(0, 0x03);
-//Telemetry.value[TELEM_DSM_FLOG_FADESA]  = 0;
-//TELEMETRY_SetUpdated(TELEM_DSM_FLOG_FADESA);
+//	NRF24L01_SetTxRxMode(TXRX_OFF);
+  //  NRF24L01_SetTxRxMode(RX_EN);
 }
+if(0)
+{
+// new code
+    NRF24L01_WriteReg(NRF24L01_05_RF_CH, bind ? RF_BIND_CHANNEL : rf_channels[rf_chan++]);
+    rf_chan %= sizeof(rf_channels);
+	
+	NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x20);
+    NRF24L01_FlushTx();
+   
+    // Power on, TX mode, 2byte CRC
+    // Why CRC0? xn297 does not interpret it - either 16-bit CRC or nothing
+
+    NRF24L01_SetTxRxMode(TX_EN);  
+    XN297_Configure( (1<<NRF24L01_00_EN_CRC) | (1<<NRF24L01_00_CRCO) | (1<<NRF24L01_00_PWR_UP));
+
+ //   NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
+ //   NRF24L01_FlushTx();
+
+    XN297_WritePayload(packet, PACKET_SIZE);
 
 
-
+    // Check and adjust transmission power. We do this after
+    // transmission to not bother with timeout after power
+    // settings change -  we have plenty of time until next
+    // packet.
+//int x = 0;
+ //   while( !(NRF24L01_ReadReg(NRF24L01_07_STATUS) & (1<<5)) && x<1000)
+	{
+	//volatile int x = 200;
+	//while(x--);
+	//x++;
+	}
+	
+// set rx mode
+//NRF24L01_WriteReg(0, 0x03);
+}
 
     // Check and adjust transmission power. We do this after
     // transmission to not bother with timeout after power
@@ -252,10 +279,8 @@ NRF24L01_WriteReg(0, 0x03);
 #endif
 }
 
-u16 telemetry_count = 0;
+u16 telemetry_count;
 static u16 loopcount = 0;
-
-
 
 static int check_rx( void)
 {
@@ -271,35 +296,44 @@ static int check_rx( void)
 	if( NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR) ) 
           { // data received from aircraft
            
-              XN297_ReadPayload(packet, PACKET_SIZE+2);
-        
+              XN297_ReadPayload(packet, PACKET_SIZE);
+               
+                //if (  packet[0] == 133) Serial.println("x");
+                //delayMicroseconds(50);
                 NRF24L01_WriteReg(NRF24L01_07_STATUS, 255);
                 //delayMicroseconds(50);
                 NRF24L01_FlushRx();
+				//MUSIC_Play(MUSIC_DONE_BINDING);
                 // decode data
                 if (  packet[0] == 133 )
                 {
-				// uncompensated battery volts*100
+                   if ( packet[1] )
+                   {
+                    //alarm = 1;
+                    //Serial.print( packet[1] );
+                    //Serial.print( " " );
+                   }
+                   else
+                   {
+                    //warning = 0;
+                    //alarm = 0;
+                   }
 				   chanval.bytes.msb = packet[3]&0x7;
 				   chanval.bytes.lsb = packet[4]&0xff;
 				   Telemetry.value[TELEM_DSM_FLOG_VOLT1] = chanval.value;
-				   TELEMETRY_SetUpdated(TELEM_DSM_FLOG_VOLT1);
 				   
-				// compensated battery volts*100  
 				   chanval.bytes.msb = packet[5]&0x7;
 				   chanval.bytes.lsb = packet[6]&0xff;
 				   Telemetry.value[TELEM_DSM_FLOG_VOLT2] = chanval.value;
+				   
+				   	TELEMETRY_SetUpdated(TELEM_DSM_FLOG_VOLT1);
 					TELEMETRY_SetUpdated(TELEM_DSM_FLOG_VOLT2);
 					
-				Telemetry.value[TELEM_DSM_FLOG_HOLDS] = packet[7]*2;
-				TELEMETRY_SetUpdated(TELEM_DSM_FLOG_HOLDS);
-				
-				telemetry_count++;	
-				//Telemetry.value[TELEM_DSM_FLOG_FADESA]  =  packet[15];
-				//TELEMETRY_SetUpdated(TELEM_DSM_FLOG_FADESA);		
+					telemetry_count++;
 				 return 1;  
+				   //MUSIC_Play(MUSIC_DONE_BINDING);
                 } // end tel received
-				
+
                 
                 //Serial.println("x");
           
@@ -321,10 +355,10 @@ static void bay_init()
     // NRF24L01_WriteRegisterMulti(0x3e, "\xc9\x9a\xb0,\x61,\xbb,\xab,\x9c", 7); 
     // NRF24L01_WriteRegisterMulti(0x39, "\x0b\xdf\xc4,\xa7,\x03,\xab,\x9c", 7); 
 
-//XN297_SetScrambledMode(XN297_SCRAMBLED);
+XN297_SetScrambledMode(1);
 
     XN297_SetTXAddr(bind_address, ADDRESS_LENGTH);
-//	XN297_SetRXAddr(bind_address, ADDRESS_LENGTH);
+	XN297_SetRXAddr(bind_address, ADDRESS_LENGTH);
 	
     NRF24L01_FlushTx();
     NRF24L01_FlushRx();
@@ -332,7 +366,7 @@ static void bay_init()
     NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x01);
 //    NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x03);
 
-    NRF24L01_WriteReg(NRF24L01_11_RX_PW_P0, PACKET_SIZE + 2);
+    NRF24L01_WriteReg(NRF24L01_11_RX_PW_P0, 15);
 	
     NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0x00); // no retransmits
     NRF24L01_SetBitrate(NRF24L01_BR_1M);             // 1Mbps
@@ -377,7 +411,6 @@ static void bay_init()
 
 
 u8 bay_count = 0;
-u16 last_telemetry_count;
 
 MODULE_CALLTYPE
 static u16 bay_callback()
@@ -390,6 +423,7 @@ static u16 bay_callback()
 
     case Bayang_BIND2:
         if (counter == 0) {
+            //bay_init2();
 			XN297_SetTXAddr(rx_tx_addr, ADDRESS_LENGTH);
 			XN297_SetRXAddr(rx_tx_addr, ADDRESS_LENGTH);
             phase = Bayang_DATA;
@@ -404,67 +438,53 @@ static u16 bay_callback()
         break;
 
     case Bayang_DATA:
-	if( telemetry)
-	{
 		loopcount++;
-		if (loopcount>1000)
+		if (loopcount>1023)
 		{
 		loopcount = 0;
 		Telemetry.value[TELEM_DSM_FLOG_FRAMELOSS] = telemetry_count;
-		if ( telemetry_count!= last_telemetry_count ) TELEMETRY_SetUpdated(TELEM_DSM_FLOG_FRAMELOSS);
-		last_telemetry_count = telemetry_count;
+		TELEMETRY_SetUpdated(TELEM_DSM_FLOG_FRAMELOSS);
 		telemetry_count = 0;
-		
-		//TELEMETRY_SetUpdated(TELEM_DSM_FLOG_FRAMELOSS);
 		}
 		
         if ( bay_count == 0 )
 		{
+		
+		
 		send_packet(0);
 		}
 
 		if ( bay_count == 1 )
+		{
+			if ( check_rx() )
 			{
-			//NRF24L01_WriteReg(0, 0x03);
+			Telemetry.value[TELEM_DSM_FLOG_FADESB] = 1;
+			TELEMETRY_SetUpdated(TELEM_DSM_FLOG_FADESB);
 			}
-			
-			
-			if ( bay_count == 2 )
-			{
-
-			}
-			
-			if ( bay_count == 3 )
-			{
-				if ( check_rx() )
-				{
-				Telemetry.value[TELEM_DSM_FLOG_FADESB] = 3;
-				//TELEMETRY_SetUpdated(TELEM_DSM_FLOG_FADESB);
-				}
-			}
-			
-			if ( bay_count == 4 )
-			{
-				if ( check_rx() )
-				{
-				Telemetry.value[TELEM_DSM_FLOG_FADESB] = 4;
-				//TELEMETRY_SetUpdated(TELEM_DSM_FLOG_FADESB);
-				}
-			}
-			bay_count++;
-			bay_count%=5;
-
 		}
-		else
+		
+		
+		if ( bay_count == 2 )
 		{
-		// no telemetry
-		if ( bay_count == 0 )
+			if ( check_rx() )
+			{
+			Telemetry.value[TELEM_DSM_FLOG_FADESB] = 2;
+			TELEMETRY_SetUpdated(TELEM_DSM_FLOG_FADESB);
+			}
+		}
+		
+		if ( bay_count == 3 )
 		{
-		send_packet(0);
+			if ( check_rx() )
+			{
+			Telemetry.value[TELEM_DSM_FLOG_FADESB] = 3;
+			TELEMETRY_SetUpdated(TELEM_DSM_FLOG_FADESB);
+			}
 		}
 		bay_count++;
-		bay_count%=2;
-		}	
+		bay_count%=4;
+
+		
         break;
     }
     return PACKET_PERIOD;
@@ -522,12 +542,12 @@ static void initialize()
 	//TELEM_DSM_FLOG_FADESL, TELEM_DSM_FLOG_FADESR,
 	//TELEM_DSM_FLOG_FRAMELOSS, TELEM_DSM_FLOG_HOLDS,
 	//TELEM_DSM_FLOG_VOLT1
-	//TELEM_DSM_FLOG_RPM1, TELEM_DSM_FLOG_VOLT2, TELEM_DSM_FLOG_TEMP1
+	// TELEM_DSM_FLOG_RPM1, TELEM_DSM_FLOG_VOLT2, TELEM_DSM_FLOG_TEMP1
 
-	telemetry = Model.proto_opts[PROTOOPTS_TELEMETRY];
+	Telemetry.value[TELEM_DSM_FLOG_VOLT1] = 1000; //In 1/100 of Volts
+	Telemetry.value[TELEM_DSM_FLOG_VOLT2] = 1100; //In 1/100 of Volts
+	
 
-if ( telemetry )
-	Telemetry.value[TELEM_DSM_FLOG_VOLT1] = Telemetry.value[TELEM_DSM_FLOG_VOLT2]= 888; //In 1/100 of Volts	
 	
     initialize_txid();
     bay_init();
@@ -552,9 +572,9 @@ const void *Bayang_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_GETOPTIONS:
             return bay_opts;
-        //case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_ON;
-		case PROTOCMD_TELEMETRYSTATE:
-            return (void *)(long)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
+        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_ON;
+		//case PROTOCMD_TELEMETRYSTATE:
+        //    return (void *)(long)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
         default: break;
     }
     return 0;
