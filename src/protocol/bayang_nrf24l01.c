@@ -106,13 +106,17 @@ ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 static u16 counter;
 static u8 phase;
 static u8 telemetry;
-static u8 packet[PACKET_SIZE+2];
+static u8 packet[PACKET_SIZE];
 static u8 tx_power;
 static u8 txid[3];
 static u8 rf_chan; 
 static u8 rf_channels[RF_NUM_CHANNELS]; 
 static u8 rx_tx_addr[ADDRESS_LENGTH];
 
+static u16 telemetry_count = 0;
+static u16 last_telemetry_count = 0;
+static u16 loopcount = 0;
+static u8 bay_count = 0;
 
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
@@ -202,35 +206,12 @@ static void send_packet(u8 bind)
 	
 	XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
 
-int x = 1;	
-//	while( !(NRF24L01_ReadReg(NRF24L01_07_STATUS) & (1<<5))  )  
-//	{ 
-//	usleep(50);
-//	x++;
-//	}
-	
-//Telemetry.value[TELEM_DSM_FLOG_FADESA]  = x;
-//TELEMETRY_SetUpdated(TELEM_DSM_FLOG_FADESA);	
-/*	
-	NRF24L01_SetTxRxMode(TXRX_OFF);
-    NRF24L01_FlushRx();
-    NRF24L01_SetTxRxMode(RX_EN);
-    XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP) | BV(NRF24L01_00_PRIM_RX)); 
-	
-	NRF24L01_WriteReg(NRF24L01_07_STATUS, BV(NRF24L01_07_RX_DR));
-*/	
-// set rx mode
-//XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP) | BV(NRF24L01_00_PRIM_RX)); 
-if ( telemetry )
-{
-//	NRF24L01_SetTxRxMode(TXRX_OFF);
-//    NRF24L01_SetTxRxMode(RX_EN);
-//	XN297_Configure( BV(NRF24L01_00_PWR_UP) | BV(NRF24L01_00_PRIM_RX)); 
-	
-NRF24L01_WriteReg(0, 0x03);
-//Telemetry.value[TELEM_DSM_FLOG_FADESA]  = 0;
-//TELEMETRY_SetUpdated(TELEM_DSM_FLOG_FADESA);
-}
+
+	if ( telemetry )
+	{
+	// switch radio to rx, no crc
+	NRF24L01_WriteReg(0, 0x03);
+	}
 
 
 
@@ -252,8 +233,6 @@ NRF24L01_WriteReg(0, 0x03);
 #endif
 }
 
-u16 telemetry_count = 0;
-static u16 loopcount = 0;
 
 
 
@@ -269,18 +248,19 @@ static int check_rx( void)
     } chanval;
 
 	if( NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR) ) 
-          { // data received from aircraft
-           
-              XN297_ReadPayload(packet, PACKET_SIZE+2);
+          { // data received from aircraft 
+              XN297_ReadPayload(packet, PACKET_SIZE);
         
                 NRF24L01_WriteReg(NRF24L01_07_STATUS, 255);
-                //delayMicroseconds(50);
+
                 NRF24L01_FlushRx();
-                // decode data
-                if (  packet[0] == 133 )
+                // decode data , check sum is ok as well, since there is no crc
+                if (  packet[14] == checksum() && packet[0] == 133 )
                 {
 				// uncompensated battery volts*100
 				   chanval.bytes.msb = packet[3]&0x7;
+				   u8 flags = packet[3]>>3;
+				   
 				   chanval.bytes.lsb = packet[4]&0xff;
 				   Telemetry.value[TELEM_DSM_FLOG_VOLT1] = chanval.value;
 				   TELEMETRY_SetUpdated(TELEM_DSM_FLOG_VOLT1);
@@ -291,19 +271,16 @@ static int check_rx( void)
 				   Telemetry.value[TELEM_DSM_FLOG_VOLT2] = chanval.value;
 					TELEMETRY_SetUpdated(TELEM_DSM_FLOG_VOLT2);
 					
-				Telemetry.value[TELEM_DSM_FLOG_HOLDS] = packet[7]*2;
-				TELEMETRY_SetUpdated(TELEM_DSM_FLOG_HOLDS);
-				
-				telemetry_count++;	
-				//Telemetry.value[TELEM_DSM_FLOG_FADESA]  =  packet[15];
-				//TELEMETRY_SetUpdated(TELEM_DSM_FLOG_FADESA);		
-				 return 1;  
+					Telemetry.value[TELEM_DSM_FLOG_HOLDS] = packet[7]*2;
+					TELEMETRY_SetUpdated(TELEM_DSM_FLOG_HOLDS);
+					// battery low flag
+					Telemetry.value[TELEM_DSM_FLOG_FADESL] = (flags&1)?100:0;
+					TELEMETRY_SetUpdated(TELEM_DSM_FLOG_FADESL);
+					
+					telemetry_count++;		
+					 return 1;  
                 } // end tel received
 				
-                
-                //Serial.println("x");
-          
-              //break;
           }
 return 0;
 }
@@ -321,18 +298,14 @@ static void bay_init()
     // NRF24L01_WriteRegisterMulti(0x3e, "\xc9\x9a\xb0,\x61,\xbb,\xab,\x9c", 7); 
     // NRF24L01_WriteRegisterMulti(0x39, "\x0b\xdf\xc4,\xa7,\x03,\xab,\x9c", 7); 
 
-//XN297_SetScrambledMode(XN297_SCRAMBLED);
-
     XN297_SetTXAddr(bind_address, ADDRESS_LENGTH);
-//	XN297_SetRXAddr(bind_address, ADDRESS_LENGTH);
 	
     NRF24L01_FlushTx();
     NRF24L01_FlushRx();
     NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);      // No Auto Acknowldgement on all data pipes
     NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x01);
-//    NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x03);
 
-    NRF24L01_WriteReg(NRF24L01_11_RX_PW_P0, PACKET_SIZE + 2);
+    NRF24L01_WriteReg(NRF24L01_11_RX_PW_P0, PACKET_SIZE);
 	
     NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0x00); // no retransmits
     NRF24L01_SetBitrate(NRF24L01_BR_1M);             // 1Mbps
@@ -376,9 +349,6 @@ static void bay_init()
 
 
 
-u8 bay_count = 0;
-u16 last_telemetry_count;
-
 MODULE_CALLTYPE
 static u16 bay_callback()
 {
@@ -411,48 +381,42 @@ static u16 bay_callback()
 		{
 		loopcount = 0;
 		Telemetry.value[TELEM_DSM_FLOG_FRAMELOSS] = telemetry_count;
-		if ( telemetry_count!= last_telemetry_count ) TELEMETRY_SetUpdated(TELEM_DSM_FLOG_FRAMELOSS);
+		// set updated if lower than previous, so an alarm can be used when telemetry lost but does not go on forever
+		if ( telemetry_count < last_telemetry_count ) TELEMETRY_SetUpdated(TELEM_DSM_FLOG_FRAMELOSS);
 		last_telemetry_count = telemetry_count;
 		telemetry_count = 0;
-		
-		//TELEMETRY_SetUpdated(TELEM_DSM_FLOG_FRAMELOSS);
 		}
 		
         if ( bay_count == 0 )
 		{
 		send_packet(0);
 		}
-
+		
 		if ( bay_count == 1 )
+		{
+			if ( check_rx() )
 			{
-			//NRF24L01_WriteReg(0, 0x03);
+			Telemetry.value[TELEM_DSM_FLOG_FADESB] = 1;
 			}
-			
-			
-			if ( bay_count == 2 )
+		}
+		
+		if ( bay_count == 3 )
+		{
+			if ( check_rx() )
 			{
-
+			Telemetry.value[TELEM_DSM_FLOG_FADESB] = 3;
 			}
-			
-			if ( bay_count == 3 )
+		}
+	
+		if ( bay_count == 4 )
+		{
+			if ( check_rx() )
 			{
-				if ( check_rx() )
-				{
-				Telemetry.value[TELEM_DSM_FLOG_FADESB] = 3;
-				//TELEMETRY_SetUpdated(TELEM_DSM_FLOG_FADESB);
-				}
+			Telemetry.value[TELEM_DSM_FLOG_FADESB] = 4;
 			}
-			
-			if ( bay_count == 4 )
-			{
-				if ( check_rx() )
-				{
-				Telemetry.value[TELEM_DSM_FLOG_FADESB] = 4;
-				//TELEMETRY_SetUpdated(TELEM_DSM_FLOG_FADESB);
-				}
-			}
-			bay_count++;
-			bay_count%=5;
+		}
+		bay_count++;
+		bay_count%=5;
 
 		}
 		else
@@ -506,6 +470,7 @@ static void initialize_txid()
     rf_channels[1] = (lfsr & 0x1f) + 0x10;;
     rf_channels[2] = rf_channels[1] + 0x20;
     rf_channels[3] = rf_channels[2] + 0x20;
+
 }
 
 static void initialize()
@@ -514,6 +479,8 @@ static void initialize()
     tx_power = Model.tx_power;   
     counter = BIND_COUNT;
 	
+	last_telemetry_count = 0;
+	telemetry_count = 0;
 	
 	memset(&Telemetry, 0, sizeof(Telemetry));
 	TELEMETRY_SetType(TELEM_DSM);
