@@ -13,6 +13,12 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// Telemetry data if enabled ( does not work with factory firmware )
+// TELEM_DSM_FLOG_VOLT1 - real battery voltage
+// TELEM_DSM_FLOG_VOLT2 - compensated battery voltage
+// TELEM_DSM_FLOG_HOLDS - rx reception strenght ( packets per second )
+// TELEM_DSM_FLOG_FRAMELOSS - tx telemetry reception strenght ( packets per second )
+// TELEM_DSM_FLOG_FADESL - battery low flag ( LVC )
 
 #ifdef MODULAR
   //Allows the linker to properly relocate
@@ -44,8 +50,10 @@
 #define PACKET_PERIOD    450
 #define dbgprintf printf
 #else
-#define BIND_COUNT       2000
-#define PACKET_PERIOD    1000UL // Timeout for callback in uSec
+#define BIND_COUNT       4000
+// Timeout for callback in uSec
+#define PACKET_PERIOD    1000UL 
+
 //printf inside an interrupt handler is really dangerous
 //this shouldn't be enabled even in debug builds without explicitly
 //turning it on
@@ -190,9 +198,7 @@ static void send_packet(u8 bind)
     packet[14] = checksum();
  
  
-  // old code 
-    // Power on, TX mode, 2byte CRC
-    // Why CRC0? xn297 does not interpret it - either 16-bit CRC or nothing
+
 	NRF24L01_WriteReg(NRF24L01_05_RF_CH, bind ? RF_BIND_CHANNEL : rf_channels[rf_chan++]);
     rf_chan %= sizeof(rf_channels);
 
@@ -204,17 +210,16 @@ static void send_packet(u8 bind)
 	NRF24L01_SetTxRxMode(TXRX_OFF);
     NRF24L01_SetTxRxMode(TX_EN); 
 	
+    // Power on, TX mode, 2byte CRC
+    // Why CRC0? xn297 does not interpret it - either 16-bit CRC or nothing	
 	XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
 
 
 	if ( telemetry )
 	{
 	// switch radio to rx, no crc
-	NRF24L01_WriteReg(0, 0x03);
+	NRF24L01_WriteReg( NRF24L01_00_CONFIG, 0x03);
 	}
-
-
-
 
     // Check and adjust transmission power. We do this after
     // transmission to not bother with timeout after power
@@ -249,37 +254,38 @@ static int check_rx( void)
 
 	if( NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR) ) 
           { // data received from aircraft 
-              XN297_ReadPayload(packet, PACKET_SIZE);
+            XN297_ReadPayload(packet, PACKET_SIZE);
         
-                NRF24L01_WriteReg(NRF24L01_07_STATUS, 255);
+            NRF24L01_WriteReg(NRF24L01_07_STATUS, 255);
 
-                NRF24L01_FlushRx();
-                // decode data , check sum is ok as well, since there is no crc
-                if (  packet[14] == checksum() && packet[0] == 133 )
-                {
+			NRF24L01_FlushRx();
+			// decode data , check sum is ok as well, since there is no crc
+			if (  packet[0] == 0x85 && packet[14] == checksum() )
+			{
 				// uncompensated battery volts*100
-				   chanval.bytes.msb = packet[3]&0x7;
-				   u8 flags = packet[3]>>3;
-				   
-				   chanval.bytes.lsb = packet[4]&0xff;
-				   Telemetry.value[TELEM_DSM_FLOG_VOLT1] = chanval.value;
-				   TELEMETRY_SetUpdated(TELEM_DSM_FLOG_VOLT1);
-				   
+				chanval.bytes.msb = packet[3]&0x7;
+				u8 flags = packet[3]>>3;
+				chanval.bytes.lsb = packet[4]&0xff;
+				Telemetry.value[TELEM_DSM_FLOG_VOLT1] = chanval.value;
+				TELEMETRY_SetUpdated(TELEM_DSM_FLOG_VOLT1);
+			   
 				// compensated battery volts*100  
-				   chanval.bytes.msb = packet[5]&0x7;
-				   chanval.bytes.lsb = packet[6]&0xff;
-				   Telemetry.value[TELEM_DSM_FLOG_VOLT2] = chanval.value;
-					TELEMETRY_SetUpdated(TELEM_DSM_FLOG_VOLT2);
-					
-					Telemetry.value[TELEM_DSM_FLOG_HOLDS] = packet[7]*2;
-					TELEMETRY_SetUpdated(TELEM_DSM_FLOG_HOLDS);
-					// battery low flag
-					Telemetry.value[TELEM_DSM_FLOG_FADESL] = (flags&1)?100:0;
-					TELEMETRY_SetUpdated(TELEM_DSM_FLOG_FADESL);
-					
-					telemetry_count++;		
-					 return 1;  
-                } // end tel received
+			    chanval.bytes.msb = packet[5]&0x7;
+				chanval.bytes.lsb = packet[6]&0xff;
+				Telemetry.value[TELEM_DSM_FLOG_VOLT2] = chanval.value;
+				TELEMETRY_SetUpdated(TELEM_DSM_FLOG_VOLT2);
+				
+				// reception in packets / sec , multiplied by 2
+				Telemetry.value[TELEM_DSM_FLOG_HOLDS] = packet[7]*2;
+				TELEMETRY_SetUpdated(TELEM_DSM_FLOG_HOLDS);
+				
+				// battery low flag
+				Telemetry.value[TELEM_DSM_FLOG_FADESL] = (flags&1)?100:0;
+				TELEMETRY_SetUpdated(TELEM_DSM_FLOG_FADESL);
+				
+				telemetry_count++;		
+				return 1;  
+			} // end tel received
 				
           }
 return 0;
@@ -376,60 +382,42 @@ static u16 bay_callback()
     case Bayang_DATA:
 	if( telemetry)
 	{
+	// telemetry is enabled 
 		loopcount++;
 		if (loopcount>1000)
 		{
-		loopcount = 0;
-		Telemetry.value[TELEM_DSM_FLOG_FRAMELOSS] = telemetry_count;
-		// set updated if lower than previous, so an alarm can be used when telemetry lost but does not go on forever
-		if ( telemetry_count < last_telemetry_count ) TELEMETRY_SetUpdated(TELEM_DSM_FLOG_FRAMELOSS);
-		last_telemetry_count = telemetry_count;
-		telemetry_count = 0;
+		 //calculate telemetry reception packet rate - packets per second
+			loopcount = 0;
+			Telemetry.value[TELEM_DSM_FLOG_FRAMELOSS] = telemetry_count;
+			// set updated if lower than previous, so an alarm can be used when telemetry lost but does not go on forever
+			if ( telemetry_count < last_telemetry_count ) TELEMETRY_SetUpdated(TELEM_DSM_FLOG_FRAMELOSS);
+			last_telemetry_count = telemetry_count;
+			telemetry_count = 0;
 		}
 		
         if ( bay_count == 0 )
 		{
-		send_packet(0);
-		}
-		
-		if ( bay_count == 1 )
-		{
-			if ( check_rx() )
-			{
-			Telemetry.value[TELEM_DSM_FLOG_FADESB] = 1;
-			}
-		}
-		
-		if ( bay_count == 3 )
-		{
-			if ( check_rx() )
-			{
-			Telemetry.value[TELEM_DSM_FLOG_FADESB] = 3;
-			}
-		}
-	
-		if ( bay_count == 4 )
-		{
-			if ( check_rx() )
-			{
-			Telemetry.value[TELEM_DSM_FLOG_FADESB] = 4;
-			}
-		}
-		bay_count++;
-		bay_count%=5;
-
+			send_packet(0);
 		}
 		else
 		{
+			check_rx();
+		}
+		
+		bay_count++;
+		bay_count%=5;
+	}
+	else
+	{
 		// no telemetry
 		if ( bay_count == 0 )
 		{
-		send_packet(0);
+			send_packet(0);
 		}
 		bay_count++;
 		bay_count%=2;
-		}	
-        break;
+	}	
+    break;
     }
     return PACKET_PERIOD;
 }
@@ -485,17 +473,12 @@ static void initialize()
 	memset(&Telemetry, 0, sizeof(Telemetry));
 	TELEMETRY_SetType(TELEM_DSM);
 
-	//TELEM_DSM_FLOG_FADESA, TELEM_DSM_FLOG_FADESB,
-	//TELEM_DSM_FLOG_FADESL, TELEM_DSM_FLOG_FADESR,
-	//TELEM_DSM_FLOG_FRAMELOSS, TELEM_DSM_FLOG_HOLDS,
-	//TELEM_DSM_FLOG_VOLT1
-	//TELEM_DSM_FLOG_RPM1, TELEM_DSM_FLOG_VOLT2, TELEM_DSM_FLOG_TEMP1
-
 	telemetry = Model.proto_opts[PROTOOPTS_TELEMETRY];
 
-if ( telemetry )
-	Telemetry.value[TELEM_DSM_FLOG_VOLT1] = Telemetry.value[TELEM_DSM_FLOG_VOLT2]= 888; //In 1/100 of Volts	
-	
+	// set some initial values to show nothing has been received 
+	if ( telemetry )
+		Telemetry.value[TELEM_DSM_FLOG_VOLT1] = Telemetry.value[TELEM_DSM_FLOG_VOLT2]= 888; //8.88V In 1/100 of Volts	
+		
     initialize_txid();
     bay_init();
     phase = Bayang_INIT1;
@@ -519,7 +502,6 @@ const void *Bayang_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_GETOPTIONS:
             return bay_opts;
-        //case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_ON;
 		case PROTOCMD_TELEMETRYSTATE:
             return (void *)(long)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
         default: break;
