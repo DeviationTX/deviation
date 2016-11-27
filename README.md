@@ -1,7 +1,3 @@
-# Test copy - may be modified - not guaranteed to work
-silver13
-
-
 The Deviation firmware project is hosted at http://www.deviationtx.com
 
 There you can find links to:
