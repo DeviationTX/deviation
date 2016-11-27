@@ -1,5 +1,6 @@
 HAS_4IN1_FLASH ?= 0
 HAS_FLASH_DETECT ?= 0
+USE_JTAG ?= 0
 
 ifndef BUILD_TARGET
 
@@ -35,6 +36,9 @@ CFLAGS  += -D"HAS_4IN1_FLASH=1"
 endif
 ifeq "$(HAS_FLASH_DETECT)" "1"
 CFLAGS  += -D"HAS_FLASH_DETECT=1"
+endif
+ifeq "$(USE_JTAG)" "1"
+CFLAGS  += -D"USE_JTAG=1"
 endif
 MODULE_FLAGS = -fno-builtin
 

@@ -40,6 +40,7 @@ void PWR_Init(void)
                   GPIO_CNF_INPUT_FLOAT, _PWRSW_PIN);
 
     /* Disable SWD and set SWD pins as I/O for programable switch */
+#if !defined USE_JTAG || !USE_JTAG
     AFIO_MAPR = (AFIO_MAPR & ~AFIO_MAPR_SWJ_MASK) | AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_OFF;
     gpio_set_mode(GPIO_BANK_JTMS_SWDIO, GPIO_MODE_OUTPUT_50_MHZ,
                   GPIO_CNF_OUTPUT_PUSHPULL, GPIO_JTMS_SWDIO);
@@ -47,6 +48,7 @@ void PWR_Init(void)
     gpio_set_mode(GPIO_BANK_JTCK_SWCLK, GPIO_MODE_OUTPUT_50_MHZ,
                   GPIO_CNF_OUTPUT_PUSHPULL, GPIO_JTCK_SWCLK);
     gpio_set(GPIO_BANK_JTCK_SWCLK, GPIO_JTCK_SWCLK);
+#endif
 }
 
 void PWR_Shutdown()
