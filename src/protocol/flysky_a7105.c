@@ -41,10 +41,11 @@
 #define BIND_COUNT 2500
 #endif
 
-#define PACKET_PERIOD 1510UL
+#define PACKET_PERIOD_FLYSKY 1510UL
+#define PACKET_PERIOD_CX20 3984UL
 
 static const char * const flysky_opts[] = {
-  "WLToys ext.",  _tr_noop("Off"), "V9x9", "V6x6", "V912", NULL,
+  "WLToys ext.",  _tr_noop("Off"), "V9x9", "V6x6", "V912", "CX20", NULL,
   NULL
 };
 enum {
@@ -57,6 +58,7 @@ ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 #define WLTOYS_EXT_V9X9 1
 #define WLTOYS_EXT_V6X6 2
 #define WLTOYS_EXT_V912 3
+#define WLTOYS_EXT_CX20 4
 
 FLASHBYTETABLE A7105_regs[] = {
     0xFF, 0x42, 0x00, 0x14, 0x00, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x01, 0x21, 0x05, 0x00, 0x50,
@@ -134,6 +136,13 @@ static u8 chancol;
 static u8 chanoffset;
 static u8 packet[21];
 static u16 counter;
+static u16 packet_period;
+// for CX20 (haven't figured out txid / channels relationship yet)
+static u8 rx_tx_addr[4] = {0x06, 0x35, 0x89, 0x72};
+static u8 hopping_frequency[16] = {
+    0x35, 0x85, 0x21, 0x71, 0x2B, 0x7B, 0x3A, 0x53,
+    0x49, 0x26, 0x0D, 0x5D, 0x3F, 0x8F, 0x17, 0x06
+};
 
 static int flysky_init()
 {
@@ -291,6 +300,12 @@ static void flysky_apply_extension_flags()
             packet[20] = 0x00; // unknown
             break;
             
+        case WLTOYS_EXT_CX20:
+            seq_counter++;
+            packet[19] = 00; // unknown
+            packet[20] = (seq_counter<<4)|0x0A;
+            break;
+            
         default:
             break; 
     }
@@ -305,10 +320,17 @@ static void flysky_build_packet(u8 init)
     //Center = 0x5d9
     //1 %    = 5
     packet[0] = init ? 0xaa : 0x55;
-    packet[1] = (id >>  0) & 0xff;
-    packet[2] = (id >>  8) & 0xff;
-    packet[3] = (id >> 16) & 0xff;
-    packet[4] = (id >> 24) & 0xff;
+    if(Model.proto_opts[PROTOOPTS_WLTOYS] == WLTOYS_EXT_CX20) {
+        packet[1] = rx_tx_addr[3];
+        packet[2] = rx_tx_addr[2];
+        packet[3] = rx_tx_addr[1];
+        packet[4] = rx_tx_addr[0];
+    } else {
+        packet[1] = (id >>  0) & 0xff;
+        packet[2] = (id >>  8) & 0xff;
+        packet[3] = (id >> 16) & 0xff;
+        packet[4] = (id >> 24) & 0xff;
+    }
     for (i = 0; i < 8; i++) {
         if (i > Model.num_channels) {
             packet[5 + i*2] = 0;
@@ -335,16 +357,25 @@ static u16 flysky_cb()
             PROTOCOL_SetBindState(0);
     } else {
         flysky_build_packet(0);
-        A7105_WriteData(packet, 21, pgm_read_byte(&tx_channels[chanrow][chancol])-chanoffset);
+        if(Model.proto_opts[PROTOOPTS_WLTOYS] == WLTOYS_EXT_CX20) {
+            A7105_WriteData(packet, 21, hopping_frequency[chancol]);
+        } else {
+            A7105_WriteData(packet, 21, pgm_read_byte(&tx_channels[chanrow][chancol])-chanoffset);
+        }
         chancol = (chancol + 1) % 16;
         if (! chancol) //Keep transmit power updated
             A7105_SetPower(Model.tx_power);
     }
-    return PACKET_PERIOD;
+    return packet_period;
 }
 
 static void initialize(u8 bind) {
     CLOCK_StopTimer();
+    if(Model.proto_opts[PROTOOPTS_WLTOYS] == WLTOYS_EXT_CX20) {
+        packet_period = PACKET_PERIOD_CX20;
+    } else {
+        packet_period = PACKET_PERIOD_FLYSKY;
+    }
     while(1) {
         A7105_Reset();
         CLOCK_ResetWatchdog();
@@ -363,10 +394,11 @@ static void initialize(u8 bind) {
     chanoffset = (id & 0xff) / 16;
     if (bind || ! Model.fixed_id) {
         counter = BIND_COUNT;
-        PROTOCOL_SetBindState(2500 * PACKET_PERIOD / 1000); //msec
+        PROTOCOL_SetBindState(2500 * packet_period / 1000); //msec
     } else {
         counter = 0;
     }
+    
     CLOCK_StartTimer(2400, flysky_cb);
 }
 
