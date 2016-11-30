@@ -156,6 +156,11 @@ static int flysky_init()
     for (i = 0; i < 0x33; i++)
     {
         reg = pgm_read_byte(&A7105_regs[i]);
+        if(Model.proto_opts[PROTOOPTS_WLTOYS] == WLTOYS_EXT_CX20) {
+            if(i==0x0E) reg=0x01;
+            if(i==0x1F) reg=0x1F;
+            if(i==0x20) reg=0x1E;
+        }
         if( reg != 0xFF)
             A7105_WriteReg(i, reg);
     }
