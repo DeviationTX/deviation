@@ -367,10 +367,10 @@ static u16 flysky_cb()
         } else {
             A7105_WriteData(packet, 21, pgm_read_byte(&tx_channels[chanrow][chancol])-chanoffset);
         }
-        chancol = (chancol + 1) % 16;
         if (! chancol) //Keep transmit power updated
             A7105_SetPower(Model.tx_power);
     }
+    chancol = (chancol + 1) % 16;
     return packet_period;
 }
 
