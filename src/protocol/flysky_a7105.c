@@ -308,7 +308,7 @@ static void flysky_apply_extension_flags()
         case WLTOYS_EXT_CX20:
             seq_counter++;
             packet[19] = 00; // unknown
-            packet[20] = (seq_counter<<4)|0x0A;
+            packet[20] = (chancol<<4)|0x0A;
             break;
             
         default:
