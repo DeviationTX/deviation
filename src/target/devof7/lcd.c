@@ -244,8 +244,9 @@ void lcd_show_line(const char string[], u8 line, u8 align, u16 color) {
 void LCD_Init()
 {
     LCD_SetFont(1);
-    /* Enable GPIOA clock. */
+    /* Enable GPIOA and GPIOB clock. */
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPAEN);
+    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPBEN);
 
     /* Set GPIO0, GPIO8, GPIO15, GPIO4 (in GPIO port A) to 'output push-pull'. */
     gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_2_MHZ,
@@ -265,11 +266,33 @@ void LCD_Init()
     gpio_clear(GPIOA, GPIO8);
     gpio_clear(GPIOA, GPIO15);
 
-    //Initialization is mostly done in SPI Flash
-    //Setup CS as B.0 Data/Control = C.5
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPBEN);
+    // Initialization is mostly done in SPI Flash
+    // UNLESS we use SPI2 for 4-in-1 module
+    if (_SPI_FLASH_PORT != 1) {
+        /* Enable SPI1 */
+        rcc_peripheral_enable_clock(&RCC_APB2ENR,  RCC_APB2ENR_SPI1EN);
+        gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
+                      GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO5);
+        gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
+                      GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO7);
+        gpio_set_mode(GPIOA, GPIO_MODE_INPUT,
+                      GPIO_CNF_INPUT_FLOAT, GPIO6);
+
+        spi_init_master(SPI1, 
+                        SPI_CR1_BAUDRATE_FPCLK_DIV_4,
+                        SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE,
+                        SPI_CR1_CPHA_CLK_TRANSITION_1, 
+                        SPI_CR1_DFF_8BIT,
+                        SPI_CR1_MSBFIRST);
+        spi_enable_software_slave_management(SPI1);
+        spi_set_nss_high(SPI1);
+
+        spi_enable(SPI1);
+    }
+    // Setup CS as B.0 Data/Control = C.5
     gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
                   GPIO_CNF_OUTPUT_PUSHPULL, GPIO0);
+    gpio_set(GPIOB, GPIO0); // CS_HI();
 
     LCD_Cmd(LCD_IA911_CLEAR_VRAM); //Clear the VRAM
     // Wait for a couple of clock ticks

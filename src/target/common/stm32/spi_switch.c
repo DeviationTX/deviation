@@ -113,6 +113,7 @@ static void detect()
         flash_present = 1;
     }
     switch_detected = cyrf_present || flash_present;
+    printf("SPI Switch %s\n", switch_detected ? "detected" : "absent");
 }
 
 void SPISwitch_Init()
@@ -139,17 +140,17 @@ static void UseModule(int module)
 
     u8 cmd = (module & 0x07) | extra_bits;
     CS_LO();
-    spi_xfer(SPI2, cmd);
+    spi_xfer(SPIx, cmd);
     CS_HI();
 
     // Adjust baud rate
-    spi_disable(SPI2);
+    spi_disable(SPIx);
     if (module == MODULE_FLASH) {
-        spi_set_baudrate_prescaler(SPI2, SPI_CR1_BR_FPCLK_DIV_4);
+        spi_set_baudrate_prescaler(SPIx, SPI_CR1_BR_FPCLK_DIV_4);
     } else {
-        spi_set_baudrate_prescaler(SPI2, SPI_CR1_BR_FPCLK_DIV_16);
+        spi_set_baudrate_prescaler(SPIx, SPI_CR1_BR_FPCLK_DIV_16);
     }
-    spi_enable(SPI2);
+    spi_enable(SPIx);
 
     last_module_used = module;
 }
@@ -180,7 +181,7 @@ static void SetExtraBits(u8 mask, int state)
     else       extra_bits &= ~mask;
     u8 cmd = (last_module_used & 0x07) | extra_bits;
     CS_LO();
-    spi_xfer(SPI2, cmd);
+    spi_xfer(SPIx, cmd);
     CS_HI();
 }
 
