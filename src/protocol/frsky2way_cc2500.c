@@ -276,7 +276,7 @@ static void frsky2way_parse_telem(u8 *pkt, int len)
 // pkt 4 = A2 : 13.4mV per count; 3.0V = 0xE3 on D6FR
 // pkt 5 = RSSI
 // pkt 6 = number of stream bytes
-// pkt 7 = sequence number increments mod 8 with each packet containing stream data
+// pkt 7 = sequence number increments mod 32 when packet containing stream data acknowledged
 // pkt 8-(8+(pkt[6]-1)) = stream data
 // pkt len-2 = downlink RSSI
 // pkt len-1 = crc status (bit7 set indicates good), link quality indicator (bits6-0)
