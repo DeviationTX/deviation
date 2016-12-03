@@ -103,7 +103,7 @@ const char *MCU_GetPinName(char *str, struct mcu_pin *port)
         default: return "None"; break;
     }
     for(int i = 0; i < 16; i++) {
-        if(port->pin == (1 << i)) {
+        if(port->pin == (1ul << i)) {
             sprintf(str+1, "%d", i);
             return str;
         }
