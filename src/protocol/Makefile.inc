@@ -4,6 +4,7 @@ PROTO_MODULES += $(ODIR)/protocol/devo.mod
 PROTO_MODULES += $(ODIR)/protocol/dsm2.mod
 PROTO_MODULES += $(ODIR)/protocol/dsmx.mod
 PROTO_MODULES += $(ODIR)/protocol/flysky.mod
+PROTO_MODULES += $(ODIR)/protocol/afhds-2a.mod
 PROTO_MODULES += $(ODIR)/protocol/hubsan4.mod
 PROTO_MODULES += $(ODIR)/protocol/joysway.mod
 PROTO_MODULES += $(ODIR)/protocol/j6pro.mod
@@ -34,7 +35,12 @@ PROTO_MODULES += $(ODIR)/protocol/fy326.mod
 PROTO_MODULES += $(ODIR)/protocol/bayang.mod
 PROTO_MODULES += $(ODIR)/protocol/h8-3d.mod
 PROTO_MODULES += $(ODIR)/protocol/mjxq.mod
+PROTO_MODULES += $(ODIR)/protocol/mt99xx.mod
 PROTO_MODULES += $(ODIR)/protocol/s-fhss.mod
+PROTO_MODULES += $(ODIR)/protocol/frskyx.mod
+PROTO_MODULES += $(ODIR)/protocol/assan.mod
+PROTO_MODULES += $(ODIR)/protocol/fq777.mod
+PROTO_MODULES += $(ODIR)/protocol/inav.mod
 
 ALL += $(PROTO_MODULES)
 else #BUILD_TARGET
@@ -52,6 +58,10 @@ $(ODIR)/protocol/dsmx.mod : $(ODIR)/dsm2_cyrf6936.bin
 
 $(ODIR)/protocol/flysky.mod : $(ODIR)/flysky_a7105.bin
 	@echo Building 'flysky' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
+    
+$(ODIR)/protocol/afhds-2a.mod : $(ODIR)/flysky_afhds2a_a7105.bin
+	@echo Building 'afhds-2a' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
 $(ODIR)/protocol/frsky-v8.mod : $(ODIR)/frsky1way_cc2500.bin
@@ -174,8 +184,28 @@ $(ODIR)/protocol/mjxq.mod : $(ODIR)/mjxq_nrf24l01.bin
 	@echo Building 'mjxq' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@    
 
+$(ODIR)/protocol/mt99xx.mod : $(ODIR)/mt99xx_nrf24l01.bin
+	@echo Building 'mt99xx' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@    
+
 $(ODIR)/protocol/s-fhss.mod : $(ODIR)/sfhss_cc2500.bin
 	@echo Building 'sfhss' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@    
+
+$(ODIR)/protocol/frskyx.mod : $(ODIR)/frskyx_cc2500.bin
+	@echo Building 'frskyx' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
+    
+$(ODIR)/protocol/assan.mod : $(ODIR)/assan_nrf24l01.bin
+	@echo Building 'assan' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
+
+$(ODIR)/protocol/fq777.mod : $(ODIR)/fq777_nrf24l01.bin
+	@echo Building 'fq777' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
+
+$(ODIR)/protocol/inav.mod : $(ODIR)/inav_nrf24l01.bin
+	@echo Building 'inav' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
 endif #BUILD_TARGET
