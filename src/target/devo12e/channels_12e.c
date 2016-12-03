@@ -56,9 +56,9 @@ s32 CHAN_ReadRawInput(int channel)
     case INP_RUDDER: value = adc_array_raw[2]; break;  // bug fix: left horizon
     case INP_ELEVATOR:  value = adc_array_raw[3]; break;  // bug fix: left vertical
     case INP_AUX4:     value = adc_array_raw[4]; break;
-    case INP_AUX5:     value = adc_array_raw[5]; break;
-    case INP_AUX6:     value = adc_array_raw[6]; break;
-    case INP_AUX7:     value = adc_array_raw[7]; break;
+    case INP_AUX5:     value = adc_array_raw[7]; break;
+    case INP_AUX6:     value = adc_array_raw[5]; break;
+    case INP_AUX7:     value = adc_array_raw[6]; break;
     case INP_RUD_DR0:  value = gpio_get(GPIOC, GPIO8); break;
     case INP_RUD_DR1:  value = ! gpio_get(GPIOC, GPIO8); break;
     case INP_ELE_DR0:  value = gpio_get(GPIOC, GPIO7); break;

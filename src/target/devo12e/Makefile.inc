@@ -1,6 +1,8 @@
-FILESYSTEM := devo10
-SCREENSIZE := 128x64x1
-DFU_ARGS   := -c 12 -b 0x08004000
+FILESYSTEMS := common base_fonts 128x64x1
+SCREENSIZE  := 128x64x1
+DFU_ARGS    := -c 12 -b 0x08004000
+FONTS        = filesystem/$(FILESYSTEM)/media/12normal.fon \
+               filesystem/$(FILESYSTEM)/media/04b03.fon
 
 include $(SDIR)/target/common/devo/Makefile.inc
 
