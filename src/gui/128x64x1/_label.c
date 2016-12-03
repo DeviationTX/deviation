@@ -93,4 +93,3 @@ void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_w, u16 obj_h, const char 
     }
     LCD_PrintStringXY(txt_x, txt_y, str);
 }
-
