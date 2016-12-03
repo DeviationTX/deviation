@@ -189,6 +189,7 @@ struct reorder_obj {
 struct scanner_obj {
     guiButton_t enable;
     guiButton_t scan_mode;
+    guiButton_t attenuator;
     guiBarGraph_t bar[80];
 };
 
