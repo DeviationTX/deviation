@@ -112,12 +112,7 @@ guiObject_t *GUI_CreateTextSelectPlate(guiTextSelect_t *select, u16 x, u16 y, u1
 
     GUI_TextSelectEnablePress(select, select_cb ? 1 : 0);
 
-#if LCD_DEPTH == 1
-    int underline = select->desc.style == LABEL_UNDERLINE;
-#else
-   const int underline = 0;
-#endif
-    if ((width == 0 || height == 0) && ! underline)
+    if ((width == 0 || height == 0) && select->desc.style != LABEL_UNDERLINE)
         select->desc.style = LABEL_NO_BOX;
 
     return obj;
