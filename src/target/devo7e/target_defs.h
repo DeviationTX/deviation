@@ -18,6 +18,7 @@
 #define HAS_ADVANCED_GUI    1
 #define HAS_PERMANENT_TIMER 0
 #define HAS_TELEMETRY       1
+#define HAS_EXTENDED_TELEMETRY 0
 #define HAS_TOUCH           0
 #define HAS_RTC             0
 #define HAS_VIBRATINGMOTOR  1
@@ -54,4 +55,3 @@
 #define VOLTAGE_OFFSET    249
 
 #endif //_DEVO7E_TARGET_H_
-
