@@ -14,9 +14,9 @@
  */
 
 #ifdef MODULAR
-  //Allows the linker to properly relocate
-  #define DSM2_Cmds PROTO_Cmds
-  #pragma long_calls
+    //Allows the linker to properly relocate
+    #define DSM2_Cmds PROTO_Cmds
+    #pragma long_calls
 #endif
 
 #include <stdlib.h>
@@ -27,9 +27,9 @@
 #include "config/model.h"
 
 #ifdef MODULAR
-  #pragma long_calls_off
-  extern unsigned _data_loadaddr;
-  const unsigned long protocol_type = (unsigned long)&_data_loadaddr;
+    #pragma long_calls_off
+    extern unsigned _data_loadaddr;
+    const unsigned long protocol_type = (unsigned long)&_data_loadaddr;
 #endif
 
 #ifdef PROTO_HAS_CYRF6936
@@ -39,31 +39,54 @@
 #else
     #define RANDOM_CHANNELS  1
 #endif
+
 #define BIND_CHANNEL 0x0d //This can be any odd channel
 #define MODEL 0
 
 #define NUM_WAIT_LOOPS (100 / 5) //each loop is ~5us.  Do not wait more than 100us
 
 static const char * const dsm_opts[] = {
-  _tr_noop("Telemetry"),  _tr_noop("Off"), _tr_noop("On"), NULL,
-  NULL
+    _tr_noop("Telemetry"),  _tr_noop("Off"), _tr_noop("On"), NULL, 
+    _tr_noop("OrangeRx"),  _tr_noop("No"), _tr_noop("Yes"), NULL, 
+#ifndef MODULAR
+    _tr_noop("HighSpeed"),  _tr_noop("Off"), _tr_noop("On"), NULL, 
+    _tr_noop("F.Log filter"),  _tr_noop("Off"), _tr_noop("On"), NULL, 
+#endif
+    NULL
 };
+
 enum {
     PROTOOPTS_TELEMETRY = 0,
+    PROTOOPTS_ORANGERX,
+#ifndef MODULAR
+    PROTOOPTS_HIGHSPEED,
+    PROTOOPTS_FLOGFILTER,
+#endif
     LAST_PROTO_OPT,
 };
+
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
+
 #define TELEM_ON 1
 #define TELEM_OFF 0
+#define ORANGERX_YES 1
+#define ORANGERX_NO 0
+#ifndef MODULAR
+    #define HIGHSPEED_ON 1
+    #define HIGHSPEED_OFF 0
+    #define FLOGFILTER_ON 1
+    #define FLOGFILTER_OFF 0
+#endif
 
 //During binding we will send BIND_COUNT/2 packets
 //One packet each 10msec
 #ifdef EMULATOR
-#define USE_FIXED_MFGID
-#define BIND_COUNT 2
+    #define USE_FIXED_MFGID
+    #define BIND_COUNT 2
 #else
-#define BIND_COUNT 600
+    #define BIND_COUNT 600
 #endif
+
 enum {
     DSM2_BIND = 0,
     DSM2_CHANSEL     = BIND_COUNT + 0,
@@ -123,7 +146,7 @@ static const u8 pncodes[5][9][8] = {
   /* Col 5 */ {0x9B, 0x75, 0xF7, 0xE0, 0x14, 0x8D, 0xB5, 0x80},
   /* Col 6 */ {0xBF, 0x54, 0x98, 0xB9, 0xB7, 0x30, 0x5A, 0x88},
   /* Col 7 */ {0x35, 0xD1, 0xFC, 0x97, 0x23, 0xD4, 0xC9, 0x88},
-  /* Col 8 */ {0x88, 0xE1, 0xD6, 0x31, 0x26, 0x5F, 0xBD, 0x40}
+  /* Col 8 */ {0xE1, 0xD6, 0x31, 0x26, 0x5F, 0xBD, 0x40, 0x93}
 },
 { /* Row 4 */
   /* Col 0 */ {0xE1, 0xD6, 0x31, 0x26, 0x5F, 0xBD, 0x40, 0x93},
@@ -138,18 +161,19 @@ static const u8 pncodes[5][9][8] = {
 },
 };
 
-static const u8 pn_bind[] = { 0xc6,0x94,0x22,0xfe,0x48,0xe6,0x57,0x4e };
+//static const u8 pn_bind[] = {0xD7, 0xA1, 0x54, 0xB1, 0x5E, 0x89, 0xAE, 0x86, 0xc6, 0x94, 0x22, 0xfe, 0x48, 0xe6, 0x57, 0x4e};
+//static const u8 pn_bind_transmit[] = {0xD7, 0xA1, 0x54, 0xB1, 0x5E, 0x89, 0xAE, 0x86, 0xc6, 0x94, 0x22, 0xfe, 0x48, 0xe6, 0x57, 0x4e};
+//static const u8 pn_bind_receive1[] = {0x98, 0x88, 0x1B, 0xE4, 0x30, 0x79, 0x03, 0x84, 0x06, 0x0C, 0x12, 0x18, 0x1E, 0x24, 0x71, 0x10};
+//static const u8 pn_bind_receive2[] = {0x98, 0x88, 0x1B, 0xE4, 0x30, 0x79, 0x03, 0x84, 0xC9, 0x2C, 0x06, 0x93, 0x86, 0xB9, 0x9E, 0xD7};
 
-static const u8 ch_map4[] = {0, 1, 2, 3, 0xff, 0xff, 0xff};    //Guess
-static const u8 ch_map5[] = {0, 1, 2, 3, 4,    0xff, 0xff}; //Guess
-static const u8 ch_map6[] = {1, 5, 2, 3, 0,    4,    0xff}; //HP6DSM
-static const u8 ch_map7[] = {1, 5, 2, 4, 3,    6,    0}; //DX6i
-static const u8 ch_map8[] = {1, 5, 2, 3, 6,    0xff, 0xff, 4, 0, 7,    0xff, 0xff, 0xff, 0xff}; //DX8
-static const u8 ch_map9[] = {3, 2, 1, 5, 0,    4,    6,    7, 8, 0xff, 0xff, 0xff, 0xff, 0xff}; //DM9
-static const u8 ch_map10[] = {3, 2, 1, 5, 0,    4,    6,    7, 8, 9, 0xff, 0xff, 0xff, 0xff};
-static const u8 ch_map11[] = {3, 2, 1, 5, 0,    4,    6,    7, 8, 9, 10, 0xff, 0xff, 0xff};
-static const u8 ch_map12[] = {3, 2, 1, 5, 0,    4,    6,    7, 8, 9, 10, 11, 0xff, 0xff};
-static const u8 * const ch_map[] = {ch_map4, ch_map5, ch_map6, ch_map7, ch_map8, ch_map9, ch_map10, ch_map11, ch_map12};
+//up to 7 channels
+static const u8 ch_map7[] =  {1, 5, 2, 3, 0,  4,    6}; //DX6i
+//from 8 channels up to 12 channels
+static const u8 ch_map12[] = {1, 5, 2, 4, 6, 10, 0xff,    0, 7, 3, 8, 9, 11, 0xff}; //12ch - DX18
+#ifndef MODULAR
+// "High Speed" 11ms for 8...10 channels
+static const u8 ch_map14[] = {1, 5, 2, 3, 4,  6,    8,    1, 5, 2, 3, 0,  7,    9};
+#endif
 
 u8 packet[16];
 u8 channels[23];
@@ -159,19 +183,21 @@ u8 data_col;
 u16 state;
 u8 crcidx;
 u8 binding;
+
 #ifdef USE_FIXED_MFGID
-//static const u8 cyrfmfg_id[6] = {0x5e, 0x28, 0xa3, 0x1b, 0x00, 0x00}; //dx8
-static const u8 cyrfmfg_id[6] = {0xd4, 0x62, 0xd6, 0xad, 0xd3, 0xff}; //dx6i
+    //static const u8 cyrfmfg_id[6] = {0x5e, 0x28, 0xa3, 0x1b, 0x00, 0x00}; //dx8
+    static const u8 cyrfmfg_id[6] = {0xd4, 0x62, 0xd6, 0xad, 0xd3, 0xff}; //dx6i
 #else
-static u8 cyrfmfg_id[6];
+    static u8 cyrfmfg_id[6];
 #endif
+
 u8 num_channels;
 u16 crc;
 u8 model;
 
 static void build_bind_packet()
 {
-    u8 i;
+    u32 i;
     u16 sum = 384 - 0x10;
     packet[0] = crc >> 8;
     packet[1] = crc & 0xff;
@@ -188,11 +214,7 @@ static void build_bind_packet()
     packet[10] = 0x01; //???
     packet[11] = num_channels;
     if(Model.protocol == PROTOCOL_DSMX) {
-#ifdef MODULAR
-        packet[12] = 0xb2;
-#else
         packet[12] = num_channels < 8 && Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_OFF ? 0xa2 : 0xb2;
-#endif
     } else {
         packet[12] = num_channels < 8 ? 0x01 : 0x02;
     }
@@ -205,8 +227,8 @@ static void build_bind_packet()
 
 static void build_data_packet(u8 upper)
 {
-    u8 i;
-    const u8 *chmap = ch_map[num_channels - 4];
+    const u8 *chmap;
+    
     if (binding && PROTOCOL_SticksMoved(0)) {
         //Don't turn off dialog until sticks are moved
         PROTOCOL_SetBindState(0);  //Turn off Bind dialog
@@ -220,12 +242,21 @@ static void build_data_packet(u8 upper)
         packet[1] = (0xff ^ cyrfmfg_id[3]) + model;
     }
     u8 bits = Model.protocol == PROTOCOL_DSMX ? 11 : 10;
+    if(num_channels < 8) {
+        chmap = ch_map7;
+#ifndef MODULAR
+    } else if((num_channels < 11) && (Model.proto_opts[PROTOOPTS_HIGHSPEED] == HIGHSPEED_ON)) {
+        chmap = ch_map14;
+#endif
+    } else {
+        chmap = ch_map12;
+    }
     u16 max = 1 << bits;
     u16 pct_100 = (u32)max * 100 / 150;
-    for (i = 0; i < 7; i++) {
-       unsigned idx = chmap[upper * 7 + i];
+    for (u32 i = 0; i < 7; i++) {
+       u8 idx = chmap[upper * 7 + i];
        s32 value;
-       if (chmap[upper*7 + i] == 0xff) {
+       if ((chmap[upper*7 + i] == 0xff) || ((num_channels > 7) && (chmap[upper*7 + i] > num_channels - 1))) {
            value = 0xffff;
        } else {
            if (binding && Model.limits[idx].flags & CH_FAILSAFE_EN) {
@@ -234,14 +265,76 @@ static void build_data_packet(u8 upper)
                value = (s32)Channels[idx] * (pct_100 / 2) / CHAN_MAX_VALUE + (max / 2);
            }
            if (value >= max)
-               value = max-1;
+               value = max - 1;
            else if (value < 0)
                value = 0;
            value = (upper && i == 0 ? 0x8000 : 0) | (chmap[upper * 7 + i] << bits) | value;
        }
-       packet[i*2+2] = (value >> 8) & 0xff;
-       packet[i*2+3] = (value >> 0) & 0xff;
+       packet[i*2 + 2] = (value >> 8) & 0xff;
+       packet[i*2 + 3] = (value >> 0) & 0xff;
     }
+}
+
+static const u8 init_vals[][2] = {
+    //{CYRF_1D_MODE_OVERRIDE, 0x01},  //moved to CYRF_Reset()
+    {CYRF_03_TX_CFG, 0x38 | 7},     //Data Code Length = 64 chip codes + Data Mode = SDR Mode + max-power(+4 dBm)
+    {CYRF_06_RX_CFG, 0x4A},         //LNA + FAST TURN EN + RXOW EN, enable low noise amplifier, fast turning, overwrite enable
+    {CYRF_12_DATA64_THOLD, 0x0a},   //TH64 = 0Ah, set pn correlation threshold (0Eh???)
+    {CYRF_1B_TX_OFFSET_LSB, 0x55},  //STRIM LSB = 0x55, typical configuration
+    {CYRF_1C_TX_OFFSET_MSB, 0x05},  //STRIM MSB = 0x05, typical configuration
+    {CYRF_32_AUTO_CAL_TIME, 0x3c},  //AUTO_CAL_TIME = 3Ch, typical configuration
+    {CYRF_35_AUTOCAL_OFFSET, 0x14}, //AUTO_CAL_OFFSET = 14h, typical configuration
+    //{CYRF_39_ANALOG_CTRL, 0x01},    //ALL SLOW
+    {CYRF_01_TX_LENGTH, 0x10},      //TX Length = 16 byte packet
+    {CYRF_28_CLK_EN, 0x02},         //RXF, force receive clock enable ???
+};
+
+static void cyrf_startup_config()
+{
+    for(u32 i = 0; i < sizeof(init_vals) / 2; i++)
+        CYRF_WriteRegister(init_vals[i][0], init_vals[i][1]);
+    //If using 64-SDR, set number of preamble repetitions to four for optimum performance
+    CYRF_WritePreamble(0x333304);
+}
+
+static const u8 bind_vals[][2] = {
+    {CYRF_03_TX_CFG, 0x38 | 7},  //Data Code Length = 64 chip codes + Data Mode = SDR Mode + max-power(+4 dBm)
+    {CYRF_10_FRAMING_CFG, 0x4a}, //SOP LEN + SOP TH = 0Ah (0Eh???)
+    {CYRF_1E_RX_OVERRIDE, 0x14}, //FRC RXDR + DIS RXCRC (disable rx CRC)
+    {CYRF_1F_TX_OVERRIDE, 0x04}, //DIS TXCRC (disable tx CRC)
+    {CYRF_14_EOP_CTRL, 0x02},    //EOP = 2 (set EOP sync = 2)
+};
+
+static void cyrf_bind_config()
+{
+    for(u32 i = 0; i < sizeof(bind_vals) / 2; i++)
+        CYRF_WriteRegister(bind_vals[i][0], bind_vals[i][1]);
+}
+
+void initialize_bind_state()
+{
+    cyrf_bind_config();
+    CYRF_WriteRegister(CYRF_00_CHANNEL, BIND_CHANNEL); //This seems to be random?
+    //In 64-SDR mode, only the first eight bytes are used, but all sixteen bytes must be writed.
+    CYRF_ConfigDataCode(pncodes[0][8], 8); //first eight bytes
+    CYRF_ConfigDataCode(pncodes[0][8], 8); //last eight bytes, unused, so can be any
+    build_bind_packet();
+}
+
+static const u8 transfer_vals[][2] = {
+    //{CYRF_29_RX_ABORT, 0x20},    //RX abort anable                   (RX mode abort in time Rx bind responce)
+    //{CYRF_0F_XACT_CFG, 0x28},    //Force end state = Synth Mode (TX) (RX mode abort in time Rx bind responce)
+    //{CYRF_29_RX_ABORT, 0x00},    //Clear RX abort                    (RX mode abort in time Rx bind responce)
+    {CYRF_03_TX_CFG, 0x28 | 7},  //Data Code Length = 64 chip codes + Data Mode = 8DR Mode + max-power(+4 dBm)
+    {CYRF_10_FRAMING_CFG, 0xea}, //SOP EN + SOP LEN = 64 chips + LEN EN + SOP TH = 0Ah (0Eh???)
+    {CYRF_1E_RX_OVERRIDE, 0x00}, //Reset RX overrides
+    {CYRF_1F_TX_OVERRIDE, 0x00}, //Reset TX overrides
+};
+
+static void cyrf_transfer_config()
+{
+    for(u32 i = 0; i < sizeof(transfer_vals) / 2; i++)
+        CYRF_WriteRegister(transfer_vals[i][0], transfer_vals[i][1]);
 }
 
 static u8 get_pn_row(u8 channel)
@@ -251,88 +344,20 @@ static u8 get_pn_row(u8 channel)
            : channel % 5;
 }
 
-static const u8 init_vals[][2] = {
-    {CYRF_02_TX_CTRL, 0x00},
-    {CYRF_05_RX_CTRL, 0x00},
-    {CYRF_28_CLK_EN, 0x02},
-    {CYRF_32_AUTO_CAL_TIME, 0x3c},
-    {CYRF_35_AUTOCAL_OFFSET, 0x14},
-    {CYRF_06_RX_CFG, 0x4A},
-    {CYRF_1B_TX_OFFSET_LSB, 0x55},
-    {CYRF_1C_TX_OFFSET_MSB, 0x05},
-    {CYRF_0F_XACT_CFG, 0x24},
-    {CYRF_03_TX_CFG, 0x38 | 7},
-    {CYRF_12_DATA64_THOLD, 0x0a},
-    {CYRF_0F_XACT_CFG, 0x04},
-    {CYRF_39_ANALOG_CTRL, 0x01},
-    {CYRF_0F_XACT_CFG, 0x24}, //Force IDLE
-    {CYRF_29_RX_ABORT, 0x00}, //Clear RX abort
-    {CYRF_12_DATA64_THOLD, 0x0a}, //set pn correlation threshold
-    {CYRF_10_FRAMING_CFG, 0x4a}, //set sop len and threshold
-    {CYRF_29_RX_ABORT, 0x0f}, //Clear RX abort?
-    {CYRF_03_TX_CFG, 0x38 | 7}, //Set 64chip, SDE mode, max-power
-    {CYRF_10_FRAMING_CFG, 0x4a}, //set sop len and threshold
-    {CYRF_1F_TX_OVERRIDE, 0x04}, //disable tx CRC
-    {CYRF_1E_RX_OVERRIDE, 0x14}, //disable rx crc
-    {CYRF_14_EOP_CTRL, 0x02}, //set EOP sync == 2
-    {CYRF_01_TX_LENGTH, 0x10}, //16byte packet
-};
-
-static void cyrf_config()
-{
-    for(u32 i = 0; i < sizeof(init_vals) / 2; i++)
-        CYRF_WriteRegister(init_vals[i][0], init_vals[i][1]);
-    CYRF_WritePreamble(0x333304);
-    CYRF_ConfigRFChannel(0x61);
-}
-
-void initialize_bind_state()
-{
-    u8 data_code[32];
-    CYRF_ConfigRFChannel(BIND_CHANNEL); //This seems to be random?
-    u8 pn_row = get_pn_row(BIND_CHANNEL);
-    //printf("Ch: %d Row: %d SOP: %d Data: %d\n", BIND_CHANNEL, pn_row, sop_col, data_col);
-    CYRF_ConfigCRCSeed(crc);
-    CYRF_ConfigSOPCode(pncodes[pn_row][sop_col]);
-    memcpy(data_code, pncodes[pn_row][data_col], 16);
-    memcpy(data_code + 16, pncodes[0][8], 8);
-    memcpy(data_code + 24, pn_bind, 8);
-    CYRF_ConfigDataCode(data_code, 32);
-    build_bind_packet();
-}
-
-static const u8 data_vals[][2] = {
-    {CYRF_05_RX_CTRL, 0x83}, //Initialize for reading RSSI
-    {CYRF_29_RX_ABORT, 0x20},
-    {CYRF_0F_XACT_CFG, 0x24},
-    {CYRF_29_RX_ABORT, 0x00},
-    {CYRF_03_TX_CFG, 0x08 | 7},
-    {CYRF_10_FRAMING_CFG, 0xea},
-    {CYRF_1F_TX_OVERRIDE, 0x00},
-    {CYRF_1E_RX_OVERRIDE, 0x00},
-    {CYRF_03_TX_CFG, 0x28 | 7},
-    {CYRF_12_DATA64_THOLD, 0x3f},
-    {CYRF_10_FRAMING_CFG, 0xff},
-    {CYRF_0F_XACT_CFG, 0x24}, //Switch from reading RSSI to Writing
-    {CYRF_29_RX_ABORT, 0x00},
-    {CYRF_12_DATA64_THOLD, 0x0a},
-    {CYRF_10_FRAMING_CFG, 0xea},
-};
-
-static void cyrf_configdata()
-{
-    for(u32 i = 0; i < sizeof(data_vals) / 2; i++)
-        CYRF_WriteRegister(data_vals[i][0], data_vals[i][1]);
-}
-
 static void set_sop_data_crc()
 {
     u8 pn_row = get_pn_row(channels[chidx]);
     //printf("Ch: %d Row: %d SOP: %d Data: %d\n", ch[chidx], pn_row, sop_col, data_col);
-    CYRF_ConfigRFChannel(channels[chidx]);
+    CYRF_WriteRegister(CYRF_00_CHANNEL, channels[chidx]);
     CYRF_ConfigCRCSeed(crcidx ? ~crc : crc);
     CYRF_ConfigSOPCode(pncodes[pn_row][sop_col]);
-    CYRF_ConfigDataCode(pncodes[pn_row][data_col], 16);
+    //In 64-8DR mode, all sixteen bytes are used
+    CYRF_ConfigDataCode(pncodes[pn_row][data_col], 8); //first eight bytes
+    if((pn_row == 3) && (data_col == 7) && (Model.proto_opts[PROTOOPTS_ORANGERX] == ORANGERX_YES)) {
+        CYRF_ConfigDataCode((const u8 *)"\x88\xE1\xD6\x31\x26\x5F\xBD\x40", 8); //last eight bytes
+    } else {
+        CYRF_ConfigDataCode(pncodes[pn_row][data_col + 1], 8); //last eight bytes
+    }
     /* setup for next iteration */
     if(Model.protocol == PROTOCOL_DSMX)
         chidx = (chidx + 1) % 23;
@@ -343,15 +368,15 @@ static void set_sop_data_crc()
 
 static void calc_dsmx_channel()
 {
-    int idx = 0;
+    u32 idx = 0;
     u32 id = ~((cyrfmfg_id[0] << 24) | (cyrfmfg_id[1] << 16) | (cyrfmfg_id[2] << 8) | (cyrfmfg_id[3] << 0));
     u32 id_tmp = id;
     while(idx < 23) {
-        int i;
-        int count_3_27 = 0, count_28_51 = 0, count_52_76 = 0;
+        u32 i;
+        u32 count_3_27 = 0, count_28_51 = 0, count_52_76 = 0;
         id_tmp = id_tmp * 0x0019660D + 0x3C6EF35F; // Randomization
-        u8 next_ch = ((id_tmp >> 8) % 0x49) + 3;       // Use least-significant byte and must be larger than 3
-        if (((next_ch ^ id) & 0x01 )== 0)
+        u32 next_ch = ((id_tmp >> 8) % 0x49) + 3;  // Use least-significant byte and must be larger than 3
+        if (((next_ch ^ id) & 0x01) == 0)
             continue;
         for (i = 0; i < idx; i++) {
             if(channels[i] == next_ch)
@@ -385,16 +410,17 @@ static u32 bcd_to_int(u32 data)
     return value;
 }
 
-static int pkt32_to_coord(u8 *ptr)
+static u32 pkt32_to_coord(u8 *ptr)
 {
     // (decimal, format DD MM.MMMM)
     return bcd_to_int(ptr[3]) * 3600000
          + bcd_to_int(((u32)ptr[2] << 16) | ((u32)ptr[1] << 8) | ptr[0]) * 6;
 }
+
 NO_INLINE static void parse_telemetry_packet()
 {
     static u8 altitude; // byte from first GPS packet
-#if HAS_DSM_EXTENDED_TELEMETRY
+#if HAS_EXTENDED_TELEMETRY
     static const u8 update0a[] = { TELEM_DSM_PBOX_VOLT1, TELEM_DSM_PBOX_VOLT2,
                                    TELEM_DSM_PBOX_CAPACITY1, TELEM_DSM_PBOX_CAPACITY2,
                                    TELEM_DSM_PBOX_ALARMV1, TELEM_DSM_PBOX_ALARMV2,
@@ -403,11 +429,11 @@ NO_INLINE static void parse_telemetry_packet()
                                    TELEM_DSM_JETCAT_PACKVOLT, TELEM_DSM_JETCAT_PUMPVOLT,
                                    TELEM_DSM_JETCAT_RPM, TELEM_DSM_JETCAT_TEMPEGT,
                                    TELEM_DSM_JETCAT_OFFCOND, 0};
-    static const u8 update20[] = { TELEM_DSM_HYPOTHETIC_RPM, TELEM_DSM_HYPOTHETIC_VOLT1,
-                                   TELEM_DSM_HYPOTHETIC_TEMP1, TELEM_DSM_HYPOTHETIC_AMPS1,
-                                   TELEM_DSM_HYPOTHETIC_TEMP2, TELEM_DSM_HYPOTHETIC_AMPS2,
-                                   TELEM_DSM_HYPOTHETIC_VOLT2, TELEM_DSM_HYPOTHETIC_THROTTLE,
-                                   TELEM_DSM_HYPOTHETIC_OUTPUT, 0};
+    static const u8 update20[] = { TELEM_DSM_ESC_RPM, TELEM_DSM_ESC_VOLT1,
+                                   TELEM_DSM_ESC_TEMP1, TELEM_DSM_ESC_AMPS1,
+                                   TELEM_DSM_ESC_TEMP2, TELEM_DSM_ESC_AMPS2,
+                                   TELEM_DSM_ESC_VOLT2, TELEM_DSM_ESC_THROTTLE,
+                                   TELEM_DSM_ESC_OUTPUT, 0};
     static const u8 update18[] = { TELEM_DSM_RXPCAP_AMPS, TELEM_DSM_RXPCAP_CAPACITY, TELEM_DSM_RXPCAP_VOLT, 0};
     static const u8 update34[] = { TELEM_DSM_FPCAP_AMPS, TELEM_DSM_FPCAP_CAPACITY, TELEM_DSM_FPCAP_TEMP, 0};
 #endif
@@ -429,31 +455,58 @@ NO_INLINE static void parse_telemetry_packet()
                                    TELEM_DSM_VARIO_CLIMBRATE4, TELEM_DSM_VARIO_CLIMBRATE5,
                                    TELEM_DSM_VARIO_CLIMBRATE6, 0};
     const u8 *update = &update7f[7];
-    unsigned idx = 0;
+    u32 idx = 0;
 
 #define data_type  packet[0]
 #define end_byte   packet[15]
 #define LSB_1st    ((data_type >= 0x15 && data_type <= 0x18) || (data_type == 0x34))
 
-    // Convert 8bit packet into 16bit equivalent
     static u16 pktTelem[8];
+
+    // Convert 8bit packet into 16bit equivalent
     if (LSB_1st) {
-        for(u8 i=1; i < 8; ++i) {
-            pktTelem[i] = (packet[i*2+1] <<8) | packet[i*2];
+        for(u32 i = 1; i < 8; ++i) {
+            pktTelem[i] = (packet[i*2+1] << 8) | packet[i*2];
         }
     } else {
-        for(u8 i=1; i < 8; ++i) {
-            pktTelem[i] = (packet[i*2] <<8) | packet[i*2+1];
+        for(u32 i = 1; i < 8; ++i) {
+            pktTelem[i] = (packet[i*2] << 8) | packet[i*2+1];
         }
     }
     switch(data_type) {
         case 0x7f: //TM1000 Flight log
         case 0xff: //TM1100 Flight log
+#ifndef MODULAR
+            //=================================================================
+            // Filter out "Telemetry Range Warning" signals
+            //=================================================================
+            // if 'Holds'>=255 -> Telemetry Range Warning
+            // if 'A' or 'B' or 'L' or 'R' not equal to its previous value 
+            // and >=511 (usually =65535) -> Telemetry Range Warning
+            // therefore A, B, L, R, F, H -> not valid (must be filtered).
+            // Fades A is an 8-bit value, B, R, and L are 16-bit values. 
+            //=================================================================
+            if (Model.proto_opts[PROTOOPTS_FLOGFILTER] == FLOGFILTER_ON) {
+                if(pktTelem[6] > 15) { //holds
+                    break;
+                } else if(pktTelem[6] > (u16)Telemetry.value[TELEM_DSM_FLOG_HOLDS]) {
+                    update = update7f; //refresh "Flight Log" in case "Hold" state
+                    break;
+                }
+                //if(pktTelem[1] > 255) //fadesA - unknown if it's right for third party Rx, so will use generic condition
+                if((pktTelem[1] != 0xFFFF) && (pktTelem[1] > (u16)Telemetry.value[TELEM_DSM_FLOG_FADESA] + 510)) //fadesA
+                    break;
+                if((pktTelem[2] != 0xFFFF) && (pktTelem[2] > (u16)Telemetry.value[TELEM_DSM_FLOG_FADESB] + 510)) //fadesB
+                    break;
+                if((pktTelem[3] != 0xFFFF) && (pktTelem[3] > (u16)Telemetry.value[TELEM_DSM_FLOG_FADESL] + 510)) //fadesL
+                    break;
+                if((pktTelem[4] != 0xFFFF) && (pktTelem[4] > (u16)Telemetry.value[TELEM_DSM_FLOG_FADESR] + 510)) //fadesR
+                    break;
+                if(pktTelem[5] > (u16)Telemetry.value[TELEM_DSM_FLOG_FRAMELOSS] + 510) //frLoss
+                    break;
+            }
+#endif
             update = update7f;
-            break;
-        case 0x7e: //TM1000
-        case 0xfe: //TM1100
-            update = update7e;
             break;
         case 0x03: //High Current sensor
             update = update03;
@@ -467,7 +520,7 @@ NO_INLINE static void parse_telemetry_packet()
         case 0x14: //G-Force sensor
             update = update14;
             break;
-#if HAS_DSM_EXTENDED_TELEMETRY
+#if HAS_EXTENDED_TELEMETRY
         case 0x18: //RX Pack Cap sensor (SPMA9604)
             update = update18;
             break;
@@ -489,7 +542,7 @@ NO_INLINE static void parse_telemetry_packet()
         return;
     }
     switch(data_type) {
-#if HAS_DSM_EXTENDED_TELEMETRY
+#if HAS_EXTENDED_TELEMETRY
         case 0x0a: //Powerbox sensor
             update = update0a;
             Telemetry.value[TELEM_DSM_PBOX_VOLT1] = pktTelem[1]; //In 1/100 of Volts
@@ -503,33 +556,43 @@ NO_INLINE static void parse_telemetry_packet()
             break;
         case 0x15: //JetCat sensor
             update = update15;
-            Telemetry.value[TELEM_DSM_JETCAT_STATUS] = packet[2];
-            Telemetry.value[TELEM_DSM_JETCAT_THROTTLE] = bcd_to_int(packet[3]); //up to 159% (the upper nibble is 0-f, the lower nibble 0-9)
+            Telemetry.value[TELEM_DSM_JETCAT_STATUS]   = packet[2];
+            Telemetry.value[TELEM_DSM_JETCAT_THROTTLE] = bcd_to_int(packet[3]);   //up to 159% (the upper nibble is 0-f, the lower nibble 0-9)
             Telemetry.value[TELEM_DSM_JETCAT_PACKVOLT] = bcd_to_int(pktTelem[2]); //In 1/100 of Volts
             Telemetry.value[TELEM_DSM_JETCAT_PUMPVOLT] = bcd_to_int(pktTelem[3]); //In 1/100 of Volts (low voltage)
-            Telemetry.value[TELEM_DSM_JETCAT_RPM] =      bcd_to_int(pktTelem[4] & 0x0fff); //RPM up to 999999
-            Telemetry.value[TELEM_DSM_JETCAT_TEMPEGT] =  bcd_to_int(pktTelem[6]); //EGT temp up to 999°C
-            Telemetry.value[TELEM_DSM_JETCAT_OFFCOND] = end_byte;
+            Telemetry.value[TELEM_DSM_JETCAT_RPM]      = bcd_to_int(pktTelem[4] & 0x0fff); //RPM up to 999999
+            Telemetry.value[TELEM_DSM_JETCAT_TEMPEGT]  = bcd_to_int(pktTelem[6]); //EGT temp up to 999°C
+            Telemetry.value[TELEM_DSM_JETCAT_OFFCOND]  = end_byte;
             break;
-        case 0x20: //Hypothetic sensor
+        case 0x20: //Electronic Speed Control
             update = update20;
-            Telemetry.value[TELEM_DSM_HYPOTHETIC_RPM] =   pktTelem[1]; //In 10 rpm
-            Telemetry.value[TELEM_DSM_HYPOTHETIC_VOLT1] = pktTelem[2]; //Batt in 1/100 of Volts (Volt2)
-            Telemetry.value[TELEM_DSM_HYPOTHETIC_TEMP1] = pktTelem[3]; //FET Temp in 1/10 of degree (Fahrenheit???)
-            Telemetry.value[TELEM_DSM_HYPOTHETIC_AMPS1] = pktTelem[4]; //In 1/100 Amp
-            Telemetry.value[TELEM_DSM_HYPOTHETIC_TEMP2] = pktTelem[5]; //BEC Temp in 1/10 of degree (Fahrenheit???)
-            Telemetry.value[TELEM_DSM_HYPOTHETIC_AMPS2] = packet[12];     //BEC current in 1/10 Amp
-            Telemetry.value[TELEM_DSM_HYPOTHETIC_VOLT2] = packet[13] * 5; //BEC voltage in 1/100 of Volt
-            Telemetry.value[TELEM_DSM_HYPOTHETIC_THROTTLE] = packet[14]* 5; //Throttle % in 0.1%
-            Telemetry.value[TELEM_DSM_HYPOTHETIC_OUTPUT] = end_byte * 5; //Output % in 0.1%
+            Telemetry.value[TELEM_DSM_ESC_RPM]   = pktTelem[1] * 10; //In rpm, 0-655340 (0xFFFF --> No data)
+            Telemetry.value[TELEM_DSM_ESC_VOLT1] = pktTelem[2];      //Batt in 1/100 of Volts (Volt2) (0-655.34V) (0xFFFF --> No data)
+            Telemetry.value[TELEM_DSM_ESC_TEMP1] = pktTelem[3];      //FET Temp in 1/10 of C degree (0-999.8C) (0xFFFF --> No data)
+            Telemetry.value[TELEM_DSM_ESC_AMPS1] = pktTelem[4];      //In 1/100 Amp (0-655.34A) (0xFFFF --> No data)
+            Telemetry.value[TELEM_DSM_ESC_TEMP2] = pktTelem[5];      //BEC Temp in 1/10 of C degree (0-999.8C) (0xFFFF --> No data)
+            Telemetry.value[TELEM_DSM_ESC_AMPS2] = packet[12];       //BEC current in 1/10 Amp (0-25.4A) (0xFF ----> No data)
+            Telemetry.value[TELEM_DSM_ESC_VOLT2] = packet[13] * 5;   //BEC voltage in 0.05V (0-12.70V) (0xFF ----> No data)
+            Telemetry.value[TELEM_DSM_ESC_THROTTLE] = packet[14]* 5; //Throttle % in 0.5% (0-127%) (0xFF ----> No data)
+            Telemetry.value[TELEM_DSM_ESC_OUTPUT] = end_byte * 5;    //Power Output % in 0.5% (0-127%) (0xFF ----> No data)
             break;
-#endif //HAS_DSM_EXTENDED_TELEMETRY
+#endif //HAS_EXTENDED_TELEMETRY
+        case 0x7e: //TM1000
+        case 0xfe: //TM1100
+            update = update7e;
+            Telemetry.value[TELEM_DSM_FLOG_RPM1]  = (pktTelem[1] == 0xffff || pktTelem[1] < 200) ?  0 : (120000000 / 2 / pktTelem[1]);
+            Telemetry.value[TELEM_DSM_FLOG_VOLT2] =  pktTelem[2];
+            Telemetry.value[TELEM_DSM_FLOG_TEMP1] = (pktTelem[3] == 0x7fff) ? 0 : (pktTelem[3] - 32) * 5 / 9; //Convert to °C
+            break;
         case 0x16: //GPS sensor (always second GPS packet)
             update = update16;
-            Telemetry.gps.altitude  = bcd_to_int((altitude << 24) | ((u32)pktTelem[1] << 8)); //In m * 1000 (16Bit decimal, 1 unit is 0.1m)
-            Telemetry.gps.latitude  =  pkt32_to_coord(&packet[4]) * ((end_byte & 0x01)? 1: -1); //1=N(+), 0=S(-)
-            Telemetry.gps.longitude = (pkt32_to_coord(&packet[8]) + ((end_byte & 0x04)? 360000000: 0)) //1=+100 degrees
-                                                                  * ((end_byte & 0x02)? 1: -1); //1=E(+), 0=W(-)
+            Telemetry.gps.altitude  = (bcd_to_int((altitude << 24) | ((u32)pktTelem[1] << 8))) 
+                                                                   * ((end_byte & 0x80) ? -1 : 1); 
+                                                                  	  //In m * 1000 (16Bit decimal, 1 unit is 0.1m)
+                                                                  	  //1 = below sea level, 0 = above sea level
+            Telemetry.gps.latitude  =  pkt32_to_coord(&packet[4]) * ((end_byte & 0x01) ? 1 : -1); //1 = N(+), 0 = S(-)
+            Telemetry.gps.longitude = (pkt32_to_coord(&packet[8]) + ((end_byte & 0x04) ? 360000000 : 0)) //1 = +100 degrees
+                                                                  * ((end_byte & 0x02) ? 1 : -1); //1 = E(+), 0 = W(-)
             Telemetry.gps.heading = bcd_to_int(pktTelem[6]); //In degrees (16Bit decimal, 1 unit is 0.1 degree)
             break;
         case 0x17: //GPS sensor (always first GPS packet)
@@ -554,8 +617,7 @@ NO_INLINE static void parse_telemetry_packet()
     }
     idx = 0;
     while (*update) {
-        if (pktTelem[++idx] != 0xffff)
-            TELEMETRY_SetUpdated(*update);
+        TELEMETRY_SetUpdated(*update);
         update++;
     }
 }
@@ -565,14 +627,14 @@ static u16 dsm2_cb()
 {
 #define CH1_CH2_DELAY 4010  // Time between write of channel 1 and channel 2
 #define WRITE_DELAY   1550  // Time after write to verify write complete
-#define READ_DELAY     400  // Time before write to check read state, and switch channels
+#define READ_DELAY     600  // Time before write to check read state, and switch channels.
+                            // Telemetry read+processing =~200us and switch channels =~300us
     if(state < DSM2_CHANSEL) {
         //Binding
         state += 1;
         if(state & 1) {
             //Send packet on even states
-            //Note state has already incremented,
-            // so this is actually 'even' state
+            //Note state has already incremented, so this is actually 'even' state
             CYRF_WriteDataPacket(packet);
             return 8500;
         } else {
@@ -583,7 +645,7 @@ static u16 dsm2_cb()
     } else if(state < DSM2_CH1_WRITE_A) {
         //Select channels and configure for writing data
         //CYRF_FindBestChannels(ch, 2, 10, 1, 79);
-        cyrf_configdata();
+        cyrf_transfer_config();
         CYRF_SetTxRxMode(TX_EN);
         chidx = 0;
         crcidx = 0;
@@ -599,25 +661,35 @@ static u16 dsm2_cb()
         state++;
         return WRITE_DELAY;
     } else if(state == DSM2_CH1_CHECK_A || state == DSM2_CH1_CHECK_B) {
-        int i = 0;
-        while (! (CYRF_ReadRegister(CYRF_04_TX_IRQ_STATUS) & 0x02)) {
-            if(++i > NUM_WAIT_LOOPS)
+        u32 i = 0;
+        u8 reg;
+        while (! ((reg = CYRF_ReadRegister(CYRF_04_TX_IRQ_STATUS)) & 0x02)) {
+            if (++i >= NUM_WAIT_LOOPS)
                 break;
+        }
+        if (Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON) {
+            // reset cyrf6936 in case TX mode and RX mode freezed
+            if (((reg & 0x22) == 0x20) || (CYRF_ReadRegister(CYRF_02_TX_CTRL) & 0x80)) {
+                CYRF_Reset();
+                cyrf_startup_config();
+                cyrf_transfer_config();
+                CYRF_SetTxRxMode(TX_EN);
+                //printf(" Rst CYRF\n");
+            }
         }
         set_sop_data_crc();
         state++;
         return CH1_CH2_DELAY - WRITE_DELAY;
     } else if(state == DSM2_CH2_CHECK_A || state == DSM2_CH2_CHECK_B) {
-        int i = 0;
+        u32 i = 0;
         while (! (CYRF_ReadRegister(CYRF_04_TX_IRQ_STATUS) & 0x02)) {
             if(++i > NUM_WAIT_LOOPS)
                 break;
         }
         if (state == DSM2_CH2_CHECK_A) {
             //Keep transmit power in sync
-            CYRF_WriteRegister(CYRF_03_TX_CFG, 0x28 | Model.tx_power);
+            CYRF_WriteRegister(CYRF_03_TX_CFG, 0x28 | Model.tx_power); //Data Code Length = 64 chip codes + Data Mode = 8DR Mode + tx_power
         }
-#ifndef MODULAR
         if (Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_OFF) {
             set_sop_data_crc();
             if (state == DSM2_CH2_CHECK_A) {
@@ -630,9 +702,7 @@ static u16 dsm2_cb()
                 state = DSM2_CH1_WRITE_A;
             }
             return 11000 - CH1_CH2_DELAY - WRITE_DELAY;
-        } else
-#endif
-        {
+        } else {
             state++;
             CYRF_SetTxRxMode(RX_EN); //Receive mode
             CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x80); //Prepare to receive
@@ -647,18 +717,19 @@ static u16 dsm2_cb()
         if((rx_state & 0x07) == 0x02) { // good data (complete with no errors)
             CYRF_WriteRegister(CYRF_07_RX_IRQ_STATUS, 0x80); // need to set RXOW before data read
             CYRF_ReadDataPacketLen(packet, CYRF_ReadRegister(CYRF_09_RX_COUNT));
+            //rssi = CYRF_ReadRegister(CYRF_13_RSSI) & 0x1F; // RSSI of the received telemetry signal
             parse_telemetry_packet();
         }
         if (state == DSM2_CH2_READ_A && num_channels < 8) {
             state = DSM2_CH2_READ_B;
             //Reseat RX mode just in case any error
             CYRF_WriteRegister(CYRF_0F_XACT_CFG, (CYRF_ReadRegister(CYRF_0F_XACT_CFG) | 0x20));  // Force end state
-            int i = 0;
+            u32 i = 0;
             while (CYRF_ReadRegister(CYRF_0F_XACT_CFG) & 0x20) {
                 if(++i > NUM_WAIT_LOOPS)
                     break;
             }
-            CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x80); //Prepare to receive
+            CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x80);  //Prepare to receive
             return 11000;
         }
         if (state == DSM2_CH2_READ_A)
@@ -676,6 +747,8 @@ static void initialize(u8 bind)
 {
     CLOCK_StopTimer();
     CYRF_Reset();
+    cyrf_startup_config();
+
 #ifndef USE_FIXED_MFGID
     CYRF_GetMfgData(cyrfmfg_id);
     if (Model.fixed_id) {
@@ -685,8 +758,6 @@ static void initialize(u8 bind)
         cyrfmfg_id[3] ^= (Model.fixed_id >> 24) & 0xff;
     }
 #endif
-    cyrf_config();
-
     if (Model.protocol == PROTOCOL_DSMX) {
         calc_dsmx_channel();
     } else {
@@ -707,18 +778,8 @@ static void initialize(u8 bind)
             channels[1] = (cyrfmfg_id[1] + cyrfmfg_id[3] + cyrfmfg_id[5]
                           + ((Model.fixed_id >> 8) & 0xff) + ((Model.fixed_id >> 8) & 0xff)) % 40 + 40;
         }
+        //printf("DSM2 Channels: %02x %02x\n", channels[0], channels[1]);
     }
-    /*
-    channels[0] = 0;
-    channels[1] = 0;
-    if (Model.fixed_id == 0)
-        Model.fixed_id = 0x2b9d2952;
-    cyrfmfg_id[0] = 0xff ^ ((Model.fixed_id >> 24) & 0xff);
-    cyrfmfg_id[1] = 0xff ^ ((Model.fixed_id >> 16) & 0xff);
-    cyrfmfg_id[2] = 0xff ^ ((Model.fixed_id >> 8) & 0xff);
-    cyrfmfg_id[3] = 0xff ^ ((Model.fixed_id >> 0) & 0xff);
-    printf("DSM2 Channels: %02x %02x\n", channels[0], channels[1]);
-    */
     crc = ~((cyrfmfg_id[0] << 8) + cyrfmfg_id[1]);
     crcidx = 0;
     sop_col = (cyrfmfg_id[0] + cyrfmfg_id[1] + cyrfmfg_id[2] + 2) & 0x07;
@@ -732,7 +793,6 @@ static void initialize(u8 bind)
 
     memset(&Telemetry, 0, sizeof(Telemetry));
     TELEMETRY_SetType(TELEM_DSM);
-    CYRF_SetTxRxMode(TX_EN);
     if (bind) {
         state = DSM2_BIND;
         PROTOCOL_SetBindState((BIND_COUNT > 200 ? BIND_COUNT / 2 : 200) * 10); //msecs
@@ -742,6 +802,7 @@ static void initialize(u8 bind)
         state = DSM2_CHANSEL;
         binding = 0;
     }
+    CYRF_SetTxRxMode(TX_EN);
     CLOCK_StartTimer(10000, dsm2_cb);
 }
 
@@ -758,15 +819,10 @@ const void *DSM2_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_NUMCHAN: return (void *)12L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)7L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
-#ifdef MODULAR
-        case PROTOCMD_TELEMETRYSTATE:
-            return (void *)(long)(PROTO_TELEM_ON);
-#else
         case PROTOCMD_GETOPTIONS:
             return dsm_opts;
         case PROTOCMD_TELEMETRYSTATE:
             return (void *)(long)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
-#endif
         default: break;
     }
     return NULL;

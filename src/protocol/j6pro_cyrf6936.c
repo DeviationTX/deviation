@@ -14,9 +14,9 @@
  */
 
 #ifdef MODULAR
-  //Allows the linker to properly relocate
-  #define J6PRO_Cmds PROTO_Cmds
-  #pragma long_calls
+    //Allows the linker to properly relocate
+    #define J6PRO_Cmds PROTO_Cmds
+    #pragma long_calls
 #endif
 #include "common.h"
 #include "interface.h"
@@ -25,12 +25,12 @@
 #include "telemetry.h"
 
 #ifdef MODULAR
-  #pragma long_calls_off
-  extern unsigned _data_loadaddr;
-  const unsigned long protocol_type = (unsigned long)&_data_loadaddr;
+    #pragma long_calls_off
+    extern unsigned _data_loadaddr;
+    const unsigned long protocol_type = (unsigned long)&_data_loadaddr;
 #endif
-#ifdef PROTO_HAS_CYRF6936
 
+#ifdef PROTO_HAS_CYRF6936
 #define NUM_WAIT_LOOPS (100 / 5) //each loop is ~5us.  Do not wait more than 100us
 
 //For Debug
@@ -84,10 +84,10 @@ static u8 packet[16];
 static u8 radio_ch[4];
 static u8 num_channels;
 #ifdef USE_FIXED_MFGID
-//static const u8 cyrfmfg_id[6] = {0x00,0x00,0x00,0x00,0x00,0x00};
-static const u8 cyrfmfg_id[6] = {0x49, 0xec, 0xa9, 0xc4, 0xc1, 0xff};
+    //static const u8 cyrfmfg_id[6] = {0x00,0x00,0x00,0x00,0x00,0x00};
+    static const u8 cyrfmfg_id[6] = {0x49, 0xec, 0xa9, 0xc4, 0xc1, 0xff};
 #else
-static u8 cyrfmfg_id[6];
+    static u8 cyrfmfg_id[6];
 #endif
 
 void build_bind_packet()
@@ -128,62 +128,45 @@ void build_data_packet()
 static void cyrf_init()
 {
     /* Initialise CYRF chip */
-       CYRF_WriteRegister(CYRF_28_CLK_EN, 0x02);
-       CYRF_WriteRegister(CYRF_32_AUTO_CAL_TIME, 0x3c);
-       CYRF_WriteRegister(CYRF_35_AUTOCAL_OFFSET, 0x14);
-       CYRF_WriteRegister(CYRF_1C_TX_OFFSET_MSB, 0x05);
-       CYRF_WriteRegister(CYRF_1B_TX_OFFSET_LSB, 0x55);
-       CYRF_WriteRegister(CYRF_0F_XACT_CFG, 0x25);
-       CYRF_WriteRegister(CYRF_03_TX_CFG, 0x05 | Model.tx_power);
-       CYRF_WriteRegister(CYRF_06_RX_CFG, 0x8a);
-       CYRF_WriteRegister(CYRF_03_TX_CFG, 0x28 | Model.tx_power);
-       CYRF_WriteRegister(CYRF_12_DATA64_THOLD, 0x0e);
-       CYRF_WriteRegister(CYRF_10_FRAMING_CFG, 0xee);
-       CYRF_WriteRegister(CYRF_1F_TX_OVERRIDE, 0x00);
-       CYRF_WriteRegister(CYRF_1E_RX_OVERRIDE, 0x00);
-       CYRF_ConfigDataCode(data_code, 16);
-       CYRF_WritePreamble(0x023333);
+    CYRF_WriteRegister(CYRF_28_CLK_EN, 0x02);         //RXF, force receive clock enable
+    CYRF_WriteRegister(CYRF_32_AUTO_CAL_TIME, 0x3c);  //AUTO_CAL_TIME = 3Ch, typical configuration
+    CYRF_WriteRegister(CYRF_35_AUTOCAL_OFFSET, 0x14); //AUTO_CAL_OFFSET = 14h, typical configuration
+    CYRF_WriteRegister(CYRF_1C_TX_OFFSET_MSB, 0x05);  //STRIM MSB = 0x05, typical configuration
+    CYRF_WriteRegister(CYRF_1B_TX_OFFSET_LSB, 0x55);  //STRIM LSB = 0x55, typical configuration
+    CYRF_WriteRegister(CYRF_06_RX_CFG, 0x4a);         //LNA + FAST TURN EN + RXOW EN, enable low noise amplifier, fast turning, overwrite enable
+    CYRF_WriteRegister(CYRF_03_TX_CFG, 0x28 | 0x07);  //Data Code Length = 64 chip codes + Data Mode = 8DR Mode + max-power(+4 dBm)
+    CYRF_WriteRegister(CYRF_12_DATA64_THOLD, 0x0e);   //TH64 = 0Eh, set pn correlation threshold
+    CYRF_WriteRegister(CYRF_10_FRAMING_CFG, 0xee);    //SOP EN + SOP LEN = 64 chips + LEN EN + SOP TH = 0Eh
+    CYRF_WriteRegister(CYRF_1F_TX_OVERRIDE, 0x00);    //Reset TX overrides
+    CYRF_WriteRegister(CYRF_1E_RX_OVERRIDE, 0x00);    //Reset RX overrides
+    CYRF_ConfigDataCode(data_code, 16);
+    CYRF_WritePreamble(0x333302);                     //Default preamble
 #ifndef USE_FIXED_MFGID
-       CYRF_GetMfgData(cyrfmfg_id);
-       if (Model.fixed_id) {
-           cyrfmfg_id[0] ^= (Model.fixed_id >> 0) & 0xff;
-           cyrfmfg_id[1] ^= (Model.fixed_id >> 8) & 0xff;
-           cyrfmfg_id[2] ^= (Model.fixed_id >> 16) & 0xff;
-           cyrfmfg_id[3] ^= (Model.fixed_id >> 24) & 0xff;
-       }
+    CYRF_GetMfgData(cyrfmfg_id);
+    if (Model.fixed_id) {
+        cyrfmfg_id[0] ^= (Model.fixed_id >> 0) & 0xff;
+        cyrfmfg_id[1] ^= (Model.fixed_id >> 8) & 0xff;
+        cyrfmfg_id[2] ^= (Model.fixed_id >> 16) & 0xff;
+        cyrfmfg_id[3] ^= (Model.fixed_id >> 24) & 0xff;
+    }
 #endif
 }
 static void cyrf_bindinit()
 {
-/* Use when binding */
-       //0.060470# 03 2f
-       CYRF_WriteRegister(CYRF_03_TX_CFG, 0x28 | 0x07); //Use max power for binding in case there is no telem module
-
-       CYRF_ConfigRFChannel(0x52);
-       CYRF_ConfigSOPCode(bind_sop_code);
-       CYRF_ConfigCRCSeed(0x0000);
-       CYRF_WriteRegister(CYRF_06_RX_CFG, 0x4a);
-       CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x83);
-       //0.061511# 13 20
-
-       CYRF_ConfigRFChannel(0x52);
-       //0.062684# 0f 05
-       CYRF_WriteRegister(CYRF_0F_XACT_CFG, 0x25);
-       //0.062792# 0f 05
-       CYRF_WriteRegister(CYRF_02_TX_CTRL, 0x40);
-       build_bind_packet(); //01 01 e9 49 ec a9 c4 c1 ff
-       //CYRF_WriteDataPacketLen(packet, 0x09);
+    /* Use when binding */
+    CYRF_SetPower(0x07); //Use max power (+4 dBm) for binding in case there is no telem module
+    CYRF_ConfigSOPCode(bind_sop_code);
+    CYRF_ConfigCRCSeed(0x0000);
+    build_bind_packet();
 }
 static void cyrf_datainit()
 {
-/* Use when already bound */
-       //0.094007# 0f 05
-       u8 sop_idx = (0xff & (cyrfmfg_id[0] + cyrfmfg_id[1] + cyrfmfg_id[2] + cyrfmfg_id[3] - cyrfmfg_id[5])) % 19;
-       u16 crc =  (0xff & (cyrfmfg_id[1] - cyrfmfg_id[4] + cyrfmfg_id[5])) |
-                ((0xff & (cyrfmfg_id[2] + cyrfmfg_id[3] - cyrfmfg_id[4] + cyrfmfg_id[5])) << 8);
-       CYRF_WriteRegister(CYRF_0F_XACT_CFG, 0x25);
-       CYRF_ConfigSOPCode(sopcodes[sop_idx]);
-       CYRF_ConfigCRCSeed(crc);
+    /* Use when already bound */
+    u8 sop_idx = (0xff & (cyrfmfg_id[0] + cyrfmfg_id[1] + cyrfmfg_id[2] + cyrfmfg_id[3] - cyrfmfg_id[5])) % 19;
+    u16 crc =  (0xff & (cyrfmfg_id[1] - cyrfmfg_id[4] + cyrfmfg_id[5])) |
+              ((0xff & (cyrfmfg_id[2] + cyrfmfg_id[3] - cyrfmfg_id[4] + cyrfmfg_id[5])) << 8);
+    CYRF_ConfigSOPCode(sopcodes[sop_idx]);
+    CYRF_ConfigCRCSeed(crc);
 }
 
 static void set_radio_channels()
@@ -205,9 +188,6 @@ static u16 j6pro_cb()
         case J6PRO_BIND_01:
             CYRF_ConfigRFChannel(0x52);
             CYRF_SetTxRxMode(TX_EN);
-            //0.062684# 0f 05
-            CYRF_WriteRegister(CYRF_0F_XACT_CFG, 0x25);
-            //0.062684# 0f 05
             CYRF_WriteDataPacketLen(packet, 0x09);
             state = J6PRO_BIND_03_START;
             return 3000; //3msec
@@ -220,8 +200,7 @@ static u16 j6pro_cb()
             }
             CYRF_ConfigRFChannel(0x53);
             CYRF_SetTxRxMode(RX_EN);
-            CYRF_WriteRegister(CYRF_06_RX_CFG, 0x4a);
-            CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x83);
+            CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x80); //Prepare to receive
             state = J6PRO_BIND_03_CHECK;
             return 30000; //30msec
         case J6PRO_BIND_03_CHECK:
@@ -261,7 +240,6 @@ static u16 j6pro_cb()
         case J6PRO_BIND_05_4:
         case J6PRO_BIND_05_5:
         case J6PRO_BIND_05_6:
-            CYRF_WriteRegister(CYRF_0F_XACT_CFG, 0x25);
             CYRF_WriteDataPacketLen(packet, 0x0f);
             state = state + 1;
             return 4600; //4.6msec
