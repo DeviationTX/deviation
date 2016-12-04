@@ -15,10 +15,10 @@
 
 /* Includes ------------------------------------------------------------------*/
 
-#include <stm32f10x.h>
+#include "common.h"
+// #include <stm32f10x.h> libopencm3 headers included from common.h cover this
 #include "mass_mal.h"
 #include "usb_bot.h"
-#include "common.h"
 //#include "target.h"
 
 #include <string.h>
