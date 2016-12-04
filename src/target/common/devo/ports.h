@@ -1,7 +1,9 @@
 #ifndef _PORTS_H_
 #define _PORTS_H_
 
+#ifndef EMULATOR
 #include <libopencm3/stm32/gpio.h> /* For GPIO* definitions */
+#endif
 
 struct mcu_pin {
     u32 port;
@@ -21,10 +23,12 @@ struct mcu_pin {
     #define _SPI_FLASH_MISO_PIN      {GPIOA, GPIO6}
     #define _SPI_FLASH_MOSI_PIN      {GPIOA, GPIO7}
 #endif
+#ifndef EMULATOR
 static const struct mcu_pin FLASH_CSN_PIN   = _SPI_FLASH_CSN_PIN;
 static const struct mcu_pin FLASH_SCK_PIN   = _SPI_FLASH_SCK_PIN;
 static const struct mcu_pin FLASH_MISO_PIN  = _SPI_FLASH_MISO_PIN;
 static const struct mcu_pin FLASH_MOSI_PIN  = _SPI_FLASH_MOSI_PIN;
+#endif
 #ifndef SPIFLASH_TYPE
     #define SPIFLASH_TYPE SST25VFxxxB
 #endif
@@ -37,11 +41,13 @@ static const struct mcu_pin FLASH_MOSI_PIN  = _SPI_FLASH_MOSI_PIN;
     #define _SPI_PROTO_MISO_PIN      {GPIOB, GPIO14}
     #define _SPI_PROTO_MOSI_PIN      {GPIOB, GPIO15}
 #endif
+#ifndef EMULATOR
 static const struct mcu_pin PROTO_RST_PIN   = _SPI_PROTO_RST_PIN;
 static const struct mcu_pin PROTO_CSN_PIN   = _SPI_PROTO_CSN_PIN;
 static const struct mcu_pin PROTO_SCK_PIN   = _SPI_PROTO_SCK_PIN;
 static const struct mcu_pin PROTO_MISO_PIN  = _SPI_PROTO_MISO_PIN;
 static const struct mcu_pin PROTO_MOSI_PIN  = _SPI_PROTO_MOSI_PIN;
+#endif
 
 #ifndef _ADC
 #define ADC_OVERSAMPLE_WINDOW_COUNT 1
