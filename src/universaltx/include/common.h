@@ -6,6 +6,9 @@
 //Magic macro to check enum size
 //#define ctassert(n,e) extern unsigned char n[(e)?0:-1]
 #define ctassert(COND,MSG) typedef char static_assertion_##MSG[(COND)?1:-1]
+#define NO_INLINE __attribute__ ((noinline))
+#define DEBUG_WINDOW_SIZE 0
+
 
 #include <stdint.h>
 typedef uint8_t  u8;
@@ -22,6 +25,7 @@ typedef int32_t  s32;
 #include "../../std.h"
 #include "target.h"
 
+#define CHAN_MULTIPLIER 100
 #define CHAN_MAX_VALUE 10000
 #define CHAN_MIN_VALUE -10000
 #define _tr(x) x
@@ -75,6 +79,16 @@ u8 SPI_ReadRegister(u8 address);
 */
 
 void PROTOCOL_SetBindState(int i);
+
+/* Clock functions */
+#define LOW_PRIORITY_MSEC 100
+#define MEDIUM_PRIORITY_MSEC   5
+enum MsecCallback {
+    MEDIUM_PRIORITY,
+    LOW_PRIORITY,
+    LAST_PRIORITY,
+};
+
 void CLOCK_StopTimer();
 void CLOCK_StartTimer(int t, u16 (*_cmd)());
 void CLOCK_ResetWatchdog();
@@ -87,7 +101,29 @@ u32 Crc(const void *, int size);
 u32 rand32_r(u32 *seed, u8 update); //LFSR based PRNG
 u32 rand32(); //LFSR based PRNG
 
+//Compatibility with Atmega
+#define FLASHBYTETABLE static const u8
+#define FLASHWORDTABLE static const u16
+#define pgm_read_word(x) (*(x))
+#define pgm_read_byte(x) (*(x))
+void PROTO_CS_HI(int module);
+void PROTO_CS_LO(int module);
+
+#define ADC_OVERSAMPLE_WINDOW_COUNT 1
+    #define _ADC                    ADC1
+    #define _RCC_APB2ENR_ADCEN      RCC_APB2ENR_ADC1EN
+    #define _RCC_APB2RSTR_ADCRST    RCC_APB2RSTR_ADC1RST
+    #define _ADC_SMPR_SMP_XXDOT5CYC ADC_SMPR_SMP_239DOT5CYC
+    #define _DMA                    DMA1
+    #define _DMA_CHANNEL            DMA_CHANNEL1
+    #define _RCC_AHBENR_DMAEN       RCC_AHBENR_DMA1EN
+    #define _DMA_ISR                dma1_channel1_isr
+    #define _DMA_IFCR_CGIF          DMA_IFCR_CGIF1
+    #define _NVIC_DMA_CHANNEL_IRQ   NVIC_DMA1_CHANNEL1_IRQ
+
 
 /* Target defs */
 void MCU_SerialNumber(u8 *var, int len);
+
+
 #endif /*_COMMON_H_ */

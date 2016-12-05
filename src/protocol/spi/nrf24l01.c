@@ -47,11 +47,11 @@
 static u8 rf_setup;
 
 static void CS_HI() {
-    PROTO_CS_HI(NRF24L01);
+    MODULE_CSN(NRF24L01, 1);
 }
 
 static void CS_LO() {
-    PROTO_CS_LO(NRF24L01);
+    MODULE_CSN(NRF24L01, 0);
 }
 void NRF24L01_Initialize()
 {

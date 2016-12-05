@@ -8,6 +8,9 @@
 u8 PROTOSPI_read3wire();
 uint8_t spi_xfer8(uint32_t spi, uint8_t data);
 
+void PROTO_CS_HI(int module);
+void PROTO_CS_LO(int module);
+
 #define spi_xfer             DO_NOT_USE
 #define PROTOSPI_pin_set     PORT_pin_set
 #define PROTOSPI_pin_clear   PORT_pin_clear

@@ -24,6 +24,7 @@
 #include "mixer.h"
 #include "config/model.h"
 #include "config/tx.h" // for Transmitter
+#include "telemetry.h"
 #include "music.h"
 
 #ifdef MODULAR

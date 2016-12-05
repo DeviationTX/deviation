@@ -43,11 +43,11 @@
 #define Delay usleep
 
 static void CS_HI() {
-    PROTO_CS_HI(CYRF6936);
+    MODULE_CSN(CYRF6936, 1);
 }
 
 static void CS_LO() {
-    PROTO_CS_LO(CYRF6936);
+    MODULE_CSN(CYRF6936, 0);
 }
 
 void CYRF_WriteRegister(u8 address, u8 data)
@@ -173,8 +173,12 @@ void CYRF_SetTxRxMode(enum TXRX_State mode)
     }
     //Set the post tx/rx state
 #if HAS_MULTIMOD_SUPPORT
-    if (MODULE_ENABLE[CYRF6936].port == 0xFFFFFFFF) {
-        if ((MODULE_ENABLE[CYRF6936].pin >> 8) == 0x01) {
+    if(MODULE_ENABLE[MULTIMOD].port && MULTIMOD_SwitchCommand(CYRF6936, mode)) {
+        //We only get here if the UniversalTx is enabled
+        return;
+    }
+    if (MODULE_ENABLE[CYRF6936].port == SWITCH_ADDRESS) {
+        if ((MODULE_ENABLE[CYRF6936].pin >> 8) == CYRF6936_AWA24S) {
             AWA24S_SetTxRxMode(mode);
             return;
         }
