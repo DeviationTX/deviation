@@ -22,20 +22,6 @@
 
 static struct modelcfg_obj * const gui = &gui_objs.u.modelcfg;
 
-static void okcancel_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    (void)data;
-    PAGE_RemoveAllObjects();
-    PAGE_ModelInit(-1);  // devo8 doesn't care the page value, while it must be -1 for devo10
-}
-
-static void show_titlerow(const char *header)
-{
-    GUI_CreateLabel(&gui->title, 8, 10, NULL, TITLE_FONT, (void *)header);
-    PAGE_CreateOkButton(LCD_WIDTH-56, 4, okcancel_cb);
-}
-
 enum {
     COL1 = (8 + ((LCD_WIDTH - 320) / 2)),
     COL2 = (COL1 + 128),
