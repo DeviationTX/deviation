@@ -1,6 +1,10 @@
 #ifndef _TELEMETRY_H_
 #define _TELEMETRY_H_
 
+#if !defined(HAS_EXTENDED_TELEMETRY)
+#define HAS_EXTENDED_TELEMETRY 0
+#endif
+
 #define TELEM_ERROR_TIME 5000
 #define TELEM_NUM_ALARMS 6
 
