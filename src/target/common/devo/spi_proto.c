@@ -103,6 +103,9 @@ int SPI_ProtoGetPinConfig(int module, int state) {
 
 void SPI_ProtoInit()
 {
+// If we use SPI Switch board then SPI2 is shared between RF chips
+// and flash, so it is initialized in SPIFlash.
+#if _SPI_PROTO_PORT != _SPI_FLASH_PORT
     /* Enable SPIx */
     rcc_peripheral_enable_clock(&APB_SPIxEN, SPIxEN);
     /* Enable GPIOA */
@@ -128,6 +131,22 @@ void SPI_ProtoInit()
     gpio_set(GPIO_BANK_JTCK_SWCLK, GPIO_JTCK_SWCLK);
 #endif
 
+    /* Includes enable? */
+    spi_init_master(SPIx, 
+                    SPI_CR1_BAUDRATE_FPCLK_DIV_16,
+                    SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE,
+                    SPI_CR1_CPHA_CLK_TRANSITION_1, 
+                    SPI_CR1_DFF_8BIT,
+                    SPI_CR1_MSBFIRST);
+    spi_enable_software_slave_management(SPIx);
+    spi_set_nss_high(SPIx);
+    spi_enable(SPIx);
+#endif
+
+    if (HAS_4IN1_FLASH && _SPI_FLASH_PORT != _SPI_PROTO_PORT) {
+        SPISwitch_Init();
+    }
+
 #if HAS_MULTIMOD_SUPPORT
     if(Transmitter.module_enable[MULTIMOD].port) {
         struct mcu_pin *port = &Transmitter.module_enable[MULTIMOD];
@@ -148,21 +167,6 @@ void SPI_ProtoInit()
             gpio_set(port->port, port->pin);
         }
     }
-    /* Includes enable? */
-    spi_init_master(SPIx, 
-                    SPI_CR1_BAUDRATE_FPCLK_DIV_16,
-                    SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE,
-                    SPI_CR1_CPHA_CLK_TRANSITION_1, 
-                    SPI_CR1_DFF_8BIT,
-                    SPI_CR1_MSBFIRST);
-    spi_enable_software_slave_management(SPIx);
-    spi_set_nss_high(SPIx);
-    spi_enable(SPIx);
-
-    if (HAS_4IN1_FLASH && _SPI_FLASH_PORT != _SPI_PROTO_PORT) {
-        SPISwitch_Init();
-    }
-
     PROTO_Stubs(0);
 }
 

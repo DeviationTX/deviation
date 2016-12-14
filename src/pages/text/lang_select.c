@@ -34,6 +34,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 
 void PAGE_LanguageInit(int page)
 {
+    (void) page;
     int num_lang = count_num_languages();
     PAGE_ShowHeader(_tr("Press ENT to change"));
 
