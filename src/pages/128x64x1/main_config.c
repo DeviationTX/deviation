@@ -55,7 +55,7 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data);
 
 void PAGE_MainLayoutInit(int page)
 {
-    (void) page;
+    (void)page;
 #if HAS_LAYOUT_EDITOR
     PAGE_ShowHeader(_tr("Layout: Long-Press ENT"));
     PAGE_SetActionCB(_action_cb);

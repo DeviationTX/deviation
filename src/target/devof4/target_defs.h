@@ -78,5 +78,4 @@
 #define VOLTAGE_NUMERATOR 324
 #define VOLTAGE_OFFSET    382
 
-#endif //_DEVOF4_TARGET_H_
-
+#endif //_DEVO7E_TARGET_H_

@@ -165,6 +165,10 @@ static void frsky2way_build_bind_packet()
     packet[17] = 0x01;
 }
 
+#if HAS_EXTENDED_TELEMETRY
+static u8 sequence;
+#endif
+
 static void frsky2way_build_data_packet()
 {
     //11 d7 2d 22 00 01 c9 c9 ca ca 88 88 ca ca c9 ca 88 88
@@ -173,7 +177,11 @@ static void frsky2way_build_data_packet()
     packet[1] = fixed_id & 0xff;
     packet[2] = fixed_id >> 8;
     packet[3] = counter;
+#if HAS_EXTENDED_TELEMETRY
+    packet[4] = sequence;   // acknowledge last hub packet
+#else
     packet[4] = 0x00;
+#endif
     packet[5] = 0x01;
 
     packet[10] = 0;
@@ -268,7 +276,7 @@ static void frsky2way_parse_telem(u8 *pkt, int len)
 // pkt 4 = A2 : 13.4mV per count; 3.0V = 0xE3 on D6FR
 // pkt 5 = RSSI
 // pkt 6 = number of stream bytes
-// pkt 7 = sequence number increments mod 8 with each packet containing stream data
+// pkt 7 = sequence number increments mod 32 when packet containing stream data acknowledged
 // pkt 8-(8+(pkt[6]-1)) = stream data
 // pkt len-2 = downlink RSSI
 // pkt len-1 = crc status (bit7 set indicates good), link quality indicator (bits6-0)
@@ -294,20 +302,25 @@ static void frsky2way_parse_telem(u8 *pkt, int len)
     Telemetry.value[TELEM_FRSKY_VOLT2] = pkt[4] * (132*AD2gain) / 1000; //In 1/100 of Volts *(A2gain/10)
     TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT2);
 
-    Telemetry.value[TELEM_FRSKY_RSSI] = pkt[5]; 	// Value in Db
+    Telemetry.value[TELEM_FRSKY_RSSI] = pkt[5];
     TELEMETRY_SetUpdated(TELEM_FRSKY_RSSI);
 
+    Telemetry.value[TELEM_FRSKY_LQI] = pkt[len-1] & 0x7f;
+    TELEMETRY_SetUpdated(TELEM_FRSKY_LQI);
+
+    Telemetry.value[TELEM_FRSKY_LRSSI] = (s8)pkt[len-2] / 2 - 70; 	// Value in dBm
+    TELEMETRY_SetUpdated(TELEM_FRSKY_LRSSI);
+
 #if HAS_EXTENDED_TELEMETRY
-    static u8 sequence;
 
     if (pkt[0] < 7) return;   // be paranoid about packet length
 
     if (pkt[6] && pkt[6] <= pkt[0]-7) {   // be paranoid about packet length
+        sequence = (sequence + 1) % 32;
         if (pkt[7] != sequence) {
             ts_state = TS_IDLE;
             sequence = pkt[7];    // should be able to recover in middle of sequence
         }
-        sequence = (sequence + 1) % 8;
             
         for(int i=8; i < 8+pkt[6]; i++)
             frsky_parse_telem_stream(pkt[i]);
@@ -362,8 +375,6 @@ static u16 frsky2way_cb()
             unsigned len = CC2500_ReadReg(CC2500_3B_RXBYTES | CC2500_READ_BURST);
             if (len && len < sizeof(packet)) {
                 CC2500_ReadData(packet, len);
-                //CC2500_WriteReg(CC2500_0C_FSCTRL0, CC2500_ReadReg(CC2500_32_FREQEST));
-                //parse telemetry packet here
                 frsky2way_parse_telem(packet, len);
             }
 #ifdef EMULATOR
@@ -446,6 +457,7 @@ static void initialize(int bind)
     fixed_id = get_tx_id();
 #if HAS_EXTENDED_TELEMETRY
     ts_state = TS_IDLE;
+    sequence = 8;
 #endif
     frsky2way_init(bind);
     if (bind) {

@@ -105,8 +105,8 @@ void CC2500_SetTxRxMode(enum TXRX_State mode)
     }
 
     if(mode == TX_EN) {
-        CC2500_WriteReg(R0, 0x2F | 0x40);
         CC2500_WriteReg(R2, 0x2F);
+        CC2500_WriteReg(R0, 0x2F | 0x40);
     } else if (mode == RX_EN) {
         CC2500_WriteReg(R0, 0x2F);
         CC2500_WriteReg(R2, 0x2F | 0x40);
