@@ -65,13 +65,6 @@ static u8 current_chan;
 static u8 txid[4];
 static u8 rf_chans[4];
 
-// haven't figured out txid<-->rf channel mapping yet
-static const struct {
-    u8 txid[sizeof(txid)];
-    u8 rfchan[NUM_RF_CHANNELS];
-} q303_tx_rf_map[] =  {{{0xb8, 0x69, 0x64, 0x67}, {0x48, 0x4a, 0x4c, 0x46}}, // tx2
-                       {{0xAE, 0x89, 0x97, 0x87}, {0x4A, 0x4C, 0x4E, 0x48}}}; // tx1
-
 enum {
     BIND,
     DATA
@@ -158,7 +151,7 @@ static void send_packet(u8 bind)
         u16 rudder   = convert_channel(CHANNEL4);
         
         packet[0] = 0x55;
-        packet[1] = aileron >> 2     ;     // 8 bits
+        packet[1] = aileron >> 2;          // 8 bits
         packet[2] = (aileron & 0x03) << 6  // 2 bits
                   | (elevator >> 4);       // 6 bits
         packet[3] = (elevator & 0x0f) << 4 // 4 bits
@@ -180,28 +173,13 @@ static void send_packet(u8 bind)
             packet[9] |= FLAG_GIMBAL_DN;
         else if(Channels[CHANNEL_GIMBAL] > CHAN_MAX_VALUE / 2)
             packet[9] |= FLAG_GIMBAL_UP;
-        // set low rate for first packets
-        if(bind_counter != 0) {
-            packet[8] &= ~0x03;
-            bind_counter--;
-        }
     }
-    
-#ifdef EMULATOR
-    uint8_t pos;
-    dbgprintf("\nCh: %02x    ", bind ? 0x02 : rf_chans[current_chan]);
-    for(pos=0; pos<sizeof(packet); pos++)
-        dbgprintf("%02x ", packet[pos]);
-#endif
     
     // Power on, TX mode, CRC enabled
     XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
-    if (bind) {
-        NRF24L01_WriteReg(NRF24L01_05_RF_CH, RF_BIND_CHANNEL);
-    } else {
-        NRF24L01_WriteReg(NRF24L01_05_RF_CH, rf_chans[current_chan++]);
-        current_chan %= NUM_RF_CHANNELS;
-    }
+
+    NRF24L01_WriteReg(NRF24L01_05_RF_CH, bind ? RF_BIND_CHANNEL : rf_chans[current_chan++]);
+    current_chan %= NUM_RF_CHANNELS;
 
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
     NRF24L01_FlushTx();
@@ -274,25 +252,11 @@ static void q303_init()
 MODULE_CALLTYPE
 static u16 q303_callback()
 {
-#ifdef EMULATOR
-    uint8_t pos;
-#endif
     switch (phase) {
         case BIND:
             if (bind_counter == 0) {
                 tx_addr[0] = 0x55;
                 memcpy(&tx_addr[1], txid, 4);
-#ifdef EMULATOR
-                dbgprintf("\ntxid: ");
-                for(pos=0; pos<sizeof(txid); pos++)
-                    dbgprintf("%02x ", txid[pos]);
-                dbgprintf("\ntx_addr: ");
-                for(pos=0; pos<sizeof(tx_addr); pos++)
-                    dbgprintf("%02x ", tx_addr[pos]);
-                dbgprintf("\nrf_chans: ");
-                for(pos=0; pos<sizeof(rf_chans); pos++)
-                    dbgprintf("%02x ", rf_chans[pos]);
-#endif
                 XN297_SetTXAddr(tx_addr, 5);
                 phase = DATA;
                 bind_counter = BIND_COUNT;
@@ -312,8 +276,32 @@ static u16 q303_callback()
 // haven't figured out txid<-->rf channel mapping yet
 static void initialize_txid()
 {
-    memcpy(txid, q303_tx_rf_map[Model.fixed_id % (sizeof(q303_tx_rf_map)/sizeof(q303_tx_rf_map[0]))].txid, sizeof(txid));
-    memcpy(rf_chans, q303_tx_rf_map[Model.fixed_id % (sizeof(q303_tx_rf_map)/sizeof(q303_tx_rf_map[0]))].rfchan, sizeof(rf_chans));
+    u32 lfsr = 0xb2c54a2ful;
+    u8 i,j,offset;
+    
+#ifndef USE_FIXED_MFGID
+    u8 var[12];
+    MCU_SerialNumber(var, 12);
+    dbgprintf("Manufacturer id: ");
+    for (int i = 0; i < 12; ++i) {
+        dbgprintf("%02X", var[i]);
+        rand32_r(&lfsr, var[i]);
+    }
+    dbgprintf("\r\n");
+#endif
+
+    if (Model.fixed_id) {
+       for (i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
+           rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
+    }
+    // Pump zero bytes for LFSR to diverge more
+    for (i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
+
+    for(i=0; i<4; i++)
+        txid[i] = (lfsr >> (i*8)) & 0xff;
+    offset = txid[0] & 3;
+    for(i=0; i<NUM_RF_CHANNELS; i++)
+        rf_chans[i] = 0x46 + i*2 + offset;
 }
 
 static void initialize()
