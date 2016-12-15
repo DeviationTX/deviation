@@ -204,24 +204,28 @@ static void send_packet(u8 bind)
                       bind ? RF_BIND_CHANNEL : rf_channels[rf_chan++]);
     rf_chan %= sizeof(rf_channels);
 
-    NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
+ //   NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
     NRF24L01_FlushTx();
 
     XN297_WritePayload(packet, PACKET_SIZE);
 
     NRF24L01_SetTxRxMode(TXRX_OFF);
-    NRF24L01_SetTxRxMode(TX_EN);
+//    NRF24L01_SetTxRxMode(TX_EN);
 
     // Power on, TX mode, 2byte CRC
     // Why CRC0? xn297 does not interpret it - either 16-bit CRC or nothing     
     XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) |
                     BV(NRF24L01_00_PWR_UP));
 
-
-    if (telemetry) {
-        // switch radio to rx, no crc
-        NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x03);
-    }
+int x = 0;
+ while( !(NRF24L01_ReadReg(NRF24L01_07_STATUS) & (1<<5)) ) 
+ {
+ x++;
+ Telemetry.value[TELEM_DSM_FLOG_FADESR] = x;
+ TELEMETRY_SetUpdated(TELEM_DSM_FLOG_FADESR);
+ usleep(30);
+ }
+ 
     // Check and adjust transmission power. We do this after
     // transmission to not bother with timeout after power
     // settings change -  we have plenty of time until next
@@ -399,8 +403,14 @@ MODULE_CALLTYPE static u16 bay_callback()
 
             if (bay_count == 0) {
                 send_packet(0);
-            } else {
-                check_rx();
+            }
+else
+if (bay_count == 1) 
+{  
+        // switch radio to rx, no crc
+        NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x03);
+}
+else		{ check_rx();
             }
 
             bay_count++;
