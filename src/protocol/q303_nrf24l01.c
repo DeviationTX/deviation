@@ -274,7 +274,6 @@ static u16 q303_callback()
     return PACKET_PERIOD;
 }
 
-// haven't figured out txid<-->rf channel mapping yet
 static void initialize_txid()
 {
     u32 lfsr = 0xb2c54a2ful;
@@ -284,7 +283,7 @@ static void initialize_txid()
     u8 var[12];
     MCU_SerialNumber(var, 12);
     dbgprintf("Manufacturer id: ");
-    for (int i = 0; i < 12; ++i) {
+    for (i = 0; i < 12; ++i) {
         dbgprintf("%02X", var[i]);
         rand32_r(&lfsr, var[i]);
     }
