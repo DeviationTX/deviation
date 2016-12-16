@@ -237,7 +237,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
 
 void CONFIG_WriteTx()
 {
-    int i;
+    u32 i;
     FILE *fh;
     struct Transmitter *t = &Transmitter;
     fh = fopen("tx.ini", "w");

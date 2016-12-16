@@ -46,7 +46,7 @@ const char * const MODULE_NAME[TX_MODULE_LAST] = {
 
 static int get_module_index(const char *str)
 {
-    for(int i = 0; i < TX_MODULE_LAST; i++) {
+    for(u32 i = 0; i < TX_MODULE_LAST; i++) {
         if (strcasecmp(str, MODULE_NAME[i]) == 0)
             return i;
     }

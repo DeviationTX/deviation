@@ -50,7 +50,7 @@ static struct str_map {
 
 const char *_tr(const char *str)
 {
-    int i;
+    u32 i;
     if (lookupmap[0].pos == 0xffff) {
         return str;
     }
@@ -68,7 +68,7 @@ const char *_tr(const char *str)
 unsigned fix_crlf(char *str)
 {
     unsigned len = strlen(str);
-    unsigned i, j;
+    u32 i, j;
     for (i = 0; i < len; i++) {
         char replace = '\0';
         if (str[i] == '\r' || str[i] == '\n') {
