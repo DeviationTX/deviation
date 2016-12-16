@@ -210,7 +210,7 @@ static void send_packet(u8 bind)
     XN297_WritePayload(packet, PACKET_SIZE);
 
     NRF24L01_SetTxRxMode(TXRX_OFF);
-//    NRF24L01_SetTxRxMode(TX_EN);
+    NRF24L01_SetTxRxMode(TX_EN);
 
     // Power on, TX mode, 2byte CRC
     // Why CRC0? xn297 does not interpret it - either 16-bit CRC or nothing     
@@ -218,7 +218,7 @@ static void send_packet(u8 bind)
                     BV(NRF24L01_00_PWR_UP));
 
 int x = 0;
- while( !(NRF24L01_ReadReg(NRF24L01_07_STATUS) & (1<<5)) ) 
+ while( 0&&!(NRF24L01_ReadReg(NRF24L01_07_STATUS) & (1<<5)) ) 
  {
  x++;
  Telemetry.value[TELEM_DSM_FLOG_FADESR] = x;
@@ -380,7 +380,7 @@ MODULE_CALLTYPE static u16 bay_callback()
             if (bay_count == 0)
                 send_packet(1);
             bay_count++;
-            bay_count %= 4;
+            bay_count %= 10;
             counter -= 1;
         }
         break;
@@ -404,14 +404,16 @@ MODULE_CALLTYPE static u16 bay_callback()
             if (bay_count == 0) {
                 send_packet(0);
             }
-else
-if (bay_count == 1) 
-{  
-        // switch radio to rx, no crc
-        NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x03);
-}
-else		{ check_rx();
-            }
+
+		if (bay_count == 2) 
+		{  
+				// switch radio to rx, no crc
+				NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x03);
+		}
+		if (bay_count > 2) 		
+		{ 
+		check_rx();
+		}
 
             bay_count++;
             bay_count %= 5;
