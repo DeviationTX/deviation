@@ -460,6 +460,10 @@ static void initialize(int bind)
     sequence = 8;
 #endif
     frsky2way_init(bind);
+
+    memset(&Telemetry, 0, sizeof(Telemetry));
+    TELEMETRY_SetType(TELEM_FRSKY);
+
     if (bind) {
         PROTOCOL_SetBindState(0xFFFFFFFF);
         state = FRSKY_BIND;
