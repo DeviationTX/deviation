@@ -75,8 +75,7 @@ static int handle_label(struct LabelDesc *label, const char *name, const char *v
         return 1;
     }
     if(MATCH_KEY(BOX)) {
-        u8 idx;
-        for (idx = 0; idx < NUM_STR_ELEMS(BOX_VAL); idx++) {
+        for (u32 idx = 0; idx < NUM_STR_ELEMS(BOX_VAL); idx++) {
             if(MATCH_VALUE(BOX_VAL[idx])) {
                 label->style = idx;
             }
@@ -147,13 +146,13 @@ static const struct struct_map _secbargraph[] =
 
 static int ini_handler(void* user, const char* section, const char* name, const char* value)
 {
-    u8 idx;
+    u32 idx;
     struct display_settings *d = (struct display_settings *)user;
     int value_int = atoi(value);
 
     int assign_int(void* ptr, const struct struct_map *map, int map_size)
     {
-        for(int i = 0; i < map_size; i++) {
+        for(s32 i = 0; i < map_size; i++) {
             if(MATCH_KEY(map[i].str)) {
                 int size = map[i].offset >> 13;
                 int offset = map[i].offset & 0x1FFF;

@@ -195,7 +195,7 @@ s8 mapstrcasecmp(const char *s1, const char *s2)
 }
 static u8 get_source(const char *section, const char *value)
 {
-    unsigned i;
+    u32 i;
     unsigned val;
     const char *ptr = (value[0] == '!') ? value + 1 : value;
     const char *tmp;
@@ -222,7 +222,7 @@ static u8 get_source(const char *section, const char *value)
 
 static u8 get_button(const char *section, const char *value)
 {
-    u8 i;
+    u32 i;
     for (i = 0; i <= NUM_TX_BUTTONS; i++) {
         if(strcasecmp(INPUT_ButtonName(i), value) == 0) {
             return i;
@@ -337,17 +337,17 @@ static void create_element(struct elem *elem, int type, s16 *data)
 static int layout_ini_handler(void* user, const char* section, const char* name, const char* value)
 {
     struct Model *m = (struct Model *)user;
-    u16 i;
+    u32 i;
     int offset_x = 0, offset_y = 0;
     CLOCK_ResetWatchdog();
-    int idx;
+    u32 idx;
     if (MATCH_START(name, GUI_QUICKPAGE)) {
-        u8 idx = name[9] - '1';
+        idx = name[9] - '1';
         if (idx >= NUM_QUICKPAGES) {
             printf("%s: Only %d quickpages are supported\n", section, NUM_QUICKPAGES);
             return 1;
         }
-        int max = PAGE_GetNumPages();
+        u16 max = PAGE_GetNumPages();
         for(i = 0; i < max; i++) {
             if(mapstrcasecmp(PAGE_GetName(i), value) == 0) {
                 m->pagecfg2.quickpage[idx] = i;
@@ -391,7 +391,7 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
         printf("No free element available (max = %d)\n", NUM_ELEMS);
         return 1;
     }
-    int type;
+    u32 type;
     for (type = 0; type < ELEM_LAST; type++)
         if(mapstrcasecmp(name, GetElemName(type)) == 0)
             break;
@@ -469,7 +469,7 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
         {
             if(count)
                 return 1;
-            for (int j = 0; j <= NUM_SOURCES; j++) {
+            for (u32 j = 0; j <= NUM_SOURCES; j++) {
                 char cmp[10];
                 if(mapstrcasecmp(INPUT_SourceNameAbbrevSwitchReal(cmp, j), ptr+1) == 0) {
                     data[5] = j;
@@ -545,7 +545,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
     struct Model *m = (struct Model *)user;
 int assign_int(void* ptr, const struct struct_map *map, int map_size)
 {
-    for(int i = 0; i < map_size; i++) {
+    for(s32 i = 0; i < map_size; i++) {
         if(MATCH_KEY(map[i].str)) {
             int size = map[i].offset >> 13;
             int offset = map[i].offset & 0x1FFF;
@@ -573,7 +573,7 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
     return 0;
 }
     CLOCK_ResetWatchdog();
-    unsigned i;
+    u32 i;
     if (MATCH_SECTION("")) {
         if(MATCH_KEY(MODEL_NAME)) {
             strlcpy(m->name, value, sizeof(m->name)-1);
@@ -645,7 +645,7 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
         return handle_proto_opts(m, name, value, opts);
     }
     if (MATCH_START(section, SECTION_MIXER)) {
-        int idx;
+        u32 idx;
         for (idx = 0; idx < NUM_MIXERS; idx++) {
             if(m->mixers[idx].src == 0)
                 break;
@@ -793,7 +793,7 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
         if(assign_int(&m->trims[idx], _sectrim, MAPSIZE(_sectrim)))
             return 1;
         if (MATCH_KEY(TRIM_SWITCH)) {
-            for (int i = 0; i <= NUM_SOURCES; i++) {
+            for (i = 0; i <= NUM_SOURCES; i++) {
                 char cmp[10];
                 if(mapstrcasecmp(INPUT_SourceNameAbbrevSwitchReal(cmp, i), value) == 0) {
                     m->trims[idx].sw = i;
@@ -986,7 +986,7 @@ static void get_model_file(char *file, u8 model_num)
 void write_int(FILE *fh, void* ptr, const struct struct_map *map, int map_size)
 {
     char tmpstr[20];
-    for(int i = 0; i < map_size; i++) {
+    for(s32 i = 0; i < map_size; i++) {
         int size = map[i].offset >> 13;
         int offset = map[i].offset & 0x1FFF;
         int value;
@@ -1015,8 +1015,8 @@ void write_int(FILE *fh, void* ptr, const struct struct_map *map, int map_size)
 
 u8 write_mixer(FILE *fh, struct Model *m, u8 channel)
 {
-    int idx;
-    int i;
+    u32 idx;
+    s32 i;
     char tmpstr[20];
     u8 changed = 0;
     for(idx = 0; idx < NUM_MIXERS; idx++) {
@@ -1079,7 +1079,7 @@ static void write_proto_opts(FILE *fh, struct Model *m)
 u8 CONFIG_WriteModel(u8 model_num) {
     char file[20];
     FILE *fh;
-    u8 idx;
+    u32 idx;
     struct Model *m = &Model;
 
 
@@ -1221,7 +1221,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
     }
 #endif //HAS_DATALOG
     fprintf(fh, "[%s]\n", SECTION_SAFETY);
-    for(int i = 0; i < NUM_SOURCES + 1; i++) {
+    for(u32 i = 0; i < NUM_SOURCES + 1; i++) {
         if (WRITE_FULL_MODEL || m->safety[i]) {
             fprintf(fh, "%s=%s\n", i == 0 ? "Auto" : INPUT_SourceNameReal(file, i), SAFETY_VAL[m->safety[i]]);
         }
@@ -1273,7 +1273,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
 
 void clear_model(u8 full)
 {
-    u8 i;
+    u32 i;
     if (full) {
         memset(&Model, 0, sizeof(Model));
     } else {
@@ -1383,7 +1383,7 @@ void CONFIG_ParseIconName(char *name, const char *value)
 
 enum ModelType CONFIG_ParseModelType(const char *value)
 {
-    u8 i;
+    u32 i;
     for (i = 0; i < NUM_STR_ELEMS(MODEL_TYPE_VAL); i++) {
         if (MATCH_VALUE(MODEL_TYPE_VAL[i])) {
             return i;
