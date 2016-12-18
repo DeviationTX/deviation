@@ -29,6 +29,10 @@ void UART_Initialize()
     rcc_peripheral_enable_clock(&_USART_RCC_APB_ENR_IOP,   _USART_RCC_APB_ENR_IOP_EN);
     rcc_peripheral_enable_clock(&_USART_RCC_APB_ENR_USART, _USART_RCC_APB_ENR_USART_EN);
 
+    /* Enable DMA clock */
+    // TODO ENABLED ALREADY FOR ADC?
+    rcc_peripheral_enable_clock(&RCC_AHBENR, _RCC_AHBENR_DMAEN);
+
     /* Setup GPIO pin GPIO_USARTX_TX on USART GPIO port for transmit. */
     gpio_set_mode(_USART_GPIO, GPIO_MODE_OUTPUT_50_MHZ,
                     GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, _USART_GPIO_USART_TX);
@@ -70,9 +74,6 @@ static volatile u8 busy;
 u8 UART_Send(u8 *data, u16 len) {
     if (busy) return 1;
     busy = 1;
-
-    /* Enable DMA clock */
-    // TODO ENABLED ALREADY FOR ADC? rcc_peripheral_enable_clock(&RCC_AHBENR, _RCC_AHBENR_DMAEN);
 
     dma_channel_reset(_USART_DMA, _USART_DMA_CHANNEL);
 

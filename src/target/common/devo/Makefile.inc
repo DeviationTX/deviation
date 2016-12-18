@@ -1,3 +1,7 @@
+HAS_4IN1_FLASH ?= 0
+HAS_FLASH_DETECT ?= 0
+USE_JTAG ?= 0
+
 ifndef BUILD_TARGET
 
 CROSS    = arm-none-eabi-
@@ -27,6 +31,15 @@ SRC_C   += $(wildcard $(SDIR)/target/common/devo/protocol/*.c) \
 endif
 
 CFLAGS   = -D"assert_param(x)=" -DSTM32F10X_HD -DSTM32F1 -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -fdata-sections -ffunction-sections -I$(SDIR)/target/common/devo -I$(SDIR)/target/common/devo/msc2/lib -I$(SDIR)/target/common/devo/msc2 -I$(SDIR)/libopencm3/include -I$(SDIR)/target/common/filesystems -fno-builtin-printf -Os --specs=nano.specs
+ifeq "$(HAS_4IN1_FLASH)" "1"
+CFLAGS  += -D"HAS_4IN1_FLASH=1"
+endif
+ifeq "$(HAS_FLASH_DETECT)" "1"
+CFLAGS  += -D"HAS_FLASH_DETECT=1"
+endif
+ifeq "$(USE_JTAG)" "1"
+CFLAGS  += -D"USE_JTAG=1"
+endif
 MODULE_FLAGS = -fno-builtin
 
 #LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -nostdlib
