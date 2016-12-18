@@ -371,32 +371,11 @@ static void frskyX_data_frame() {
 
 #include "frsky_d_telem._c"
 
-static u8 sport_crc(u8 *data) {
-    u16 crc = 0;
-    for (int i=1; i < FRSKY_SPORT_PACKET_SIZE-1; ++i) {
-        crc += data[i];
-        crc += crc >> 8;
-        crc &= 0x00ff;
-    }
-    return 0x00ff - crc;
-}
-
-static void serial_echo(u8 *packet) {
-  static u8 outbuf[FRSKY_SPORT_PACKET_SIZE+2] = {0x7e};
-
-  memcpy(outbuf+1, packet, FRSKY_SPORT_PACKET_SIZE);
-  outbuf[FRSKY_SPORT_PACKET_SIZE+1] = sport_crc(outbuf+2);
-  UART_Send(outbuf, FRSKY_SPORT_PACKET_SIZE+2);
-}
-
 
 static void processSportPacket(u8 *packet) {
 //    u8  instance = (packet[0] & 0x1F) + 1;    // all instances of same sensor write to same telemetry value
-    u8  prim = packet[1];
-    u16 id = *((u16 *)(packet+2));
-
-    if (!PPMin_Mode())
-        serial_echo(packet);   // echo to trainer port
+    u8  prim                = packet[1];
+    u16 id                  = *((u16 *)(packet+2));
 
     if (prim != DATA_FRAME)
         return;
@@ -591,25 +570,19 @@ static void frsky_check_telemetry(u8 *pkt, u8 len) {
         && crc(&pkt[3], TELEM_PKT_SIZE-7) == (pkt[TELEM_PKT_SIZE-4] << 8 | pkt[TELEM_PKT_SIZE-3])
        ) {
         if (pkt[4] > 0x36) {   // distinguish RSSI from VOLT1 (maybe bit 7 always set for RSSI?)
-            Telemetry.value[TELEM_FRSKY_RSSI] = pkt[4] / 2;
+            Telemetry.value[TELEM_FRSKY_RSSI] = pkt[4] / 2; 	// Value in Db
             TELEMETRY_SetUpdated(TELEM_FRSKY_RSSI);
         } else {
             Telemetry.value[TELEM_FRSKY_VOLT1] = pkt[4] * 10;      // In 1/100 of Volts
             TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT1);
         }
 
-        Telemetry.value[TELEM_FRSKY_LQI] = pkt[len-1] & 0x7f;
-        TELEMETRY_SetUpdated(TELEM_FRSKY_LQI);
-
-        Telemetry.value[TELEM_FRSKY_LRSSI] = (s8)pkt[len-2] / 2 - 70; 	// Value in dBm
-        TELEMETRY_SetUpdated(TELEM_FRSKY_LRSSI);
-
         if ((pkt[5] >> 4 & 0x0f) == 0x08) {   // restart or somesuch
             seq_last_sent = 8;
             seq_last_rcvd = 0;
 #if HAS_EXTENDED_TELEMETRY
             dataState = STATE_DATA_IDLE;    // reset sport decoder
-#endif
+#endif // HAS_EXTENDED_TELEMETRY
         } else {
             if ((pkt[5] >> 4 & 0x03) == (seq_last_rcvd + 1) % 4) {
                 seq_last_rcvd = (seq_last_rcvd + 1) % 4;
@@ -617,14 +590,14 @@ static void frsky_check_telemetry(u8 *pkt, u8 len) {
 #if HAS_EXTENDED_TELEMETRY
             else 
                 dataState = STATE_DATA_IDLE;    // reset sport decoder if sequence number wrong
-#endif
+#endif // HAS_EXTENDED_TELEMETRY
         }
 
 #if HAS_EXTENDED_TELEMETRY
         if (pkt[6] <= 6)
             for (u8 i=0; i < pkt[6]; i++)
                 frsky_parse_sport_stream(pkt[7+i]);
-#endif
+#endif // HAS_EXTENDED_TELEMETRY
     }
 }
 
@@ -836,7 +809,6 @@ static void initialize(int bind)
     seq_last_rcvd = 8;
 #if HAS_EXTENDED_TELEMETRY
     Telemetry.value[TELEM_FRSKY_MIN_CELL] = TELEMETRY_GetMaxValue(TELEM_FRSKY_MIN_CELL);
-    UART_SetDataRate(57600);    // set for s.port compatibility
 #endif
 
     u32 seed = get_tx_id();
@@ -848,9 +820,6 @@ static void initialize(int bind)
 
     frskyX_init(); 
     CC2500_SetTxRxMode(TX_EN);  // enable PA 
-
-    memset(&Telemetry, 0, sizeof(Telemetry));
-    TELEMETRY_SetType(TELEM_FRSKY);
 
     if (bind) {
         PROTOCOL_SetBindState(0xFFFFFFFF);
@@ -884,9 +853,6 @@ const void *FRSKYX_Cmds(enum ProtoCmds cmd)
             return (void *)1L;
         case PROTOCMD_RESET:
         case PROTOCMD_DEINIT:
-#if HAS_EXTENDED_TELEMETRY
-            UART_SetDataRate(0);  // restore data rate to default
-#endif
             CLOCK_StopTimer();
             return (void *)(CC2500_Reset() ? 1L : -1L);
         default: break;
