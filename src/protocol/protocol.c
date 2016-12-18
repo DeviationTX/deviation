@@ -24,6 +24,10 @@
 
 #if !defined(HAS_4IN1_FLASH)
 #define HAS_4IN1_FLASH 0
+#elif defined(EMULATOR)
+// Disable for emulator
+#undef HAS_4IN1_FLASH
+#define HAS_4IN1_FLASH 0
 #endif
 
 extern struct FAT FontFAT; //defined in screen/lcd_string.c
