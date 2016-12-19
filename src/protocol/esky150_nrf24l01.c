@@ -314,16 +314,8 @@ static u16 esky150_callback()
     switch (phase) {
     case ESKY150_INIT2:
         timeout = esky150_init2();
-        phase = ESKY150_BIND;
+        phase = ESKY150_DATA;
         break;
-    case ESKY150_BIND:
-        if (bind_counter == 0) {
-         //tx_addr[1] = txid[0];
-         //tx_addr[2] = txid[1];
-         //tx_addr[2] = txid[1];
-         //tx_addr[2] = txid[1];
-         
-        phase = ESKY150_DATA;    
     case ESKY150_DATA:
         if (packet_count == 4)
             packet_count = 0;
@@ -365,8 +357,9 @@ static void initialize_tx_id()
     set_tx_id(lfsr);
 }
 
-static void initialize()
+static void initialize(u8 bind)
 {
+    (void) bind;
     CLOCK_StopTimer();
     tx_power = Model.tx_power;
     total_packets = 0;
@@ -380,14 +373,14 @@ const void *ESKY150_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:
-            initialize();
+            initialize(0);
             return 0;
         case PROTOCMD_DEINIT:
         case PROTOCMD_RESET:
             CLOCK_StopTimer();
             return (void *)(NRF24L01_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // Always Autobind
-        case PROTOCMD_BIND:  initialize(); return 0;
+        case PROTOCMD_BIND:  initialize(1); return 0;
         case PROTOCMD_NUMCHAN: return (void *) 4L; // T, A, E, R
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)4L;
         // TODO: return id correctly
