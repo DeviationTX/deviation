@@ -240,7 +240,7 @@ static u16 convert_2bit_channel(u8 num)
       if (ch >= CHAN_MAX_VALUE/2) ch_out = 3; else ch_out = 2;       
     } else if (ch < CHAN_MIN_VALUE/2) ch_out = 0; else ch_out = 1;       
 
-    return ch; 
+    return ch_out; 
 }
 
 static void read_controls(u16* throttle, u16* aileron, u16* elevator, u16* rudder,
