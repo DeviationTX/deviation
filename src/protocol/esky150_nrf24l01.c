@@ -43,8 +43,6 @@
 #define PACKET_PERIOD 4800
 #define PACKET_CHKTIME  100 // Time to wait for packet to be sent (no ACK, so very short)
 
-#define BIND_COUNT 1000
-
 #define PAYLOADSIZE 15
 #define NFREQCHANNELS 2
 #define TXID_SIZE 4
@@ -72,7 +70,7 @@ static u8 packet_sent;
 static u8 tx_id[TXID_SIZE];
 static u8 rf_ch_num;
 static u8 packet_count;
-static u16 bind_counter;
+// static u16 bind_counter;
 static u32 total_packets;
 static u8 tx_power;
 static u16 throttle, rudder, elevator, aileron;
