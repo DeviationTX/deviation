@@ -44,7 +44,7 @@
 #define INIT_WAIT_MS  10000
 
 // Callback timeout period for sending bind packets, minimum 250
-#define BINDING_PACKET_PERIOD  1000
+#define BINDING_PACKET_PERIOD  2000
 
 // Timeout for sending data packets, in uSec, ESky2 protocol requires 4.8ms
 #define SENDING_PACKET_PERIOD  4800
@@ -59,7 +59,7 @@
 #define BIND_COUNT 5
 #define dbgprintf printf
 #else
-#define BIND_COUNT 2000
+#define BIND_COUNT 3000
 #define dbgprintf if(0) printf
 #endif 
 
@@ -103,7 +103,7 @@ enum {
     STATE_SENDING,
 };
 
-static const u8 u1_rx_addr[TX_ADDRESS_SIZE] = { 0x73, 0x73, 0x74, 0x63 }; //This RX address "sstc" is fixed for the new ESKY-Protocol
+static const u8 u1_rx_addr[TX_ADDRESS_SIZE] = { 0x73, 0x73, 0x74, 0x63 }; //This RX address "sstc" is fixed for ESky2
 
 //================================================================================================
 // Private Function Prototypes
@@ -283,6 +283,7 @@ static void esky2_init(u8 tx_addr[], u8 hopping_ch[])
     NRF24L01_SetBitrate(NRF24L01_BR_2M);
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);     // Clear data ready, data sent, and retransmit
     NRF24L01_WriteReg(NRF24L01_11_RX_PW_P0, PAYLOADSIZE);   // bytes of data payload for pipe 0
+    NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, u1_rx_addr, TX_ADDRESS_SIZE);
 
 
     NRF24L01_Activate(0x73);
@@ -340,8 +341,8 @@ static void esky2_init(u8 tx_addr[], u8 hopping_ch[])
 static void esky2_calculate_frequency_hopping_channels(u32 seed, u8 hopping_channels[])
 {
     // Use channels 2..79
-    u8 first = 0x22; //seed % 37 + 2;
-    u8 second = 0x4a;//first + 40;
+    u8 first = seed % 37 + 2;
+    u8 second = first + 40;
     hopping_channels[0] = first;  // 0x22;
     hopping_channels[1] = second; // 0x4a;
     dbgprintf("Using channels %02d and %02d\n", first, second);
@@ -401,7 +402,6 @@ static void esky2_calculate_tx_addr(u8 tx_addr[])
 //-------------------------------------------------------------------------------------------------
 static void esky2_bind_init(u8 tx_addr[], u8 bind_packet[])
 {
-    NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, u1_rx_addr, TX_ADDRESS_SIZE);
     NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, u1_rx_addr, TX_ADDRESS_SIZE);
     bind_packet[0]  = tx_addr[0];
     bind_packet[1]  = tx_addr[1];
