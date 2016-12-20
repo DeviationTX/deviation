@@ -404,6 +404,7 @@ static void esky2_calculate_tx_addr(u8 tx_addr[])
 static void esky2_bind_init(u8 tx_addr[], u8 bind_packet[])
 {
     NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, u1_rx_addr, TX_ADDRESS_SIZE);
+    NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, u1_rx_addr, TX_ADDRESS_SIZE);
     bind_packet[0]  = tx_addr[0];
     bind_packet[1]  = tx_addr[1];
     bind_packet[2]  = tx_addr[2];
