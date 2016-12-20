@@ -1,14 +1,27 @@
-#ifndef _DEVO7E_TARGET_H_
-#define _DEVO7E_TARGET_H_
+#ifndef _DEVOF4_TARGET_H_
+#define _DEVOF4_TARGET_H_
 
-#define USE_DEVOFS 1 //Must be before common_devo include
+#define SPIFLASH_SECTOR_OFFSET 0
+#if defined HAS_4IN1_FLASH && HAS_4IN1_FLASH
+// Use 4-in-1 flash
+#define _SPI_FLASH_PORT              2 //SPI2
+    #define _SPI_FLASH_CSN_PIN       {GPIOB, GPIO12}
+    #define _SPI_FLASH_SCK_PIN       {GPIOB, GPIO13}
+    #define _SPI_FLASH_MISO_PIN      {GPIOB, GPIO14}
+    #define _SPI_FLASH_MOSI_PIN      {GPIOB, GPIO15}
+
+    #define SPIFLASH_SECTORS 4096
+    #define SPIFLASH_TYPE W25QxxBV
+#else
+    #define SPIFLASH_SECTORS 16
+    #define SPIFLASH_TYPE SST25VFxxxA
+    #define USE_DEVOFS 1 //Must be before common_devo include
+#endif
+
 #include "../common/devo/common_devo.h"
 
-#define TXID 0xF7
-#define SPIFLASH_TYPE SST25VFxxxA
+#define TXID 0xF4
 #define VECTOR_TABLE_LOCATION 0x3000 //0x3000
-#define SPIFLASH_SECTOR_OFFSET 0
-#define SPIFLASH_SECTORS 16
 
 #define LCD_WIDTH 24
 #define LCD_HEIGHT 12
@@ -66,4 +79,3 @@
 #define VOLTAGE_OFFSET    382
 
 #endif //_DEVO7E_TARGET_H_
-

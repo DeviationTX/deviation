@@ -30,10 +30,12 @@ struct TouchCalibration {
     s32 yoffset;
 };
 
+#if 0 // Defined in ports.h
 struct mcu_pin {
     u32 port;
     u32 pin; //This only needs to be u16, but we need the struct to be word-aligned
 };
+#endif
 
 enum ExtraHardware {
     VIBRATING_MOTOR = 0x01,

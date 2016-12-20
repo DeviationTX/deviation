@@ -15,10 +15,10 @@
 
 /* Includes ------------------------------------------------------------------*/
 
-#include <stm32f10x.h>
+#include "common.h"
+// #include <stm32f10x.h> libopencm3 headers included from common.h cover this
 #include "mass_mal.h"
 #include "usb_bot.h"
-#include "common.h"
 //#include "target.h"
 
 #include <string.h>
@@ -74,7 +74,7 @@
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-uint32_t Mass_Memory_Size[2] = {0x1000 * (FAT_OFFSET + SPIFLASH_SECTORS - SPIFLASH_SECTOR_OFFSET), 0};
+// uint32_t Mass_Memory_Size[2] = {0x1000 * (FAT_OFFSET + SPIFLASH_SECTORS - SPIFLASH_SECTOR_OFFSET), 0};
 uint32_t Mass_Block_Size[2] = {4096, 0};
 uint32_t Mass_Block_Count[2] = {FAT_OFFSET + SPIFLASH_SECTORS - SPIFLASH_SECTOR_OFFSET, 0};
 volatile uint32_t Status = 0;

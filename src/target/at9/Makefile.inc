@@ -1,4 +1,5 @@
 HAS_4IN1_FLASH ?= 0
+HAS_FLASH_DETECT ?= $(HAS_4IN1_FLASH)
 
 ifeq "$(HAS_4IN1_FLASH)" "1"
 FILESYSTEMS := common base_fonts 320x240x16
@@ -25,7 +26,7 @@ NUM_MODELS ?= 10
 LINKFILE = $(SDIR)/target/$(TARGET)/$(TARGET).ld
 LIBOPENCM3 = $(SDIR)/libopencm3/lib/libopencm3_stm32f1.a
 
-SRC_C    = $(wildcard $(SDIR)/target/$(TARGET)/*.c) \
+SRC_C   := $(wildcard $(SDIR)/target/$(TARGET)/*.c) \
            $(wildcard $(SDIR)/target/common/stm32/*.c) \
            $(wildcard $(SDIR)/target/common/filesystems/*.c) \
            $(wildcard $(SDIR)/target/common/filesystems/devofs/*.c) \
@@ -37,9 +38,16 @@ SRC_C    = $(wildcard $(SDIR)/target/$(TARGET)/*.c) \
            $(wildcard $(SDIR)/target/common/devo/uart.c) \
            $(SDIR)/target/devo8/ili9341.c
 
+ifneq "$(HAS_4IN1_FLASH)" "1"
+SRC_C := $(filter-out $(SDIR)/target/common/stm32/spi_flash.c, $(SRC_C))
+endif
+
 CFLAGS   = -D"assert_param(x)=" -DSTM32F10X_HD -DSTM32F1 -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -fdata-sections -ffunction-sections -I$(SDIR)/target/common/devo/msc2/lib -I$(SDIR)/target/common/devo/msc2 -I$(SDIR)/libopencm3/include -I$(SDIR)/target/common/filesystems -fno-builtin-printf -Os --specs=nano.specs
 ifeq "$(HAS_4IN1_FLASH)" "1"
-CFLAGS += -D"HAS_4IN1_FLASH=1"
+CFLAGS  += -D"HAS_4IN1_FLASH=1"
+endif
+ifeq "$(HAS_FLASH_DETECT)" "1"
+CFLAGS  += -D"HAS_FLASH_DETECT=1"
 endif
 MODULE_FLAGS = -fno-builtin
 
