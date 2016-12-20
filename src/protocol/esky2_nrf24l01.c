@@ -3,21 +3,16 @@
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
  (at your option) any later version.
-
+ 
  Deviation is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
-
+ 
  You should have received a copy of the GNU General Public License
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-#ifdef MODULAR
-  //Allows the linker to properly relocate
-  #define ESKY_NEW_Cmds PROTO_Cmds
-  #pragma long_calls
-#endif
+ 
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
@@ -26,39 +21,59 @@
 #include "music.h"
 #include "telemetry.h"
 
-#ifdef MODULAR
-  //Some versions of gcc applythis to definitions, others to calls
-  //So just use long_calls everywhere
-  //#pragma long_calls_off
-  extern unsigned _data_loadaddr;
-  const unsigned long protocol_type = (unsigned long)&_data_loadaddr;
-#endif
-
 #ifdef PROTO_HAS_NRF24L01
-
 #include "iface_nrf24l01.h"
 
-#ifdef EMULATOR
-  #define USE_FIXED_MFGID
-  #define BIND_COUNT 10
-  #define PACKET_PERIOD    450
-  #define dbgprintf printf
-#else
-  #define BIND_COUNT 1000
-  // Timeout for callback in uSec, 4.8ms=4800us for new ESky protocol
-  #define PACKET_PERIOD 4800
-  #define PACKET_CHKTIME  100 // Time to wait for packet to be sent (no ACK, so very short)
-  #define dbgprintf if(0) printf  //do not use the printf, to save a lot of memory and don't have int problems.
+#ifdef MODULAR
+  //Some versions of gcc apply this to definitions, others to calls
+  //So just use long_calls everywhere
+  //#pragma long_calls_off
+  extern u32 _data_loadaddr;
+  const u32 protocol_type = (u32)&_data_loadaddr;
+
+  //Allows the linker to properly relocate
+  #define ESky2_Cmds PROTO_Cmds
+  #pragma long_calls
 #endif
 
+//================================================================================================
+// Definitions
+//================================================================================================
+
+// Wait for RX chip stable - 10ms
+#define INIT_WAIT_MS  10000
+
+// Callback timeout period for sending bind packets, minimum 250
+#define BINDING_PACKET_PERIOD  1000
+
+// Timeout for sending data packets, in uSec, ESky2 protocol requires 4.8ms
+#define SENDING_PACKET_PERIOD  4800
+
+//ESky2 sends 1 data packet per frequency (Confirmation needed!)
+#define PACKET_SEND_COUNT 1
+
+
+// packets to be sent during binding
+#ifdef EMULATOR
+#define USE_FIXED_MFGID
+#define BIND_COUNT 5
+#define dbgprintf printf
+#else
+#define BIND_COUNT 500
+#define dbgprintf if(0) printf
+#endif 
 
 #define PAYLOADSIZE 15
-#define NFREQCHANNELS 2
-#define TXID_SIZE 4
-#define ADDR_SIZE 4
 
+//ESky2 only uses 2 RF channels
+#define RF_CH_COUNT 2
+ 
+#define TX_ADDRESS_SIZE 4
 
+#define NO_RF_CHANNEL_CHANGE -1
 
+typedef int BOOL;
+ 
 // For code readability
 enum {
     CHANNEL1 = 0,
@@ -69,71 +84,205 @@ enum {
     CHANNEL6,
     CHANNEL7
 };
+ 
+enum {
+    PROTOOPTS_STARTBIND = 0,
+    LAST_PROTO_OPT,
+};
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
+ 
+enum {
+    STARTBIND_NO  = 0,
+    STARTBIND_YES = 1,
+};
+ 
+enum {
+    STATE_PRE_BIND,
+    STATE_BINDING,
+    STATE_PRE_SEND,
+    STATE_SENDING,
+};
 
+static const u8 u1_rx_addr[TX_ADDRESS_SIZE] = { 0x73, 0x73, 0x74, 0x63 }; //This RX address "sstc" is fixed for the new ESKY-Protocol
 
-static u8 packet[PAYLOADSIZE];
-static u8 packet_sent;
-static u8 tx_id[TXID_SIZE];
-static u8 rf_ch_num;
-static u8 packet_count;
-// static u16 bind_counter;
-static u32 total_packets;
-static u8 tx_power;
-static u16 throttle, rudder, elevator, aileron, flight_mode, aux_ch6, aux_ch7;
+//================================================================================================
+// Private Function Prototypes
+//================================================================================================
+static void esky2_start_tx(BOOL bind_yes);
+static u16  esky2_tx_callback();
+ 
+static void esky2_init(u8 tx_addr[], u8 hopping_ch[]);
+ 
+static void esky2_bind_init(u8 tx_addr[], u8 bind_packet[]);
+ 
+static void esky2_calculate_frequency_hopping_channels(u32 seed, u8 hopping_channels[]);
+static void esky2_calculate_tx_addr(u8 tx_addr[]);
+static void esky2_send_packet(u8 packet[], s32 rf_ch);
+ 
+static void esky2_send_init(u8 tx_addr[], u8 packet[]);
+static void esky2_update_packet_control_data(u8 packet[], s32 packet_count, s32 rf_ch_idx, u8 hopping_ch[]);
+ 
+static void esky2_read_controls(u16* throttle, u16* aileron, u16* elevator, u16* rudder, u16* flight_mode, u16* aux_ch6, u16* aux_ch7, u8* flags);
+static u16  esky2_convert_channel(u8 num);
+static u16  esky2_convert_2bit_channel(u8 num);
+ 
+//================================================================================================
+// Local Variables
+//================================================================================================
+static const char * const ESKY2_PROTOCOL_OPTIONS[] = {
+  _tr_noop("Re-bind"),  _tr_noop("No"), _tr_noop("Yes"), NULL, 
+  NULL
+};
+ 
+//Payload data buffer
+static u8 packet_[PAYLOADSIZE];
+static u8 hopping_channels_[RF_CH_COUNT];
+
+static u16 sending_packet_period;
+ 
+//ESky2 uses 4 byte address
+static u8 tx_addr_[TX_ADDRESS_SIZE];
+ 
+static u32 tx_state_ = STATE_PRE_BIND;
+static u32 tx_power_;
 static u8 flags;
-static u8 hopping_frequency[NFREQCHANNELS];
-
-
-static const u8 u1_rx_addr[ADDR_SIZE] = { 0x73, 0x73, 0x74, 0x63 }; //This RX address "sstc" is fixed for the new ESKY-Protocol
-
-//
-static u8 phase;
-enum {
-    ESKY_NEW_INIT2 = 0,
-    ESKY_NEW_DATA
-};
-
-
-
-// Bit vector from bit position
-#define BV(bit) (1 << bit)
-
-// Packet ack status values
-enum {
-    PKT_PENDING = 0,
-    PKT_ACKED,
-    PKT_TIMEOUT
-};
-
-static u8 packet_ack()
+ 
+//================================================================================================
+// Public Functions
+//================================================================================================
+const void *ESky2_Cmds(enum ProtoCmds cmd)
 {
-    switch (NRF24L01_ReadReg(NRF24L01_07_STATUS) & (BV(NRF24L01_07_TX_DS) | BV(NRF24L01_07_MAX_RT))) {
-    case BV(NRF24L01_07_TX_DS):
-        return PKT_ACKED;
-    case BV(NRF24L01_07_MAX_RT):
-        return PKT_TIMEOUT;
+    switch(cmd) {
+        case PROTOCMD_INIT:
+        	esky2_start_tx((Model.proto_opts[PROTOOPTS_STARTBIND] == STARTBIND_YES));
+            return 0;
+        case PROTOCMD_DEINIT:
+        case PROTOCMD_RESET:
+            CLOCK_StopTimer();
+            return (void *)((NRF24L01_Reset()) ? 1L : -1L);
+        case PROTOCMD_CHECK_AUTOBIND:
+            return (void *)0L; // Never Autobind
+        case PROTOCMD_BIND:
+        	esky2_start_tx(STARTBIND_YES);
+			return 0;
+        case PROTOCMD_NUMCHAN:
+            return (void *)7L; // T, A, E, R, FMODE, AUX1, AUX2
+        case PROTOCMD_DEFAULT_NUMCHAN:
+            return (void *)4L;
+        case PROTOCMD_CURRENT_ID: 
+            return (Model.fixed_id) ? (void *)Model.fixed_id : 0;
+        case PROTOCMD_GETOPTIONS: 
+            return ESKY2_PROTOCOL_OPTIONS;
+        case PROTOCMD_TELEMETRYSTATE: 
+            return (void *)PROTO_TELEM_UNSUPPORTED;
+        default: break;
     }
-    return PKT_PENDING;
+    return 0;
+}
+ 
+//================================================================================================
+// Private Functions
+//================================================================================================
+static void esky2_start_tx(BOOL bind_yes)
+{
+    CLOCK_StopTimer();
+    dbgprintf("ESky2 protocol started\n");
+    sending_packet_period = SENDING_PACKET_PERIOD;
+    esky2_init(tx_addr_, hopping_channels_);
+    if(bind_yes)
+    {
+        PROTOCOL_SetBindState(BIND_COUNT * BINDING_PACKET_PERIOD / 1000); //msec
+        tx_state_ = STATE_PRE_BIND;
+    } else {
+        tx_state_ = STATE_PRE_SEND;
+    }
+    CLOCK_StartTimer(INIT_WAIT_MS, esky2_tx_callback);
 }
 
-// 2-bytes CRC
-#define CRC_CONFIG (BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO))
-
-static u16 esky_new_init()
+//-------------------------------------------------------------------------------------------------
+// This function is an ISR called by hardware timer interrupt.
+// It works at background to send binding packets or data packets.
+// For ESky2, since there is no feedback from the receiver, only two type of flows:
+//   STATE_INIT_BINDING -> STATE_BINDING -> STATE_INIT_SENDING -> STATE_SENDING
+//   STATE_INIT_SENDING -> STATE_SENDING
+//
+// For 7E, this module is loaded into RAM, we need to set __attribute__((__long_call__))
+//-------------------------------------------------------------------------------------------------
+MODULE_CALLTYPE
+static u16 esky2_tx_callback()
 {
+static s32 packet_sent = 0;
+static s32 rf_ch_idx = 0;
+    switch(tx_state_)
+    {
+    case STATE_PRE_BIND:
+        esky2_bind_init(tx_addr_, packet_);
+        tx_state_ = STATE_BINDING;
+        packet_sent = 0;
+        //Do once, no break needed
+    case STATE_BINDING:
+        if(packet_sent < BIND_COUNT)
+        {
+            packet_sent++;
+            esky2_send_packet(packet_, NO_RF_CHANNEL_CHANGE);
+            return BINDING_PACKET_PERIOD;
+        } else {
+            //Tell foreground interface binding is done
+            PROTOCOL_SetBindState(0);
+            MUSIC_Play(MUSIC_DONE_BINDING);
+            tx_state_ = STATE_PRE_SEND;
+           //Do once, no break needed
+        }
+    case STATE_PRE_SEND:
+            packet_sent = 0;
+            esky2_send_init(tx_addr_, packet_);
+            rf_ch_idx = 0;
+            tx_state_ = STATE_SENDING;
+           //Do once, no break needed
+    case STATE_SENDING:
+        if(packet_sent >= PACKET_SEND_COUNT)
+        {
+            packet_sent = 0;
+            rf_ch_idx++;
+            if(rf_ch_idx >= RF_CH_COUNT) rf_ch_idx = 0;
+            esky2_update_packet_control_data(packet_, 0, rf_ch_idx, hopping_channels_);
+            esky2_send_packet(packet_, hopping_channels_[rf_ch_idx]);
+        } else {
+            esky2_send_packet(packet_, NO_RF_CHANNEL_CHANGE);
+        }
+        packet_sent++;
+        return SENDING_PACKET_PERIOD;
+    } //switch
+ 
+    //Bad things happened, rest
+    packet_sent = 0;
+    tx_state_ = STATE_PRE_SEND;
+    return sending_packet_period;
+}
+ 
+//-------------------------------------------------------------------------------------------------
+// This function setup 24L01
+// ESky2 uses one way communication, receiving only. 24L01 RX is never enabled.
+//-------------------------------------------------------------------------------------------------
+#define CRC_CONFIG (BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO))
+ 
+static void esky2_init(u8 tx_addr[], u8 hopping_ch[])
+{
+   // Bit vector from bit position
+    #define BV(bit) (1 << bit)
+ 
+    esky2_calculate_tx_addr(tx_addr);
+    esky2_calculate_frequency_hopping_channels(*((u32*)tx_addr), hopping_ch);
+ 
     NRF24L01_Initialize();
 
     NRF24L01_WriteReg(NRF24L01_00_CONFIG, CRC_CONFIG); 
     NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);      // No Auto Acknoledgement
     NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x01);  // Enable data pipe 0
-    NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, ADDR_SIZE-2);   // 4-byte RX/TX address
+    NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x02);   // 4-byte RX/TX address
     NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0);    // Disable retransmit
     NRF24L01_SetPower(Model.tx_power);
     NRF24L01_SetBitrate(NRF24L01_BR_2M);
-    NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, u1_rx_addr, ADDR_SIZE);
-    NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, tx_id, ADDR_SIZE);
-
-
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);     // Clear data ready, data sent, and retransmit
     NRF24L01_WriteReg(NRF24L01_11_RX_PW_P0, PAYLOADSIZE);   // bytes of data payload for pipe 0
 
@@ -143,16 +292,17 @@ static u16 esky_new_init()
     // Enable: Dynamic Payload Length, Payload with ACK , W_TX_PAYLOAD_NOACK
     NRF24L01_WriteReg(NRF24L01_1D_FEATURE, BV(NRF2401_1D_EN_DPL) | BV(NRF2401_1D_EN_ACK_PAY) | BV(NRF2401_1D_EN_DYN_ACK));
 
-    // Check for Beken BK2425 chip
+    
+    // Check for Beken BK2421/BK2423 chip
     // It is done by using Beken specific activate code, 0x53
     // and checking that status register changed appropriately
     // There is no harm to run it on nRF24L01 because following
     // closing activate command changes state back even if it
     // does something on nRF24L01
-    NRF24L01_Activate(0x53); // magic for BK2425 bank switch
+    NRF24L01_Activate(0x53); // magic for BK2421 bank switch
     dbgprintf("Trying to switch banks\n");
     if (NRF24L01_ReadReg(NRF24L01_07_STATUS) & 0x80) {
-        dbgprintf("BK2425 detected\n");
+        dbgprintf("BK2421 detected\n");
 //        long nul = 0;
         // Beken registers don't have such nice names, so we just mention
         // them by their numbers
@@ -176,133 +326,137 @@ static u16 esky_new_init()
     }
     NRF24L01_Activate(0x53); // switch bank back
 
-    // Delay 50 ms
-    return 50000u;
-}
-
-
-static u16 esky_new_init2()
-{
+    tx_power_ = Model.tx_power;
+    NRF24L01_SetPower(Model.tx_power);
+    
     NRF24L01_FlushTx();
-    NRF24L01_FlushRx();
-    packet_sent = 0;
-    packet_count = 0;
-    rf_ch_num = 0;
-
     // Turn radio power on
     NRF24L01_SetTxRxMode(TX_EN);
-    NRF24L01_WriteReg(NRF24L01_00_CONFIG, CRC_CONFIG | BV(NRF24L01_00_PWR_UP));
-    // delayMicroseconds(150);
-    return 150u;
+    NRF24L01_WriteReg(NRF24L01_00_CONFIG, BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
+    
 }
-
-
-static void calc_fh_channels(u32 seed)
+ 
+//-------------------------------------------------------------------------------------------------
+// This function generates "random" RF hopping frequency channel numbers.
+//-------------------------------------------------------------------------------------------------
+static void esky2_calculate_frequency_hopping_channels(u32 seed, u8 hopping_channels[])
 {
     // Use channels 2..79
     u8 first = seed % 37 + 2;
     u8 second = first + 40;
-    hopping_frequency[0] = first;  // 0x22;
-    hopping_frequency[1] = second; // 0x4a;
+    hopping_channels[0] = first;  // 0x22;
+    hopping_channels[1] = second; // 0x4a;
     dbgprintf("Using channels %02d and %02d\n", first, second);
 }
-
-
-static void set_tx_id(u32 id)
+ 
+//-------------------------------------------------------------------------------------------------
+// This function generate RF TX packet address
+// ESky2 can remember the binding parameters; we do not need rebind when power up.
+// This requires the address must be repeatable for a specific RF ID at power up.
+// The ARM Device ID is used as seed, so controllers with the same RF ID have their
+// own specific addresses.
+//-------------------------------------------------------------------------------------------------
+static void esky2_calculate_tx_addr(u8 tx_addr[])
 {
-    tx_id[0] = (id >> 24) & 0xFF;
-    tx_id[1] = (id >> 16) & 0xFF;
-    tx_id[2] = (id >> 8) & 0xFF;
-    tx_id[3] = (id >> 0) & 0xFF;
-    dbgprintf("TX id %02X %02X %02X %02X\n", tx_id[0], tx_id[1], tx_id[2], tx_id[3]);
-    calc_fh_channels(id);
-}
+    u32 lfsr = 0xb2c54a2ful;
 
-// Channel values are servo time in ms, 1500ms is the middle,
-// 1000 and 2000 are min and max values
-static u16 convert_channel(u8 num)
-{
-    s32 ch = Channels[num];
-    if (ch < CHAN_MIN_VALUE) {
-        ch = CHAN_MIN_VALUE;
-    } else if (ch > CHAN_MAX_VALUE) {
-        ch = CHAN_MAX_VALUE;
+    #ifndef USE_FIXED_MFGID
+    u8 var[12];
+    MCU_SerialNumber(var, 12);
+    dbgprintf("Manufacturer id: ");
+    for (int i = 0; i < 12; ++i) {
+        dbgprintf("%02X", var[i]);
+        rand32_r(&lfsr, var[i]);
     }
-    return (u16) ((ch * 500 / CHAN_MAX_VALUE) + 1500);
-}
+    dbgprintf("\r\n");
+    #endif
 
-static u16 convert_2bit_channel(u8 num)
-{
-    s32 ch = Channels[num];
-    u16 ch_out
-    if (ch >= 0)
-    { 
-      if (ch >= CHAN_MAX_VALUE/2) ch_out = 3; else ch_out = 2;       
-    } else if (ch < CHAN_MIN_VALUE/2) ch_out = 0; else ch_out = 1;       
-
-    return ch_out; 
-}
-
-static void read_controls(u16* throttle, u16* aileron, u16* elevator, u16* rudder,
-                          u16* flight_mode, u16* aux_ch6, u16* aux_ch7, u8* flags)
-{
-    (void) flags;
-    // Protocol is registered TAERG, that is
-    // Throttle is channel 0, Aileron - 1, Elevator - 2, Rudder - 3
-    // Sometimes due to imperfect calibration or mixer settings
-    // throttle can be less than CHAN_MIN_VALUE or larger than
-    // CHAN_MAX_VALUE. As we have no space here, we hard-limit
-    // channels values by min..max range
-
-    *throttle    = convert_channel(CHANNEL1);
-    *aileron     = convert_channel(CHANNEL2);
-    *elevator    = convert_channel(CHANNEL3);
-    *rudder      = convert_channel(CHANNEL4);
-    *flight_mode = convert_2bit_channel(CHANNEL5);
-    *aux_ch6     = convert_channel(CHANNEL6);
-    *aux_ch7     = convert_2bit_channel(CHANNEL7);
-
-    // Print channels every now and then
-    if (0) { // (total_packets & 0x3FF) == 1) {
-        dbgprintf("Raw channels: %d, %d, %d, %d, %d, %d, %d, %d\n",
-               Channels[0], Channels[1], Channels[2], Channels[3],
-               Channels[4], Channels[5], Channels[6], Channels[7]);
-        dbgprintf("Aileron %d, elevator %d, throttle %d, rudder %d\n",
-               (s16) *aileron, (s16) *elevator, (s16) *throttle, (s16) *rudder);
+    if (Model.fixed_id) {
+       for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
+           rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
     }
+    // Pump zero bytes for LFSR to diverge more
+    for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
+
+    tx_addr[0] = (lfsr >> 24) & 0xFF;
+    tx_addr[1] = (lfsr >> 16) & 0xFF;
+    tx_addr[2] = (lfsr >> 8) & 0xFF;
+    tx_addr[3] = (lfsr >> 0) & 0xFF;
+
+    dbgprintf("TX ID %02X %02X %02X %02X\n", tx_addr[0], tx_addr[1], tx_addr[2], tx_addr[3]);
 }
-
-
-
-static void send_packet(u8 bind)
+ 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Following functions are called by timer ISR. When a foreground function is preempted by the ISR,
+// if the shared data are in the middle of changing, the data lose integrity.
+// Related data are:
+//   Channels[]     - These are keeping change, may be.
+//   Model.tx_power - This is not important, the value will be stable eventually
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//-------------------------------------------------------------------------------------------------
+// This function init 24L01 regs and packet data for binding
+//
+// Send tx address to the ESky2 receiver during binding.
+// It seems that ESky2 can remember these parameters, no binding needed after power up.
+//
+// Bind uses fixed TX address "sstc", 2 Mbps data rate and channel 1
+//-------------------------------------------------------------------------------------------------
+static void esky2_bind_init(u8 tx_addr[], u8 bind_packet[])
 {
-    u8 rf_ch = 1; // bind channel
-    
-    if (bind) {
-      // Bind packet
-      packet[0]  = tx_id[0];
-      packet[1]  = tx_id[1];
-      packet[2]  = tx_id[2];
-      packet[3]  = tx_id[3]; 
-      packet[4]  = u1_rx_addr[0];
-      packet[5]  = u1_rx_addr[1];
-      packet[6]  = u1_rx_addr[2];
-      packet[7]  = u1_rx_addr[3];
-      packet[8]  = tx_id[0];
-      packet[9]  = tx_id[1];
-      packet[10] = tx_id[2];
-      packet[11] = tx_id[3]; 
-      packet[12] = 0;
-      packet[13] = 0;
-      packet[14] = 0;
-    } else {
-      rf_ch = hopping_frequency[rf_ch_num];
-      rf_ch_num = 1 - rf_ch_num;
-  
-      read_controls(&throttle, &aileron, &elevator, &rudder, &flight_mode, &aux_ch6, &aux_ch7, &flags);
-  
-      packet[0]  = hopping_frequency[0];
-      packet[1]  = hopping_frequency[1];
+    NRF24L01_SetBitrate(NRF24L01_BR_1M);
+    NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, u1_rx_addr, TX_ADDRESS_SIZE);
+    bind_packet[0]  = tx_addr[0];
+    bind_packet[1]  = tx_addr[1];
+    bind_packet[2]  = tx_addr[2];
+    bind_packet[3]  = tx_addr[3]; 
+    bind_packet[4]  = u1_rx_addr[0];
+    bind_packet[5]  = u1_rx_addr[1];
+    bind_packet[6]  = u1_rx_addr[2];
+    bind_packet[7]  = u1_rx_addr[3];
+    bind_packet[8]  = tx_addr[0];
+    bind_packet[9]  = tx_addr[1];
+    bind_packet[10] = tx_addr[2];
+    bind_packet[11] = tx_addr[3]; 
+    bind_packet[12] = 0;
+    bind_packet[13] = 0;
+    bind_packet[14] = 0;
+ 
+    //Set address and RF channel and send the first packet
+    esky2_send_packet(packet_, 1);
+}
+ 
+static void esky2_send_packet(u8 packet[], s32 rf_ch)
+{
+    if(rf_ch > 0)
+    {
+        NRF24L01_WriteReg(NRF24L01_05_RF_CH, (u8)rf_ch);
+    }
+    NRF24L01_WritePayload(packet, PAYLOADSIZE);
+}
+ 
+//-------------------------------------------------------------------------------------------------
+// Initialize 24L01 for sending packets
+// If Model.proto_opts[PROTOOPTS_STARTBIND] is not selected, this is the entry point after esky2_init()
+//-------------------------------------------------------------------------------------------------
+static void esky2_send_init(u8 tx_addr[], u8 packet[])
+{
+    NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, tx_addr, TX_ADDRESS_SIZE);
+ 
+    esky2_update_packet_control_data(packet, 0, 0, hopping_channels_);
+}
+ 
+
+//-------------------------------------------------------------------------------------------------
+// Update control data to be sent
+// Do it once per frequency.
+//-------------------------------------------------------------------------------------------------
+static void esky2_update_packet_control_data(u8 packet[], s32 packet_count, s32 rf_ch_idx, u8 hopping_ch[])
+{
+    u16 throttle, rudder, elevator, aileron, flight_mode, aux_ch6, aux_ch7;
+    esky2_read_controls(&throttle, &aileron, &elevator, &rudder, &flight_mode, &aux_ch6, &aux_ch7, &flags);
+     
+    packet[0]  = hopping_ch[0];
+      packet[1]  = hopping_ch[1];
       packet[2]  = ((flight_mode << 6) && 0xC0) | ((aux_ch7 << 4) && 0x30) | ((throttle >> 8) & 0xFF);
       packet[3]  = throttle & 0xFF;
       packet[4]  = ((aux_ch6 >> 4) & 0xF0) | ((aileron >> 8) & 0xFF); //and 0xFF works as values are anyways not bigger than 12 bits, but faster code like that
@@ -320,116 +474,72 @@ static void send_packet(u8 bind)
       u8 sum = 0;
       for (int i = 0; i < 14; ++i) sum += packet[i];
       packet[14] = sum;
-    }
 
-    packet_sent = 0;
-    NRF24L01_WriteReg(NRF24L01_05_RF_CH, rf_ch);
-    NRF24L01_FlushTx();
-    NRF24L01_WritePayload(packet, sizeof(packet));
-    ++total_packets;
-    packet_sent = 1;
-
-//    radio.ce(HIGH);
-//    delayMicroseconds(15);
-    // It saves power to turn off radio after the transmission,
-    // so as long as we have pins to do so, it is wise to turn
-    // it back.
-//    radio.ce(LOW);
-
-    // Check and adjust transmission power. We do this after
-    // transmission to not bother with timeout after power
-    // settings change -  we have plenty of time until next
-    // packet.
-    if (! rf_ch_num && tx_power != Model.tx_power) {
-        //Keep transmit power updated
-        tx_power = Model.tx_power;
-        NRF24L01_SetPower(tx_power);
+    if(tx_power_ != (u32)Model.tx_power)
+    {
+       NRF24L01_SetPower(Model.tx_power);
+       tx_power_ = Model.tx_power;
     }
 }
-
-
-MODULE_CALLTYPE
-static u16 esky_new_callback()
+ 
+//-------------------------------------------------------------------------------------------------
+// This function is the data interface between the remote control and ESky2 RX,
+//-------------------------------------------------------------------------------------------------
+static void esky2_read_controls(u16* throttle, u16* aileron, u16* elevator, u16* rudder,
+                          u16* flight_mode, u16* aux_ch6, u16* aux_ch7, u8* flags)
 {
-    u16 timeout = PACKET_PERIOD;
-    switch (phase) {
-    case ESKY_NEW_INIT2:
-        timeout = esky_new_init2();
-        phase = ESKY_NEW_DATA;
-        break;
-    case ESKY_NEW_DATA:
-        if (packet_count == 4)
-            packet_count = 0;
-        else {
-            if (packet_sent && packet_ack() != PKT_ACKED) {
-                dbgprintf("Packet not sent yet\n");
-                return PACKET_CHKTIME;
-            }
-            send_packet(0);
-        }
-        break;
-    }
-    return timeout;
-}
+    (void) flags;
+    // Protocol is registered TAERG, that is
+    // Throttle is channel 0, Aileron - 1, Elevator - 2, Rudder - 3
+    // Sometimes due to imperfect calibration or mixer settings
+    // throttle can be less than CHAN_MIN_VALUE or larger than
+    // CHAN_MAX_VALUE. As we have no space here, we hard-limit
+    // channels values by min..max range
 
-// Generate internal id from TX id and manufacturer id (STM32 unique id)
-static void initialize_tx_id()
+    *throttle    = esky2_convert_channel(CHANNEL1);
+    *aileron     = esky2_convert_channel(CHANNEL2);
+    *elevator    = esky2_convert_channel(CHANNEL3);
+    *rudder      = esky2_convert_channel(CHANNEL4);
+    *flight_mode = esky2_convert_2bit_channel(CHANNEL5);
+    *aux_ch6     = esky2_convert_channel(CHANNEL6);
+    *aux_ch7     = esky2_convert_2bit_channel(CHANNEL7);
+
+    // Print channels every now and then
+    if (0) { // (total_packets & 0x3FF) == 1) {
+        dbgprintf("Raw channels: %d, %d, %d, %d, %d, %d, %d, %d\n",
+               Channels[0], Channels[1], Channels[2], Channels[3],
+               Channels[4], Channels[5], Channels[6], Channels[7]);
+        dbgprintf("Aileron %d, elevator %d, throttle %d, rudder %d\n",
+               (s16) *aileron, (s16) *elevator, (s16) *throttle, (s16) *rudder);
+    }
+}
+ 
+//-------------------------------------------------------------------------------------------------
+// Convert channel: Channel values are servo time in ms, 1500ms is the middle,
+// 1000 and 2000 are min and max values
+//-------------------------------------------------------------------------------------------------
+
+static u16 esky2_convert_channel(u8 num)
 {
-    u32 lfsr = 0xb2c54a2ful;
-
-#ifndef USE_FIXED_MFGID
-    u8 var[12];
-    MCU_SerialNumber(var, 12);
-    dbgprintf("Manufacturer id: ");
-    for (int i = 0; i < 12; ++i) {
-        dbgprintf("%02X", var[i]);
-        rand32_r(&lfsr, var[i]);
+    s32 ch = Channels[num];
+    if (ch < CHAN_MIN_VALUE) {
+        ch = CHAN_MIN_VALUE;
+    } else if (ch > CHAN_MAX_VALUE) {
+        ch = CHAN_MAX_VALUE;
     }
-    dbgprintf("\r\n");
-#endif
-
-    if (Model.fixed_id) {
-       for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
-           rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
-    }
-    // Pump zero bytes for LFSR to diverge more
-    for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
-
-    set_tx_id(lfsr);
+    return (u16) ((ch * 500 / CHAN_MAX_VALUE) + 1500);
 }
 
-static void initialize(u8 bind)
+static u16 esky2_convert_2bit_channel(u8 num)
 {
-    (void) bind;
-    CLOCK_StopTimer();
-    tx_power = Model.tx_power;
-    total_packets = 0;
-    u16 timeout = esky_new_init();
-    initialize_tx_id();
+    s32 ch = Channels[num];
+    u16 ch_out;
+    if (ch >= 0)
+    { 
+      if (ch >= CHAN_MAX_VALUE/2) ch_out = 3; else ch_out = 2;       
+    } else if (ch < CHAN_MIN_VALUE/2) ch_out = 0; else ch_out = 1;       
 
-    CLOCK_StartTimer(timeout, esky_new_callback);
+    return ch_out; 
 }
-
-const void *ESKY_NEW_Cmds(enum ProtoCmds cmd)
-{
-    switch(cmd) {
-        case PROTOCMD_INIT:
-            initialize(0);
-            return 0;
-        case PROTOCMD_DEINIT:
-        case PROTOCMD_RESET:
-            CLOCK_StopTimer();
-            return (void *)(NRF24L01_Reset() ? 1L : -1L);
-        case PROTOCMD_CHECK_AUTOBIND: return (void *)0L; // No Autobind
-        case PROTOCMD_BIND:  initialize(1); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 7L; // T, A, E, R, FMODE, AUX, AUX
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)4L;
-        // TODO: return id correctly
-        case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
-        case PROTOCMD_GETOPTIONS: return (void *) 0;
-        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
-        default: break;
-    }
-    return 0;
-}
-#endif
+ 
+#endif //PROTO_HAS_NRF24L01
