@@ -63,7 +63,7 @@ static u8 SPIFLASH_USE_AAI      = 1;
 #endif
 
 
-void CS_HI()
+static void CS_HI()
 {
     if (HAS_4IN1_FLASH && _SPI_PROTO_PORT == _SPI_FLASH_PORT) {
         cm_enable_interrupts();
@@ -71,7 +71,7 @@ void CS_HI()
     PORT_pin_set(FLASH_CSN_PIN);
 }
 
-void CS_LO()
+static void CS_LO()
 {
     if (HAS_4IN1_FLASH && _SPI_PROTO_PORT == _SPI_FLASH_PORT) {
         cm_disable_interrupts();
