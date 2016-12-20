@@ -234,7 +234,10 @@ int INPUT_GetFirstSwitch(int sw) {
 
 const char *INPUT_MapSourceName(unsigned idx, unsigned *val)
 {
+    (void) idx;
+    (void) val;
     unsigned i = 0;
+    (void) i;
     #define CHANMAP(oldname, new) if(idx == i++) { *val = INP_##new; return oldname;}
     #include "capabilities.h"
     #undef CHANMAP

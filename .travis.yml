@@ -7,6 +7,7 @@ env:
       - TARGET=devo12
       - TARGET=devo7e
       - TARGET=devof12e
+      - TARGET=at9
       - MAKETARGET=win_emu_devo8
 #      - COMPILER=latest TARGET=devo8
 

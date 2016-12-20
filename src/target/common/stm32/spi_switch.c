@@ -54,7 +54,7 @@ static int module_map[] = {
 #define NRF24L01_CE    0x80
 static int last_module_used;
 static u8 extra_bits;
-static unsigned switch_detected;
+static unsigned switch_detected, flash_present;
 
 static void UseModule(int module);
 
@@ -64,7 +64,7 @@ static void detect()
     switch_detected = 0;
     u32 res;
     unsigned cyrf_present = 0;
-    unsigned flash_present = 0;
+    flash_present = 0;
     
     printf("Detecting SPI Switch\n");
     /* Check that CYRF6936 is present */
@@ -134,6 +134,11 @@ unsigned SPISwitch_Present()
     return switch_detected;
 }
 
+unsigned SPISwitch_FlashPresent()
+{
+    return flash_present;
+}
+
 static void UseModule(int module)
 {
     if (module == last_module_used) return;
@@ -147,7 +152,7 @@ static void UseModule(int module)
     spi_disable(SPIx);
     if (module == MODULE_FLASH) {
         spi_set_baudrate_prescaler(SPIx, SPI_CR1_BR_FPCLK_DIV_4);
-    } else {
+    } else if (last_module_used == MODULE_FLASH) {
         spi_set_baudrate_prescaler(SPIx, SPI_CR1_BR_FPCLK_DIV_16);
     }
     spi_enable(SPIx);
