@@ -59,7 +59,7 @@
 #define BIND_COUNT 5
 #define dbgprintf printf
 #else
-#define BIND_COUNT 500
+#define BIND_COUNT 2000
 #define dbgprintf if(0) printf
 #endif 
 
@@ -342,8 +342,8 @@ static void esky2_init(u8 tx_addr[], u8 hopping_ch[])
 static void esky2_calculate_frequency_hopping_channels(u32 seed, u8 hopping_channels[])
 {
     // Use channels 2..79
-    u8 first = seed % 37 + 2;
-    u8 second = first + 40;
+    u8 first = 0x22; //seed % 37 + 2;
+    u8 second = 0x4a;//first + 40;
     hopping_channels[0] = first;  // 0x22;
     hopping_channels[1] = second; // 0x4a;
     dbgprintf("Using channels %02d and %02d\n", first, second);
@@ -403,7 +403,6 @@ static void esky2_calculate_tx_addr(u8 tx_addr[])
 //-------------------------------------------------------------------------------------------------
 static void esky2_bind_init(u8 tx_addr[], u8 bind_packet[])
 {
-    NRF24L01_SetBitrate(NRF24L01_BR_1M);
     NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, u1_rx_addr, TX_ADDRESS_SIZE);
     bind_packet[0]  = tx_addr[0];
     bind_packet[1]  = tx_addr[1];
@@ -421,7 +420,7 @@ static void esky2_bind_init(u8 tx_addr[], u8 bind_packet[])
     bind_packet[13] = 0;
     bind_packet[14] = 0;
  
-    //Set address and RF channel and send the first packet
+    //Send the first packet
     esky2_send_packet(packet_, 1);
 }
  
