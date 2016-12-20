@@ -49,7 +49,7 @@
 // Timeout for sending data packets, in uSec, ESky2 protocol requires 4.8ms
 #define SENDING_PACKET_PERIOD  4800
 
-//ESky2 sends 1 data packet per frequency (Confirmation needed!)
+//ESky2 sends 1 data packet per frequency
 #define PACKET_SEND_COUNT 1
 
 
@@ -120,7 +120,7 @@ static void esky2_calculate_tx_addr(u8 tx_addr[]);
 static void esky2_send_packet(u8 packet[], s32 rf_ch);
  
 static void esky2_send_init(u8 tx_addr[], u8 packet[]);
-static void esky2_update_packet_control_data(u8 packet[], s32 packet_count, s32 rf_ch_idx, u8 hopping_ch[]);
+static void esky2_update_packet_control_data(u8 packet[], u8 hopping_ch[]);
  
 static void esky2_read_controls(u16* throttle, u16* aileron, u16* elevator, u16* rudder, u16* flight_mode, u16* aux_ch6, u16* aux_ch7, u8* flags);
 static u16  esky2_convert_channel(u8 num);
@@ -136,9 +136,8 @@ static const char * const ESKY2_PROTOCOL_OPTIONS[] = {
  
 //Payload data buffer
 static u8 packet_[PAYLOADSIZE];
-static u8 hopping_channels_[RF_CH_COUNT];
 
-static u16 sending_packet_period;
+static u8 hopping_channels_[RF_CH_COUNT];
  
 //ESky2 uses 4 byte address
 static u8 tx_addr_[TX_ADDRESS_SIZE];
@@ -187,7 +186,6 @@ static void esky2_start_tx(BOOL bind_yes)
 {
     CLOCK_StopTimer();
     dbgprintf("ESky2 protocol started\n");
-    sending_packet_period = SENDING_PACKET_PERIOD;
     esky2_init(tx_addr_, hopping_channels_);
     if(bind_yes)
     {
@@ -245,7 +243,7 @@ static s32 rf_ch_idx = 0;
             packet_sent = 0;
             rf_ch_idx++;
             if(rf_ch_idx >= RF_CH_COUNT) rf_ch_idx = 0;
-            esky2_update_packet_control_data(packet_, 0, rf_ch_idx, hopping_channels_);
+            esky2_update_packet_control_data(packet_, hopping_channels_);
             esky2_send_packet(packet_, hopping_channels_[rf_ch_idx]);
         } else {
             esky2_send_packet(packet_, NO_RF_CHANNEL_CHANGE);
@@ -257,7 +255,7 @@ static s32 rf_ch_idx = 0;
     //Bad things happened, rest
     packet_sent = 0;
     tx_state_ = STATE_PRE_SEND;
-    return sending_packet_period;
+    return SENDING_PACKET_PERIOD;
 }
  
 //-------------------------------------------------------------------------------------------------
@@ -442,7 +440,7 @@ static void esky2_send_init(u8 tx_addr[], u8 packet[])
 {
     NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, tx_addr, TX_ADDRESS_SIZE);
  
-    esky2_update_packet_control_data(packet, 0, 0, hopping_channels_);
+    esky2_update_packet_control_data(packet, hopping_channels_);
 }
  
 
@@ -450,7 +448,7 @@ static void esky2_send_init(u8 tx_addr[], u8 packet[])
 // Update control data to be sent
 // Do it once per frequency.
 //-------------------------------------------------------------------------------------------------
-static void esky2_update_packet_control_data(u8 packet[], s32 packet_count, s32 rf_ch_idx, u8 hopping_ch[])
+static void esky2_update_packet_control_data(u8 packet[], u8 hopping_ch[])
 {
     u16 throttle, rudder, elevator, aileron, flight_mode, aux_ch6, aux_ch7;
     esky2_read_controls(&throttle, &aileron, &elevator, &rudder, &flight_mode, &aux_ch6, &aux_ch7, &flags);
