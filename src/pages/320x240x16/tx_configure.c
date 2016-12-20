@@ -229,12 +229,6 @@ static inline guiObject_t *_get_obj(int idx, int objid)
     }
 }
 
-static void draw_target(u16 x, u16 y)
-{
-    LCD_DrawFastHLine(x - 5, y, 11, SMALLBOX_FONT.font_color);
-    LCD_DrawFastVLine(x, y - 5, 11, SMALLBOX_FONT.font_color);
-}
-
 const char *show_msg_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
@@ -252,6 +246,12 @@ const char *coords_cb(guiObject_t *obj, const void *data)
 }
 
 #if HAS_TOUCH
+static void draw_target(u16 x, u16 y)
+{
+    LCD_DrawFastHLine(x - 5, y, 11, SMALLBOX_FONT.font_color);
+    LCD_DrawFastVLine(x, y - 5, 11, SMALLBOX_FONT.font_color);
+}
+
 void PAGE_TouchInit(int page)
 {
     (void)page;
