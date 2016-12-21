@@ -168,7 +168,6 @@ static int scroll_cb(struct guiObject *parent, u8 pos, s8 direction, void *data)
 
 void GUI_DrawListbox(struct guiObject *obj, u8 redraw_all)
 {
-    u8 i;
     struct guiListbox *listbox = (struct guiListbox *)obj;
     unsigned int font;
     if (listbox->item_count <= listbox->entries_per_page)
@@ -202,7 +201,7 @@ void GUI_DrawListbox(struct guiObject *obj, u8 redraw_all)
         }
     }
     LCD_SetFont(font);
-    for(i = 0; i < listbox->entries_per_page; i++) {
+    for(s32 i = 0; i < listbox->entries_per_page; i++) {
         const char *str = listbox->string_cb(i + listbox->cur_pos, listbox->cb_data);
         if (listbox->style == LISTBOX_DEVO10) {
             LCD_SetFontColor((i + listbox->cur_pos == listbox->selected && obj == objSELECTED)? SELECT_TXT : TEXT);
@@ -219,12 +218,11 @@ u8 GUI_TouchListbox(struct guiObject *obj, struct touch *coords, u8 long_press)
 {
     struct guiListbox *listbox = (struct guiListbox *)obj;
     struct guiBox box;
-    u8 i;
     box.x = obj->box.x;
     box.y = obj->box.y;
     box.width = obj->box.width;
     box.height = listbox->text_height;
-    for (i = 0; i < listbox->entries_per_page; i++) {
+    for (u32 i = 0; i < listbox->entries_per_page; i++) {
         box.y = obj->box.y + i * listbox->text_height;
         if (coords_in_box(&box, coords)) {
             u8 selected = i + listbox->cur_pos;
@@ -291,4 +289,3 @@ static unsigned press_cb(u32 button, unsigned flags, void *data)
     return 1;
 
 }
-
