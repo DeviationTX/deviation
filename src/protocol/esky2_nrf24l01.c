@@ -341,8 +341,8 @@ static void esky2_init(u8 tx_addr[], u8 hopping_ch[])
 static void esky2_calculate_frequency_hopping_channels(u32 seed, u8 hopping_channels[])
 {
     // Use channels 2..79
-    u8 first = seed % 37 + 2;
-    u8 second = first + 40;
+    u8 first = 0x22; //seed % 37 + 2;
+    u8 second = 0x4a; //first + 40;
     hopping_channels[0] = first;  // 0x22;
     hopping_channels[1] = second; // 0x4a;
     dbgprintf("Using channels %02d and %02d\n", first, second);
@@ -455,7 +455,7 @@ static void esky2_update_packet_control_data(u8 packet[], u8 hopping_ch[])
      
     packet[0]  = hopping_ch[0];
       packet[1]  = hopping_ch[1];
-      packet[2]  = ((flight_mode << 6) && 0xC0) | ((aux_ch7 << 4) && 0x30) | ((throttle >> 8) & 0xFF);
+      packet[2]  = ((flight_mode << 6) & 0xC0) | ((aux_ch7 << 4) & 0x30) | ((throttle >> 8) & 0xFF);
       packet[3]  = throttle & 0xFF;
       packet[4]  = ((aux_ch6 >> 4) & 0xF0) | ((aileron >> 8) & 0xFF); //and 0xFF works as values are anyways not bigger than 12 bits, but faster code like that
       packet[5]  = aileron  & 0xFF;
