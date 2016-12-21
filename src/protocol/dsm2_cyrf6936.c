@@ -354,7 +354,7 @@ static void set_sop_data_crc()
     //In 64-8DR mode, all sixteen bytes are used
     CYRF_ConfigDataCode(pncodes[pn_row][data_col], 8); //first eight bytes
     if((pn_row == 3) && (data_col == 7) && (Model.proto_opts[PROTOOPTS_ORANGERX] == ORANGERX_YES)) {
-        CYRF_ConfigDataCode((void *)"\x88\xE1\xD6\x31\x26\x5F\xBD\x40", 8); //last eight bytes
+        CYRF_ConfigDataCode((const u8 *)"\x88\xE1\xD6\x31\x26\x5F\xBD\x40", 8); //last eight bytes
     } else {
         CYRF_ConfigDataCode(pncodes[pn_row][data_col + 1], 8); //last eight bytes
     }
@@ -561,7 +561,7 @@ NO_INLINE static void parse_telemetry_packet()
             Telemetry.value[TELEM_DSM_JETCAT_PACKVOLT] = bcd_to_int(pktTelem[2]); //In 1/100 of Volts
             Telemetry.value[TELEM_DSM_JETCAT_PUMPVOLT] = bcd_to_int(pktTelem[3]); //In 1/100 of Volts (low voltage)
             Telemetry.value[TELEM_DSM_JETCAT_RPM]      = bcd_to_int(pktTelem[4] & 0x0fff); //RPM up to 999999
-            Telemetry.value[TELEM_DSM_JETCAT_TEMPEGT]  = bcd_to_int(pktTelem[6]); //EGT temp up to 999°C
+            Telemetry.value[TELEM_DSM_JETCAT_TEMPEGT]  = bcd_to_int(pktTelem[6]); //EGT temp up to 999C
             Telemetry.value[TELEM_DSM_JETCAT_OFFCOND]  = end_byte;
             break;
         case 0x20: //Electronic Speed Control
@@ -582,7 +582,7 @@ NO_INLINE static void parse_telemetry_packet()
             update = update7e;
             Telemetry.value[TELEM_DSM_FLOG_RPM1]  = (pktTelem[1] == 0xffff || pktTelem[1] < 200) ?  0 : (120000000 / 2 / pktTelem[1]);
             Telemetry.value[TELEM_DSM_FLOG_VOLT2] =  pktTelem[2];
-            Telemetry.value[TELEM_DSM_FLOG_TEMP1] = (pktTelem[3] == 0x7fff) ? 0 : (pktTelem[3] - 32) * 5 / 9; //Convert to °C
+            Telemetry.value[TELEM_DSM_FLOG_TEMP1] = (pktTelem[3] == 0x7fff) ? 0 : (pktTelem[3] - 32) * 5 / 9; //Convert to C
             break;
         case 0x16: //GPS sensor (always second GPS packet)
             update = update16;
@@ -791,8 +791,6 @@ static void initialize(u8 bind)
     else if (num_channels > 12)
         num_channels = 12;
 
-    memset(&Telemetry, 0, sizeof(Telemetry));
-    TELEMETRY_SetType(TELEM_DSM);
     if (bind) {
         state = DSM2_BIND;
         PROTOCOL_SetBindState((BIND_COUNT > 200 ? BIND_COUNT / 2 : 200) * 10); //msecs
@@ -823,6 +821,8 @@ const void *DSM2_Cmds(enum ProtoCmds cmd)
             return dsm_opts;
         case PROTOCMD_TELEMETRYSTATE:
             return (void *)(long)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
+        case PROTOCMD_TELEMETRYTYPE: 
+            return (void *)(long) TELEM_DSM;
         default: break;
     }
     return NULL;

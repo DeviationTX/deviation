@@ -793,9 +793,6 @@ static void initialize()
 
     int delay = cflie_init();
 
-    memset(&Telemetry, 0, sizeof(Telemetry));
-    TELEMETRY_SetType(TELEM_DSM);
-
     dbgprintf("cflie init\n");
     if (phase == CFLIE_INIT_SEARCH) {
         PROTOCOL_SetBindState(0xFFFFFFFF);
@@ -820,6 +817,8 @@ const void *CFlie_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_GETOPTIONS: return cflie_opts;
         case PROTOCMD_TELEMETRYSTATE:
             return (void *)(long)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
+        case PROTOCMD_TELEMETRYTYPE: 
+            return (void *)(long) TELEM_DSM;
         default: break;
     }
     return 0;

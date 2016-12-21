@@ -13,10 +13,7 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* Uncomment define below to enable packet loss telemetry. Also add
-   YD717 protocol to TELEMETRY_SetTypeByProtocol to
-   set type to DSM.
-   */
+// Uncomment define below to enable packet loss telemetry.
 //#define YD717_TELEMETRY
 
 
@@ -519,11 +516,6 @@ static void initialize()
     yd717_init();
     phase = YD717_INIT1;
 
-#ifdef YD717_TELEMETRY
-    memset(&Telemetry, 0, sizeof(Telemetry));
-    TELEMETRY_SetType(TELEM_DSM);
-#endif
-
     PROTOCOL_SetBindState(0xFFFFFFFF);
     CLOCK_StartTimer(INITIAL_WAIT, yd717_callback);
 }
@@ -545,6 +537,8 @@ const void *YD717_Cmds(enum ProtoCmds cmd)
 #ifdef YD717_TELEMETRY
         case PROTOCMD_TELEMETRYSTATE:
             return (void *)(long)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
+        case PROTOCMD_TELEMETRYTYPE: 
+            return (void *)(long) TELEM_DSM;
 #else
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
 #endif
@@ -553,4 +547,3 @@ const void *YD717_Cmds(enum ProtoCmds cmd)
     return 0;
 }
 #endif
-

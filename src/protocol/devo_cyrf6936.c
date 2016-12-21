@@ -565,8 +565,6 @@ static void initialize()
     use_fixed_id = 0;
     failsafe_pkt = 0;
     radio_ch_ptr = radio_ch;
-    memset(&Telemetry, 0, sizeof(Telemetry));
-    TELEMETRY_SetType(TELEM_DEVO);
     CYRF_ConfigRFChannel(*radio_ch_ptr);
     //FIXME: Properly setnumber of channels;
     num_channels = ((Model.num_channels + 3) >> 2) * 4;
@@ -616,6 +614,8 @@ const void *DEVO_Cmds(enum ProtoCmds cmd)
             break;
         case PROTOCMD_TELEMETRYSTATE:
             return (void *)(long)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
+        case PROTOCMD_TELEMETRYTYPE: 
+            return (void *)(long) TELEM_DEVO;
         default: break;
     }
     return 0;
