@@ -172,6 +172,10 @@ void PROTOCOL_Load(int no_dlg)
     #undef PROTODEF
 #endif
     PROTOCOL_SetSwitch(get_module(Model.protocol));
+    if (PROTOCOL_GetTelemetryState() != PROTO_TELEM_UNSUPPORTED) {
+        memset(&Telemetry, 0, sizeof(Telemetry));
+        TELEMETRY_SetType(PROTOCOL_GetTelemetryType());
+    }
 }
  
 u8 PROTOCOL_WaitingForSafe()
@@ -316,6 +320,14 @@ int PROTOCOL_GetTelemetryState()
     if(Model.protocol != PROTOCOL_NONE && PROTOCOL_LOADED)
         telem_state = (long)PROTO_Cmds(PROTOCMD_TELEMETRYSTATE);
     return telem_state;
+}
+
+int PROTOCOL_GetTelemetryType()
+{
+    int telem_type = TELEM_DEVO;
+    if(Model.protocol != PROTOCOL_NONE && PROTOCOL_LOADED)
+        telem_type = (long)PROTO_Cmds(PROTOCMD_TELEMETRYTYPE);
+    return telem_type;
 }
 
 void PROTOCOL_CheckDialogs()
