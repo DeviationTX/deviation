@@ -825,11 +825,6 @@ static void initialize(init_bind_t bind)
     inav_init(bind);
     init_nrf24l01();
 
-#ifdef INAV_TELEMETRY
-    memset(&Telemetry, 0, sizeof(Telemetry));
-    TELEMETRY_SetType(TELEM_LTM);
-#endif
-
     if (bind) {
         phase = PHASE_INIT;
         PROTOCOL_SetBindState(BIND_COUNT * PACKET_PERIOD / 1000);
@@ -857,6 +852,7 @@ const void *INAV_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_GETOPTIONS: return inav_opts;
 #ifdef INAV_TELEMETRY
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
+        case PROTOCMD_TELEMETRYTYPE:  return (void *)(long) TELEM_LTM;
 #else
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
 #endif
@@ -865,4 +861,3 @@ const void *INAV_Cmds(enum ProtoCmds cmd)
     return 0;
 }
 #endif
-
