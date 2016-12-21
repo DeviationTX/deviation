@@ -614,8 +614,6 @@ static void initialize(u8 bind) {
     vtx_freq = 0;
     packet_count=0;
     bind_count = 0;
-    memset(&Telemetry, 0, sizeof(Telemetry));
-    TELEMETRY_SetType(TELEM_DEVO);
     if( Model.proto_opts[PROTOOPTS_VTX_FREQ] == 0)
         Model.proto_opts[PROTOOPTS_VTX_FREQ] = 5885;
     CLOCK_StartTimer(10000, hubsan_cb);
@@ -640,6 +638,8 @@ const void *HUBSAN_Cmds(enum ProtoCmds cmd)
             return hubsan4_opts;
         case PROTOCMD_TELEMETRYSTATE: 
             return (void *)(long)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
+        case PROTOCMD_TELEMETRYTYPE: 
+            return (void *)(long) TELEM_DEVO;
         default: break;
     }
     return 0;

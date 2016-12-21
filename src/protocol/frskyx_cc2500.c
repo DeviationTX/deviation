@@ -821,9 +821,6 @@ static void initialize(int bind)
     frskyX_init(); 
     CC2500_SetTxRxMode(TX_EN);  // enable PA 
 
-    memset(&Telemetry, 0, sizeof(Telemetry));
-    TELEMETRY_SetType(TELEM_FRSKY);
-
     if (bind) {
         PROTOCOL_SetBindState(0xFFFFFFFF);
         state = FRSKY_BIND;
@@ -854,6 +851,8 @@ const void *FRSKYX_Cmds(enum ProtoCmds cmd)
             return frskyx_opts;
         case PROTOCMD_TELEMETRYSTATE:
             return (void *)1L;
+        case PROTOCMD_TELEMETRYTYPE: 
+            return (void *)(long) TELEM_FRSKY;
         case PROTOCMD_RESET:
         case PROTOCMD_DEINIT:
             CLOCK_StopTimer();

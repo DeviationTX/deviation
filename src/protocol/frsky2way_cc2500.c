@@ -457,9 +457,6 @@ static void initialize(int bind)
 #endif
     frsky2way_init(bind);
 
-    memset(&Telemetry, 0, sizeof(Telemetry));
-    TELEMETRY_SetType(TELEM_FRSKY);
-
     if (bind) {
         PROTOCOL_SetBindState(0xFFFFFFFF);
         state = FRSKY_BIND;
@@ -486,6 +483,8 @@ const void *FRSKY2WAY_Cmds(enum ProtoCmds cmd)
             return frsky_opts;
         case PROTOCMD_TELEMETRYSTATE:
             return (void *)(long)(Model.proto_opts[PROTO_OPTS_TELEM] == TELEM_ON ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
+        case PROTOCMD_TELEMETRYTYPE: 
+            return (void *)(long) TELEM_FRSKY;
         case PROTOCMD_RESET:
         case PROTOCMD_DEINIT:
             CLOCK_StopTimer();
@@ -495,4 +494,3 @@ const void *FRSKY2WAY_Cmds(enum ProtoCmds cmd)
     return 0;
 }
 #endif
-
