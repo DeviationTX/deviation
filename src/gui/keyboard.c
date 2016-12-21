@@ -205,7 +205,7 @@ static char keyboard_cmd(enum DrawCmds cmd, struct guiKeyboard *keyboard, struct
     struct guiBox box;
     const char * const *keys = array[keyboard->type];
 
-    u8 row, i;
+    u32 row, i;
     char ch = '\0';
     for(row = 0; row < 4; row++) {
         const char *ptr = keys[row];
@@ -397,4 +397,3 @@ static unsigned press_cb(u32 button, unsigned flags, void *data)
     }
     return 1;
 }
-
