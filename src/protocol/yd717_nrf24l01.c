@@ -13,10 +13,7 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* Uncomment define below to enable packet loss telemetry. Also add
-   YD717 protocol to TELEMETRY_SetTypeByProtocol to
-   set type to DSM.
-   */
+// Uncomment define below to enable packet loss telemetry.
 //#define YD717_TELEMETRY
 
 
