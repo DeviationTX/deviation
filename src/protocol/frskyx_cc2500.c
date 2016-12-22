@@ -850,7 +850,7 @@ const void *FRSKYX_Cmds(enum ProtoCmds cmd)
             if (!Model.proto_opts[PROTO_OPTS_AD2GAIN]) Model.proto_opts[PROTO_OPTS_AD2GAIN] = 100;  // if not set, default to no gain
             return frskyx_opts;
         case PROTOCMD_TELEMETRYSTATE:
-            return (void *)1L;
+            return (void *)(long) PROTO_TELEM_ON;
         case PROTOCMD_TELEMETRYTYPE: 
             return (void *)(long) TELEM_FRSKY;
         case PROTOCMD_RESET:
