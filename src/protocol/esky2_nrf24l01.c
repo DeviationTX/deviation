@@ -87,6 +87,7 @@ enum {
  
 enum {
     PROTOOPTS_STARTBIND = 0,
+    PROTOOPTS_FIXEDRF,
     LAST_PROTO_OPT,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
@@ -94,6 +95,11 @@ ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 enum {
     STARTBIND_NO  = 0,
     STARTBIND_YES = 1,
+};
+
+enum {
+    FIXEDRF_NO = 0,
+    FIXEDRF_YES = 1,
 };
  
 enum {
@@ -131,6 +137,7 @@ static u16  esky2_convert_2bit_channel(u8 num);
 //================================================================================================
 static const char * const ESKY2_PROTOCOL_OPTIONS[] = {
   _tr_noop("Re-bind"),  _tr_noop("No"), _tr_noop("Yes"), NULL, 
+  _tr_noop("RF channels"), _tr_noop("random"), _tr_noop("fixed"), NULL,
   NULL
 };
  
@@ -336,15 +343,21 @@ static void esky2_init(u8 tx_addr[], u8 hopping_ch[])
 }
  
 //-------------------------------------------------------------------------------------------------
-// This function generates "random" RF hopping frequency channel numbers.
+// This function generates "random" RF hopping frequency channel numbers. From SPI traces the
+// original TX always sets for channelx 0x22 and 0x4a - let's leave it to the user what he prefers.
 //-------------------------------------------------------------------------------------------------
 static void esky2_calculate_frequency_hopping_channels(u32 seed, u8 hopping_channels[])
 {
     // Use channels 2..79
-    u8 first = 0x22; //seed % 37 + 2;
-    u8 second = 0x4a; //first + 40;
-    hopping_channels[0] = first;  // 0x22;
-    hopping_channels[1] = second; // 0x4a;
+    u8 first = 0x22;
+    u8 second = 0x4a;
+    if ( Model.proto_opts[PROTOOPTS_FIXEDRF] == FIXEDRF_NO ) {
+      first = seed % 37 + 2;
+      second = first + 40;
+    }
+
+    hopping_channels[0] = first;
+    hopping_channels[1] = second;
     dbgprintf("Using channels %02d and %02d\n", first, second);
 }
  
@@ -453,9 +466,10 @@ static void esky2_update_packet_control_data(u8 packet[], u8 hopping_ch[])
     u16 throttle, rudder, elevator, aileron, flight_mode, aux_ch6, aux_ch7;
     esky2_read_controls(&throttle, &aileron, &elevator, &rudder, &flight_mode, &aux_ch6, &aux_ch7, &flags);
      
-    packet[0]  = hopping_ch[0];
+      packet[0]  = hopping_ch[0];
       packet[1]  = hopping_ch[1];
       packet[2]  = ((flight_mode << 6) & 0xC0) | ((aux_ch7 << 4) & 0x30) | ((throttle >> 8) & 0xFF);
+      packet[3]  = throttle & 0xFF;
       packet[3]  = throttle & 0xFF;
       packet[4]  = ((aux_ch6 >> 4) & 0xF0) | ((aileron >> 8) & 0xFF); //and 0xFF works as values are anyways not bigger than 12 bits, but faster code like that
       packet[5]  = aileron  & 0xFF;
@@ -495,9 +509,9 @@ static void esky2_read_controls(u16* throttle, u16* aileron, u16* elevator, u16*
     // channels values by min..max range
 
     *throttle    = esky2_convert_channel(CHANNEL1);
-    *aileron     = esky2_convert_channel(CHANNEL2);
+    *aileron     = 3000 - esky2_convert_channel(CHANNEL2);
     *elevator    = esky2_convert_channel(CHANNEL3);
-    *rudder      = esky2_convert_channel(CHANNEL4);
+    *rudder      = 3000 - esky2_convert_channel(CHANNEL4);
     *flight_mode = esky2_convert_2bit_channel(CHANNEL5);
     *aux_ch6     = esky2_convert_channel(CHANNEL6);
     *aux_ch7     = esky2_convert_2bit_channel(CHANNEL7);
@@ -536,6 +550,8 @@ static u16 esky2_convert_2bit_channel(u8 num)
     { 
       if (ch >= CHAN_MAX_VALUE/2) ch_out = 3; else ch_out = 2;       
     } else if (ch < CHAN_MIN_VALUE/2) ch_out = 0; else ch_out = 1;       
+
+    if (Model.num_channels <= num) ch_out = 0; //set unused channels to zero, for compatibility with older 4 channel models
 
     return ch_out; 
 }
