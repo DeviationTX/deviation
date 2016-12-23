@@ -518,7 +518,7 @@ static const char *reorder_text_cb(u8 idx)
 }
 static void reorder_return_cb(u8 *list)
 {
-    int i;
+    s32 i;
     if (list) {
         struct Mixer tmpmix[NUM_COMPLEX_MIXERS];
         memset(tmpmix, 0, sizeof(tmpmix));
