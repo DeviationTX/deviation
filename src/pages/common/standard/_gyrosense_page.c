@@ -36,8 +36,8 @@ static const char *gyro_output_cb(guiObject_t *obj, int dir, void *data)
     gyro_output = GUI_TextSelectHelper(gyro_output, GYROOUTPUT_GEAR , GYROOUTPUT_AUX2, dir, 2, 2, &changed);
     if (changed) {  // switch gyro output between the gear and the aux2
         // firstly: dynamically create mixes for target gyro channel
-        s32 i;
-        for(i = 0; i < GYROMIXER_COUNT; i ++) {
+        int i;
+        for (i = 0; i < GYROMIXER_COUNT; i ++) {
             if(! mp->mixer_ptr[i])
                 break;
             mp->mixer[i] = *mp->mixer_ptr[i];
@@ -51,7 +51,7 @@ static const char *gyro_output_cb(guiObject_t *obj, int dir, void *data)
         // reload mixers because order may change
         int count = STDMIX_GetMixers(mp->mixer_ptr, gyro_output, GYROMIXER_COUNT);
         convert_output_to_percentile();
-        for(i = 0; i < count; i ++) {
+        for (i = 0; i < count; i ++) {
             GUI_Redraw(&gui->gyro[i]);
         }
     }
@@ -65,7 +65,7 @@ static const char *gyro_output_cb(guiObject_t *obj, int dir, void *data)
 static void convert_output_to_percentile()
 {
     int count = INPUT_NumSwitchPos(mapped_std_channels.switches[SWITCHFUNC_GYROSENSE]);
-    for(s32 i = 0; i < count; i++) {
+    for (u8 i = 0; i < count; i++) {
         output[i] = (mp->mixer_ptr[i]->scalar + 100)/2;
     }
 }

@@ -73,7 +73,7 @@ static void get_hold_state()
 
 static void set_hold_state(u8 state) {
     struct Mixer mix[4];
-    s32 i;
+    int i;
     for(i = 0; i < 4 && mp->mixer_ptr[i]; i++)
         mix[i] = *mp->mixer_ptr[i];
     int num_pos = INPUT_NumSwitchPos(mix[1].sw);
@@ -88,7 +88,7 @@ static void set_hold_state(u8 state) {
     STDMIX_GetMixers(mp->mixer_ptr, mix[1].dest, 4);
     set_cur_mixer();
     GUI_Redraw(&gui->graph);
-    for(u32 i = 0; i < 9; i++)
+    for (u8 i = 0; i < 9; i++)
         GUI_Redraw(&gui->val[i]);
 }
 
