@@ -69,7 +69,7 @@ static void find_line_ends()
     }
     w = (char *)PREV_PTR(w);
     const char *prev_w = (char *)PREV_PTR(w);
-    for (int i = 0; i < NUM_ROWS; i++) {
+    for(u32 i = 0; i < NUM_ROWS; i++) {
         while (*prev_w != 0) {
             if (w == r) {
                 line_pos[i] = r - logstr;
@@ -90,7 +90,7 @@ void PAGE_DebuglogEvent()
     if(changed) {
         changed = 0;
         find_line_ends();
-        for (int i = 0; i < DEBUG_LINE_COUNT; i++) {
+        for(u32 i = 0; i < DEBUG_LINE_COUNT; i++) {
             GUI_Redraw(&gui->line[i]);
         }
     }

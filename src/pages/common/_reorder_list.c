@@ -62,7 +62,7 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
 void press_button_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    u8 tmp;
+    u32 tmp;
     switch((long)data) {
     case MOVE_UP:
         if(rl.selected > 0) {

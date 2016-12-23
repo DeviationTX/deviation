@@ -197,8 +197,8 @@ static const char *show_loadsave_cb(guiObject_t *obj, const void *data)
 
 int model_count()
 {
-    int num_models;
-    for (num_models = 1; num_models <= 100; num_models++) {
+    u32 num_models;
+    for(num_models = 1; num_models <= 100; num_models++) {
         sprintf(tempstring, "models/model%d.ini", num_models);
         FILE *fh = fopen(tempstring, "r");
         if (! fh)

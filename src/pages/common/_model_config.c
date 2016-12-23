@@ -63,8 +63,8 @@ static const char *proto_opt_cb(guiObject_t *obj, int dir, void *data)
     unsigned pos = 0;
     unsigned step = 0;
     u8 changed;
-    int i, start, end;
-    for(i = 0; i < idx; i++) {
+    int start, end;
+    for(s32 i = 0; i < idx; i++) {
         while(proto_strs[pos])
             pos++;
         pos++;

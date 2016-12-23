@@ -72,7 +72,7 @@ void PAGE_ChantestEvent()
         return;
     }
     volatile s32 *raw = MIXER_GetInputs();
-    for(int i = 0; i < cp->num_bars; i++) {
+    for(u32 i = 0; i < cp->num_bars; i++) {
         int ch = get_channel_idx(cur_row * NUM_BARS_PER_ROW + i);
         int v = RANGE_TO_PCT((ch >= NUM_INPUTS && ch < NUM_INPUTS + NUM_OUT_CHANNELS)
                              ? Channels[ch - NUM_INPUTS]

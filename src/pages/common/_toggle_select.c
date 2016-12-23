@@ -56,7 +56,7 @@ static u32 _get_icon_info()
         }
     #endif
     if(count == 0) {
-        for(int i = 0; i < 4; i++) {
+        for(u32 i = 0; i < 4; i++) {
             u16 w, h;
             int ok = LCD_ImageDimensions(toggle_files[i], &w, &h);
             if(ok) {

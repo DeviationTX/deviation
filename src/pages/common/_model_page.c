@@ -205,12 +205,12 @@ static const char *ppmin_select_cb(guiObject_t *obj, int dir, void *data)
             switch (new_ppm) {
                 case PPM_IN_TRAIN1:
                     memset(Model.ppm_map, -1, sizeof(Model.ppm_map));
-                    for(int i = 0; i < Model.num_channels; i++)
+                    for(u32 i = 0; i < Model.num_channels; i++)
                         Model.ppm_map[i] = i;
                     break;
                 case PPM_IN_TRAIN2:
                     memset(Model.ppm_map, -1, sizeof(Model.ppm_map));
-                    for(int i = 0; i < 4; i++)
+                    for(u32 i = 0; i < 4; i++)
                         Model.ppm_map[i] = i+1;
                     break;
             }
