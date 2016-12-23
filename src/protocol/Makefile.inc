@@ -41,6 +41,7 @@ PROTO_MODULES += $(ODIR)/protocol/frskyx.mod
 PROTO_MODULES += $(ODIR)/protocol/assan.mod
 PROTO_MODULES += $(ODIR)/protocol/fq777.mod
 PROTO_MODULES += $(ODIR)/protocol/inav.mod
+PROTO_MODULES += $(ODIR)/protocol/q303.mod
 
 ALL += $(PROTO_MODULES)
 else #BUILD_TARGET
@@ -206,6 +207,10 @@ $(ODIR)/protocol/fq777.mod : $(ODIR)/fq777_nrf24l01.bin
 
 $(ODIR)/protocol/inav.mod : $(ODIR)/inav_nrf24l01.bin
 	@echo Building 'inav' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
+
+$(ODIR)/protocol/q303.mod : $(ODIR)/q303_nrf24l01.bin
+	@echo Building 'q303' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
 endif #BUILD_TARGET
