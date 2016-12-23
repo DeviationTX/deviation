@@ -107,7 +107,7 @@ static const char *reorder_text_cb(u8 idx)
 static void reorder_return_cb(u8 *list)
 {
     if (list) {
-        int i, j, k = 0;
+        u32 i, j, k = 0;
         struct Mixer tmpmix[NUM_MIXERS];
         memset(tmpmix, 0, sizeof(tmpmix));
         for(j = 0; j < NUM_CHANNELS; j++) {
@@ -196,14 +196,13 @@ void templateselect_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     long idx = (long)data;
-    u8 i;
     PAGE_MixerExit();
     mp->cur_template = MIXER_GetTemplate(idx);
     PAGE_SetModal(1);
     MIXER_GetLimit(idx, &mp->limit);
     mp->channel = idx;
     mp->num_complex_mixers = 1;
-    for(i = 0; i < sizeof(mp->mixer) / sizeof(struct Mixer); i++) {
+    for(u32 i = 0; i < sizeof(mp->mixer) / sizeof(struct Mixer); i++) {
         MIXER_InitMixer(mp->mixer + i, idx);
         mp->mixer[i].src = 0;
     }

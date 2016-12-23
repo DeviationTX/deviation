@@ -135,7 +135,7 @@ s32 bar_cb(void * data)
 
 void PAGE_MainEvent()
 {
-    int i;
+    u32 i;
     if (PAGE_GetModal()) {
 #if HAS_TELEMETRY
         if(pagemem.modal_page == 2) {
@@ -330,7 +330,7 @@ unsigned map_type(int type)
 int MAINPAGE_FindNextElem(unsigned type, int idx)
 {
     type = map_type(type);
-    for(int i = idx; i < NUM_ELEMS; i++) {
+    for(s32 i = idx; i < NUM_ELEMS; i++) {
         if(! ELEM_USED(pc->elem[i]))
             break;
         if (map_type(ELEM_TYPE(pc->elem[i])) == type)

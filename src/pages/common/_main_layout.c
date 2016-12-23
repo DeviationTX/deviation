@@ -29,12 +29,11 @@ static void notify_cb(guiObject_t *obj);
 void draw_elements()
 {
     u16 x, y, w, h;
-    int i;
     set_selected_for_move(-1);
     guiObject_t *obj = gui->y.header.next;
     if (obj)
         GUI_RemoveHierObjects(obj);
-    for (i = 0; i < NUM_ELEMS; i++) {
+    for(u32 i = 0; i < NUM_ELEMS; i++) {
         if (! GetWidgetLoc(&pc->elem[i], &x, &y, &w, &h))
             break;
         int type = ELEM_TYPE(pc->elem[i]);

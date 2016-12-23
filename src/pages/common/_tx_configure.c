@@ -63,7 +63,7 @@ static const char *auto_dimmer_time_cb(guiObject_t *obj, int dir, void *data);
 static unsigned _action_cb_calibrate(u32 button, unsigned flags, void *data)
 {
     (void)data;
-    u8 i;
+    u32 i;
     if (flags & BUTTON_PRESS) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             // bug fix: when most users see the "Calibration done", it is very likely tha they will press ext to exit,
@@ -75,7 +75,7 @@ static unsigned _action_cb_calibrate(u32 button, unsigned flags, void *data)
         } else if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
             switch (calibrate_state){
             case CALI_CENTER:
-                for (i = 0; i < INP_HAS_CALIBRATION; i++) {
+                for(i = 0; i < INP_HAS_CALIBRATION; i++) {
                     s32 value = CHAN_ReadRawInput(i + 1);
                     Transmitter.calibration[i].max = 0x0000;
                     Transmitter.calibration[i].min = 0xFFFF;
@@ -86,7 +86,7 @@ static unsigned _action_cb_calibrate(u32 button, unsigned flags, void *data)
                 calibrate_state = CALI_MAXMIN;
                 break;
             case CALI_MAXMIN:
-                for (i = 0; i < INP_HAS_CALIBRATION; i++) {
+                for(i = 0; i < INP_HAS_CALIBRATION; i++) {
                     printf("Input %d: Max: %d Min: %d Zero: %d\n", i+1, Transmitter.calibration[i].max, Transmitter.calibration[i].min, Transmitter.calibration[i].zero);
                 }
                 GUI_DrawBackground(0, 0, LCD_WIDTH, LCD_HEIGHT);
@@ -131,7 +131,7 @@ static void calibrate_sticks(void)
             GUI_RefreshScreen();
             priority_ready = 0;
         }
-        for (u8 i = 0; i < INP_HAS_CALIBRATION; i++) {
+        for(u32 i = 0; i < INP_HAS_CALIBRATION; i++) {
             s32 value = CHAN_ReadRawInput(i + 1);
             if (value > Transmitter.calibration[i].max)
                 Transmitter.calibration[i].max = value;

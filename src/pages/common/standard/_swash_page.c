@@ -23,7 +23,7 @@ static void update_swashmixes()
     u8 state = 1;
     if (Model.swash_type ==  SWASH_TYPE_NONE)
         state = 0;
-    for (u8 i = 0; i < 3; i++) {
+    for(u32 i = 0; i < 3; i++) {
         GUI_TextSelectEnable(&gui->mix[i], state);
     }
 }
@@ -93,7 +93,7 @@ static const char *swashmix_val_cb(guiObject_t *obj, int dir, void *data)
 
 static void get_swash()
 {
-    for (u8 i = 0; i < 3; i++) {
+    for(u32 i = 0; i < 3; i++) {
         u8 mask = SWASH_INV_ELEVATOR_MASK;
         switch (i) {
         case 0: // aile

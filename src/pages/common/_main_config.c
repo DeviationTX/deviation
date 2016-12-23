@@ -30,7 +30,7 @@ int elem_abs_to_rel(int idx)
 int elem_rel_to_abs(int type, int idx)
 {
     int nxt = -1;
-    for(int i = 0; i < idx+1; i++)
+    for(s32 i = 0; i < idx+1; i++)
         nxt = MAINPAGE_FindNextElem(type, nxt+1);
     return nxt;
 }
@@ -185,7 +185,7 @@ static void dlgbut_cb(struct guiObject *obj, const void *data)
 {
     (void)obj;
     int idx = (long)data;
-    int i;
+    u32 i;
     //Remove object
     int type = ELEM_TYPE(pc->elem[idx]);
     for(i = idx+1; i < NUM_ELEMS; i++) {
