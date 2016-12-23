@@ -35,10 +35,10 @@ const char *STDMIX_channelname_cb(guiObject_t *obj, const void *data)
 
 int STDMIX_GetMixers(struct Mixer **mixers, u8 dest_channel, int count)
 {
-    u8 idx;
+    u32 idx;
     u8 i = 0;
     struct Mixer *mix = MIXER_GetAllMixers();
-    for (idx = 0; idx < NUM_MIXERS; idx++) {
+    for(idx = 0; idx < NUM_MIXERS; idx++) {
         if (i >= count)
             break;
         if (mix[idx].src!= 0 && mix[idx].dest == dest_channel) {
