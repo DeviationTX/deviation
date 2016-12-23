@@ -16,15 +16,15 @@
 static struct advmixer_obj  * const gui  = &gui_objs.u.advmixer;
 static struct advmixcfg_obj * const guim = &gui_objs.u.advmixcfg;
 static struct mixer_page    * const mp   = &pagemem.u.mixer_page;
-static u16 current_selected = 0;
-
+static u8 show_chantest;
 static void templateselect_cb(guiObject_t *obj, const void *data);
 static void limitselect_cb(guiObject_t *obj, const void *data);
 static void virtname_cb(guiObject_t *obj, const void *data);
 static const char *show_source(guiObject_t *obj, const void *data);
 
-static void _show_title();
+static void _show_title(int page);
 static void _show_page();
+static void _determine_save_in_live();
 
 const char *MIXPAGE_ChannelNameCB(guiObject_t *obj, const void *data)
 {
@@ -93,9 +93,11 @@ void show_chantest_cb(guiObject_t *obj, const void *data)
     (void)data;
     (void)obj;
     
-    PAGE_PushByID(PAGEID_CHANMON, 0);
+    show_chantest = 1;
+    PAGE_ChantestModal(PAGE_MixerInit, mp->top_channel);
 }
 
+void PAGE_ShowReorderList(u8 *list, u8 count, u8 selected, u8 max_allowed, const char *(*text_cb)(u8 idx), void(*return_page)(u8 *));
 static const char *reorder_text_cb(u8 idx)
 {
     long i = idx-1;
@@ -105,7 +107,7 @@ static const char *reorder_text_cb(u8 idx)
 static void reorder_return_cb(u8 *list)
 {
     if (list) {
-        int i, j, k = 0;
+        u32 i, j, k = 0;
         struct Mixer tmpmix[NUM_MIXERS];
         memset(tmpmix, 0, sizeof(tmpmix));
         for(j = 0; j < NUM_CHANNELS; j++) {
@@ -134,6 +136,7 @@ static void reorder_return_cb(u8 *list)
         memcpy(Model.limits, tmplimits, sizeof(Model.limits));
         MIXER_SetMixers(NULL, 0);
     }
+    PAGE_MixerInit(mp->top_channel);
 }
 
 void reorder_cb(guiObject_t *obj, const void *data)
@@ -145,9 +148,11 @@ void reorder_cb(guiObject_t *obj, const void *data)
 
 void PAGE_MixerInit(int page)
 {
-    (void)page;
+    PAGE_SetModal(0);
     memset(mp, 0, sizeof(*mp));
-    _show_title();
+    mp->top_channel = page;
+    show_chantest = 0;
+    _show_title(page);
     _show_page();
 }
 
@@ -158,16 +163,46 @@ static const char *show_source(guiObject_t *obj, const void *data)
     return INPUT_SourceName(tempstring, *source);
 }
 
+static void _determine_save_in_live()
+{
+    if (mp->are_limits_changed) {
+        mp->are_limits_changed = 0;
+        MIXER_SetLimit(mp->channel, &mp->limit); // save limits' change in live
+    }
+}
+
+void PAGE_MixerEvent()
+{
+    if (show_chantest) {
+        PAGE_ChantestEvent();
+        return;
+    }
+    // bug fix: when entering chantest modal page from the mixer page, the mp structure might be set to wrong value
+    // and will clear all limit data in devo8, simply because all structures inside the pagemem are unions and share the same memory
+    _determine_save_in_live();
+    if (mp->cur_mixer && ! mp->edit.parent) {
+        if (mp->cur_template == MIXERTEMPLATE_SIMPLE
+            || mp->cur_template == MIXERTEMPLATE_EXPO_DR
+            || mp->cur_template == MIXERTEMPLATE_COMPLEX)
+        {
+            if(MIXER_GetCachedInputs(mp->raw, CHAN_MAX_VALUE / 100)) { // +/-1%
+                MIXPAGE_RedrawGraphs();
+            }
+        }
+    }
+}
+
 void templateselect_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     long idx = (long)data;
-    u8 i;
+    PAGE_MixerExit();
     mp->cur_template = MIXER_GetTemplate(idx);
-    mp->limit = MIXER_GetLimit(idx);
+    PAGE_SetModal(1);
+    MIXER_GetLimit(idx, &mp->limit);
     mp->channel = idx;
     mp->num_complex_mixers = 1;
-    for(i = 0; i < sizeof(mp->mixer) / sizeof(struct Mixer); i++) {
+    for(u32 i = 0; i < sizeof(mp->mixer) / sizeof(struct Mixer); i++) {
         MIXER_InitMixer(mp->mixer + i, idx);
         mp->mixer[i].src = 0;
     }
@@ -188,14 +223,17 @@ void templateselect_cb(guiObject_t *obj, const void *data)
             }
         }
     }
-    PAGE_PushByID(PAGEID_MIXTEMPL, 0);
+    MIXPAGE_ChangeTemplate(1);
 }
 
 void limitselect_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     long ch = (long)data;
-    PAGE_PushByID(PAGEID_EDITLIMIT, ch);
+    PAGE_MixerExit();
+    MIXER_GetLimit(ch, &mp->limit);
+    mp->channel = ch;
+    MIXPAGE_EditLimits();
 }
 
 static int callback_result;

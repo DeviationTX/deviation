@@ -27,6 +27,7 @@ static void toggle_link_cb(guiObject_t *obj, const void *data);
 static const char *show_trim_cb(guiObject_t *obj, const void *data);
 static void toggle_trim_cb(guiObject_t *obj, const void *data);
 
+void PAGE_ShowReorderList(u8 *list, u8 count, u8 selected, u8 max_allowed, const char *(*text_cb)(u8 idx), void(*return_page)(u8 *));
 static void reorder_cb(guiObject_t *obj, void *data);
 
 static void _show_titlerow();
@@ -55,24 +56,6 @@ enum {
     COMPLEX_TRIM,
     COMPLEX_LAST,
 };
-
-void PAGE_MixTemplateInit(int page)
-{
-    (void)page;
-    MIXPAGE_ChangeTemplate(1);
-}
-
-void PAGE_MixTemplateEvent()
-{
-    if (mp->cur_template == MIXERTEMPLATE_SIMPLE
-        || mp->cur_template == MIXERTEMPLATE_EXPO_DR
-        || mp->cur_template == MIXERTEMPLATE_COMPLEX)
-    {
-        if(MIXER_GetCachedInputs(mp->raw, CHAN_MAX_VALUE / 100)) { // +/-1%
-            MIXPAGE_RedrawGraphs();
-        }
-    }
-}
 
 void MIXPAGE_ChangeTemplate(int show_header)
 {
@@ -198,10 +181,10 @@ s32 eval_mixer_cb(s32 xval, void * data)
 
     /* Min/Max is a servo limit, shouldn't be shown here
     if(mix->dest < NUM_OUT_CHANNELS) {
-        if (yval > PCT_TO_RANGE(mp->tmplimit.max))
-            yval = PCT_TO_RANGE(mp->tmplimit.max);
-        else if (yval < PCT_TO_RANGE(mp->tmplimit.min))
-            yval = PCT_TO_RANGE(mp->tmplimit.min);
+        if (yval > PCT_TO_RANGE(mp->limit.max))
+            yval = PCT_TO_RANGE(mp->limit.max);
+        else if (yval < PCT_TO_RANGE(mp->limit.min))
+            yval = PCT_TO_RANGE(mp->limit.min);
     }
     */
 
@@ -210,7 +193,7 @@ s32 eval_mixer_cb(s32 xval, void * data)
     else if (yval <CHAN_MIN_VALUE * 5 / 4)
         yval = CHAN_MIN_VALUE * 5 / 4;
     //Don't showchannel-reverse on the graph (but do show input reverse)
-    //if (mp->tmplimit.flags & CH_REVERSE)
+    //if (mp->limit.flags & CH_REVERSE)
     //    yval = -yval;
     return yval;
 }
@@ -225,7 +208,7 @@ s32 eval_chan_cb(void * data)
     }
     for (i = 0; i < mp->num_mixers; i++)
         MIXER_ApplyMixer(&mp->mixer[i], mp->raw, NULL);
-    s32 value = MIXER_ApplyLimits(mp->cur_mixer->dest, mp->limit, mp->raw, NULL, APPLY_ALL);
+    s32 value = MIXER_ApplyLimits(mp->cur_mixer->dest, &mp->limit, mp->raw, NULL, APPLY_ALL);
     if (value > CHAN_MAX_VALUE)
         return CHAN_MAX_VALUE;
     if (value < CHAN_MIN_VALUE)
@@ -314,8 +297,8 @@ const char *set_number100_cb(guiObject_t *obj, int dir, void *data)
         sprintf(tempstring, "%d", *value);
         return tempstring;
     }
-    s8 min = -125; //(value == &mp->tmplimit.max) ? mp->tmplimit.min : -100;
-    s8 max = 125; //(value == &mp->tmplimit.min) ? mp->tmplimit.max : 100;
+    s8 min = -125; //(value == &mp->limit.max) ? mp->limit.min : -100;
+    s8 max = 125; //(value == &mp->limit.min) ? mp->limit.max : 100;
     *value = GUI_TextSelectHelper(*value, min, max, dir, 1, 5, &changed);
     sprintf(tempstring, "%d", *value);
     if (changed) {
@@ -504,6 +487,12 @@ void sourceselect_cb(guiObject_t *obj, void *data)
     }
 }
 
+void graph_cb()
+{
+    mp->edit.parent = NULL;
+    MIXPAGE_ChangeTemplate(1);
+}
+
 void curveselect_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
@@ -514,8 +503,7 @@ void curveselect_cb(guiObject_t *obj, void *data)
     int idx = (mix == &mp->mixer[1]) ? 1 : (mix == &mp->mixer[2]) ? 2 : 0;
     if (CURVE_TYPE(&mix->curve) > CURVE_FIXED
         && (mp->cur_template != MIXERTEMPLATE_EXPO_DR || mix == 0 || ! (mp->link_curves & idx))) {
-        mp->edit.curveptr = &mix->curve;
-        PAGE_PushByID(PAGEID_EDITCURVE, 0);
+        MIXPAGE_EditCurves(&mix->curve, graph_cb);
     }
 }
 
@@ -530,7 +518,7 @@ static const char *reorder_text_cb(u8 idx)
 }
 static void reorder_return_cb(u8 *list)
 {
-    int i;
+    s32 i;
     if (list) {
         struct Mixer tmpmix[NUM_COMPLEX_MIXERS];
         memset(tmpmix, 0, sizeof(tmpmix));
@@ -554,8 +542,8 @@ static void reorder_return_cb(u8 *list)
         memcpy(mp->mixer, tmpmix, sizeof(mp->mixer));
         mp->num_complex_mixers = i;
     }
+    MIXPAGE_ChangeTemplate(1);
 }
-
 void reorder_cb(guiObject_t *obj, void *data)
 {
     (void)data;
@@ -570,11 +558,12 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
     (void)obj;
     if (data) {
         //Save mixer here
-        //*mp->limit = mp->tmplimit;
+        MIXER_SetLimit(mp->channel, &mp->limit);
         MIXER_SetTemplate(mp->channel, mp->cur_template);
         MIXER_SetMixers(mp->mixer, mp->num_mixers);
     }
-    PAGE_Pop();
+    PAGE_RemoveAllObjects();
+    PAGE_MixerInit(mp->top_channel);
 }
 
 static u8 touch_cb(s16 x, s16 y, void *data)
