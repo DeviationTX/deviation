@@ -27,7 +27,6 @@ PROTO_MODULES += $(ODIR)/protocol/hm830.mod
 PROTO_MODULES += $(ODIR)/protocol/kn.mod
 PROTO_MODULES += $(ODIR)/protocol/esky150.mod
 PROTO_MODULES += $(ODIR)/protocol/esky.mod
-PROTO_MODULES += $(ODIR)/protocol/esky2.mod
 PROTO_MODULES += $(ODIR)/protocol/bluefly.mod
 PROTO_MODULES += $(ODIR)/protocol/cx10.mod
 PROTO_MODULES += $(ODIR)/protocol/cg023.mod
@@ -152,10 +151,6 @@ $(ODIR)/protocol/esky150.mod : $(ODIR)/esky150_nrf24l01.bin
 
 $(ODIR)/protocol/esky.mod : $(ODIR)/esky_nrf24l01.bin
 	@echo Building 'esky' module
-	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
-
-$(ODIR)/protocol/esky2.mod : $(ODIR)/esky2_nrf24l01.bin
-	@echo Building 'esky2' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
 $(ODIR)/protocol/bluefly.mod : $(ODIR)/bluefly_nrf24l01.bin
