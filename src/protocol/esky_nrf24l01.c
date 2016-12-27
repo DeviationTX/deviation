@@ -324,7 +324,7 @@ static u16 esky_callback()
     switch (phase) {
     case ESKY_INIT2:
         esky_init2();
-        MUSIC_Play(MUSIC_TELEMALARM1);
+        // MUSIC_Play(MUSIC_TELEMALARM1);	// Shouldn't play telemetry alarm doing bind init
         phase = ESKY_BIND;
         return 150;
         break;

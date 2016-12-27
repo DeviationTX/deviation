@@ -352,7 +352,7 @@ static u16 mt99xx_callback()
 {
     switch (state) {
     case MT99XX_INIT:
-        MUSIC_Play(MUSIC_TELEMALARM1);
+        // MUSIC_Play(MUSIC_TELEMALARM1);	// Shouldn't play telemetry alarm doing bind init
         state = MT99XX_BIND;
         break;
 

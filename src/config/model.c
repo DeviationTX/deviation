@@ -17,6 +17,9 @@
 #include "model.h"
 #include "telemetry.h"
 #include "tx.h"
+#if HAS_EXTENDED_AUDIO
+#include "alertcfg.h"
+#endif
 #include <stdlib.h>
 #include <string.h>
 extern const u8 EATRG[PROTO_MAP_LEN];
@@ -73,7 +76,12 @@ static const char MIXER_OFFSET[] = "offset";
 static const char MIXER_USETRIM[] = "usetrim";
 
 static const char MIXER_MUXTYPE[] = "muxtype";
-static const char * const MIXER_MUXTYPE_VAL[MUX_LAST]  = { "replace", "multiply", "add", "max", "min", "delay" };
+static const char * const MIXER_MUXTYPE_VAL[MUX_LAST]  = {
+  "replace", "multiply", "add", "max", "min", "delay",
+#if HAS_EXTENDED_AUDIO
+  "beep",
+#endif
+};
 
 static const char MIXER_CURVETYPE[] = "curvetype";
 static const char * const MIXER_CURVETYPE_VAL[CURVE_MAX+1] = {
@@ -1308,7 +1316,7 @@ u8 CONFIG_ReadModel(u8 model_num) {
     Transmitter.current_model = model_num;
     clear_model(1);
 
-    char file[20];
+    char file[30];
     auto_map = 0;
     get_model_file(file, model_num);
     if (CONFIG_IniParse(file, ini_handler, &Model)) {
@@ -1316,6 +1324,11 @@ u8 CONFIG_ReadModel(u8 model_num) {
     }
     if (! ELEM_USED(Model.pagecfg2.elem[0]))
         CONFIG_ReadLayout("layout/default.ini");
+#if HAS_EXTENDED_AUDIO
+    file[strlen(file)-4] = '\0';
+    strcat(file, ".map");
+    CONFIG_AlertParse(file);
+#endif
     if(! PROTOCOL_HasPowerAmp(Model.protocol))
         Model.tx_power = TXPOWER_150mW;
     MIXER_SetMixers(NULL, 0);

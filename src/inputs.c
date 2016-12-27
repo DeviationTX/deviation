@@ -302,12 +302,21 @@ void INPUT_CheckChanges(void) {
     s32 changed_analog_value;
     s8 changed_input = INP_NONE;
     s8 value;
+#if HAS_EXTENDED_AUDIO && NUM_AUX_KNOBS
+    s8 aux_up = 0;
+#endif
     for (int i=1; i <= NUM_INPUTS; i++) {
       if(i <= INP_HAS_CALIBRATION) {
           changed_analog_value = CHAN_ReadInput(i);
           value = changed_analog_value >> 7;
           if (changed_input == INP_NONE && abs(value - last_analogs[i]) > 35) {
              changed_input = MIXER_MapChannel(i);
+#if HAS_EXTENDED_AUDIO && NUM_AUX_KNOBS
+             if (value - last_analogs[i] > 0)
+                 aux_up = 1;
+             else
+                 aux_up = 0;
+#endif
              last_analogs[i] = value;
           }
       } else {
@@ -324,5 +333,26 @@ void INPUT_CheckChanges(void) {
     }
     if (changed_input != INP_NONE) {
         GUI_HandleInput(changed_input, changed_input <= INP_HAS_CALIBRATION ? changed_analog_value : CHAN_MAX_VALUE);
+#if HAS_EXTENDED_AUDIO
+        s8 music_idx;
+#if NUM_AUX_KNOBS
+        if ((changed_input > NUM_STICKS) && (changed_input <= NUM_STICKS + NUM_AUX_KNOBS)) {
+            music_idx = changed_input - (NUM_STICKS+1);
+            if (aux_up) {
+                if (Model.aux_music_no[music_idx].up_state_music)
+                    MUSIC_Play(Model.aux_music_no[music_idx].up_state_music);
+            } else {
+                if (Model.aux_music_no[music_idx].down_state_music)
+                    MUSIC_Play(Model.aux_music_no[music_idx].down_state_music);
+            }
+            return;
+	}
+#endif
+	music_idx = changed_input - INP_HAS_CALIBRATION - 1;
+
+	/* Skip pots & Play music file if the switch has a voice file number defined */
+	if ((music_idx >= 0) && (Model.switch_music_no[music_idx]))
+            MUSIC_Play(Model.switch_music_no[music_idx]);
+#endif //HAS_EXTENDED_AUDIO
     }
 }

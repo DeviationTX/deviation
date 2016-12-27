@@ -12,6 +12,9 @@
 #include "telemetry.h"
 #include "datalog.h"
 #include "pagecfg.h"
+#if HAS_EXTENDED_AUDIO
+#include "music.h"
+#endif
 
 /* INI file consts */
 const char *MODEL_NAME;
@@ -64,6 +67,13 @@ struct Model {
 #if HAS_DATALOG
     struct datalog datalog;
 #endif
+#if HAS_EXTENDED_AUDIO
+    u16 switch_music_no[NUM_INPUTS - INP_HAS_CALIBRATION];	//Switch array to point to music file number, no pots
+    struct ButtonMusic button_music_no[NUM_TX_BUTTONS];	//Button array to point to music file number
+#if NUM_AUX_KNOBS
+    struct AuxMusic aux_music_no[NUM_AUX_KNOBS];
+#endif
+#endif // HAS_EXTENDED_AUDIO
 };
 extern struct Model Model;
 extern const char * const RADIO_TX_POWER_VAL[TXPOWER_LAST];

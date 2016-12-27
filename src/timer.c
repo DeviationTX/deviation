@@ -125,8 +125,8 @@ void TIMER_Power(){
                 new_throttle < 1000 && abs(CHAN_ReadInput(INP_RUDDER)) < 1000 &&
                 !ScanButtons() && (!HAS_TOUCH || !SPITouch_IRQ()) ) {
         if ( CLOCK_getms() > timer ) {
-            timer =  CLOCK_getms() + 2000;
-            MUSIC_Play(MUSIC_SHUTDOWN);
+            timer =  CLOCK_getms() + 3000;
+            MUSIC_Play(MUSIC_INACTIVITY_ALARM);
         }                
     } else 
            timer =  CLOCK_getms() + alert;

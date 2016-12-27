@@ -72,7 +72,20 @@ static const char *const sections[] = {
     "telem_alarm4",
     "telem_alarm5",
     "telem_alarm6",
+    "inactivity_alarm",
 };
+
+#if HAS_EXTENDED_AUDIO
+static const char *const audio_devices[] = {
+    NULL,
+    "all",
+    "buzzer",
+    "extaudio",
+};
+
+static u8 playback_device;
+#endif
+static u8 vibrate;
 
 #define NUM_NOTES (sizeof(note_map) / sizeof(struct NoteMap))
 
@@ -82,6 +95,21 @@ static int ini_handler(void* user, const char* section, const char* name, const 
     u16 i;
     const char *requested_sec = (const char *)user;
     if (strcasecmp(section, requested_sec) == 0) {
+#if HAS_EXTENDED_AUDIO
+        if (strcasecmp("device", name) == 0) {
+            for (i = 1; i < AUDDEV_LAST; i++) {
+                if (strcasecmp(audio_devices[i], value) == 0) {
+                    playback_device = i;
+                    break;
+                }
+            }
+        }
+#endif
+        if (strcasecmp("vibrate", name) == 0) {
+            if (strcasecmp(value, "off") == 0) {
+                vibrate = 0;
+            }
+        }
         if (strcasecmp("volume", name) == 0) {
             Volume = atoi(value);
             if (Volume > 100)
@@ -109,6 +137,7 @@ u16 next_note_cb() {
 
 void MUSIC_Beep(char* note, u16 duration, u16 interval, u8 count)
 {
+    vibrate = 1; // Haptic sensor set to on as default
     u8 tone=0,i;
     next_note = 1;
     Volume = Transmitter.volume * 10;
@@ -130,11 +159,21 @@ void MUSIC_Beep(char* note, u16 duration, u16 interval, u8 count)
         Notes[(i*2)+1].duration = interval / 10;
     }
     SOUND_SetFrequency(note_map[Notes[0].note].note, Volume);
-    SOUND_Start((u16)Notes[0].duration * 10, next_note_cb);
+    SOUND_Start((u16)Notes[0].duration * 10, next_note_cb, vibrate);
 }
 
 void MUSIC_Play(enum Music music)
 {
+#if HAS_EXTENDED_AUDIO
+    // Play audio for switch
+    if (Transmitter.audio_player && (music > MUSIC_TOTAL)) {
+        AUDIO_Play(music);
+        return;
+    }
+    playback_device = AUDDEV_UNDEF;
+#endif
+    vibrate = 1;	// Haptic sensor set to on as default
+
     /* NOTE: We need to do all this even if volume is zero, because
        the haptic sensor may be enabled */
     num_notes = 0;
@@ -157,9 +196,19 @@ void MUSIC_Play(enum Music music)
         printf("ERROR: Could not read %s\n", filename);
         return;
     }
+#if HAS_EXTENDED_AUDIO
+    if (Transmitter.audio_player) {
+        if ((playback_device == AUDDEV_EXTAUDIO) || (playback_device == AUDDEV_UNDEF)) {
+            AUDIO_Play(music);
+            Volume = 0;	// Just activate the haptic sensor, no buzzer
+        } else if (playback_device == AUDDEV_ALL) {
+            AUDIO_Play(music);
+        }
+    }
+#endif
     if(! num_notes)
         return;
     SOUND_SetFrequency(note_map[Notes[0].note].note, Volume);
-    SOUND_Start((u16)Notes[0].duration * 10, next_note_cb);
+    SOUND_Start((u16)Notes[0].duration * 10, next_note_cb, vibrate);
 }
 

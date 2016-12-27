@@ -165,7 +165,7 @@ void SPI_FlashBlockWriteEnable(unsigned enable);
 /* Sound */
 void SOUND_Init();
 void SOUND_SetFrequency(unsigned freq, unsigned volume);
-void SOUND_Start(unsigned msec, u16 (*next_note_cb)());
+void SOUND_Start(unsigned msec, u16 (*next_note_cb)(), u8 vibrate);
 void SOUND_StartWithoutVibrating(unsigned msec, u16(*next_note_cb)());
 void SOUND_Stop();
 

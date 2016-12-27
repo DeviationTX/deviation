@@ -257,7 +257,7 @@ static u16 fy326_callback()
     u8 i;
     switch (phase) {
     case FY319_INIT1:
-        MUSIC_Play(MUSIC_TELEMALARM1);
+        // MUSIC_Play(MUSIC_TELEMALARM1);	// Shouldn't play telemetry alarm doing bind init
         NRF24L01_SetTxRxMode(TXRX_OFF);
         NRF24L01_FlushRx();
         NRF24L01_SetTxRxMode(RX_EN);
@@ -300,7 +300,7 @@ static u16 fy326_callback()
         break;
     
     case FY326_INIT1:
-        MUSIC_Play(MUSIC_TELEMALARM1);
+        // MUSIC_Play(MUSIC_TELEMALARM1);	// Shouldn't play telemetry alarm doing bind init
         bind_counter = BIND_COUNT;
         phase = FY326_BIND2;
         send_packet(1);

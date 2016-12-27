@@ -291,7 +291,7 @@ static u16 h8_3d_callback()
 {
     switch (phase) {
     case H8_3D_INIT1:
-        MUSIC_Play(MUSIC_TELEMALARM1);
+        // MUSIC_Play(MUSIC_TELEMALARM1);	// Shouldn't play telemetry alarm doing bind init
         phase = H8_3D_BIND2;
         break;
 

@@ -315,6 +315,10 @@ void CONFIG_LoadTx()
 #if HAS_EXTRA_SWITCHES
     CHAN_SetSwitchCfg("");
 #endif
+#if HAS_EXTENDED_AUDIO
+    Transmitter.audio_player = AUDIO_NONE;
+    Transmitter.audio_2way = 0;
+#endif
 #if HAS_EXTRA_BUTTONS
     CHAN_SetButtonCfg("");
 #endif
