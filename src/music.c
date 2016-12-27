@@ -18,7 +18,7 @@
 #include "config/tx.h"
 #include <stdlib.h>
 
-static struct {u8 note; u8 duration;} Notes[100];
+static struct {u8 note; u8 duration;} Notes[100];	
 static u8 Volume;
 static u8 next_note;
 static u8 num_notes;
@@ -84,6 +84,7 @@ static const char *const audio_devices[] = {
 };
 
 static u8 playback_device;
+static u16 music_queue[10];
 #endif
 static u8 vibrate;
 
@@ -131,6 +132,14 @@ static int ini_handler(void* user, const char* section, const char* name, const 
 u16 next_note_cb() {
     if (next_note == num_notes)
         return 0;
+#if HAS_EXTENDED_AUDIO
+    if (Transmitter.audio_player) {
+        if ((playback_device == AUDDEV_EXTAUDIO) || (playback_device == AUDDEV_UNDEF)) {
+            AUDIO_Play(music_queue[next_note]);
+            return MUSIC_GetDuration(music_queue[next_note++]);
+        }      
+    }
+#endif
     SOUND_SetFrequency(note_map[Notes[next_note].note].note, Volume);
     return Notes[next_note++].duration * 10;
 }
@@ -212,3 +221,64 @@ void MUSIC_Play(enum Music music)
     SOUND_Start((u16)Notes[0].duration * 10, next_note_cb, vibrate);
 }
 
+#if HAS_EXTENDED_AUDIO 
+u16 MUSIC_GetDuration(u16 music)
+{
+    u8 i;
+    for ( i = 0; i < sizeof(music_durations)/sizeof(music_durations[0]);i++) {
+        if ( music_durations[i].music == music ) return music_durations[i].duration;
+    }
+    return 0;
+          
+}
+
+void MUSIC_TelemValue(enum Music music, s32 telem_val, u16 telem_unit)
+{
+    u8 i,j;
+    char digits[6];
+    Volume = 0;
+    next_note = 1;
+    num_notes = 0;
+    j = 1;
+    
+    // Get single digits from telemetry value
+    u32 abs_telem_val = (u32)telem_val;
+    while (abs_telem_val > 0) {
+        digits[num_notes] = abs_telem_val % 10;
+        abs_telem_val /= 10;
+        ++num_notes;
+    }
+    
+    // Fill music queue
+    num_notes++;
+    music_queue[0] = music;
+
+    for (i=num_notes; i > 1; i--) {
+        music_queue[j] = digits[i-2] + 1000;
+        j++;
+    }
+    // Add decimal seperator for 
+    if (telem_unit == 2) { 
+        num_notes++;
+        music_queue[j] = music_queue[j-1];
+        music_queue[j-1] = 1010;
+        j++;
+    }
+    if (telem_unit > 0) {
+        num_notes++;
+        music_queue[j] = telem_unit + 1010;
+    }  
+
+    if (Transmitter.audio_player) {
+        if ((playback_device == AUDDEV_EXTAUDIO) || (playback_device == AUDDEV_UNDEF)) {
+            SOUND_Start(100, next_note_cb, vibrate);
+#ifdef BUILDTYPE_DEV
+            for (i=0;i<num_notes;i++) {
+                printf("Playing music %d for %d ms\n",music_queue[i], MUSIC_GetDuration(music_queue[i]));
+            }
+#endif
+         }
+    }
+    
+}
+#endif

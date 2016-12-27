@@ -54,10 +54,18 @@ struct ButtonMusic {
     u16 off_state_music;            // Music to be played when button is Off
 };
 
-int AUDIO_Play(enum Music music);
+struct {u16 music; u16 duration;} music_durations[80];
+
+int AUDIO_Play(u16 music);
+
+u16 MUSIC_GetDuration(u16 music);
+
+void MUSIC_TelemValue(enum Music music, s32 telem_val, u16 telem_unit);
 #endif
 
 void MUSIC_Beep(char* note, u16 duration, u16 interval, u8 count);
 
 void MUSIC_Play(enum Music music);
+
+
 #endif

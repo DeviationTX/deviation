@@ -39,7 +39,7 @@ AUDIO_Print(char *string) {
 #endif
 
 // Generate a string to play.
-int AUDIO_Play(enum Music music) {
+int AUDIO_Play(u16 music) {
   #ifdef BUILDTYPE_DEV
   // dev builds log to the serial port, so just report it.
   printf("Playing alert #%d\n", music);

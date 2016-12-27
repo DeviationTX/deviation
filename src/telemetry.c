@@ -342,7 +342,51 @@ void TELEMETRY_Alarm()
 #ifdef DEBUG_TELEMALARM
         printf("beep: %d\n\n", k);
 #endif
+
+#ifdef HAS_EXTENDED_AUDIO
+        if (TELEMETRY_Type() == TELEM_DEVO) {
+          switch(Model.telem_alarm[k]) {
+              case TELEM_DEVO_TEMP1:
+              case TELEM_DEVO_TEMP2:
+              case TELEM_DEVO_TEMP3:
+              case TELEM_DEVO_TEMP4: MUSIC_TelemValue(MUSIC_TELEMALARM1+k, TELEMETRY_GetValue(Model.telem_alarm[k])-20,1); break;
+              case TELEM_DEVO_VOLT1:
+              case TELEM_DEVO_VOLT2:
+              case TELEM_DEVO_VOLT3: MUSIC_TelemValue(MUSIC_TELEMALARM1+k, TELEMETRY_GetValue(Model.telem_alarm[k]),2); break;
+              case TELEM_DEVO_RPM1:
+              case TELEM_DEVO_RPM2: MUSIC_TelemValue(MUSIC_TELEMALARM1+k, TELEMETRY_GetValue(Model.telem_alarm[k]),3); break;
+          }
+        }
+ 
+        if (TELEMETRY_Type() == TELEM_DSM) {
+          switch(Model.telem_alarm[k]) {
+		case TELEM_DSM_AIRSPEED:
+		case TELEM_DSM_FLOG_FADESA:
+		case TELEM_DSM_FLOG_FADESB:
+		case TELEM_DSM_FLOG_FADESL:
+		case TELEM_DSM_FLOG_FADESR:
+		case TELEM_DSM_FLOG_FRAMELOSS:
+		case TELEM_DSM_FLOG_HOLDS: MUSIC_TelemValue(MUSIC_TELEMALARM1+k, TELEMETRY_GetValue(Model.telem_alarm[k]),0); break;     
+		case TELEM_DSM_FLOG_RPM1: MUSIC_TelemValue(MUSIC_TELEMALARM1+k, TELEMETRY_GetValue(Model.telem_alarm[k]),3); break;
+		case TELEM_DSM_FLOG_VOLT1:
+		case TELEM_DSM_FLOG_VOLT2: MUSIC_TelemValue(MUSIC_TELEMALARM1+k, TELEMETRY_GetValue(Model.telem_alarm[k]),2); break;
+		case TELEM_DSM_FLOG_TEMP1: MUSIC_TelemValue(MUSIC_TELEMALARM1+k, TELEMETRY_GetValue(Model.telem_alarm[k]),1); break;
+		case TELEM_DSM_AMPS1: MUSIC_TelemValue(MUSIC_TELEMALARM1+k, TELEMETRY_GetValue(Model.telem_alarm[k]),4); break;
+		case TELEM_DSM_ALTITUDE:        
+		case TELEM_DSM_ALTITUDE_MAX:MUSIC_TelemValue(MUSIC_TELEMALARM1+k, TELEMETRY_GetValue(Model.telem_alarm[k]),5); break;
+		case TELEM_DSM_GFORCE_X:
+		case TELEM_DSM_GFORCE_Y:
+		case TELEM_DSM_GFORCE_Z:
+		case TELEM_DSM_GFORCE_XMAX:
+		case TELEM_DSM_GFORCE_YMAX:
+		case TELEM_DSM_GFORCE_ZMAX:
+		case TELEM_DSM_GFORCE_ZMIN: MUSIC_TelemValue(MUSIC_TELEMALARM1+k, TELEMETRY_GetValue(Model.telem_alarm[k]),6); break;          
+          }
+        } 
+
+#else
         MUSIC_Play(MUSIC_TELEMALARM1 + k);
+#endif
     }
 }
 
