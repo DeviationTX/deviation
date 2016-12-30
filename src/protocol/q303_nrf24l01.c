@@ -52,7 +52,8 @@
 #endif
 
 #define PACKET_SIZE  10
-#define PACKET_PERIOD   1500  // Timeout for callback in uSec
+#define Q303_PACKET_PERIOD   1500  // Timeout for callback in uSec
+#define CX35_PACKET_PERIOD   3000
 #define INITIAL_WAIT     500
 #define RF_BIND_CHANNEL 0x02
 #define NUM_RF_CHANNELS    4
@@ -60,11 +61,13 @@
 static u8 packet[PACKET_SIZE];
 static u8 phase;
 static u16 bind_counter;
+static u32 packet_counter;
 static u8 tx_power;
 static u8 tx_addr[5];
 static u8 current_chan;
 static u8 txid[4];
 static u8 rf_chans[4];
+static u16 packet_period;
 
 enum {
     BIND,
@@ -72,7 +75,7 @@ enum {
 };
 
 static const char * const q303_opts[] = {
-    _tr_noop("Format"), "Q303", NULL, 
+    _tr_noop("Format"), "Q303", "CX35", NULL, 
     NULL
 };
 
@@ -83,6 +86,7 @@ enum {
 
 enum {
     FORMAT_Q303 = 0,
+    FORMAT_CX35,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
@@ -98,10 +102,11 @@ enum {
     CHANNEL8,       // Video Camera
     CHANNEL9,       // Headless
     CHANNEL10,      // RTH
-    CHANNEL11,      // Gimbal control (3 pos)
+    CHANNEL11,      // Gimbal control (3 pos on Q303, full range on CX35)
 };
 
-#define CHANNEL_AHOLD    CHANNEL5
+#define CHANNEL_AHOLD    CHANNEL5  // Q303
+#define CHANNEL_ARM      CHANNEL5  // CX35
 #define CHANNEL_FLIP     CHANNEL6
 #define CHANNEL_SNAPSHOT CHANNEL7
 #define CHANNEL_VIDEO    CHANNEL8
@@ -109,12 +114,12 @@ enum {
 #define CHANNEL_RTH      CHANNEL10
 #define CHANNEL_GIMBAL   CHANNEL11
 
-// flags going to packet[8]
+// flags going to packet[8] (Q303)
 #define FLAG_HIGHRATE 0x03
 #define FLAG_AHOLD    0x40
 #define FLAG_RTH      0x80
 
-// flags going to packet[9]
+// flags going to packet[9] (Q303)
 #define FLAG_GIMBAL_DN 0x04
 #define FLAG_GIMBAL_UP 0x20
 #define FLAG_HEADLESS  0x08
@@ -122,34 +127,77 @@ enum {
 #define FLAG_SNAPSHOT  0x10
 #define FLAG_VIDEO     0x01
 
+#define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
+
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
 
-// Channel values: 0-1000
-static u16 convert_channel(u8 num)
+#define CHAN_RANGE (CHAN_MAX_VALUE - CHAN_MIN_VALUE)
+static u16 scale_channel(u8 ch, u16 destMin, u16 destMax)
 {
-    s32 ch = Channels[num];
-    if (ch < CHAN_MIN_VALUE) {
-        ch = CHAN_MIN_VALUE;
-    } else if (ch > CHAN_MAX_VALUE) {
-        ch = CHAN_MAX_VALUE;
-    }
-    return (u16) ((ch * 500 / CHAN_MAX_VALUE) + 500);
+    s32 chanval = Channels[ch];
+    s32 range = (s32) destMax - (s32) destMin;
+
+    if (chanval < CHAN_MIN_VALUE)
+        chanval = CHAN_MIN_VALUE;
+    else if (chanval > CHAN_MAX_VALUE)
+        chanval = CHAN_MAX_VALUE;
+    return (range * (chanval - CHAN_MIN_VALUE)) / CHAN_RANGE + destMin;
 }
 
-#define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
+static u8 cx35_btn_state;
+#define BTN_TAKEOFF  1
+#define BTN_DESCEND  2
+#define BTN_SNAPSHOT 4
+#define BTN_VIDEO    8
+#define BTN_RTH      16
+
+#define CMD_TAKEOFF  0x0e
+#define CMD_DESCEND  0x0f
+#define CMD_SNAPSHOT 0x0b
+#define CMD_VIDEO    0x0c
+#define CMD_RTH      0x11
+
+static u8 cx35_lastButton()
+{
+    // simulate 2 keypress on rate button just after bind
+    if(packet_counter < 50) {
+        cx35_btn_state = 0;
+        packet_counter++;
+        return 0x00;
+    }
+    if(packet_counter < 150) {
+        packet_counter++;
+        return 0x09;
+    }
+    if(packet_counter < 250) {
+        packet_counter++;
+        return 0x29;
+    }
+    
+    // descend
+    if(!(GET_FLAG(CHANNEL_ARM, 1)) && !(cx35_btn_state & BTN_DESCEND)) {
+        cx35_btn_state |= BTN_DESCEND;
+        cx35_btn_state &= ~BTN_TAKEOFF;
+        return CMD_DESCEND;
+    }
+        
+    // take off
+}
+
 static void send_packet(u8 bind)
 {
+    u16 aileron, elevator, throttle, rudder, slider;
     if(bind) {
         packet[0] = 0xaa;
         memcpy(&packet[1], txid, 4);
         memset(&packet[5], 0, 5);
     }
     else {
-        u16 aileron  = 1000 - convert_channel(CHANNEL1);
-        u16 elevator = 1000 - convert_channel(CHANNEL2);
-        u16 throttle = convert_channel(CHANNEL3);
-        u16 rudder   = convert_channel(CHANNEL4);
+        aileron  = scale_channel(CHANNEL1, 1000, 0);
+        elevator = scale_channel(CHANNEL2, 1000, 0);
+        throttle = scale_channel(CHANNEL3, 0, 1000);
+        rudder   = scale_channel(CHANNEL4, 0, 1000);
         
         packet[0] = 0x55;
         packet[1] = aileron >> 2;          // 8 bits
@@ -160,20 +208,37 @@ static void send_packet(u8 bind)
         packet[4] = (throttle & 0x3f) << 2 // 6 bits 
                   | (rudder >> 8);         // 2 bits
         packet[5] = rudder & 0xff;         // 8 bits
-        packet[6] = 0x10; // trim(s) ?
-        packet[7] = 0x10; // trim(s) ?
-        packet[8] = 0x03  // high rate (0-3)
-                  | GET_FLAG(CHANNEL_AHOLD, FLAG_AHOLD)
-                  | GET_FLAG(CHANNEL_RTH, FLAG_RTH);
-        packet[9] = 0x40 // always set
-                  | GET_FLAG(CHANNEL_HEADLESS, FLAG_HEADLESS)
-                  | GET_FLAG(CHANNEL_FLIP, FLAG_FLIP)
-                  | GET_FLAG(CHANNEL_SNAPSHOT, FLAG_SNAPSHOT)
-                  | GET_FLAG(CHANNEL_VIDEO, FLAG_VIDEO);
-        if(Channels[CHANNEL_GIMBAL] < CHAN_MIN_VALUE / 2)
-            packet[9] |= FLAG_GIMBAL_DN;
-        else if(Channels[CHANNEL_GIMBAL] > CHAN_MAX_VALUE / 2)
-            packet[9] |= FLAG_GIMBAL_UP;
+        
+        switch(Model.proto_opts[PROTOOPTS_FORMAT]) {
+            case FORMAT_Q303:
+                packet[6] = 0x10; // trim(s) ?
+                packet[7] = 0x10; // trim(s) ?
+                packet[8] = 0x03  // high rate (0-3)
+                          | GET_FLAG(CHANNEL_AHOLD, FLAG_AHOLD)
+                          | GET_FLAG(CHANNEL_RTH, FLAG_RTH);
+                packet[9] = 0x40 // always set
+                          | GET_FLAG(CHANNEL_HEADLESS, FLAG_HEADLESS)
+                          | GET_FLAG(CHANNEL_FLIP, FLAG_FLIP)
+                          | GET_FLAG(CHANNEL_SNAPSHOT, FLAG_SNAPSHOT)
+                          | GET_FLAG(CHANNEL_VIDEO, FLAG_VIDEO);
+                if(Channels[CHANNEL_GIMBAL] < CHAN_MIN_VALUE / 2)
+                    packet[9] |= FLAG_GIMBAL_DN;
+                else if(Channels[CHANNEL_GIMBAL] > CHAN_MAX_VALUE / 2)
+                    packet[9] |= FLAG_GIMBAL_UP;
+                break;
+            case FORMAT_CX35:
+                slider = scale_channel(CHANNEL_GIMBAL, 731, 342);
+                packet[6] = slider >> 2;
+                packet[7] = ((slider & 3) << 6)
+                          | 0x3e; // ?? 6 bit left (always 111110 ?)
+                
+                packet[8] = 0x80; // always set
+                packet[9] = 0x0f  // 0x29  // high rate + disarmed ?
+                          | GET_FLAG(CHANNEL_SNAPSHOT, 0x02) // ??
+                          | GET_FLAG(CHANNEL_VIDEO, 0x04); // ??
+                packet[9]&=~GET_FLAG(CHANNEL_ARM, 0x01); // armed ?
+                break;
+        }
     }
     
     // Power on, TX mode, CRC enabled
@@ -204,7 +269,14 @@ static void q303_init()
     
     NRF24L01_Initialize();
     NRF24L01_SetTxRxMode(TX_EN);
-    XN297_SetScrambledMode(XN297_UNSCRAMBLED);
+    if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_CX35) {
+        XN297_SetScrambledMode(XN297_SCRAMBLED);
+        NRF24L01_SetBitrate(NRF24L01_BR_1M);
+    }
+    else { // Q303
+        XN297_SetScrambledMode(XN297_UNSCRAMBLED);
+        NRF24L01_SetBitrate(NRF24L01_BR_250K);
+    }
     XN297_SetTXAddr(bind_address, 5);
     NRF24L01_FlushTx();
     NRF24L01_FlushRx();
@@ -213,7 +285,6 @@ static void q303_init()
     NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x01);
     NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x03);
     NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0x00); // no retransmits
-    NRF24L01_SetBitrate(NRF24L01_BR_250K);
     NRF24L01_SetPower(Model.tx_power);
     NRF24L01_Activate(0x73);                          // Activate feature register
     NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 0x00);       // Disable dynamic payload length on all pipes
@@ -260,7 +331,7 @@ static u16 q303_callback()
                 memcpy(&tx_addr[1], txid, 4);
                 XN297_SetTXAddr(tx_addr, 5);
                 phase = DATA;
-                bind_counter = BIND_COUNT;
+                packet_counter = 0;
                 PROTOCOL_SetBindState(0);
             } else {
                 send_packet(1);
@@ -271,7 +342,7 @@ static u16 q303_callback()
             send_packet(0);
             break;
     }
-    return PACKET_PERIOD;
+    return packet_period;
 }
 
 static void initialize_txid()
@@ -300,8 +371,18 @@ static void initialize_txid()
     for(i=0; i<4; i++)
         txid[i] = (lfsr >> (i*8)) & 0xff;
     offset = txid[0] & 3;
-    for(i=0; i<NUM_RF_CHANNELS; i++)
-        rf_chans[i] = 0x46 + i*2 + offset;
+    if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_CX35) {
+        // test with captured txid
+        memcpy(txid, (u8*) "\x24\x37\x46\x89", 4);
+        offset = 0;
+        
+        for(i=0; i<NUM_RF_CHANNELS; i++)
+            rf_chans[i] = 0x14 + i*3 + offset;
+    }
+    else{ // Q303
+        for(i=0; i<NUM_RF_CHANNELS; i++)
+            rf_chans[i] = 0x46 + i*2 + offset;
+    }
 }
 
 static void initialize()
@@ -311,8 +392,12 @@ static void initialize()
     initialize_txid();
     q303_init();
     bind_counter = BIND_COUNT;
+    if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q303)
+        packet_period = Q303_PACKET_PERIOD;
+    else if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_CX35)
+        packet_period = CX35_PACKET_PERIOD;
     current_chan = 0;
-    PROTOCOL_SetBindState(BIND_COUNT * PACKET_PERIOD / 1000);
+    PROTOCOL_SetBindState(BIND_COUNT * packet_period / 1000);
     phase = BIND;
     CLOCK_StartTimer(INITIAL_WAIT, q303_callback);
 }
