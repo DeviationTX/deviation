@@ -424,6 +424,10 @@ static void initialize_txid()
         txid[i] = (lfsr >> (i*8)) & 0xff;
     offset = txid[0] & 3;
     if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_CX35) {        
+        // not figured out txid/channels for CX35 yet, use a known pair
+        memcpy(txid, (u8*) "\x24\x37\x46\x89", 4);
+        offset = 0;
+        
         for(i=0; i<NUM_RF_CHANNELS; i++)
             rf_chans[i] = 0x14 + i*3 + offset;
     }
