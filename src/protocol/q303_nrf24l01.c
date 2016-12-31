@@ -145,44 +145,97 @@ static u16 scale_channel(u8 ch, u16 destMin, u16 destMax)
     return (range * (chanval - CHAN_MIN_VALUE)) / CHAN_RANGE + destMin;
 }
 
-static u8 cx35_btn_state;
-#define BTN_TAKEOFF  1
-#define BTN_DESCEND  2
-#define BTN_SNAPSHOT 4
-#define BTN_VIDEO    8
-#define BTN_RTH      16
-
-#define CMD_TAKEOFF  0x0e
-#define CMD_DESCEND  0x0f
-#define CMD_SNAPSHOT 0x0b
-#define CMD_VIDEO    0x0c
-#define CMD_RTH      0x11
-
 static u8 cx35_lastButton()
 {
+    #define BTN_TAKEOFF  1
+    #define BTN_DESCEND  2
+    #define BTN_SNAPSHOT 4
+    #define BTN_VIDEO    8
+    #define BTN_RTH      16
+
+    #define CMD_RATE     0x09
+    #define CMD_TAKEOFF  0x0e
+    #define CMD_DESCEND  0x0f
+    #define CMD_SNAPSHOT 0x0b
+    #define CMD_VIDEO    0x0c
+    #define CMD_RTH      0x11
+    
+    static u8 cx35_btn_state;
+    static u8 command;
     // simulate 2 keypress on rate button just after bind
     if(packet_counter < 50) {
         cx35_btn_state = 0;
         packet_counter++;
-        return 0x00;
+        command = 0x00; // startup
     }
-    if(packet_counter < 150) {
+    else if(packet_counter < 150) {
         packet_counter++;
-        return 0x09;
+        command = CMD_RATE; // 1st keypress
     }
-    if(packet_counter < 250) {
+    else if(packet_counter < 250) {
         packet_counter++;
-        return 0x29;
+        command |= 0x20; // 2nd keypress
     }
     
     // descend
-    if(!(GET_FLAG(CHANNEL_ARM, 1)) && !(cx35_btn_state & BTN_DESCEND)) {
+    else if(!(GET_FLAG(CHANNEL_ARM, 1)) && !(cx35_btn_state & BTN_DESCEND)) {
         cx35_btn_state |= BTN_DESCEND;
         cx35_btn_state &= ~BTN_TAKEOFF;
-        return CMD_DESCEND;
+        command = CMD_DESCEND;
     }
         
     // take off
+    else if(GET_FLAG(CHANNEL_ARM,1) && !(cx35_btn_state & BTN_TAKEOFF)) {
+        cx35_btn_state |= BTN_TAKEOFF;
+        cx35_btn_state &= ~BTN_DESCEND;
+        command = CMD_TAKEOFF;
+    }
+    
+    // RTH
+    else if(GET_FLAG(CHANNEL_RTH,1) && !(cx35_btn_state & BTN_RTH)) {
+        cx35_btn_state |= BTN_RTH;
+        if(command == CMD_RTH)
+            command |= 0x20;
+        else
+            command = CMD_RTH;
+    }
+    else if(!(GET_FLAG(CHANNEL_RTH,1)) && (cx35_btn_state & BTN_RTH)) {
+        cx35_btn_state &= ~BTN_RTH;
+        if(command == CMD_RTH)
+            command |= 0x20;
+        else
+            command = CMD_RTH;
+    }
+    
+    // video
+    else if(GET_FLAG(CHANNEL_VIDEO,1) && !(cx35_btn_state & BTN_VIDEO)) {
+        cx35_btn_state |= BTN_VIDEO;
+        if(command == CMD_VIDEO)
+            command |= 0x20;
+        else
+            command = CMD_VIDEO;
+    }
+    else if(!(GET_FLAG(CHANNEL_VIDEO,1)) && (cx35_btn_state & BTN_VIDEO)) {
+        cx35_btn_state &= ~BTN_VIDEO;
+        if(command == CMD_VIDEO)
+            command |= 0x20;
+        else
+            command = CMD_VIDEO;
+    }
+    
+    // snapshot
+    else if(GET_FLAG(CHANNEL_SNAPSHOT,1) && !(cx35_btn_state & BTN_SNAPSHOT)) {
+        cx35_btn_state |= BTN_SNAPSHOT;
+        if(command == CMD_SNAPSHOT)
+            command |= 0x20;
+        else
+            command = CMD_SNAPSHOT;
+    }
+    
+    if(!(GET_FLAG(CHANNEL_SNAPSHOT,1)))
+        cx35_btn_state &= ~BTN_SNAPSHOT;
+    
+    return command;
 }
 
 static void send_packet(u8 bind)
@@ -231,12 +284,8 @@ static void send_packet(u8 bind)
                 packet[6] = slider >> 2;
                 packet[7] = ((slider & 3) << 6)
                           | 0x3e; // ?? 6 bit left (always 111110 ?)
-                
                 packet[8] = 0x80; // always set
-                packet[9] = 0x0f  // 0x29  // high rate + disarmed ?
-                          | GET_FLAG(CHANNEL_SNAPSHOT, 0x02) // ??
-                          | GET_FLAG(CHANNEL_VIDEO, 0x04); // ??
-                packet[9]&=~GET_FLAG(CHANNEL_ARM, 0x01); // armed ?
+                packet[9] = cx35_lastButton();
                 break;
         }
     }
@@ -371,11 +420,7 @@ static void initialize_txid()
     for(i=0; i<4; i++)
         txid[i] = (lfsr >> (i*8)) & 0xff;
     offset = txid[0] & 3;
-    if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_CX35) {
-        // test with captured txid
-        memcpy(txid, (u8*) "\x24\x37\x46\x89", 4);
-        offset = 0;
-        
+    if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_CX35) {        
         for(i=0; i<NUM_RF_CHANNELS; i++)
             rf_chans[i] = 0x14 + i*3 + offset;
     }
