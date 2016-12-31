@@ -252,6 +252,9 @@ static void send_packet(u8 bind)
         throttle = scale_channel(CHANNEL3, 0, 1000);
         rudder   = scale_channel(CHANNEL4, 0, 1000);
         
+        if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_CX35)
+            aileron = 1000 - aileron;
+        
         packet[0] = 0x55;
         packet[1] = aileron >> 2;          // 8 bits
         packet[2] = (aileron & 0x03) << 6  // 2 bits
