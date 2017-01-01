@@ -68,6 +68,14 @@ static const char *const sections[] = {
     "telem_alarm4",
     "telem_alarm5",
     "telem_alarm6",
+    "beep_1x",
+    "beep_2x",
+    "beep_3x",
+    "beep_4x",
+    "beep_5x",
+    "beep_6x",
+    "beep_7x",
+    "beep_8x",
 };
 
 #define NUM_NOTES (sizeof(note_map) / sizeof(struct NoteMap))

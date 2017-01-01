@@ -108,6 +108,7 @@ enum {
 #define CHANNEL_AHOLD    CHANNEL5  // Q303
 #define CHANNEL_ARM      CHANNEL5  // CX35
 #define CHANNEL_FLIP     CHANNEL6
+#define CHANNEL_VTX      CHANNEL6  // CX35
 #define CHANNEL_SNAPSHOT CHANNEL7
 #define CHANNEL_VIDEO    CHANNEL8
 #define CHANNEL_HEADLESS CHANNEL9
@@ -152,6 +153,7 @@ static u8 cx35_lastButton()
     #define BTN_SNAPSHOT 4
     #define BTN_VIDEO    8
     #define BTN_RTH      16
+    #define BTN_VTX      32
 
     #define CMD_RATE     0x09
     #define CMD_TAKEOFF  0x0e
@@ -159,12 +161,15 @@ static u8 cx35_lastButton()
     #define CMD_SNAPSHOT 0x0b
     #define CMD_VIDEO    0x0c
     #define CMD_RTH      0x11
+    #define CMD_VTX      0x10
     
     static u8 cx35_btn_state;
     static u8 command;
+    static u8 vtx_channel;
     // simulate 2 keypress on rate button just after bind
     if(packet_counter < 50) {
         cx35_btn_state = 0;
+        vtx_channel = 0;
         packet_counter++;
         command = 0x00; // startup
     }
@@ -231,9 +236,23 @@ static u8 cx35_lastButton()
         else
             command = CMD_SNAPSHOT;
     }
+        
+    // vtx channel
+    else if(GET_FLAG(CHANNEL_VTX,1) && !(cx35_btn_state & BTN_VTX)) {
+        cx35_btn_state |= BTN_VTX;
+        vtx_channel++;
+        MUSIC_Play(MUSIC_BEEP_1X + (vtx_channel & 7));
+        dbgprintf("\nVtx++");
+        if(command == CMD_VTX)
+            command |= 0x20;
+        else
+            command = CMD_VTX;
+    }
     
     if(!(GET_FLAG(CHANNEL_SNAPSHOT,1)))
         cx35_btn_state &= ~BTN_SNAPSHOT;
+    if(!(GET_FLAG(CHANNEL_VTX,1)))
+        cx35_btn_state &= ~BTN_VTX;
     
     return command;
 }
