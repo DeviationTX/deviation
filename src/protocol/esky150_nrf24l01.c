@@ -13,6 +13,18 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
  
+//****************************************************************************
+//  ESky protocol for small models since 2014 (150, 300, 150X, ...)
+//****************************************************************************
+// 
+//  Relating threads (in order of relevance):
+//
+//    https://www.deviationtx.com/forum/6-general-discussions/6446-esky-150x-which-protocol
+//    https://www.deviationtx.com/forum/builds/2458-devo10-esky-protocol-draft
+//    https://www.deviationtx.com/forum/3-feedback-questions/4007-esky150-protocol-and-devo-6-8s
+//
+//****************************************************************************
+ 
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
@@ -477,7 +489,7 @@ static void esky2_update_packet_control_data(u8 packet[], u8 hopping_ch[])
       packet[7]  = elevator & 0xFF;
       packet[8]  = ((aux_ch6 << 4) & 0xF0) | ((rudder >> 8) & 0xFF); //and 0xFF works as values are anyways not bigger than 12 bits, but faster code like that
       packet[9]  = rudder & 0xFF;
-      // The next 4 Bytes don't seem to be used. They are constant 00 D8 18 F8 for Esky 150 and 00 00 40 00 for ESKY 150X
+      // The next 4 Bytes are sint8 trim values (TAER). As trims are already included within normal outputs, these values are set to zero.
       packet[10] = 0x00;
       packet[11] = 0x00;
       packet[12] = 0x00;
@@ -509,9 +521,9 @@ static void esky2_read_controls(u16* throttle, u16* aileron, u16* elevator, u16*
     // channels values by min..max range
 
     *throttle    = esky2_convert_channel(CHANNEL1);
-    *aileron     = 3000 - esky2_convert_channel(CHANNEL2);
+    *aileron     = 3000 - esky2_convert_channel(CHANNEL2); //channel is reversed
     *elevator    = esky2_convert_channel(CHANNEL3);
-    *rudder      = 3000 - esky2_convert_channel(CHANNEL4);
+    *rudder      = 3000 - esky2_convert_channel(CHANNEL4); //channel is reversed
     *flight_mode = esky2_convert_2bit_channel(CHANNEL5);
     *aux_ch6     = esky2_convert_channel(CHANNEL6);
     *aux_ch7     = esky2_convert_2bit_channel(CHANNEL7);
