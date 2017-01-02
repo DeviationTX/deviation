@@ -123,7 +123,7 @@ void MUSIC_Beep(char* note, u16 duration, u16 interval, u8 count)
         }
     }
     num_notes = count*2;
-    for(u8 i=0; i<count; i++) {
+    for(i=0; i<count; i++) {
         Notes[i*2].note = tone;
         Notes[i*2].duration = duration / 10;
         Notes[(i*2)+1].note = 0;
