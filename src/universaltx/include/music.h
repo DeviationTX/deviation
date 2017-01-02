@@ -1,4 +1,4 @@
 #include "../../music.h"
 #define MUSIC_Play(x)
-#define MUSIC_Beep(x,y,z)
+#define MUSIC_Beep(w,x,y,z)
 
