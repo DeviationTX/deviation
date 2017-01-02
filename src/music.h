@@ -21,15 +21,8 @@ enum Music {
     MUSIC_TELEMALARM4,
     MUSIC_TELEMALARM5,
     MUSIC_TELEMALARM6,
-    MUSIC_BEEP_1X,
-    MUSIC_BEEP_2X,
-    MUSIC_BEEP_3X,
-    MUSIC_BEEP_4X,
-    MUSIC_BEEP_5X,
-    MUSIC_BEEP_6X,
-    MUSIC_BEEP_7X,
-    MUSIC_BEEP_8X,
 };
 
+void MUSIC_Beep(char* note, u16 duration, u16 interval, u8 count);
 void MUSIC_Play(enum Music music);
 #endif

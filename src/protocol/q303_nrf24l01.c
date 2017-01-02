@@ -241,7 +241,7 @@ static u8 cx35_lastButton()
     else if(GET_FLAG(CHANNEL_VTX,1) && !(cx35_btn_state & BTN_VTX)) {
         cx35_btn_state |= BTN_VTX;
         vtx_channel++;
-        MUSIC_Play(MUSIC_BEEP_1X + (vtx_channel & 7));
+        MUSIC_Beep("d2", 100, 100, (vtx_channel & 7) + 1);
         dbgprintf("\nVtx++");
         if(command == CMD_VTX)
             command |= 0x20;
