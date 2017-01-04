@@ -212,5 +212,5 @@ $(ODIR)/protocol/inav.mod : $(ODIR)/inav_nrf24l01.bin
 $(ODIR)/protocol/q303.mod : $(ODIR)/q303_nrf24l01.bin
 	@echo Building 'q303' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
-
+    
 endif #BUILD_TARGET
