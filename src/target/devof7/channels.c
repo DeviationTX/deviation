@@ -65,6 +65,10 @@ s32 CHAN_ReadRawInput(int channel)
     case INP_RUDDER: value = adc_array_raw[2]; break;  // bug fix: left horizon
     case INP_ELEVATOR:  value = adc_array_raw[3]; break;  // bug fix: left vertical
 
+    
+    case INP_HOLD0:    value = gpio_get(GPIOC, GPIO12); break;
+    case INP_HOLD1:    value = !gpio_get(GPIOC, GPIO12); break;
+    
     case INP_AIL_DR0:  value = gpio_get(GPIOC, GPIO13); break;
     case INP_AIL_DR1:  value = ! gpio_get(GPIOC, GPIO13); break;
 
