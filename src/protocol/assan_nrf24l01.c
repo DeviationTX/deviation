@@ -301,8 +301,8 @@ const void *ASSAN_Cmds(enum ProtoCmds cmd)
             return (void *)(NRF24L01_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return (void *)0L;
         case PROTOCMD_BIND:  initASSAN(1); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 10L;
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)10L;
+        case PROTOCMD_NUMCHAN: return (void *) 8L;
+        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_GETOPTIONS: return (void*)0L;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
