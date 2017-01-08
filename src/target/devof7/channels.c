@@ -74,6 +74,9 @@ s32 CHAN_ReadRawInput(int channel)
 
     case INP_GEAR0:    value = gpio_get(GPIOC, GPIO14); break;
     case INP_GEAR1:    value = ! gpio_get(GPIOC, GPIO14); break;
+    
+    case INP_TRN0:      value = gpio_get(GPIOC, GPIO15); break;
+    case INP_TRN1:      value = !gpio_get(GPIOC, GPIO15); break;
 
     case INP_MIX0:     value = ! gpio_get(GPIOB, GPIO4); break;
     case INP_MIX1:     value = (gpio_get(GPIOB, GPIO3) && gpio_get(GPIOB, GPIO4)); break;
