@@ -119,12 +119,14 @@ void init()
 void send_packet()
 {
     u32 temp;
-    for(u8 ch=0;ch<10;ch++)
+    for(u8 ch=0;ch<8;ch++)
     {
         temp=((s32)Channels[ch] * 0x1f1 / CHAN_MAX_VALUE + 0x5d9)<<3;
         packet[2*ch]=temp>>8;
         packet[2*ch+1]=temp;
     }
+    for(u8 i=0; i<ADDRESS_LENGTH; i++)
+        packet[16+i]=packet[23-i];
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);        // Clear data ready, data sent, and retransmit
     NRF24L01_FlushTx();
     NRF24L01_WritePayload(packet, PACKET_SIZE);
@@ -249,6 +251,7 @@ static void initialize_txid()
     for(u8 i=0;i<4;i++)
     {
         u8 temp=lfsr & 0xff;
+        lfsr >>=8;
         packet[i+20]=temp;
         packet[i+24]=temp+1;
         freq+=temp;
