@@ -119,12 +119,14 @@ void init()
 void send_packet()
 {
     u32 temp;
-    for(u8 ch=0;ch<10;ch++)
+    for(u8 ch=0;ch<8;ch++)
     {
         temp=((s32)Channels[ch] * 0x1f1 / CHAN_MAX_VALUE + 0x5d9)<<3;
         packet[2*ch]=temp>>8;
         packet[2*ch+1]=temp;
     }
+    for(u8 i=0; i<ADDRESS_LENGTH; i++)
+        packet[16+i]=packet[23-i];
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);        // Clear data ready, data sent, and retransmit
     NRF24L01_FlushTx();
     NRF24L01_WritePayload(packet, PACKET_SIZE);
@@ -249,6 +251,7 @@ static void initialize_txid()
     for(u8 i=0;i<4;i++)
     {
         u8 temp=lfsr & 0xff;
+        lfsr >>=8;
         packet[i+20]=temp;
         packet[i+24]=temp+1;
         freq+=temp;
@@ -298,8 +301,8 @@ const void *ASSAN_Cmds(enum ProtoCmds cmd)
             return (void *)(NRF24L01_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return (void *)0L;
         case PROTOCMD_BIND:  initASSAN(1); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 10L;
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)10L;
+        case PROTOCMD_NUMCHAN: return (void *) 8L;
+        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_GETOPTIONS: return (void*)0L;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
