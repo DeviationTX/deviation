@@ -26,7 +26,7 @@
                    | (1 << INP_SWB0) | (1 << INP_SWB1) | (1 << INP_SWB2))
 extern u32 global_extra_switches;
 
-const u8 adc_chan_sel[NUM_ADC_CHANNELS] = {10, 12, 13, 11, 16, 14};
+const u8 adc_chan_sel[NUM_ADC_CHANNELS] = {10, 12, 13, 11, 15, 16, 14};
 
 void CHAN_Init()
 {
@@ -38,6 +38,7 @@ void CHAN_Init()
     gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO1);
     gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO2);
     gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO3);
+    gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO5);
     /* Enable Voltage measurement */
     gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO4);
 
@@ -64,12 +65,19 @@ s32 CHAN_ReadRawInput(int channel)
     case INP_AILERON:   value = adc_array_raw[1]; break;  // bug fix: right horizon
     case INP_RUDDER: value = adc_array_raw[2]; break;  // bug fix: left horizon
     case INP_ELEVATOR:  value = adc_array_raw[3]; break;  // bug fix: left vertical
-
+    case INP_AUX2:     value = adc_array_raw[4]; break;
+    
+    case INP_HOLD0:    value = gpio_get(GPIOC, GPIO12); break;
+    case INP_HOLD1:    value = !gpio_get(GPIOC, GPIO12); break;
+    
     case INP_AIL_DR0:  value = gpio_get(GPIOC, GPIO13); break;
     case INP_AIL_DR1:  value = ! gpio_get(GPIOC, GPIO13); break;
 
     case INP_GEAR0:    value = gpio_get(GPIOC, GPIO14); break;
     case INP_GEAR1:    value = ! gpio_get(GPIOC, GPIO14); break;
+    
+    case INP_TRN0:      value = gpio_get(GPIOC, GPIO15); break;
+    case INP_TRN1:      value = !gpio_get(GPIOC, GPIO15); break;
 
     case INP_MIX0:     value = ! gpio_get(GPIOB, GPIO4); break;
     case INP_MIX1:     value = (gpio_get(GPIOB, GPIO3) && gpio_get(GPIOB, GPIO4)); break;
@@ -78,6 +86,8 @@ s32 CHAN_ReadRawInput(int channel)
     case INP_FMOD0:    value = ! gpio_get(GPIOC, GPIO11); break;
     case INP_FMOD1:    value = (gpio_get(GPIOC, GPIO10) && gpio_get(GPIOC, GPIO11)); break;
     case INP_FMOD2:    value = ! gpio_get(GPIOC, GPIO10); break;
+
+
     case INP_SWA0:     value = global_extra_switches   & 0x04;  break;
     case INP_SWA1:     value = !(global_extra_switches & 0x0c); break;
     case INP_SWA2:     value = global_extra_switches   & 0x08;  break;
