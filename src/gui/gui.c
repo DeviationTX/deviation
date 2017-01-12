@@ -455,6 +455,8 @@ u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
     in_touch = 0;
     return ret;
 #else
+    (void)coords;
+    (void)long_press;
     return 0;
 #endif
 }

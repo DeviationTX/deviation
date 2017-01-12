@@ -12,7 +12,7 @@ default: $(TARGET)
 ALLTARGETS = $(filter-out common,$(notdir $(wildcard target/*)))
 
 # The supported transmitters
-TXS ?= devo6 devo7e devo8 devo10 devo12 devof7 devof4 devof12e at9
+TXS ?= devo6 devo7e devo7e-256 devo8 devo10 devo12e devo12 devof7 devof4 devof12e at9
 
 #Filter non-existant emus
 EMUS = $(foreach dir,$(TXS:%=emu_%),$(if $(wildcard target/$(dir)),$(dir),))
