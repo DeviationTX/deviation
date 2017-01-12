@@ -315,18 +315,16 @@ static uint8_t bit_reverse(uint8_t b_in)
 }
 #else
 // rbit instruction works on cortex m3, but not on m0
-uint32_t __RBIT(uint32_t in)
+uint32_t __RBIT_(uint32_t in)
 {
- uint32_t out=0;
- 
-   __asm volatile ("rbit %0, %1" : "=r" (out) : "r" (in) );
-   return(out);
+    uint32_t out=0;
+    __asm volatile ("rbit %0, %1" : "=r" (out) : "r" (in) );
+    return(out);
 }
-
 
 static uint8_t bit_reverse(uint8_t a)
 {
-return __RBIT( (unsigned int) a)>>24; 
+    return __RBIT_( (unsigned int) a)>>24; 
 }
 
 #endif
