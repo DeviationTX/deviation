@@ -204,7 +204,7 @@ static void send_packet(u8 bind)
                       bind ? RF_BIND_CHANNEL : rf_channels[rf_chan++]);
     rf_chan %= sizeof(rf_channels);
 
- //   NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
+    NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
     NRF24L01_FlushTx();
 
     XN297_WritePayload(packet, PACKET_SIZE);
@@ -217,15 +217,11 @@ static void send_packet(u8 bind)
     XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) |
                     BV(NRF24L01_00_PWR_UP));
 
-int x = 0;
- while( 0&&!(NRF24L01_ReadReg(NRF24L01_07_STATUS) & (1<<5)) ) 
- {
- x++;
- Telemetry.value[TELEM_DSM_FLOG_FADESR] = x;
- TELEMETRY_SetUpdated(TELEM_DSM_FLOG_FADESR);
- usleep(30);
- }
- 
+
+    if (telemetry) {
+        // switch radio to rx, no crc
+        NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x03);
+    }
     // Check and adjust transmission power. We do this after
     // transmission to not bother with timeout after power
     // settings change -  we have plenty of time until next
@@ -380,7 +376,7 @@ MODULE_CALLTYPE static u16 bay_callback()
             if (bay_count == 0)
                 send_packet(1);
             bay_count++;
-            bay_count %= 10;
+            bay_count %= 4;
             counter -= 1;
         }
         break;
@@ -403,17 +399,9 @@ MODULE_CALLTYPE static u16 bay_callback()
 
             if (bay_count == 0) {
                 send_packet(0);
+            } else {
+                check_rx();
             }
-
-		if (bay_count == 2) 
-		{  
-				// switch radio to rx, no crc
-				NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x03);
-		}
-		if (bay_count > 2) 		
-		{ 
-		check_rx();
-		}
 
             bay_count++;
             bay_count %= 5;
