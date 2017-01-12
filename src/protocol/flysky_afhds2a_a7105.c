@@ -542,8 +542,6 @@ static void initialize(u8 bind)
         rxid[3] = (Model.proto_opts[PROTOOPTS_RXID2]) & 0xff;
     }
     channel = 0;
-    memset(&Telemetry, 0, sizeof(Telemetry));
-    TELEMETRY_SetType(TELEM_FRSKY);
     CLOCK_StartTimer(50000, afhds2a_cb);
 }
 
@@ -564,7 +562,10 @@ const void *AFHDS2A_Cmds(enum ProtoCmds cmd)
             if( Model.proto_opts[PROTOOPTS_SERVO_HZ] < 50 || Model.proto_opts[PROTOOPTS_SERVO_HZ] > 400)
                 Model.proto_opts[PROTOOPTS_SERVO_HZ] = 50;
             return afhds2a_opts;
-        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_ON;
+        case PROTOCMD_TELEMETRYSTATE:
+            return (void *)(long) PROTO_TELEM_ON;
+        case PROTOCMD_TELEMETRYTYPE:
+            return (void *)(long) TELEM_FRSKY;
         default: break;
     }
     return 0;

@@ -25,17 +25,15 @@
 #include "protocol/interface.h"
 #include "protospi.h"
 
-#ifdef PROTO_HAS_CYRF6936
-    #if ! HAS_MULTIMOD_SUPPORT && (!defined(HAS_CYRF_RESET) || HAS_CYRF_RESET)
-	      //GPIOB.11
-    #if defined(HAS_4IN1_FLASH) && HAS_4IN1_FLASH
-        #define RS_HI() SPISwitch_CYRF6936_RESET(1)
-        #define RS_LO() SPISwitch_CYRF6936_RESET(0)
-    #else
-        #define RS_HI() PROTOSPI_pin_set(CYRF_RESET_PIN)
-        #define RS_LO() PROTOSPI_pin_clear(CYRF_RESET_PIN)
-    #endif
+#if !defined(HAS_4IN1_FLASH)
+#define HAS_4IN1_FLASH 0
+#elif defined(EMULATOR)
+// Disable for emulator
+#undef HAS_4IN1_FLASH
+#define HAS_4IN1_FLASH 0
 #endif
+
+#ifdef PROTO_HAS_CYRF6936
 
 //Disable AWA24S
 #define AWA24S 0
@@ -91,25 +89,41 @@ u8 CYRF_ReadRegister(u8 address)
     return data;
 }
 
+/* If we have hard reset pin available either directly or through
+ * 4-in-1 SPI switch, we use it for reset, otherwise use soft reset
+ * by writing 1 to MODE_OVERRIDE register.
+ * To save space in module, always use soft reset for modular build.
+ */
 int CYRF_Reset()
 {
+#if HAS_4IN1_FLASH && !defined(MODULAR)
+    if (SPISwitch_Present()) {
+        SPISwitch_CYRF6936_RESET(1);
+        Delay(100);
+        SPISwitch_CYRF6936_RESET(0);
+        Delay(100);
+    } else {
+#endif        
 #if HAS_MULTIMOD_SUPPORT || (defined(HAS_CYRF_RESET) && ! HAS_CYRF_RESET)
         CYRF_WriteRegister(CYRF_1D_MODE_OVERRIDE, 0x01);
         Delay(200);
         /* Reset the CYRF chip */
 #else
-        RS_HI();
+        PROTOSPI_pin_set(CYRF_RESET_PIN);
         Delay(100);
-        RS_LO();
+        PROTOSPI_pin_clear(CYRF_RESET_PIN);
         Delay(100);
 #endif
-        CYRF_WriteRegister(CYRF_0C_XTAL_CTRL, 0xC0); //Enable XOUT as GPIO
-        CYRF_WriteRegister(CYRF_0D_IO_CFG, 0x04); //Enable PACTL as GPIO
-        CYRF_SetTxRxMode(TXRX_OFF);
-        //Verify the CYRD chip is responding
-        int res = CYRF_ReadRegister(CYRF_10_FRAMING_CFG) == 0xa5;
-        //printf("CYRF6936 reset %s\n", res ? "succeded" : "failed");
-        return res;
+#if HAS_4IN1_FLASH && !defined(MODULAR)
+    }
+#endif
+    CYRF_WriteRegister(CYRF_0C_XTAL_CTRL, 0xC0); //Enable XOUT as GPIO
+    CYRF_WriteRegister(CYRF_0D_IO_CFG, 0x04); //Enable PACTL as GPIO
+    CYRF_SetTxRxMode(TXRX_OFF);
+    //Verify the CYRD chip is responding
+    int res = CYRF_ReadRegister(CYRF_10_FRAMING_CFG) == 0xa5;
+    //printf("CYRF6936 reset %s\n", res ? "succeded" : "failed");
+    return res;
 }
 
 u8 CYRF_MaxPower()

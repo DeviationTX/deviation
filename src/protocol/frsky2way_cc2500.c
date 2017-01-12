@@ -460,6 +460,7 @@ static void initialize(int bind)
     sequence = 8;
 #endif
     frsky2way_init(bind);
+
     if (bind) {
         PROTOCOL_SetBindState(0xFFFFFFFF);
         state = FRSKY_BIND;
@@ -490,9 +491,10 @@ const void *FRSKY2WAY_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_DEINIT:
             CLOCK_StopTimer();
             return (void *)(CC2500_Reset() ? 1L : -1L);
+        case PROTOCMD_TELEMETRYTYPE: 
+            return (void *)(long) TELEM_FRSKY;
         default: break;
     }
     return 0;
 }
 #endif
-

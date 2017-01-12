@@ -228,6 +228,26 @@ int MCU_SetPin(struct mcu_pin *, const char *name);
 const char *MCU_GetPinName(char *str, struct mcu_pin *);
 void MCU_SerialNumber(u8 *var, int len);
 
+#if defined HAS_4IN1_FLASH && HAS_4IN1_FLASH
+void SPISwitch_Init();
+unsigned SPISwitch_Present();
+unsigned SPISwitch_FlashPresent();
+void SPISwitch_CS_HI(int module);
+void SPISwitch_CS_LO(int module);
+void SPISwitch_UseFlashModule();
+void SPISwitch_CYRF6936_RESET(int state);
+void SPISwitch_NRF24L01_CE(int state);
+#else
+#define SPISwitch_Init()
+#define SPISwitch_Present() 0
+#define SPISwitch_FlashPresent() 0
+#define SPISwitch_CS_HI(module)
+#define SPISwitch_CS_LO(module)
+#define SPISwitch_UseFlashModule()
+#define SPISwitch_CYRF6936_RESET(state)
+#define SPISwitch_NRF24L01_CE(state)
+#endif
+
 
 #ifdef MODULAR
   #define MODULE_CALLTYPE __attribute__((__long_call__))

@@ -480,10 +480,6 @@ static void initialize()
 
     last_telemetry_count = 0;
     telemetry_count = 0;
-
-    memset(&Telemetry, 0, sizeof(Telemetry));
-    TELEMETRY_SetType(TELEM_DSM);
-
     telemetry = Model.proto_opts[PROTOOPTS_TELEMETRY];
 
     // set some initial values to show nothing has been received 
@@ -526,6 +522,8 @@ const void *Bayang_Cmds(enum ProtoCmds cmd)
         return (void *) (long) (Model.proto_opts[PROTOOPTS_TELEMETRY] ==
                                 TELEM_ON ? PROTO_TELEM_ON :
                                 PROTO_TELEM_OFF);
+    case PROTOCMD_TELEMETRYTYPE: 
+        return (void *)(long) TELEM_DSM;
     default:
         break;
     }

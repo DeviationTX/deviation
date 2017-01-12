@@ -23,5 +23,6 @@ enum Music {
     MUSIC_TELEMALARM6,
 };
 
+void MUSIC_Beep(char* note, u16 duration, u16 interval, u8 count);
 void MUSIC_Play(enum Music music);
 #endif

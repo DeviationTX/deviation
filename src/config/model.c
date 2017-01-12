@@ -616,7 +616,6 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
                 if (MATCH_VALUE(RADIO_PROTOCOL_VAL[i])) {
                     m->protocol = i;
                     PROTOCOL_Load(1);
-                    TELEMETRY_SetTypeByProtocol(m->protocol);
                     return 1;
                 }
             }

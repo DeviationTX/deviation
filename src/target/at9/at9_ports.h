@@ -10,8 +10,13 @@
     #define _SPI_FLASH_SCK_PIN       {GPIOB, GPIO13}
     #define _SPI_FLASH_MISO_PIN      {GPIOB, GPIO14}
     #define _SPI_FLASH_MOSI_PIN      {GPIOB, GPIO15}
+    
+#include "../../common/devo/ports.h"
 
-#ifndef _USART
+#if 0
+// _SPI_PROTO_PORT defined in ports.h
+
+#if 0 // defined in ports.h
     #define _USART                        USART1
     #define _USART_DR                     USART1_DR
     #define _USART_DMA                    DMA1
@@ -37,5 +42,6 @@
     #define _DMA_ISR                dma1_channel1_isr
     #define _DMA_IFCR_CGIF          DMA_IFCR_CGIF1
     #define _NVIC_DMA_CHANNEL_IRQ   NVIC_DMA1_CHANNEL1_IRQ
+#endif
 
 #endif //_RADIOLINK_AT9_PORTS_H

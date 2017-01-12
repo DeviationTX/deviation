@@ -5,18 +5,14 @@
 #define VECTOR_TABLE_LOCATION 0x3000
 
 #define SPIFLASH_SECTOR_OFFSET 0x0000
+
 #if defined HAS_4IN1_FLASH && HAS_4IN1_FLASH
-#define SPIFLASH_SECTORS 1024
-
-#define SPIFLASH_TYPE IS25CQxxx
-
+    #define SPIFLASH_SECTORS 1024
+    #define SPIFLASH_TYPE IS25CQxxx
 #else
-
-#define SPIFLASH_SECTORS 64
-
-#define USE_PBM_IMAGE 1
-#define USE_DEVOFS 1 //Must be before common_devo include
-
+    #define SPIFLASH_SECTORS 64
+    #define USE_PBM_IMAGE 1
+    #define USE_DEVOFS 1 //Must be before common_devo include
 #endif
 
 #define DISABLE_PWM 1                 //FIXME
@@ -88,17 +84,8 @@ static inline void LCD_ForceUpdate() {}
     {51, 120}, {51, 105}, {-229, 120}, {-229, 105}, \
     {-106, 135}, {21, 135}, {-259, 135}, {174, 135}, \
     {30, 71}, {30, 56}, {-250, 71}, {-250, 56}, \
-    {185, 220}, {185, 200}, {-95, 220}, {-95, 200}, {200, 180}, {-80, 180}, \
+    {185, 220}, {185, 200}, \
     }
-
-#if defined HAS_4IN1_FLASH && HAS_4IN1_FLASH
-void SPISwitch_Init();
-void SPISwitch_CS_HI(int module);
-void SPISwitch_CS_LO(int module);
-void SPISwitch_UseFlashModule();
-void SPISwitch_CYRF6936_RESET(int state);
-void SPISwitch_NRF24L01_CE(int state);
-#endif
 
 
 #endif //_AT9_TARGET_DEFS_H_

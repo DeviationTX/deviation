@@ -29,6 +29,7 @@
 #define HAS_EXTRA_BUTTONS  0
 #define HAS_MULTIMOD_SUPPORT 1
 #define HAS_VIDEO           0
+#define HAS_4IN1_FLASH      1
 
 #define NO_LANGUAGE_SUPPORT 1
 
