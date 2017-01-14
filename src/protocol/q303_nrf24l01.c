@@ -440,16 +440,26 @@ static void initialize_txid()
 
     for(i=0; i<4; i++)
         txid[i] = (lfsr >> (i*8)) & 0xff;
-    offset = txid[0] & 3;
+    
     if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_CX35) {        
-        // not figured out txid/channels for CX35 yet, use a known pair
-        memcpy(txid, (u8*) "\x24\x37\x46\x89", 4);
-        offset = 0;
-        
-        for(i=0; i<NUM_RF_CHANNELS; i++)
-            rf_chans[i] = 0x14 + i*3 + offset;
+        // not thoroughly figured out txid/channels mapping yet
+        // for now 5 msb of txid[0] must be cleared
+        txid[0] &= 7;
+        offset = 6+((txid[0] & 7)*3);
+        u8 chans[16] = {0x14, }; // works only if txid[0] < 8
+        for(i=1; i<16; i++) {
+            chans[i] = chans[i-1] + offset;
+            if(chans[i] > 0x41)
+                chans[i] -= 0x33;
+            if(chans[i] < 0x14)
+                chans[i] += offset;
+        }
+        // cx35 tx uses only 4 of those channels 
+        for(i=0; i<4; i++)
+            rf_chans[i] = chans[i*3];
     }
     else{ // Q303
+        offset = txid[0] & 3;
         for(i=0; i<NUM_RF_CHANNELS; i++)
             rf_chans[i] = 0x46 + i*2 + offset;
     }
