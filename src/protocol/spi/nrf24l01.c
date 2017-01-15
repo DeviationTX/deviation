@@ -303,18 +303,8 @@ FLASHWORDTABLE xn297_crc_xorout[] = {
     0xb798, 0x5133, 0x67db, 0xd94e};
 
 
-#ifdef EMULATOR
-static uint8_t bit_reverse(uint8_t b_in)
-{
-    uint8_t b_out = 0;
-    for (int i = 0; i < 8; ++i) {
-        b_out = (b_out << 1) | (b_in & 1);
-        b_in >>= 1;
-    }
-    return b_out;
-}
-#else
-// rbit instruction works on cortex m3, but not on m0
+#if ( defined (__GNUC__) && (__ARM_ARCH_ISA_THUMB==2) )
+// rbit instruction works on cortex m3
 uint32_t __RBIT_(uint32_t in)
 {
     uint32_t out=0;
@@ -326,7 +316,16 @@ static uint8_t bit_reverse(uint8_t a)
 {
     return __RBIT_( (unsigned int) a)>>24; 
 }
-
+#else
+static uint8_t bit_reverse(uint8_t b_in)
+{
+    uint8_t b_out = 0;
+    for (int i = 0; i < 8; ++i) {
+        b_out = (b_out << 1) | (b_in & 1);
+        b_in >>= 1;
+    }
+    return b_out;
+}
 #endif
 
 static const uint16_t polynomial = 0x1021;
