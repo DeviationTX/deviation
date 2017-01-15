@@ -300,14 +300,14 @@ static void send_packet(u8 bind)
                 throttle = scale_channel(CHANNEL3, 1000, 2000);
                 rudder   = scale_channel(CHANNEL4, 1000, 2000);
                 
-                packet[1] = aileron >> 8;
-                packet[2] = aileron & 0xff;
-                packet[3] = elevator >> 8;
-                packet[4] = elevator & 0xff;
-                packet[5] = throttle >> 8;
-                packet[6] = throttle & 0xff;
-                packet[7] = rudder >> 8;
-                packet[8] = rudder & 0xff;    
+                packet[1] = aileron & 0xff;
+                packet[2] = aileron >> 8;
+                packet[3] = elevator & 0xff;
+                packet[4] = elevator >> 8;
+                packet[5] = throttle & 0xff;
+                packet[6] = throttle >> 8;
+                packet[7] = rudder & 0xff;
+                packet[8] = rudder >> 8;
                 break;
         }
         
