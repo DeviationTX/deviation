@@ -51,16 +51,10 @@
     #define dbgprintf if(0) printf
 #endif
 
-#define Q303_PACKET_SIZE       10  // also CX35
-#define CX10D_PACKET_SIZE      11
-#define Q303_PACKET_PERIOD   1500  // Timeout for callback in uSec
-#define CX35_PACKET_PERIOD   3000  // also CX10D
 #define INITIAL_WAIT          500
 #define RF_BIND_CHANNEL      0x02
-#define Q303_RF_CHANNELS        4  // also CX35
-#define CX10D_RF_CHANNELS      16
 
-static u8 packet[CX10D_PACKET_SIZE];
+static u8 packet[11];
 static u8 phase;
 static u16 bind_counter;
 static u32 packet_counter;
@@ -68,7 +62,7 @@ static u8 tx_power;
 static u8 tx_addr[5];
 static u8 current_chan;
 static u8 txid[4];
-static u8 rf_chans[CX10D_RF_CHANNELS];
+static u8 rf_chans[16];
 static u16 packet_period;
 static u8 packet_size;
 static u8 num_rf_channels;
@@ -79,7 +73,7 @@ enum {
 };
 
 static const char * const q303_opts[] = {
-    _tr_noop("Format"), "Q303", "CX35", "CX10D", NULL, 
+    _tr_noop("Format"), "Q303", "CX35", "CX10D", "CX10WD", NULL, 
     NULL
 };
 
@@ -92,6 +86,7 @@ enum {
     FORMAT_Q303 = 0,
     FORMAT_CX35,
     FORMAT_CX10D,
+    FORMAT_CX10WD,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
@@ -344,6 +339,11 @@ static void send_packet(u8 bind)
                 packet[9] = 0x02; // rate (0-2)
                 packet[10]= 00; // ???
                 break;
+                
+            case FORMAT_CX10WD:
+                packet[9] = 0x60; // high rate ? (0x00-0x40-0x60)
+                packet[10] = 0;
+                break;
         }
     }
     
@@ -378,6 +378,7 @@ static void q303_init()
     switch(Model.proto_opts[PROTOOPTS_FORMAT]) {
         case FORMAT_CX35:
         case FORMAT_CX10D:
+        case FORMAT_CX10WD:
             XN297_SetScrambledMode(XN297_SCRAMBLED);
             NRF24L01_SetBitrate(NRF24L01_BR_1M);
             break;
@@ -482,6 +483,7 @@ static void initialize_txid()
     
     switch(Model.proto_opts[PROTOOPTS_FORMAT]) {
         case FORMAT_Q303:
+        case FORMAT_CX10WD:
             offset = txid[0] & 3;
             for(i=0; i<4; i++)
                 rf_chans[i] = 0x46 + i*2 + offset;
@@ -517,19 +519,24 @@ static void initialize()
     bind_counter = BIND_COUNT;
     switch(Model.proto_opts[PROTOOPTS_FORMAT]) {
         case FORMAT_Q303:
-            packet_period = Q303_PACKET_PERIOD;
-            packet_size = Q303_PACKET_SIZE;
-            num_rf_channels = Q303_RF_CHANNELS;
+            packet_period = 1500;
+            packet_size = 10;
+            num_rf_channels = 4;
             break;
         case FORMAT_CX35:
-            packet_period = CX35_PACKET_PERIOD;
-            packet_size = Q303_PACKET_SIZE;
-            num_rf_channels = Q303_RF_CHANNELS;
+            packet_period = 3000;
+            packet_size = 10;
+            num_rf_channels = 4;
             break;
         case FORMAT_CX10D:
-            packet_period = CX35_PACKET_PERIOD;
-            packet_size = CX10D_PACKET_SIZE;
-            num_rf_channels = CX10D_RF_CHANNELS;
+            packet_period = 3000;
+            packet_size = 11;
+            num_rf_channels = 16;
+            break;
+        case FORMAT_CX10WD:
+            packet_period = 3000;
+            packet_size = 11;
+            num_rf_channels = 4;
             break;
     }
     current_chan = 0;
