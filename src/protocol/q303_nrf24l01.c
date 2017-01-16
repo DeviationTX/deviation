@@ -290,6 +290,7 @@ static void send_packet(u8 bind)
                 break;
             
             case FORMAT_CX10D:
+            case FORMAT_CX10WD:
                 aileron  = scale_channel(CHANNEL1, 1000, 2000);
                 elevator = scale_channel(CHANNEL2, 1000, 2000);
                 throttle = scale_channel(CHANNEL3, 1000, 2000);
