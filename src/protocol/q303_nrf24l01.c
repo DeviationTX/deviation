@@ -96,7 +96,7 @@ enum {
     CHANNEL2,       // Elevator
     CHANNEL3,       // Throttle
     CHANNEL4,       // Rudder
-    CHANNEL5,       // Altitude Hold
+    CHANNEL5,       // Altitude Hold or Take off / Descend
     CHANNEL6,       // Flip
     CHANNEL7,       // Still Camera
     CHANNEL8,       // Video Camera
@@ -106,7 +106,7 @@ enum {
 };
 
 #define CHANNEL_AHOLD    CHANNEL5  // Q303
-#define CHANNEL_ARM      CHANNEL5  // CX35
+#define CHANNEL_ARM      CHANNEL5  // CX35, CX10WD
 #define CHANNEL_FLIP     CHANNEL6
 #define CHANNEL_VTX      CHANNEL6  // CX35
 #define CHANNEL_SNAPSHOT CHANNEL7
@@ -342,8 +342,10 @@ static void send_packet(u8 bind)
                 break;
                 
             case FORMAT_CX10WD:
-                packet[9] = 0x60; // high rate ? (0x00-0x40-0x60)
-                packet[10] = 0;
+                packet[8] |= GET_FLAG(CHANNEL_FLIP, 0x10);
+                packet[9]  = GET_FLAG(CHANNEL_ARM, 0x60)
+                           | 0x02; // rate (0-2)
+                packet[10] = 0x00;
                 break;
         }
     }
