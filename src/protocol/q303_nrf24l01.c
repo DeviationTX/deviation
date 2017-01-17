@@ -157,6 +157,7 @@ static u16 scale_channel(u8 ch, u16 destMin, u16 destMax)
 static u8 cx10wd_getButtons()
 {
     #define CX10WD_FLAG_LAND    0x20
+    #define CX10D_FLAG_LAND     0x80
     #define CX10WD_FLAG_TAKEOFF 0x40
     
     static u8 btn_state;
@@ -173,7 +174,14 @@ static u8 cx10wd_getButtons()
     else if(GET_FLAG_LOW(CHANNEL_ARM,1) && !(btn_state & BTN_DESCEND)) {
         btn_state |= BTN_DESCEND;
         btn_state &= ~BTN_TAKEOFF;
-        command ^= CX10WD_FLAG_LAND;
+        switch(Model.proto_opts[PROTOOPTS_FORMAT]) {
+            case FORMAT_CX10WD:
+                command ^= CX10WD_FLAG_LAND;
+                break;
+            case FORMAT_CX10D:
+                command ^= CX10D_FLAG_LAND;
+                break;
+        }
     }
     
     // auto take off
