@@ -129,6 +129,7 @@ enum {
 #define FLAG_VIDEO     0x01
 
 #define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
+#define GET_FLAG_LOW(ch, mask) (Channels[ch] < 0 ? mask : 0)
 
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
@@ -152,6 +153,38 @@ static u16 scale_channel(u8 ch, u16 destMin, u16 destMax)
 #define BTN_VIDEO    8
 #define BTN_RTH      16
 #define BTN_VTX      32
+
+static u8 cx10wd_getButtons()
+{
+    #define CX10WD_FLAG_LAND    0x20
+    #define CX10WD_FLAG_TAKEOFF 0x40
+    
+    static u8 btn_state;
+    static u8 command;
+    
+    // startup
+    if(packet_counter < 50) {
+        btn_state = 0;
+        command = 0;
+        packet_counter++;
+    }
+    
+    // auto land
+    else if(GET_FLAG_LOW(CHANNEL_ARM,1) && !(btn_state & BTN_DESCEND)) {
+        btn_state |= BTN_DESCEND;
+        btn_state &= ~BTN_TAKEOFF;
+        command ^= CX10WD_FLAG_LAND;
+    }
+    
+    // auto take off
+    else if(GET_FLAG(CHANNEL_ARM,1) && !(btn_state & BTN_TAKEOFF)) {
+        btn_state |= BTN_TAKEOFF;
+        btn_state &= ~BTN_DESCEND;
+        command ^= CX10WD_FLAG_TAKEOFF;
+    }
+    
+    return command;
+}
 
 static u8 cx35_lastButton()
 {
@@ -343,8 +376,8 @@ static void send_packet(u8 bind)
                 
             case FORMAT_CX10WD:
                 packet[8] |= GET_FLAG(CHANNEL_FLIP, 0x10);
-                packet[9]  = GET_FLAG(CHANNEL_ARM, 0x60)
-                           | 0x02; // rate (0-2)
+                packet[9]  = 0x02  // rate (0-2)
+                           | cx10wd_getButtons(); // auto land / take off management
                 packet[10] = 0x00;
                 break;
         }
