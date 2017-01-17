@@ -379,7 +379,7 @@ static void send_packet(u8 bind)
             case FORMAT_CX10D:
                 packet[8] |= GET_FLAG(CHANNEL_FLIP, 0x10);
                 packet[9] = 0x02; // rate (0-2)
-                packet[10]= 00; // ???
+                packet[10]= cx10wd_getButtons(); // auto land / take off management
                 break;
                 
             case FORMAT_CX10WD:
