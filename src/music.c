@@ -236,7 +236,7 @@ void MUSIC_TelemValue(enum Music music, s32 telem_val, u16 telem_unit)
 {
     u8 i,j;
     char digits[6];
-    Volume = 0;
+    SOUND_SetFrequency(10, 0); // We are using the buzzer timer to manage our mp3 queue so we have to turn the buzzer off
     next_note = 1;
     num_notes = 0;
     j = 1;
