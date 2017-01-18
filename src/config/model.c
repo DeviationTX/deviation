@@ -1445,8 +1445,11 @@ u8 CONFIG_IsModelChanged() {
 }
 
 u8 CONFIG_SaveModelIfNeeded() {
-    if (CONFIG_IsModelChanged())
+    if (CONFIG_IsModelChanged()) {
+        crc32 = Crc(&Model, sizeof(Model));
+        //printf("Saving model, page %d\n", PAGE_GetID());
         CONFIG_WriteModel(Transmitter.current_model);
+    }
     return 1;
 }
 

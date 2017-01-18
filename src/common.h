@@ -119,6 +119,7 @@ const char *PAGE_GetName(int idx);
 int PAGE_GetNumPages();
 int PAGE_GetStartPage();
 int PAGE_GetID();
+int PAGE_ModelDoneEditing();
 
 /* Protocol */
 #define PROTODEF(proto, module, map, init, name) proto,
