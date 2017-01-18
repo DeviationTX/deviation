@@ -247,7 +247,8 @@ void EventLoop()
 #endif
         GUI_RefreshScreen();
 #if defined(HAS_HARD_POWER_OFF) && HAS_HARD_POWER_OFF
-        CONFIG_SaveModelIfNeeded();
+        if (PAGE_ModelDoneEditing())
+            CONFIG_SaveModelIfNeeded();
         CONFIG_SaveTxIfNeeded();
 #endif
     }

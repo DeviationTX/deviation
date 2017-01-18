@@ -81,6 +81,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 static void _show_bar_page()
 {
     int num_bars = num_disp_bars();
+    //printf("Show bar page nbars: %d, bars per row: %d\n", num_bars, NUM_BARS_PER_ROW);
     int num_rows = 1;
 
     if (num_bars > 2 * (NUM_BARS_PER_ROW + 1)) {
@@ -90,6 +91,7 @@ static void _show_bar_page()
             num_bars = 2 * NUM_BARS_PER_ROW;
     }
     cp->num_bars = num_bars;
+    //printf("Calculated num rows: %d, num bars: %d, cur row: %d\n", num_rows, num_bars, cur_row);
     GUI_CreateScrollable(&gui->scrollable,
         0, 32, LCD_WIDTH, LCD_HEIGHT-32, LCD_HEIGHT - 32, num_rows, row_cb, NULL, NULL, NULL);
 }

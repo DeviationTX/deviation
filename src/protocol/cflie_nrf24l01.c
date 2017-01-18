@@ -805,7 +805,7 @@ static void initialize()
 
 const void *CFlie_Cmds(enum ProtoCmds cmd)
 {
-    dbgprintf("CFlie_Cmds %d\n", cmd);
+    // dbgprintf("CFlie_Cmds %d\n", cmd);
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(); return 0;
         case PROTOCMD_DEINIT:

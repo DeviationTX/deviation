@@ -331,5 +331,6 @@ void CONFIG_SaveTxIfNeeded()
     if (crc32 == newCrc)
         return;
     crc32 = newCrc;
+    //printf("Saving TX\n");
     CONFIG_WriteTx();
 }
