@@ -290,3 +290,8 @@ int PAGE_QuickPage(u32 buttons, u8 flags, void *data)
     }
     return 0;
 }
+
+int PAGE_ModelDoneEditing()
+{
+    return cur_page <= PAGEID_MODELMNU;
+}
