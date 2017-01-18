@@ -1,4 +1,4 @@
-static const u8 reg_init_13[] = {
+static const u8 reg_init[] = {
  0xFF,     0,
     2,  0x44,
     4,     0,
