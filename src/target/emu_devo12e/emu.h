@@ -1,8 +1,8 @@
 #ifndef _EMU_H_
 #define _EMU_H_
 
-#define LCD_WIDTH_MULT 2
-#define LCD_HEIGHT_MULT 2
-#define EMU_STRING "DEVO-10-Emu"
+#define ZOOM_X 2
+#define ZOOM_Y 2
+#define EMU_STRING "DEVO-12e-Emu"
 #define FILESYSTEM_DIR "filesystem/devo10"
 #endif
