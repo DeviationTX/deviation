@@ -44,7 +44,7 @@
     #define BIND_COUNT 4
     #define dbgprintf printf
 #else
-    #define BIND_COUNT 2335
+    #define BIND_COUNT 1500
     //printf inside an interrupt handler is really dangerous
     //this shouldn't be enabled even in debug builds without explicitly
     //turning it on
@@ -97,7 +97,7 @@ enum {
     CHANNEL3,       // Throttle
     CHANNEL4,       // Rudder
     CHANNEL5,       // Altitude Hold or Take off / Descend
-    CHANNEL6,       // Flip
+    CHANNEL6,       // Flip or Vtx channel increment (CX35)
     CHANNEL7,       // Still Camera
     CHANNEL8,       // Video Camera
     CHANNEL9,       // Headless
@@ -106,7 +106,7 @@ enum {
 };
 
 #define CHANNEL_AHOLD    CHANNEL5  // Q303
-#define CHANNEL_ARM      CHANNEL5  // CX35, CX10WD
+#define CHANNEL_ARM      CHANNEL5  // CX35 (2 pos: land/take off), CX10D/WD (3 pos: land/manual/take off)
 #define CHANNEL_FLIP     CHANNEL6
 #define CHANNEL_VTX      CHANNEL6  // CX35
 #define CHANNEL_SNAPSHOT CHANNEL7
@@ -114,19 +114,6 @@ enum {
 #define CHANNEL_HEADLESS CHANNEL9
 #define CHANNEL_RTH      CHANNEL10
 #define CHANNEL_GIMBAL   CHANNEL11
-
-// flags going to packet[8] (Q303)
-#define FLAG_HIGHRATE 0x03
-#define FLAG_AHOLD    0x40
-#define FLAG_RTH      0x80
-
-// flags going to packet[9] (Q303)
-#define FLAG_GIMBAL_DN 0x04
-#define FLAG_GIMBAL_UP 0x20
-#define FLAG_HEADLESS  0x08
-#define FLAG_FLIP      0x80
-#define FLAG_SNAPSHOT  0x10
-#define FLAG_VIDEO     0x01
 
 #define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
 #define GET_FLAG_LOW(ch, mask) (Channels[ch] < 0 ? mask : 0)
@@ -204,12 +191,12 @@ static u8 cx35_lastButton()
     #define CX35_CMD_RTH      0x11
     #define CX35_CMD_VTX      0x10
     
-    static u8 cx35_btn_state;
+    static u8 btn_state;
     static u8 command;
     static u8 vtx_channel;
     // simulate 2 keypress on rate button just after bind
     if(packet_counter < 50) {
-        cx35_btn_state = 0;
+        btn_state = 0;
         vtx_channel = 0;
         packet_counter++;
         command = 0x00; // startup
@@ -224,29 +211,29 @@ static u8 cx35_lastButton()
     }
     
     // descend
-    else if(!(GET_FLAG(CHANNEL_ARM, 1)) && !(cx35_btn_state & BTN_DESCEND)) {
-        cx35_btn_state |= BTN_DESCEND;
-        cx35_btn_state &= ~BTN_TAKEOFF;
+    else if(!(GET_FLAG(CHANNEL_ARM, 1)) && !(btn_state & BTN_DESCEND)) {
+        btn_state |= BTN_DESCEND;
+        btn_state &= ~BTN_TAKEOFF;
         command = CX35_CMD_DESCEND;
     }
         
     // take off
-    else if(GET_FLAG(CHANNEL_ARM,1) && !(cx35_btn_state & BTN_TAKEOFF)) {
-        cx35_btn_state |= BTN_TAKEOFF;
-        cx35_btn_state &= ~BTN_DESCEND;
+    else if(GET_FLAG(CHANNEL_ARM,1) && !(btn_state & BTN_TAKEOFF)) {
+        btn_state |= BTN_TAKEOFF;
+        btn_state &= ~BTN_DESCEND;
         command = CX35_CMD_TAKEOFF;
     }
     
     // RTH
-    else if(GET_FLAG(CHANNEL_RTH,1) && !(cx35_btn_state & BTN_RTH)) {
-        cx35_btn_state |= BTN_RTH;
+    else if(GET_FLAG(CHANNEL_RTH,1) && !(btn_state & BTN_RTH)) {
+        btn_state |= BTN_RTH;
         if(command == CX35_CMD_RTH)
             command |= 0x20;
         else
             command = CX35_CMD_RTH;
     }
-    else if(!(GET_FLAG(CHANNEL_RTH,1)) && (cx35_btn_state & BTN_RTH)) {
-        cx35_btn_state &= ~BTN_RTH;
+    else if(!(GET_FLAG(CHANNEL_RTH,1)) && (btn_state & BTN_RTH)) {
+        btn_state &= ~BTN_RTH;
         if(command == CX35_CMD_RTH)
             command |= 0x20;
         else
@@ -254,15 +241,15 @@ static u8 cx35_lastButton()
     }
     
     // video
-    else if(GET_FLAG(CHANNEL_VIDEO,1) && !(cx35_btn_state & BTN_VIDEO)) {
-        cx35_btn_state |= BTN_VIDEO;
+    else if(GET_FLAG(CHANNEL_VIDEO,1) && !(btn_state & BTN_VIDEO)) {
+        btn_state |= BTN_VIDEO;
         if(command == CX35_CMD_VIDEO)
             command |= 0x20;
         else
             command = CX35_CMD_VIDEO;
     }
-    else if(!(GET_FLAG(CHANNEL_VIDEO,1)) && (cx35_btn_state & BTN_VIDEO)) {
-        cx35_btn_state &= ~BTN_VIDEO;
+    else if(!(GET_FLAG(CHANNEL_VIDEO,1)) && (btn_state & BTN_VIDEO)) {
+        btn_state &= ~BTN_VIDEO;
         if(command == CX35_CMD_VIDEO)
             command |= 0x20;
         else
@@ -270,8 +257,8 @@ static u8 cx35_lastButton()
     }
     
     // snapshot
-    else if(GET_FLAG(CHANNEL_SNAPSHOT,1) && !(cx35_btn_state & BTN_SNAPSHOT)) {
-        cx35_btn_state |= BTN_SNAPSHOT;
+    else if(GET_FLAG(CHANNEL_SNAPSHOT,1) && !(btn_state & BTN_SNAPSHOT)) {
+        btn_state |= BTN_SNAPSHOT;
         if(command == CX35_CMD_SNAPSHOT)
             command |= 0x20;
         else
@@ -279,8 +266,8 @@ static u8 cx35_lastButton()
     }
         
     // vtx channel
-    else if(GET_FLAG(CHANNEL_VTX,1) && !(cx35_btn_state & BTN_VTX)) {
-        cx35_btn_state |= BTN_VTX;
+    else if(GET_FLAG(CHANNEL_VTX,1) && !(btn_state & BTN_VTX)) {
+        btn_state |= BTN_VTX;
         vtx_channel++;
         MUSIC_Beep("d2", 100, 100, (vtx_channel & 7) + 1);
         if(command == CX35_CMD_VTX)
@@ -290,9 +277,9 @@ static u8 cx35_lastButton()
     }
     
     if(!(GET_FLAG(CHANNEL_SNAPSHOT,1)))
-        cx35_btn_state &= ~BTN_SNAPSHOT;
+        btn_state &= ~BTN_SNAPSHOT;
     if(!(GET_FLAG(CHANNEL_VTX,1)))
-        cx35_btn_state &= ~BTN_VTX;
+        btn_state &= ~BTN_VTX;
     
     return command;
 }
@@ -354,17 +341,17 @@ static void send_packet(u8 bind)
                 packet[6] = 0x10; // trim(s) ?
                 packet[7] = 0x10; // trim(s) ?
                 packet[8] = 0x03  // high rate (0-3)
-                          | GET_FLAG(CHANNEL_AHOLD, FLAG_AHOLD)
-                          | GET_FLAG(CHANNEL_RTH, FLAG_RTH);
+                          | GET_FLAG(CHANNEL_AHOLD,   0x40)
+                          | GET_FLAG(CHANNEL_RTH,     0x80);
                 packet[9] = 0x40 // always set
-                          | GET_FLAG(CHANNEL_HEADLESS, FLAG_HEADLESS)
-                          | GET_FLAG(CHANNEL_FLIP, FLAG_FLIP)
-                          | GET_FLAG(CHANNEL_SNAPSHOT, FLAG_SNAPSHOT)
-                          | GET_FLAG(CHANNEL_VIDEO, FLAG_VIDEO);
+                          | GET_FLAG(CHANNEL_HEADLESS,0x08)
+                          | GET_FLAG(CHANNEL_FLIP,    0x80)
+                          | GET_FLAG(CHANNEL_SNAPSHOT,0x10)
+                          | GET_FLAG(CHANNEL_VIDEO,   0x01);
                 if(Channels[CHANNEL_GIMBAL] < CHAN_MIN_VALUE / 2)
-                    packet[9] |= FLAG_GIMBAL_DN;
+                    packet[9] |= 0x04; // gimbal down
                 else if(Channels[CHANNEL_GIMBAL] > CHAN_MAX_VALUE / 2)
-                    packet[9] |= FLAG_GIMBAL_UP;
+                    packet[9] |= 0x20; // gimbal up
                 break;
                 
             case FORMAT_CX35:
