@@ -303,7 +303,7 @@ FLASHWORDTABLE xn297_crc_xorout[] = {
     0xb798, 0x5133, 0x67db, 0xd94e};
 
 
-#if ( defined (__GNUC__) && (__ARM_ARCH_ISA_THUMB==2) )
+#if defined(__GNUC__) && defined(__ARM_ARCH_ISA_THUMB) && (__ARM_ARCH_ISA_THUMB==2)
 // rbit instruction works on cortex m3
 uint32_t __RBIT_(uint32_t in)
 {
