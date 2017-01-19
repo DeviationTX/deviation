@@ -13,7 +13,7 @@ default: $(TARGET)
 ALLTARGETS = $(filter-out common,$(notdir $(wildcard target/*)))
 
 # The supported transmitters
-TXS ?= devo6 devo7e devo8 devo10 devo12 devof7 devof4 devof12e
+TXS ?= devo6 devo7e devo8 devo10 devo12e devo12 devof7 devof4 devof12e
 # These txs use file systems for other txs, so don't have a file system target.
 NOFSTXS = devo6 devo7e
 
