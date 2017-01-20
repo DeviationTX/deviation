@@ -22,10 +22,10 @@
 
 //Set this to the number of trials
 #define DEBUG_SCREEN_ALIGNMENT 0
-#include "tw8816_init_1.5.h"
-//#include "tw8816_init_1.3.h"
-//#include "tw8816_init_bl1.3a.h"
 //#include "tw8816_init_1.5.h"
+#include "tw8816_init_1.3.h"
+//#include "tw8816_init_bl1.3a.h"
+//#include "tw8816_init_bl1.6a.h"
 
 void wait_button() {
     u32 buttons = ScanButtons();
