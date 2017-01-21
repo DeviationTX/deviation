@@ -6,6 +6,8 @@
 *.gz
 *.map
 src/objs/
+src/osx/mp3/
+src/osx/models/*.map
 ##src/gz*
 ##src/elf*
 #src/push
