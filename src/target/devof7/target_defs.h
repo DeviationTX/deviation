@@ -61,7 +61,7 @@
 #define MAX_POINTS 13
 #define NUM_MIXERS ((NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS) * 4)
 
-#define INP_HAS_CALIBRATION 4
+#define INP_HAS_CALIBRATION 5
 
 /* Compute voltage from y = 2.1592x + 0.2493 */
 #define VOLTAGE_NUMERATOR 324

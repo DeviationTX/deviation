@@ -18,7 +18,7 @@
 #include "config/tx.h"
 #include <stdlib.h>
 
-static struct {u8 note; u8 duration;} Notes[100];	
+static struct {u8 note; u8 duration;} Notes[100];
 static u8 Volume;
 static u8 next_note;
 static u8 num_notes;
@@ -27,12 +27,8 @@ struct NoteMap {
     u16 note;
 };
 static const struct NoteMap note_map[] = {
-#ifdef EMULATOR    
-    {"xx",   0},    // 10 Hz tone makes the emulator crash
-#else
-    {"xx",   10},   // 0 Hz doesn't work well on actual hardware
-#endif
-    {"a",  220}, {"ax", 233}, {"b",  247},
+    {"xx",   0}, {"a",  220}, {"ax", 233}, {"b",  247},
+
     {"c0", 262}, {"cx0",277}, {"d0", 294}, {"dx0",311}, {"e0", 330}, {"f0", 349},
     {"fx0",370}, {"g0", 392}, {"gx0",415}, {"a0", 440}, {"ax0",466}, {"b0", 494},
 

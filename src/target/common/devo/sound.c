@@ -57,6 +57,10 @@ void SOUND_Init()
 
 void SOUND_SetFrequency(unsigned frequency, unsigned volume)
 {
+    if(frequency == 0) {
+        volume = 0;
+        frequency = 220;
+    }
     if (volume == 0) {
         //We need to keep the timer running (for the vibration motor, but also in case there is a pause in the music)
         //But don't want the buzzer running

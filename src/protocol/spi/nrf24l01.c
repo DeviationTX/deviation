@@ -302,6 +302,21 @@ FLASHWORDTABLE xn297_crc_xorout[] = {
     0x1852, 0xdf36, 0x129d, 0xb17c, 0xd5f5, 0x70d7,
     0xb798, 0x5133, 0x67db, 0xd94e};
 
+
+#if defined(__GNUC__) && defined(__ARM_ARCH_ISA_THUMB) && (__ARM_ARCH_ISA_THUMB==2)
+// rbit instruction works on cortex m3
+uint32_t __RBIT_(uint32_t in)
+{
+    uint32_t out=0;
+    __asm volatile ("rbit %0, %1" : "=r" (out) : "r" (in) );
+    return(out);
+}
+
+static uint8_t bit_reverse(uint8_t a)
+{
+    return __RBIT_( (unsigned int) a)>>24; 
+}
+#else
 static uint8_t bit_reverse(uint8_t b_in)
 {
     uint8_t b_out = 0;
@@ -311,7 +326,7 @@ static uint8_t bit_reverse(uint8_t b_in)
     }
     return b_out;
 }
-
+#endif
 
 static const uint16_t polynomial = 0x1021;
 static const uint16_t initial    = 0xb5d2;
