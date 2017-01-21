@@ -30,7 +30,7 @@ void CONFIG_AlertParse(const char* filename)
     char *pt;
     int textlen;
     int val;
-    u8 j,k = 0;
+    u32 j,k = 0;
     char line[MAX_LINE];
     char name[MAX_NAME];
     const char *button_name;

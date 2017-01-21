@@ -56,11 +56,9 @@ struct ButtonMusic {
 
 struct {u16 music; u16 duration;} music_durations[80];
 
-int AUDIO_Play(u16 music);
-
 u16 MUSIC_GetDuration(u16 music);
 
-void MUSIC_TelemValue(enum Music music, s32 telem_val, u16 telem_unit);
+void MUSIC_PlayValue(enum Music music, u32 value, u16 unit);
 #endif
 
 void MUSIC_Beep(char* note, u16 duration, u16 interval, u8 count);

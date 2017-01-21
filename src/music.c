@@ -17,6 +17,8 @@
 #include "music.h"
 #include "config/tx.h"
 #include <stdlib.h>
+#include "telemetry.h"
+#include "extended_audio.h"
 
 static struct {u8 note; u8 duration;} Notes[100];
 static u8 Volume;
@@ -80,13 +82,13 @@ static const char *const audio_devices[] = {
 };
 
 static u8 playback_device;
-static u16 music_queue[10];
+static u16 music_queue[8];
 #endif
 static u8 vibrate;
 
 #define NUM_NOTES (sizeof(note_map) / sizeof(struct NoteMap))
 
-    
+
 static int ini_handler(void* user, const char* section, const char* name, const char* value)
 {
     u16 i;
@@ -129,11 +131,9 @@ u16 next_note_cb() {
     if (next_note == num_notes)
         return 0;
 #if HAS_EXTENDED_AUDIO
-    if (Transmitter.audio_player) {
-        if ((playback_device == AUDDEV_EXTAUDIO) || (playback_device == AUDDEV_UNDEF)) {
-            AUDIO_Play(music_queue[next_note]);
-            return MUSIC_GetDuration(music_queue[next_note++]);
-        }      
+    if ((playback_device == AUDDEV_EXTAUDIO) || (playback_device == AUDDEV_UNDEF)) {
+        AUDIO_Play(music_queue[next_note]);
+        return MUSIC_GetDuration(music_queue[next_note++]);
     }
 #endif
     SOUND_SetFrequency(note_map[Notes[next_note].note].note, Volume);
@@ -167,22 +167,7 @@ void MUSIC_Beep(char* note, u16 duration, u16 interval, u8 count)
     SOUND_Start((u16)Notes[0].duration * 10, next_note_cb, vibrate);
 }
 
-void MUSIC_Play(enum Music music)
-{
-#if HAS_EXTENDED_AUDIO
-    // Play audio for switch
-    if (Transmitter.audio_player && (music > MUSIC_TOTAL)) {
-        AUDIO_Play(music);
-        return;
-    }
-    playback_device = AUDDEV_UNDEF;
-#endif
-    vibrate = 1;	// Haptic sensor set to on as default
-
-    /* NOTE: We need to do all this even if volume is zero, because
-       the haptic sensor may be enabled */
-    num_notes = 0;
-    next_note = 1;
+int MUSIC_GetSound(enum Music music) {
     Volume = Transmitter.volume * 10;
     char filename[] = "media/sound.ini\0\0\0"; // placeholder for longer folder name
     #ifdef _DEVO12_TARGET_H_
@@ -199,12 +184,35 @@ void MUSIC_Play(enum Music music)
     #endif
     if(CONFIG_IniParse(filename, ini_handler, (void *)sections[music])) {
         printf("ERROR: Could not read %s\n", filename);
+        return 1;
+    }
+    return 0;
+}
+
+void MUSIC_Play(enum Music music)
+{
+#if HAS_EXTENDED_AUDIO
+    // Play audio for switch
+    if (Transmitter.audio_player && (music > MUSIC_TOTAL)) {
+        AUDIO_Play(music);
         return;
     }
+    playback_device = AUDDEV_UNDEF;
+#endif
+    vibrate = 1;	// Haptic sensor set to on as default
+
+    /* NOTE: We need to do all this even if volume is zero, because
+       the haptic sensor may be enabled */
+    num_notes = 0;
+    next_note = 1;
+    if (MUSIC_GetSound(music)) return;
+
 #if HAS_EXTENDED_AUDIO
     if (Transmitter.audio_player) {
         if ((playback_device == AUDDEV_EXTAUDIO) || (playback_device == AUDDEV_UNDEF)) {
-            AUDIO_Play(music);
+            music_queue[0] = music;
+            num_notes=1;
+            next_note=0;
             Volume = 0;	// Just activate the haptic sensor, no buzzer
         } else if (playback_device == AUDDEV_ALL) {
             AUDIO_Play(music);
@@ -217,56 +225,60 @@ void MUSIC_Play(enum Music music)
     SOUND_Start((u16)Notes[0].duration * 10, next_note_cb, vibrate);
 }
 
-#if HAS_EXTENDED_AUDIO 
+#if HAS_EXTENDED_AUDIO
 u16 MUSIC_GetDuration(u16 music)
 {
-    u8 i;
+    u32 i;
     for ( i = 0; i < sizeof(music_durations)/sizeof(music_durations[0]);i++) {
         if ( music_durations[i].music == music ) return music_durations[i].duration;
     }
     return 0;
-          
+
 }
 
-void MUSIC_TelemValue(enum Music music, s32 telem_val, u16 telem_unit)
+void MUSIC_PlayValue(enum Music music, u32 value, u16 unit)
 {
-    u8 i,j;
-    char digits[6];
+    u32 i,j = 1;
+    char digits[6]; // Do we need more?
+
+    if (MUSIC_GetSound(music)) return;
+    if ((Transmitter.audio_player && playback_device == AUDDEV_BUZZER) || !Transmitter.audio_player) {
+        MUSIC_Play(music);
+        return;
+    }
+
     SOUND_SetFrequency(10, 0); // We are using the buzzer timer to manage our mp3 queue so we have to turn the buzzer off
     next_note = 0;
     num_notes = 0;
-    j = 1;
-    
-    // Get single digits from telemetry value
-    u32 abs_telem_val = (u32)telem_val;
-    while (abs_telem_val > 0) {
-        digits[num_notes] = abs_telem_val % 10;
-        abs_telem_val /= 10;
+
+    // Get single digits from value
+    while (value > 0) {
+        digits[num_notes] = value % 10;
+        value /= 10;
         ++num_notes;
     }
-    
     // Fill music queue
     num_notes++;
     music_queue[0] = music;
 
     for (i=num_notes; i > 1; i--) {
-        music_queue[j] = digits[i-2] + 1000;
+        music_queue[j] = digits[i-2] + 1000; // mp3 files 1000 - 1009 for digits
         j++;
     }
-    // Add decimal seperator for voltage readout
-    if (telem_unit == 2) { 
+    // Add decimal seperator for some units
+    if (unit == TELEM_UNIT_VOLT || unit == TELEM_UNIT_AMPS || unit == TELEM_UNIT_ALTITUDE || unit == TELEM_UNIT_GFORCE) {
         num_notes++;
         music_queue[j] = music_queue[j-1];
-        music_queue[j-1] = 1010;
+        music_queue[j-1] = 1010; //mp3 for decimal
         j++;
     }
-    if (telem_unit > 0) {
+    // Add unit for value if specified
+    if (unit > 0) {
         num_notes++;
-        music_queue[j] = telem_unit + 1010;
-    }  
-
+        music_queue[j] = unit + 1010; // mp3 files 1011-1016 for units
+    }
+    // Start callback for music queue
     if (Transmitter.audio_player) {
-        if ((playback_device == AUDDEV_EXTAUDIO) || (playback_device == AUDDEV_UNDEF)) {
             SOUND_Start(100, next_note_cb, vibrate);
 #ifdef BUILDTYPE_DEV
             for (i=0;i<num_notes;i++) {
@@ -274,7 +286,5 @@ void MUSIC_TelemValue(enum Music music, s32 telem_val, u16 telem_unit)
             }
 #endif
          }
-    }
-    
 }
 #endif

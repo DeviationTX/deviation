@@ -95,6 +95,17 @@ enum {
     TELEM_DSM_LAST,
 };
 
+#ifdef HAS_EXTENDED_AUDIO
+enum {
+    TELEM_UNIT_NONE = 0,
+    TELEM_UNIT_TEMP,
+    TELEM_UNIT_VOLT,
+    TELEM_UNIT_RPM,
+    TELEM_UNIT_AMPS,
+    TELEM_UNIT_ALTITUDE,
+    TELEM_UNIT_GFORCE,
+};
+#endif
 
 // FrSky telemetry stream state machine
 typedef enum {
