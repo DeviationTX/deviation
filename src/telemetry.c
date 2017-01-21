@@ -38,7 +38,7 @@ static u32 last_updated[TELEM_UPDATE_SIZE] = {0};
 static u32 music_time = 0;
 static u32 error_time = 0;
 #define CHECK_DURATION 500
-#define MUSIC_INTERVAL 2000 // DON'T need to play music in every 100ms
+#define MUSIC_INTERVAL 15000 // DON'T need to play music in every 100ms
 
 void _get_value_str(char *str, s32 value, u8 decimals, char units)
 {
