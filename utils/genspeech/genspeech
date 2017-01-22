@@ -1,0 +1,111 @@
+#!/bin/bash
+
+# Check for machine type
+if [ "`uname`" = "Darwin" ]
+then
+	TTSCMD="say"
+	TTSOPT="-o"
+	TTSFILEEXT="aiff"
+else
+	TTSCMD="espeak"
+	TTSOPT="-z -w"
+	TTSFILEEXT="wav"
+fi
+
+# Test for TTS command existance
+command -v $TTSCMD >/dev/null 2>&1
+if [ $? != 0 ]
+then
+	echo "Please install $TTSCMD onto your system"
+        exit 1
+fi
+
+# Test for lame command existance
+command -v lame >/dev/null 2>&1
+if [ $? != 0 ]
+then
+	echo "Please install lame onto your system"
+        exit 1
+fi
+
+# Test for mplayer
+command -v mplayer >/dev/null 2>&1
+if [ $? != 0 ]
+then
+	echo "Please install mplayer onto your system"
+	exit 1
+fi
+
+FILENUM=1
+IDX=0
+TMPFILE="/tmp/speechidx.tmp"
+cp /dev/null $TMPFILE
+SPEECHDIR="mp3"
+mkdir $SPEECHDIR 2>/dev/null
+rm -f ${SPEECHDIR}/* >/dev/null 2>&1
+rm -f models/model*.map >/dev/null 2>&1
+
+for INFILE in models/globalAlert.txt
+do
+	echo "Processing global alerts..."
+	while read LINE
+	do		
+		SWITCH=`echo $LINE | cut -d':' -f1`
+		SWITCH=`echo $SWITCH | sed -e 's/^ *//;s/ *$//' | tr [a-z] [A-Z]`
+		MSG=`echo $LINE | cut -d':' -f2`
+		MSG=`echo $MSG | sed -e 's/^ *//;s/ *$//' | tr [a-z] [A-Z]`
+		IDXTEXT=`printf '%04d' $IDX`
+		$TTSCMD $TTSOPT ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT} "$MSG"
+		lame --quiet ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT} ${SPEECHDIR}/${IDXTEXT}.mp3
+		MP3LENGTH=`mplayer -vo null -ao null -frames 0 -identify ${SPEECHDIR}/${IDXTEXT}.mp3 | grep 'ID_LENGTH' | cut -d'=' -f2`
+		MP3LENGTH=`echo 'scale=0;' $MP3LENGTH '* 1000/1' | bc`
+		echo "${SWITCH}:${IDXTEXT}:$MP3LENGTH" >> globalAlert.map
+		echo "MP3 $IDXTEXT processed."
+		rm ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT}
+		IDX=`expr $IDX + 1`
+		if [ $IDX = 20 ]; then
+			IDX=1000
+		fi
+                if [ $IDX = 1017 ]; then
+			IDX=2000
+		fi                
+	done < $INFILE
+done
+
+
+
+for INFILE in models/model*Alert.txt
+do
+	echo "Processing file $INFILE..."
+	IDX=2000
+	OUTFILE=`echo $INFILE | sed -e 's/Alert\.txt/\.map/'`
+	rm $OUTFILE 2>/dev/null
+	echo "Adding global alerts to $INFILE..."
+        cat globalAlert.map >> $OUTFILE	
+	while read LINE
+	do
+		SWITCH=`echo $LINE | cut -d':' -f1`
+		SWITCH=`echo $SWITCH | sed -e 's/^ *//;s/ *$//' | tr [a-z] [A-Z]`
+		MSG=`echo $LINE | cut -d':' -f2`
+		MSG=`echo $MSG | sed -e 's/^ *//;s/ *$//' | tr [a-z] [A-Z]`
+		R=`grep "@${MSG}@" $TMPFILE`
+		if [ $? != 0 ]
+		then
+			IDXTEXT=`printf '%04d' $IDX`
+			$TTSCMD $TTSOPT ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT} "$MSG"
+			lame --quiet ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT} ${SPEECHDIR}/${IDXTEXT}.mp3
+			MP3LENGTH=`mplayer -vo null -ao null -frames 0 -identify ${SPEECHDIR}/${IDXTEXT}.mp3 | grep 'ID_LENGTH' | cut -d'=' -f2`
+			MP3LENGTH=`echo 'scale=0;' $MP3LENGTH '* 1000/1' | bc`
+			echo "${SWITCH}:${IDXTEXT}:${MP3LENGTH}" >> $OUTFILE
+			echo "File $IDXTEXT processed."
+			rm ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT}
+			echo "@${MSG}@:${IDXTEXT}:${MP3LENGTH}" >> $TMPFILE
+			IDX=`expr $IDX + 1`
+		else
+			echo "${SWITCH}:`echo $R|cut -d':' -f2,3`" >> $OUTFILE
+		fi
+                
+	done < $INFILE
+done
+rm $TMPFILE
+rm globalAlert.map
