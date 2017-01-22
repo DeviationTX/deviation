@@ -60,6 +60,9 @@ struct Transmitter {
     enum AudioPlayers audio_player;
     u8 audio_2way;	// Currently unused.
 #endif 
+#if HAS_AUDIO_UART5
+    u8 audio_uart5;
+#endif
     enum Mode mode;
     u16 batt_alarm;
     u16 batt_critical;

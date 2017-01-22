@@ -35,6 +35,9 @@ static char * const AUDIO_PLAYER[AUDIO_LAST] = {
     [AUDIO_DF_PLAYER] = "dfplayer",
     };
 #endif
+#if HAS_AUDIO_UART5
+const char UART5_ENABLE[] = "extended-audio-uart5";
+#endif
 /* Section: TX Module */
 static const char SECTION_MODULES[] = "modules";
 static const char MODULE_ENABLE_PIN[] = "enable";
@@ -97,6 +100,12 @@ static int ini_handler(void* user, const char* section, const char* name, const 
                     else Transmitter.audio_player = AUDIO_NONE;
                 }
             }
+        }
+#endif
+#if HAS_AUDIO_UART5
+        if (MATCH_KEY(UART5_ENABLE)) {
+            if (value_int)
+            Transmitter.audio_uart5 = 1;
         }
 #endif
         if(MATCH_KEY("txid")) {

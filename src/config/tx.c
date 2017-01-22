@@ -319,6 +319,9 @@ void CONFIG_LoadTx()
     Transmitter.audio_player = AUDIO_NONE;
     Transmitter.audio_2way = 0;
 #endif
+#if HAS_AUDIO_UART5
+    Transmitter.audio_uart5 = 0;
+#endif
 #if HAS_EXTRA_BUTTONS
     CHAN_SetButtonCfg("");
 #endif
