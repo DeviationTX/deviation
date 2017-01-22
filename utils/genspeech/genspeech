@@ -100,7 +100,9 @@ do
 	OUTFILE=`echo $INFILE | sed -e 's/Alert\.txt/\.map/'`
 	rm $OUTFILE 2>/dev/null
 	echo "Adding global alerts to $INFILE..."
+	echo ";The global alarms are currently hardcoded, index numbers can not be changed!" >> $OUTFILE
         cat globalAlert.map >> $OUTFILE	
+	echo ";Below are custom alarms for individual models (switch, trim etc.)" >> $OUTFILE
 	while read LINE
 	do
 		SWITCH=`echo $LINE | cut -d':' -f1`

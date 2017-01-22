@@ -387,7 +387,7 @@ void TELEMETRY_Alarm()
 #endif
                 case TELEM_DSM_AMPS1: MUSIC_PlayValue(MUSIC_TELEMALARM1+k, (u32)TELEMETRY_GetValue(Model.telem_alarm[k]),TELEM_UNIT_AMPS); break;
 #if HAS_EXTENDED_TELEMETRY
-// we need to get rid of this whole switch mess later on, as it uses up a lot of valuable space on the devo7e. For now, we just exclude some more telemetry values to make it fit again!
+// The block is actually not part of HAS_EXTENDED_TELEMETRY but has been excluded for ROM space issues on devo7e. We need to get rid of this whole switch mess later on, as it uses up a lot of valuable space.
                 case TELEM_DSM_ALTITUDE:       
                 case TELEM_DSM_ALTITUDE_MAX:
                 case TELEM_DSM_VARIO_CLIMBRATE1:

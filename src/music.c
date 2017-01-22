@@ -17,7 +17,6 @@
 #include "music.h"
 #include "config/tx.h"
 #include <stdlib.h>
-#include "telemetry.h"
 #include "extended_audio.h"
 
 static struct {u8 note; u8 duration;} Notes[100];
@@ -269,14 +268,15 @@ void MUSIC_PlayValue(enum Music music, u32 value, u16 unit)
     if (unit == TELEM_UNIT_VOLT || unit == TELEM_UNIT_AMPS || unit == TELEM_UNIT_ALTITUDE || unit == TELEM_UNIT_GFORCE) {
         num_notes++;
         music_queue[j] = music_queue[j-1];
-        music_queue[j-1] = 1010; //mp3 for decimal
+        music_queue[j-1] = 1010; // mp3 for decimal
         j++;
     }
     // Add unit for value if specified
-    if (unit > 0) {
+    if (unit > TELEM_UNIT_NONE) {
         num_notes++;
         music_queue[j] = unit + 1010; // mp3 files 1011-1016 for units
     }
+
     // Start callback for music queue
     if (Transmitter.audio_player) {
             SOUND_Start(100, next_note_cb, vibrate);

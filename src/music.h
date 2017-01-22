@@ -44,6 +44,17 @@ enum AudioDevices {
 #define NUM_STICKS	4
 #define NUM_AUX_KNOBS	(INP_HAS_CALIBRATION - NUM_STICKS)	// Exclude sticks
 
+enum {
+    TELEM_UNIT_NONE = 0,
+    TELEM_UNIT_TEMP,
+    TELEM_UNIT_VOLT,
+    TELEM_UNIT_RPM,
+    TELEM_UNIT_AMPS,
+    TELEM_UNIT_ALTITUDE,
+    TELEM_UNIT_GFORCE,
+    TELEM_UNIT_SECONDS,
+};
+
 struct AuxMusic {
     u16 up_state_music;              // Music to be played when Aux turns up
     u16 down_state_music;            // Music to be played when Aux turns down

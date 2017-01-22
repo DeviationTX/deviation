@@ -1,13 +1,13 @@
 STARTUP:	Welcome to deviation
 SHUTDOWN:	Goodbye
 VOLUME:		Volume
-ALARM1:		Alarm 1
-ALARM2:		Alarm 2
-ALARM3:		Alarm 3
-ALARM4:		Alarm 4
-BATT_ALARM:	Warning! Battery low!
+ALARM1:		Timer 1 alarm
+ALARM2:		Timer 2 alarm
+ALARM3:		Timer 3 alarm
+ALARM4:		Timer 4 alarm
+BATT_ALARM:	Transmitter battery voltage
 DONE_BINDING:	Finished binding
-TIMER_WARNING:	Timer alert!
+TIMER_WARNING:	Time remaining
 KEY_PRESSING:	keypress
 SAVING:		Saving
 MAXLEN:		maximum length
@@ -29,9 +29,10 @@ NUMBER7:	7
 NUMBER8:	8
 NUMBER9:	9
 DECSEP:		point
-DEGREES:	degress
+DEGREES:	degrees
 VOLTS:		volt
 RPMS:		rounds per minute
 AMPERES:	amperes
 ALTITUDE:	meters
 GFORCE:		g
+SECONDS:	seconds

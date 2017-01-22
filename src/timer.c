@@ -191,7 +191,11 @@ void TIMER_Update()
                     warn_time = ((timer_val[i] / Transmitter.countdown_timer_settings.prealert_interval)
                             * Transmitter.countdown_timer_settings.prealert_interval);
                     if (timer_val[i] > warn_time && (timer_val[i] - delta) <= warn_time) {
+#ifdef HAS_EXTENDED_AUDIO
+                        MUSIC_PlayValue(MUSIC_TIMER_WARNING,timer_val[i]/1000,TELEM_UNIT_SECONDS);
+#else
                         MUSIC_Play(MUSIC_TIMER_WARNING);
+#endif
                     }
                 }
                 // Beep once for each timeup_interval past 0
