@@ -6,17 +6,34 @@ then
 	TTSCMD="say"
 	TTSOPT="-o"
 	TTSFILEEXT="aiff"
+	TTSLCMD="afinfo"
+	TTSLOPT=""
+	TTSLPP=" | grep duration | cut -d' ' -f3"
 else
 	TTSCMD="espeak"
-	TTSOPT="-z -w"
+	TTSCMD2="pico2wave"
+	TTSOPT="-z -w "
+	TTSOPT2="--wave="
 	TTSFILEEXT="wav"
+	TTSLCMD="mplayer"
+	TTSLOPT="-vo null -ao null -frames 0 -identify"
+	TTSLPP=" | grep 'ID_LENGTH' | cut -d'=' -f2"
 fi
 
 # Test for TTS command existance
+command -v $TTSCMD2 >/dev/null 2>&1
+if [ $? != 0 ]
+then
+	echo "$TTSCMD2 unavailable, trying $TTSCMD..."
+else
+        TTSCMD=$TTSCMD2
+	TTSOPT=$TTSOPT2
+fi
+
 command -v $TTSCMD >/dev/null 2>&1
 if [ $? != 0 ]
 then
-	echo "Please install $TTSCMD onto your system"
+	echo "Please install $TTSCMD or $TTSCMD2 onto your system"
         exit 1
 fi
 
@@ -28,14 +45,15 @@ then
         exit 1
 fi
 
-# Test for mplayer
-command -v mplayer >/dev/null 2>&1
+# Test for TTS length command existance
+command -v $TTSLCMD >/dev/null 2>&1
 if [ $? != 0 ]
 then
-	echo "Please install mplayer onto your system"
+	echo "Please install $TTSLCMD onto your system"
 	exit 1
 fi
 
+echo "Generating voice files with $TTSCMD".
 FILENUM=1
 IDX=0
 TMPFILE="/tmp/speechidx.tmp"
@@ -55,13 +73,13 @@ do
 		MSG=`echo $LINE | cut -d':' -f2`
 		MSG=`echo $MSG | sed -e 's/^ *//;s/ *$//' | tr [a-z] [A-Z]`
 		IDXTEXT=`printf '%04d' $IDX`
-		$TTSCMD $TTSOPT ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT} "$MSG"
+		$TTSCMD ${TTSOPT}${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT} "$MSG"
+		eval TTSLEN=\`$TTSLCMD $TTSLOPT ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT} $TTSLPP\`
+		TTSLEN=`echo 'scale=0;' $TTSLEN '* 1000/1' | bc`
 		lame --quiet ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT} ${SPEECHDIR}/${IDXTEXT}.mp3
-		MP3LENGTH=`mplayer -vo null -ao null -frames 0 -identify ${SPEECHDIR}/${IDXTEXT}.mp3 | grep 'ID_LENGTH' | cut -d'=' -f2`
-		MP3LENGTH=`echo 'scale=0;' $MP3LENGTH '* 1000/1' | bc`
-		echo "${SWITCH}:${IDXTEXT}:$MP3LENGTH" >> globalAlert.map
-		echo "MP3 $IDXTEXT processed."
+		echo "${SWITCH}:${IDXTEXT}:$TTSLEN" >> globalAlert.map
 		rm ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT}
+		echo "Alert $IDXTEXT generated (${TTSLEN} ms)"
 		IDX=`expr $IDX + 1`
 		if [ $IDX = 20 ]; then
 			IDX=1000
@@ -92,14 +110,14 @@ do
 		if [ $? != 0 ]
 		then
 			IDXTEXT=`printf '%04d' $IDX`
-			$TTSCMD $TTSOPT ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT} "$MSG"
+			$TTSCMD ${TTSOPT}${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT} "$MSG"
+			eval TTSLEN=\`$TTSLCMD $TTSLOPT ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT} $TTSLPP\`
+			TTSLEN=`echo 'scale=0;' $TTSLEN '* 1000/1' | bc`
 			lame --quiet ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT} ${SPEECHDIR}/${IDXTEXT}.mp3
-			MP3LENGTH=`mplayer -vo null -ao null -frames 0 -identify ${SPEECHDIR}/${IDXTEXT}.mp3 | grep 'ID_LENGTH' | cut -d'=' -f2`
-			MP3LENGTH=`echo 'scale=0;' $MP3LENGTH '* 1000/1' | bc`
-			echo "${SWITCH}:${IDXTEXT}:${MP3LENGTH}" >> $OUTFILE
-			echo "File $IDXTEXT processed."
+			echo "${SWITCH}:${IDXTEXT}:${TTSLEN}" >> $OUTFILE
 			rm ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT}
-			echo "@${MSG}@:${IDXTEXT}:${MP3LENGTH}" >> $TMPFILE
+			echo "@${MSG}@:${IDXTEXT}:${TTSLEN}" >> $TMPFILE
+			echo "Alert $IDXTEXT generated (${TTSLEN} ms)"
 			IDX=`expr $IDX + 1`
 		else
 			echo "${SWITCH}:`echo $R|cut -d':' -f2,3`" >> $OUTFILE
