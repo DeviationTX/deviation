@@ -1,10 +1,10 @@
 The genspeech utility needs to be run under OSX or linux.  On OSX, it will use text-to-speech command "say"
-to generate the aiff speech files.  On Linux, it will use text-to-speech command espeak to generate wave
-speech files.  Then, it will use "lame" to convert aiff or wave files to mp3 format.  Please make sure
-you've installed these command line utilities onto your system.
+to generate the aiff speech files.  On Linux, it will use text-to-speech commands pico2wave or espeak to generate wave speech files. Then, it will use "lame" to convert aiff or wave files to mp3 format. Once generated, the duration of each audio file gets checked with mplayer (linux) or afinfo (OSX). Please make sure you've installed these command line utilities onto your system.
 
 Usage:
-1. For each model file, you can optionally provide a Switch/Trim Button/Auxillary Knob to Alert Message file.  For example,
+1. For global alerts as well as numerical values, decimal seperator and units the file globalAlert.txt is processed. Please note you can not change the labels defined but only the texts after ": in each line.
+
+2. For each model file, you can optionally provide a Switch/Trim Button/Auxillary Knob to Alert Message file.  For example,
    File: Model1Alert.txt
    Content: FMODE0:		Acro Mode
             FMODE1:		Angle Mode
@@ -31,14 +31,16 @@ Usage:
                                 (turning up or down).  For example, AUX4_UP indicating knob has been turned up;
                                 and AUX4_DOWN indicating knob has been turned down.
 
-2. Place all the Switch to Alert Message files under "models" directory.  There are 2 sample Alert Message files
-   provided in the "models" directory.  You can remove them before placing your own files.
+3. Place all the Switch to Alert Message files under "models" directory.  There is a sample Alert Message file
+   provided in the "models" directory.  You can remove it before placing your own files.
 
 3. Run "genspeech" and it will generate a mapping file for each Switch to Alert Message file, such as
    model1.map, model2.map, etc.  The mapping file contains the mapping of Switches and their corresponding
-   voice message number.  For example, below model1.map will be generated from the above Model1Alert.txt file.
+   voice message number. Also included will be the global alerts. For example, below model1.map will be
+   generated from the above Model1Alert.txt file.
    File: model1.map
-   Content: FMODE0:0100
+   Content: [... global alerts 0000-0019 and 1000-1016...]
+            FMODE0:0100
             FMODE1:0101
             HOLD1:0102
             HOLD0:0103
