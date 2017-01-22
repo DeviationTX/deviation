@@ -4,6 +4,7 @@
 if [ "`uname`" = "Darwin" ]
 then
 	TTSCMD="say"
+        TTSCMD2="pico2wave"
 	TTSOPT="-o"
 	TTSFILEEXT="aiff"
 	TTSLCMD="afinfo"
