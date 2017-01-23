@@ -85,10 +85,7 @@ do
 		if [ $IDX = 20 ]; then
 			IDX=1000
 		fi
-                if [ $IDX = 1017 ]; then
-			IDX=2000
-		fi                
-	done < $INFILE
+ 	done < $INFILE
 done
 
 
