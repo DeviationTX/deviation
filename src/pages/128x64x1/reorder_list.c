@@ -22,14 +22,10 @@ enum {
     LABEL_X      = 59,
     LABEL_WIDTH  = (LCD_WIDTH-59-4),
     ROW1_X       = 0,
-    //ROW1_W       = 25,
     ROW1_W       = 27,
-    //ROW2_X       = 27,
     ROW2_X       = 28,
     BUTTON_W     = 55,
-    //SAVE_X       = ((LCD_WIDTH + 59) / 2 - 30/2),
     SAVE_X       = LABEL_X,
-    //SAVE_W       = 30,
     SAVE_W       = LABEL_WIDTH,
 };
 #endif //OVERRIDE_PLACEMENT
