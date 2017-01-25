@@ -23,7 +23,7 @@
 enum {
     LABELNUM_X        = 0,
     LABELNUM_WIDTH    = 16,
-    LABEL_X           = 17,
+    LABEL_X           = 20,
     LABEL_WIDTH       = 0,
 };
 #define HEADER_HEIGHT (LCD_HEIGHT==240 ? 37 : 40)
@@ -49,7 +49,8 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         if (idx == absrow) {
             GUI_CreateLabelBox(&gui->idx[relrow], LABELNUM_X, y,
                 LABELNUM_WIDTH, LINE_HEIGHT,  &DEFAULT_FONT, idx_string_cb, NULL, (void *)(absrow+ 1L));
-            GUI_CreateButton(&gui->name[relrow], LABEL_X, y, BUTTON_96, menu_name_cb, 0x0000, menu_press_cb, (const void *)(long)i);
+            //GUI_CreateButton(&gui->name[relrow], LABEL_X, y, BUTTON_96, menu_name_cb, 0x0000, menu_press_cb, (const void *)(long)i);
+            GUI_CreateButton(&gui->name[relrow], LABEL_X, y, BUTTON_MENUITEM, menu_name_cb, 0x0000, menu_press_cb, (const void *)(long)i);
             //GUI_CreateLabelBox(&gui->name[relrow], LABEL_X, y,
             //    LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, menu_name_cb, menu_press_cb, (const void *)(long)i);
             break;
