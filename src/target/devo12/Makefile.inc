@@ -1,8 +1,9 @@
-SCREENSIZE := 480x272x16
-FILESYSTEM := devo12
-DFU_ARGS   := -c 12 -b 0x08004000
-
-PRE_FS = $(ODIR)/.pre_fs
+SCREENSIZE  := 480x272x16
+FILESYSTEMS := common base_fonts 320x240x16 480x272x16
+DFU_ARGS    := -c 12 -b 0x08004000
+FONTS        = filesystem/$(FILESYSTEM)/media/15normal.fon \
+               filesystem/$(FILESYSTEM)/media/23bold.fon
+LANGUAGE    := devo8,devo12
 
 include $(SDIR)/target/common/devo/Makefile.inc
 
@@ -10,19 +11,12 @@ ifndef BUILD_TARGET
 ALL += $(TARGET)-lib.dfu
 MEDIA_FILES = 
 else
-$(TARGET)-lib.dfu: $(wildcard filesystem/devo12/media/*.*) $(TARGET).dfu $(PRE_FS)
+$(TARGET)-lib.dfu: $(LAST_MODEL) $(TARGET).dfu $(PRE_FS)
 	/bin/rm -rf $(ODIR)/filesystem 2> /dev/null; true
 	/bin/mkdir $(ODIR)/filesystem
 	/bin/cp -prf filesystem/devo12/media $(ODIR)/filesystem/
 	../utils/mkfat/mkfat.py --size 16M $(ODIR)/filesystem/ $(ODIR)/$(TARGET)-lib.bin
 	../utils/dfu.py --alt 2 --name "$(HGVERSION) Library" -b 0x64080000:$(ODIR)/$(TARGET)-lib.bin $@
-
-$(PRE_FS): $(FONTS)
-	mkdir -p filesystem/$(FILESYSTEM)/media/ 2>/dev/null || true
-	cp -prf filesystem/devo8/* filesystem/$(FILESYSTEM)/
-	cp -prf filesystem/common/media filesystem/$(FILESYSTEM)/
-	rm -rf filesystem/$(FILESYSTEM)/language 2>/dev/null || true
-	touch $(PRE_FS)
 
 $(TARGET).fs:
 	/bin/rm -rf $(ODIR)/filesystem; /bin/cp -prf filesystem/devo12 $(ODIR)/filesystem

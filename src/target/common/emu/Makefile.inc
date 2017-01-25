@@ -34,8 +34,9 @@ else
     endif
 endif
 else #BUILD_TARGET
+CFLAGS += -DFILESYSTEM_DIR="\"filesystem/$(FILESYSTEM)\""
 
-$(TARGET).zip: $(TARGET).$(EXEEXT)
+$(TARGET).zip: $(TARGET).$(EXEEXT) $(TARGET).fs_wrapper
 	mv -f $(TARGET).$(EXEEXT) deviation-$(HGVERSION).$(EXEEXT)
 	rm -f deviation-$(HGVERSION).zip
 	zip deviation-$(HGVERSION).zip deviation-$(HGVERSION).$(EXEEXT)

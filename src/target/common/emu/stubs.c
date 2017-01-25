@@ -82,6 +82,7 @@ void UART_Initialize() {}
 int FS_Mount(void *FAT, const char *drive) {
     (void)FAT;
     (void)drive;
+    printf("Changing directory to: '%s'\n", FILESYSTEM_DIR);
     return ! chdir(FILESYSTEM_DIR);
 }
 
