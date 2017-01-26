@@ -4,5 +4,4 @@
 #define ZOOM_X 2
 #define ZOOM_Y 2
 #define EMU_STRING "DEVO-7e-256-Emu"
-#define FILESYSTEM_DIR "filesystem/devo7e"
 #endif

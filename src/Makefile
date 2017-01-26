@@ -13,9 +13,7 @@ default: $(TARGET)
 ALLTARGETS = $(filter-out common,$(notdir $(wildcard target/*)))
 
 # The supported transmitters
-TXS ?= devo6 devo7e devo8 devo10 devo12e devo12 devof7 devof4 devof12e
-# These txs use file systems for other txs, so don't have a file system target.
-NOFSTXS = devo6 devo7e
+TXS ?= devo6 devo7e devo7e-256 devo8 devo10 devo12e devo12 devof7 devof4 devof12e
 
 #Filter non-existant emus
 EMUS = $(foreach dir,$(TXS:%=emu_%),$(if $(wildcard target/$(dir)),$(dir),))
@@ -39,9 +37,7 @@ win_$1:
 	$(MAKE) TARGET=$1 WINDOWS=1 CROSS=i586-mingw32msvc-
 fs_$1:
 ifneq "$(INCLUDE_FS)" "1"
-ifneq "$(findstring $1,$(NOFSTXS))" "$1"
 	$(MAKE) TARGET=$1 fs
-endif
 endif
 both_$1: $1 emu_$1
 zip_$1:
@@ -154,6 +150,7 @@ CFLAGS   +=  -DMODULAR=$(MODULAR)
 endif
 
 CFLAGS   := $(CFLAGS) -Wall -Wextra -Werror=undef -I. -D$(PROGMODE) -std=gnu99 -Itarget/$(TARGET) -Igui/$(SCREENSIZE) \
+            -Ipages/$(SCREENSIZE) \
             -DHGVERSION="\"${HGVERSION}\""
 CXXFLAGS := $(CXXFLAGS) $(patsubst -std=gnu99,,$(CFLAGS))
 EXEEXT   ?= elf
@@ -164,12 +161,7 @@ EXEEXT   ?= elf
 ############################################
 #this section defines final build files    #
 ############################################
-
-FONTS    = filesystem/devo10/media/12normal.fon \
-           filesystem/devo8/media/15normal.fon \
-           filesystem/devo8/media/23bold.fon \
-           filesystem/devo10/media/04b03.fon
-
+FILESYSTEM = $(subst emu_,,$(TARGET))
 MODELDIR = filesystem/$(FILESYSTEM)/models
 
 LAST_MODEL := $(MODELDIR)/model$(NUM_MODELS).ini
@@ -203,11 +195,12 @@ $(VERBOSE).SILENT:
 clean:
 	rm -f $(TARGET).$(EXEEXT) $(TARGET).bin $(TARGET).dfu $(TARGET).list \
 		$(TARGET).map $(ODIR)/*.o $(ODIR)/*.o_ $(ODIR)/*.P  $(ODIR)/*.bin \
-		filesystem/devo7e filesystem/devo12 2> /dev/null || true
+		filesystem/$(FILESYSYTEM) 2> /dev/null || true
 
 distclean:
 	rm -f *.$(EXEEXT) *.bin *.dfu *.list *.map
 	rm -rf objs
+	rm -rf  filesystem
 	$(MAKE) -C libopencm3 clean > /dev/null
 	rm -rf deviation*.zip
 
@@ -285,20 +278,18 @@ endif
 $(LAST_MODEL): model_template.ini tx_template.ini $(FONTS) $(PRE_FS)
 	@echo " + Copying template files for $(FILESYSTEM)"
 	mkdir -p filesystem/$(FILESYSTEM) || true
-	cp -prf filesystem/common/media filesystem/$(FILESYSTEM)/
-	cp -prf filesystem/common/template filesystem/$(FILESYSTEM)/
-	mkdir filesystem/$(FILESYSTEM)/layout 2> /dev/null; \
-        cp -prf filesystem/common/layout/*.* filesystem/$(FILESYSTEM)/layout/
+	for i in $(FILESYSTEMS); do cp -prf fs/$$i/* filesystem/$(FILESYSTEM)/; done
+	rm filesystem/$(FILESYSTEM)/*/.ignore 2>/dev/null || true
 	cp tx_template.ini filesystem/$(FILESYSTEM)/tx.ini
-	cp filesystem/common/datalog.bin filesystem/$(FILESYSTEM)/datalog.bin
-	cp filesystem/common/hardware.ini filesystem/$(FILESYSTEM)/hardware.ini
 	echo 'empty' > filesystem/$(FILESYSTEM)/errors.txt
 	mkdir filesystem/$(FILESYSTEM)/models 2> /dev/null || true
 	echo 'name=Model1' > filesystem/$(FILESYSTEM)/models/model1.ini \
 		&& cat model_template.ini >> filesystem/$(FILESYSTEM)/models/model1.ini
 	cp model_template.ini filesystem/$(FILESYSTEM)/models/default.ini
+ifdef LANGUAGE
 	mkdir filesystem/$(FILESYSTEM)/language 2> /dev/null; \
-               ../utils/extract_strings.pl -target $(FILESYSTEM) -update -objdir $(ODIR)
+               ../utils/extract_strings.pl -fs $(FILESYSTEM) -targets $(LANGUAGE) -update -objdir $(ODIR)
+endif
 	export tx=$(FILESYSTEM); \
 	number=2 ; while [ $$number -le $(NUM_MODELS) ] ; do \
 		cp model_template.ini filesystem/$$tx/models/model$$number.ini; \
@@ -310,16 +301,20 @@ $(LAST_MODEL): model_template.ini tx_template.ini $(FONTS) $(PRE_FS)
 ######################
 #Necessary Font files#
 ######################
-filesystem/devo10/media/12normal.fon: fonts/12normal.bdf
+filesystem/$(FILESYSTEM)/media/12normal.fon: fonts/12normal.bdf
+	mkdir -p filesystem/$(FILESYSTEM)/media/
 	../utils/font/bdf_to_font.pl -maxsize 12 -mode bin $< -out $@ -minspace 10
 
-filesystem/devo8/media/15normal.fon: fonts/15normal.bdf
+filesystem/$(FILESYSTEM)/media/15normal.fon: fonts/15normal.bdf
+	mkdir -p filesystem/$(FILESYSTEM)/media/
 	../utils/font/bdf_to_font.pl -maxsize 15 -mode bin $< -out $@ -minspace 8
 
-filesystem/devo8/media/23bold.fon: fonts/23bold.bdf
+filesystem/$(FILESYSTEM)/media/23bold.fon: fonts/23bold.bdf
+	mkdir -p filesystem/$(FILESYSTEM)/media/
 	../utils/font/bdf_to_font.pl -maxsize 23 -mode bin $< -out $@ -minspace 8
 
-filesystem/devo10/media/04b03.fon: fonts/04b03.bdf
+filesystem/$(FILESYSTEM)/media/04b03.fon: fonts/04b03.bdf
+	mkdir -p filesystem/$(FILESYSTEM)/media/
 	../utils/font/bdf_to_font.pl -maxsize 5 -mode bin $< -out $@ -minspace 5
 
 ##############################
