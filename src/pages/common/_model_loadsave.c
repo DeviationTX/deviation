@@ -56,7 +56,7 @@ static void select_cb(guiObject_t *obj, u16 sel, void *data)
             int count = 0;
             int type;
             while((type = FS_ReadDir(filename)) != 0) {
-                if (type == 1 && strncasecmp(filename + strlen(filename) - 4, ".bmp", 4) == 0) {
+                if (type == 1 && strncasecmp(filename + strlen(filename) - 4, IMG_EXT, 4) == 0) {
                     count++;
                     if (sel == count) {
                         CONFIG_ParseIconName(mp->iconstr, filename);
@@ -116,7 +116,7 @@ static const char *string_cb(u8 idx, void *data)
     } else if ((long)data == LOAD_ICON) { //Icon
         if (idx == 0)
             return _tr("Default");
-        if (! get_idx_filename(tempstring, "modelico", ".bmp", idx-1, ""))
+        if (! get_idx_filename(tempstring, "modelico", IMG_EXT, idx-1, ""))
             return _tr("Unknown");
         return tempstring;
     } else if ((long)data == LOAD_LAYOUT) {
@@ -246,7 +246,7 @@ void MODELPage_ShowLoadSave(int loadsave, void(*return_page)(int page))
         mp->selected = 1;
     } else if (loadsave == LOAD_ICON) { //Icon
         mp->selected = 0;
-        num_models = 1 + count_files("modelico", ".bmp", Model.icon[0] ? Model.icon+9 : NULL);
+        num_models = 1 + count_files("modelico", IMG_EXT, Model.icon[0] ? Model.icon+9 : NULL);
         const char *ico = mp->selected == 0 ? CONFIG_GetIcon(Model.type) : CONFIG_GetCurrentIcon();
         strlcpy(mp->iconstr, ico, sizeof(mp->iconstr));
         mp->selected++;
