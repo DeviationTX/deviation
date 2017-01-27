@@ -65,9 +65,11 @@ struct ButtonMusic {
     u16 off_state_music;            // Music to be played when button is Off
 };
 
-struct {u16 music; u16 duration;} music_durations[80];
+struct {u16 music; u16 duration; char label[30];} music_index[80];
 
 u16 MUSIC_GetDuration(u16 music);
+
+const char * MUSIC_GetLabel(u16 music);
 
 void MUSIC_PlayValue(enum Music music, u32 value, u16 unit);
 #endif

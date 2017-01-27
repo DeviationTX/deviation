@@ -213,6 +213,9 @@ void MUSIC_Play(enum Music music)
             num_notes=1;
             next_note=0;
             Volume = 0;	// Just activate the haptic sensor, no buzzer
+#ifdef BUILDTYPE_DEV
+            printf("Playing alert #%d (%s)\n",music_queue[0], MUSIC_GetLabel(music_queue[0]));
+#endif
         } else if (playback_device == AUDDEV_ALL) {
             AUDIO_Play(music);
         }
@@ -228,12 +231,24 @@ void MUSIC_Play(enum Music music)
 u16 MUSIC_GetDuration(u16 music)
 {
     u32 i;
-    for ( i = 0; i < sizeof(music_durations)/sizeof(music_durations[0]);i++) {
-        if ( music_durations[i].music == music ) return music_durations[i].duration;
+    for ( i = 0; i < sizeof(music_index)/sizeof(music_index[0]);i++) {
+        if ( music_index[i].music == music ) return music_index[i].duration;
     }
     return 0;
 
 }
+
+#if HAS_MUSIC_CONFIG
+const char * MUSIC_GetLabel(u16 music)
+{
+    u32 i;
+    for ( i = 0; i < sizeof(music_index)/sizeof(music_index[0]);i++) {
+        if ( music_index[i].music == music ) return music_index[i].label;
+    }
+    return 0;
+
+}
+#endif
 
 void MUSIC_PlayValue(enum Music music, u32 value, u16 unit)
 {
@@ -282,7 +297,7 @@ void MUSIC_PlayValue(enum Music music, u32 value, u16 unit)
             SOUND_Start(100, next_note_cb, vibrate);
 #ifdef BUILDTYPE_DEV
             for (i=0;i<num_notes;i++) {
-                printf("Playing music %d for %d ms\n",music_queue[i], MUSIC_GetDuration(music_queue[i]));
+                printf("Playing music %d (%s) for %d ms\n",music_queue[i], MUSIC_GetLabel(music_queue[i]), MUSIC_GetDuration(music_queue[i]));
             }
 #endif
          }

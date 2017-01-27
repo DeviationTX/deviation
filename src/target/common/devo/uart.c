@@ -40,10 +40,10 @@ void UART_Initialize()
                   //GPIO_USART1_RX);
 
     /* Setup UART parameters. */
-#if defined(BUILDTYPE_DEV) || HAS_AUDIO_UART5
-    usart_set_baudrate(_USART, 115200);
-#else
+#if !defined(BUILDTYPE_DEV) && HAS_EXTENDED_AUDIO
     usart_set_baudrate(_USART, 9600);
+#else
+    usart_set_baudrate(_USART, 115200);
 #endif
     usart_set_databits(_USART, 8);
     usart_set_stopbits(_USART, USART_STOPBITS_1);

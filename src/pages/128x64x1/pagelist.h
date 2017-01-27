@@ -60,6 +60,9 @@ PAGEDEF(PAGEID_TRIM,     PAGE_TrimInit,        NULL,                  NULL,     
 PAGEDEF(PAGEID_DATALOG,  PAGE_DatalogInit,     PAGE_DatalogEvent,     NULL,               MODEL_MENU,  _tr_noop("Datalog"))
 #endif
 PAGEDEF(PAGEID_MAINCFG,  PAGE_MainLayoutInit,  NULL,                  NULL,               MODEL_MENU,  _tr_noop("Main page config"))
+#if HAS_MUSIC_CONFIG
+PAGEDEF(PAGEID_MUSICCFG, PAGE_MusicconfigInit,    NULL,    NULL,               MODEL_MENU,   _tr_noop("Music config"))
+#endif
 
 // Transmitter menu
 //-----------------

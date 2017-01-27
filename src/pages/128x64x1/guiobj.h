@@ -217,6 +217,13 @@ struct debuglog_obj {
     guiScrollable_t scrollable;
 };
 
+#ifdef HAS_MUSIC_CONFIG
+struct musicconfig_obj {
+    guiScrollable_t scrollable;
+    guiLabel_t name;
+};
+#endif
+
 /****Advanced ****/
 struct advcurve_obj {
     guiTextSelect_t name;
@@ -365,6 +372,9 @@ struct gui_objs {
         struct calibrate_obj calibrate;
         struct usb_obj usb;
         struct debuglog_obj debuglog;
+#ifdef HAS_MUSIC_CONFIG
+        struct musicconfig_obj musicconfig;
+#endif
         
         struct advcurve_obj advcurve;
         struct advlimit_obj advlimit;

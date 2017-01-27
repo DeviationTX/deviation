@@ -28,10 +28,12 @@
 void
 AUDIO_send_char(uint8_t c) {
 #if HAS_AUDIO_UART5
-    if (Transmitter.audio_uart5) 
+    if (Transmitter.audio_uart5) {
         usart_send_blocking(UART5, c);
-    else
+    }
+    else {
         usart_send_blocking(_USART, c);
+    }
       
 #else
     usart_send_blocking(_USART, c);

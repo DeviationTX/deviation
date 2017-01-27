@@ -22,6 +22,7 @@
 #include "_menus.h"
 #include "config/display.h"
 #include "rtc_config.h"
+#include "musicconfig_page.h"
 
 #define PAGE_NAME_MAX 10
 
@@ -156,6 +157,11 @@ void PAGE_DatalogExit();
 void PAGE_DebuglogInit();
 void PAGE_DebuglogEvent();
 void PAGE_DebuglogExit();
+
+/* Musicconfig */
+void PAGE_MusicconfigInit();
+void PAGE_MusicconfigEvent();
+void PAGE_MusicconfigExit();
 
 void PAGE_ChangeByID(enum PageID id, s8 menuPage);
 void PAGE_PushByID(enum PageID id, int page);

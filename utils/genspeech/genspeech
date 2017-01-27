@@ -73,14 +73,15 @@ do
 		SWITCH=`echo $SWITCH | sed -e 's/^ *//;s/ *$//' | tr [a-z] [A-Z]`
 		MSG=`echo $LINE | cut -d':' -f2`
 		MSG=`echo $MSG | sed -e 's/^ *//;s/ *$//' | tr [a-z] [A-Z]`
-		IDXTEXT=`printf '%04d' $IDX`
+		IDXTEXTID=`printf '%04d' $IDX`
+		IDXTEXT=`echo ${IDXTEXTID}_${MSG} | tr -d ' '`
 		$TTSCMD ${TTSOPT}${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT} "$MSG"
 		eval TTSLEN=\`$TTSLCMD $TTSLOPT ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT} $TTSLPP\`
 		TTSLEN=`echo 'scale=0;' $TTSLEN '* 1000/1' | bc`
 		lame --quiet ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT} ${SPEECHDIR}/${IDXTEXT}.mp3
-		echo "${SWITCH}:${IDXTEXT}:$TTSLEN" >> globalAlert.map
+		echo "${SWITCH}:${IDXTEXTID}:${TTSLEN}:${MSG}" >> globalAlert.map
 		rm ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT}
-		echo "Alert $IDXTEXT generated (${TTSLEN} ms)"
+		echo "Alert ${IDXTEXT}.mp3 generated (length $TTSLEN ms)"
 		IDX=`expr $IDX + 1`
 		if [ $IDX = 20 ]; then
 			IDX=1000
@@ -109,15 +110,16 @@ do
 		R=`grep "@${MSG}@" $TMPFILE`
 		if [ $? != 0 ]
 		then
-			IDXTEXT=`printf '%04d' $IDX`
+			IDXTEXTID=`printf '%04d' $IDX`
+			IDXTEXT=`echo ${IDXTEXTID}_${MSG} | tr -d ' '`
 			$TTSCMD ${TTSOPT}${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT} "$MSG"
 			eval TTSLEN=\`$TTSLCMD $TTSLOPT ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT} $TTSLPP\`
 			TTSLEN=`echo 'scale=0;' $TTSLEN '* 1000/1' | bc`
 			lame --quiet ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT} ${SPEECHDIR}/${IDXTEXT}.mp3
-			echo "${SWITCH}:${IDXTEXT}:${TTSLEN}" >> $OUTFILE
+			echo "${SWITCH}:${IDXTEXTID}:${TTSLEN}:$MSG" >> $OUTFILE
 			rm ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT}
-			echo "@${MSG}@:${IDXTEXT}:${TTSLEN}" >> $TMPFILE
-			echo "Alert $IDXTEXT generated (${TTSLEN} ms)"
+			echo "@${MSG}@:${IDXTEXTID}:${TTSLEN}" >> $TMPFILE
+			echo "Alert ${IDXTEXT}.mp3 generated (length $TTSLEN ms)"
 			IDX=`expr $IDX + 1`
 		else
 			echo "${SWITCH}:`echo $R|cut -d':' -f2,3`" >> $OUTFILE

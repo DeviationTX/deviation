@@ -18,6 +18,10 @@
 #include "music.h"
 #include "tx.h"
 
+#ifndef EMULATOR
+#include <libopencm3/stm32/usart.h>
+#endif // EMULATOR
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -102,12 +106,18 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             }
         }
 #endif
-#if HAS_AUDIO_UART5
+
+#if HAS_AUDIO_UART5 && !defined(BUILDTYPE_DEV)
         if (MATCH_KEY(UART5_ENABLE)) {
-            if (value_int)
-            Transmitter.audio_uart5 = 1;
+            if (value_int) {
+                Transmitter.audio_uart5 = 1;
+                usart_disable(_USART);
+                usart_set_baudrate(_USART, 115200);
+                usart_enable(_USART);
+            }
         }
 #endif
+
         if(MATCH_KEY("txid")) {
             Transmitter.txid = strtol(value, NULL, 16);
         }

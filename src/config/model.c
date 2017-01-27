@@ -18,8 +18,9 @@
 #include "telemetry.h"
 #include "tx.h"
 #if HAS_EXTENDED_AUDIO
-#include "alertcfg.h"
+#include "../music.h"
 #endif
+
 #include <stdlib.h>
 #include <string.h>
 extern const u8 EATRG[PROTO_MAP_LEN];
@@ -181,6 +182,11 @@ static const char DATALOG_RATE[] = "rate";
 #define _STRINGIFY(x) #x
 static const char SECTION_GUI[] = "gui-" STRINGIFY(LCD_WIDTH) "x" STRINGIFY(LCD_HEIGHT);
 static const char GUI_QUICKPAGE[] = "quickpage";
+
+#if HAS_EXTENDED_AUDIO
+/* Section: Music */
+static const char SECTION_MUSIC[] = "music";
+#endif
 
  
 s8 mapstrcasecmp(const char *s1, const char *s2)
@@ -978,6 +984,56 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
             return 1;
         }
     }
+#if HAS_EXTENDED_AUDIO
+    char src_name[50];
+    const char *button_name;
+
+    if (MATCH_SECTION(SECTION_MUSIC)) {
+        if (!MUSIC_GetDuration(atoi(value))) {
+            printf("Music %s not found in music.map\n",value);
+            return 0;
+        }
+        for (int i = INP_HAS_CALIBRATION+1; i <= NUM_INPUTS; i++) {
+            INPUT_SourceName(src_name, i);
+            if (MATCH_KEY(src_name)) {
+                Model.switch_music_no[i - INP_HAS_CALIBRATION - 1] = atoi(value);
+                return 1;
+            }
+        }
+        for (int i = 1; i <= NUM_TX_BUTTONS; i++) {
+            button_name = INPUT_ButtonName(i);
+            strcpy(src_name, button_name);
+            strcat(src_name, "_ON");
+            // Button name alone or with suffix "_ON" will be considered the same
+            if (MATCH_KEY(button_name) || MATCH_KEY(src_name)) {
+                Model.button_music_no[i-1].on_state_music = atoi(value);
+                return 1;
+            }
+            strcpy(src_name, button_name);
+            strcat(src_name, "_OFF");
+            if (MATCH_KEY(src_name)) {
+                Model.button_music_no[i-1].off_state_music = atoi(value);
+                return 1;
+            }
+        }
+#if NUM_AUX_KNOBS
+        for (int i = NUM_STICKS+1; i <= NUM_STICKS + NUM_AUX_KNOBS; i++) {
+            INPUT_SourceName(src_name, i);
+            strcat(src_name, "_UP");
+            if (MATCH_KEY(src_name)) {
+                Model.aux_music_no[i - (NUM_STICKS+1)].up_state_music = atoi(value);
+                return 1;
+            }
+            INPUT_SourceName(src_name, i);
+            strcat(src_name, "_DOWN");
+            if (MATCH_KEY(src_name)) {
+                Model.aux_music_no[i - (NUM_STICKS+1)].down_state_music = atoi(value);
+                return 1;
+            }
+        }
+#endif
+    }
+#endif
     printf("Unknown Section: '%s'\n", section);
     return 0;
 }
@@ -1319,16 +1375,12 @@ u8 CONFIG_ReadModel(u8 model_num) {
     char file[30];
     auto_map = 0;
     get_model_file(file, model_num);
+
     if (CONFIG_IniParse(file, ini_handler, &Model)) {
         printf("Failed to parse Model file: %s\n", file);
     }
     if (! ELEM_USED(Model.pagecfg2.elem[0]))
         CONFIG_ReadLayout("layout/default.ini");
-#if HAS_EXTENDED_AUDIO
-    file[strlen(file)-4] = '\0';
-    strcat(file, ".map");
-    CONFIG_AlertParse(file);
-#endif
     if(! PROTOCOL_HasPowerAmp(Model.protocol))
         Model.tx_power = TXPOWER_150mW;
     MIXER_SetMixers(NULL, 0);

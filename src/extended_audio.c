@@ -42,7 +42,7 @@ AUDIO_Print(char *string) {
 int AUDIO_Play(u16 music) {
   #ifdef BUILDTYPE_DEV
   // dev builds log to the serial port, so just report it.
-  printf("Playing alert #%d\n", music);
+  printf("Playing alert #%d (%s)\n", music, MUSIC_GetLabel(music));
   #endif
 
   #if !defined(BUILDTYPE_DEV) || HAS_AUDIO_UART5

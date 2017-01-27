@@ -18,6 +18,7 @@
 #include "gui/gui.h"
 #include "tx.h"
 #include "rtc.h"
+#include "alertcfg.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -329,6 +330,9 @@ void CONFIG_LoadTx()
     CONFIG_LoadHardware();
     CONFIG_IniParse("tx.ini", ini_handler, (void *)&Transmitter);
     crc32 = Crc(&Transmitter, sizeof(Transmitter));
+#if HAS_EXTENDED_AUDIO
+    CONFIG_AlertParse("music.map");
+#endif
     return;
 }
 
