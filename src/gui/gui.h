@@ -70,8 +70,8 @@ struct LabelDesc {
 
 struct ImageMap {
     const char *file;
-    u8 width;
-    u8 height;
+    u16 width;
+    u16 height;
     u16 x_off;
     u16 y_off;
 };

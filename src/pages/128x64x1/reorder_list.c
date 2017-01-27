@@ -20,13 +20,13 @@
 
 enum {
     LABEL_X      = 59,
-    ROW1_X       = 0,
-    ROW1_W       = 25,
-    ROW2_X       = 27,
-    BUTTON_W     = 55,
-    SAVE_X       = ((LCD_WIDTH + 59) / 2 - 30/2),
-    SAVE_W       = 30,
     LABEL_WIDTH  = (LCD_WIDTH-59-4),
+    ROW1_X       = 0,
+    ROW1_W       = 27,
+    ROW2_X       = 28,
+    BUTTON_W     = 55,
+    SAVE_X       = LABEL_X,
+    SAVE_W       = LABEL_WIDTH,
 };
 #endif //OVERRIDE_PLACEMENT
 #include "../common/_reorder_list.c"

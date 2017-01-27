@@ -14,6 +14,7 @@
  */
 
 const struct ImageMap image_map[] = {
+    {"media/btn_menu" IMG_EXT,440, 24, 0, 0}, /*FILE_BTN_MENUITEM */
     {"media/btn96_24" IMG_EXT, 96, 24, 0, 0}, /*FILE_BTN96_24 */
     {"media/btn48_24" IMG_EXT, 48, 24, 0, 0}, /*FILE_BTN48_24 */
     {"media/btn96_16" IMG_EXT, 96, 16, 0, 0}, /*FILE_BTN96_16 */
