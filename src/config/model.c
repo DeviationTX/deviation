@@ -188,7 +188,7 @@ static const char GUI_QUICKPAGE[] = "quickpage";
 static const char SECTION_MUSIC[] = "music";
 #endif
 
- 
+
 s8 mapstrcasecmp(const char *s1, const char *s2)
 {
     int i = 0;
@@ -392,7 +392,7 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
         }
         seen_res = HIRES;
     }
-#else 
+#else
     if (! MATCH_SECTION(SECTION_GUI))
         return 1;
 #endif
@@ -400,7 +400,7 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
         if (! ELEM_USED(Model.pagecfg2.elem[idx]))
             break;
     }
-    
+
     if (idx == NUM_ELEMS) {
         printf("No free element available (max = %d)\n", NUM_ELEMS);
         return 1;
@@ -744,7 +744,7 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
             }
             return 1;
         }
-       
+
         if(assign_int(&m->limits[idx], _seclimit, MAPSIZE(_seclimit)))
             return 1;
         if (MATCH_KEY(CHAN_LIMIT_MIN)) {
@@ -834,17 +834,17 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
             return 1;
         }
         if (MATCH_KEY(SWASH_ELE_INV)) {
-            if (value_int) 
+            if (value_int)
                 m->swash_invert |= 0x01;
             return 1;
         }
         if (MATCH_KEY(SWASH_AIL_INV)) {
-            if (value_int) 
+            if (value_int)
                 m->swash_invert |= 0x02;
             return 1;
         }
         if (MATCH_KEY(SWASH_COL_INV)) {
-            if (value_int) 
+            if (value_int)
                 m->swash_invert |= 0x04;
             return 1;
         }
@@ -943,7 +943,7 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
             src = get_source(section, name);
         }
         if(found || src) {
-            u8 i;
+            u32 i;
             for (i = 0; i < NUM_STR_ELEMS(SAFETY_VAL); i++) {
                 if (MATCH_VALUE(SAFETY_VAL[i])) {
                     m->safety[src] = i;
@@ -987,16 +987,16 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
 #if HAS_EXTENDED_AUDIO
     char src_name[50];
     const char *button_name;
-
+    u8 val = atoi(value);
     if (MATCH_SECTION(SECTION_MUSIC)) {
-        if (!MUSIC_GetDuration(atoi(value))) {
+        if (!MUSIC_GetDuration(val)) {
             printf("Music %s not found in music.map\n",value);
             return 0;
         }
         for (int i = INP_HAS_CALIBRATION+1; i <= NUM_INPUTS; i++) {
             INPUT_SourceName(src_name, i);
             if (MATCH_KEY(src_name)) {
-                Model.switch_music_no[i - INP_HAS_CALIBRATION - 1] = atoi(value);
+                m->switch_music_no[i - INP_HAS_CALIBRATION - 1] = val;
                 return 1;
             }
         }
@@ -1006,13 +1006,13 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
             strcat(src_name, "_ON");
             // Button name alone or with suffix "_ON" will be considered the same
             if (MATCH_KEY(button_name) || MATCH_KEY(src_name)) {
-                Model.button_music_no[i-1].on_state_music = atoi(value);
+                m->button_music_no[i-1].on_state_music = val;
                 return 1;
             }
             strcpy(src_name, button_name);
             strcat(src_name, "_OFF");
             if (MATCH_KEY(src_name)) {
-                Model.button_music_no[i-1].off_state_music = atoi(value);
+                m->button_music_no[i-1].off_state_music = val;
                 return 1;
             }
         }
@@ -1021,13 +1021,13 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
             INPUT_SourceName(src_name, i);
             strcat(src_name, "_UP");
             if (MATCH_KEY(src_name)) {
-                Model.aux_music_no[i - (NUM_STICKS+1)].up_state_music = atoi(value);
+                m->aux_music_no[i - (NUM_STICKS+1)].up_state_music = val;
                 return 1;
             }
             INPUT_SourceName(src_name, i);
             strcat(src_name, "_DOWN");
             if (MATCH_KEY(src_name)) {
-                Model.aux_music_no[i - (NUM_STICKS+1)].down_state_music = atoi(value);
+                m->aux_music_no[i - (NUM_STICKS+1)].down_state_music = val;
                 return 1;
             }
         }
@@ -1056,7 +1056,7 @@ void write_int(FILE *fh, void* ptr, const struct struct_map *map, int map_size)
         if (map[i].defval == 0xffff)
             continue;
         switch(size) {
-            case 0: 
+            case 0:
             case 2: //SRC
             case 6: //BUTTON
                     value = *((u8 *)((long)ptr + offset)); break;
@@ -1232,7 +1232,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
             continue;
         fprintf(fh, "[%s%d]\n", SECTION_TRIM, idx+1);
         fprintf(fh, "%s=%s\n", TRIM_SOURCE,
-             m->trims[idx].src >= 1 && m->trims[idx].src <= 4 
+             m->trims[idx].src >= 1 && m->trims[idx].src <= 4
              ? tx_stick_names[m->trims[idx].src-1]
              : INPUT_SourceNameReal(file, m->trims[idx].src));
         write_int(fh, &m->trims[idx], _sectrim, MAPSIZE(_sectrim));

@@ -47,25 +47,27 @@ void CONFIG_AlertParse(const char* filename)
             if ((textlen > 0) && (line[textlen-1] == '\r'))
                 line[--textlen] = '\0';
         }
+/* removed to fit on devo7e, and since trailing spaces are just part of the label we don't need stripping them
         // strip trailing spaces
         while ((textlen > 0) && ((line[textlen-1] == ' ') || (line[textlen-1] == '\t')))
             line[--textlen] = '\0';
+*/
         // Ignore comments or empty lines
         if ((line[0] == '\0') || (line[0] == ';'))
             continue;
         pt = strtok(line,":");
-        while(pt != NULL) { 
+        while(pt != NULL) {
             j++;
             val = atoi(pt);
 #if HAS_MUSIC_CONFIG
-	    if (j == 4) strcpy(music_index[k].label,pt);
+	          if (j == 4) strcpy(music_index[k].label,pt);
 #endif
             if (j == 3) music_index[k].duration = val;
             if (j == 2) music_index[k].music = val;
             pt = strtok(NULL, ":");
-            
+
         }
-        k++;    
+        k++;
     }
     fclose(file);
 }

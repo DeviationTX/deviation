@@ -16,8 +16,8 @@
 #include "common.h"
 #include "music.h"
 #include "config/tx.h"
-#include <stdlib.h>
 #include "extended_audio.h"
+#include <stdlib.h>
 
 static struct {u8 note; u8 duration;} Notes[100];
 static u8 Volume;
@@ -214,7 +214,7 @@ void MUSIC_Play(enum Music music)
             next_note=0;
             Volume = 0;	// Just activate the haptic sensor, no buzzer
 #ifdef BUILDTYPE_DEV
-            printf("Playing alert #%d (%s)\n",music_queue[0], MUSIC_GetLabel(music_queue[0]));
+            printf("Playing music #%d (%s)\n",music_queue[0], MUSIC_GetLabel(music_queue[0]));
 #endif
         } else if (playback_device == AUDDEV_ALL) {
             AUDIO_Play(music);
