@@ -74,7 +74,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
     int x = 63;
-    int w = 59;
+    int w = 60;
     const void *lbl_data = NULL;
     void *lbl_cb = NULL;
     void *but_press = NULL;

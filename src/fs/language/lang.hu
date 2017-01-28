@@ -180,7 +180,7 @@ Közép imp. hossz
 |devo10:Center PW
 Közép imp.
 :Center all \nsticks and knobs\nthen press ENT
-Állítsa középre a \nbotkormányokat és potikat\nés nyomjon ENT-t
+Állítsa középre a \nbotkormányokat \nés a tekerőket,\nmajd nyomjon ENT-t
 :Ch
 Cs
 :Ch%d
@@ -504,7 +504,7 @@ Lejjebb
 :Move Up
 Feljebb
 :Move sticks and knobs\nto max & min positions\nthen press ENT
-Mozgassa a botokat és potikat\nmin-tól max-ig\nés nyomjon ENT-t
+Mozgassa a botokat \nés a tekerőket\nmin-tól max-ig,\nmajd nyomjon ENT-t
 :Multi
 Multi
 :Multirotor
@@ -769,6 +769,8 @@ Imbolygó
 Kapcsoló
 :Switch assignment
 Kapcsoló összerendelés
+|devo10:Switch assignment
+Kapcs. összerend.
 :Switch1
 Kapcs.1
 :Switch2
@@ -828,7 +830,7 @@ Sablon
 :Template..
 Sablon...
 :Thr hold
-Gáz kapcsoló
+Gáz kapcs.
 :Throttle curves
 Gáz görbék
 :Throttle hold
@@ -850,7 +852,7 @@ Ismétlés interv.
 :Timeup intvl
 Ismétlés interv.
 :Toggle
-Váltó k.
+Kapcs. 
 :Touch Calibrate
 Érintés kalibrálás
 :Touch Test
@@ -869,6 +871,8 @@ Oktató konf. (Csatorna)
 Oktató konf. (Bot)
 :Trainer Sw
 Oktató kapcs.
+|devo10:Trainer Sw
+Oktató k.
 :Transmitter config
 Távirányító konfig.
 :Transmitter menu
@@ -956,7 +960,7 @@ késleltetés
 |devo10:delay
 késlelt.
 :from
-tól
+-ra, erről:
 :is not supported
 nem támogatott
 :is turned off

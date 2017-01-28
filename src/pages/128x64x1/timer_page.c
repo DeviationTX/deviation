@@ -21,12 +21,12 @@
 
 enum {
     LABEL_X        = 0,
-    LABEL_WIDTH    = 55,
-    TEXTSEL_X      = 55,
+    LABEL_WIDTH    = 57,
+    TEXTSEL_X      = 58,
     TEXTSEL_WIDTH  = 65,
-    RESET_X        = 58,
+    RESET_X        = 61,
     RESET_WIDTH    = 59,
-    START_WIDTH    = 50,
+    START_WIDTH    = 57,
 };
 #endif //OVERRIDE_PLACEMENT
 

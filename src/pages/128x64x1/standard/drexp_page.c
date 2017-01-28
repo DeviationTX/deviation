@@ -51,7 +51,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     GUI_CreateTextSelectPlate(&gui->value1[relrow], 0, y,
         w1, LINE_HEIGHT, &TINY_FONT, NULL, set_dr_cb, (void *)(long)(absrow - PITTHROMODE_NORMAL));
     GUI_CreateTextSelectPlate(&gui->value2[relrow], w1+1, y,
-        w2, LINE_HEIGHT, &DEFAULT_FONT, NULL, set_exp_cb, (void *)(long)(absrow - PITTHROMODE_NORMAL));
+        w2, LINE_HEIGHT, &TINY_FONT, NULL, set_exp_cb, (void *)(long)(absrow - PITTHROMODE_NORMAL));
     return 2;
 }
 
