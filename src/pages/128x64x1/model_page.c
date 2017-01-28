@@ -25,11 +25,11 @@
 enum {
     DEFAULT_TEXTSEL_X = 63,
     LEFT_TEXTSEL_X    = 0,
-    TEXTSEL_WIDTH     = 59,
+    TEXTSEL_WIDTH     = 60,
     LABEL_X           = 0,
     LABEL_WIDTH       = 0,
     BUTTON_X          = 63,
-    BUTTON_WIDTH      = 59,
+    BUTTON_WIDTH      = 60,
 };
 #endif //OVERRIDE_PLACEMENT
 

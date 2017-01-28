@@ -23,21 +23,21 @@
 enum {
     NEWTEXTSEL_X = 0,
     NEWTEXTSEL_W = 68,
-    NEWBUTTON_X = 68,
-    NEWBUTTON_W = 50,
+    NEWBUTTON_X = 69,
+    NEWBUTTON_W = 54,
     QPBUTTON_X  = 0,
-    QPBUTTON_W  = 124,
+    QPBUTTON_W  = 123,
     MENULABEL_X = 0,
     MENULABEL_W = 56,
     MENUTEXT_X  = 0,
-    MENUTEXT_W  = 124,
+    MENUTEXT_W  = 123,
     #define LINE_OFFSET 1
     ELEMBUT_X   = 0,
-    ELEMBUT_W   = 50,
+    ELEMBUT_W   = 55,
     ELEMLBL_X   = 0,
     ELEMLBL_W   = 56,
     ELEMTXT_X   = 56,
-    ELEMTXT_W   = 68,
+    ELEMTXT_W   = 67,
 };
 #endif //OVERRIDE_PLACEMENT
 static struct layout_page    * const lp  = &pagemem.u.layout_page;

@@ -96,7 +96,7 @@ static void show_page(CurvesMode _curve_mode, int page)
     PAGE_ShowHeader(_tr("Mode"));
     
     // FIXME: need a special value for header button/textsels
-    GUI_CreateTextSelectPlate(&gui->mode, 35, 0, 55, HEADER_WIDGET_HEIGHT, &DEFAULT_FONT, NULL, set_mode_cb, (void *)(long)curve_mode);
+    GUI_CreateTextSelectPlate(&gui->mode, 32, 0, 59, HEADER_WIDGET_HEIGHT, &DEFAULT_FONT, NULL, set_mode_cb, (void *)(long)curve_mode);
     GUI_CreateTextSelectPlate(&gui->hold, 92, 0, 36, HEADER_WIDGET_HEIGHT, &DEFAULT_FONT, NULL, set_holdstate_cb, NULL);
     if (pit_mode != PITTHROMODE_HOLD)
         GUI_SetHidden((guiObject_t *)&gui->hold, 1);

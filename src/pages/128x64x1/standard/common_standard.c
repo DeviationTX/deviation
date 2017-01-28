@@ -28,8 +28,8 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 {
     struct page_defs *page_defs = (struct page_defs *)data;
     (void)data;
-    u8 w = 59;
-    u8 x = 58;
+    u8 w = 60;
+    u8 x = 63;
 
     GUI_CreateLabelBox(&gui->name[relrow], 0, y,
             0, LINE_HEIGHT, &DEFAULT_FONT, STDMIX_channelname_cb, NULL, (void *)(long)absrow);
