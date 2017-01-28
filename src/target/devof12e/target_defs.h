@@ -1,5 +1,5 @@
-#ifndef _DEVO7E_TARGET_H_
-#define _DEVO7E_TARGET_H_
+#ifndef _DEVO_F12E_TARGET_H_
+#define _DEVO_F12E_TARGET_H_
 
 #define USE_DEVOFS 1 //Must be before common_devo include
 #include "../common/devo/common_devo.h"
@@ -65,4 +65,4 @@
 #define VOLTAGE_NUMERATOR 326
 #define VOLTAGE_OFFSET    507
 
-#endif //_DEVO7E_TARGET_H_
+#endif //_DEVO_F12E_TARGET_H_

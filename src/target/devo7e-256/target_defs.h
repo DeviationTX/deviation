@@ -1,5 +1,5 @@
-#ifndef _DEVO7E_TARGET_H_
-#define _DEVO7E_TARGET_H_
+#ifndef _DEVO7E_256_TARGET_H_
+#define _DEVO7E_256_TARGET_H_
 
 #include "../common/devo/common_devo.h"
 
@@ -56,4 +56,4 @@
 #define VOLTAGE_NUMERATOR 216
 #define VOLTAGE_OFFSET    249
 
-#endif //_DEVO7E_TARGET_H_
+#endif //_DEVO7E_256_TARGET_H_
