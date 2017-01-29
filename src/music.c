@@ -166,7 +166,7 @@ void MUSIC_Beep(char* note, u16 duration, u16 interval, u8 count)
     SOUND_Start((u16)Notes[0].duration * 10, next_note_cb, vibrate);
 }
 
-int MUSIC_GetSound(enum Music music) {
+int MUSIC_GetSound(u16 music) {
     Volume = Transmitter.volume * 10;
     char filename[] = "media/sound.ini\0\0\0"; // placeholder for longer folder name
     #ifdef _DEVO12_TARGET_H_
@@ -181,6 +181,10 @@ int MUSIC_GetSound(enum Music music) {
             checked = 1;
         }
     #endif
+    if (music >= MUSIC_TOTAL) {
+        printf("ERROR: Music %d can not be found in sound.ini", music);
+        return 1;
+    }
     if(CONFIG_IniParse(filename, ini_handler, (void *)sections[music])) {
         printf("ERROR: Could not read %s\n", filename);
         return 1;
@@ -188,7 +192,7 @@ int MUSIC_GetSound(enum Music music) {
     return 0;
 }
 
-void MUSIC_Play(enum Music music)
+void MUSIC_Play(u16 music)
 {
 #if HAS_EXTENDED_AUDIO
     // Play audio for switch
@@ -231,8 +235,8 @@ void MUSIC_Play(enum Music music)
 u16 MUSIC_GetDuration(u16 music)
 {
     u32 i;
-    for ( i = 0; i < sizeof(music_index)/sizeof(music_index[0]);i++) {
-        if ( music_index[i].music == music ) return music_index[i].duration;
+    for ( i = 0; i < sizeof(music_map)/sizeof(music_map[0]);i++) {
+        if ( music_map[i].music == music ) return music_map[i].duration;
     }
     return 0;
 
@@ -242,21 +246,21 @@ u16 MUSIC_GetDuration(u16 music)
 const char * MUSIC_GetLabel(u16 music)
 {
     u32 i;
-    for ( i = 0; i < sizeof(music_index)/sizeof(music_index[0]);i++) {
-        if ( music_index[i].music == music ) return music_index[i].label;
+    for ( i = 0; i < sizeof(music_map)/sizeof(music_map[0]);i++) {
+        if ( music_map[i].music == music ) return music_map[i].label;
     }
     return 0;
 
 }
 #endif
 
-void MUSIC_PlayValue(enum Music music, u32 value, u16 unit)
+void MUSIC_PlayValue(u16 music, u32 value, u16 unit)
 {
-    u32 i,j = 1;
+    u32 i,idx= 1;
     char digits[6]; // Do we need more?
 
-    if (MUSIC_GetSound(music)) return;
     if ((Transmitter.audio_player && playback_device == AUDDEV_BUZZER) || !Transmitter.audio_player) {
+        MUSIC_GetSound(music);
         MUSIC_Play(music);
         return;
     }
@@ -276,20 +280,21 @@ void MUSIC_PlayValue(enum Music music, u32 value, u16 unit)
     music_queue[0] = music;
 
     for (i=num_notes; i > 1; i--) {
-        music_queue[j] = digits[i-2] + 1000; // mp3 files 1000 - 1009 for digits
-        j++;
+        music_queue[idx] = digits[i-2] + 1000; // mp3 files 1000 - 1009 for digits
+        idx++;
     }
     // Add decimal seperator for some units
     if (unit == TELEM_UNIT_VOLT || unit == TELEM_UNIT_AMPS || unit == TELEM_UNIT_ALTITUDE || unit == TELEM_UNIT_GFORCE) {
         num_notes++;
-        music_queue[j] = music_queue[j-1];
-        music_queue[j-1] = 1010; // mp3 for decimal
-        j++;
+        music_queue[idx] = music_queue[idx-1];
+        music_queue[idx-1] = music_queue[idx-2];
+        music_queue[idx-2] = 1010; // mp3 for decimal
+        idx++;
     }
     // Add unit for value if specified
     if (unit > TELEM_UNIT_NONE) {
         num_notes++;
-        music_queue[j] = unit + 1010; // mp3 files 1011-1016 for units
+        music_queue[idx] = unit + 1010; // mp3 files 1011-1016 for units
     }
 
     // Start callback for music queue

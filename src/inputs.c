@@ -339,11 +339,11 @@ void INPUT_CheckChanges(void) {
         if ((changed_input > NUM_STICKS) && (changed_input <= NUM_STICKS + NUM_AUX_KNOBS)) {
             music_idx = changed_input - (NUM_STICKS+1);
             if (aux_up) {
-                if (Model.aux_music_no[music_idx].up_state_music)
-                    MUSIC_Play(Model.aux_music_no[music_idx].up_state_music);
+                if (Model.music.aux_nr[music_idx].up)
+                    MUSIC_Play(Model.music.aux_nr[music_idx].up);
             } else {
-                if (Model.aux_music_no[music_idx].down_state_music)
-                    MUSIC_Play(Model.aux_music_no[music_idx].down_state_music);
+                if (Model.music.aux_nr[music_idx].down)
+                    MUSIC_Play(Model.music.aux_nr[music_idx].down);
             }
             return;
 	}
@@ -351,8 +351,8 @@ void INPUT_CheckChanges(void) {
 	music_idx = changed_input - INP_HAS_CALIBRATION - 1;
 
 	/* Skip pots & Play music file if the switch has a voice file number defined */
-	if ((music_idx >= 0) && (Model.switch_music_no[music_idx]))
-            MUSIC_Play(Model.switch_music_no[music_idx]);
+	if ((music_idx >= 0) && (Model.music.switch_nr[music_idx]))
+            MUSIC_Play(Model.music.switch_nr[music_idx]);
 #endif //HAS_EXTENDED_AUDIO
     }
 }

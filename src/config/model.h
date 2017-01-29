@@ -25,7 +25,7 @@ const char *MODEL_TEMPLATE;
 
 //This cannot be computed, and must be manually updated
 #define NUM_PROTO_OPTS 4
-#define VIRT_NAME_LEN 10 
+#define VIRT_NAME_LEN 10
 
 struct Model {
     u32 fixed_id;
@@ -68,11 +68,7 @@ struct Model {
     struct datalog datalog;
 #endif
 #if HAS_EXTENDED_AUDIO
-    u16 switch_music_no[NUM_INPUTS - INP_HAS_CALIBRATION];	//Switch array to point to music file number, no pots
-    struct ButtonMusic button_music_no[NUM_TX_BUTTONS];	//Button array to point to music file number
-#if NUM_AUX_KNOBS
-    struct AuxMusic aux_music_no[NUM_AUX_KNOBS];
-#endif
+    struct Music_Nr music;
 #endif // HAS_EXTENDED_AUDIO
 };
 extern struct Model Model;

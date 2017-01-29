@@ -1,6 +1,8 @@
 #ifndef _MUSIC_H_
 #define _MUSIC_H_
 
+#include <telemetry.h>
+
 enum Music {
     MUSIC_STARTUP = 0,
     MUSIC_SHUTDOWN,
@@ -41,6 +43,8 @@ enum AudioDevices {
 };
 
 #if HAS_EXTENDED_AUDIO
+#define MAX_MUSICMAP_ENTRIES 80
+#define MAX_MUSIC_LABEL 30
 #define NUM_STICKS	4
 #define NUM_AUX_KNOBS	(INP_HAS_CALIBRATION - NUM_STICKS)	// Exclude sticks
 
@@ -56,27 +60,36 @@ enum {
 };
 
 struct AuxMusic {
-    u16 up_state_music;              // Music to be played when Aux turns up
-    u16 down_state_music;            // Music to be played when Aux turns down
+    u16 up;              // Music to be played when Aux turns up
+    u16 down;            // Music to be played when Aux turns down
 };
 
 struct ButtonMusic {
-    u16 on_state_music;             // Music to be played when button is On
-    u16 off_state_music;            // Music to be played when button is Off
+    u16 on;             // Music to be played when button is On
+    u16 off;            // Music to be played when button is Off
 };
 
-struct {u16 music; u16 duration; char label[30];} music_index[80];
+struct  Music_Nr {
+  u16 switch_nr[NUM_INPUTS - INP_HAS_CALIBRATION];	//Switch array to point to music file number, no pots
+  struct ButtonMusic button_nr[NUM_TX_BUTTONS];	//Button array to point to music file number
+  u16 telem_nr[TELEM_NUM_ALARMS];
+#if NUM_AUX_KNOBS
+  struct AuxMusic aux_nr[NUM_AUX_KNOBS];
+#endif
+};
+
+struct {u16 music; u16 duration; char label[MAX_MUSIC_LABEL];} music_map[MAX_MUSICMAP_ENTRIES];
 
 u16 MUSIC_GetDuration(u16 music);
 
 const char * MUSIC_GetLabel(u16 music);
 
-void MUSIC_PlayValue(enum Music music, u32 value, u16 unit);
-#endif
+void MUSIC_PlayValue(u16 music, u32 value, u16 unit);
+
+#endif //HAS_EXTENDED_AUDIO
 
 void MUSIC_Beep(char* note, u16 duration, u16 interval, u8 count);
 
-void MUSIC_Play(enum Music music);
-
+void MUSIC_Play(u16 music);
 
 #endif

@@ -42,7 +42,7 @@ extern volatile u8 ppmin_num_channels;
 // volatile makes sure, each access to the array
 // will be an actual access to the memory location
 // an element is stored in.
-// If it is omitted, the optimizer might create a 
+// If it is omitted, the optimizer might create a
 // 'short cut', removing seemingly unneccessary memory accesses,
 // and thereby preventing the propagation of an update from
 // the main loop to the interrupt routine (since the optimizer
@@ -270,7 +270,7 @@ s32 MIXER_CreateCyclicOutput(volatile s32 *raw, unsigned cycnum)
         cyc[2] = collective - aileron;
         break;
     }
-    
+
     return cyc[cycnum-1];
 }
 
@@ -403,7 +403,7 @@ s32 MIXER_ApplyLimits(unsigned channel, struct Limit *limit, volatile s32 *_raw,
             value = INT16_MAX;
         else if (value < INT16_MIN)
             value = INT16_MIN;
-    }      
+    }
     return value;
 }
 
@@ -504,7 +504,7 @@ int compact_mixers() {
     unsigned j;
     while(i < max) {
         unsigned src = MIXER_SRC(Model.mixers[i].src);
-        if(! src 
+        if(! src
            || Model.templates[Model.mixers[i].dest] == MIXERTEMPLATE_NONE
            || Model.templates[Model.mixers[i].dest] == MIXERTEMPLATE_CYC1
            || Model.templates[Model.mixers[i].dest] == MIXERTEMPLATE_CYC2
@@ -537,7 +537,7 @@ unsigned find_dependencies(unsigned ch, unsigned *deps)
             found = 1;
             if (MIXER_SRC(mixer->src) > NUM_SOURCES && MIXER_SRC(mixer->src) != NUM_SOURCES + 1 + ch) {
                 deps[MIXER_SRC(mixer->src) - NUM_SOURCES - 1] = 1;
-            } 
+            }
             if (MIXER_SRC(mixer->sw) > NUM_SOURCES && MIXER_SRC(mixer->sw) != NUM_SOURCES + 1 + ch) {
                 deps[MIXER_SRC(mixer->sw) - NUM_SOURCES - 1] = 1;
             }
@@ -670,11 +670,11 @@ static void _trim_music_play(int trim_idx, int is_neg, int on_state)
     else
         button_idx = Model.trims[trim_idx].pos - 1;
     if (on_state) {
-        if (Model.button_music_no[button_idx].on_state_music)
-            MUSIC_Play(Model.button_music_no[button_idx].on_state_music);
+        if (Model.music.button_nr[button_idx].on)
+            MUSIC_Play(Model.music.button_nr[button_idx].on);
     } else {
-        if (Model.button_music_no[button_idx].off_state_music)
-            MUSIC_Play(Model.button_music_no[button_idx].off_state_music);
+        if (Model.music.button_nr[button_idx].off)
+            MUSIC_Play(Model.music.button_nr[button_idx].off);
     }
 }
 #endif

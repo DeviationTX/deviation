@@ -19,8 +19,6 @@
 #include "model.h"
 #include "../music.h"
 
-#define MAX_LINE 80
-
 #if HAS_EXTENDED_AUDIO
 
 void CONFIG_AlertParse(const char* filename)
@@ -30,7 +28,7 @@ void CONFIG_AlertParse(const char* filename)
     int textlen;
     int val;
     u32 j,k = 0;
-    char line[MAX_LINE];
+    char line[MAX_MUSICMAP_ENTRIES];
 
     file = fopen(filename, "r");
     if (!file) {
@@ -59,13 +57,14 @@ void CONFIG_AlertParse(const char* filename)
         while(pt != NULL) {
             j++;
             val = atoi(pt);
+            switch (j) {
+              case 2: music_map[k].music = val;
+              case 3: music_map[k].duration = val;
 #if HAS_MUSIC_CONFIG
-	          if (j == 4) strcpy(music_index[k].label,pt);
+              case 4: strcpy(music_map[k].label,pt);
 #endif
-            if (j == 3) music_index[k].duration = val;
-            if (j == 2) music_index[k].music = val;
+            }
             pt = strtok(NULL, ":");
-
         }
         k++;
     }

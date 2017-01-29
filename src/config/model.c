@@ -186,6 +186,8 @@ static const char GUI_QUICKPAGE[] = "quickpage";
 #if HAS_EXTENDED_AUDIO
 /* Section: Music */
 static const char SECTION_MUSIC[] = "music";
+static const char * const MUSIC_TELEMALARM[TELEM_NUM_ALARMS] =
+     { "telemalarm1", "telemalarm2", "telemalarm3", "telemalarm4", "telemalarm5", "telemalarm6" };
 #endif
 
 
@@ -987,16 +989,16 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
 #if HAS_EXTENDED_AUDIO
     char src_name[50];
     const char *button_name;
-    u8 val = atoi(value);
+    u16 val = atoi(value);
     if (MATCH_SECTION(SECTION_MUSIC)) {
         if (!MUSIC_GetDuration(val)) {
-            printf("Music %s not found in music.map\n",value);
+            printf("%s: Music %s not found in music.map\n", section, value);
             return 0;
         }
         for (int i = INP_HAS_CALIBRATION+1; i <= NUM_INPUTS; i++) {
             INPUT_SourceName(src_name, i);
             if (MATCH_KEY(src_name)) {
-                m->switch_music_no[i - INP_HAS_CALIBRATION - 1] = val;
+                m->music.switch_nr[i - INP_HAS_CALIBRATION - 1] = val;
                 return 1;
             }
         }
@@ -1006,13 +1008,13 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
             strcat(src_name, "_ON");
             // Button name alone or with suffix "_ON" will be considered the same
             if (MATCH_KEY(button_name) || MATCH_KEY(src_name)) {
-                m->button_music_no[i-1].on_state_music = val;
+                m->music.button_nr[i-1].on = val;
                 return 1;
             }
             strcpy(src_name, button_name);
             strcat(src_name, "_OFF");
             if (MATCH_KEY(src_name)) {
-                m->button_music_no[i-1].off_state_music = val;
+                m->music.button_nr[i-1].off = val;
                 return 1;
             }
         }
@@ -1021,17 +1023,25 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
             INPUT_SourceName(src_name, i);
             strcat(src_name, "_UP");
             if (MATCH_KEY(src_name)) {
-                m->aux_music_no[i - (NUM_STICKS+1)].up_state_music = val;
+                m->music.aux_nr[i - (NUM_STICKS+1)].up = val;
                 return 1;
             }
             INPUT_SourceName(src_name, i);
             strcat(src_name, "_DOWN");
             if (MATCH_KEY(src_name)) {
-                m->aux_music_no[i - (NUM_STICKS+1)].down_state_music = val;
+                m->music.aux_nr[i - (NUM_STICKS+1)].down = val;
                 return 1;
             }
         }
 #endif
+        for (int i = 0; i < TELEM_NUM_ALARMS; i++) {
+            if (MATCH_KEY(MUSIC_TELEMALARM[i])) {
+                m->music.telem_nr[i] = val;
+                return 1;
+            }
+        }
+        printf("%s: unknown source name '%s'\n", section, name);
+        return 0;
     }
 #endif
     printf("Unknown Section: '%s'\n", section);
@@ -1379,6 +1389,13 @@ u8 CONFIG_ReadModel(u8 model_num) {
     if (CONFIG_IniParse(file, ini_handler, &Model)) {
         printf("Failed to parse Model file: %s\n", file);
     }
+#if HAS_EXTENDED_AUDIO
+    for (int i = 0; i < TELEM_NUM_ALARMS; i++) { // Set default telemetry alarms if not model-specific
+        if (Model.music.telem_nr[i] == 0) {
+           Model.music.telem_nr[i] = MUSIC_TELEMALARM1 + i;
+        }
+    }
+#endif
     if (! ELEM_USED(Model.pagecfg2.elem[0]))
         CONFIG_ReadLayout("layout/default.ini");
     if(! PROTOCOL_HasPowerAmp(Model.protocol))
