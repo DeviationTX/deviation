@@ -655,6 +655,10 @@ static u16 frskyx_cb() {
       state++;      
       break;    
     case FRSKY_DATA1:
+      if (fine != (s8)Model.proto_opts[PROTO_OPTS_FREQFINE]) {
+          fine = (s8)Model.proto_opts[PROTO_OPTS_FREQFINE];
+          CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);
+      }
       CC2500_SetTxRxMode(TX_EN);
       set_start(channr);
       CC2500_SetPower(Model.tx_power);    
