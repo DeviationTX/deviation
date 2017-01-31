@@ -351,8 +351,14 @@ void INPUT_CheckChanges(void) {
 	music_idx = changed_input - INP_HAS_CALIBRATION - 1;
 
 	/* Skip pots & Play music file if the switch has a voice file number defined */
-	if ((music_idx >= 0) && (Model.music.switch_nr[music_idx]))
-            MUSIC_Play(Model.music.switch_nr[music_idx]);
+	if (changed_input >= INP_HAS_CALIBRATION) {
+      for (int i=0; i < MODEL_CUSTOM_ALARMS; i++) {
+          if (Model.music.custom[i].src == changed_input) {
+              MUSIC_Play(Model.music.custom[i].music);
+              break; // stop searching for music once found
+          }
+      }
+  }
 #endif //HAS_EXTENDED_AUDIO
     }
 }

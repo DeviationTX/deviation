@@ -45,8 +45,20 @@ enum AudioDevices {
 #if HAS_EXTENDED_AUDIO
 #define MAX_MUSICMAP_ENTRIES 80
 #define MAX_MUSIC_LABEL 30
+#define CUSTOM_ALARM_ID 2000
+#define MODEL_CUSTOM_ALARMS (NUM_INPUTS - INP_HAS_CALIBRATION + TELEM_NUM_ALARMS)
 #define NUM_STICKS	4
 #define NUM_AUX_KNOBS	(INP_HAS_CALIBRATION - NUM_STICKS)	// Exclude sticks
+
+enum {
+    TELEM_CUSTOM_NONE = 99,
+    TELEM_ALARM_CUSTOM1,
+    TELEM_ALARM_CUSTOM2,
+    TELEM_ALARM_CUSTOM3,
+    TELEM_ALARM_CUSTOM4,
+    TELEM_ALARM_CUSTOM5,
+    TELEM_ALARM_CUSTOM6,
+};
 
 enum {
     TELEM_UNIT_NONE = 0,
@@ -69,8 +81,13 @@ struct ButtonMusic {
     u16 off;            // Music to be played when button is Off
 };
 
+struct CustomMusic {
+  u8 src;
+  u16 music;
+};
+
 struct  Music_Nr {
-  u16 switch_nr[NUM_INPUTS - INP_HAS_CALIBRATION];	//Switch array to point to music file number, no pots
+  struct CustomMusic custom[MODEL_CUSTOM_ALARMS];	//Switch array to point to music file number, no pots
   struct ButtonMusic button_nr[NUM_TX_BUTTONS];	//Button array to point to music file number
   u16 telem_nr[TELEM_NUM_ALARMS];
 #if NUM_AUX_KNOBS
@@ -78,11 +95,14 @@ struct  Music_Nr {
 #endif
 };
 
+u8 music_map_entries;
+u8 music_map_custom_entries;
+
 struct {u16 music; u16 duration; char label[MAX_MUSIC_LABEL];} music_map[MAX_MUSICMAP_ENTRIES];
 
 u16 MUSIC_GetDuration(u16 music);
-
 const char * MUSIC_GetLabel(u16 music);
+u16 MUSIC_GetTelemetryAlarm(enum Music music);
 
 void MUSIC_PlayValue(u16 music, u32 value, u16 unit);
 

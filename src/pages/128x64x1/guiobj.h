@@ -37,7 +37,7 @@ struct mainconfig_obj {
     union {
         guiLabel_t label;
         guiButton_t button;
-    } col1[7]; 
+    } col1[7];
     guiTextSelect_t value[7];
     guiScrollable_t scrollable;
 };
@@ -206,7 +206,7 @@ struct calibrate_obj {
     guiLabel_t msg;
     guiLabel_t msg1;
 };
-    
+
 struct usb_obj {
     guiLabel_t label;
 };
@@ -221,6 +221,13 @@ struct debuglog_obj {
 struct musicconfig_obj {
     guiScrollable_t scrollable;
     guiLabel_t name;
+    guiTextSelect_t musicsrc;
+    guiLabel_t idxlbl;
+    guiTextSelect_t musicidx;
+    guiLabel_t vollbl;
+    guiTextSelect_t setvol;
+    guiLabel_t musiclbl;
+
 };
 #endif
 
@@ -297,7 +304,7 @@ struct stddrexp_obj {
     guiTextSelect_t value2[3];
     guiXYGraph_t graph;
     guiScrollable_t scrollable;
-    
+
 };
 
 struct stdchan_obj {
@@ -375,7 +382,7 @@ struct gui_objs {
 #ifdef HAS_MUSIC_CONFIG
         struct musicconfig_obj musicconfig;
 #endif
-        
+
         struct advcurve_obj advcurve;
         struct advlimit_obj advlimit;
         struct advmixer_obj advmixer;

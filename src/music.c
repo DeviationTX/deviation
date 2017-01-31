@@ -17,6 +17,7 @@
 #include "music.h"
 #include "config/tx.h"
 #include "extended_audio.h"
+#include "config/model.h"
 #include <stdlib.h>
 
 static struct {u8 note; u8 duration;} Notes[100];
@@ -166,7 +167,15 @@ void MUSIC_Beep(char* note, u16 duration, u16 interval, u8 count)
     SOUND_Start((u16)Notes[0].duration * 10, next_note_cb, vibrate);
 }
 
-int MUSIC_GetSound(u16 music) {
+u16 MUSIC_GetTelemetryAlarm(enum Music music) {
+   for (int i = 0; i < MODEL_CUSTOM_ALARMS; i++) {
+        if (Model.music.custom[i].src == TELEM_ALARM_CUSTOM1 - MUSIC_TELEMALARM1 + music)
+            return Model.music.custom[i].music;
+    }
+    return music;
+}
+
+u16 MUSIC_GetSound(u16 music) {
     Volume = Transmitter.volume * 10;
     char filename[] = "media/sound.ini\0\0\0"; // placeholder for longer folder name
     #ifdef _DEVO12_TARGET_H_
@@ -208,8 +217,6 @@ void MUSIC_Play(u16 music)
        the haptic sensor may be enabled */
     num_notes = 0;
     next_note = 1;
-    if (MUSIC_GetSound(music)) return;
-
 #if HAS_EXTENDED_AUDIO
     if (Transmitter.audio_player) {
         if ((playback_device == AUDDEV_EXTAUDIO) || (playback_device == AUDDEV_UNDEF)) {
@@ -225,6 +232,8 @@ void MUSIC_Play(u16 music)
         }
     }
 #endif
+
+    if (MUSIC_GetSound(music)) return;
     if(! num_notes)
         return;
     SOUND_SetFrequency(note_map[Notes[0].note].note, Volume);
@@ -260,8 +269,7 @@ void MUSIC_PlayValue(u16 music, u32 value, u16 unit)
     char digits[6]; // Do we need more?
 
     if ((Transmitter.audio_player && playback_device == AUDDEV_BUZZER) || !Transmitter.audio_player) {
-        MUSIC_GetSound(music);
-        MUSIC_Play(music);
+            MUSIC_Play(music);
         return;
     }
 

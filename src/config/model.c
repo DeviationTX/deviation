@@ -188,6 +188,7 @@ static const char GUI_QUICKPAGE[] = "quickpage";
 static const char SECTION_MUSIC[] = "music";
 static const char * const MUSIC_TELEMALARM[TELEM_NUM_ALARMS] =
      { "telemalarm1", "telemalarm2", "telemalarm3", "telemalarm4", "telemalarm5", "telemalarm6" };
+u8 musicsrc_parsed,musictelem_parsed;
 #endif
 
 
@@ -987,7 +988,7 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
         }
     }
 #if HAS_EXTENDED_AUDIO
-    char src_name[50];
+    char src_name[20];
     const char *button_name;
     u16 val = atoi(value);
     if (MATCH_SECTION(SECTION_MUSIC)) {
@@ -998,7 +999,9 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
         for (int i = INP_HAS_CALIBRATION+1; i <= NUM_INPUTS; i++) {
             INPUT_SourceName(src_name, i);
             if (MATCH_KEY(src_name)) {
-                m->music.switch_nr[i - INP_HAS_CALIBRATION - 1] = val;
+                m->music.custom[musicsrc_parsed].music = val;
+                m->music.custom[musicsrc_parsed].src = i;
+                musicsrc_parsed++;
                 return 1;
             }
         }
@@ -1036,7 +1039,9 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
 #endif
         for (int i = 0; i < TELEM_NUM_ALARMS; i++) {
             if (MATCH_KEY(MUSIC_TELEMALARM[i])) {
-                m->music.telem_nr[i] = val;
+                m->music.custom[MODEL_CUSTOM_ALARMS - TELEM_NUM_ALARMS + musictelem_parsed].music = val;
+                m->music.custom[MODEL_CUSTOM_ALARMS - TELEM_NUM_ALARMS + musictelem_parsed].src = i + TELEM_ALARM_CUSTOM1;
+                musictelem_parsed++;
                 return 1;
             }
         }
@@ -1339,6 +1344,19 @@ u8 CONFIG_WriteModel(u8 model_num) {
             fprintf(fh, "%s%d=%s\n", GUI_QUICKPAGE, idx+1, PAGE_GetName(val));
         }
     }
+#if HAS_EXTENDED_AUDIO
+    fprintf(fh, "[%s]\n", SECTION_MUSIC);
+    for (idx = 0; idx < MODEL_CUSTOM_ALARMS; idx++) {
+        if ( m->music.custom[idx].music && m->music.custom[idx].src) {
+            if (m->music.custom[idx].src <= NUM_INPUTS) {
+                fprintf(fh, "%s=%d\n", INPUT_SourceName(file,m->music.custom[idx].src), m->music.custom[idx].music);
+            }
+            else {
+                fprintf(fh, "TELEMALARM%d=%d\n", m->music.custom[idx].src-TELEM_CUSTOM_NONE, m->music.custom[idx].music);
+            }
+        }
+    }
+#endif
     CONFIG_EnableLanguage(1);
     fclose(fh);
     return 1;
@@ -1385,17 +1403,13 @@ u8 CONFIG_ReadModel(u8 model_num) {
     char file[30];
     auto_map = 0;
     get_model_file(file, model_num);
-
+#if HAS_EXTENDED_AUDIO
+    musicsrc_parsed = 0;
+    musictelem_parsed = 0;
+#endif
     if (CONFIG_IniParse(file, ini_handler, &Model)) {
         printf("Failed to parse Model file: %s\n", file);
     }
-#if HAS_EXTENDED_AUDIO
-    for (int i = 0; i < TELEM_NUM_ALARMS; i++) { // Set default telemetry alarms if not model-specific
-        if (Model.music.telem_nr[i] == 0) {
-           Model.music.telem_nr[i] = MUSIC_TELEMALARM1 + i;
-        }
-    }
-#endif
     if (! ELEM_USED(Model.pagecfg2.elem[0]))
         CONFIG_ReadLayout("layout/default.ini");
     if(! PROTOCOL_HasPowerAmp(Model.protocol))

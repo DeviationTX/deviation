@@ -17,6 +17,7 @@
 #include "common.h"
 #include "pages.h"
 #include "gui/gui.h"
+#include "music.h"
 
 #ifndef OVERRIDE_PLACEMENT
 enum {
@@ -34,6 +35,13 @@ enum {
 
 #include "../common/_musicconfig_page.c"
 
+/*            Advanced
+   Row1       Source
+   Row2       Music-nr
+   Row3       Music-label
+   Row4       Volume
+*/
+
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
@@ -42,9 +50,23 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     //Row 1
     GUI_CreateLabelBox(&gui->name, LABEL_X, y,
             LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, musicconfig_str_cb, NULL, (void *)(long)absrow);
-    //GUI_CreateTextSelectPlate(&gui->type, TEXTSEL_X, y,
-    //        TEXTSEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, set_timertype_cb, (void *)(long)absrow);
-    
+    GUI_CreateTextSelectPlate(&gui->musicsrc, TEXTSEL_X, y,
+            TEXTSEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, toggle_musicsrc_cb, musicsrc_cb, (void *)(long)absrow);
+    //Row 2
+    y += space;
+    GUI_CreateLabelBox(&gui->idxlbl, LABEL_X, y,
+            LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("MP3 ID"));
+    GUI_CreateTextSelectPlate(&gui->musicidx, TEXTSEL_X, y,
+            TEXTSEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, music_test_cb, musicid_cb, (void *)(long)absrow);
+    y += space;
+    //Row 3
+     GUI_CreateLabelBox(&gui->vollbl, LABEL_X, y ,
+             LABEL_WIDTH, LINE_HEIGHT,&DEFAULT_FONT, NULL, NULL, _tr("MP3 Label:"));
+    y += space;
+    //Row 4
+    GUI_CreateLabelBox(&gui->musiclbl, LABEL_X, y,
+            LABEL_WIDTH + TEXTSEL_WIDTH, LINE_HEIGHT, &TINY_FONT, musiclbl_cb, NULL, (void *)(long)absrow);
+return 1;
 }
 
 void PAGE_MusicconfigInit(int page)
@@ -54,7 +76,7 @@ void PAGE_MusicconfigInit(int page)
     PAGE_RemoveAllObjects();
     PAGE_ShowHeader(PAGE_GetName(PAGEID_MUSICCFG));
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
-                     LCD_HEIGHT - HEADER_HEIGHT, NUM_TIMERS, row_cb, NULL, NULL, NULL);
+                     LCD_HEIGHT - HEADER_HEIGHT, NUM_INPUTS - INP_HAS_CALIBRATION + TELEM_NUM_ALARMS, row_cb, NULL, NULL, NULL);
     PAGE_SetScrollable(&gui->scrollable, &current_selected);
 
 }
