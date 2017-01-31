@@ -1,6 +1,6 @@
-SW B0:		LOW Rate Selected
-SW B1:		Medium Rate Selected
-SW B2:		High Rate Selected
-FMODE1:		Shooting bubbles
-HOLD1:		Flip Mode Activated
-HOLD0:		Flip Mode Disabled
+LOW Rate Selected
+Medium Rate Selected
+High Rate Selected
+Shooting bubbles
+Flip Mode Activated
+Flip Mode Disabled

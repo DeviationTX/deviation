@@ -58,19 +58,21 @@ echo "Generating voice files with $TTSCMD".
 FILENUM=1
 IDX=0
 TMPFILE="/tmp/speechidx.tmp"
+OUTFILE="music.map"
 cp /dev/null $TMPFILE
 SPEECHDIR="mp3"
 mkdir $SPEECHDIR 2>/dev/null
 rm -f ${SPEECHDIR}/* >/dev/null 2>&1
-rm -f models/model*.map >/dev/null 2>&1
+rm -f music.map >/dev/null 2>&1
 
 for INFILE in models/globalAlert.txt
 do
 	echo "Processing global alerts..."
+	echo ";This file contains the MP3 mapping for external MP3 player modules (currently AudioFX or DFPlayer Mini)" >> $OUTFILE
+	echo ";Each entry is in the format MP3 ID:duration in ms:label" >> $OUTFILE
+	echo ";The global alarms are currently hardcoded, index numbers cannot be changed!" >> $OUTFILE
 	while read LINE
 	do		
-		SWITCH=`echo $LINE | cut -d':' -f1`
-		SWITCH=`echo $SWITCH | sed -e 's/^ *//;s/ *$//' | tr [a-z] [A-Z]`
 		MSG=`echo $LINE | cut -d':' -f2`
 		MSG=`echo $MSG | sed -e 's/^ *//;s/ *$//' | tr [a-z] [A-Z]`
 		IDXTEXTID=`printf '%04d' $IDX`
@@ -79,7 +81,7 @@ do
 		eval TTSLEN=\`$TTSLCMD $TTSLOPT ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT} $TTSLPP\`
 		TTSLEN=`echo 'scale=0;' $TTSLEN '* 1000/1' | bc`
 		lame --quiet ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT} ${SPEECHDIR}/${IDXTEXT}.mp3
-		echo "${SWITCH}:${IDXTEXTID}:${TTSLEN}:${MSG}" >> globalAlert.map
+		echo "${IDXTEXTID}:${TTSLEN}:${MSG}" >> $OUTFILE
 		rm ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT}
 		echo "Alert ${IDXTEXT}.mp3 generated (length $TTSLEN ms)"
 		IDX=`expr $IDX + 1`
@@ -95,16 +97,9 @@ for INFILE in models/model*Alert.txt
 do
 	echo "Processing file $INFILE..."
 	IDX=2000
-	OUTFILE=`echo $INFILE | sed -e 's/Alert\.txt/\.map/'`
-	rm $OUTFILE 2>/dev/null
-	echo "Adding global alerts to $INFILE..."
-	echo ";The global alarms are currently hardcoded, index numbers cannot be changed!" >> $OUTFILE
-        cat globalAlert.map >> $OUTFILE	
 	echo ";Below are custom alarms for individual models (switch, trim, telemetry etc.)" >> $OUTFILE
 	while read LINE
 	do
-		SWITCH=`echo $LINE | cut -d':' -f1`
-		SWITCH=`echo $SWITCH | sed -e 's/^ *//;s/ *$//' | tr [a-z] [A-Z]`
 		MSG=`echo $LINE | cut -d':' -f2`
 		MSG=`echo $MSG | sed -e 's/^ *//;s/ *$//' | tr [a-z] [A-Z]`
 		R=`grep "@${MSG}@" $TMPFILE`
@@ -116,16 +111,19 @@ do
 			eval TTSLEN=\`$TTSLCMD $TTSLOPT ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT} $TTSLPP\`
 			TTSLEN=`echo 'scale=0;' $TTSLEN '* 1000/1' | bc`
 			lame --quiet ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT} ${SPEECHDIR}/${IDXTEXT}.mp3
-			echo "${SWITCH}:${IDXTEXTID}:${TTSLEN}:$MSG" >> $OUTFILE
+			echo "${IDXTEXTID}:${TTSLEN}:$MSG" >> $OUTFILE
 			rm ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT}
 			echo "@${MSG}@:${IDXTEXTID}:${TTSLEN}" >> $TMPFILE
 			echo "Alert ${IDXTEXT}.mp3 generated (length $TTSLEN ms)"
 			IDX=`expr $IDX + 1`
 		else
-			echo "${SWITCH}:`echo $R|cut -d':' -f2,3`" >> $OUTFILE
+			`echo $R|cut -d':' -f2,3` >> $OUTFILE
 		fi
                 
 	done < $INFILE
 done
+echo "Finished writing music.map"
+echo "Please copy music.map to the root folder of your deviation transmitter."
+echo "The folder mp3 has to be placed on the SD card of your MP3 player."
 rm $TMPFILE
-rm globalAlert.map
+exit 0

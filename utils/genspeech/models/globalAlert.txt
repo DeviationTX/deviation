@@ -18,16 +18,16 @@ TELEMALARM4:	Telemetry alarm 4
 TELEMALARM5:	Telemetry alarm 5
 TELEMALARM6:	Telemetry alarm 6
 INACTIVITY_ALARM:	Inactivity alarm
-NUMBER0:	0
-NUMBER1:	1
-NUMBER2:	2
-NUMBER3:	3
-NUMBER4:	4
-NUMBER5:	5
-NUMBER6:	6
-NUMBER7:	7
-NUMBER8:	8
-NUMBER9:	9
+NUMBER0:	zero
+NUMBER1:	one
+NUMBER2:	two
+NUMBER3:	three
+NUMBER4:	four
+NUMBER5:	five
+NUMBER6:	six
+NUMBER7:	seven
+NUMBER8:	eight
+NUMBER9:	nine
 DECSEP:		point
 DEGREES:	degrees
 VOLTS:		volt
