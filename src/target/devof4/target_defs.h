@@ -1,5 +1,5 @@
-#ifndef _DEVOF4_TARGET_H_
-#define _DEVOF4_TARGET_H_
+#ifndef _DEVO_F4_TARGET_H_
+#define _DEVO_F4_TARGET_H_
 
 #define SPIFLASH_SECTOR_OFFSET 0
 #if defined HAS_4IN1_FLASH && HAS_4IN1_FLASH
@@ -78,4 +78,4 @@
 #define VOLTAGE_NUMERATOR 324
 #define VOLTAGE_OFFSET    382
 
-#endif //_DEVO7E_TARGET_H_
+#endif //_DEVO_F4_TARGET_H_

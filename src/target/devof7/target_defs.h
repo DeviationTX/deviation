@@ -1,5 +1,5 @@
-#ifndef _DEVO7E_TARGET_H_
-#define _DEVO7E_TARGET_H_
+#ifndef _DEVO_F7_TARGET_H_
+#define _DEVO_F7_TARGET_H_
 
 #define USE_DEVOFS 1 //Must be before common_devo include
 #define SPIFLASH_TYPE SST25VFxxxA
@@ -67,5 +67,5 @@
 #define VOLTAGE_NUMERATOR 324
 #define VOLTAGE_OFFSET    382
 
-#endif //_DEVO7E_TARGET_H_
+#endif //_DEVO_F7_TARGET_H_
 

@@ -20,11 +20,11 @@
 enum {
     TITLE_X  = 0,
     TITLE_W  = LCD_WIDTH - 51,
-    REVERT_X = LCD_WIDTH - 50,
-    REVERT_W = 50,
+    REVERT_X = LCD_WIDTH - 62,
+    REVERT_W = 54,
     LABEL_X  = 0,
-    LABEL_W  = 60,
-    TEXTSEL_X = 60,
+    LABEL_W  = 63,
+    TEXTSEL_X = 63,
     TEXTSEL_W = 60,
 };
 #endif //OVERRIDE_PLACEMENT

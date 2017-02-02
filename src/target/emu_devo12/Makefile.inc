@@ -5,7 +5,3 @@ FONTS        = filesystem/$(FILESYSTEM)/media/15normal.fon \
 LANGUAGE    := devo8,devo12
 
 include target/common/emu/Makefile.inc
-
-ifdef BUILD_TARGET
-
-endif

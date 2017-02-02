@@ -16,7 +16,7 @@ struct model_page {
     u8 last_mixermode;
     u8 last_txpower;
 /*Load save */
-    u8 total_items;
+    u16 total_items;
     u8 menu_type;
     enum ModelType modeltype;
 };
