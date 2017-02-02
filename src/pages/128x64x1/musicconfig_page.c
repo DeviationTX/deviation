@@ -28,6 +28,8 @@ enum {
     RESET_X        = 58,
     RESET_WIDTH    = 59,
     START_WIDTH    = 50,
+    MSG_X          = 20,
+    MSG_Y          = 10,
 };
 #endif //OVERRIDE_PLACEMENT
 
@@ -60,23 +62,31 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             TEXTSEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, music_test_cb, musicid_cb, (void *)(long)absrow);
     y += space;
     //Row 3
-     GUI_CreateLabelBox(&gui->vollbl, LABEL_X, y ,
-             LABEL_WIDTH, LINE_HEIGHT,&DEFAULT_FONT, NULL, NULL, _tr("MP3 Label:"));
-    y += space;
-    //Row 4
     GUI_CreateLabelBox(&gui->musiclbl, LABEL_X, y,
             LABEL_WIDTH + TEXTSEL_WIDTH, LINE_HEIGHT, &TINY_FONT, musiclbl_cb, NULL, (void *)(long)absrow);
-return 1;
+    y += space;
+    //Row 4
+/*    GUI_CreateLabelBox(&gui->vollbl, LABEL_X, y ,
+            LABEL_WIDTH, LINE_HEIGHT,&DEFAULT_FONT, NULL, NULL, _tr("Volume"));
+    GUI_CreateTextSelectPlate(&gui->setvol, TEXTSEL_X, y,
+            TEXTSEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, music_test_cb, setvol_cb, (void *)(long)absrow);
+*/
+    return 1;
 }
 
 void PAGE_MusicconfigInit(int page)
 {
     (void)page;
     PAGE_SetModal(0);
+    if (Transmitter.audio_player == 0) {
+        GUI_CreateLabelBox(&gui->msg, MSG_X, MSG_Y, 0, 0, &DEFAULT_FONT, NULL, NULL,
+            _tr("MP3 player support must\nbe enabled in hardware.ini"));
+        return;
+    }
     PAGE_RemoveAllObjects();
     PAGE_ShowHeader(PAGE_GetName(PAGEID_MUSICCFG));
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
-                     LCD_HEIGHT - HEADER_HEIGHT, NUM_INPUTS - INP_HAS_CALIBRATION + TELEM_NUM_ALARMS, row_cb, NULL, NULL, NULL);
+                     LCD_HEIGHT - HEADER_HEIGHT, MODEL_CUSTOM_ALARMS, row_cb, NULL, NULL, NULL);
     PAGE_SetScrollable(&gui->scrollable, &current_selected);
 
 }

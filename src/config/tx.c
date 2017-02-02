@@ -303,7 +303,7 @@ void CONFIG_LoadTx()
     Transmitter.contrast = 5;
     Transmitter.volume = 10;
     Transmitter.vibration_state = 0; // default to off since only devo10 support it
-    Transmitter.power_alarm = 0;     // default to off 
+    Transmitter.power_alarm = 0;     // default to off
     Transmitter.batt_alarm = DEFAULT_BATTERY_ALARM;
     Transmitter.batt_critical = DEFAULT_BATTERY_CRITICAL;
     Transmitter.batt_warning_interval = DEFAULT_BATTERY_WARNING_INTERVAL;
@@ -319,6 +319,7 @@ void CONFIG_LoadTx()
 #if HAS_EXTENDED_AUDIO
     Transmitter.audio_player = AUDIO_NONE;
     Transmitter.audio_2way = 0;
+    Transmitter.audio_vol = 31;
 #endif
 #if HAS_AUDIO_UART5
     Transmitter.audio_uart5 = 0;

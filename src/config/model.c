@@ -188,6 +188,7 @@ static const char GUI_QUICKPAGE[] = "quickpage";
 static const char SECTION_MUSIC[] = "music";
 static const char * const MUSIC_TELEMALARM[TELEM_NUM_ALARMS] =
      { "telemalarm1", "telemalarm2", "telemalarm3", "telemalarm4", "telemalarm5", "telemalarm6" };
+static const char * const AUDIO_VOL = "volume";
 u8 musicsrc_parsed,musictelem_parsed;
 #endif
 
@@ -990,8 +991,16 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
 #if HAS_EXTENDED_AUDIO
     char src_name[20];
     const char *button_name;
-    u16 val = atoi(value);
+
     if (MATCH_SECTION(SECTION_MUSIC)) {
+        u16 val = atoi(value);
+        if (MATCH_KEY(AUDIO_VOL)) {
+            if (val > 31)
+                Transmitter.audio_vol = 31;
+            else
+                Transmitter.audio_vol = val;
+            return 1;
+        }
         if (!MUSIC_GetDuration(val)) {
             printf("%s: Music %s not found in music.map\n", section, value);
             return 0;
@@ -1001,6 +1010,7 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
             if (MATCH_KEY(src_name)) {
                 m->music.custom[musicsrc_parsed].music = val;
                 m->music.custom[musicsrc_parsed].src = i;
+//                m->music.custom[musicsrc_parsed].vol = vol;
                 musicsrc_parsed++;
                 return 1;
             }
@@ -1041,6 +1051,7 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
             if (MATCH_KEY(MUSIC_TELEMALARM[i])) {
                 m->music.custom[MODEL_CUSTOM_ALARMS - TELEM_NUM_ALARMS + musictelem_parsed].music = val;
                 m->music.custom[MODEL_CUSTOM_ALARMS - TELEM_NUM_ALARMS + musictelem_parsed].src = i + TELEM_ALARM_CUSTOM1;
+//                m->music.custom[MODEL_CUSTOM_ALARMS - TELEM_NUM_ALARMS + musictelem_parsed].vol = vol;
                 musictelem_parsed++;
                 return 1;
             }
@@ -1346,13 +1357,16 @@ u8 CONFIG_WriteModel(u8 model_num) {
     }
 #if HAS_EXTENDED_AUDIO
     fprintf(fh, "[%s]\n", SECTION_MUSIC);
+    fprintf(fh, "volume=%d", Transmitter.audio_vol);
     for (idx = 0; idx < MODEL_CUSTOM_ALARMS; idx++) {
         if ( m->music.custom[idx].music && m->music.custom[idx].src) {
             if (m->music.custom[idx].src <= NUM_INPUTS) {
-                fprintf(fh, "%s=%d\n", INPUT_SourceName(file,m->music.custom[idx].src), m->music.custom[idx].music);
+                fprintf(fh, "%s=%d\n", INPUT_SourceName(file,m->music.custom[idx].src),
+                    m->music.custom[idx].music);
             }
             else {
-                fprintf(fh, "TELEMALARM%d=%d\n", m->music.custom[idx].src-TELEM_CUSTOM_NONE, m->music.custom[idx].music);
+                fprintf(fh, "TELEMALARM%d=%d\n", m->music.custom[idx].src-TELEM_CUSTOM_NONE,
+                    m->music.custom[idx].music);
             }
         }
     }

@@ -90,4 +90,12 @@ int AUDIO_Play(u16 music) {
   #endif
   return 1;
 }
+
+void AUDIO_SetVolume(void) {
+  //sending volume to audio player not implented yet.
+#ifdef BUILDTYPE_DEV
+    printf("Setting external audio volume to %d", Transmitter.audio_vol);
+#endif
+}
+
 #endif

@@ -73,15 +73,16 @@ do
 	echo ";The global alarms are currently hardcoded, index numbers cannot be changed!" >> $OUTFILE
 	while read LINE
 	do		
-		MSG=`echo $LINE | cut -d':' -f2`
-		MSG=`echo $MSG | sed -e 's/^ *//;s/ *$//' | tr [a-z] [A-Z]`
+		LABEL=`echo $LINE | cut -d':' -f2`
+		LABEL=`echo $LABEL | sed -e 's/^[ \t]+//g'`
+		MSG=`echo $LABEL | sed -e 's/^ *//;s/ *$//' | tr [a-z] [A-Z]`
 		IDXTEXTID=`printf '%04d' $IDX`
 		IDXTEXT=`echo ${IDXTEXTID}_${MSG} | tr -d ' '`
 		$TTSCMD ${TTSOPT}${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT} "$MSG"
 		eval TTSLEN=\`$TTSLCMD $TTSLOPT ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT} $TTSLPP\`
 		TTSLEN=`echo 'scale=0;' $TTSLEN '* 1000/1' | bc`
 		lame --quiet ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT} ${SPEECHDIR}/${IDXTEXT}.mp3
-		echo "${IDXTEXTID}:${TTSLEN}:${MSG}" >> $OUTFILE
+		echo "${IDXTEXTID}:${TTSLEN}:${LABEL}" >> $OUTFILE
 		rm ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT}
 		echo "Alert ${IDXTEXT}.mp3 generated (length $TTSLEN ms)"
 		IDX=`expr $IDX + 1`
@@ -100,8 +101,9 @@ do
 	echo ";Below are custom alarms for individual models (switch, trim, telemetry etc.)" >> $OUTFILE
 	while read LINE
 	do
-		MSG=`echo $LINE | cut -d':' -f2`
-		MSG=`echo $MSG | sed -e 's/^ *//;s/ *$//' | tr [a-z] [A-Z]`
+		LABEL=`echo $LINE | cut -d':' -f2`
+		LABEL=`echo $LABEL | sed -e 's/^[ \t]+//g'`
+		MSG=`echo $LABEL | sed -e 's/^ *//;s/ *$//' | tr [a-z] [A-Z]`
 		R=`grep "@${MSG}@" $TMPFILE`
 		if [ $? != 0 ]
 		then
@@ -111,7 +113,7 @@ do
 			eval TTSLEN=\`$TTSLCMD $TTSLOPT ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT} $TTSLPP\`
 			TTSLEN=`echo 'scale=0;' $TTSLEN '* 1000/1' | bc`
 			lame --quiet ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT} ${SPEECHDIR}/${IDXTEXT}.mp3
-			echo "${IDXTEXTID}:${TTSLEN}:$MSG" >> $OUTFILE
+			echo "${IDXTEXTID}:${TTSLEN}:$LABEL" >> $OUTFILE
 			rm ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT}
 			echo "@${MSG}@:${IDXTEXTID}:${TTSLEN}" >> $TMPFILE
 			echo "Alert ${IDXTEXT}.mp3 generated (length $TTSLEN ms)"

@@ -358,7 +358,7 @@ struct usb_obj {
     guiLabel_t msg;
     guiLabel_t time;
     guiLabel_t date;
-};    
+};
 
 struct rtc_obj {
     guiLabel_t      title;
@@ -387,6 +387,21 @@ struct debuglog_obj {
     guiLabel_t      line[DEBUG_LINE_COUNT];
     guiScrollable_t scrollable;
 };
+
+#ifdef HAS_MUSIC_CONFIG
+struct musicconfig_obj {
+    guiLabel_t msg;
+    guiLabel_t vollbl;
+    guiTextSelect_t vol;
+    guiScrollable_t scrollable;
+    guiLabel_t name[5];
+    guiTextSelect_t musicsrc[5];
+    guiLabel_t idxlbl[5];
+    guiTextSelect_t musicidx[5];
+    guiLabel_t musiclbl[5];
+
+};
+#endif
 
 /****Advanced ****/
 struct advcurve_obj {
@@ -611,6 +626,9 @@ struct gui_objs {
         struct usb_obj usb;
         struct rtc_obj rtc;
         struct debuglog_obj debuglog;
+#ifdef HAS_MUSIC_CONFIG
+        struct musicconfig_obj musicconfig;
+#endif
 
         struct advcurve_obj advcurve;
         struct advlimit_obj advlimit;

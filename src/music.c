@@ -167,14 +167,6 @@ void MUSIC_Beep(char* note, u16 duration, u16 interval, u8 count)
     SOUND_Start((u16)Notes[0].duration * 10, next_note_cb, vibrate);
 }
 
-u16 MUSIC_GetTelemetryAlarm(enum Music music) {
-   for (int i = 0; i < MODEL_CUSTOM_ALARMS; i++) {
-        if (Model.music.custom[i].src == TELEM_ALARM_CUSTOM1 - MUSIC_TELEMALARM1 + music)
-            return Model.music.custom[i].music;
-    }
-    return music;
-}
-
 u16 MUSIC_GetSound(u16 music) {
     Volume = Transmitter.volume * 10;
     char filename[] = "media/sound.ini\0\0\0"; // placeholder for longer folder name
@@ -260,6 +252,14 @@ const char * MUSIC_GetLabel(u16 music)
     }
     return 0;
 
+}
+
+u16 MUSIC_GetTelemetryAlarm(enum Music music) {
+   for (int i = 0; i < MODEL_CUSTOM_ALARMS; i++) {
+        if (Model.music.custom[i].src == TELEM_ALARM_CUSTOM1 - MUSIC_TELEMALARM1 + music)
+            return Model.music.custom[i].music;
+    }
+    return music;
 }
 #endif
 

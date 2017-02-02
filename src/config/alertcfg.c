@@ -60,17 +60,18 @@ void CONFIG_AlertParse(const char* filename)
             j++;
             val = atoi(pt);
             switch (j) {
-              case 2: music_map[music_map_entries].music = val;
+              case 1: music_map[music_map_entries].music = val;
                       if (val > 1999) music_map_custom_entries++;
                       break;
-              case 3: music_map[music_map_entries].duration = val; break;
+              case 2: music_map[music_map_entries].duration = val; break;
 #if HAS_MUSIC_CONFIG
-              case 4: strcpy(music_map[music_map_entries].label,pt);
+              case 3: strcpy(music_map[music_map_entries].label,pt);
 #endif
             }
             pt = strtok(NULL, ":");
         }
-        music_map_entries++;
+        if (music_map[music_map_entries].duration > 0) //ignore zero length entries
+            music_map_entries++;
     }
     fclose(file);
 }

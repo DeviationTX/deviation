@@ -83,13 +83,13 @@ struct ButtonMusic {
 
 struct CustomMusic {
   u8 src;
+//  u8 vol;
   u16 music;
 };
 
 struct  Music_Nr {
   struct CustomMusic custom[MODEL_CUSTOM_ALARMS];	//Switch array to point to music file number, no pots
   struct ButtonMusic button_nr[NUM_TX_BUTTONS];	//Button array to point to music file number
-  u16 telem_nr[TELEM_NUM_ALARMS];
 #if NUM_AUX_KNOBS
   struct AuxMusic aux_nr[NUM_AUX_KNOBS];
 #endif

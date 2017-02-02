@@ -343,7 +343,7 @@ void TELEMETRY_Alarm()
         printf("beep: %d\n\n", k);
 #endif
 
-#ifdef HAS_EXTENDED_AUDIO
+#if HAS_EXTENDED_AUDIO && HAS_MUSIC_CONFIG
         if (TELEMETRY_Type() == TELEM_DEVO) {
             switch(Model.telem_alarm[k]) {
                 case TELEM_DEVO_VOLT1:
@@ -385,8 +385,6 @@ void TELEMETRY_Alarm()
                 case TELEM_DSM_ESC_AMPS2:
 #endif
                 case TELEM_DSM_AMPS1: MUSIC_PlayValue(MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + k), (u32)TELEMETRY_GetValue(Model.telem_alarm[k]),TELEM_UNIT_AMPS); break;
-#if HAS_EXTENDED_TELEMETRY
-// The block is actually not part of HAS_EXTENDED_TELEMETRY but has been excluded for ROM space issues on devo7e. We need to get rid of this whole switch mess later on, as it uses up a lot of valuable space.
                 case TELEM_DSM_ALTITUDE:
                 case TELEM_DSM_ALTITUDE_MAX:
                 case TELEM_DSM_VARIO_CLIMBRATE1:
@@ -404,7 +402,6 @@ void TELEMETRY_Alarm()
                 case TELEM_DSM_GFORCE_YMAX:
                 case TELEM_DSM_GFORCE_ZMAX:
                 case TELEM_DSM_GFORCE_ZMIN: MUSIC_PlayValue(MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + k), (u32)TELEMETRY_GetValue(Model.telem_alarm[k]),TELEM_UNIT_GFORCE); break;
-#endif
                 default: MUSIC_PlayValue(MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + k), (u32)TELEMETRY_GetValue(Model.telem_alarm[k]),TELEM_UNIT_NONE);
           }
         }
@@ -437,7 +434,7 @@ void TELEMETRY_Alarm()
         }
 #else
         MUSIC_Play(MUSIC_TELEMALARM1 + k);
-#endif
+#endif //HAS_EXTENDED_AUDIO && HAS_MUSIC_CONFIG
 
     }
 }

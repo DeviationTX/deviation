@@ -56,10 +56,11 @@ struct Transmitter {
     u8 telem;
     u8 music_shutdown;
     u8 extra_hardware;
-#if HAS_EXTENDED_AUDIO 
+#if HAS_EXTENDED_AUDIO
     enum AudioPlayers audio_player;
     u8 audio_2way;	// Currently unused.
-#endif 
+    u8 audio_vol;
+#endif
 #if HAS_AUDIO_UART5
     u8 audio_uart5;
 #endif
@@ -76,7 +77,7 @@ struct Transmitter {
 #if HAS_RTC
     u8 rtcflags;    // bit0: clock12hr, bit1-3: time format, bit4-7 date format (see pages/320x240x16/rtc_config.c)
 #endif
-    
+
     #ifdef HAS_MORE_THAN_32_INPUTS
         u64 ignore_src;
     #else
