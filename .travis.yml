@@ -77,7 +77,6 @@ before_script:
   - echo $PATH
   - echo $HOME
   - arm-none-eabi-gcc --version
-  - cp $HOME/portaudio-w32/bin/libportaudio-2.dll src/
 
 script: cd src && make $MAKETARGET
 
