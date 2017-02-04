@@ -41,7 +41,7 @@ static const char * const frskyx_opts[] = {
   _tr_noop("Failsafe"), "Hold", "NoPulse", "RX", NULL,
   _tr_noop("AD2GAIN"),  "0", "2000", "655361", NULL,       // big step 10, little step 1
   _tr_noop("Freq-Fine"),  "-127", "127", NULL,
-  _tr_noop("Format"),  "STD", "EU", NULL,
+  _tr_noop("Format"),  "FCC", "EU", NULL,
   NULL
 };
 enum {
@@ -747,8 +747,8 @@ static u16 frskyx_cb() {
   return 1;   
 }
 
-// register, standard, EU
-static u8 init_data[][3] = {
+// register, FCC, EU
+static const u8 init_data[][3] = {
     {CC2500_02_IOCFG0,    0x06,  0x06},
     {CC2500_00_IOCFG2,    0x06,  0x06},
     {CC2500_17_MCSM1,     0x0c,  0x0E},
@@ -770,33 +770,38 @@ static u8 init_data[][3] = {
     {CC2500_15_DEVIATN,   0x51,  0x53},
 };                               
 
+// register, value
+static const u8 init_data_shared[][2] = {
+    {CC2500_19_FOCCFG,    0x16},
+    {CC2500_1A_BSCFG,     0x6c}, 
+    {CC2500_1B_AGCCTRL2,  0x43},
+    {CC2500_1C_AGCCTRL1,  0x40},
+    {CC2500_1D_AGCCTRL0,  0x91},
+    {CC2500_21_FREND1,    0x56},
+    {CC2500_22_FREND0,    0x10},
+    {CC2500_23_FSCAL3,    0xa9},
+    {CC2500_24_FSCAL2,    0x0A},
+    {CC2500_25_FSCAL1,    0x00},
+    {CC2500_26_FSCAL0,    0x11},
+    {CC2500_29_FSTEST,    0x59},
+    {CC2500_2C_TEST2,     0x88},
+    {CC2500_2D_TEST1,     0x31},
+    {CC2500_2E_TEST0,     0x0B},
+    {CC2500_03_FIFOTHR,   0x07},
+    {CC2500_09_ADDR,      0x00},
+};
+
 static void frskyX_init() {
   CC2500_Reset();
 
   u8 format = Model.proto_opts[PROTO_OPTS_FORMAT] + 1;
 
   for (u32 i=0; i < ((sizeof init_data) / (sizeof init_data[0])); i++)
-    CC2500_WriteReg(init_data[i][0], init_data[i][format]);
+      CC2500_WriteReg(init_data[i][0], init_data[i][format]);
+  for (u32 i=0; i < ((sizeof init_data_shared) / (sizeof init_data_shared[0])); i++)
+      CC2500_WriteReg(init_data_shared[i][0], init_data_shared[i][1]);
 
-  CC2500_WriteReg(CC2500_19_FOCCFG, 0x16);
-  CC2500_WriteReg(CC2500_1A_BSCFG, 0x6c); 
-  CC2500_WriteReg(CC2500_1B_AGCCTRL2,0x43);
-  CC2500_WriteReg(CC2500_1C_AGCCTRL1,0x40);
-  CC2500_WriteReg(CC2500_1D_AGCCTRL0,0x91);
-  CC2500_WriteReg(CC2500_21_FREND1, 0x56);
-  CC2500_WriteReg(CC2500_22_FREND0, 0x10);
-  CC2500_WriteReg(CC2500_23_FSCAL3, 0xa9);
-  CC2500_WriteReg(CC2500_24_FSCAL2, 0x0A);
-  CC2500_WriteReg(CC2500_25_FSCAL1, 0x00);
-  CC2500_WriteReg(CC2500_26_FSCAL0, 0x11);
-  CC2500_WriteReg(CC2500_29_FSTEST, 0x59);
-  CC2500_WriteReg(CC2500_2C_TEST2, 0x88);
-  CC2500_WriteReg(CC2500_2D_TEST1, 0x31);
-  CC2500_WriteReg(CC2500_2E_TEST0, 0x0B);
-  CC2500_WriteReg(CC2500_03_FIFOTHR, 0x07);
-  CC2500_WriteReg(CC2500_09_ADDR, 0x00);
   CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);
-
   CC2500_Strobe(CC2500_SIDLE);    
 
   //calibrate hop channels
