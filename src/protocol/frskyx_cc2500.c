@@ -262,7 +262,6 @@ static void frskyX_data_frame() {
     failsafe_count += 1;
 
 
-    packet[0] = 0x1D; 
     packet[0] = Model.proto_opts[PROTO_OPTS_FORMAT] ? 0x20 : 0x1D;       
     packet[1] = fixed_id;
     packet[2] = fixed_id >> 8;
@@ -310,12 +309,11 @@ static void frskyX_data_frame() {
     
     chan_offset ^= 0x08;
     
-    memset(&packet[22], 0, packet_size-15);
+    memset(&packet[22], 0, packet_size-24);
 
     u16 lcrc = crc(&packet[3], packet_size-5);
     packet[packet_size-2] = lcrc >> 8;
     packet[packet_size-1] = lcrc;
-    printf("bind: packet_size=%d, format=%d\n", packet_size, Model.proto_opts[PROTO_OPTS_FORMAT]);
 } 
 
 
