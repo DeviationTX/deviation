@@ -41,12 +41,14 @@ static const char * const frskyx_opts[] = {
   _tr_noop("Failsafe"), "Hold", "NoPulse", "RX", NULL,
   _tr_noop("AD2GAIN"),  "0", "2000", "655361", NULL,       // big step 10, little step 1
   _tr_noop("Freq-Fine"),  "-127", "127", NULL,
+  _tr_noop("Format"),  "STD", "EU", NULL,
   NULL
 };
 enum {
     PROTO_OPTS_FAILSAFE,
     PROTO_OPTS_AD2GAIN,
     PROTO_OPTS_FREQFINE,
+    PROTO_OPTS_FORMAT,
     LAST_PROTO_OPT,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
@@ -55,7 +57,7 @@ ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 #define FAILSAFE_NOPULSE 1
 #define FAILSAFE_RX      2
 
-#define PACKET_SIZE 30
+#define PACKET_SIZE 33
 
 // Statics are not initialized on 7e so in initialize() if necessary
 static u8 chanskip;
@@ -66,6 +68,7 @@ static u8 ctr;
 static s8 fine;
 static u8 seq_last_sent;
 static u8 seq_last_rcvd;
+static u8 packet_size;
 
 
 // u8 ptr[4] = {0x01,0x12,0x23,0x30};
@@ -165,7 +168,7 @@ static void set_start(u8 ch) {
 #define RXNUM 16
 static void frskyX_build_bind_packet()
 {
-    packet[0] = 0x1D;       
+    packet[0] = Model.proto_opts[PROTO_OPTS_FORMAT] ? 0x20 : 0x1D;
     packet[1] = 0x03;          
     packet[2] = 0x01;               
 
@@ -181,11 +184,11 @@ static void frskyX_build_bind_packet()
     packet[11] = 0x02;
     packet[12] = RXNUM;
 
-    memset(&packet[13], 0, 15);
+    memset(&packet[13], 0, packet_size-15);
 
-    u16 lcrc = crc(&packet[3], 25);
-    packet[28] = lcrc >> 8;
-    packet[29] = lcrc;
+    u16 lcrc = crc(&packet[3], packet_size-5);
+    packet[packet_size-2] = lcrc >> 8;
+    packet[packet_size-1] = lcrc;
 
 }
 
@@ -260,6 +263,7 @@ static void frskyX_data_frame() {
 
 
     packet[0] = 0x1D; 
+    packet[0] = Model.proto_opts[PROTO_OPTS_FORMAT] ? 0x20 : 0x1D;       
     packet[1] = fixed_id;
     packet[2] = fixed_id >> 8;
 
@@ -306,12 +310,12 @@ static void frskyX_data_frame() {
     
     chan_offset ^= 0x08;
     
-    for (u8 i = 22;i<28;i++)
-      packet[i] = 0;
-    
-    u16 lcrc = crc(&packet[3], 25);
-    packet[28] = lcrc >> 8;
-    packet[29] = lcrc;
+    memset(&packet[22], 0, packet_size-15);
+
+    u16 lcrc = crc(&packet[3], packet_size-5);
+    packet[packet_size-2] = lcrc >> 8;
+    packet[packet_size-1] = lcrc;
+    printf("bind: packet_size=%d, format=%d\n", packet_size, Model.proto_opts[PROTO_OPTS_FORMAT]);
 } 
 
 
@@ -601,7 +605,7 @@ static void frsky_check_telemetry(u8 *pkt, u8 len) {
         Telemetry.value[TELEM_FRSKY_LQI] = pkt[len-1] & 0x7f;
         TELEMETRY_SetUpdated(TELEM_FRSKY_LQI);
 
-        Telemetry.value[TELEM_FRSKY_LRSSI] = (s8)pkt[len-2] / 2 - 70; 	// Value in dBm
+        Telemetry.value[TELEM_FRSKY_LRSSI] = (s8)pkt[len-2] / 2 - 70;  // Value in dBm
         TELEMETRY_SetUpdated(TELEM_FRSKY_LRSSI);
 
         if ((pkt[5] >> 4 & 0x0f) == 0x08) {   // restart or somesuch
@@ -745,28 +749,37 @@ static u16 frskyx_cb() {
   return 1;   
 }
 
+// register, standard, EU
+static u8 init_data[][3] = {
+    {CC2500_02_IOCFG0,    0x06,  0x06},
+    {CC2500_00_IOCFG2,    0x06,  0x06},
+    {CC2500_17_MCSM1,     0x0c,  0x0E},
+    {CC2500_18_MCSM0,     0x18,  0x18},
+    {CC2500_06_PKTLEN,    0x1E,  0x23},
+    {CC2500_07_PKTCTRL1,  0x04,  0x04},
+    {CC2500_08_PKTCTRL0,  0x01,  0x01},
+    {CC2500_3E_PATABLE,   0xff,  0xff},
+    {CC2500_0B_FSCTRL1,   0x0A,  0x08},
+    {CC2500_0C_FSCTRL0,   0x00,  0x00},
+    {CC2500_0D_FREQ2,     0x5c,  0x5c},
+    {CC2500_0E_FREQ1,     0x76,  0x80},
+    {CC2500_0F_FREQ0,     0x27,  0x00},
+    {CC2500_10_MDMCFG4,   0x7B,  0x7B},
+    {CC2500_11_MDMCFG3,   0x61,  0xF8},
+    {CC2500_12_MDMCFG2,   0x13,  0x03},
+    {CC2500_13_MDMCFG1,   0x23,  0x23},
+    {CC2500_14_MDMCFG0,   0x7a,  0x7a},
+    {CC2500_15_DEVIATN,   0x51,  0x53},
+};                               
+
 static void frskyX_init() {
   CC2500_Reset();
-  CC2500_WriteReg(CC2500_02_IOCFG0, 0x06);    
-  CC2500_WriteReg(CC2500_00_IOCFG2, 0x06);
-  CC2500_WriteReg(CC2500_17_MCSM1, 0x0C);
-  CC2500_WriteReg(CC2500_18_MCSM0, 0x18);
-  CC2500_WriteReg(CC2500_06_PKTLEN, 0x1E);
-  CC2500_WriteReg(CC2500_07_PKTCTRL1, 0x04);
-  CC2500_WriteReg(CC2500_08_PKTCTRL0, 0x01);
-  CC2500_WriteReg(CC2500_3E_PATABLE, 0xff);
-  CC2500_WriteReg(CC2500_0B_FSCTRL1, 0x0A);
-  CC2500_WriteReg(CC2500_0C_FSCTRL0, 0x00);
-  CC2500_WriteReg(CC2500_0D_FREQ2, 0x5c);
-  CC2500_WriteReg(CC2500_0E_FREQ1, 0x76);
-//  CC2500_WriteReg(CC2500_0F_FREQ0, 0x27); 
-  CC2500_WriteReg(CC2500_0F_FREQ0, 0x27);
-  CC2500_WriteReg(CC2500_10_MDMCFG4, 0x7B); 
-  CC2500_WriteReg(CC2500_11_MDMCFG3, 0x61);
-  CC2500_WriteReg(CC2500_12_MDMCFG2, 0x13);
-  CC2500_WriteReg(CC2500_13_MDMCFG1, 0x23);
-  CC2500_WriteReg(CC2500_14_MDMCFG0, 0x7a);
-  CC2500_WriteReg(CC2500_15_DEVIATN, 0x51);
+
+  u8 format = Model.proto_opts[PROTO_OPTS_FORMAT] + 1;
+
+  for (u32 i=0; i < ((sizeof init_data) / (sizeof init_data[0])); i++)
+    CC2500_WriteReg(init_data[i][0], init_data[i][format]);
+
   CC2500_WriteReg(CC2500_19_FOCCFG, 0x16);
   CC2500_WriteReg(CC2500_1A_BSCFG, 0x6c); 
   CC2500_WriteReg(CC2500_1B_AGCCTRL2,0x43);
@@ -784,9 +797,10 @@ static void frskyX_init() {
   CC2500_WriteReg(CC2500_2E_TEST0, 0x0B);
   CC2500_WriteReg(CC2500_03_FIFOTHR, 0x07);
   CC2500_WriteReg(CC2500_09_ADDR, 0x00);
-  CC2500_WriteReg(CC2500_07_PKTCTRL1, 0x04);      
   CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);
+
   CC2500_Strobe(CC2500_SIDLE);    
+
   //calibrate hop channels
   for (u8 c = 0; c < 47; c++) {
       CC2500_Strobe(CC2500_SIDLE);    
@@ -829,6 +843,7 @@ static void initialize(int bind)
 
     // initialize statics since 7e modules don't initialize
     fine = Model.proto_opts[PROTO_OPTS_FREQFINE];
+    packet_size = Model.proto_opts[PROTO_OPTS_FORMAT] ? 33 : 30;
     fixed_id = (u16) get_tx_id();
     failsafe_count = 0;
     chan_offset = 0;
