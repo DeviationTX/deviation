@@ -57,7 +57,7 @@ ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 #define FAILSAFE_NOPULSE 1
 #define FAILSAFE_RX      2
 
-#define PACKET_SIZE 33
+#define MAX_PACKET_SIZE 33
 
 // Statics are not initialized on 7e so in initialize() if necessary
 static u8 chanskip;
@@ -88,7 +88,7 @@ static enum {
 } state;
 
 static u16 fixed_id;
-static u8 packet[PACKET_SIZE];
+static u8 packet[MAX_PACKET_SIZE];
 
 static const u8 hop_data[] = {
   0x02, 0xD4, 0xBB, 0xA2, 0x89,
@@ -722,7 +722,7 @@ static u16 frskyx_cb() {
     case FRSKY_DATA4:
       len = CC2500_ReadReg(CC2500_3B_RXBYTES | CC2500_READ_BURST) & 0x7F; 
 #ifndef EMULATOR
-      if (len && len < PACKET_SIZE) {
+      if (len && len < MAX_PACKET_SIZE) {
           CC2500_ReadData(packet, len);
           frsky_check_telemetry(packet, len);
       } else {
