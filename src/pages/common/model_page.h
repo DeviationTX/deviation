@@ -17,7 +17,7 @@ struct model_page {
     u8 last_txpower;
 /*Load save */
     s8 selected;
-    u16 total_items;
+    u8 total_items;
     void(*return_page)(int page);
     enum ModelType modeltype;
 };
