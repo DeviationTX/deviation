@@ -4,7 +4,7 @@ MAKEFLAGS += --no-builtin-rules
 .SUFFIXES:
 
 ###########################################
-## Provide some convenient make targets. ##
+## Provide some convenient make targets  ##
 ###########################################
 ifndef  TARGET
 TARGET   ?= devo8
@@ -193,12 +193,12 @@ $(VERBOSE).SILENT:
 .PHONY: clean distclean language
 
 clean:
-	rm -f $(TARGET).$(EXEEXT) $(TARGET).bin $(TARGET).dfu $(TARGET).list \
+	rm -f $(TARGET).$(EXEEXT) $(TARGET).exe $(TARGET).bin $(TARGET).dfu $(TARGET).list \
 		$(TARGET).map $(ODIR)/*.o $(ODIR)/*.o_ $(ODIR)/*.P  $(ODIR)/*.bin \
 		filesystem/$(FILESYSYTEM) 2> /dev/null || true
 
 distclean:
-	rm -f *.$(EXEEXT) *.bin *.dfu *.list *.map
+	rm -f *.$(EXEEXT) *.exe *.bin *.dfu *.list *.map
 	rm -rf objs
 	rm -rf  filesystem
 	$(MAKE) -C libopencm3 clean > /dev/null
@@ -244,7 +244,7 @@ coverity:
 	cov-build --dir cov-int make TARGET=devo10
 	tar -cvzf coverity-$(HGVERSION).tgz cov-int
 ##########################################
-#Ensure necessray directories are created#
+#Ensure necessary directories are created#
 ##########################################
 $(OBJS): | $(ODIR)
 
@@ -255,7 +255,7 @@ $(MODELDIR):
 	@mkdir -p $@
 
 ######################
-#The main expecutable#
+#The main executable #
 ######################
 $(TARGET).$(EXEEXT): $(LINKFILE) $(OBJS) $(LIBOPENCM3)
 	@echo " + Building '$@'"
