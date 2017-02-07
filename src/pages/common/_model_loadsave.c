@@ -151,6 +151,7 @@ int model_count()
         if (! fh)
             break;
         fclose(fh);
+        CLOCK_ResetWatchdog();
     }
     num_models--;
     return num_models;
