@@ -65,7 +65,7 @@ void CONFIG_AlertParse(const char* filename)
                       break;
               case 2: music_map[music_map_entries].duration = val; break;
 #if HAS_MUSIC_CONFIG
-              case 3: strcpy(music_map[music_map_entries].label,pt);
+              case 3: strlcpy(music_map[music_map_entries].label,pt,MAX_MUSIC_LABEL);
 #endif
             }
             pt = strtok(NULL, ":");

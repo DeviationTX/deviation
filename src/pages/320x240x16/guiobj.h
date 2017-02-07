@@ -391,15 +391,10 @@ struct debuglog_obj {
 #ifdef HAS_MUSIC_CONFIG
 struct musicconfig_obj {
     guiLabel_t msg;
-    guiLabel_t vollbl;
-    guiTextSelect_t vol;
     guiScrollable_t scrollable;
-    guiLabel_t name[5];
-    guiTextSelect_t musicsrc[5];
-    guiLabel_t idxlbl[5];
-    guiTextSelect_t musicidx[5];
-    guiLabel_t musiclbl[5];
-
+    guiLabel_t name[10];
+    guiTextSelect_t musicidx[10];
+    guiLabel_t musiclbl[10];
 };
 #endif
 

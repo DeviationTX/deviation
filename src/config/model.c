@@ -189,7 +189,6 @@ static const char SECTION_MUSIC[] = "music";
 static const char * const MUSIC_TELEMALARM[TELEM_NUM_ALARMS] =
      { "telemalarm1", "telemalarm2", "telemalarm3", "telemalarm4", "telemalarm5", "telemalarm6" };
 static const char * const AUDIO_VOL = "volume";
-u8 musicsrc_parsed,musictelem_parsed;
 #endif
 
 
@@ -994,6 +993,7 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
 
     if (MATCH_SECTION(SECTION_MUSIC)) {
         u16 val = atoi(value);
+/*
         if (MATCH_KEY(AUDIO_VOL)) {
             if (val > 31)
                 Transmitter.audio_vol = 31;
@@ -1001,6 +1001,7 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
                 Transmitter.audio_vol = val;
             return 1;
         }
+*/
         if (!MUSIC_GetDuration(val)) {
             printf("%s: Music %s not found in music.map\n", section, value);
             return 0;
@@ -1008,26 +1009,23 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
         for (int i = INP_HAS_CALIBRATION+1; i <= NUM_INPUTS; i++) {
             INPUT_SourceName(src_name, i);
             if (MATCH_KEY(src_name)) {
-                m->music.custom[musicsrc_parsed].music = val;
-                m->music.custom[musicsrc_parsed].src = i;
-//                m->music.custom[musicsrc_parsed].vol = vol;
-                musicsrc_parsed++;
+                m->music.switches[i - INP_HAS_CALIBRATION - 1].music = val;
                 return 1;
             }
         }
-        for (int i = 1; i <= NUM_TX_BUTTONS; i++) {
+/*        for (int i = 1; i <= NUM_TX_BUTTONS; i++) {
             button_name = INPUT_ButtonName(i);
             strcpy(src_name, button_name);
             strcat(src_name, "_ON");
             // Button name alone or with suffix "_ON" will be considered the same
             if (MATCH_KEY(button_name) || MATCH_KEY(src_name)) {
-                m->music.button_nr[i-1].on = val;
+                m->music.buttons[i-1].on = val;
                 return 1;
             }
             strcpy(src_name, button_name);
             strcat(src_name, "_OFF");
             if (MATCH_KEY(src_name)) {
-                m->music.button_nr[i-1].off = val;
+                m->music.buttons[i-1].off = val;
                 return 1;
             }
         }
@@ -1036,23 +1034,21 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
             INPUT_SourceName(src_name, i);
             strcat(src_name, "_UP");
             if (MATCH_KEY(src_name)) {
-                m->music.aux_nr[i - (NUM_STICKS+1)].up = val;
+                m->music.aux[i - (NUM_STICKS+1)].up = val;
                 return 1;
             }
             INPUT_SourceName(src_name, i);
             strcat(src_name, "_DOWN");
             if (MATCH_KEY(src_name)) {
-                m->music.aux_nr[i - (NUM_STICKS+1)].down = val;
+                m->music.aux[i - (NUM_STICKS+1)].down = val;
                 return 1;
             }
         }
 #endif
+*/
         for (int i = 0; i < TELEM_NUM_ALARMS; i++) {
             if (MATCH_KEY(MUSIC_TELEMALARM[i])) {
-                m->music.custom[MODEL_CUSTOM_ALARMS - TELEM_NUM_ALARMS + musictelem_parsed].music = val;
-                m->music.custom[MODEL_CUSTOM_ALARMS - TELEM_NUM_ALARMS + musictelem_parsed].src = i + TELEM_ALARM_CUSTOM1;
-//                m->music.custom[MODEL_CUSTOM_ALARMS - TELEM_NUM_ALARMS + musictelem_parsed].vol = vol;
-                musictelem_parsed++;
+                m->music.telemetry[i].music = val;
                 return 1;
             }
         }
@@ -1357,17 +1353,15 @@ u8 CONFIG_WriteModel(u8 model_num) {
     }
 #if HAS_EXTENDED_AUDIO
     fprintf(fh, "[%s]\n", SECTION_MUSIC);
-    fprintf(fh, "volume=%d", Transmitter.audio_vol);
-    for (idx = 0; idx < MODEL_CUSTOM_ALARMS; idx++) {
-        if ( m->music.custom[idx].music && m->music.custom[idx].src) {
-            if (m->music.custom[idx].src <= NUM_INPUTS) {
-                fprintf(fh, "%s=%d\n", INPUT_SourceName(file,m->music.custom[idx].src),
-                    m->music.custom[idx].music);
-            }
-            else {
-                fprintf(fh, "TELEMALARM%d=%d\n", m->music.custom[idx].src-TELEM_CUSTOM_NONE,
-                    m->music.custom[idx].music);
-            }
+//    fprintf(fh, "volume=%d", Transmitter.audio_vol);
+    for (idx = 0; idx < NUM_INPUTS - INP_HAS_CALIBRATION; idx++) {
+        if (m->music.switches[idx].music) {
+            fprintf(fh, "%s=%d\n", INPUT_SourceName(file,idx + INP_HAS_CALIBRATION + 1), m->music.switches[idx].music);
+        }
+    }
+    for (idx = 0; idx < TELEM_NUM_ALARMS; idx++) {
+        if (m->music.telemetry[idx].music) {
+            fprintf(fh, "TELEMALARM%d=%d\n", idx + 1, m->music.telemetry[idx].music);
         }
     }
 #endif
@@ -1417,10 +1411,6 @@ u8 CONFIG_ReadModel(u8 model_num) {
     char file[30];
     auto_map = 0;
     get_model_file(file, model_num);
-#if HAS_EXTENDED_AUDIO
-    musicsrc_parsed = 0;
-    musictelem_parsed = 0;
-#endif
     if (CONFIG_IniParse(file, ini_handler, &Model)) {
         printf("Failed to parse Model file: %s\n", file);
     }

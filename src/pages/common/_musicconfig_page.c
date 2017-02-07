@@ -20,126 +20,93 @@ static struct musicconfig_obj * const gui = &gui_objs.u.musicconfig;
 
 static u16 current_selected = 0;
 
+enum {
+    MUSIC_SRC_SWITCH = 1,
+    MUSIC_SRC_BUTTON,
+#if NUM_AUX_KNOBS
+    MUSIC_SRC_AUX;
+#endif
+    MUSIC_SRC_TELEMETRY,
+};
+
+static u8 musicconfig_getsrctype (u8 idx)
+{
+    if (idx < NUM_INPUTS - INP_HAS_CALIBRATION)
+        return MUSIC_SRC_SWITCH;
+/*    if (idx < NUM_INPUTS - INP_HAS_CALIBRATION + NUM_TX_BUTTONS)
+        return MUSIC_SRC_BUTTON;
+#if NUM_AUX_KNOBS
+    if (idx < NUM_INPUTS - INP_HAS_CALIBRATION + NUM_TX_BUTTONS + NUM_AUX_KNOBS)
+        return MUSIC_SRC_AUX;
+#endif
+*/
+    return MUSIC_SRC_TELEMETRY;
+}
 
 const char *musicconfig_str_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    int i = (long)data;
-    if ( i < NUM_INPUTS - INP_HAS_CALIBRATION )
-        snprintf(tempstring, sizeof(tempstring), _tr("Switch %d"), i + 1);
-    else
+    int idx = (long)data;
+    if (musicconfig_getsrctype(idx) == MUSIC_SRC_SWITCH)
+        INPUT_SourceName(tempstring,idx + INP_HAS_CALIBRATION + 1);
+    if (musicconfig_getsrctype(idx) == MUSIC_SRC_TELEMETRY)
         snprintf(tempstring, sizeof(tempstring), _tr("Telem %d"),
-            i - (NUM_INPUTS - INP_HAS_CALIBRATION) + 1);
-
+            idx - (MODEL_CUSTOM_ALARMS - TELEM_NUM_ALARMS) + 1);
     return tempstring;
-}
-
-const char *_set_musicsrc_cb(guiTextSelect_t *obj, u8 *src, int dir, int idx, int source)
-{
-    (void) obj;
-    (void) dir;
-    (void) idx;
-    (void) source;
-    u8 changed;
-
-    int newsrc = GUI_TextSelectHelper(MIXER_SRC(*src), INP_HAS_CALIBRATION + 1,
-        NUM_SOURCES - NUM_OUT_CHANNELS - NUM_VIRT_CHANNELS - MAX_PPM_IN_CHANNELS, dir, 1, 1, &changed);
-    *src = newsrc;
-    return INPUT_SourceName(tempstring, *src);
-}
-
-const char *musicsrc_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void) obj;
-    int idx = (long)data;
-    struct CustomMusic *musicpt = &Model.music.custom[idx];
-    if (musicpt->src == 0) {
-#if HAS_TOUCH
-      int cur_row = idx - GUI_ScrollableCurrentRow(&gui->scrollable);
-      GUI_SetHidden((guiObject_t *)&gui->idxlbl[cur_row], 1);
-      GUI_SetHidden((guiObject_t *)&gui->musicidx[cur_row], 1);
-      GUI_SetHidden((guiObject_t *)&gui->musiclbl[cur_row], 1);
-#else
-      GUI_SetHidden((guiObject_t *)&gui->idxlbl, 1);
-      GUI_SetHidden((guiObject_t *)&gui->musicidx, 1);
-      GUI_SetHidden((guiObject_t *)&gui->musiclbl, 1);
-#endif
-      return strcpy(tempstring, _tr("None"));
-    }
-    if (idx < NUM_INPUTS - INP_HAS_CALIBRATION) {
-        const char *str = _set_musicsrc_cb((guiTextSelect_t *)obj, &musicpt->src, dir, idx, INP_NONE);
-        return str;
-    }
-    else {
-        musicpt->src = GUI_TextSelectHelper(musicpt->src, TELEM_ALARM_CUSTOM1, TELEM_ALARM_CUSTOM6, dir, 1, 1, NULL);
-        snprintf(tempstring, 12, "TELEM%d", musicpt->src - TELEM_CUSTOM_NONE);
-        return tempstring;
-    }
-}
-
-void toggle_musicsrc_cb(guiObject_t *obj, void *data)
-{
-    int idx = (long)data;
-    struct CustomMusic *musicpt = &Model.music.custom[idx];
-    if (musicpt->src == 0) {
-      if (idx < NUM_INPUTS - INP_HAS_CALIBRATION)
-          musicpt->src = INP_HAS_CALIBRATION + 1;
-      else
-          musicpt->src = TELEM_ALARM_CUSTOM1;
-#if HAS_TOUCH
-      int cur_row = idx-GUI_ScrollableCurrentRow(&gui->scrollable);
-      GUI_SetHidden((guiObject_t *)&gui->idxlbl[cur_row], 0);
-      GUI_SetHidden((guiObject_t *)&gui->musicidx[cur_row], 0);
-      GUI_SetHidden((guiObject_t *)&gui->musiclbl[cur_row], 0);
-#else
-      GUI_SetHidden((guiObject_t *)&gui->idxlbl, 0);
-      GUI_SetHidden((guiObject_t *)&gui->musicidx, 0);
-      GUI_SetHidden((guiObject_t *)&gui->musiclbl, 0);
-#endif
-    }
-    else {
-      musicpt->src = 0;
-#if HAS_TOUCH
-      int cur_row = idx-GUI_ScrollableCurrentRow(&gui->scrollable);
-      GUI_SetHidden((guiObject_t *)&gui->idxlbl[cur_row], 1);
-      GUI_SetHidden((guiObject_t *)&gui->musicidx[cur_row], 1);
-      GUI_SetHidden((guiObject_t *)&gui->musiclbl[cur_row], 1);
-#else
-      GUI_SetHidden((guiObject_t *)&gui->idxlbl, 1);
-      GUI_SetHidden((guiObject_t *)&gui->musicidx, 1);
-      GUI_SetHidden((guiObject_t *)&gui->musiclbl, 1);
-#endif
-    }
-    GUI_Redraw(obj);
-}
-
-static const char *musiclbl_cb(guiObject_t *obj, const void *data)
-{
-    (void) obj;
-    int idx = (long)data;
-    return MUSIC_GetLabel(Model.music.custom[idx].music);
-    GUI_Redraw(obj);
 }
 
 static void music_test_cb(guiObject_t *obj, void *data)
 {
     (void) obj;
     u8 idx = (long)data;
-    MUSIC_Play(Model.music.custom[idx].music);
+    if (musicconfig_getsrctype(idx) == MUSIC_SRC_SWITCH) {
+        if (Model.music.switches[idx].music)
+            MUSIC_Play(Model.music.switches[idx].music);
+    }
+    if (musicconfig_getsrctype(idx) == MUSIC_SRC_TELEMETRY) {
+        if (Model.music.telemetry[idx - (MODEL_CUSTOM_ALARMS - TELEM_NUM_ALARMS)].music)
+            MUSIC_Play(Model.music.telemetry[idx - (MODEL_CUSTOM_ALARMS - TELEM_NUM_ALARMS)].music);
+    }
+}
+
+static const char *musiclbl_cb(guiObject_t *obj, const void *data)
+{
+    (void) obj;
+    int idx = (long)data;
+    if (musicconfig_getsrctype(idx) == MUSIC_SRC_SWITCH) {
+        if (Model.music.switches[idx].music)
+            return MUSIC_GetLabel(Model.music.switches[idx].music);
+    }
+    if (musicconfig_getsrctype(idx) == MUSIC_SRC_TELEMETRY) {
+        if (Model.music.telemetry[idx - (MODEL_CUSTOM_ALARMS - TELEM_NUM_ALARMS)].music)
+            return MUSIC_GetLabel(Model.music.telemetry[idx - (MODEL_CUSTOM_ALARMS - TELEM_NUM_ALARMS)].music);
+    }
+    return strcpy(tempstring, "");
 }
 
 static const char *musicid_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     int idx = (long)data;
-    struct CustomMusic *musicpt = &Model.music.custom[idx];
+    int cur_row = idx - GUI_ScrollableCurrentRow(&gui->scrollable);
+    struct CustomMusic *musicpt;
+
+//    if (musicconfig_getsrctype(idx) == MUSIC_SRC_SWITCH)
+        musicpt = &Model.music.switches[idx];
+/*    if (musicconfig_getsrctype(idx) == MUSIC_SRC_TELEMETRY)
+        musicpt = &Model.music.telemetry[idx - (MODEL_CUSTOM_ALARMS - TELEM_NUM_ALARMS-1)];
+*/
+    if (dir == -1 && musicpt->music == CUSTOM_ALARM_ID) // set to none below CUSTOM_ALARM_ID
+        musicpt->music = 0;
+    if (dir == 1 && musicpt->music == 0) // set to CUSTOM_ALARM_ID when currently none
+        musicpt->music = CUSTOM_ALARM_ID - 1;
+
+    if (musicpt->music == 0) {
+        GUI_Redraw(&gui->musiclbl[cur_row]);
+        return strcpy(tempstring, _tr("None"));
+    }
     musicpt->music = GUI_TextSelectHelper(musicpt->music, CUSTOM_ALARM_ID, CUSTOM_ALARM_ID + music_map_custom_entries  - 1, dir, 1, 10, NULL);
     snprintf(tempstring, 5, "%d", musicpt->music);
-#if HAS_TOUCH
-    int cur_row = idx - GUI_ScrollableCurrentRow(&gui->scrollable);
     GUI_Redraw(&gui->musiclbl[cur_row]);
-#else
-    GUI_Redraw(&gui->musiclbl);
-#endif
     return tempstring;
 }

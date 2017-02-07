@@ -21,21 +21,12 @@
 #if HAS_MUSIC_CONFIG
 
 enum {
-    MUSICROWS = 4,
-    MUSICROWSPACER = (LCD_WIDTH == 480 ? 45 : 40),
+    MUSICROWSPACER = (LCD_WIDTH == 480 ? 23 : 20),
     COL1 = 5,
-    COL2 = 70,
-    COL3 = 175,
-    COL4 = 225,
+    COL2 = 65,
+    COL3 = 130,
 };
 #include "../common/_musicconfig_page.c"
-
-/*            Advanced
-   Row1       Source
-   Row2       Music-nr
-   Row3       Music-label
-   Row4       Volume
-*/
 
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
@@ -44,13 +35,9 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         int music_num = absrow;
         //Row 1
         GUI_CreateLabelBox(&gui->name[relrow], COL1, row, COL2-COL1, 18, &DEFAULT_FONT,musicconfig_str_cb, NULL, (void *)(long)music_num);
-        GUI_CreateTextSelect(&gui->musicsrc[relrow], COL2, row, TEXTSELECT_96, toggle_musicsrc_cb, musicsrc_cb, (void *)(long)music_num);
-        GUI_CreateLabelBox(&gui->idxlbl[relrow], COL3, row, COL4-COL3, 18, &DEFAULT_FONT, NULL, NULL,  _tr("MP3 ID"));
-        GUI_CreateTextSelect(&gui->musicidx[relrow],  COL4, row, TEXTSELECT_64, music_test_cb, musicid_cb, (void *)(long)music_num);
-        //Row 2
-        row+=20;
-        GUI_CreateLabelBox(&gui->musiclbl[relrow], COL1, row, LCD_WIDTH-25, 18, &DEFAULT_FONT, musiclbl_cb, NULL, (void *)(long)music_num);
-    return 2;
+        GUI_CreateTextSelect(&gui->musicidx[relrow],  COL2, row, TEXTSELECT_64, music_test_cb, musicid_cb, (void *)(long)music_num);
+        GUI_CreateLabelBox(&gui->musiclbl[relrow], COL3, row, LCD_WIDTH - COL3 - ARROW_WIDTH, 18, &TINY_FONT, musiclbl_cb, NULL, (void *)(long)music_num);
+    return 1;
 }
 
 void PAGE_MusicconfigInit(int page)

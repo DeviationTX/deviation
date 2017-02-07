@@ -255,10 +255,8 @@ const char * MUSIC_GetLabel(u16 music)
 }
 
 u16 MUSIC_GetTelemetryAlarm(enum Music music) {
-   for (int i = 0; i < MODEL_CUSTOM_ALARMS; i++) {
-        if (Model.music.custom[i].src == TELEM_ALARM_CUSTOM1 - MUSIC_TELEMALARM1 + music)
-            return Model.music.custom[i].music;
-    }
+    if (Model.music.telemetry[music - MUSIC_TELEMALARM1].music > 0)
+        return Model.music.telemetry[music - MUSIC_TELEMALARM1].music;
     return music;
 }
 #endif

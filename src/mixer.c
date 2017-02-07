@@ -670,11 +670,11 @@ static void _trim_music_play(int trim_idx, int is_neg, int on_state)
     else
         button_idx = Model.trims[trim_idx].pos - 1;
     if (on_state) {
-        if (Model.music.button_nr[button_idx].on)
-            MUSIC_Play(Model.music.button_nr[button_idx].on);
+        if (Model.music.buttons[button_idx].on)
+            MUSIC_Play(Model.music.buttons[button_idx].on);
     } else {
-        if (Model.music.button_nr[button_idx].off)
-            MUSIC_Play(Model.music.button_nr[button_idx].off);
+        if (Model.music.buttons[button_idx].off)
+            MUSIC_Play(Model.music.buttons[button_idx].off);
     }
 }
 #endif

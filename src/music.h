@@ -43,8 +43,12 @@ enum AudioDevices {
 };
 
 #if HAS_EXTENDED_AUDIO
-#define MAX_MUSICMAP_ENTRIES 80
-#define MAX_MUSIC_LABEL 30
+#define MAX_MUSICMAP_ENTRIES 80 // arbitraty chosen
+#if HAS_TOUCH
+#define MAX_MUSIC_LABEL 28 // limit label length due to limited screen width
+#else
+#define MAX_MUSIC_LABEL 26
+#endif
 #define CUSTOM_ALARM_ID 2000
 #define MODEL_CUSTOM_ALARMS (NUM_INPUTS - INP_HAS_CALIBRATION + TELEM_NUM_ALARMS)
 #define NUM_STICKS	4
@@ -82,16 +86,19 @@ struct ButtonMusic {
 };
 
 struct CustomMusic {
-  u8 src;
-//  u8 vol;
+  u16 music;
+};
+
+struct TelemetryMusic {
   u16 music;
 };
 
 struct  Music_Nr {
-  struct CustomMusic custom[MODEL_CUSTOM_ALARMS];	//Switch array to point to music file number, no pots
-  struct ButtonMusic button_nr[NUM_TX_BUTTONS];	//Button array to point to music file number
+  struct CustomMusic switches[NUM_INPUTS - INP_HAS_CALIBRATION];	//Switch array to point to music file number, no pots
+  struct CustomMusic telemetry[TELEM_NUM_ALARMS]; //Telemetry Alarm array to point to music file number
+  struct ButtonMusic buttons[NUM_TX_BUTTONS];	//Button array to point to music file number
 #if NUM_AUX_KNOBS
-  struct AuxMusic aux_nr[NUM_AUX_KNOBS];
+  struct AuxMusic aux[NUM_AUX_KNOBS];
 #endif
 };
 

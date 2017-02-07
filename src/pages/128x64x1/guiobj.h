@@ -221,13 +221,9 @@ struct debuglog_obj {
 struct musicconfig_obj {
     guiLabel_t msg;
     guiScrollable_t scrollable;
-    guiLabel_t name;
-    guiTextSelect_t musicsrc;
-    guiLabel_t idxlbl;
-    guiTextSelect_t musicidx;
-    guiLabel_t vollbl;
-    guiTextSelect_t setvol;
-    guiLabel_t musiclbl;
+    guiLabel_t name[2];
+    guiTextSelect_t musicidx[2];
+    guiLabel_t musiclbl[2];
 
 };
 #endif
