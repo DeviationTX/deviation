@@ -54,7 +54,7 @@ static void _show_titlerow()
             MIXPAGE_ChanNameProtoCB, NULL, (void *)((long)mp->cur_mixer->dest));
     labelDesc.style = LABEL_CENTER;
     GUI_CreateTextSelectPlate(&gui->tmpl, TYPE_X, 0,  TYPE_W, HEADER_WIDGET_HEIGHT, &labelDesc, NULL, templatetype_cb, (void *)((long)mp->channel));
-    GUI_CreateButtonPlateText(&gui->save, SAVE_X, 0, SAVE_W, HEADER_WIDGET_HEIGHT, &labelDesc, NULL, 0, okcancel_cb, (void *)_tr("Save"));
+    GUI_CreateButtonPlateText(&gui->save, SAVE_X, 0, SAVE_W, HEADER_WIDGET_HEIGHT, &labelDesc, NULL, okcancel_cb, (void *)_tr("Save"));
 }
 
 
@@ -135,7 +135,7 @@ static int complex_row_cb(int absrow, int relrow, int y, void *data)
     data = NULL;
     if (absrow + COMMON_LAST == COMPLEX_TRIM) {
         GUI_CreateButtonPlateText(&gui->value[relrow].but, LABEL_X, y,
-            LABEL_W, LINE_HEIGHT, &labelDesc, show_trim_cb, 0x0000, toggle_trim_cb, NULL);
+            LABEL_W, LINE_HEIGHT, &labelDesc, show_trim_cb, toggle_trim_cb, NULL);
         if (! MIXER_SourceHasTrim(MIXER_SRC(mp->mixer[0].src)))
             GUI_SetHidden((guiObject_t *)&gui->label[relrow], 1);
         return 1;
@@ -312,7 +312,7 @@ static int expo_row_cb(int absrow, int relrow, int y, void *data)
     if (but) {
         labelDesc.style = LABEL_CENTER;
         GUI_CreateButtonPlateText(&gui->label[relrow].but, LABEL_X, y,
-            LABEL_W, LINE_HEIGHT, &labelDesc, label_cb, 0xffff, buttgl, butdata);
+            LABEL_W, LINE_HEIGHT, &labelDesc, label_cb, buttgl, butdata);
         if(disable) {
             GUI_ButtonEnable((guiObject_t *)&gui->label[relrow].but, 0);
         }

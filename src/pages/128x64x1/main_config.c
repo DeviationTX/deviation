@@ -148,13 +148,13 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         GUI_CreateTextSelectPlate(&gui->value[relrow], NEWTEXTSEL_X, y_ts,
                  NEWTEXTSEL_W, LINE_HEIGHT, &DEFAULT_FONT, NULL, newelem_cb, NULL);
         GUI_CreateButtonPlateText(&gui->col1[relrow].button, NEWBUTTON_X, y,  NEWBUTTON_W,
-                 LINE_HEIGHT, &DEFAULT_FONT, add_dlgbut_str_cb, 0x0000, newelem_press_cb, (void *)1);
+                 LINE_HEIGHT, &DEFAULT_FONT, add_dlgbut_str_cb, newelem_press_cb, (void *)1);
         return 2;
     }
 #endif
     if (absrow >= num_elems + NUM_QUICKPAGES) {
         GUI_CreateButtonPlateText(&gui->col1[relrow].button, QPBUTTON_X, y, QPBUTTON_W, LINE_HEIGHT,
-                 &DEFAULT_FONT, add_dlgbut_str_cb, 0x0000, add_dlgbut_cb, (void *)0);
+                 &DEFAULT_FONT, add_dlgbut_str_cb, add_dlgbut_cb, (void *)0);
         return 1;
     }
     if (absrow >= num_elems && absrow < num_elems + NUM_QUICKPAGES) {
@@ -180,7 +180,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         int selectable = 1;
         if (type == ELEM_TOGGLE) {
             GUI_CreateButtonPlateText(&gui->col1[relrow].button, ELEMBUT_X, y, ELEMBUT_W,
-                    LINE_HEIGHT, &DEFAULT_FONT, cfglabel_cb, 0x0000, switchicon_press_cb, (void *)item);
+                    LINE_HEIGHT, &DEFAULT_FONT, cfglabel_cb, switchicon_press_cb, (void *)item);
             selectable = 2;
         }
         else

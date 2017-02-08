@@ -227,7 +227,7 @@ static void add_dlg_cb(guiObject_t *obj, const void *data)
     GUI_CreateButton(&gui->dlgbut[0],
         ADD_ADDBUT_X,
         ADD_DIALOG_Y + 30,
-        BUTTON_64x16, add_dlgbut_str_cb, 0, newelem_press_cb, (void *)1L);
+        BUTTON_64x16, add_dlgbut_str_cb, newelem_press_cb, (void *)1L);
 
     GUI_CreateLabel(&gui->dlglbl[1],
         ADD_LBL_X,
@@ -236,7 +236,7 @@ static void add_dlg_cb(guiObject_t *obj, const void *data)
     GUI_CreateButton(&gui->dlgbut[1],
         ADD_BUT_X,
         ADD_DIALOG_Y + 60,
-        BUTTON_96x16, add_dlgbut_str_cb, 0, add_dlgbut_cb, (void *)0L);
+        BUTTON_96x16, add_dlgbut_str_cb, add_dlgbut_cb, (void *)0L);
     int y = ADD_DIALOG_Y + 90;
     for (long i = 0; i < NUM_QUICKPAGES; i++) {
         GUI_CreateLabel(&gui->dlglbl[i+2], ADD_LBL_X, y, menulabel_cb, DEFAULT_FONT, (void *)i);
@@ -273,12 +273,12 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         GUI_CreateLabelBox(&gui->dlglbl[relrow], X, y, 10, 16, &DEFAULT_FONT, label_cb, NULL, (void *)(long)(absrow));
         GUI_CreateTextSelect(&gui->dlgts[relrow], X + 15, y, TEXTSELECT_96, NULL, dlgts_cb, (void *)elemidx);
         if (type == ELEM_TOGGLE) {
-            GUI_CreateButton(&gui->dlgbut2[relrow], del_x, y, BUTTON_64x16, dlgbut_str_cb, 0, toggle_press_cb, (void *)elemidx);
+            GUI_CreateButton(&gui->dlgbut2[relrow], del_x, y, BUTTON_64x16, dlgbut_str_cb, toggle_press_cb, (void *)elemidx);
             //del_x = X + 15 + 168;
             num_objs++;
         }
     }
-    GUI_CreateButton(&gui->dlgbut[relrow], X+width-64, y, BUTTON_64x16, dlgbut_str_cb, 0, dlgbut_cb, (void *)elemidx);
+    GUI_CreateButton(&gui->dlgbut[relrow], X+width-64, y, BUTTON_64x16, dlgbut_str_cb, dlgbut_cb, (void *)elemidx);
     return num_objs;
 }
 

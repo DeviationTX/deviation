@@ -237,8 +237,8 @@ void _show_page()
     GUI_CreateLabelBox(&gui->newdate, XL(DATEBOXWIDTH), 150, DATEBOXWIDTH, 32, &BIGBOX_FONT, rtc_text_cb, NULL, (void *)NEWDATE);
     GUI_CreateLabelBox(&gui->newtime, XR(DATEBOXWIDTH), 150, DATEBOXWIDTH, 32, &BIGBOX_FONT, rtc_text_cb, NULL, (void *)NEWTIME);
 
-    GUI_CreateButton(&gui->setdate, XL(96), 184, BUTTON_96, rtc_text_cb, 0x0000, rtc_set_cb, (void *)DATEBUTTON);
-    GUI_CreateButton(&gui->settime, XR(96), 184, BUTTON_96, rtc_text_cb, 0x0000, rtc_set_cb, (void *)TIMEBUTTON);
+    GUI_CreateButton(&gui->setdate, XL(96), 184, BUTTON_96, rtc_text_cb, rtc_set_cb, (void *)DATEBUTTON);
+    GUI_CreateButton(&gui->settime, XR(96), 184, BUTTON_96, rtc_text_cb, rtc_set_cb, (void *)TIMEBUTTON);
 
     LCD_GetStringDimensions((u8 *)rtc_text_cb(NULL, (void *)RESULTLABEL), &w, &h);
     GUI_CreateLabel(&gui->actlbl, XM(w), 243 - h / 2 , rtc_text_cb, DEFAULT_FONT, (void *)RESULTLABEL);

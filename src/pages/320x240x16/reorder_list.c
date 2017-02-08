@@ -66,16 +66,16 @@ void PAGE_ReorderInit(int page)
             rl.list[i] = 0;
     }
     PAGE_ShowHeader("");
-    GUI_CreateButton(&gui->save, 220 + (LCD_WIDTH - 320), 4, BUTTON_96, _show_button_cb, 0x0000, okcancel_cb, (void *)SAVE);
-    GUI_CreateButton(&gui->up, 8 + REORD_XOFFSET, 40, BUTTON_96x16, _show_button_cb, 0x0000, press_button_cb, (void *)MOVE_UP);
-    GUI_CreateButton(&gui->down, 8 + REORD_XOFFSET, 60, BUTTON_96x16, _show_button_cb, 0x0000, press_button_cb, (void *)MOVE_DOWN);
+    GUI_CreateButton(&gui->save, 220 + (LCD_WIDTH - 320), 4, BUTTON_96, _show_button_cb, okcancel_cb, (void *)SAVE);
+    GUI_CreateButton(&gui->up, 8 + REORD_XOFFSET, 40, BUTTON_96x16, _show_button_cb, press_button_cb, (void *)MOVE_UP);
+    GUI_CreateButton(&gui->down, 8 + REORD_XOFFSET, 60, BUTTON_96x16, _show_button_cb, press_button_cb, (void *)MOVE_DOWN);
 
     GUI_CreateTextSelect(&gui->value, 8 + REORD_XOFFSET, 90, TEXTSELECT_96, NULL, value_val_cb, NULL);
-    GUI_CreateButton(&gui->apply, 8 + REORD_XOFFSET, 110, BUTTON_96x16, _show_button_cb, 0x0000, press_button_cb, (void *)APPLY);
+    GUI_CreateButton(&gui->apply, 8 + REORD_XOFFSET, 110, BUTTON_96x16, _show_button_cb, press_button_cb, (void *)APPLY);
     GUI_CreateTextSelect(&gui->copy, 8 + REORD_XOFFSET, 130, TEXTSELECT_96, NULL, copy_val_cb, NULL);
     if (requested) {
-        GUI_CreateButton(&gui->insert, 8 + REORD_XOFFSET, 160, BUTTON_96x16, _show_button_cb, 0x0000, press_button_cb, (void *)INSERT);
-        GUI_CreateButton(&gui->remove, 8 + REORD_XOFFSET, 180, BUTTON_96x16, _show_button_cb, 0x0000, press_button_cb, (void *)REMOVE);
+        GUI_CreateButton(&gui->insert, 8 + REORD_XOFFSET, 160, BUTTON_96x16, _show_button_cb, press_button_cb, (void *)INSERT);
+        GUI_CreateButton(&gui->remove, 8 + REORD_XOFFSET, 180, BUTTON_96x16, _show_button_cb, press_button_cb, (void *)REMOVE);
     }
     GUI_CreateScrollable(&gui->scrollable, 112 + REORD_XOFFSET, 40, 200, LISTBOX_ITEMS * 24,
                          24, rl.max, row_cb, NULL, NULL, NULL);

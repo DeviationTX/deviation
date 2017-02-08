@@ -59,7 +59,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         row+=20;
         /* Reset Perm timer*/
         GUI_CreateLabelBox(&gui->resetpermlbl[i], COL1, row, COL2-COL1, 18, &DEFAULT_FONT, NULL, NULL, _tr("Reset"));
-        GUI_CreateButton(&gui->resetperm[i], COL2, row, BUTTON_96x16, show_timerperm_cb, 0x0000, reset_timerperm_cb, (void *)(long)timer_num);
+        GUI_CreateButton(&gui->resetperm[i], COL2, row, BUTTON_96x16, show_timerperm_cb, reset_timerperm_cb, (void *)(long)timer_num);
         if(Model.mixer_mode != MIXER_STANDARD) {
             /* or Reset switch */
             GUI_CreateLabelBox(&gui->resetlbl[i], COL1, row, COL2-COL1, 18, &DEFAULT_FONT, NULL, NULL, _tr("Reset sw"));
@@ -71,7 +71,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         GUI_CreateTextSelect(&gui->start[i], COL2, row, TEXTSELECT_96, NULL, set_start_cb, (void *)(long)timer_num);
         if(Model.mixer_mode == MIXER_STANDARD)
             row += 20;
-        GUI_CreateButton(&gui->setperm[i], COL2, row, BUTTON_96x16, show_timerperm_cb, 0x0000, reset_timerperm_cb, (void *)(long)(timer_num | 0x80));
+        GUI_CreateButton(&gui->setperm[i], COL2, row, BUTTON_96x16, show_timerperm_cb, reset_timerperm_cb, (void *)(long)(timer_num | 0x80));
         update_countdown(timer_num);
         int tmpselectable = (Model.timer[timer_num].type < TIMER_COUNTDOWN) ? 2 : 3;
         if (Model.mixer_mode == MIXER_ADVANCED)

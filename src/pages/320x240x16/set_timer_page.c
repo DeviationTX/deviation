@@ -98,8 +98,8 @@ static void _show_settimer_page(u8 index)
     GUI_CreateTextSelect(&guiset->secondsel, XVAL, YUNIT + YDIFF + YDIFF, TEXTSELECT_64, NULL, _timer_new_str_cb, (void *)TIMER_SECONDS);
 
     // add / set buttons
-    GUI_CreateButton(&guiset->addbtn, XADD, YBTN, BUTTON_64x16, timer_value_str_cb, 0, add_set_button_cb, (void *)ADD_BUTTON);
-    GUI_CreateButton(&guiset->setbtn, XSET, YBTN, BUTTON_64x16, timer_value_str_cb, 0, add_set_button_cb, (void *)SET_BUTTON);
+    GUI_CreateButton(&guiset->addbtn, XADD, YBTN, BUTTON_64x16, timer_value_str_cb, add_set_button_cb, (void *)ADD_BUTTON);
+    GUI_CreateButton(&guiset->setbtn, XSET, YBTN, BUTTON_64x16, timer_value_str_cb, add_set_button_cb, (void *)SET_BUTTON);
 
     // resulting value
     GUI_CreateLabel(&guiset->newlbl, XLEFT, YRES, NULL, DEFAULT_FONT, (void *)_tr("resulting value"));
