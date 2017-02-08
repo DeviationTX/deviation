@@ -200,10 +200,8 @@ int model_count()
     u32 num_models;
     for(num_models = 1; num_models <= 200; num_models++) {
         sprintf(tempstring, "models/model%d.ini", num_models);
-        FILE *fh = fopen(tempstring, "r");
-        if (! fh)
+        if (! fexists(tempstring))
             break;
-        fclose(fh);
         CLOCK_ResetWatchdog();
     }
     num_models--;
