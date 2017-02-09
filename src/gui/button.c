@@ -25,7 +25,7 @@ enum {
 };
 
 guiObject_t *GUI_CreateButton(guiButton_t *button, u16 x, u16 y, enum ButtonType type,
-    const char *(*strCallback)(struct guiObject *, const void *), u16 fontColor,
+    const char *(*strCallback)(struct guiObject *, const void *),
     void (*CallBack)(struct guiObject *obj, const void *data), const void *cb_data)
 {
     struct guiHeader *obj = (guiObject_t *)button;
@@ -50,7 +50,6 @@ guiObject_t *GUI_CreateButton(guiButton_t *button, u16 x, u16 y, enum ButtonType
 
     // bug fix: must set a default font, otherwise language other than English might not be displayed in some dialogs
     button->desc.font = DEFAULT_FONT.font;
-    button->fontColor = fontColor;
     button->strCallback = strCallback;
     button->CallBack = CallBack;
     button->cb_data = cb_data;
@@ -90,10 +89,10 @@ guiObject_t *GUI_CreateIcon(guiButton_t *button, u16 x, u16 y, const struct Imag
 }
 
 guiObject_t *GUI_CreateButtonPlateText(guiButton_t *button, u16 x, u16 y, u16 width, u16 height, const struct LabelDesc *desc,
-    const char *(*strCallback)(struct guiObject *, const void *), u16 fontColor,
+    const char *(*strCallback)(struct guiObject *, const void *),
     void (*CallBack)(struct guiObject *obj, const void *data), const void *cb_data)
 {
-    guiObject_t *obj = GUI_CreateButton(button, x, y, BUTTON_DEVO10, strCallback, fontColor, CallBack, cb_data);
+    guiObject_t *obj = GUI_CreateButton(button, x, y, BUTTON_DEVO10, strCallback, CallBack, cb_data);
     struct guiBox *box = &obj->box;
     button->desc = *desc;
     box->width = width;

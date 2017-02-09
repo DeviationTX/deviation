@@ -90,7 +90,7 @@ static void show_iconsel_page(int SelectedIcon)
     int toggleinput = MIXER_SRC(Model.pagecfg2.elem[tp->tglidx].src);
     PAGE_RemoveAllObjects();
     PAGE_ShowHeader(INPUT_SourceNameAbbrevSwitch(tempstring, toggleinput));
-    GUI_CreateButton(&gui->revert, LCD_WIDTH-96-8, 4, BUTTON_96, revert_str_cb, 0x0000, revert_cb, NULL);
+    GUI_CreateButton(&gui->revert, LCD_WIDTH-96-8, 4, BUTTON_96, revert_str_cb, revert_cb, NULL);
     // Show name of source for toggle icon
 
     // style the switch textbox

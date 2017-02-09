@@ -139,11 +139,11 @@ void PAGE_ScannerInit(int page)
     PAGE_SetModal(0);
     PAGE_ShowHeader(PAGE_GetName(PAGEID_SCANNER));
     sp->enable = 0;
-    GUI_CreateButton(&gui->enable, LCD_WIDTH/2 - 152, 40, BUTTON_96, enablestr_cb, 0x0000, press_enable_cb, NULL);
+    GUI_CreateButton(&gui->enable, LCD_WIDTH/2 - 152, 40, BUTTON_96, enablestr_cb, press_enable_cb, NULL);
     sp->scan_mode = 0;
-    GUI_CreateButton(&gui->scan_mode, LCD_WIDTH/2 - 48, 40, BUTTON_96, modestr_cb, 0x0000, press_mode_cb, NULL);
+    GUI_CreateButton(&gui->scan_mode, LCD_WIDTH/2 - 48, 40, BUTTON_96, modestr_cb, press_mode_cb, NULL);
     sp->attenuator = 0;
-    GUI_CreateButton(&gui->attenuator, LCD_WIDTH/2 + 56, 40, BUTTON_96, attstr_cb, 0x0000, press_attenuator_cb, NULL);    
+    GUI_CreateButton(&gui->attenuator, LCD_WIDTH/2 + 56, 40, BUTTON_96, attstr_cb, press_attenuator_cb, NULL);    
     sp->channel = 0;
     sp->time_to_scan = 0;
     for(i = 0; i < (MAX_RADIOCHANNEL - MIN_RADIOCHANNEL + 1); i++) {

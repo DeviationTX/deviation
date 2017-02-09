@@ -40,7 +40,7 @@ static void _show_titlerow()
     GUI_CreateLabelBox(&gui->title, TITLE_X, 0 , TITLE_W, HEADER_HEIGHT, &labelDesc,
             MIXPAGE_ChanNameProtoCB, NULL, (void *)(long)mp->channel);
     labelDesc.style = LABEL_CENTER;
-    GUI_CreateButtonPlateText(&gui->revert, REVERT_X, 0, REVERT_W, HEADER_WIDGET_HEIGHT, &labelDesc, NULL, 0, revert_cb, (void *)_tr("Revert"));
+    GUI_CreateButtonPlateText(&gui->revert, REVERT_X, 0, REVERT_W, HEADER_WIDGET_HEIGHT, &labelDesc, NULL, revert_cb, (void *)_tr("Revert"));
 }
 
 static guiObject_t *getobj_cb(int relrow, int col, void *data)

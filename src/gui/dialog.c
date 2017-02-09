@@ -69,16 +69,15 @@ guiObject_t *GUI_CreateDialog(guiDialog_t *dialog, u16 x, u16 y, u16 width, u16 
         but = GUI_CreateButton(&dialog->but1, DIALOG_SINGLE_BUTTON_X, DIALOG_SINGLE_BUTTON_Y,
                     DIALOG_BUTTON,
                     dgType == dtOk ? dlgbut_strok_cb : dlgbut_strcancel_cb,
-                    0x0000,
                     dgType == dtOk ? dlgbut_pressok_cb : dlgbut_presscancel_cb,
                     obj);
         }
         break;
     case dtOkCancel: {
         GUI_CreateButton(&dialog->but1, DIALOG_DUAL_BUTTON_X1, DIALOG_DUAL_BUTTON_Y,
-                DIALOG_BUTTON, dlgbut_strok_cb, 0x0000, dlgbut_pressok_cb, obj);
+                DIALOG_BUTTON, dlgbut_strok_cb, dlgbut_pressok_cb, obj);
         but = GUI_CreateButton(&dialog->but2, DIALOG_DUAL_BUTTON_X2, DIALOG_DUAL_BUTTON_Y,
-                 DIALOG_BUTTON, dlgbut_strcancel_cb, 0x0000, dlgbut_presscancel_cb, obj);
+                 DIALOG_BUTTON, dlgbut_strcancel_cb, dlgbut_presscancel_cb, obj);
         }
         break;
     case dtNone:

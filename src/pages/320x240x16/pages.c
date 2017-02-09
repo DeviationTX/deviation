@@ -197,13 +197,13 @@ guiObject_t *PAGE_CreateCancelButton(u16 x, u16 y, void (*CallBack)(guiObject_t 
 {
     exit_cmd = CallBack;
     exit_data = (void *)0;
-    return GUI_CreateButton(&gui->previco, x, y, BUTTON_96, okcancelstr_cb, 0x0000, CallBack, (void *)0);
+    return GUI_CreateButton(&gui->previco, x, y, BUTTON_96, okcancelstr_cb, CallBack, (void *)0);
 }
 guiObject_t *PAGE_CreateOkButton(u16 x, u16 y, void (*CallBack)(guiObject_t *obj, const void *data))
 {
     enter_cmd = CallBack;
     enter_data = (void *)1;
-    return GUI_CreateButton(&gui->nextico, x, y, BUTTON_48, okcancelstr_cb, 0x0000, CallBack, (void *)1);
+    return GUI_CreateButton(&gui->nextico, x, y, BUTTON_48, okcancelstr_cb, CallBack, (void *)1);
 }
 
 int PAGE_GetStartPage()

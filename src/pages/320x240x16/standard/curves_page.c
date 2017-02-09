@@ -138,7 +138,7 @@ static void show_page(CurvesMode _curve_mode, int page)
         GUI_CreateLabelBox(&gui->vallbl[i], COL1, ROWBASE+20*i+1, COL2-COL1, 16, &DEFAULT_FONT, NULL, NULL, label);
         GUI_CreateTextSelect(&gui->val[i], COL2, ROWBASE+20*i, TEXTSELECT_64, NULL, set_pointval_cb, (void *)i);
         if (i > 0 && i < 8)
-            GUI_CreateButton(&gui->lock[i-1], COL3, ROWBASE+20*i, BUTTON_64x16, lockstr_cb, 0x0000, press_cb, (void *)i);
+            GUI_CreateButton(&gui->lock[i-1], COL3, ROWBASE+20*i, BUTTON_64x16, lockstr_cb, press_cb, (void *)i);
     }
     GUI_CreateXYGraph(&gui->graph, 160 + ((LCD_WIDTH - 320) / 2), 80 + ((LCD_HEIGHT - 240) / 2) - (GRAPHSIZE - GRAPHSIZE_320) / 2, GRAPHSIZE, GRAPHSIZE,
                   CHAN_MIN_VALUE, CHAN_MIN_VALUE,

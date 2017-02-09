@@ -78,7 +78,7 @@ static void _show_simple()
     //x += space;
     //Row 5
     /*
-    mp->trimObj = GUI_CreateButton(COL1_VALUE, 214, BUTTON_96x16, show_trim_cb, 0x0000, toggle_trim_cb, NULL);
+    mp->trimObj = GUI_CreateButton(COL1_VALUE, 214, BUTTON_96x16, show_trim_cb, toggle_trim_cb, NULL);
     if (! MIXER_SourceHasTrim(MIXER_SRC(mp->mixer[0].src)))
         GUI_SetHidden(mp->trimObj, 1);
 
@@ -95,7 +95,7 @@ static void _show_expo_dr()
     //Row 1
     mp->firstObj = GUI_CreateLabelBox(&gui2->srclbl, COL1_TEXT, 32, 96, 16, &NARROW_FONT, NULL, NULL, _tr("Src"));
     /*
-    mp->trimObj = GUI_CreateButton(COL1_TEXT, 32, BUTTON_96x16, show_trim_cb, 0x0000, toggle_trim_cb, NULL);
+    mp->trimObj = GUI_CreateButton(COL1_TEXT, 32, BUTTON_96x16, show_trim_cb, toggle_trim_cb, NULL);
     mp->firstObj = mp->trimObj;
 
     if (! MIXER_SourceHasTrim(MIXER_SRC(mp->mixer[0].src)))
@@ -113,8 +113,8 @@ static void _show_expo_dr()
                          set_input_source_cb, &mp->mixer[2].sw);
     //Row 3
     GUI_CreateLabelBox(&gui2->high, COL1_TEXT, 72, 96, 16, &NARROW_FONT, NULL, NULL, _tr("High-Rate"));
-    GUI_CreateButton(&gui2->rate[0], COL_EXP2, 72, BUTTON_96x16, show_rate_cb, 0x0000, toggle_link_cb, (void *)0);
-    GUI_CreateButton(&gui2->rate[1], COL_EXP3, 72, BUTTON_96x16, show_rate_cb, 0x0000, toggle_link_cb, (void *)1);
+    GUI_CreateButton(&gui2->rate[0], COL_EXP2, 72, BUTTON_96x16, show_rate_cb, toggle_link_cb, (void *)0);
+    GUI_CreateButton(&gui2->rate[1], COL_EXP3, 72, BUTTON_96x16, show_rate_cb, toggle_link_cb, (void *)1);
     //Row 4
     GUI_CreateTextSelect(&gui2->curvehi, COL1_TEXT, 96, TEXTSELECT_96, curveselect_cb, set_curvename_cb, &mp->mixer[0]);
     //The following 2 items are mutex.  One is always hidden
@@ -188,7 +188,7 @@ static void _show_complex(int page_change)
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE * 5 / 4,
                               0, PCT_TO_RANGE(25), eval_mixer_cb, curpos_cb, touch_cb, mp->cur_mixer);
     //Row 7
-    GUI_CreateButton(&gui3->trim, COL1_VALUE, 214, BUTTON_96x16, show_trim_cb, 0x0000, toggle_trim_cb, NULL);
+    GUI_CreateButton(&gui3->trim, COL1_VALUE, 214, BUTTON_96x16, show_trim_cb, toggle_trim_cb, NULL);
     if (! MIXER_SourceHasTrim(MIXER_SRC(mp->mixer[0].src)))
         GUI_SetHidden((guiObject_t *)&gui3->trim, 1);
     /*
