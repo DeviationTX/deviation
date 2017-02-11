@@ -124,7 +124,6 @@ const char *invalidstdmixer_string_cb(guiObject_t *obj, void *data)
 }
 void PAGE_ShowInvalidStandardMixerDialog(void *guiObj)
 {
-    (void)guiObj;
     if (dialog)
         return;
     dialog = GUI_CreateDialog(&gui->dialog, 10 + DLG_XOFFSET, 42 + DLG_YOFFSET, 300, 188,
