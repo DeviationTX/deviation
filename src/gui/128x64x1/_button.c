@@ -31,7 +31,8 @@ void _DrawButton(struct guiObject *obj)
     u16 x_off, y_off;
 
 #define BUTTON_ROUND 3
-    LCD_SetFont(button->desc.font); //Set Font here so callback can calculate size
+    // bug fix: must set the default font, otherwise language other than English might not be displayed
+    LCD_SetFont(DEFAULT_FONT.font); //Set Font here so callback can calculate size
     if (button->strCallback)
         txt = button->strCallback(obj, button->cb_data);
     else
@@ -46,7 +47,7 @@ void _DrawButton(struct guiObject *obj)
         h = text_h;
     if (obj == objSELECTED) {
         LCD_FillRoundRect(obj->box.x, obj->box.y, w, h , BUTTON_ROUND, 1);
-        LCD_SetFontColor(0);
+        LCD_SetFontColor(~DEFAULT_FONT.font_color);
     }  else {
         LCD_FillRoundRect(obj->box.x, obj->box.y, w, h , BUTTON_ROUND, 0); // clear the background
         if (GUI_IsButtonEnabled(obj))
@@ -61,7 +62,7 @@ void _DrawButton(struct guiObject *obj)
         LCD_DrawLine(x1, y1, x1 - 2, obj->box.y, 1);
         LCD_DrawLine(x1, y2, x1 - 2, obj->box.y + obj->box.height -1, 1);
         LCD_DrawLine(x1, y1, x1, y2, 1); */
-        LCD_SetFontColor(0xffff);
+        LCD_SetFontColor(DEFAULT_FONT.font_color);
     }
     // bug fix: if the string width is wider than box width, e.g. changing to Chinese, x_off might be very big(actuall
     //it is negative)
