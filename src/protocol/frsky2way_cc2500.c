@@ -166,7 +166,7 @@ static void frsky2way_build_bind_packet()
 }
 
 #if HAS_EXTENDED_TELEMETRY
-    static u8 sequence;
+static u8 sequence;
 #endif
 
 static void frsky2way_build_data_packet()
@@ -302,8 +302,14 @@ static void frsky2way_parse_telem(u8 *pkt, int len)
     Telemetry.value[TELEM_FRSKY_VOLT2] = pkt[4] * (132*AD2gain) / 1000; //In 1/100 of Volts *(A2gain/10)
     TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT2);
 
-    Telemetry.value[TELEM_FRSKY_RSSI] = pkt[5]; 	// Value in Db
+    Telemetry.value[TELEM_FRSKY_RSSI] = pkt[5];
     TELEMETRY_SetUpdated(TELEM_FRSKY_RSSI);
+
+    Telemetry.value[TELEM_FRSKY_LQI] = pkt[len-1] & 0x7f;
+    TELEMETRY_SetUpdated(TELEM_FRSKY_LQI);
+
+    Telemetry.value[TELEM_FRSKY_LRSSI] = (s8)pkt[len-2] / 2 - 70; 	// Value in dBm
+    TELEMETRY_SetUpdated(TELEM_FRSKY_LRSSI);
 
 #if HAS_EXTENDED_TELEMETRY
 
@@ -369,8 +375,6 @@ static u16 frsky2way_cb()
             unsigned len = CC2500_ReadReg(CC2500_3B_RXBYTES | CC2500_READ_BURST);
             if (len && len < sizeof(packet)) {
                 CC2500_ReadData(packet, len);
-                //CC2500_WriteReg(CC2500_0C_FSCTRL0, CC2500_ReadReg(CC2500_32_FREQEST));
-                //parse telemetry packet here
                 frsky2way_parse_telem(packet, len);
             }
 #ifdef EMULATOR
@@ -483,12 +487,12 @@ const void *FRSKY2WAY_Cmds(enum ProtoCmds cmd)
             return frsky_opts;
         case PROTOCMD_TELEMETRYSTATE:
             return (void *)(long)(Model.proto_opts[PROTO_OPTS_TELEM] == TELEM_ON ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
-        case PROTOCMD_TELEMETRYTYPE: 
-            return (void *)(long) TELEM_FRSKY;
         case PROTOCMD_RESET:
         case PROTOCMD_DEINIT:
             CLOCK_StopTimer();
             return (void *)(CC2500_Reset() ? 1L : -1L);
+        case PROTOCMD_TELEMETRYTYPE: 
+            return (void *)(long) TELEM_FRSKY;
         default: break;
     }
     return 0;
