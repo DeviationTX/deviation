@@ -49,7 +49,7 @@ static void show_titlerow(const char *header)
     //u8 w = 40;
     // I don't think there is a need for the save button
     //GUI_CreateButtonPlateText(LCD_WIDTH - w -5, 0,
-    //        w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, 0x0000, okcancel_cb, _tr("Save"));
+    //        w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, okcancel_cb, _tr("Save"));
 }
 
 static guiObject_t *getobj_cb(int relrow, int col, void *data)

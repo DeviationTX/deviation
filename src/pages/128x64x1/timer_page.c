@@ -101,7 +101,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     GUI_CreateLabelBox(&gui->resetpermlbl, LABEL_X, y  ,
             LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Reset"));
     GUI_CreateButtonPlateText(&gui->resetperm, RESET_X, y ,
-            RESET_WIDTH, LINE_HEIGHT,&DEFAULT_FONT, show_timerperm_cb, 0x0000, reset_timerperm_cb,(void *)(long)absrow);
+            RESET_WIDTH, LINE_HEIGHT,&DEFAULT_FONT, show_timerperm_cb, reset_timerperm_cb,(void *)(long)absrow);
     if(Model.mixer_mode != MIXER_STANDARD) {
         /* or Reset switch */
     	GUI_CreateLabelBox(&gui->resetlbl, LABEL_X, y ,
@@ -121,7 +121,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     if(Model.mixer_mode == MIXER_STANDARD)
         y+= space;
     GUI_CreateButtonPlateText(&gui->setperm, RESET_X, y,
-        RESET_WIDTH, LINE_HEIGHT,&DEFAULT_FONT, show_timerperm_cb, 0x0000, reset_timerperm_cb,(void *)(long)(absrow | 0x80));
+        RESET_WIDTH, LINE_HEIGHT,&DEFAULT_FONT, show_timerperm_cb, reset_timerperm_cb,(void *)(long)(absrow | 0x80));
 #endif
 
     update_countdown(absrow);

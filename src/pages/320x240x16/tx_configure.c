@@ -122,7 +122,7 @@ static void _show_page()
         row += space;
         if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
         GUI_CreateLabelBox(&gui1->langlbl, col1, row+ADDROW, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Language"));
-        GUI_CreateButton(&gui1->lang, col2, row, BUTTON_WIDE, langstr_cb, 0x0000, lang_select_cb, NULL);
+        GUI_CreateButton(&gui1->lang, col2, row, BUTTON_WIDE, langstr_cb, lang_select_cb, NULL);
         row += space + ADDSPACE ;
         if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
         GUI_CreateLabelBox(&gui1->modelbl, col1, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Stick mode"));
@@ -130,16 +130,16 @@ static void _show_page()
         row += space + (ADDSPACE-1) / 2;
         if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
         GUI_CreateLabelBox(&gui1->touchlbl, col1, row+ADDROW, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Touch screen"));
-        GUI_CreateButton(&gui1->touchcalib, col2, row, BUTTON_WIDE, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_TOUCH);
+        GUI_CreateButton(&gui1->touchcalib, col2, row, BUTTON_WIDE, calibratestr_cb, press_cb, (void *)CALIB_TOUCH);
         row += space + ADDSPACE;
         if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
         GUI_CreateLabelBox(&gui1->sticklbl, col1, row+ADDROW, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Sticks"));
-        GUI_CreateButton(&gui1->stickcalib, col2, row, BUTTON_WIDE, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_STICK);
+        GUI_CreateButton(&gui1->stickcalib, col2, row, BUTTON_WIDE, calibratestr_cb, press_cb, (void *)CALIB_STICK);
 #if HAS_RTC
         row += space + ADDSPACE;
         if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
         GUI_CreateLabelBox(&gui1->clocklbl, col1, row+ADDROW, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Clock"));
-        GUI_CreateButton(&gui1->clock, col2, row, BUTTON_WIDE, clockstr_cb, 0x0000, press_cb, (void *)SET_CLOCK);
+        GUI_CreateButton(&gui1->clock, col2, row, BUTTON_WIDE, clockstr_cb, press_cb, (void *)SET_CLOCK);
         row += space + ADDSPACE;
 #else
         row += space + (LCD_WIDTH == 320 ? 8 : 16); // for nicer look

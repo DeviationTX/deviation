@@ -37,7 +37,7 @@ static void _show_buttons(int loadsave)
     else if (loadsave == SAVE_MODEL)
         PAGE_ShowHeader(_tr("Press ENT to copy to"));
     //u8 w = 40;
-    //GUI_CreateButtonPlateText(LCD_WIDTH -w -5, 0, w, ITEM_HEIGHT, &DEFAULT_FONT, show_loadsave_cb, 0x0000, okcancel_cb, (void *)(loadsave+1L));
+    //GUI_CreateButtonPlateText(LCD_WIDTH -w -5, 0, w, ITEM_HEIGHT, &DEFAULT_FONT, show_loadsave_cb, okcancel_cb, (void *)(loadsave+1L));
 }
 
 static const char *iconstr_cb(guiObject_t *obj, int dir, void *data)

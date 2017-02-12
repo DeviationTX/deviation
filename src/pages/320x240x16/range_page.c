@@ -43,7 +43,7 @@ static void _draw_page(int has_pa) {
                            NULL, NULL, tempstring);
     } else {
         GUI_CreateButton(&gui->button, INFO_X, 40, DIALOG_BUTTON,
-                         startstop_dlg, 0x0000, start_test,
+                         startstop_dlg, start_test,
                          (void *)(long)mp->testing);
         if (mp->testing) {
             snprintf(tempstring, sizeof(tempstring), "%s %s %s %s.",

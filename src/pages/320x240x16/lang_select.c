@@ -53,7 +53,7 @@ void LANGPage_Select(void(*return_page)(int page))
     PAGE_SetModal(1);
     cp->return_page = return_page;
     PAGE_CreateCancelButton(LCD_WIDTH-208, 4, okcancel_cb);
-    GUI_CreateButton(&gui->ok, LCD_WIDTH-104, 4, BUTTON_96, show_load_cb, 0x0000, okcancel_cb, (void *)1L);
+    GUI_CreateButton(&gui->ok, LCD_WIDTH-104, 4, BUTTON_96, show_load_cb, okcancel_cb, (void *)1L);
     num_lang = 1;
     if (FS_OpenDir("language")) {
         char filename[13];
