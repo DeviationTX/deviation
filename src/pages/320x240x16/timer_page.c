@@ -112,7 +112,7 @@ static void _draw_body() {
         row+=20;
         /* Reset Perm timer*/
         GUI_CreateLabelBox(&gui->resetpermlbl[i], COL1, row, COL2-COL1, 18, &DEFAULT_FONT, NULL, NULL, _tr("Reset"));
-        GUI_CreateButton(&gui->resetperm[i], COL2, row, BUTTON_96x16, show_timerperm_cb, 0x0000, reset_timerperm_cb, (void *)(long)i);
+        GUI_CreateButton(&gui->resetperm[i], COL2, row, BUTTON_96x16, show_timerperm_cb, reset_timerperm_cb, (void *)(long)i);
         if(Model.mixer_mode != MIXER_STANDARD) {
             /* or Reset switch */
             GUI_CreateLabelBox(&gui->resetlbl[i], COL1, row, COL2-COL1, 18, &DEFAULT_FONT, NULL, NULL, _tr("Reset sw"));
@@ -124,13 +124,13 @@ static void _draw_body() {
         GUI_CreateTextSelect(&gui->start[i], COL2, row, TEXTSELECT_96, NULL, set_start_cb, (void *)(long)i);
         if(Model.mixer_mode == MIXER_STANDARD)
             row += 20;
-        GUI_CreateButton(&gui->setperm[i], COL2, row, BUTTON_96x16, show_timerperm_cb, 0x0000, reset_timerperm_cb, (void *)(long)(i | 0x80));
+        GUI_CreateButton(&gui->setperm[i], COL2, row, BUTTON_96x16, show_timerperm_cb, reset_timerperm_cb, (void *)(long)(i | 0x80));
 #if 0 //HAS_RTC
         // date label and set date/time button
         GUI_CreateLabelBox(&gui->datelbl[i], COL1, row, COL2-COL1, 18, &DEFAULT_FONT, NULL, NULL, _tr("Date:"));
         GUI_CreateLabelBox(&gui->datevallbl[i], COL2+20, row, 96, 18, &DEFAULT_FONT, show_date_cb, NULL, (void *)(long)i);
         GUI_CreateLabelBox(&gui->setlbl[i], COL1, row+20, COL2-COL1, 18, &DEFAULT_FONT, NULL, NULL, _tr("Set:"));
-        GUI_CreateButton(&gui->set[i], COL2, row+20, BUTTON_96x16, show_set_cb, 0x0000, press_set_cb, (void *)(long)i);
+        GUI_CreateButton(&gui->set[i], COL2, row+20, BUTTON_96x16, show_set_cb, press_set_cb, (void *)(long)i);
 #endif
         update_countdown(i);
     }

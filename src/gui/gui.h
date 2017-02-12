@@ -169,7 +169,6 @@ typedef struct guiButton {
     struct guiHeader header;
     struct LabelDesc desc;
     const struct ImageMap *image;
-    u16 fontColor;
     const char *(*strCallback)(struct guiObject *obj, const void *data);
     void (*CallBack)(struct guiObject *obj, const void *data);
     const void *cb_data;
@@ -363,10 +362,10 @@ guiObject_t *GUI_CreateImageOffset(guiImage_t *, u16 x, u16 y, u16 width, u16 he
 
 guiObject_t *GUI_CreateButton(guiButton_t *, u16 x, u16 y, enum ButtonType type,
         const char *(*strCallback)(guiObject_t *, const void *),
-        u16 fontColor, void (*CallBack)(guiObject_t *obj, const void *data), const void *cb_data);
+        void (*CallBack)(guiObject_t *obj, const void *data), const void *cb_data);
 guiObject_t *GUI_CreateButtonPlateText(guiButton_t *, u16 x, u16 y, u16 width, u16 height, const struct LabelDesc *desc,
         const char *(*strCallback)(guiObject_t *, const void *),
-        u16 fontColor, void (*CallBack)(guiObject_t *obj, const void *data), const void *cb_data);
+        void (*CallBack)(guiObject_t *obj, const void *data), const void *cb_data);
 guiObject_t *GUI_CreateIcon(guiButton_t *, u16 x, u16 y, const struct ImageMap *image,
         void (*CallBack)(guiObject_t *obj, const void *data), const void *cb_data);
 void GUI_ButtonEnable(guiObject_t *obj, u8 enable);

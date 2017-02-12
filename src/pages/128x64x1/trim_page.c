@@ -63,7 +63,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     (void)data;
     struct Trim *trim = MIXER_GetAllTrims();
     GUI_CreateButtonPlateText(&gui->src[relrow], BUTTON_X, y, BUTTON_WIDTH, LINE_HEIGHT,
-            &DEFAULT_FONT, trimsource_name_cb, 0x0000, _edit_cb, (void *)((long)absrow));
+            &DEFAULT_FONT, trimsource_name_cb, _edit_cb, (void *)((long)absrow));
     GUI_CreateTextSelectPlate(&gui->item[relrow], TEXTSEL_X, y,
             TEXTSEL_WIDTH, LINE_HEIGHT, &TINY_FONT,  NULL, set_trimstep_cb, (void *)(long)(absrow+0x000)); //0x000: Use Model.trims
     GUI_CreateLabelBox(&gui->name[relrow], LABEL_X, y, LABEL_WIDTH, LINE_HEIGHT,
@@ -152,7 +152,7 @@ static void _edit_cb(guiObject_t *obj, const void *data)
     PAGE_ShowHeader(_tr("Edit")); // to draw a line only
 
     GUI_CreateButtonPlateText(&guit->save, BUTTON2_X, BUTTON2_Y, BUTTON2_WIDTH, LINE_HEIGHT,
-            &DEFAULT_FONT, NULL, 0x0000, okcancel_cb, (void *)_tr("Save"));
+            &DEFAULT_FONT, NULL, okcancel_cb, (void *)_tr("Save"));
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                          LINE_SPACE, ITEM_LAST, row2_cb, getobj2_cb, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));

@@ -78,8 +78,8 @@ void PAGE_ModelInit(int page)
 
     row += 20;
     GUI_CreateLabel(&gui->namelbl, COL1, row, NULL, DEFAULT_FONT, _tr("Model name"));  // use the same naming convention for devo8 and devo10
-    GUI_CreateButton(&gui->name, COL2, row, BUTTON_96x16, show_text_cb, 0x0000, _changename_cb, Model.name);
-    GUI_CreateButton(&gui->icon, COL3, row, BUTTON_64x16, show_text_cb, 0x0000, changeicon_cb, _tr("Icon"));
+    GUI_CreateButton(&gui->name, COL2, row, BUTTON_96x16, show_text_cb, _changename_cb, Model.name);
+    GUI_CreateButton(&gui->icon, COL3, row, BUTTON_64x16, show_text_cb, changeicon_cb, _tr("Icon"));
 
     row += 20;
     GUI_CreateLabel(&gui->typelbl, COL1, row, NULL, DEFAULT_FONT, _tr("Model type"));
@@ -108,8 +108,8 @@ void PAGE_ModelInit(int page)
     else
         sprintf(mp->fixed_id, "%d", (int)Model.fixed_id);
     GUI_CreateLabel(&gui->fixedidlbl, COL1, row, NULL, DEFAULT_FONT, _tr("Fixed ID"));
-    GUI_CreateButton(&gui->fixedid, COL2, row, BUTTON_96x16, show_text_cb, 0x0000, fixedid_cb, mp->fixed_id);
-    GUI_CreateButton(&gui->bind, COL3, row, BUTTON_64x16, show_bindtext_cb, 0x0000, bind_cb, NULL);
+    GUI_CreateButton(&gui->fixedid, COL2, row, BUTTON_96x16, show_text_cb, fixedid_cb, mp->fixed_id);
+    GUI_CreateButton(&gui->bind, COL3, row, BUTTON_64x16, show_bindtext_cb, bind_cb, NULL);
     configure_bind_button();
 }
 

@@ -25,7 +25,7 @@
 static void _show_buttons(int loadsave)
 {
     PAGE_CreateCancelButton(LCD_WIDTH - 208, 4, okcancel_cb);
-    GUI_CreateButton(&gui->ok, LCD_WIDTH - 104, 4, BUTTON_96, show_loadsave_cb, 0x0000, okcancel_cb, (void *)(loadsave+1L));
+    GUI_CreateButton(&gui->ok, LCD_WIDTH - 104, 4, BUTTON_96, show_loadsave_cb, okcancel_cb, (void *)(loadsave+1L));
 }
 
 static void _show_list(int loadsave, u8 num_models)

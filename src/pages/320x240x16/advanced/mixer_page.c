@@ -59,17 +59,17 @@ static void _show_page()
             ch += (NUM_OUT_CHANNELS - Model.num_channels);
         if (ch < NUM_OUT_CHANNELS) {
             obj = GUI_CreateButton(&gui->name[i].but, XOFFSET+4, row, BUTTON_64x16, MIXPAGE_ChanNameProtoCB,
-                                   0x0000, limitselect_cb, (void *)((long)ch));
+                                   limitselect_cb, (void *)((long)ch));
         } else if(! _is_virt_cyclic(ch)) {
             obj = GUI_CreateButton(&gui->name[i].but, XOFFSET+4, row, BUTTON_64x16, MIXPAGE_ChanNameProtoCB,
-                                   0x0000, virtname_cb, (void *)(long)ch);
+                                   virtname_cb, (void *)(long)ch);
         } else {
             obj = GUI_CreateLabelBox(&gui->name[i].lbl, XOFFSET+4, row, 64, 18, &DEFAULT_FONT,
                                    MIXPAGE_ChanNameProtoCB, NULL, (void *)((long)ch));
         }
         if (! mp->firstObj)
             mp->firstObj = obj;
-        GUI_CreateButton(&gui->tmpl[i], XOFFSET+132, row, BUTTON_64x16, template_name_cb, 0x0000,
+        GUI_CreateButton(&gui->tmpl[i], XOFFSET+132, row, BUTTON_64x16, template_name_cb,
                          templateselect_cb, (void *)((long)ch));
         for (idx = 0; idx < NUM_MIXERS; idx++)
             if (mix[idx].src && mix[idx].dest == ch)
