@@ -29,9 +29,8 @@ void CONFIG_AlertParse(const char* filename)
     int val;
     u32 j = 0;
     music_map_entries = 0;
-    music_map_custom_entries = 0;
+    memset(music_map,0,sizeof(music_map));
     char line[MAX_MUSICMAP_ENTRIES];
-
     file = fopen(filename, "r");
     if (!file) {
 	printf("Can't open music mapping file: %s\n", filename);
@@ -60,9 +59,7 @@ void CONFIG_AlertParse(const char* filename)
             j++;
             val = atoi(pt);
             switch (j) {
-              case 1: music_map[music_map_entries].music = val;
-                      if (val > 1999) music_map_custom_entries++;
-                      break;
+              case 1: music_map_entries = val; break;
               case 2: music_map[music_map_entries].duration = val; break;
 #if HAS_MUSIC_CONFIG
               case 3: strlcpy(music_map[music_map_entries].label,pt,MAX_MUSIC_LABEL);
@@ -70,8 +67,9 @@ void CONFIG_AlertParse(const char* filename)
             }
             pt = strtok(NULL, ":");
         }
-        if (music_map[music_map_entries].duration > 0) //ignore zero length entries
-            music_map_entries++;
+//        printf("music_map[%d]: duration=%d, label=%s\n", music_map_entries, music_map[music_map_entries].duration, music_map[music_map_entries].label);
+//        if (music_map[music_map_entries].duration > 0) //ignore zero length entries
+//            music_map_entries++;
     }
     fclose(file);
 }

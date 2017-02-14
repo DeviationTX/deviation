@@ -346,14 +346,13 @@ void INPUT_CheckChanges(void) {
                     MUSIC_Play(Model.music.aux[music_idx].down);
             }
             return;
-	}
+	      }
 #endif
-	music_idx = changed_input - INP_HAS_CALIBRATION - 1;
-
-	/* Skip pots & Play music file if the switch has a voice file number defined */
-	if (changed_input >= INP_HAS_CALIBRATION) {
-      MUSIC_Play(Model.music.switches[music_idx].music);
-  }
+	      music_idx = changed_input - INP_HAS_CALIBRATION - 1;
+	      /* Skip pots & Play music file if the switch has a voice file number defined */
+	      if (changed_input >= INP_HAS_CALIBRATION && Model.music.switches[music_idx].music) {
+            MUSIC_Play(Model.music.switches[music_idx].music);
+        }
 #endif //HAS_EXTENDED_AUDIO
     }
 }

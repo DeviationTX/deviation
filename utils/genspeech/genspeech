@@ -86,9 +86,6 @@ do
 		rm ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT}
 		echo "Alert ${IDXTEXT}.mp3 generated (length $TTSLEN ms)"
 		IDX=`expr $IDX + 1`
-		if [ $IDX = 20 ]; then
-			IDX=1000
-		fi
  	done < $INFILE
 done
 
@@ -97,7 +94,6 @@ done
 for INFILE in models/model*Alert.txt
 do
 	echo "Processing file $INFILE..."
-	IDX=2000
 	echo ";Below are custom alarms for individual models (switch, trim, telemetry etc.)" >> $OUTFILE
 	while read LINE
 	do

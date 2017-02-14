@@ -57,7 +57,7 @@ void PAGE_SplashEvent()
     if ( 0 == time ) {
     	time = CLOCK_getms()+ Transmitter.splash_delay * 100; // 3 sec.
 #if HAS_EXTENDED_AUDIO
-        time_startup_msg = CLOCK_getms() + 5 * 100;     // Dealy 0.5 second to play startup audio
+        time_startup_msg = CLOCK_getms() + 10 * 100;     // Dealy 0.5 second to play startup audio
 #endif
     }
 #if HAS_EXTENDED_AUDIO
@@ -68,7 +68,7 @@ void PAGE_SplashEvent()
 #endif
     // We use SPITouch_IRQ() here instead of attaching an event to the image because
     // We want to abort regardless of where on the page the touch occurred
-    if ( CLOCK_getms() > time || SPITouch_IRQ()) 
+    if ( CLOCK_getms() > time || SPITouch_IRQ())
 	PAGE_ChangeByID(PAGEID_MAIN, 0);
 }
 

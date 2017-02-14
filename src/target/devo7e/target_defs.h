@@ -30,7 +30,7 @@
 #define HAS_MULTIMOD_SUPPORT 1
 #define HAS_VIDEO           0
 #define HAS_4IN1_FLASH      1
-#define HAS_EXTENDED_AUDIO  1 
+#define HAS_EXTENDED_AUDIO  1
 #define HAS_AUDIO_UART5     0
 #define HAS_MUSIC_CONFIG    0
 
@@ -59,4 +59,3 @@
 #define VOLTAGE_OFFSET    249
 
 #endif //_DEVO7E_TARGET_H_
-

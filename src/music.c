@@ -133,7 +133,7 @@ u16 next_note_cb() {
 #if HAS_EXTENDED_AUDIO
     if ((playback_device == AUDDEV_EXTAUDIO) || (playback_device == AUDDEV_UNDEF)) {
         AUDIO_Play(music_queue[next_note]);
-        return MUSIC_GetDuration(music_queue[next_note++]);
+        return music_map[music_queue[next_note++]].duration;
     }
 #endif
     SOUND_SetFrequency(note_map[Notes[next_note].note].note, Volume);
@@ -217,7 +217,7 @@ void MUSIC_Play(u16 music)
             next_note=0;
             Volume = 0;	// Just activate the haptic sensor, no buzzer
 #ifdef BUILDTYPE_DEV
-            printf("Playing music #%d (%s)\n",music_queue[0], MUSIC_GetLabel(music_queue[0]));
+            printf("Playing music #%d (%s)\n",music_queue[0], music_map[music_queue[0]].label);
 #endif
         } else if (playback_device == AUDDEV_ALL) {
             AUDIO_Play(music);
@@ -233,7 +233,7 @@ void MUSIC_Play(u16 music)
 }
 
 #if HAS_EXTENDED_AUDIO
-u16 MUSIC_GetDuration(u16 music)
+/*u16 MUSIC_GetDuration(u16 music)
 {
     u32 i;
     for ( i = 0; i < sizeof(music_map)/sizeof(music_map[0]);i++) {
@@ -241,10 +241,10 @@ u16 MUSIC_GetDuration(u16 music)
     }
     return 0;
 
-}
+}*/
 
 #if HAS_MUSIC_CONFIG
-const char * MUSIC_GetLabel(u16 music)
+/*const char * MUSIC_GetLabel(u16 music)
 {
     u32 i;
     for ( i = 0; i < sizeof(music_map)/sizeof(music_map[0]);i++) {
@@ -252,7 +252,7 @@ const char * MUSIC_GetLabel(u16 music)
     }
     return 0;
 
-}
+}*/
 
 u16 MUSIC_GetTelemetryAlarm(enum Music music) {
     if (Model.music.telemetry[music - MUSIC_TELEMALARM1].music > 0)
@@ -261,10 +261,11 @@ u16 MUSIC_GetTelemetryAlarm(enum Music music) {
 }
 #endif
 
-void MUSIC_PlayValue(u16 music, u32 value, u16 unit)
+void MUSIC_PlayValue(u16 music, u32 value, u8 unit, u8 prec)
 {
     u32 i,idx= 1;
     char digits[6]; // Do we need more?
+    char thousands = 0;
 
     if ((Transmitter.audio_player && playback_device == AUDDEV_BUZZER) || !Transmitter.audio_player) {
             MUSIC_Play(music);
@@ -275,32 +276,56 @@ void MUSIC_PlayValue(u16 music, u32 value, u16 unit)
     next_note = 0;
     num_notes = 0;
 
-    // Get single digits from value
-    while (value > 0) {
-        digits[num_notes] = value % 10;
-        value /= 10;
-        ++num_notes;
+    //Add precision digits
+    for (i=0; i < prec; i++) {
+        digits[num_notes++] = value % 10;
+        value /=10;
     }
+    //Add decimal seperator
+    if (prec > 0) {
+        digits[num_notes++] = 110;
+    }
+
+    // Get single digits from remaining value
+    while (value > 0) {
+        if(value > 999) {
+            thousands = value / 1000;
+            value %= 1000;
+        }
+        if(value > 99) {
+            digits[num_notes++] = value % 100;
+            value /= 100;
+            digits[num_notes++] = value + 99;
+            if (thousands){
+              digits[num_notes++] = 109;
+              digits[num_notes++] = thousands;
+            }
+            break;
+        }
+        if(value < 101 && value > 0) {
+            digits[num_notes++] = value;
+            break;
+        }
+        else {
+            if (thousands){
+                digits[num_notes++] = 109;
+                digits[num_notes++] = thousands;
+            }
+        }
+    }
+
     // Fill music queue
     num_notes++;
     music_queue[0] = music;
 
     for (i=num_notes; i > 1; i--) {
-        music_queue[idx] = digits[i-2] + 1000; // mp3 files 1000 - 1009 for digits
-        idx++;
-    }
-    // Add decimal seperator for some units
-    if (unit == TELEM_UNIT_VOLT || unit == TELEM_UNIT_AMPS || unit == TELEM_UNIT_ALTITUDE || unit == TELEM_UNIT_GFORCE) {
-        num_notes++;
-        music_queue[idx] = music_queue[idx-1];
-        music_queue[idx-1] = music_queue[idx-2];
-        music_queue[idx-2] = 1010; // mp3 for decimal
+        music_queue[idx] = digits[i-2] + MUSIC_TOTAL; // mp3 files 1000 - 1009 for digits
         idx++;
     }
     // Add unit for value if specified
     if (unit > TELEM_UNIT_NONE) {
         num_notes++;
-        music_queue[idx] = unit + 1010; // mp3 files 1011-1016 for units
+        music_queue[idx] = unit + 130;
     }
 
     // Start callback for music queue
@@ -308,7 +333,7 @@ void MUSIC_PlayValue(u16 music, u32 value, u16 unit)
             SOUND_Start(100, next_note_cb, vibrate);
 #ifdef BUILDTYPE_DEV
             for (i=0;i<num_notes;i++) {
-                printf("Playing music %d (%s) for %d ms\n",music_queue[i], MUSIC_GetLabel(music_queue[i]), MUSIC_GetDuration(music_queue[i]));
+                printf("Playing music %d (%s) for %d ms\n",music_queue[i], music_map[music_queue[i]].label, music_map[music_queue[i]].duration);
             }
 #endif
          }

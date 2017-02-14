@@ -34,7 +34,7 @@ void PAGE_SplashInit(int page)
     u16 w, h;
     LCD_ImageDimensions(SPLASH_FILE, &w, &h);
     //GUI_CreateImageOffset(&gui->splash_image, 15, 10, w-offset, h-5, offset, 0, SPLASH_FILE, NULL, NULL);
-    if( w < LCD_WIDTH - 1 && h < LCD_HEIGHT - LINE_HEIGHT - 3) 
+    if( w < LCD_WIDTH - 1 && h < LCD_HEIGHT - LINE_HEIGHT - 3)
     	GUI_CreateImageOffset(&gui->splash_image, (LCD_WIDTH-w)/2, (LCD_HEIGHT-h-LINE_HEIGHT)/2, w, h, 0, 0, SPLASH_FILE, NULL, NULL);
     GUI_CreateLabelBox(&gui->version, 0, LCD_HEIGHT - LINE_HEIGHT - 1 , LCD_WIDTH, LINE_HEIGHT, &MICRO_FONT, NULL, NULL, DeviationVersion);
 }
@@ -60,7 +60,7 @@ void PAGE_SplashEvent()
     if ( 0 == time ) {
     	time = CLOCK_getms() + Transmitter.splash_delay * 100;
 #if HAS_EXTENDED_AUDIO
-        time_startup_msg = CLOCK_getms() + 5 * 100;	// Dealy 0.5 second to play startup audio
+        time_startup_msg = CLOCK_getms() + 10 * 100;	// Dealy 0.5 second to play startup audio
 #endif
     }
 #if HAS_EXTENDED_AUDIO
@@ -70,7 +70,7 @@ void PAGE_SplashEvent()
     }
 #endif
 
-    if ( CLOCK_getms() > time ) 
+    if ( CLOCK_getms() > time )
 	PAGE_ChangeByID(PAGEID_MAIN,0);
 /*     if ( offset > 0 ) {
 	offset -= step;

@@ -120,15 +120,15 @@ void TIMER_Power(){
     elevator = 2 == mode ? abs(CHAN_ReadInput(INP_THROTTLE)) : abs(CHAN_ReadInput(INP_ELEVATOR));
     new_throttle = 2 == mode ?  abs(CHAN_ReadInput(INP_ELEVATOR)) : abs(CHAN_ReadInput(INP_THROTTLE));
     new_throttle = abs(new_throttle - throttle);
-     
-    if( elevator < 1000 && abs(CHAN_ReadInput(INP_AILERON)) < 1000 && 
+
+    if( elevator < 1000 && abs(CHAN_ReadInput(INP_AILERON)) < 1000 &&
                 new_throttle < 1000 && abs(CHAN_ReadInput(INP_RUDDER)) < 1000 &&
                 !ScanButtons() && (!HAS_TOUCH || !SPITouch_IRQ()) ) {
         if ( CLOCK_getms() > timer ) {
             timer =  CLOCK_getms() + 3000;
             MUSIC_Play(MUSIC_INACTIVITY_ALARM);
-        }                
-    } else 
+        }
+    } else
            timer =  CLOCK_getms() + alert;
     throttle = 2 == mode ?  abs(CHAN_ReadInput(INP_ELEVATOR)) : abs(CHAN_ReadInput(INP_THROTTLE));
 }
@@ -192,7 +192,7 @@ void TIMER_Update()
                             * Transmitter.countdown_timer_settings.prealert_interval);
                     if (timer_val[i] > warn_time && (timer_val[i] - delta) <= warn_time) {
 #ifdef HAS_EXTENDED_AUDIO
-                        MUSIC_PlayValue(MUSIC_TIMER_WARNING,timer_val[i]/1000,TELEM_UNIT_SECONDS);
+                        MUSIC_PlayValue(MUSIC_TIMER_WARNING,timer_val[i]/1000,TELEM_UNIT_SECONDS,0);
 #else
                         MUSIC_Play(MUSIC_TIMER_WARNING);
 #endif

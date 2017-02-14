@@ -1002,7 +1002,7 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
             return 1;
         }
 */
-        if (!MUSIC_GetDuration(val)) {
+        if(val>MAX_MUSICMAP_ENTRIES-1 || music_map[val].duration == 0) {
             printf("%s: Music %s not found in music.map\n", section, value);
             return 0;
         }
