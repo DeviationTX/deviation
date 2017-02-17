@@ -25,11 +25,11 @@
 enum {
     DEFAULT_TEXTSEL_X = 63,
     LEFT_TEXTSEL_X    = 0,
-    TEXTSEL_WIDTH     = 59,
+    TEXTSEL_WIDTH     = 60,
     LABEL_X           = 0,
     LABEL_WIDTH       = 0,
     BUTTON_X          = 63,
-    BUTTON_WIDTH      = 59,
+    BUTTON_WIDTH      = 60,
 };
 #endif //OVERRIDE_PLACEMENT
 
@@ -140,7 +140,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     }
     if (but_tgl) {
         GUI_CreateButtonPlateText(&gui->col2[relrow].but, BUTTON_X, y,
-            BUTTON_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, but_txt, 0x0000, but_tgl, but_data);
+            BUTTON_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, but_txt, but_tgl, but_data);
         count++;
     }
     return count;

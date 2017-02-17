@@ -121,10 +121,7 @@ void press_icon_cb(guiObject_t *obj, s8 press_type, const void *data)
         if ((long)data == 0) {
             PAGE_PushByID(PAGEID_MENU, 0);
         } else if ((long)data == 1) {
-            if(HAS_STANDARD_GUI && Model.mixer_mode == MIXER_STANDARD)
-                PAGE_PushByID(PAGEID_MODELMNU, 0);
-            else
-                PAGE_PushByID(PAGEID_MIXER, 0);
+            PAGE_PushByID(PAGEID_MODELMNU, 0);
         } else {
             PAGE_PushByID(PAGEID_LOADSAVE, LOAD_MODEL);
         }

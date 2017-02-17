@@ -139,7 +139,7 @@ void PAGE_DatalogInit(int page)
     GUI_CreateLabelBox(&gui->enlbl, SCROLLABLE_X, row, 80, 18, &DEFAULT_FONT, NULL, NULL, _tr("Enable"));
     GUI_CreateTextSource(&gui->en, SCROLLABLE_X + 78, row, TEXTSELECT_96, NULL, sourcesel_cb, sourcesel_input_cb, NULL);
     //Col2
-    GUI_CreateButton(&gui->reset, SCROLLABLE_X + SCROLLABLE_WIDTH - 64, row, BUTTON_64x16, reset_str_cb, 0, reset_press_cb, NULL);
+    GUI_CreateButton(&gui->reset, SCROLLABLE_X + SCROLLABLE_WIDTH - 64, row, BUTTON_64x16, reset_str_cb, reset_press_cb, NULL);
     row += ROW_HEIGHT;
 
     //col1
@@ -150,8 +150,8 @@ void PAGE_DatalogInit(int page)
     row += ROW_HEIGHT;
 
     GUI_CreateLabelBox(&gui->selectlbl, SCROLLABLE_X, row, 80, 18, &DEFAULT_FONT, NULL, NULL, _tr("Select"));
-    GUI_CreateButton(&gui->all, SCROLLABLE_X + SCROLLABLE_WIDTH - 64 - 64 - 10, row, BUTTON_64x16, select_str_cb, 0, select_press_cb, (void *)0L);
-    GUI_CreateButton(&gui->none, SCROLLABLE_X + SCROLLABLE_WIDTH - 64, row, BUTTON_64x16, select_str_cb, 0, select_press_cb, (void *)1L);
+    GUI_CreateButton(&gui->all, SCROLLABLE_X + SCROLLABLE_WIDTH - 64 - 64 - 10, row, BUTTON_64x16, select_str_cb, select_press_cb, (void *)0L);
+    GUI_CreateButton(&gui->none, SCROLLABLE_X + SCROLLABLE_WIDTH - 64, row, BUTTON_64x16, select_str_cb, select_press_cb, (void *)1L);
     row += ROW_HEIGHT;
 
     int row1 = ROW1 - (NUM_TELEM - TELEMETRY_GetNumTelemSrc()); //Remove unused telemetry

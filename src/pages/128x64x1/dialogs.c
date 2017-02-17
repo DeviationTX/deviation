@@ -144,8 +144,6 @@ void PAGE_ShowInvalidStandardMixerDialog(void *guiObj)
 {
     if (dialog)
         return;
-
-    tempstring[sizeof(tempstring) - 1] = 0;
     dialog = GUI_CreateDialog(&gui->dialog, DIALOG2_X, DIALOG2_Y, DIALOG2_WIDTH, DIALOG2_HEIGHT, NULL,
             invalidstdmixer_string_cb,
             invalid_stdmixer_cb, dtOkCancel, guiObj);

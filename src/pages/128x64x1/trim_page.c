@@ -20,15 +20,15 @@
 
 enum {
     BUTTON_X      = 0,
-    BUTTON_WIDTH  = 30,
-    TEXTSEL_X     = 32,
-    TEXTSEL_WIDTH = 50,
-    LABEL_X       = 84,
-    LABEL_WIDTH   = 41,
-    STEP_X        = 46,
+    BUTTON_WIDTH  = 37,
+    TEXTSEL_X     = 38,
+    TEXTSEL_WIDTH = 52,
+    LABEL_X       = 90,
+    LABEL_WIDTH   = 34,
+    STEP_X        = 50,
     STEP_Y        = 0,
-    STEP_WIDTH    = 30,
-    TRIMPOS_X     = 88,
+    STEP_WIDTH    = 31,
+    TRIMPOS_X     = 90,
     TRIMPOS_WIDTH = 30,
 //
     LABEL2_X      = 0,
@@ -36,9 +36,9 @@ enum {
     TEXTSEL2_X    = 60,
     TEXTSEL2_WIDTH= 63,
 //
-    BUTTON2_X     = LCD_WIDTH - 50 - 1,
+    BUTTON2_X     = TEXTSEL2_X + 3,
     BUTTON2_Y     = 0,
-    BUTTON2_WIDTH = 50,
+    BUTTON2_WIDTH = TEXTSEL2_WIDTH - 6,
 };
 #endif //OVERRIDE_PLACEMENT
 
@@ -59,11 +59,11 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     (void)data;
     struct Trim *trim = MIXER_GetAllTrims();
     GUI_CreateButtonPlateText(&gui->src[relrow], BUTTON_X, y, BUTTON_WIDTH, LINE_HEIGHT,
-            &DEFAULT_FONT, trimsource_name_cb, 0x0000, edit_trim_cb, (void *)((long)absrow));
+            &DEFAULT_FONT, trimsource_name_cb, edit_trim_cb, (void *)((long)absrow));
     GUI_CreateTextSelectPlate(&gui->item[relrow], TEXTSEL_X, y,
             TEXTSEL_WIDTH, LINE_HEIGHT, &TINY_FONT,  NULL, set_trimstep_cb, (void *)(long)(absrow+0x000)); //0x000: Use Model.trims
     GUI_CreateLabelBox(&gui->name[relrow], LABEL_X, y, LABEL_WIDTH, LINE_HEIGHT,
-            &DEFAULT_FONT, NULL, NULL,  (void *)INPUT_ButtonName(trim[absrow].pos));
+            &TINY_FONT, NULL, NULL,  (void *)INPUT_ButtonName(trim[absrow].pos));
     return 2;
 }
 
@@ -138,7 +138,7 @@ void PAGE_TrimEditInit(int page)
     PAGE_ShowHeader(_tr("Edit")); // to draw a line only
 
     GUI_CreateButtonPlateText(&guit->save, BUTTON2_X, BUTTON2_Y, BUTTON2_WIDTH, LINE_HEIGHT,
-            &DEFAULT_FONT, NULL, 0x0000, okcancel_cb, (void *)_tr("Save"));
+            &DEFAULT_FONT, NULL, okcancel_cb, (void *)_tr("Save"));
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                          LINE_SPACE, ITEM_LAST, row2_cb, getobj2_cb, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));

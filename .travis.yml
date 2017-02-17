@@ -39,13 +39,13 @@ before_install:
        popd;
      fi;
    # don't build 'tests' because they don't work on a cross-compile, so we need to specify 'DIRS' explicitly
-   - if [ ! -d "$HOME/fltk-1.3.3-w32/bin" ]; then
+   - if [ ! -d "$HOME/fltk-1.3.0-w32/bin" ]; then
          mkdir $HOME/src;
-         mkdir $HOME/fltk-1.3.3-w32;
+         mkdir $HOME/fltk-1.3.0-w32;
          pushd $HOME/src;
-         curl --retry 10 --retry-max-time 120 -L "http://fltk.org/pub/fltk/1.3.3/fltk-1.3.3-source.tar.gz" | tar xzf -;
-         cd fltk-1.3.3;
-         ./configure --prefix=$HOME/fltk-1.3.3-w32 --enable-localzlib --enable-localpng --disable-gl --host=i586-mingw32msvc &&
+         curl --retry 10 --retry-max-time 120 -L "http://fltk.org/pub/fltk/1.3.0/fltk-1.3.0-source.tar.gz" | tar xzf -;
+         cd fltk-1.3.0;
+         ./configure --prefix=$HOME/fltk-1.3.0-w32 --enable-localzlib --enable-localpng --disable-gl --host=i586-mingw32msvc &&
          make DIRS="jpeg zlib png src fluid" &&
          make install DIRS="jpeg zlib png src fluid";
          popd;
@@ -70,7 +70,7 @@ install:
   - curl -s -L "https://api.travis-ci.org/repos/$TRAVIS_REPO_SLUG/builds/$TRAVIS_BUILD_ID" | python -c 'import sys, json; a = json.load(sys.stdin); print "export TRAVIS_EVENT_TYPE=" + a.get("event_type",""); print "export TRAVIS_COMMIT_MSG=\"" + a.get("message","").replace("\"", "\\\"") + "\""'
   - source <(curl -s -L "https://api.travis-ci.org/repos/$TRAVIS_REPO_SLUG/builds/$TRAVIS_BUILD_ID" | python -c 'import sys, json; a = json.load(sys.stdin); print "export TRAVIS_EVENT_TYPE=" + a.get("event_type",""); print "export TRAVIS_COMMIT_MSG=\"" + a.get("message","").replace("\"", "\\\"") + "\""')
   - if [[ "$MAKETARGET" == *"win"* ]]; then
-       export FLTK_DIR=$HOME/fltk-1.3.3-w32;
+       export FLTK_DIR=$HOME/fltk-1.3.0-w32;
        export PORTAUDIO_DIR=$HOME/portaudio-w32;
     fi;
 
@@ -78,7 +78,6 @@ before_script:
   - echo $PATH
   - echo $HOME
   - arm-none-eabi-gcc --version
-  - cp $HOME/portaudio-w32/bin/libportaudio-2.dll src/
 
 script: cd src && make $MAKETARGET
 
@@ -103,6 +102,5 @@ cache:
   apt: true
   directories:
   - $HOME/gcc-arm-none-eabi-4_8-2013q4
-  - $HOME/fltk-1.3.3-w32
+  - $HOME/fltk-1.3.0-w32
   - $HOME/portaudio-w32
-

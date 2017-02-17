@@ -22,7 +22,7 @@ $(TARGET).fs:
 	/bin/rm -rf $(ODIR)/filesystem; /bin/cp -prf filesystem/devo12 $(ODIR)/filesystem
 	rm -f deviation-fs-$(HGVERSION).zip
 	zip -r deviation-fs-$(HGVERSION).zip $(TARGET)-lib.dfu
-	export p=`pwd`; cd $(ODIR); zip -x filesystem/media/\* -ur $$p/deviation-fs-$(HGVERSION).zip filesystem
+	export p=`pwd`; cd $(ODIR); zip -ur $$p/deviation-fs-$(HGVERSION).zip filesystem -x filesystem/media/\*
 
 $(TARGET).zip: $(ALL)
 	cp -f $(TARGET).dfu deviation-$(HGVERSION).dfu
@@ -33,7 +33,7 @@ $(TARGET).zip: $(ALL)
 	zip deviation-$(HGVERSION).zip deviation-$(HGVERSION).dfu
 ifeq "$(INCLUDE_FS)" "1"
 	zip -u deviation-$(HGVERSION).zip $(TARGET)-lib.dfu
-	export p=`pwd`; cd filesystem/$(FILESYSTEM) && zip -x media/\* -ur $$p/deviation-$(HGVERSION).zip  *
+	export p=`pwd`; cd filesystem/$(FILESYSTEM) && zip -ur $$p/deviation-$(HGVERSION).zip  * -x media/\*
 endif
 	zip -u deviation-$(HGVERSION).zip debug-$(HGVERSION).zip
 	rm -f debug-$(HGVERSION).zip

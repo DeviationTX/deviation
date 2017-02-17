@@ -23,7 +23,7 @@
 
 enum {
   LARGE_SEL_X_OFFSET = 68,
-  MED_SEL_X_OFFSET   = 68 + 10,
+  MED_SEL_X_OFFSET   = 68 + 8,
   SMALL_SEL_X_OFFSET = 68 + 15,
   TITLE_X_OFFSET     = 0,
   TITLE_WIDTH        = 0,
@@ -101,36 +101,36 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         case ITEM_BUZZ:
             title = _tr_noop("Buzz settings");
             label = _tr_noop("Buzz volume");
-            value = _buzz_vol_cb; data = &Transmitter.volume;
+            value = _buzz_vol_cb; data = &Transmitter.volume; x = MED_SEL_X_OFFSET;
             break;
         case ITEM_HAPTIC:
             label = _tr_noop("Vibration");
-            value = _vibration_state_cb; data = &Transmitter.vibration_state;
+            value = _vibration_state_cb; data = &Transmitter.vibration_state; x = MED_SEL_X_OFFSET;
             break;
         case ITEM_BATT:
             label = _tr_noop("Batt alarm");
-            value = batalarm_select_cb;
+            value = batalarm_select_cb; x = MED_SEL_X_OFFSET;
             break;
         case ITEM_ALARM_INTV:
             label = _tr_noop("Alarm intvl");
-            value = batalarmwarn_select_cb;
+            value = batalarmwarn_select_cb; x = MED_SEL_X_OFFSET;
             break;
         case ITEM_PWR_ALARM:
             label = _tr_noop("PwrOn alarm");
-            value = poweralarm_select_cb;
+            value = poweralarm_select_cb; x = MED_SEL_X_OFFSET;
             break;
         case ITEM_PWRDN_ALARM:
             label = _tr_noop("PwrDn alert");
-            value = _music_shutdown_cb;
+            value = _music_shutdown_cb; x = MED_SEL_X_OFFSET;
             break;
         case ITEM_BACKLIGHT:
             title = _tr_noop("LCD settings");
             label = _tr_noop("Backlight");
-            value = backlight_select_cb;
+            value = backlight_select_cb; x = SMALL_SEL_X_OFFSET;
             break;
         case ITEM_CONTRAST:
             label = _tr_noop("Contrast");
-            value = _contrast_select_cb;
+            value = _contrast_select_cb; x = SMALL_SEL_X_OFFSET;
             break;
         case ITEM_DIMTIME:
             label = _tr_noop("Dimmer time");
@@ -138,12 +138,12 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             break;
         case ITEM_DIMVAL:
             label = _tr_noop("Dimmer target");
-            value = common_select_cb; data = &Transmitter.auto_dimmer.backlight_dim_value; x = MED_SEL_X_OFFSET;
+            value = common_select_cb; data = &Transmitter.auto_dimmer.backlight_dim_value; x = SMALL_SEL_X_OFFSET;
             break;
         case ITEM_PREALERT:
             title = _tr_noop("Timer settings");
             label = _tr_noop("Prealert time");
-            value = prealert_time_cb; data = (void *)0L; x = MED_SEL_X_OFFSET;
+            value = prealert_time_cb; data = (void *)0L; x = SMALL_SEL_X_OFFSET;
             break;
         case ITEM_PREALERT_IVAL:
             label = _tr_noop("Prealert intvl");
@@ -156,11 +156,11 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         case ITEM_TELEMTEMP:
             title = _tr_noop("Telemetry settings");
             label = _tr_noop("Temperature");
-            value = units_cb; data = (void *)1L;
+            value = units_cb; data = (void *)1L; x = MED_SEL_X_OFFSET;
             break;
         case ITEM_TELEMLEN:
             label = _tr_noop("Length");
-            value = units_cb; data = (void *)0L;
+            value = units_cb; data = (void *)0L; x = MED_SEL_X_OFFSET;
             break;
     }
     if (title) {
@@ -175,7 +175,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             LABEL_WIDTH, LINE_HEIGHT,  &DEFAULT_FONT, NULL, NULL, _tr(label));
     if(but_str) {
         GUI_CreateButtonPlateText(&gui->value[relrow].but, x, y,
-            TEXTSEL_X_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, but_str, 0x0000, tgl, data);
+            TEXTSEL_X_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, but_str, tgl, data);
     } else {
         GUI_CreateTextSelectPlate(&gui->value[relrow].ts, x, y,
             TEXTSEL_X_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, value, data);

@@ -79,7 +79,7 @@ static void _show_titlerow()
 {
     PAGE_ShowHeader(NULL);
     GUI_CreateLabel(&gui->title, 40, 10, MIXPAGE_ChanNameProtoCB, TITLE_FONT, (void *)(long)mp->channel);
-    GUI_CreateButton(&gui->revert, LCD_WIDTH-96-8, 4, BUTTON_96, revert_str_cb, 0x0000, revert_cb, NULL);
+    GUI_CreateButton(&gui->revert, LCD_WIDTH-96-8, 4, BUTTON_96, revert_str_cb, revert_cb, NULL);
 }
 
 static inline guiObject_t *_get_obj(int idx, int objid) {

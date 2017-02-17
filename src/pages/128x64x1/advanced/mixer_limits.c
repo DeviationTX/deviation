@@ -20,11 +20,11 @@
 enum {
     TITLE_X  = 0,
     TITLE_W  = LCD_WIDTH - 51,
-    REVERT_X = LCD_WIDTH - 50,
-    REVERT_W = 50,
+    REVERT_X = LCD_WIDTH - 62,
+    REVERT_W = 54,
     LABEL_X  = 0,
-    LABEL_W  = 60,
-    TEXTSEL_X = 60,
+    LABEL_W  = 63,
+    TEXTSEL_X = 63,
     TEXTSEL_W = 60,
 };
 #endif //OVERRIDE_PLACEMENT
@@ -40,7 +40,7 @@ static void _show_titlerow()
     GUI_CreateLabelBox(&gui->title, TITLE_X, 0 , TITLE_W, HEADER_HEIGHT, &labelDesc,
             MIXPAGE_ChanNameProtoCB, NULL, (void *)(long)mp->channel);
     labelDesc.style = LABEL_CENTER;
-    GUI_CreateButtonPlateText(&gui->revert, REVERT_X, 0, REVERT_W, HEADER_WIDGET_HEIGHT, &labelDesc, NULL, 0, revert_cb, (void *)_tr("Revert"));
+    GUI_CreateButtonPlateText(&gui->revert, REVERT_X, 0, REVERT_W, HEADER_WIDGET_HEIGHT, &labelDesc, NULL, revert_cb, (void *)_tr("Revert"));
 }
 
 static guiObject_t *getobj_cb(int relrow, int col, void *data)

@@ -74,7 +74,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
     int x = 63;
-    int w = 59;
+    int w = 60;
     const void *lbl_data = NULL;
     void *lbl_cb = NULL;
     void *but_press = NULL;
@@ -113,7 +113,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     }
     if (but_press) {
         GUI_CreateButtonPlateText(&gui->col2[relrow].but, x, y,
-            w, LINE_HEIGHT, &DEFAULT_FONT, but_txt, 0x0000, but_press, but_data);
+            w, LINE_HEIGHT, &DEFAULT_FONT, but_txt, but_press, but_data);
     } else {
         GUI_CreateTextSourcePlate(&gui->col2[relrow].ts, x, y,
             w, LINE_HEIGHT, &DEFAULT_FONT, selpress_cb, sel_cb, sel_input_cb, sel_data);
