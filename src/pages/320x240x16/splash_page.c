@@ -57,7 +57,7 @@ void PAGE_SplashEvent()
     if ( 0 == time ) {
     	time = CLOCK_getms()+ Transmitter.splash_delay * 100; // 3 sec.
 #if HAS_EXTENDED_AUDIO
-        time_startup_msg = CLOCK_getms() + 10 * 100;     // Dealy 0.5 second to play startup audio
+        time_startup_msg = CLOCK_getms() + 5 * 100;     // Dealy 0.5 second to play startup audio
 #endif
     }
 #if HAS_EXTENDED_AUDIO

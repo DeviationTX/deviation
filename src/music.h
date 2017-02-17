@@ -43,7 +43,7 @@ enum AudioDevices {
 };
 
 #if HAS_EXTENDED_AUDIO
-#define MAX_MUSICMAP_ENTRIES 255 // arbitraty chosen
+#define MAX_MUSICMAP_ENTRIES 240 // arbitraty chosen
 #if HAS_TOUCH
 #define MAX_MUSIC_LABEL 28 // limit label length due to limited screen width
 #else
@@ -87,28 +87,35 @@ struct ButtonMusic {
 };
 
 struct CustomMusic {
-  u16 music;
+    u16 music;
 };
 
 struct TelemetryMusic {
-  u16 music;
+    u16 music;
 };
 
 struct  Music_Nr {
-  struct CustomMusic switches[NUM_INPUTS - INP_HAS_CALIBRATION];	//Switch array to point to music file number, no pots
-  struct CustomMusic telemetry[TELEM_NUM_ALARMS]; //Telemetry Alarm array to point to music file number
-  struct ButtonMusic buttons[NUM_TX_BUTTONS];	//Button array to point to music file number
+    struct CustomMusic switches[NUM_INPUTS - INP_HAS_CALIBRATION];	//Switch array to point to music file number, no pots
+    struct CustomMusic telemetry[TELEM_NUM_ALARMS]; //Telemetry Alarm array to point to music file number
+    struct ButtonMusic buttons[NUM_TX_BUTTONS];	//Button array to point to music file number
 #if NUM_AUX_KNOBS
-  struct AuxMusic aux[NUM_AUX_KNOBS];
+    struct AuxMusic aux[NUM_AUX_KNOBS];
 #endif
 };
 
 u8 music_map_entries;
 
-struct {u16 duration; char label[MAX_MUSIC_LABEL];} music_map[MAX_MUSICMAP_ENTRIES];
+struct MusicMap {
+    u16 musicid;
+    u16 duration;
+#if HAS_MUSIC_CONFIG
+    char label[MAX_MUSIC_LABEL];
+#endif
+};
 
-//u16 MUSIC_GetDuration(u16 music);
-//const char * MUSIC_GetLabel(u16 music);
+struct MusicMap music_map[MAX_MUSICMAP_ENTRIES];
+
+
 u16 MUSIC_GetTelemetryAlarm(enum Music music);
 
 void MUSIC_PlayValue(u16 music, u32 value, u8 unit, u8 prec);

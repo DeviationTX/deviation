@@ -132,7 +132,7 @@ u16 next_note_cb() {
         return 0;
 #if HAS_EXTENDED_AUDIO
     if ((playback_device == AUDDEV_EXTAUDIO) || (playback_device == AUDDEV_UNDEF)) {
-        AUDIO_Play(music_queue[next_note]);
+        AUDIO_Play(music_map[music_queue[next_note]].musicid);
         return music_map[music_queue[next_note++]].duration;
     }
 #endif
@@ -198,7 +198,7 @@ void MUSIC_Play(u16 music)
 #if HAS_EXTENDED_AUDIO
     // Play audio for switch
     if (Transmitter.audio_player && (music > MUSIC_TOTAL)) {
-        AUDIO_Play(music);
+        AUDIO_Play(music_map[music].musicid);
         return;
     }
     playback_device = AUDDEV_UNDEF;
@@ -212,54 +212,31 @@ void MUSIC_Play(u16 music)
 #if HAS_EXTENDED_AUDIO
     if (Transmitter.audio_player) {
         if ((playback_device == AUDDEV_EXTAUDIO) || (playback_device == AUDDEV_UNDEF)) {
-            music_queue[0] = music;
-            num_notes=1;
-            next_note=0;
-            Volume = 0;	// Just activate the haptic sensor, no buzzer
-#ifdef BUILDTYPE_DEV
-            printf("Playing music #%d (%s)\n",music_queue[0], music_map[music_queue[0]].label);
-#endif
+            AUDIO_Play(music_map[music].musicid);
+            return;
         } else if (playback_device == AUDDEV_ALL) {
-            AUDIO_Play(music);
+            AUDIO_Play(music_map[music].musicid);
         }
     }
 #endif
 
     if (MUSIC_GetSound(music)) return;
-    if(! num_notes)
-        return;
+    if(! num_notes) return;
     SOUND_SetFrequency(note_map[Notes[0].note].note, Volume);
     SOUND_Start((u16)Notes[0].duration * 10, next_note_cb, vibrate);
 }
 
-#if HAS_EXTENDED_AUDIO
-/*u16 MUSIC_GetDuration(u16 music)
-{
-    u32 i;
-    for ( i = 0; i < sizeof(music_map)/sizeof(music_map[0]);i++) {
-        if ( music_map[i].music == music ) return music_map[i].duration;
-    }
-    return 0;
-
-}*/
-
 #if HAS_MUSIC_CONFIG
-/*const char * MUSIC_GetLabel(u16 music)
-{
-    u32 i;
-    for ( i = 0; i < sizeof(music_map)/sizeof(music_map[0]);i++) {
-        if ( music_map[i].music == music ) return music_map[i].label;
-    }
-    return 0;
-
-}*/
 
 u16 MUSIC_GetTelemetryAlarm(enum Music music) {
     if (Model.music.telemetry[music - MUSIC_TELEMALARM1].music > 0)
         return Model.music.telemetry[music - MUSIC_TELEMALARM1].music;
     return music;
 }
+
 #endif
+
+#if HAS_EXTENDED_AUDIO
 
 void MUSIC_PlayValue(u16 music, u32 value, u8 unit, u8 prec)
 {
@@ -333,7 +310,7 @@ void MUSIC_PlayValue(u16 music, u32 value, u8 unit, u8 prec)
             SOUND_Start(100, next_note_cb, vibrate);
 #ifdef BUILDTYPE_DEV
             for (i=0;i<num_notes;i++) {
-                printf("Playing music %d (%s) for %d ms\n",music_queue[i], music_map[music_queue[i]].label, music_map[music_queue[i]].duration);
+                printf("Playing alert #%d (%s) for %d ms\n",music_map[music_queue[i]].musicid, music_map[music_queue[i]].label, music_map[music_queue[i]].duration);
             }
 #endif
          }

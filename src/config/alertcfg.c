@@ -37,7 +37,7 @@ void CONFIG_AlertParse(const char* filename)
         return;
     }
 
-    while (fgets(line, sizeof(line), file) != NULL) {
+    while ((fgets(line, sizeof(line), file) != NULL) && music_map_entries < MAX_MUSICMAP_ENTRIES) {
         j=0;
         textlen = strlen(line);
         // strip LF or CRLF
@@ -46,11 +46,6 @@ void CONFIG_AlertParse(const char* filename)
             if ((textlen > 0) && (line[textlen-1] == '\r'))
                 line[--textlen] = '\0';
         }
-/* removed to fit on devo7e, and since trailing spaces are just part of the label we don't need stripping them
-        // strip trailing spaces
-        while ((textlen > 0) && ((line[textlen-1] == ' ') || (line[textlen-1] == '\t')))
-            line[--textlen] = '\0';
-*/
         // Ignore comments or empty lines
         if ((line[0] == '\0') || (line[0] == ';'))
             continue;
@@ -59,7 +54,7 @@ void CONFIG_AlertParse(const char* filename)
             j++;
             val = atoi(pt);
             switch (j) {
-              case 1: music_map_entries = val; break;
+              case 1: music_map[music_map_entries].musicid = val; break;
               case 2: music_map[music_map_entries].duration = val; break;
 #if HAS_MUSIC_CONFIG
               case 3: strlcpy(music_map[music_map_entries].label,pt,MAX_MUSIC_LABEL);
@@ -68,8 +63,8 @@ void CONFIG_AlertParse(const char* filename)
             pt = strtok(NULL, ":");
         }
 //        printf("music_map[%d]: duration=%d, label=%s\n", music_map_entries, music_map[music_map_entries].duration, music_map[music_map_entries].label);
-//        if (music_map[music_map_entries].duration > 0) //ignore zero length entries
-//            music_map_entries++;
+        if (music_map[music_map_entries].duration > 0) //ignore zero length entries
+            music_map_entries++;
     }
     fclose(file);
 }

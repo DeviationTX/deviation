@@ -100,7 +100,7 @@ static const char *musicid_cb(guiObject_t *obj, int dir, void *data)
 /*    if (musicconfig_getsrctype(idx) == MUSIC_SRC_TELEMETRY)
         musicpt = &Model.music.telemetry[idx - (MODEL_CUSTOM_ALARMS - TELEM_NUM_ALARMS-1)];
 */
-    if (dir == -1 && musicpt->music == 0) // set to none below CUSTOM_ALARM_ID
+    if (dir == -1 && musicpt->music == 0) // set to none below 1
         musicpt->music = 0;
     if (dir == 1 && musicpt->music == 0) // set to CUSTOM_ALARM_ID when currently none
         musicpt->music = CUSTOM_ALARM_ID - 1;
@@ -109,7 +109,7 @@ static const char *musicid_cb(guiObject_t *obj, int dir, void *data)
         GUI_Redraw(&gui->musiclbl[cur_row]);
         return strcpy(tempstring, _tr("None"));
     }
-    musicpt->music = GUI_TextSelectHelper(musicpt->music, 1, music_map_entries, dir, 1, 10, NULL);
+    musicpt->music = GUI_TextSelectHelper(musicpt->music, 1, music_map_entries-1, dir, 1, 10, NULL);
     snprintf(tempstring, 5, "%d", musicpt->music);
     GUI_Redraw(&gui->musiclbl[cur_row]);
     return tempstring;
