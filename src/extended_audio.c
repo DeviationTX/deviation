@@ -92,9 +92,33 @@ int AUDIO_Play(u16 music) {
 }
 
 void AUDIO_SetVolume(void) {
-  //sending volume to audio player not implented yet.
 #ifdef BUILDTYPE_DEV
-    printf("Setting external audio volume to %d", Transmitter.audio_vol);
+    printf("Setting external audio volume to %d\n", Transmitter.audio_vol);
+#else
+    switch (Transmitter.audio_player) {
+      case AUDIO_LAST: // Sigh. Shut up the warnings
+      case AUDIO_AUDIOFX: // AUDIOFX only allows up down selection of volume...not implemented
+      case AUDIO_NONE: break;	// Play beeps...
+      case AUDIO_DF_PLAYER: {
+        static uint8_t buffer[] =
+          {0x7E, 0xFF, 0x06, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0xEF};
+
+        // Fill in volume
+        buffer[5] = (uint8_t)(Transmitter.audio_vol >> 8);
+        buffer[6] = (uint8_t)Transmitter.audio_vol;
+
+        // And the checksum
+        uint16_t sum = 0;
+        for (int i=1; i < 7; i += 1)
+          sum += buffer[i];
+        sum = -sum;
+        buffer[7] = (uint8_t)(sum >> 8);
+        buffer[8] = (uint8_t)sum;
+
+        AUDIO_Send(buffer, sizeof(buffer));
+        break;
+      }
+    }
 #endif
 }
 

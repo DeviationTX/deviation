@@ -18,6 +18,7 @@
 #include "gui/gui.h"
 #include "config/tx.h"
 #include "config/model.h"
+#include "extended_audio.h"
 
 
 static struct tx_obj    * const gui  = &gui_objs.u.tx;
@@ -93,6 +94,9 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     int col1 = COL1;
     int col2 = COL2;
     if (page_num == 0 || LCD_WIDTH == 480) {
+#if HAS_EXTENDED_AUDIO
+        row -= (LCD_WIDTH == 320 ? 0 : 8);
+#endif
         GUI_CreateLabelBox(&gui1->head1_1, col1, row, 0, 0, &SECTION_FONT, NULL, NULL, _tr("Generic settings"));
 #ifndef NO_LANGUAGE_SUPPORT
         row += space;
@@ -126,7 +130,12 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
     }
     if (page_num == 1 || LCD_WIDTH == 480) {
+#if HAS_EXTENDED_AUDIO
+        row -= (LCD_WIDTH == 320 ? 8 : 4);
+        GUI_CreateLabelBox(&gui2->head2_1, col1, row, 0, 0, &SECTION_FONT, NULL, NULL, _tr("Audio settings"));
+#else
         GUI_CreateLabelBox(&gui2->head2_1, col1, row, 0, 0, &SECTION_FONT, NULL, NULL, _tr("Buzzer settings"));
+#endif
         row += space;
         if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
         GUI_CreateLabelBox(&gui2->power_alarmlbl, col1, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Power On alarm"));
@@ -143,11 +152,21 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
         GUI_CreateLabelBox(&gui2->buzzlbl, col1, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Buzz volume"));
         GUI_CreateTextSelect(&gui2->buzz, col2, row, TEXTSELECT_96, NULL, _buzz_vol_cb, (void *)&Transmitter.volume);
+#if HAS_EXTENDED_AUDIO
+        row += space;
+        if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
+        GUI_CreateLabelBox(&gui2->audiolbl, col1, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Audio volume"));
+        GUI_CreateTextSelect(&gui2->audio, col2, row, TEXTSELECT_96, NULL, _audio_vol_cb, (void *)&Transmitter.audio_vol);
+#endif
         row += space;
         if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
         GUI_CreateLabelBox(&gui2->musicshutdbl, col1, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Power-down alert"));
         GUI_CreateTextSelect(&gui2->music_shutdown, col2, row, TEXTSELECT_96, NULL, _music_shutdown_cb, (void *)&Transmitter.music_shutdown);
+#if HAS_EXTENDED_AUDIO
+        row += space;
+#else
         row += space + 8;
+#endif
         if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
         GUI_CreateLabelBox(&gui2->head2_2, col1, row, 0, 0, &SECTION_FONT, NULL, NULL, _tr("LCD settings"));
         row += space;

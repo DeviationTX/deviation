@@ -37,6 +37,9 @@ const char RTC[]="has_rtc";
 const char BRIGHTNESS[] = "brightness";
 const char CONTRAST[] = "contrast";
 const char VOLUME[] = "volume";
+#if HAS_EXTENDED_AUDIO
+const char AUDIO_VOL[] = "audio_vol";
+#endif
 const char VIBRATION[] = "vibration";
 const char POWER_ALARM[] = "power_alarm";
 
@@ -117,6 +120,12 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             t->volume = atoi(value);
             return 1;
         }
+#if HAS_EXTENDED_AUDIO
+        if (MATCH_KEY(AUDIO_VOL)) {
+            t->audio_vol = atoi(value);
+            return 1;
+        }
+#endif
         if (MATCH_KEY(VIBRATION)) {
             t->vibration_state = atoi(value);
             return 1;
@@ -254,6 +263,9 @@ void CONFIG_WriteTx()
     fprintf(fh, "%s=%d\n", BRIGHTNESS, Transmitter.backlight);
     fprintf(fh, "%s=%d\n", CONTRAST, Transmitter.contrast);
     fprintf(fh, "%s=%d\n", VOLUME, Transmitter.volume);
+#if HAS_EXTENDED_AUDIO
+    fprintf(fh, "%s=%d\n", AUDIO_VOL, Transmitter.audio_vol);
+#endif
     fprintf(fh, "%s=%d\n", VIBRATION, Transmitter.vibration_state);
     fprintf(fh, "%s=%d\n", POWER_ALARM, Transmitter.power_alarm);
     fprintf(fh, "%s=%d\n", BATT_ALARM, Transmitter.batt_alarm);
@@ -319,7 +331,7 @@ void CONFIG_LoadTx()
 #if HAS_EXTENDED_AUDIO
     Transmitter.audio_player = AUDIO_NONE;
     Transmitter.audio_2way = 0;
-    Transmitter.audio_vol = 31;
+    Transmitter.audio_vol = 30;
 #endif
 #if HAS_AUDIO_UART5
     Transmitter.audio_uart5 = 0;

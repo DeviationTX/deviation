@@ -16,6 +16,7 @@
 #include "common.h"
 #include "pages.h"
 #include "gui/gui.h"
+#include "extended_audio.h"
 
 static struct splash_obj * const gui = &gui_objs.u.splash;
 static unsigned _action_cb(u32 button, unsigned flags, void *data);
@@ -62,6 +63,7 @@ void PAGE_SplashEvent()
     }
 #if HAS_EXTENDED_AUDIO
     if (time_startup_msg && (CLOCK_getms() > time_startup_msg) ) {
+        AUDIO_SetVolume();
         MUSIC_Play(MUSIC_STARTUP);
         time_startup_msg = 0;
     }

@@ -307,6 +307,8 @@ struct tx_obj {
              guiLabel_t head2_1;
              guiLabel_t buzzlbl;
              guiTextSelect_t buzz;
+             guiLabel_t audiolbl;
+             guiTextSelect_t audio;
              guiTextSelect_t power_alarm;
              guiLabel_t power_alarmlbl;
              guiLabel_t battalrmlbl;
