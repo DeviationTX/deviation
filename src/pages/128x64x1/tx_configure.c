@@ -188,7 +188,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             LABEL_WIDTH, LINE_HEIGHT,  &DEFAULT_FONT, NULL, NULL, _tr(label));
     if(but_str) {
         GUI_CreateButtonPlateText(&gui->value[relrow].but, x, y,
-            TEXTSEL_X_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, but_str, 0x0000, tgl, data);
+            TEXTSEL_X_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, but_str, tgl, data);
     } else {
         GUI_CreateTextSelectPlate(&gui->value[relrow].ts, x, y,
             TEXTSEL_X_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, value, data);

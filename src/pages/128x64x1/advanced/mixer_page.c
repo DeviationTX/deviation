@@ -63,10 +63,10 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         channel += (NUM_OUT_CHANNELS - Model.num_channels);
     if (channel < NUM_OUT_CHANNELS) {
         labelDesc.style = LABEL_LEFT;
-        GUI_CreateButtonPlateText(&gui->limit[relrow], COL1_X, y, COL1_W, LINE_HEIGHT, &labelDesc, MIXPAGE_ChanNameProtoCB, 0,
+        GUI_CreateButtonPlateText(&gui->limit[relrow], COL1_X, y, COL1_W, LINE_HEIGHT, &labelDesc, MIXPAGE_ChanNameProtoCB,
                 limitselect_cb, (void *)((long)channel));
     } else if(! _is_virt_cyclic(channel)) {
-        GUI_CreateButtonPlateText(&gui->limit[relrow], COL1_X, y, COL1_W, LINE_HEIGHT, &labelDesc, MIXPAGE_ChanNameProtoCB, 0,
+        GUI_CreateButtonPlateText(&gui->limit[relrow], COL1_X, y, COL1_W, LINE_HEIGHT, &labelDesc, MIXPAGE_ChanNameProtoCB,
                 virtname_cb, (void *)((long)channel));
     } else {
         GUI_CreateLabelBox(&gui->name[relrow], COL1_X, y, COL1_W, LINE_HEIGHT, &labelDesc,
@@ -74,7 +74,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         selectable = 1;
     }
     labelDesc.style = LABEL_CENTER;
-    GUI_CreateButtonPlateText(&gui->tmpl[relrow], COL2_X, y, COL2_W, LINE_HEIGHT , &labelDesc, template_name_cb, 0,
+    GUI_CreateButtonPlateText(&gui->tmpl[relrow], COL2_X, y, COL2_W, LINE_HEIGHT , &labelDesc, template_name_cb,
         templateselect_cb, (void *)((long)channel));
    
     for (idx = 0; idx < NUM_MIXERS; idx++)
