@@ -210,7 +210,7 @@ void MUSIC_Play(u16 music)
     num_notes = 0;
     next_note = 1;
 #if HAS_EXTENDED_AUDIO
-    if (Transmitter.audio_player) {
+    if (Transmitter.audio_player && Transmitter.audio_vol) {
         if ((playback_device == AUDDEV_EXTAUDIO) || (playback_device == AUDDEV_UNDEF)) {
             AUDIO_Play(music_map[music].musicid);
             return;
@@ -229,7 +229,7 @@ void MUSIC_Play(u16 music)
 #if HAS_MUSIC_CONFIG
 
 u16 MUSIC_GetTelemetryAlarm(enum Music music) {
-    if (Model.music.telemetry[music - MUSIC_TELEMALARM1].music > 0)
+    if (Model.music.telemetry[music - MUSIC_TELEMALARM1].music > 0 && Transmitter.audio_vol)
         return Model.music.telemetry[music - MUSIC_TELEMALARM1].music;
     return music;
 }
@@ -244,7 +244,8 @@ void MUSIC_PlayValue(u16 music, u32 value, u8 unit, u8 prec)
     char digits[6]; // Do we need more?
     char thousands = 0;
 
-    if ((Transmitter.audio_player && playback_device == AUDDEV_BUZZER) || !Transmitter.audio_player) {
+    if ((Transmitter.audio_player && playback_device == AUDDEV_BUZZER) || !Transmitter.audio_player
+        || !Transmitter.audio_vol) {
             MUSIC_Play(music);
         return;
     }

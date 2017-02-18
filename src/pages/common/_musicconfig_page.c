@@ -95,12 +95,12 @@ static const char *musicid_cb(guiObject_t *obj, int dir, void *data)
     int cur_row = idx - GUI_ScrollableCurrentRow(&gui->scrollable);
     struct CustomMusic *musicpt;
 
-//    if (musicconfig_getsrctype(idx) == MUSIC_SRC_SWITCH)
+    if (musicconfig_getsrctype(idx) == MUSIC_SRC_SWITCH)
         musicpt = &Model.music.switches[idx];
-/*    if (musicconfig_getsrctype(idx) == MUSIC_SRC_TELEMETRY)
-        musicpt = &Model.music.telemetry[idx - (MODEL_CUSTOM_ALARMS - TELEM_NUM_ALARMS-1)];
-*/
-    if (dir == -1 && musicpt->music == 0) // set to none below 1
+    if (musicconfig_getsrctype(idx) == MUSIC_SRC_TELEMETRY)
+        musicpt = &Model.music.telemetry[idx - (MODEL_CUSTOM_ALARMS - TELEM_NUM_ALARMS)];
+
+    if (dir == -1 && musicpt->music == CUSTOM_ALARM_ID) // set to none below 1
         musicpt->music = 0;
     if (dir == 1 && musicpt->music == 0) // set to CUSTOM_ALARM_ID when currently none
         musicpt->music = CUSTOM_ALARM_ID - 1;
@@ -109,8 +109,9 @@ static const char *musicid_cb(guiObject_t *obj, int dir, void *data)
         GUI_Redraw(&gui->musiclbl[cur_row]);
         return strcpy(tempstring, _tr("None"));
     }
-    musicpt->music = GUI_TextSelectHelper(musicpt->music, 1, music_map_entries-1, dir, 1, 10, NULL);
-    snprintf(tempstring, 5, "%d", musicpt->music);
+    musicpt->music = GUI_TextSelectHelper(musicpt->music - CUSTOM_ALARM_ID + 1, //Relabling so music in menu starts with 1
+        1, music_map_entries - CUSTOM_ALARM_ID, dir, 1, 10, NULL) + CUSTOM_ALARM_ID - 1;
+    snprintf(tempstring, 5, "%d", musicpt->music - CUSTOM_ALARM_ID + 1);
     GUI_Redraw(&gui->musiclbl[cur_row]);
     return tempstring;
 }

@@ -90,10 +90,6 @@ struct CustomMusic {
     u16 music;
 };
 
-struct TelemetryMusic {
-    u16 music;
-};
-
 struct  Music_Nr {
     struct CustomMusic switches[NUM_INPUTS - INP_HAS_CALIBRATION];	//Switch array to point to music file number, no pots
     struct CustomMusic telemetry[TELEM_NUM_ALARMS]; //Telemetry Alarm array to point to music file number
@@ -115,9 +111,7 @@ struct MusicMap {
 
 struct MusicMap music_map[MAX_MUSICMAP_ENTRIES];
 
-
 u16 MUSIC_GetTelemetryAlarm(enum Music music);
-
 void MUSIC_PlayValue(u16 music, u32 value, u8 unit, u8 prec);
 
 #endif //HAS_EXTENDED_AUDIO
