@@ -62,9 +62,11 @@ void CONFIG_AlertParse(const char* filename)
             }
             pt = strtok(NULL, ":");
         }
-        if (music_map[music_map_entries].duration > 0) //ignore zero length entries
             music_map_entries++;
     }
     fclose(file);
+/*    for(int i = 0;i<music_map_entries;i++) {
+      printf("musicmap[%d].musicid=%d,duration=%d,label=%s\n",i,music_map[i].musicid,music_map[i].duration,music_map[i].label);
+    }*/
 }
 #endif

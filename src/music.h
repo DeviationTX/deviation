@@ -55,16 +55,6 @@ enum AudioDevices {
 #define NUM_AUX_KNOBS	(INP_HAS_CALIBRATION - NUM_STICKS)	// Exclude sticks
 
 enum {
-    TELEM_CUSTOM_NONE = 99,
-    TELEM_ALARM_CUSTOM1,
-    TELEM_ALARM_CUSTOM2,
-    TELEM_ALARM_CUSTOM3,
-    TELEM_ALARM_CUSTOM4,
-    TELEM_ALARM_CUSTOM5,
-    TELEM_ALARM_CUSTOM6,
-};
-
-enum {
     TELEM_UNIT_NONE = 0,
     TELEM_UNIT_TEMP,
     TELEM_UNIT_VOLT,
@@ -76,18 +66,18 @@ enum {
 };
 
 struct AuxMusic {
-    u16 up;              // Music to be played when Aux turns up
-    u16 down;            // Music to be played when Aux turns down
+    u8 up;              // Music to be played when Aux turns up
+    u8 down;            // Music to be played when Aux turns down
 };
 
 struct ButtonMusic {
     u16 on;             // Music to be played when button is On
     u16 off;
-    u16 music;            // Music to be played when button is Off
+    u8 music;            // Music to be played when button is Off
 };
 
 struct CustomMusic {
-    u16 music;
+    u8 music;
 };
 
 struct  Music_Nr {

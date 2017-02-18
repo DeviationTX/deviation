@@ -82,7 +82,7 @@ static const char *const audio_devices[] = {
 };
 
 static u8 playback_device;
-static u16 music_queue[8];
+static u16 music_queue[15]; //arbitraty chosen
 #endif
 static u8 vibrate;
 
@@ -132,7 +132,7 @@ u16 next_note_cb() {
         return 0;
 #if HAS_EXTENDED_AUDIO
     if ((playback_device == AUDDEV_EXTAUDIO) || (playback_device == AUDDEV_UNDEF)) {
-        AUDIO_Play(music_map[music_queue[next_note]].musicid);
+        AUDIO_Play(music_queue[next_note]);
         return music_map[music_queue[next_note++]].duration;
     }
 #endif
@@ -198,8 +198,16 @@ void MUSIC_Play(u16 music)
 #if HAS_EXTENDED_AUDIO
     // Play audio for switch
     if (Transmitter.audio_player && (music > MUSIC_TOTAL)) {
-        AUDIO_Play(music_map[music].musicid);
-        return;
+#ifdef EMULATOR
+        num_notes = 0; //workaround for emulator not having timer
+#endif
+        if (!num_notes || num_notes == next_note) {
+            AUDIO_Play(music);
+            return;
+        } else {
+            music_queue[num_notes++] = music;
+            return;
+        }
     }
     playback_device = AUDDEV_UNDEF;
 #endif
@@ -210,12 +218,12 @@ void MUSIC_Play(u16 music)
     num_notes = 0;
     next_note = 1;
 #if HAS_EXTENDED_AUDIO
-    if (Transmitter.audio_player && Transmitter.audio_vol) {
+    if (Transmitter.audio_player && Transmitter.audio_vol && music_map[music].duration) {
         if ((playback_device == AUDDEV_EXTAUDIO) || (playback_device == AUDDEV_UNDEF)) {
-            AUDIO_Play(music_map[music].musicid);
+            AUDIO_Play(music);
             return;
         } else if (playback_device == AUDDEV_ALL) {
-            AUDIO_Play(music_map[music].musicid);
+            AUDIO_Play(music);
         }
     }
 #endif
@@ -297,7 +305,7 @@ void MUSIC_PlayValue(u16 music, u32 value, u8 unit, u8 prec)
     music_queue[0] = music;
 
     for (i=num_notes; i > 1; i--) {
-        music_queue[idx] = digits[i-2] + MUSIC_TOTAL; // mp3 files 1000 - 1009 for digits
+        music_queue[idx] = digits[i-2] + MUSIC_TOTAL;
         idx++;
     }
     // Add unit for value if specified
@@ -309,7 +317,7 @@ void MUSIC_PlayValue(u16 music, u32 value, u8 unit, u8 prec)
     // Start callback for music queue
     if (Transmitter.audio_player) {
             SOUND_Start(100, next_note_cb, vibrate);
-#ifdef BUILDTYPE_DEV
+#ifdef EMULATOR //workaround for emulator not having timer
             for (i=0;i<num_notes;i++) {
                 printf("Playing alert #%d (%s) for %d ms\n",music_map[music_queue[i]].musicid, music_map[music_queue[i]].label, music_map[music_queue[i]].duration);
             }

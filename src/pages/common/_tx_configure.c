@@ -395,7 +395,7 @@ static const char *_audio_vol_cb(guiObject_t *obj, int dir, void *data)
         return "----";
     u8 changed;
     if (GUI_IsTextSelectEnabled(obj)) {
-        *unsigned_data = GUI_TextSelectHelper(*unsigned_data, 0, 30, dir, 1, 1, &changed);
+        *unsigned_data = GUI_TextSelectHelper(*unsigned_data, 0, 30, dir, 1, 5, &changed);
         if (changed) {
             AUDIO_SetVolume();
             MUSIC_Play(MUSIC_VOLUME);

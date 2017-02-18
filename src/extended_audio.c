@@ -24,9 +24,9 @@
 
 // Send a block of len bytes to the Audio device.
 void
-AUDIO_Send(uint8_t *data, int len) {
+AUDIO_Send(u8 *data, int len) {
   void AUDIO_send_char(char c);
-  for (uint16_t iter = 0; iter < len; iter += 1) {
+  for (u16 iter = 0; iter < len; iter += 1) {
     AUDIO_send_char(data[iter]);
   }
 }
@@ -34,15 +34,28 @@ AUDIO_Send(uint8_t *data, int len) {
 // Send a string  to the Audio device.
 void
 AUDIO_Print(char *string) {
-  AUDIO_Send((uint8_t *)string, strlen(string));
+  AUDIO_Send((u8 *)string, strlen(string));
 }
 #endif
+
+void u16ToArray(u16 value, u8 *array){
+    *array = (u8)(value>>8);
+    *(array+1) = (u8)value;
+}
+
+// generate Checksum for DFPlyer commands
+u16 AUDIO_CalculateChecksum(u8 *buffer) {
+    u16 sum = 0;
+    for (int i=1; i < 7; i += 1)
+        sum += buffer[i];
+    return -sum;
+}
 
 // Generate a string to play.
 int AUDIO_Play(u16 music) {
   #ifdef BUILDTYPE_DEV
   // dev builds log to the serial port, so just report it.
-  printf("Playing alert #%d (%s)\n", music, music_map[music].label);
+  printf("Playing alert #%d (%s)\n", music_map[music].musicid, music_map[music].label);
   #endif
 
   #if !defined(BUILDTYPE_DEV) || HAS_AUDIO_UART5
@@ -62,31 +75,21 @@ int AUDIO_Play(u16 music) {
     case AUDIO_NONE: return 0;	// Play beeps...
     case AUDIO_AUDIOFX: {
       char buffer[5];
-      snprintf(buffer, sizeof(buffer), "#%d\n", music);
+      snprintf(buffer, sizeof(buffer), "#%d\n", music_map[music].musicid);
       AUDIO_Print(buffer);
       break;
     }
     case AUDIO_DF_PLAYER: {
-      static uint8_t buffer[] =
-        {0x7E, 0xFF, 0x06, 0x12, 0x00, 0x00, 0x00, 0x00, 0x00, 0xEF};
+        static u8 buffer[] =
+            {0x7E, 0xFF, 0x06, 0x12, 0x00, 0x00, 0x00, 0x00, 0x00, 0xEF};
+        // Fill in track number and checksum
+        u16ToArray(music_map[music].musicid, buffer+5);
+        u16ToArray(AUDIO_CalculateChecksum(buffer), buffer+7);
 
-      // Fill in track number
-      buffer[5] = (uint8_t)(music >> 8);
-      buffer[6] = (uint8_t)music;
-
-      // And the checksum
-      uint16_t sum = 0;
-      for (int i=1; i < 7; i += 1)
-        sum += buffer[i];
-      sum = -sum;
-      buffer[7] = (uint8_t)(sum >> 8);
-      buffer[8] = (uint8_t)sum;
-
-      AUDIO_Send(buffer, sizeof(buffer));
-      break;
+        AUDIO_Send(buffer, sizeof(buffer));
+        break;
     }
   }
-
   #endif
   return 1;
 }
@@ -100,23 +103,13 @@ void AUDIO_SetVolume(void) {
       case AUDIO_AUDIOFX: // AUDIOFX only allows up down selection of volume...not implemented
       case AUDIO_NONE: break;	// Play beeps...
       case AUDIO_DF_PLAYER: {
-        static uint8_t buffer[] =
-          {0x7E, 0xFF, 0x06, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0xEF};
-
-        // Fill in volume
-        buffer[5] = (uint8_t)(Transmitter.audio_vol >> 8);
-        buffer[6] = (uint8_t)Transmitter.audio_vol;
-
-        // And the checksum
-        uint16_t sum = 0;
-        for (int i=1; i < 7; i += 1)
-          sum += buffer[i];
-        sum = -sum;
-        buffer[7] = (uint8_t)(sum >> 8);
-        buffer[8] = (uint8_t)sum;
-
-        AUDIO_Send(buffer, sizeof(buffer));
-        break;
+          static u8 buffer[] =
+              {0x7E, 0xFF, 0x06, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0xEF};
+          // Fill in volume and checksum
+          u16ToArray(Transmitter.audio_vol, buffer+5);
+          u16ToArray(AUDIO_CalculateChecksum(buffer), buffer+7);
+          AUDIO_Send(buffer, sizeof(buffer));
+          break;
       }
     }
 #endif

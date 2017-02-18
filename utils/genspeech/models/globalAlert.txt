@@ -5,12 +5,12 @@ ALARM1:		Timer 1 alarm
 ALARM2:		Timer 2 alarm
 ALARM3:		Timer 3 alarm
 ALARM4:		Timer 4 alarm
-BATT_ALARM:	Transmitter battery voltage
+BATT_ALARM:	low transmitter battery voltage
 DONE_BINDING:	Finished binding
 TIMER_WARNING:	Time remaining
-KEY_PRESSING:	keypress
-SAVING:		Saving
-MAXLEN:		maximum length
+KEY_PRESSING:
+SAVING:
+MAXLEN:	
 TELEMALARM1:	Telemetry alarm 1
 TELEMALARM2:	Telemetry alarm 2
 TELEMALARM3:	Telemetry alarm 3
