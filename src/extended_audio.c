@@ -17,8 +17,11 @@
 #include "music.h"
 #include "config/tx.h"
 #include "config/model.h"
+#include "extended_audio.h"
 
 #if HAS_EXTENDED_AUDIO
+
+static u32 audio_queue_time = 0;
 
 #if HAS_AUDIO_UART5 || !defined(BUILDTYPE_DEV)
 
@@ -53,10 +56,10 @@ u16 AUDIO_CalculateChecksum(u8 *buffer) {
 
 // Generate a string to play.
 int AUDIO_Play(u16 music) {
-  #ifdef BUILDTYPE_DEV
+#ifdef BUILDTYPE_DEV
   // dev builds log to the serial port, so just report it.
-  printf("Playing alert #%d (%s)\n", music_map[music].musicid, music_map[music].label);
-  #endif
+  printf("Audio: Playing music #%d (%s)\n", music_map[music].musicid, music_map[music].label);
+#endif
 
   #if !defined(BUILDTYPE_DEV) || HAS_AUDIO_UART5
 
@@ -96,7 +99,7 @@ int AUDIO_Play(u16 music) {
 
 void AUDIO_SetVolume(void) {
 #ifdef BUILDTYPE_DEV
-    printf("Setting external audio volume to %d\n", Transmitter.audio_vol);
+    printf("Audio: Setting external audio volume to %d\n", Transmitter.audio_vol);
 #else
     switch (Transmitter.audio_player) {
       case AUDIO_LAST: // Sigh. Shut up the warnings
@@ -113,6 +116,36 @@ void AUDIO_SetVolume(void) {
       }
     }
 #endif
+}
+
+void AUDIO_CheckQueue(void) {
+    u32 t = CLOCK_getms();
+    if (next_audio < num_audio) {
+//        printf("Audio: Queue not empty t=%d, audio_queue_time= %d\n", t, audio_queue_time);
+        if (t > audio_queue_time) {
+//            printf("Audio: Playing music_queue[%d].music=%d for %d ms\n",next_audio,audio_queue[next_audio],
+//                music_map[audio_queue[next_audio]].duration);
+            AUDIO_Play(audio_queue[next_audio]);
+            audio_queue_time = CLOCK_getms() + music_map[audio_queue[next_audio]].duration;
+            next_audio++;
+        }
+    } else if (num_audio && t > audio_queue_time) {
+#ifdef BUILDTYPE_DEV
+        printf("Audio: Queue finished, resetting.\n");
+#endif
+        num_audio = 0;
+        next_audio = 0;
+    }
+}
+
+void AUDIO_AddQueue(u16 music) {
+    if (num_audio == AUDIO_QUEUE_LENGTH) {
+#ifdef BUILDTYPE_DEV
+        printf("Audio: Queue full, cannot add new music #%d\n",music);
+#endif
+        return;
+    }
+    audio_queue[num_audio++] = music;
 }
 
 #endif

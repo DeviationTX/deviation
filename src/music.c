@@ -82,7 +82,6 @@ static const char *const audio_devices[] = {
 };
 
 static u8 playback_device;
-static u16 music_queue[15]; //arbitraty chosen
 #endif
 static u8 vibrate;
 
@@ -130,12 +129,6 @@ static int ini_handler(void* user, const char* section, const char* name, const 
 u16 next_note_cb() {
     if (next_note == num_notes)
         return 0;
-#if HAS_EXTENDED_AUDIO
-    if ((playback_device == AUDDEV_EXTAUDIO) || (playback_device == AUDDEV_UNDEF)) {
-        AUDIO_Play(music_queue[next_note]);
-        return music_map[music_queue[next_note++]].duration;
-    }
-#endif
     SOUND_SetFrequency(note_map[Notes[next_note].note].note, Volume);
     return Notes[next_note++].duration * 10;
 }
@@ -168,6 +161,8 @@ void MUSIC_Beep(char* note, u16 duration, u16 interval, u8 count)
 }
 
 u16 MUSIC_GetSound(u16 music) {
+    num_notes = 0;
+    next_note = 1;
     Volume = Transmitter.volume * 10;
     char filename[] = "media/sound.ini\0\0\0"; // placeholder for longer folder name
     #ifdef _DEVO12_TARGET_H_
@@ -198,16 +193,8 @@ void MUSIC_Play(u16 music)
 #if HAS_EXTENDED_AUDIO
     // Play audio for switch
     if (Transmitter.audio_player && (music > MUSIC_TOTAL)) {
-#ifdef EMULATOR
-        num_notes = 0; //workaround for emulator not having timer
-#endif
-        if (!num_notes || num_notes == next_note) {
-            AUDIO_Play(music);
-            return;
-        } else {
-            music_queue[num_notes++] = music;
-            return;
-        }
+        AUDIO_AddQueue(music);
+        return;
     }
     playback_device = AUDDEV_UNDEF;
 #endif
@@ -215,20 +202,21 @@ void MUSIC_Play(u16 music)
 
     /* NOTE: We need to do all this even if volume is zero, because
        the haptic sensor may be enabled */
-    num_notes = 0;
-    next_note = 1;
+
+    if (MUSIC_GetSound(music)) return;
+
 #if HAS_EXTENDED_AUDIO
     if (Transmitter.audio_player && Transmitter.audio_vol && music_map[music].duration) {
         if ((playback_device == AUDDEV_EXTAUDIO) || (playback_device == AUDDEV_UNDEF)) {
-            AUDIO_Play(music);
+            AUDIO_AddQueue(music);
+            Volume = 0; // Just activate the haptic sensor, no buzzer
             return;
         } else if (playback_device == AUDDEV_ALL) {
-            AUDIO_Play(music);
+            AUDIO_AddQueue(music);
         }
     }
 #endif
 
-    if (MUSIC_GetSound(music)) return;
     if(! num_notes) return;
     SOUND_SetFrequency(note_map[Notes[0].note].note, Volume);
     SOUND_Start((u16)Notes[0].duration * 10, next_note_cb, vibrate);
@@ -248,9 +236,10 @@ u16 MUSIC_GetTelemetryAlarm(enum Music music) {
 
 void MUSIC_PlayValue(u16 music, u32 value, u8 unit, u8 prec)
 {
-    u32 i,idx= 1;
+    u32 i;
     char digits[6]; // Do we need more?
     char thousands = 0;
+    u8 digit_count = 0;
 
     if ((Transmitter.audio_player && playback_device == AUDDEV_BUZZER) || !Transmitter.audio_player
         || !Transmitter.audio_vol) {
@@ -258,18 +247,14 @@ void MUSIC_PlayValue(u16 music, u32 value, u8 unit, u8 prec)
         return;
     }
 
-    SOUND_SetFrequency(10, 0); // We are using the buzzer timer to manage our mp3 queue so we have to turn the buzzer off
-    next_note = 0;
-    num_notes = 0;
-
     //Add precision digits
     for (i=0; i < prec; i++) {
-        digits[num_notes++] = value % 10;
+        digits[digit_count++] = value % 10;
         value /=10;
     }
     //Add decimal seperator
     if (prec > 0) {
-        digits[num_notes++] = 110;
+        digits[digit_count++] = 110;
     }
 
     // Get single digits from remaining value
@@ -278,50 +263,35 @@ void MUSIC_PlayValue(u16 music, u32 value, u8 unit, u8 prec)
             thousands = value / 1000;
             value %= 1000;
         }
-        if(value > 99) {
-            digits[num_notes++] = value % 100;
+        if(value > 100) {
+            digits[digit_count++] = value % 100;
             value /= 100;
-            digits[num_notes++] = value + 99;
+            digits[digit_count++] = value + 99;
             if (thousands){
-              digits[num_notes++] = 109;
-              digits[num_notes++] = thousands;
+              digits[digit_count++] = 109;
+              digits[digit_count++] = thousands;
             }
             break;
         }
         if(value < 101 && value > 0) {
-            digits[num_notes++] = value;
+            digits[digit_count++] = value;
             break;
         }
         else {
             if (thousands){
-                digits[num_notes++] = 109;
-                digits[num_notes++] = thousands;
+                digits[digit_count++] = 109;
+                digits[digit_count++] = thousands;
             }
         }
     }
 
     // Fill music queue
-    num_notes++;
-    music_queue[0] = music;
-
-    for (i=num_notes; i > 1; i--) {
-        music_queue[idx] = digits[i-2] + MUSIC_TOTAL;
-        idx++;
+    AUDIO_AddQueue(music);
+    for (i = digit_count; i > 0; i--) {
+        AUDIO_AddQueue(digits[i-1] + MUSIC_TOTAL);
     }
     // Add unit for value if specified
-    if (unit > TELEM_UNIT_NONE) {
-        num_notes++;
-        music_queue[idx] = unit + 130;
-    }
-
-    // Start callback for music queue
-    if (Transmitter.audio_player) {
-            SOUND_Start(100, next_note_cb, vibrate);
-#ifdef EMULATOR //workaround for emulator not having timer
-            for (i=0;i<num_notes;i++) {
-                printf("Playing alert #%d (%s) for %d ms\n",music_map[music_queue[i]].musicid, music_map[music_queue[i]].label, music_map[music_queue[i]].duration);
-            }
-#endif
-         }
+    if (unit > TELEM_UNIT_NONE)
+        AUDIO_AddQueue(unit + 130);
 }
 #endif
