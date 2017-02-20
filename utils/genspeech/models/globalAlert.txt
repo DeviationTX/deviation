@@ -9,7 +9,7 @@ BATT_ALARM:	low transmitter battery voltage
 DONE_BINDING:	Finished binding
 TIMER_WARNING:	Time remaining
 KEY_PRESSING:
-SAVING:
+SAVING:		Saving
 MAXLEN:	
 TELEMALARM1:	Telemetry alarm 1
 TELEMALARM2:	Telemetry alarm 2

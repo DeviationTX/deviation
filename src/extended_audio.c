@@ -18,6 +18,7 @@
 #include "config/tx.h"
 #include "config/model.h"
 #include "extended_audio.h"
+#include "stdlib.h"
 
 #if HAS_EXTENDED_AUDIO
 
@@ -57,8 +58,18 @@ u16 AUDIO_CalculateChecksum(u8 *buffer) {
 // Generate a string to play.
 int AUDIO_Play(u16 music) {
 #ifdef BUILDTYPE_DEV
-  // dev builds log to the serial port, so just report it.
-  printf("Audio: Playing music #%d (%s)\n", music_map[music].musicid, music_map[music].label);
+    // dev builds log to the serial port, so just report it. On emulators call mpg123 to play mp3s
+    printf("Audio: Playing music #%d (%s)\n", music_map[music].musicid, music_map[music].label);
+#endif
+#ifdef EMULATOR
+    char cmd[60];
+    u16 vol_val = Transmitter.audio_vol * 32786/30;
+#ifdef _WIN32
+    sprintf(cmd, "start /B mpg123 -f %d -q ..\\..\\mp3\\%04d*.mp3 > nul 2>&1", vol_val, music_map[music].musicid);
+#else
+    sprintf(cmd, "mpg123 -f %d -q ../../mp3/%04d*.mp3 > /dev/null 2>&1 &", vol_val, music_map[music].musicid);
+#endif
+    system(cmd);
 #endif
 
   #if !defined(BUILDTYPE_DEV) || HAS_AUDIO_UART5
@@ -88,7 +99,6 @@ int AUDIO_Play(u16 music) {
         // Fill in track number and checksum
         u16ToArray(music_map[music].musicid, buffer+5);
         u16ToArray(AUDIO_CalculateChecksum(buffer), buffer+7);
-
         AUDIO_Send(buffer, sizeof(buffer));
         break;
     }
@@ -121,10 +131,7 @@ void AUDIO_SetVolume(void) {
 void AUDIO_CheckQueue(void) {
     u32 t = CLOCK_getms();
     if (next_audio < num_audio) {
-//        printf("Audio: Queue not empty t=%d, audio_queue_time= %d\n", t, audio_queue_time);
         if (t > audio_queue_time) {
-//            printf("Audio: Playing music_queue[%d].music=%d for %d ms\n",next_audio,audio_queue[next_audio],
-//                music_map[audio_queue[next_audio]].duration);
             AUDIO_Play(audio_queue[next_audio]);
             audio_queue_time = CLOCK_getms() + music_map[audio_queue[next_audio]].duration;
             next_audio++;

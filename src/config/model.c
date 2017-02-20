@@ -188,7 +188,6 @@ static const char GUI_QUICKPAGE[] = "quickpage";
 static const char SECTION_MUSIC[] = "music";
 static const char * const MUSIC_TELEMALARM[TELEM_NUM_ALARMS] =
      { "telemalarm1", "telemalarm2", "telemalarm3", "telemalarm4", "telemalarm5", "telemalarm6" };
-static const char * const AUDIO_VOL = "volume";
 #endif
 
 
@@ -993,15 +992,7 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
 
     if (MATCH_SECTION(SECTION_MUSIC)) {
         u16 val = atoi(value);
-/*
-        if (MATCH_KEY(AUDIO_VOL)) {
-            if (val > 31)
-                Transmitter.audio_vol = 31;
-            else
-                Transmitter.audio_vol = val;
-            return 1;
-        }
-*/
+
         if(val>MAX_MUSICMAP_ENTRIES-1 || music_map[val].duration == 0) {
             printf("%s: Music %s not found in music.map\n", section, value);
             return 0;
@@ -1353,7 +1344,6 @@ u8 CONFIG_WriteModel(u8 model_num) {
     }
 #if HAS_EXTENDED_AUDIO
     fprintf(fh, "[%s]\n", SECTION_MUSIC);
-//    fprintf(fh, "volume=%d", Transmitter.audio_vol);
     for (idx = 0; idx < NUM_INPUTS - INP_HAS_CALIBRATION; idx++) {
         if (m->music.switches[idx].music) {
             fprintf(fh, "%s=%d\n", INPUT_SourceName(file,idx + INP_HAS_CALIBRATION + 1), m->music.switches[idx].music);
