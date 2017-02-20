@@ -17,7 +17,9 @@
 u32 TW8816_map_char(u32 c)
 {
     switch(c) {
-        case '_': return ' ';
+        case '_':  return ' ';
+        case '*':  return 0x82;
+        case 0xB0: return 0x89;
         default : return c;
     }
 }
