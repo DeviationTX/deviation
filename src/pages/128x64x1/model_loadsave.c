@@ -22,10 +22,7 @@
 #include <stdlib.h>
 
 enum {
-    LABELNUM_X        = 0,
-    LABELNUM_WIDTH    = 16,
-    LABEL_X           = 17,
-    LABEL_WIDTH       = 0,
+    LABEL_WIDTH = 0,
 };
 
 #endif //OVERRIDE_PLACEMENT
