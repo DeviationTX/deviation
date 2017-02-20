@@ -1020,23 +1020,23 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
                 return 1;
             }
         }
+*/
 #if NUM_AUX_KNOBS
-        for (int i = NUM_STICKS+1; i <= NUM_STICKS + NUM_AUX_KNOBS; i++) {
-            INPUT_SourceName(src_name, i);
+        for (int i = 0; i < NUM_AUX_KNOBS; i++) {
+            INPUT_SourceName(src_name, i + NUM_STICKS + 1);
             strcat(src_name, "_UP");
             if (MATCH_KEY(src_name)) {
-                m->music.aux[i - (NUM_STICKS+1)].up = val;
+                m->music.aux[i * 2 + 1].music = val;
                 return 1;
             }
-            INPUT_SourceName(src_name, i);
+            INPUT_SourceName(src_name, i + NUM_STICKS + 1);
             strcat(src_name, "_DOWN");
             if (MATCH_KEY(src_name)) {
-                m->music.aux[i - (NUM_STICKS+1)].down = val;
+                m->music.aux[i * 2].music = val;
                 return 1;
             }
         }
 #endif
-*/
         for (int i = 0; i < TELEM_NUM_ALARMS; i++) {
             if (MATCH_KEY(MUSIC_TELEMALARM[i])) {
                 m->music.telemetry[i].music = val;
@@ -1344,15 +1344,23 @@ u8 CONFIG_WriteModel(u8 model_num) {
     }
 #if HAS_EXTENDED_AUDIO
     fprintf(fh, "[%s]\n", SECTION_MUSIC);
-    for (idx = 0; idx < NUM_INPUTS - INP_HAS_CALIBRATION; idx++) {
-        if (m->music.switches[idx].music) {
+    for (idx = 0; idx < NUM_SWITCHES; idx++) {
+        if (m->music.switches[idx].music)
             fprintf(fh, "%s=%d\n", INPUT_SourceName(file,idx + INP_HAS_CALIBRATION + 1), m->music.switches[idx].music);
+    }
+#if NUM_AUX_KNOBS
+    for (idx = 0; idx < NUM_AUX_KNOBS * 2; idx++) {
+        if (m->music.aux[idx].music) {
+            if (idx % 2)
+                fprintf(fh, "%s_UP=%d\n", INPUT_SourceName(tempstring,(idx-1) / 2 + NUM_STICKS + 1), m->music.aux[idx].music);
+            else
+                fprintf(fh, "%s_DOWN=%d\n", INPUT_SourceName(tempstring,idx / 2 + NUM_STICKS + 1), m->music.aux[idx].music);
         }
     }
+#endif
     for (idx = 0; idx < TELEM_NUM_ALARMS; idx++) {
-        if (m->music.telemetry[idx].music) {
+        if (m->music.telemetry[idx].music)
             fprintf(fh, "TELEMALARM%d=%d\n", idx + 1, m->music.telemetry[idx].music);
-        }
     }
 #endif
     CONFIG_EnableLanguage(1);

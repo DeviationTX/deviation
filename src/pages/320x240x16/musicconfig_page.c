@@ -23,8 +23,8 @@
 enum {
     MUSICROWSPACER = (LCD_WIDTH == 480 ? 23 : 20),
     COL1 = 5,
-    COL2 = 65,
-    COL3 = 130,
+    COL2 = 75,
+    COL3 = 140,
 };
 #include "../common/_musicconfig_page.c"
 

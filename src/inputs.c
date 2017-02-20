@@ -339,11 +339,11 @@ void INPUT_CheckChanges(void) {
         if ((changed_input > NUM_STICKS) && (changed_input <= NUM_STICKS + NUM_AUX_KNOBS)) {
             music_idx = changed_input - (NUM_STICKS+1);
             if (aux_up) {
-                if (Model.music.aux[music_idx].up)
-                    MUSIC_Play(Model.music.aux[music_idx].up);
+                if (Model.music.aux[music_idx * 2 + 1].music)
+                    MUSIC_Play(Model.music.aux[music_idx * 2 + 1].music);
             } else {
-                if (Model.music.aux[music_idx].down)
-                    MUSIC_Play(Model.music.aux[music_idx].down);
+                if (Model.music.aux[music_idx * 2].music)
+                    MUSIC_Play(Model.music.aux[music_idx * 2].music);
             }
             return;
 	      }

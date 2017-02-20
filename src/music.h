@@ -44,15 +44,16 @@ enum AudioDevices {
 
 #if HAS_EXTENDED_AUDIO
 #define MAX_MUSICMAP_ENTRIES 240 // arbitraty chosen
-#if HAS_TOUCH
-#define MAX_MUSIC_LABEL 28 // limit label length due to limited screen width
+#if HAS_RTC // Check for Devo12 screen
+#define MAX_MUSIC_LABEL 35 // limit label length due to limited screen width
 #else
 #define MAX_MUSIC_LABEL 26
 #endif
-#define CUSTOM_ALARM_ID 138
-#define MODEL_CUSTOM_ALARMS (NUM_INPUTS - INP_HAS_CALIBRATION + TELEM_NUM_ALARMS)
+#define CUSTOM_ALARM_ID 138 // start of custom MP3 IDs
 #define NUM_STICKS	4
 #define NUM_AUX_KNOBS	(INP_HAS_CALIBRATION - NUM_STICKS)	// Exclude sticks
+#define NUM_SWITCHES (NUM_INPUTS - INP_HAS_CALIBRATION)
+#define MODEL_CUSTOM_ALARMS (NUM_SWITCHES + NUM_AUX_KNOBS * 2 + TELEM_NUM_ALARMS)
 
 enum {
     TELEM_UNIT_NONE = 0,
@@ -63,11 +64,6 @@ enum {
     TELEM_UNIT_ALTITUDE,
     TELEM_UNIT_GFORCE,
     TELEM_UNIT_SECONDS,
-};
-
-struct AuxMusic {
-    u8 up;              // Music to be played when Aux turns up
-    u8 down;            // Music to be played when Aux turns down
 };
 
 struct ButtonMusic {
@@ -81,11 +77,11 @@ struct CustomMusic {
 };
 
 struct  Music_Nr {
-    struct CustomMusic switches[NUM_INPUTS - INP_HAS_CALIBRATION];	//Switch array to point to music file number, no pots
+    struct CustomMusic switches[NUM_SWITCHES];	//Switch array to point to music file number, no pots
     struct CustomMusic telemetry[TELEM_NUM_ALARMS]; //Telemetry Alarm array to point to music file number
     struct ButtonMusic buttons[NUM_TX_BUTTONS];	//Button array to point to music file number
 #if NUM_AUX_KNOBS
-    struct AuxMusic aux[NUM_AUX_KNOBS];
+    struct CustomMusic aux[NUM_AUX_KNOBS * 2]; //two per knob for up and down
 #endif
 };
 

@@ -31,15 +31,14 @@ enum {
 
 static u8 musicconfig_getsrctype (u8 idx)
 {
-    if (idx < NUM_INPUTS - INP_HAS_CALIBRATION)
+    if (idx < NUM_SWITCHES)
         return MUSIC_SRC_SWITCH;
 /*    if (idx < NUM_INPUTS - INP_HAS_CALIBRATION + NUM_TX_BUTTONS)
-        return MUSIC_SRC_BUTTON;
+        return MUSIC_SRC_BUTTON;*/
 #if NUM_AUX_KNOBS
-    if (idx < NUM_INPUTS - INP_HAS_CALIBRATION + NUM_TX_BUTTONS + NUM_AUX_KNOBS)
+    if (idx < NUM_SWITCHES + NUM_AUX_KNOBS * 2)
         return MUSIC_SRC_AUX;
 #endif
-*/
     return MUSIC_SRC_TELEMETRY;
 }
 
@@ -49,6 +48,20 @@ const char *musicconfig_str_cb(guiObject_t *obj, const void *data)
     int idx = (long)data;
     if (musicconfig_getsrctype(idx) == MUSIC_SRC_SWITCH)
         INPUT_SourceName(tempstring,idx + INP_HAS_CALIBRATION + 1);
+#if NUM_AUX_KNOBS
+    if (musicconfig_getsrctype(idx) == MUSIC_SRC_AUX) {
+        if ((idx - NUM_SWITCHES) % 2) {
+            INPUT_SourceName(tempstring,(idx - NUM_SWITCHES -1) / 2 + NUM_STICKS + 1);
+            strcat(tempstring, " ");
+            strcat(tempstring, _tr("up"));
+        }
+        else {
+            INPUT_SourceName(tempstring,(idx - NUM_SWITCHES) / 2 + NUM_STICKS + 1);
+            strcat(tempstring," ");
+            strcat(tempstring, _tr("down"));
+        }
+    }
+#endif
     if (musicconfig_getsrctype(idx) == MUSIC_SRC_TELEMETRY)
         snprintf(tempstring, sizeof(tempstring), _tr("Telem %d"),
             idx - (MODEL_CUSTOM_ALARMS - TELEM_NUM_ALARMS) + 1);
@@ -63,6 +76,11 @@ static void music_test_cb(guiObject_t *obj, void *data)
         if (Model.music.switches[idx].music)
             MUSIC_Play(Model.music.switches[idx].music);
     }
+#if NUM_AUX_KNOBS
+    if (musicconfig_getsrctype(idx) == MUSIC_SRC_AUX)
+        if (Model.music.aux[idx - NUM_SWITCHES].music)
+            MUSIC_Play(Model.music.aux[idx - NUM_SWITCHES].music);
+#endif
     if (musicconfig_getsrctype(idx) == MUSIC_SRC_TELEMETRY) {
         if (Model.music.telemetry[idx - (MODEL_CUSTOM_ALARMS - TELEM_NUM_ALARMS)].music)
             MUSIC_Play(Model.music.telemetry[idx - (MODEL_CUSTOM_ALARMS - TELEM_NUM_ALARMS)].music);
@@ -77,6 +95,12 @@ static const char *musiclbl_cb(guiObject_t *obj, const void *data)
         if (Model.music.switches[idx].music)
             return music_map[Model.music.switches[idx].music].label;
     }
+#if NUM_AUX_KNOBS
+    if (musicconfig_getsrctype(idx) == MUSIC_SRC_AUX) {
+        if(Model.music.aux[idx - NUM_SWITCHES].music)
+            return music_map[Model.music.aux[idx - NUM_SWITCHES].music].label;
+    }
+#endif
     /*if (musicconfig_getsrctype(idx) == MUSIC_SRC_BUTTON) {
         if (Model.music.buttons[idx - (NUM_INPUTS - INP_HAS_CALIBRATION)].music)
             return music_map[Model.music.buttons[idx - (NUM_INPUTS - INP_HAS_CALIBRATION)].music].label;
@@ -97,6 +121,10 @@ static const char *musicid_cb(guiObject_t *obj, int dir, void *data)
 
     if (musicconfig_getsrctype(idx) == MUSIC_SRC_SWITCH)
         musicpt = &Model.music.switches[idx];
+#if NUM_AUX_KNOBS
+    if (musicconfig_getsrctype(idx) == MUSIC_SRC_AUX)
+        musicpt = &Model.music.aux[idx - NUM_SWITCHES];
+#endif
     if (musicconfig_getsrctype(idx) == MUSIC_SRC_TELEMETRY)
         musicpt = &Model.music.telemetry[idx - (MODEL_CUSTOM_ALARMS - TELEM_NUM_ALARMS)];
 

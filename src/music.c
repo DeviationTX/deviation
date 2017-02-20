@@ -192,7 +192,7 @@ void MUSIC_Play(u16 music)
 {
 #if HAS_EXTENDED_AUDIO
     // Play audio for switch
-    if (Transmitter.audio_player && (music > MUSIC_TOTAL)) {
+    if (Transmitter.audio_player && Transmitter.audio_vol && (music > MUSIC_TOTAL)) {
         AUDIO_AddQueue(music);
         return;
     }
