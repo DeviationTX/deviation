@@ -13,23 +13,4 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "common.h"
-#include "../pages.h"
-#include "gui/gui.h"
-#include "config/model.h"
-#include "standard.h"
-
-#if HAS_STANDARD_GUI
-#include "../../common/standard/_failsafe_page.c"
-
-static const struct page_defs failsafe_defs = {
-    _tr_noop("Fail-safe"),
-    set_failsafe_cb,
-    toggle_failsafe_cb,
-};
-void PAGE_FailSafeInit(int page)
-{
-    (void)page;
-    STANDARD_Init(&failsafe_defs);
-}
-#endif //HAS_STANDARD_GUI
+#include "../../128x64x1/standard/failsafe_page.c"
