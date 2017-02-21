@@ -21,53 +21,11 @@
 #include "standard.h"
 #include "mixer_standard.h"
 
-#if HAS_STANDARD_GUI
-#include "../../common/standard/_swash_page.c"
-
-static unsigned _action_cb(u32 button, unsigned flags, void *data);
-
-void PAGE_SwashInit(int page)
-{
-    (void)page;
-    PAGE_SetActionCB(_action_cb);
-    PAGE_SetModal(0);
-    PAGE_RemoveAllObjects();
-    get_swash();
-
-    u8 w = 60;
-    u8 x = 63;
-    PAGE_ShowHeader(_tr("SwashType"));
-    GUI_CreateTextSelectPlate(&gui->type, x-3, 0, w + 8, ITEM_HEIGHT, &DEFAULT_FONT, NULL, swash_val_cb, NULL);
-
-    u8 row = ITEM_SPACE;
-    GUI_CreateLabelBox(&gui->lbl[0], 0, row, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("ELE Mix"));
-    GUI_CreateTextSelectPlate(&gui->mix[0], x, row, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, swashmix_val_cb, (void *)1);
-
-    row += ITEM_SPACE;
-    GUI_CreateLabelBox(&gui->lbl[1], 0, row, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("AIL Mix"));
-    GUI_CreateTextSelectPlate(&gui->mix[1], x, row, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, swashmix_val_cb, (void *)0);
-
-    row += ITEM_SPACE;
-    GUI_CreateLabelBox(&gui->lbl[2], 0, row, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("PIT Mix"));
-    GUI_CreateTextSelectPlate(&gui->mix[2], x, row, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, swashmix_val_cb, (void *)2);
-
-    update_swashmixes();
-    GUI_Select1stSelectableObj();
-}
-
-static unsigned _action_cb(u32 button, unsigned flags, void *data)
-{
-    (void)data;
-    //u8 total_items = 2;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
-        }
-        else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
-    }
-    return 1;
-}
-#endif //HAS_STANDARD_GUI
+#define OVERRIDE_PLACEMENT
+enum {
+    LABEL_X         = 11*ITEM_SPACE,
+    LABEL_WIDTH     = 5*ITEM_SPACE,
+    LABEL_WIDTH_ADD = 7*ITEM_SPACE,
+    LABEL_OFFSET    = 0,
+};
+#include "../../128x64x1/standard/swash_page.c"
