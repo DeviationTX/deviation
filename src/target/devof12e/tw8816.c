@@ -155,6 +155,9 @@ void TW8816_Init()
     window = 0;
     //for(int i = 0; i < 24; i++)
     //    TW8816_DisplayCharacter(i, 'A' + i, 7);
+    
+    //Hide XY Graph placeholder
+    TW8816_UnmapWindow(0);
 }
 
 void TW8816_Reset()
