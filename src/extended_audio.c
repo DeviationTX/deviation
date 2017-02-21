@@ -62,10 +62,10 @@ int AUDIO_Play(u16 music) {
     printf("Audio: Playing music #%d (%s)\n", music_map[music].musicid, music_map[music].label);
 #endif
 #ifdef EMULATOR
-    char cmd[60];
+    char cmd[70];
     u16 vol_val = Transmitter.audio_vol * 32786/30;
 #ifdef _WIN32
-    sprintf(cmd, "start /B mpg123 -f %d -q ..\\..\\mp3\\%04d*.mp3 > nul 2>&1", vol_val, music_map[music].musicid);
+    sprintf(cmd, "start /B ..\\..\\mpg123 -f %d -q ..\\..\\mp3\\%04d*.mp3 > nul 2>&1", vol_val, music_map[music].musicid);
 #else
     sprintf(cmd, "mpg123 -f %d -q ../../mp3/%04d*.mp3 > /dev/null 2>&1 &", vol_val, music_map[music].musicid);
 #endif
