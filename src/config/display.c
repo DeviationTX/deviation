@@ -41,7 +41,8 @@ static const char * const FONT_VAL[] = {
     [font_index(NORMALBOXNEG_FONT)] = "normalboxneg",
     [font_index(SECTION_FONT)]      = "section",
     [font_index(TEXTSEL_FONT)]      = "textsel", 
-    [font_index(BUTTON_FONT)]       = "button"
+    [font_index(BUTTON_FONT)]       = "button",
+    [font_index(MENU_FONT)]         = "menu"
     };
 static const char COLOR[] = "color";
 static const char BG_COLOR[] = "bg_color";
@@ -60,6 +61,8 @@ static const char BOX[] = "box_type";
 static const char * const BOX_VAL[] = {
     [LABEL_NO_BOX]      = "none",
     [LABEL_CENTER]      = "center",
+    [LABEL_LEFT]        = "left",
+    [LABEL_RIGHT]       = "right",
     [LABEL_FILL]        = "fill",
     [LABEL_BOX]         = "outline",
 #if LCD_DEPTH == 1
