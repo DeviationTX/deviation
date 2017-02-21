@@ -13,25 +13,4 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "common.h"
-#include "../pages.h"
-#include "gui/gui.h"
-#include "config/model.h"
-#include "standard.h"
-
-#if HAS_STANDARD_GUI
-#include "../../common/standard/_reverse_page.c"
-
-static const struct page_defs reverse_defs = {
-    _tr_noop("Reverse"),
-    reverse_cb,
-    NULL
-};
-
-void PAGE_ReverseInit(int page)
-{
-    (void)page;
-    STANDARD_Init(&reverse_defs);
-}
-#endif //HAS_STANDARD_GUI
-
+#include "../../128x64x1/standard/reverse_page.c"
