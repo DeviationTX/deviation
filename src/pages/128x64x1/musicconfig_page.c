@@ -25,6 +25,7 @@ enum {
     LABEL_WIDTH    = 55,
     TEXTSEL_X      = 55,
     TEXTSEL_WIDTH  = 65,
+    LABELID_WIDTH  = LABEL_WIDTH + TEXTSEL_WIDTH,
     MSG_X          = 20,
     MSG_Y          = 10,
 };
@@ -46,7 +47,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     //Row 2
     y += LINE_SPACE;
     GUI_CreateLabelBox(&gui->musiclbl[relrow], LABEL_X, y,
-            LABEL_WIDTH + TEXTSEL_WIDTH, LINE_HEIGHT, &TINY_FONT, musiclbl_cb, NULL, (void *)(long)absrow);
+            LABELID_WIDTH, LINE_HEIGHT, &TINY_FONT, musiclbl_cb, NULL, (void *)(long)absrow);
     return 1;
 }
 
@@ -54,7 +55,7 @@ void PAGE_MusicconfigInit(int page)
 {
     (void)page;
     PAGE_SetModal(0);
-    if (Transmitter.audio_player == 0) {
+    if (!Transmitter.audio_player) {
         GUI_CreateLabelBox(&gui->msg, MSG_X, MSG_Y, 0, 0, &DEFAULT_FONT, NULL, NULL,
             _tr("MP3 player support must\nbe enabled in hardware.ini"));
         return;

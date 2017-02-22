@@ -41,6 +41,7 @@
 #define HAS_VIDEO           8
 #define HAS_EXTENDED_AUDIO  0
 #define HAS_AUDIO_UART5     0
+#define HAS_MUSIC_CONFIG    0
 
 #define NO_LANGUAGE_SUPPORT 1
 

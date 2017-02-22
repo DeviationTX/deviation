@@ -13,41 +13,21 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define OVERRIDE_PLACEMENT
 #include "common.h"
 #include "pages.h"
 #include "gui/gui.h"
-#include "config/tx.h"
 #include "config/model.h"
-#include "autodimmer.h"
-#include "extended_audio.h"
 
-#if LCD_WIDTH == 66
-//devof12e
-enum {
-  LARGE_SEL_X_OFFSET = 32,
-  MED_SEL_X_OFFSET   = 32,
-  SMALL_SEL_X_OFFSET = 32,
-  TITLE_X_OFFSET     = 4,
-  TITLE_WIDTH        = LCD_WIDTH - 4,
-  LABEL_X_OFFSET     = 2,
-  LABEL_WIDTH        = 30,
-  TEXTSEL_X_WIDTH    = 24,
-  CALIB_Y            = 0,
-};
+#define OVERRIDE_PLACEMENT
 
-#else
-//devof7
+#define X_OFFSET (ITEM_SPACE * 2 - 2)
 enum {
-  LARGE_SEL_X_OFFSET = 14,
-  MED_SEL_X_OFFSET   = 14,
-  SMALL_SEL_X_OFFSET = 14,
-  TITLE_X_OFFSET     = 2,
-  TITLE_WIDTH        = LCD_WIDTH - 2,
-  LABEL_X_OFFSET     = 0,
-  LABEL_WIDTH        = 13,
-  TEXTSEL_X_WIDTH    = LCD_WIDTH - 14 - 2,
-  CALIB_Y            = 0,
+    LABEL_X        = X_OFFSET,
+    LABEL_WIDTH    = 10 * ITEM_SPACE,
+    TEXTSEL_X      = X_OFFSET + 11 * ITEM_SPACE,
+    TEXTSEL_WIDTH  = 4 * ITEM_SPACE,
+    LABELID_WIDTH  = 26 * ITEM_SPACE,
+    MSG_X          = X_OFFSET,
+    MSG_Y          = 5*ITEM_SPACE,
 };
-#endif
-#include "../128x64x1/tx_configure.c"
+#include "../128x64x1/musicconfig_page.c"

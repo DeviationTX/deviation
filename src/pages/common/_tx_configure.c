@@ -387,6 +387,7 @@ static const char *_buzz_vol_cb(guiObject_t *obj, int dir, void *data)
     return tempstring;
 }
 
+#if HAS_EXTENDED_AUDIO
 static const char *_audio_vol_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)data;
@@ -406,3 +407,4 @@ static const char *_audio_vol_cb(guiObject_t *obj, int dir, void *data)
     sprintf(tempstring, "%d", *unsigned_data);
     return tempstring;
 }
+#endif //HAS_EXTENDED_AUDIO

@@ -191,7 +191,7 @@ void TIMER_Update()
                     warn_time = ((timer_val[i] / Transmitter.countdown_timer_settings.prealert_interval)
                             * Transmitter.countdown_timer_settings.prealert_interval);
                     if (timer_val[i] > warn_time && (timer_val[i] - delta) <= warn_time) {
-#ifdef HAS_EXTENDED_AUDIO
+#if HAS_EXTENDED_AUDIO
                         MUSIC_PlayValue(MUSIC_TIMER_WARNING,timer_val[i]/1000,TELEM_UNIT_SECONDS,0);
 #else
                         MUSIC_Play(MUSIC_TIMER_WARNING);
@@ -203,7 +203,7 @@ void TIMER_Update()
                     warn_time = ((timer_val[i] - Transmitter.countdown_timer_settings.timeup_interval) / Transmitter.countdown_timer_settings.timeup_interval)
                             * Transmitter.countdown_timer_settings.timeup_interval;
                     if (timer_val[i] > warn_time && (timer_val[i] - delta) <= warn_time) {
-#ifdef HAS_EXTENDED_AUDIO
+#if HAS_EXTENDED_AUDIO
                         MUSIC_PlayValue(MUSIC_ALARM1 + i,timer_val[i]/-1000+1,TELEM_UNIT_SECONDS,0);
 #else
                         MUSIC_Play(MUSIC_ALARM1 + i + 2);
