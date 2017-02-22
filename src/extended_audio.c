@@ -57,6 +57,20 @@ u16 AUDIO_CalculateChecksum(u8 *buffer) {
 
 // Generate a string to play.
 int AUDIO_Play(u16 music) {
+#if HAS_AUDIO_UART5
+    // If we are just playing beeps....
+    if (music == MUSIC_KEY_PRESSING || music == MUSIC_MAXLEN) {
+#else
+    // If we are using the PPM port or are just playing beeps anyway....
+    if ( PPMin_Mode() || Model.protocol == PROTOCOL_PPM
+    || music == MUSIC_KEY_PRESSING || music == MUSIC_MAXLEN) {
+#ifdef BUILDTYPE_DEV
+        printf("Audio: PPM port in use\n");
+#endif
+#endif
+        return 0;
+    }
+
 #ifdef BUILDTYPE_DEV
     // dev builds log to the serial port, so just report it. On emulators call mpg123 to play mp3s
     printf("Audio: Playing music #%d (%s)\n", music_map[music].musicid, music_map[music].label);
@@ -72,18 +86,7 @@ int AUDIO_Play(u16 music) {
     system(cmd);
 #endif
 
-  #if !defined(BUILDTYPE_DEV) || HAS_AUDIO_UART5
-
-#if HAS_AUDIO_UART5
-  // If we are just playing beeps....
-  if (music == MUSIC_KEY_PRESSING || music == MUSIC_MAXLEN)
-#else
-  // If we are using the PPM port or are just playing beeps anyway....
-  if ( PPMin_Mode() || Model.protocol == PROTOCOL_PPM
-  || music == MUSIC_KEY_PRESSING || music == MUSIC_MAXLEN)
-#endif
-    return 0;
-
+#if !defined(BUILDTYPE_DEV) || HAS_AUDIO_UART5
   switch (Transmitter.audio_player) {
     case AUDIO_LAST: // Sigh. Shut up the warnings
     case AUDIO_NONE: return 0;	// Play beeps...
@@ -108,6 +111,12 @@ int AUDIO_Play(u16 music) {
 }
 
 void AUDIO_SetVolume(void) {
+    if ( PPMin_Mode() ) { //don't send volume command when using PPM port
+#ifdef BUILDTYPE_DEV
+        printf("Audio: PPM port in use\n");
+#endif
+        return;
+    }
 #ifdef BUILDTYPE_DEV
     printf("Audio: Setting external audio volume to %d\n", Transmitter.audio_vol);
 #else
