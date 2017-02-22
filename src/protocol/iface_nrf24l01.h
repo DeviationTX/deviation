@@ -148,6 +148,7 @@ void XN297_SetRXAddr(const u8* addr, int len);
 void XN297_Configure(u8 flags);
 void XN297_SetScrambledMode(const u8 mode);
 u8 XN297_WritePayload(u8* msg, int len);
+u8 XN297_WriteEnhancedPayload(u8* msg, int len, int noack, u16 crc_xorout);
 u8 XN297_ReadPayload(u8* msg, int len);
 
 #endif
