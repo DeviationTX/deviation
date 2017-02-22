@@ -63,7 +63,8 @@ static u8 rxid;
 static u8 txid[2];
 
 enum {
-    BIND,
+    BIND1,
+    BIND2,
     DATA
 };
 
@@ -152,7 +153,7 @@ static void gw008_init()
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);     // Clear data ready, data sent, and retransmit
     NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);      // No Auto Acknowldgement on all data pipes
     NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x01);
-    NRF24L01_WriteReg(NRF24L01_11_RX_PW_P0, PAYLOAD_SIZE+2); // pcf + payload
+    NRF24L01_WriteReg(NRF24L01_11_RX_PW_P0, PAYLOAD_SIZE+2); // payload + 2 bytes for pcf
     NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x03);
     NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0x00); // no retransmits
     NRF24L01_SetBitrate(NRF24L01_BR_1M);
@@ -227,7 +228,7 @@ MODULE_CALLTYPE
 static u16 gw008_callback()
 {
     switch(phase) {
-        case BIND:
+        case BIND1:
             if((NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR)) &&   // RX fifo data ready
                 XN297_ReadEnhancedPayload(packet, PAYLOAD_SIZE) == PAYLOAD_SIZE && // check payload size
                 packet[0] == txid[0] && packet[14] == txid[1]) { // check tx id
@@ -240,14 +241,18 @@ static u16 gw008_callback()
                 NRF24L01_SetTxRxMode(TXRX_OFF);
                 NRF24L01_SetTxRxMode(TX_EN);
                 send_packet(1);
-                usleep(300);
-                // switch to RX mode
-                NRF24L01_SetTxRxMode(TXRX_OFF);
-                NRF24L01_FlushRx();
-                NRF24L01_SetTxRxMode(RX_EN);
-                XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) 
-                              | BV(NRF24L01_00_PWR_UP) | BV(NRF24L01_00_PRIM_RX)); 
+                phase = BIND2;
+                return 300;
             }
+            break;
+        case BIND2:
+            // switch to RX mode
+            NRF24L01_SetTxRxMode(TXRX_OFF);
+            NRF24L01_FlushRx();
+            NRF24L01_SetTxRxMode(RX_EN);
+            XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) 
+                          | BV(NRF24L01_00_PWR_UP) | BV(NRF24L01_00_PRIM_RX)); 
+            phase = BIND1;
             return 5000;
             break;
         case DATA:
@@ -262,7 +267,7 @@ static void initialize()
     CLOCK_StopTimer();
     initialize_txid();
     tx_power = Model.tx_power;
-    phase = BIND;
+    phase = BIND1;
     gw008_init();
     current_chan = 0;
     PROTOCOL_SetBindState(0xffffffff);
