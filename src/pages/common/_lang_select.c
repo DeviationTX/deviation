@@ -66,9 +66,11 @@ static void press_cb(struct guiObject *obj, s8 press_type, const void *data)
 {
     (void)obj;
     (void)press_type;
-    long idx = (long)data;
-    CONFIG_ReadLang(idx);
-    PAGE_Pop();
+    if (press_type == -1) {
+        long idx = (long)data;
+        CONFIG_ReadLang(idx);
+        PAGE_Pop();
+    }
 }
 
 static int count_num_languages()

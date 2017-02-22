@@ -19,44 +19,10 @@
 #include "config/model.h"
 #include "standard.h"
 
-#if HAS_STANDARD_GUI
-#include "../../common/standard/_throhold_page.c"
-static unsigned _action_cb(u32 button, unsigned flags, void *data);
-
-void PAGE_ThroHoldInit(int page)
-{
-    (void)page;
-    PAGE_SetActionCB(_action_cb);
-    PAGE_SetModal(0);
-    PAGE_RemoveAllObjects();
-
-    PAGE_ShowHeader(_tr("Throttle hold"));
-
-    u8 y = ITEM_SPACE;
-    GUI_CreateLabelBox(&gui->enlbl, 0, y, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Thr hold"));
-    u8 w = 40;
-    GUI_CreateTextSelectPlate(&gui->en, 75, y, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, throhold_cb,  NULL);
-
-    y += ITEM_SPACE;
-    GUI_CreateLabelBox(&gui->valuelbl, 0, y, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Hold position"));
-    GUI_CreateTextSelectPlate(&gui->value, 75, y, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, holdpostion_cb,  NULL);
-
-    GUI_Select1stSelectableObj();
-
-}
-
-static unsigned _action_cb(u32 button, unsigned flags, void *data)
-{
-    (void)data;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
-        }
-        else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
-    }
-    return 1;
-}
-#endif //HAS_STANDARD_GUI
+#define OVERRIDE_PLACEMENT
+enum {
+    LABEL_X        = 16*ITEM_SPACE,
+    LABEL_WIDTH    = 6*ITEM_SPACE,
+    HEADER_OFFSET  = LINE_HEIGHT,
+};
+#include "../../128x64x1/standard/throhold_page.c"
