@@ -13,6 +13,7 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef OVERRIDE_PLACEMENT
 #include "common.h"
 #include "../pages.h"
 #include "gui/gui.h"
@@ -20,6 +21,20 @@
 #include "mixer.h"
 #include "mixer_standard.h"
 #include "standard.h"
+
+enum {
+    LABEL2_WIDTH = 30,
+    LABEL3_X     = 31,
+    LABEL3_WIDTH = 36,
+    MESSAGE_Y    = 10,
+    HEADER_W     = 60,
+    SCROLL_W     = 76,
+    GRAPH_X      = 77,
+    #define GRAPH_Y HEADER_HEIGHT
+    GRAPH_W      = 50,
+    GRAPH_H      = 50,
+};
+#endif //OVERRIDE_PLACEMENT
 
 #if HAS_STANDARD_GUI
 #include "../../common/standard/_drexp_page.c"
@@ -42,16 +57,15 @@ void update_graph(int graph)
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
-    u8 w1 = 30;
-    u8 w2 = 36;
 
     GUI_CreateLabelBox(&gui->label[relrow], 0, y,
         0, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, STDMIX_ModeName(absrow - PITTHROMODE_NORMAL));
     y += LINE_SPACE;
     GUI_CreateTextSelectPlate(&gui->value1[relrow], 0, y,
-        w1, LINE_HEIGHT, &TINY_FONT, NULL, set_dr_cb, (void *)(long)(absrow - PITTHROMODE_NORMAL));
-    GUI_CreateTextSelectPlate(&gui->value2[relrow], w1+1, y,
-        w2, LINE_HEIGHT, &TINY_FONT, NULL, set_exp_cb, (void *)(long)(absrow - PITTHROMODE_NORMAL));
+        LABEL2_WIDTH, LINE_HEIGHT, &TINY_FONT, NULL, set_dr_cb, (void *)(long)(absrow - PITTHROMODE_NORMAL));
+    GUI_CreateTextSelectPlate(&gui->value2[relrow], LABEL3_X, y,
+        LABEL3_WIDTH, LINE_HEIGHT, &TINY_FONT, NULL, set_exp_cb, (void *)(long)(absrow - PITTHROMODE_NORMAL));
+    
     return 2;
 }
 
@@ -63,17 +77,17 @@ void PAGE_DrExpInit(int page)
     PAGE_ShowHeader("");
     memset(mp, 0, sizeof(*mp));
     int count = get_mixers();
-    int expected = INPUT_NumSwitchPos(mapped_std_channels.switches[SWITCHFUNC_DREXP_AIL+drexp_type]);
+    int expected = INPUT_NumSwitchPos(mapped_std_channels.switches[SWITCHFUNC_DREXP_AIL + drexp_type]);
     if (count != expected) {
-        GUI_CreateLabelBox(&gui->u.msg, 0, 10, 0, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, "Invalid model ini!");// must be invalid model ini
+        GUI_CreateLabelBox(&gui->u.msg, 0, MESSAGE_Y, 0, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, "Invalid model ini!"); // must be invalid model ini
         return;
     }
-    GUI_CreateTextSelectPlate(&gui->u.type, 0, 0, 60, HEADER_WIDGET_HEIGHT,
+    GUI_CreateTextSelectPlate(&gui->u.type, 0, 0, HEADER_W, HEADER_WIDGET_HEIGHT,
                      &DEFAULT_FONT, NULL, set_type_cb, (void *)NULL);
-    GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, 76, LCD_HEIGHT - HEADER_HEIGHT,
+    GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, SCROLL_W, LCD_HEIGHT - HEADER_HEIGHT,
                      2 * LINE_SPACE, count, row_cb, NULL, NULL, NULL);
 
-    GUI_CreateXYGraph(&gui->graph, 77, HEADER_HEIGHT, 50, 50,
+    GUI_CreateXYGraph(&gui->graph, GRAPH_X, GRAPH_Y, GRAPH_W, GRAPH_H,
             CHAN_MIN_VALUE, CHAN_MIN_VALUE, CHAN_MAX_VALUE, CHAN_MAX_VALUE,
             0, 0, show_curve_cb, curpos_cb, NULL, NULL);
 
@@ -94,4 +108,5 @@ void PAGE_DrExpCurvesEvent()
         }
     }
 }
+
 #endif //HAS_STANDARD_GUI
