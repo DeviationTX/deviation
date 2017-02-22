@@ -86,7 +86,7 @@ static void _check_voltage(guiLabel_t *obj)
         next_scan = CLOCK_getms() + BATTERY_SCAN_MSEC;
         s16 batt = PWR_ReadVoltage();
         if (batt < Transmitter.batt_alarm) {
-            obj->desc.style = LABEL_INVERTED;
+            obj->desc = BATTALARM_FONT;
             GUI_Redraw(obj);
         }
         if (batt / 10 != mp->battery / 10 && batt / 10 != mp->battery / 10 + 1) {
