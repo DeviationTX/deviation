@@ -39,11 +39,11 @@ void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_w, u16 obj_h, const char 
     }
 
     if (desc->style == LABEL_RIGHT) {
-        txt_x = obj_x + obj_w - txt_w;
+        txt_x = obj_x + obj_w - txt_w - (is_selected ? Display.select_width : 0);
     } else if (obj_w > txt_w && !(desc->style == LABEL_LEFT)) {
         txt_x = obj_x+1 + (obj_w - txt_w + 1) / 2;
     } else {
-        txt_x = obj_x+1;
+        txt_x = obj_x+1 + (is_selected ? Display.select_width : 0);
     }
     txt_y = obj_y + offset + (obj_h - txt_h + 1) / 2;
 

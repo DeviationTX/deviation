@@ -25,7 +25,8 @@
 #define SECTION_FONT       (Display.font[18])
 #define TEXTSEL_FONT       (Display.font[19])
 #define BUTTON_FONT        (Display.font[20])
-#define NUM_LABELS 21
+#define MENU_FONT          (Display.font[21])
+#define NUM_LABELS 22
 
 struct disp_keyboard {
     u16 fill_color;

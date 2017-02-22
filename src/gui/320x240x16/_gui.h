@@ -2,7 +2,6 @@
 #define LCD_HEIGHT 240
 #define LCD_DEPTH 16
 enum ImageNames {
-    FILE_BTN_MENUITEM,
     FILE_BTN96_24,
     FILE_BTN48_24,
     FILE_BTN96_16,
@@ -24,7 +23,6 @@ enum ImageNames {
 #define IMAGE_MAP_END (FILE_ARROW_16_LEFT + 1)
 
 enum ButtonType {
-    BUTTON_MENUITEM,
     BUTTON_DEVO10,
     BUTTON_96,
     BUTTON_48,
