@@ -521,6 +521,23 @@ u8 XN297_ReadPayload(u8* msg, int len)
     return res;
 }
 
+u8 XN297_ReadEnhancedPayload(u8* msg, int len)
+{
+    u8 buffer[32];
+    u8 pcf_size; // pcf payload size
+    NRF24L01_ReadPayload(buffer, len+2); // pcf + payload
+    pcf_size = buffer[0];
+    if(xn297_scramble_enabled)
+        pcf_size ^= xn297_scramble[xn297_addr_len];
+    pcf_size = pcf_size >> 1;
+    for(int i=0; i<len; i++) {
+        msg[i] = bit_reverse((buffer[i+1] << 2) | (buffer[i+2] >> 6));
+        if(xn297_scramble_enabled)
+            msg[i] ^= bit_reverse((xn297_scramble[xn297_addr_len+i+1] << 2) | 
+                                  (xn297_scramble[xn297_addr_len+i+2] >> 6));
+    }
+    return pcf_size;
+}
 
 // End of XN297 emulation
 
