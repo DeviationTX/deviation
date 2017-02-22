@@ -55,12 +55,12 @@
 #define PAYLOAD_SIZE    15
 
 static u8 packet[PAYLOAD_SIZE];
-static u8 rf_chans[4] = {0x32, 0x3f, 0x42, 0x47};
+static u8 rf_chans[4];
 static u8 current_chan;
 static u8 phase;
 static u8 tx_power;
 static u8 rxid;
-static u8 txid[2] = {0x38, 0xf6};
+static u8 txid[2];
 
 enum {
     BIND,
@@ -192,6 +192,37 @@ static void gw008_init()
     NRF24L01_Activate(0x53); // switch bank back
 }
 
+static void initialize_txid()
+{
+    u32 lfsr = 0xb2c54a2ful;
+    u8 i,j;
+    
+#ifndef USE_FIXED_MFGID
+    u8 var[12];
+    MCU_SerialNumber(var, 12);
+    dbgprintf("Manufacturer id: ");
+    for(i = 0; i < 12; ++i) {
+        dbgprintf("%02X", var[i]);
+        rand32_r(&lfsr, var[i]);
+    }
+    dbgprintf("\r\n");
+#endif
+
+    if(Model.fixed_id) {
+       for (i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
+           rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
+    }
+    // Pump zero bytes for LFSR to diverge more
+    for(i=0; i<sizeof(lfsr); ++i) 
+        rand32_r(&lfsr, 0);
+
+    for(i=0; i<4; i++)
+        rf_chans[i] = 0x10 + ((lfsr >> (i*8)) % 0x37);
+    
+    txid[0] = lfsr & 0xff;
+    txid[1] = lfsr >> 8;
+}
+
 MODULE_CALLTYPE
 static u16 gw008_callback()
 {
@@ -229,6 +260,7 @@ static u16 gw008_callback()
 static void initialize()
 {
     CLOCK_StopTimer();
+    initialize_txid();
     tx_power = Model.tx_power;
     phase = BIND;
     gw008_init();
