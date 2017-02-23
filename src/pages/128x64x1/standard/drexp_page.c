@@ -23,11 +23,14 @@
 #include "standard.h"
 
 enum {
+    LABEL_X      = 0,
     LABEL2_WIDTH = 30,
     LABEL3_X     = 31,
     LABEL3_WIDTH = 36,
     MESSAGE_Y    = 10,
+    HEADER_X     = 0,
     HEADER_W     = 60,
+    SCROLL_Y     = 0,
     SCROLL_W     = 76,
     GRAPH_X      = 77,
     #define GRAPH_Y HEADER_HEIGHT
@@ -58,12 +61,12 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
 
-    GUI_CreateLabelBox(&gui->label[relrow], 0, y,
+    GUI_CreateLabelBox(&gui->label[relrow], LABEL_X, y,
         0, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, STDMIX_ModeName(absrow - PITTHROMODE_NORMAL));
     y += LINE_SPACE;
-    GUI_CreateTextSelectPlate(&gui->value1[relrow], 0, y,
+    GUI_CreateTextSelectPlate(&gui->value1[relrow], LABEL_X, y,
         LABEL2_WIDTH, LINE_HEIGHT, &TINY_FONT, NULL, set_dr_cb, (void *)(long)(absrow - PITTHROMODE_NORMAL));
-    GUI_CreateTextSelectPlate(&gui->value2[relrow], LABEL3_X, y,
+    GUI_CreateTextSelectPlate(&gui->value2[relrow], LABEL_X + LABEL3_X, y,
         LABEL3_WIDTH, LINE_HEIGHT, &TINY_FONT, NULL, set_exp_cb, (void *)(long)(absrow - PITTHROMODE_NORMAL));
     
     return 2;
@@ -82,9 +85,9 @@ void PAGE_DrExpInit(int page)
         GUI_CreateLabelBox(&gui->u.msg, 0, MESSAGE_Y, 0, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, "Invalid model ini!"); // must be invalid model ini
         return;
     }
-    GUI_CreateTextSelectPlate(&gui->u.type, 0, 0, HEADER_W, HEADER_WIDGET_HEIGHT,
+    GUI_CreateTextSelectPlate(&gui->u.type, HEADER_X, 0, HEADER_W, HEADER_WIDGET_HEIGHT,
                      &DEFAULT_FONT, NULL, set_type_cb, (void *)NULL);
-    GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, SCROLL_W, LCD_HEIGHT - HEADER_HEIGHT,
+    GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT + SCROLL_Y, SCROLL_W, LCD_HEIGHT - HEADER_HEIGHT - SCROLL_Y,
                      2 * LINE_SPACE, count, row_cb, NULL, NULL, NULL);
 
     GUI_CreateXYGraph(&gui->graph, GRAPH_X, GRAPH_Y, GRAPH_W, GRAPH_H,

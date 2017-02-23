@@ -13,7 +13,6 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define OVERRIDE_PLACEMENT
 #include "common.h"
 #include "pages.h"
 #include "gui/gui.h"
@@ -21,8 +20,13 @@
 #include "config/ini.h"
 #include <stdlib.h>
 
+#define OVERRIDE_PLACEMENT
 enum {
     LABEL_WIDTH = LCD_WIDTH,
+    IMAGE_X     = 46,
+    IMAGE_Y     = 6,
+    IMAGE_W     = 6,
+    IMAGE_H     = 4,
+    SCROLL_W    = 23*ITEM_SPACE,
 };
-
 #include "../128x64x1/model_loadsave.c"

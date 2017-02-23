@@ -280,11 +280,10 @@ struct stddrexp_obj {
         guiTextSelect_t type;
     } u;
     guiLabel_t label[SCROLLABLE_ROWS];
-    guiTextSelect_t value1[SCROLLABLE_ROWS];
-    guiTextSelect_t value2[SCROLLABLE_ROWS];
+    guiTextSelect_t value1[6];
+    guiTextSelect_t value2[6];
     guiXYGraph_t graph;
     guiScrollable_t scrollable;
-
 };
 
 struct stdchan_obj {
@@ -293,6 +292,7 @@ struct stdchan_obj {
     guiTextSelect_t value[SCROLLABLE_ROWS];
     guiScrollable_t scrollable;
 };
+
 struct stdgyro_obj {
     guiLabel_t msg;
     guiLabel_t chanlbl;
