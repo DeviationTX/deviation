@@ -91,9 +91,8 @@ void PAGE_DrExpInit(int page)
                      2 * LINE_SPACE, count, row_cb, NULL, NULL, NULL);
 
     GUI_CreateXYGraph(&gui->graph, GRAPH_X, GRAPH_Y, GRAPH_W, GRAPH_H,
-                      CHAN_MIN_VALUE, CHAN_MIN_VALUE * 5 / 4, 
-                      CHAN_MAX_VALUE, CHAN_MAX_VALUE * 5 / 4,
-                      0, 0, show_curve_cb, curpos_cb, NULL, NULL);
+            CHAN_MIN_VALUE, CHAN_MIN_VALUE, CHAN_MAX_VALUE, CHAN_MAX_VALUE,
+            0, 0, show_curve_cb, curpos_cb, NULL, NULL);
 
     GUI_Select1stSelectableObj();
 }
