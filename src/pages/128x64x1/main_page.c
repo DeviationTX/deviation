@@ -41,7 +41,7 @@ enum {
      TXPOWER_H    = 6,
 //
     MODEL_NAME_X  = 0,
-    MODEL_NAME_Y  = 1,
+    MODEL_NAME_Y  = 0,
 };
 
 #endif //OVERRIDE_PLACEMENT
@@ -72,7 +72,7 @@ void PAGE_MainInit(int page)
     next_scan = CLOCK_getms()+BATTERY_SCAN_MSEC;
 
     GUI_CreateLabelBox(&gui->name, MODEL_NAME_X, MODEL_NAME_Y, //64, 12,
-            0, 0, &SMALL_FONT, NULL, NULL, Model.name);
+            LCD_WIDTH, 12, &MODELNAME_FONT, NULL, NULL, Model.name);
 
 
     show_elements();
