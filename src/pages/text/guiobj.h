@@ -37,7 +37,7 @@ struct mainconfig_obj {
     union {
         guiLabel_t label;
         guiButton_t button;
-    } col1[SCROLLABLE_ROWS]; 
+    } col1[SCROLLABLE_ROWS];
     guiTextSelect_t value[SCROLLABLE_ROWS];
     guiScrollable_t scrollable;
 };
@@ -206,7 +206,7 @@ struct calibrate_obj {
     guiLabel_t msg;
     guiLabel_t msg1;
 };
-    
+
 struct usb_obj {
     guiLabel_t label;
 };
@@ -279,12 +279,12 @@ struct stddrexp_obj {
         guiLabel_t msg;
         guiTextSelect_t type;
     } u;
-    guiLabel_t label[2];
-    guiTextSelect_t value1[2];
-    guiTextSelect_t value2[2];
+    guiLabel_t label[SCROLLABLE_ROWS];
+    guiTextSelect_t value1[SCROLLABLE_ROWS];
+    guiTextSelect_t value2[SCROLLABLE_ROWS];
     guiXYGraph_t graph;
     guiScrollable_t scrollable;
-    
+
 };
 
 struct stdchan_obj {
