@@ -18,116 +18,19 @@
 #include "config/model.h"
 #include "../pages.h"
 
-#if HAS_STANDARD_GUI
-#include "standard.h"
-#include "../../common/standard/_common_standard.c"
-
-static struct stdchan_obj * const gui = &gui_objs.u.stdchan;
-
-static unsigned _action_cb(u32 button, unsigned flags, void *data);
-
-static int row_cb(int absrow, int relrow, int y, void *data)
-{
-    struct page_defs *page_defs = (struct page_defs *)data;
-    (void)data;
-    u8 w = 10*ITEM_SPACE;
-    u8 x = 10*ITEM_SPACE;
-
-    GUI_CreateLabelBox(&gui->name[relrow], 0, y,
-            0, ITEM_HEIGHT, &DEFAULT_FONT, STDMIX_channelname_cb, NULL, (void *)(long)absrow);
-    GUI_CreateTextSelectPlate(&gui->value[relrow], x, y,
-            w, ITEM_HEIGHT, &DEFAULT_FONT, page_defs->tgl, page_defs->value, (void *)(long)absrow);
-    return 1;
-}
-
-void STANDARD_Init(const struct page_defs *page_defs)
-{
-    PAGE_SetActionCB(_action_cb);
-    PAGE_SetModal(0);
-    PAGE_RemoveAllObjects();
-    PAGE_ShowHeader(_tr(page_defs->title));
-    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                     ITEM_SPACE, Model.num_channels, row_cb, NULL, NULL, (void *)page_defs);
-    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
-}
-
-static unsigned _action_cb(u32 button, unsigned flags, void *data)
-{
-    (void)data;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
-        }
-        else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
-    }
-    return 1;
-}
-
-void STANDARD_DrawCurvePoints(guiLabel_t vallbl[], guiTextSelect_t val[],
-        u8 selectable_bitmap,
-        void (*press_cb)(guiObject_t *obj, void *data),
-        const char *(*set_pointval_cb)(guiObject_t *obj, int value, void *data))
-{
-    u8 y = ITEM_SPACE;
-    u8 w1 = 5;
-    u8 w2 = 32;
-    u8 x = 0;
-    u8 height = 9;
-    GUI_CreateLabelBox(&vallbl[0], x, y,  w1, height, &TINY_FONT, NULL, NULL, "L");
-    x += w1;
-    GUI_CreateTextSelectPlate(&val[0], x, y, w2, height, &TINY_FONT, NULL, set_pointval_cb, (void *)(long)0);
-    x += w2 + 2;
-    GUI_CreateLabelBox(&vallbl[8], x, y,  w1, height, &TINY_FONT, NULL, NULL, "H");
-    x += w1;
-    GUI_CreateTextSelectPlate(&val[8], x, y, w2, height, &TINY_FONT, NULL, set_pointval_cb, (void *)(long)8);
-
-    y += height;
-    x = 20;
-    GUI_CreateLabelBox(&vallbl[4], x, y + 3,  w1, height, &TINY_FONT, NULL, NULL, "M");
-    x += w1;
-    GUI_CreateTextSelectPlate(&val[4], x, y +3, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)4);
-
-    y += ITEM_SPACE;
-    x = 0;
-    GUI_CreateLabelBox(&vallbl[1], x, y,  w1, height, &TINY_FONT, NULL, NULL, "2");
-    x += w1;
-    GUI_CreateTextSelectPlate(&val[1], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)1);
-    x += w2 + 2;
-    GUI_CreateLabelBox(&vallbl[2], x, y,  w1, height, &TINY_FONT, NULL, NULL, "3");
-    x += w1;
-    GUI_CreateTextSelectPlate(&val[2], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)2);
-
-    y += height +1;
-    x = 0;
-    GUI_CreateLabelBox(&vallbl[3], x, y,  w1, height, &TINY_FONT, NULL, NULL, "4");
-    x += w1;
-    GUI_CreateTextSelectPlate(&val[3], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)3);
-    x += w2 + 2;
-    GUI_CreateLabelBox(&vallbl[5], x, y,  w1, height, &TINY_FONT, NULL, NULL, "6");
-    x += w1;
-    GUI_CreateTextSelectPlate(&val[5], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)5);
-
-    y += height +1;
-    x = 0;
-    GUI_CreateLabelBox(&vallbl[6], x, y,  w1, height, &TINY_FONT, NULL, NULL, "7");
-    x += w1;
-    GUI_CreateTextSelectPlate(&val[6], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)6);
-    x += w2 + 2;
-    GUI_CreateLabelBox(&vallbl[7], x, y,  w1, height, &TINY_FONT, NULL, NULL, "8");
-    x += w1;
-    GUI_CreateTextSelectPlate(&val[7], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)7);
-
-    //update_textsel_state();
-    for (u8 i = 1; i < 8; i++) {
-        GUI_TextSelectEnablePress(&val[i], 1);
-        if (selectable_bitmap >> (i-1) & 0x01) {
-            GUI_TextSelectEnable(&val[i], 1);
-        } else {
-            GUI_TextSelectEnable(&val[i], 0);
-        }
-    }
-}
-#endif //HAS_STANDARD_GUI
+#define OVERRIDE_PLACEMENT
+enum {
+    //"Reverse", "Subtrim" and "Fail-safe" pages
+    LABEL_X        = 10*ITEM_SPACE,
+    LABEL_W        = 10*ITEM_SPACE,
+    //"Throttle curve" and "Pitch curve" pages XY-graph points
+    LINE_Y         = 2*LINE_HEIGHT,
+    WIDTH1         = 3*ITEM_SPACE,
+    WIDTH2         = 5*ITEM_SPACE,
+    WIDTH2_ADD     = 3*ITEM_SPACE,
+    LINE_H         = LINE_HEIGHT,
+    LINE_H_OFFS    = 0,
+    M_LABEL_X      = 5*ITEM_SPACE,
+    M_LEBEL_Y_OFFS = LINE_HEIGHT,
+};
+#include "../../128x64x1/standard/common_standard.c"
