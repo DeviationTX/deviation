@@ -290,9 +290,9 @@ struct stddrexp_obj {
         guiLabel_t msg;
         guiTextSelect_t type;
     } u;
-    guiLabel_t label[2];
-    guiTextSelect_t value1[2];
-    guiTextSelect_t value2[2];
+    guiLabel_t label[SCROLLABLE_ROWS];
+    guiTextSelect_t value1[SCROLLABLE_ROWS];
+    guiTextSelect_t value2[SCROLLABLE_ROWS];
     guiXYGraph_t graph;
     guiScrollable_t scrollable;
 
