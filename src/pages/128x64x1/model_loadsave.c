@@ -22,10 +22,15 @@
 #include <stdlib.h>
 
 enum {
-    LABEL_WIDTH = 0,
+    LABEL_WIDTH =  0,
+    IMAGE_X     = 75,
+    IMAGE_Y     = 20,
+    IMAGE_W     = 52,
+    IMAGE_H     = 36,
+    SCROLL_W    = 75,
 };
-
 #endif //OVERRIDE_PLACEMENT
+
 #include "../common/_model_loadsave.c"
 
 static void icon_notify_cb(guiObject_t *obj)
@@ -61,8 +66,8 @@ void PAGE_LoadSaveInit(int page)
         name = _tr("Press ENT to load");
     }
     if (page == LOAD_ICON) {
-        width = 75;
-        GUI_CreateImage(&gui->image, 75, 20, 52, 36, mp->iconstr);
+        width = SCROLL_W;
+        GUI_CreateImage(&gui->image, IMAGE_X, IMAGE_Y, IMAGE_W, IMAGE_H, mp->iconstr);
         GUI_SelectionNotify(icon_notify_cb);
     }
     selected = get_scroll_count(page);
