@@ -41,11 +41,7 @@ guiObject_t *GUI_CreateLabelBox(guiLabel_t *label, u16 x, u16 y, u16 width, u16 
     connect_object(obj);
 
     label->desc = *desc;
-#if LCD_DEPTH == 1
     int underline = label->desc.style == LABEL_UNDERLINE;
-#else
-    const int underline = 0;
-#endif
     if ((width == 0 || height == 0) && ! underline)
         label->desc.style = LABEL_NO_BOX;
     label->strCallback = strCallback;
