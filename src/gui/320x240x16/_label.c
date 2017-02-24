@@ -57,5 +57,10 @@ void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_w, u16 obj_h, const char 
         }
     }
     LCD_PrintStringXY(txt_x, txt_y, str);
+
+    if (desc->style == LABEL_UNDERLINE) {
+        //printf("Draw section: x=%d, y=%d, w=%d, color=%06x", txt_x, txt_y + txt_h - 1, obj_w, desc->font_color);
+        LCD_DrawFastHLine(txt_x, txt_y + txt_h - 1, obj_w, desc->font_color);
+    }
 }
 

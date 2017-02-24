@@ -49,10 +49,10 @@ enum LabelType {
     LABEL_LEFT,          // Left for compatibility only
     LABEL_RIGHT,         // Left for compatibility only
     LABEL_BOX,
+    LABEL_UNDERLINE,
 #if LCD_DEPTH == 1
     LABEL_SQUAREBOX,
     LABEL_BRACKET,
-    LABEL_UNDERLINE,
     LABEL_INVERTED,
 #else
     LABEL_LISTBOX,

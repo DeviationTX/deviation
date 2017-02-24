@@ -65,9 +65,9 @@ static const char * const BOX_VAL[] = {
     [LABEL_RIGHT]       = "right",     // Left for compatibility only
     [LABEL_FILL]        = "fill",
     [LABEL_BOX]         = "outline",
+    [LABEL_UNDERLINE]   = "underline",
 #if LCD_DEPTH == 1
     [LABEL_SQUAREBOX]   = "squarebox",
-    [LABEL_UNDERLINE]   = "underline",
     [LABEL_INVERTED]    = "inverted"
 #endif
     };
