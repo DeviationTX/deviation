@@ -29,42 +29,42 @@ static void _show_limits()
     int y = ROW1;
     int height = 20;
     //Row 1
-    GUI_CreateLabel(&gui->reverselbl, COL1, y, NULL, DEFAULT_FONT, _tr("Reverse"));
+    GUI_CreateLabelBox(&gui->reverselbl, COL1, y, COL2 - COL1, 0, &LABEL_FONT, NULL, NULL, _tr("Reverse"));
     GUI_CreateTextSelect(&gui->reverse, COL2, y, TEXTSELECT_96, toggle_reverse_cb, reverse_cb, (void *)((long)mp->channel));
     y += height;
     //Row 2
-    GUI_CreateLabel(&gui->failsafelbl, COL1, y, NULL, DEFAULT_FONT, _tr("Fail-safe"));
+    GUI_CreateLabelBox(&gui->failsafelbl, COL1, y, COL2 - COL1, 0, &LABEL_FONT, NULL, NULL, _tr("Fail-safe"));
     GUI_CreateTextSelect(&gui->failsafe, COL2, y, TEXTSELECT_96, toggle_failsafe_cb, set_failsafe_cb, NULL);
     y += height;
     //Row 3
-    GUI_CreateLabel(&gui->safetylbl, COL1, y, NULL, DEFAULT_FONT, _tr("Safety"));
+    GUI_CreateLabelBox(&gui->safetylbl, COL1, y, COL2 - COL1, 0, &LABEL_FONT, NULL, NULL, _tr("Safety"));
     GUI_CreateTextSource(&gui->safety, COL2, y, TEXTSELECT_96, sourceselect_cb, set_source_cb, set_input_source_cb, &mp->limit->safetysw);
     y += height;
     //Row 4
-    GUI_CreateLabel(&gui->safevallbl, COL1, y, NULL, DEFAULT_FONT, _tr("Safe Val"));
+    GUI_CreateLabelBox(&gui->safevallbl, COL1, y, COL2 - COL1, 0, &LABEL_FONT, NULL, NULL, _tr("Safe Val"));
     GUI_CreateTextSelect(&gui->safeval, COL2, y, TEXTSELECT_96, NULL, set_safeval_cb, NULL);
     y += height;
     //Row 5
-    GUI_CreateLabel(&gui->minlbl, COL1, y, NULL, DEFAULT_FONT, _tr("Min Limit"));
+    GUI_CreateLabelBox(&gui->minlbl, COL1, y, COL2 - COL1, 0, &LABEL_FONT, NULL, NULL, _tr("Min Limit"));
     GUI_CreateTextSelect(&gui->min, COL2, y, TEXTSELECT_96, NULL, set_limits_cb, &mp->limit->min);
     y += height;
     //Row 6
-    GUI_CreateLabel(&gui->maxlbl, COL1, y, NULL, DEFAULT_FONT, _tr("Max Limit"));
+    GUI_CreateLabelBox(&gui->maxlbl, COL1, y, COL2 - COL1, 0, &LABEL_FONT, NULL, NULL, _tr("Max Limit"));
     GUI_CreateTextSelect(&gui->max, COL2, y, TEXTSELECT_96, NULL, set_limits_cb, &mp->limit->max);
     y += height;
     //Row 5
-    GUI_CreateLabel(&gui->scaleneglbl, COL1, y, scalestring_cb, DEFAULT_FONT, (void *)0L);
+    GUI_CreateLabelBox(&gui->scaleneglbl, COL1, y, COL2 - COL1, 0, &LABEL_FONT, scalestring_cb, NULL, (void *)0L);
     GUI_CreateTextSelect(&gui->scaleneg, COL2, y, TEXTSELECT_96, NULL, set_limitsscale_cb, &mp->limit->servoscale_neg);
     y += height;
-    GUI_CreateLabel(&gui->scalelbl, COL1, y, scalestring_cb, DEFAULT_FONT, (void *)1L);
+    GUI_CreateLabelBox(&gui->scalelbl, COL1, y, COL2 - COL1, 0, &LABEL_FONT, scalestring_cb, NULL, (void *)1L);
     GUI_CreateTextSelect(&gui->scale, COL2, y, TEXTSELECT_96, NULL, set_limitsscale_cb, &mp->limit->servoscale);
     y += height;
     //Row 6
-    GUI_CreateLabel(&gui->subtrimlbl, COL1, y, NULL, DEFAULT_FONT, _tr("Subtrim"));
+    GUI_CreateLabelBox(&gui->subtrimlbl, COL1, y, COL2 - COL1, 0, &LABEL_FONT, NULL, NULL, _tr("Subtrim"));
     GUI_CreateTextSelect(&gui->subtrim, COL2, y, TEXTSELECT_96, NULL, set_trimstep_cb, &mp->limit->subtrim);
     y += height;
     //Row 7
-    GUI_CreateLabel(&gui->speedlbl, COL1, y, NULL, DEFAULT_FONT, _tr("Speed"));
+    GUI_CreateLabelBox(&gui->speedlbl, COL1, y, COL2 - COL1, 0, &LABEL_FONT, NULL, NULL, _tr("Speed"));
     GUI_CreateTextSelect(&gui->speed, COL2, y, TEXTSELECT_96, NULL, set_limits_cb, &mp->limit->speed);
 }
 

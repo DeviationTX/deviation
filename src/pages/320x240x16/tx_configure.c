@@ -97,27 +97,27 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 #ifndef NO_LANGUAGE_SUPPORT
         row += space;
         if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
-        GUI_CreateLabelBox(&gui1->langlbl, col1, row+ADDROW, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Language"));
+        GUI_CreateLabelBox(&gui1->langlbl, col1, row+ADDROW, col2 - col1, 0, &LABEL_FONT, NULL, NULL, _tr("Language"));
         GUI_CreateButton(&gui1->lang, col2, row, BUTTON_WIDE, langstr_cb, lang_select_cb, NULL);
 #endif
         row += space + ADDSPACE ;
         if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
-        GUI_CreateLabelBox(&gui1->modelbl, col1, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Stick mode"));
+        GUI_CreateLabelBox(&gui1->modelbl, col1, row, col2 - col1, 0, &LABEL_FONT, NULL, NULL, _tr("Stick mode"));
         GUI_CreateTextSelect(&gui1->mode, col2, row, TEXTSELECT_96, NULL, modeselect_cb, NULL);
         row += space + (ADDSPACE-1) / 2;
         if (HAS_TOUCH) {
             if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
-            GUI_CreateLabelBox(&gui1->touchlbl, col1, row+ADDROW, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Touch screen"));
+            GUI_CreateLabelBox(&gui1->touchlbl, col1, row+ADDROW, col2 - col1, 0, &LABEL_FONT, NULL, NULL, _tr("Touch screen"));
             GUI_CreateButton(&gui1->touchcalib, col2, row, BUTTON_WIDE, calibratestr_cb, press_cb, (void *)CALIB_TOUCH);
         }
         row += space + ADDSPACE;
         if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
-        GUI_CreateLabelBox(&gui1->sticklbl, col1, row+ADDROW, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Sticks"));
+        GUI_CreateLabelBox(&gui1->sticklbl, col1, row+ADDROW, col2 - col1, 0, &LABEL_FONT, NULL, NULL, _tr("Sticks"));
         GUI_CreateButton(&gui1->stickcalib, col2, row, BUTTON_WIDE, calibratestr_cb, press_cb, (void *)CALIB_STICK);
 #if HAS_RTC
         row += space + ADDSPACE;
         if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
-        GUI_CreateLabelBox(&gui1->clocklbl, col1, row+ADDROW, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Clock"));
+        GUI_CreateLabelBox(&gui1->clocklbl, col1, row+ADDROW, col2 - col1, 0, &LABEL_FONT, NULL, NULL, _tr("Clock"));
         GUI_CreateButton(&gui1->clock, col2, row, BUTTON_WIDE, clockstr_cb, press_cb, (void *)SET_CLOCK);
         row += space + ADDSPACE;
 #else
@@ -129,38 +129,38 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         GUI_CreateLabelBox(&gui2->head2_1, 0, row, LCD_WIDTH - ARROW_WIDTH, 0, &SECTION_FONT, NULL, NULL, _tr("Buzzer settings"));
         row += space;
         if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
-        GUI_CreateLabelBox(&gui2->power_alarmlbl, col1, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Power On alarm"));
+        GUI_CreateLabelBox(&gui2->power_alarmlbl, col1, row, col2 - col1, 0, &LABEL_FONT, NULL, NULL, _tr("Power On alarm"));
         GUI_CreateTextSelect(&gui2->power_alarm, col2, row, TEXTSELECT_96, NULL, poweralarm_select_cb, NULL);
         row += space;
         if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
-        GUI_CreateLabelBox(&gui2->battalrmlbl, col1, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Battery alarm"));
+        GUI_CreateLabelBox(&gui2->battalrmlbl, col1, row, col2 - col1, 0, &LABEL_FONT, NULL, NULL, _tr("Battery alarm"));
         GUI_CreateTextSelect(&gui2->battalrm, col2, row, TEXTSELECT_96, NULL, batalarm_select_cb, NULL);
         row += space;
         if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
-        GUI_CreateLabelBox(&gui2->battalrmintvllbl, col1, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Alarm interval"));
+        GUI_CreateLabelBox(&gui2->battalrmintvllbl, col1, row, col2 - col1, 0, &LABEL_FONT, NULL, NULL, _tr("Alarm interval"));
         GUI_CreateTextSelect(&gui2->battalrmintvl, col2, row, TEXTSELECT_96, NULL, batalarmwarn_select_cb, NULL);
         row += space;
         if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
-        GUI_CreateLabelBox(&gui2->buzzlbl, col1, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Buzz volume"));
+        GUI_CreateLabelBox(&gui2->buzzlbl, col1, row, col2 - col1, 0, &LABEL_FONT, NULL, NULL, _tr("Buzz volume"));
         GUI_CreateTextSelect(&gui2->buzz, col2, row, TEXTSELECT_96, NULL, _buzz_vol_cb, (void *)&Transmitter.volume);
         row += space;
         if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
-        GUI_CreateLabelBox(&gui2->musicshutdbl, col1, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Power-down alert"));
+        GUI_CreateLabelBox(&gui2->musicshutdbl, col1, row, col2 - col1, 0, &LABEL_FONT, NULL, NULL, _tr("Power-down alert"));
         GUI_CreateTextSelect(&gui2->music_shutdown, col2, row, TEXTSELECT_96, NULL, _music_shutdown_cb, (void *)&Transmitter.music_shutdown);
         row += space + 8;
         if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
         GUI_CreateLabelBox(&gui2->head2_2, 0, row, LCD_WIDTH - ARROW_WIDTH, 0, &SECTION_FONT, NULL, NULL, _tr("LCD settings"));
         row += space;
         if (row+8 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
-        GUI_CreateLabelBox(&gui2->backlightlbl, col1, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Backlight"));
+        GUI_CreateLabelBox(&gui2->backlightlbl, col1, row, col2 - col1, 0, &LABEL_FONT, NULL, NULL, _tr("Backlight"));
         GUI_CreateTextSelect(&gui2->backlight, col2, row, TEXTSELECT_96, NULL, backlight_select_cb, NULL);
         row += space;
         if (row+8 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
-        GUI_CreateLabelBox(&gui2->dimtimelbl, col1, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Dimmer time"));
+        GUI_CreateLabelBox(&gui2->dimtimelbl, col1, row, col2 - col1, 0, &LABEL_FONT, NULL, NULL, _tr("Dimmer time"));
         GUI_CreateTextSelect(&gui2->dimtime, col2, row, TEXTSELECT_96, NULL, auto_dimmer_time_cb, NULL);
         row += space;
         if (row+8 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
-        GUI_CreateLabelBox(&gui2->dimtgtlbl, col1, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Dimmer target"));
+        GUI_CreateLabelBox(&gui2->dimtgtlbl, col1, row, col2 - col1, 0, &LABEL_FONT, NULL, NULL, _tr("Dimmer target"));
         GUI_CreateTextSelect(&gui2->dimtgt, col2, row, TEXTSELECT_96, NULL, common_select_cb,
                 (void *)&Transmitter.auto_dimmer.backlight_dim_value);
         row += space + 8;
@@ -170,16 +170,16 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         GUI_CreateLabelBox(&gui3->head3_1, 0, row, LCD_WIDTH - ARROW_WIDTH, 0, &SECTION_FONT, NULL, NULL, _tr("Timer settings"));
         row += space;
         if (row+8 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
-        GUI_CreateLabelBox(&gui3->prealertlbl, col1, row, 0, 0, &DEFAULT_FONT, NULL, NULL,  _tr("Prealert time"));
+        GUI_CreateLabelBox(&gui3->prealertlbl, col1, row, col2 - col1, 0, &LABEL_FONT, NULL, NULL,  _tr("Prealert time"));
         GUI_CreateTextSelect(&gui3->prealert, col2, row, TEXTSELECT_96,NULL, prealert_time_cb, (void *)0L);
         row += space;
         if (row+8 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
-        GUI_CreateLabelBox(&gui3->preintvllbl, col1, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Prealert interval"));
+        GUI_CreateLabelBox(&gui3->preintvllbl, col1, row, col2 - col1, 0, &LABEL_FONT, NULL, NULL, _tr("Prealert interval"));
         GUI_CreateTextSelect(&gui3->preintvl, col2, row, TEXTSELECT_96, NULL, timer_interval_cb,
                 &Transmitter.countdown_timer_settings.prealert_interval);
         row += space;
         if (row+8 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
-        GUI_CreateLabelBox(&gui3->timeuplbl, col1, row, 0, 0, &DEFAULT_FONT, NULL, NULL,_tr("Timeup interval"));
+        GUI_CreateLabelBox(&gui3->timeuplbl, col1, row, col2 - col1, 0, &LABEL_FONT, NULL, NULL,_tr("Timeup interval"));
         GUI_CreateTextSelect(&gui3->timeup, col2, row, TEXTSELECT_96, NULL, timer_interval_cb,
                 &Transmitter.countdown_timer_settings.timeup_interval);
         row += space + 8;
@@ -187,18 +187,18 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         GUI_CreateLabelBox(&gui3->head3_2, 0, row, LCD_WIDTH - ARROW_WIDTH, 0, &SECTION_FONT, NULL, NULL, _tr("Telemetry settings"));
         row += space;
         if (row+8 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
-        GUI_CreateLabelBox(&gui3->templbl, col1, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Temperature"));
+        GUI_CreateLabelBox(&gui3->templbl, col1, row, col2 - col1, 0, &LABEL_FONT, NULL, NULL, _tr("Temperature"));
         GUI_CreateTextSelect(&gui3->temp, col2, row, TEXTSELECT_96, NULL, units_cb, (void *)1L);
         row += space;
         if (row+8 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
-        GUI_CreateLabelBox(&gui3->lengthlbl, col1, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Length"));
+        GUI_CreateLabelBox(&gui3->lengthlbl, col1, row, col2 - col1, 0, &LABEL_FONT, NULL, NULL, _tr("Length"));
         GUI_CreateTextSelect(&gui3->length, col2, row, TEXTSELECT_96, NULL, units_cb, (void *)0L);
 #if HAS_VIBRATINGMOTOR
         if(Transmitter.extra_hardware & VIBRATING_MOTOR) {
             row += space + 8;
             GUI_CreateLabelBox(&gui3->head3_3, 0, row, LCD_WIDTH - ARROW_WIDTH, 0, &SECTION_FONT, NULL, NULL, _tr("Vibration settings"));
             row += space;
-            GUI_CreateLabelBox(&gui3->viblbl, col1, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Vibration:"));
+            GUI_CreateLabelBox(&gui3->viblbl, col1, row, col2 - col1, 0, &LABEL_FONT, NULL, NULL, _tr("Vibration:"));
             GUI_CreateTextSelect(&gui3->vib, col2, row, TEXTSELECT_96,
                                  _vibration_test_cb, _vibration_state_cb, (void *)&Transmitter.vibration_state);
         }
