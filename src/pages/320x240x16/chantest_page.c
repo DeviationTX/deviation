@@ -128,7 +128,7 @@ static void show_button_page()
     enum {X = 0, Y = 1};
     struct LabelDesc alignRight = {
         .font = DEFAULT_FONT.font,
-        .style = LABEL_RIGHT,
+        .align = ALIGN_RIGHT,
         .font_color = DEFAULT_FONT.font_color,
         .fill_color = DEFAULT_FONT.fill_color,
         .outline_color = DEFAULT_FONT.outline_color

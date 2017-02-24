@@ -48,11 +48,14 @@ static void _show_titlerow()
     mp->entries_per_page = 2;
     memset(gui, 0, sizeof(*gui));
 
+    enum LabelType oldStyle = labelDesc.style;
     labelDesc.style = LABEL_UNDERLINE;
+    labelDesc.align = ALIGN_LEFT;
     labelDesc.font_color = labelDesc.fill_color = labelDesc.outline_color = 0xffff;
     GUI_CreateLabelBox(&gui->chan, LABEL_X, 0 , TYPE_X - LABEL_X, HEADER_HEIGHT, &labelDesc,
             MIXPAGE_ChanNameProtoCB, NULL, (void *)((long)mp->cur_mixer->dest));
-    labelDesc.style = LABEL_CENTER;
+    labelDesc.align = ALIGN_CENTER;
+    labelDesc.style = oldStyle;
     GUI_CreateTextSelectPlate(&gui->tmpl, TYPE_X, 0,  TYPE_W, HEADER_WIDGET_HEIGHT, &labelDesc, NULL, templatetype_cb, (void *)((long)mp->channel));
     GUI_CreateButtonPlateText(&gui->save, SAVE_X, 0, SAVE_W, HEADER_WIDGET_HEIGHT, &labelDesc, NULL, okcancel_cb, (void *)_tr("Save"));
 }
@@ -94,9 +97,9 @@ static int simple_row_cb(int absrow, int relrow, int y, void *data)
             value = set_number100_cb; data = &mp->mixer[0].offset;
             break;
     }
-    labelDesc.style = LABEL_LEFT;
+    labelDesc.align = ALIGN_LEFT;
     GUI_CreateLabelBox(&gui->label[relrow].lbl, LABEL_X, y, LABEL_W, LINE_HEIGHT, &labelDesc, NULL, NULL, _tr(label));
-    labelDesc.style = LABEL_CENTER;
+    labelDesc.align = ALIGN_CENTER;
     GUI_CreateTextSourcePlate(&gui->value[relrow].ts, TEXTSEL_X, y + (LINES_PER_ROW - 1) * LINE_SPACE,
                          TEXTSEL_W, LINE_HEIGHT, &labelDesc,
                          tgl, value, input_value, data);
@@ -174,10 +177,10 @@ static int complex_row_cb(int absrow, int relrow, int y, void *data)
             value = set_number100_cb; data = &mp->cur_mixer->offset;
             break;
     }
-    labelDesc.style = LABEL_LEFT;
+    labelDesc.align = ALIGN_LEFT;
     GUI_CreateLabelBox(&gui->label[relrow].lbl, LABEL_X, y, LABEL_W, LINE_HEIGHT,
             &labelDesc, NULL, NULL, _tr(label));
-    labelDesc.style = LABEL_CENTER;
+    labelDesc.align = ALIGN_CENTER;
     GUI_CreateTextSourcePlate(&gui->value[relrow].ts, TEXTSEL_X, y + (LINES_PER_ROW - 1) * LINE_SPACE,
                          TEXTSEL_W, LINE_HEIGHT, &labelDesc, tgl, value, input_value, data);
     if (absrow + COMMON_LAST == COMPLEX_SRC)
@@ -310,7 +313,7 @@ static int expo_row_cb(int absrow, int relrow, int y, void *data)
     }
     int count = 1;
     if (but) {
-        labelDesc.style = LABEL_CENTER;
+        labelDesc.align = ALIGN_CENTER;
         GUI_CreateButtonPlateText(&gui->label[relrow].but, LABEL_X, y,
             LABEL_W, LINE_HEIGHT, &labelDesc, label_cb, buttgl, butdata);
         if(disable) {
@@ -319,14 +322,14 @@ static int expo_row_cb(int absrow, int relrow, int y, void *data)
         count++;
         y += (LINES_PER_ROW - 1) * LINE_SPACE;
     } else if(label || label_cb) {
-        labelDesc.style = LABEL_LEFT;
+        labelDesc.align = ALIGN_LEFT;
         GUI_CreateLabelBox(&gui->label[relrow].lbl, LABEL_X, y, LABEL_W, LINE_HEIGHT,
             &labelDesc, label_cb, NULL, label);
         if(underline)
             GUI_CreateRect(&gui->rect1, LABEL_X, y, LABEL_W, 1, &labelDesc);
         y += (LINES_PER_ROW - 1) * LINE_SPACE;
     }
-    labelDesc.style = LABEL_CENTER;
+    labelDesc.align = ALIGN_CENTER;
     GUI_CreateTextSourcePlate(&gui->value[relrow].ts, TEXTSEL_X, y,
         TEXTSEL_W, LINE_HEIGHT, &labelDesc, tgl, value, input_value, data);
     if(disable) {

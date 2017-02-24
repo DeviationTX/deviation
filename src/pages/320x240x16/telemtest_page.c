@@ -122,8 +122,8 @@ static void show_page()
     const struct telem_layout *layout = _get_layout();
     
     int i = 0;
-    enum LabelType style = TELEM_TXT_FONT.style;
-    TELEM_TXT_FONT.style = LABEL_RIGHT;
+    enum LabelAlign align = TELEM_TXT_FONT.align;
+    TELEM_TXT_FONT.align = ALIGN_RIGHT;
     for(const struct telem_layout *ptr = layout; ptr->source; ptr++) {
         GUI_CreateLabelBox(&gui->label[i], ptr->label.x + TELEM_OFFSET_X, ptr->label.y + TELEM_OFFSET_Y,
                            ptr->label.width, ptr->label.height, &TELEM_TXT_FONT,
@@ -133,7 +133,7 @@ static void show_page()
                            telem_cb, NULL, (void *)(long)ptr->source);
         i++;
     }
-    TELEM_TXT_FONT.style = style;
+    TELEM_TXT_FONT.align = align;
     tp->telem = Telemetry;
     //memset(tp->telem.time, 0, sizeof(tp->telem.time));
 }

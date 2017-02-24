@@ -81,7 +81,8 @@ static void show_iconsel_page(int SelectedIcon) {
 
     //Header
     PAGE_ShowHeader(INPUT_SourceNameAbbrevSwitch(tempstring, toggleinput));
-    labelDesc.style = LABEL_CENTER;
+    labelDesc.style = LABEL_NO_BOX;
+    labelDesc.align = ALIGN_CENTER;
     GUI_CreateButtonPlateText(&gui->revert, REVERT_X, 0, REVERT_W, HEADER_WIDGET_HEIGHT, &labelDesc, NULL, revert_cb, (void *)_tr("Revert"));
 
 #if SEPARATOR
