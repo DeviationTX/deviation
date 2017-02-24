@@ -60,9 +60,9 @@ static const char XY_POINT_COLOR[] = "point_color";
 static const char BOX[] = "box_type";
 static const char * const BOX_VAL[] = {
     [LABEL_NO_BOX]      = "none",
-    [LABEL_CENTER]      = "center",
-    [LABEL_LEFT]        = "left",
-    [LABEL_RIGHT]       = "right",
+    [LABEL_CENTER]      = "center",    // Left for compatibility only
+    [LABEL_LEFT]        = "left",      // Left for compatibility only
+    [LABEL_RIGHT]       = "right",     // Left for compatibility only
     [LABEL_FILL]        = "fill",
     [LABEL_BOX]         = "outline",
 #if LCD_DEPTH == 1
@@ -70,6 +70,12 @@ static const char * const BOX_VAL[] = {
     [LABEL_UNDERLINE]   = "underline",
     [LABEL_INVERTED]    = "inverted"
 #endif
+    };
+static const char ALIGN[] = "align";
+static const char * const ALIGN_VAL[] = {
+    [ALIGN_CENTER]      = "center",
+    [ALIGN_LEFT]        = "left",
+    [ALIGN_RIGHT]       = "right",
     };
 
 
@@ -114,6 +120,24 @@ static int handle_label(struct LabelDesc *label, const char *name, const char *v
         for (idx = 0; idx < NUM_STR_ELEMS(BOX_VAL); idx++) {
             if(BOX_VAL[idx] && MATCH_VALUE(BOX_VAL[idx])) {
                 label->style = idx;
+                // For compatibility reasons,
+                // use the old alignment values as default
+                // if the new one is not yet set:
+                if(label->align == 0) {
+                    switch(idx) {
+                        case LABEL_CENTER: label->align = ALIGN_CENTER; break;
+                        case LABEL_LEFT:   label->align = ALIGN_LEFT;   break;
+                        case LABEL_RIGHT:  label->align = ALIGN_RIGHT;  break;
+                    }
+                }
+            }
+        }
+    }
+    if(MATCH_KEY(ALIGN)) {
+        u8 idx;
+        for (idx = 0; idx < NUM_STR_ELEMS(ALIGN_VAL); idx++) {
+            if(ALIGN_VAL[idx] && MATCH_VALUE(ALIGN_VAL[idx])) {
+                label->align = idx;
             }
         }
     }
