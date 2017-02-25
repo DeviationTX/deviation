@@ -48,6 +48,8 @@ guiObject_t *GUI_CreateLabelBox(guiLabel_t *label, u16 x, u16 y, u16 width, u16 
     label->pressCallback = pressCallback;
     label->cb_data = data;
     if (! label->desc.font)
+        label->desc.font = LABEL_FONT.font;
+    if (! label->desc.font)
         label->desc.font = DEFAULT_FONT.font;
     return obj;
 }

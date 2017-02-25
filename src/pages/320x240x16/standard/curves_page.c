@@ -122,11 +122,11 @@ static void show_page(CurvesMode _curve_mode, int page)
 
     set_cur_mixer();
     /* Row 1 */
-    GUI_CreateLabelBox(&gui->modelbl, COL_LBL, LINE1, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Mode"));
+    GUI_CreateLabelBox(&gui->modelbl, COL_LBL, LINE1, COL_TEXT - COL_LBL, 16, &LABEL_FONT, NULL, NULL, _tr("Mode"));
     GUI_CreateTextSelect(&gui->mode, COL_TEXT, LINE1-1, TEXTSELECT_128, NULL, set_mode_cb, (void *)(long)curve_mode);
-    GUI_CreateLabelBox(&gui->holdlbl, COL_LBL, LINE2, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Enabled"));
+    GUI_CreateLabelBox(&gui->holdlbl, COL_LBL, LINE2, COL_TEXT - COL_LBL, 16, &LABEL_FONT, NULL, NULL, _tr("Enabled"));
     GUI_CreateTextSelect(&gui->hold, COL_TEXT, LINE2-1, TEXTSELECT_64, NULL, set_holdstate_cb, NULL);
-    GUI_CreateLabelBox(&gui->holdsw, COL_SWITCH, LINE2, 0, 0, &DEFAULT_FONT, holdsw_str_cb, NULL, NULL);
+    GUI_CreateLabelBox(&gui->holdsw, COL_SWITCH, LINE2, LCD_WIDTH - COL_SWITCH, 16, &DEFAULT_FONT, holdsw_str_cb, NULL, NULL);
     if (pit_mode != PITTHROMODE_HOLD)
         GUI_SetHidden((guiObject_t *)&gui->hold, 1);
 
@@ -135,7 +135,7 @@ static void show_page(CurvesMode _curve_mode, int page)
         const char *label = curvepos[i];
         if(label[0] > '9')
             label = _tr(label);
-        GUI_CreateLabelBox(&gui->vallbl[i], COL1, ROWBASE+20*i+1, COL2-COL1, 16, &DEFAULT_FONT, NULL, NULL, label);
+        GUI_CreateLabelBox(&gui->vallbl[i], COL1, ROWBASE+20*i+1, COL2-COL1, 16, &LABEL_FONT, NULL, NULL, label);
         GUI_CreateTextSelect(&gui->val[i], COL2, ROWBASE+20*i, TEXTSELECT_64, NULL, set_pointval_cb, (void *)i);
         if (i > 0 && i < 8)
             GUI_CreateButton(&gui->lock[i-1], COL3, ROWBASE+20*i, BUTTON_64x16, lockstr_cb, press_cb, (void *)i);

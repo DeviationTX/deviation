@@ -34,20 +34,27 @@ static void toggle_reverse_cb(guiObject_t *obj, void *data)
 }
 static void show_page(int page)
 {
+    enum {
+        COL1 = (30 + ((LCD_WIDTH - 320) / 2)),
+        COL2 = (150 + ((LCD_WIDTH - 320) / 2)),
+        LABEL_WIDTH = (COL2 - COL1),
+        ROW1 = (40 + ((LCD_HEIGHT - 240) / 2)),
+        ROW_HEIGHT = 24,
+    };
     struct mixer_page * mp = &pagemem.u.mixer_page;
     if (mp->firstObj) {
         GUI_RemoveHierObjects(mp->firstObj);
         mp->firstObj = NULL;       
     }   
     for (long i = 0; i < ENTRIES_PER_PAGE; i++) {
-        int row = 40 + ((LCD_HEIGHT - 240) / 2) + 24 * i;
+        int row = ROW1 + ROW_HEIGHT * i;
         long ch = page  + i;
         if (ch >= Model.num_channels)
             break;
-        guiObject_t *obj = GUI_CreateLabelBox(&gui->name[i], 30 + ((LCD_WIDTH - 320) / 2), row, 0, 16, &DEFAULT_FONT, STDMIX_channelname_cb, NULL, (void *)(ch));
+        guiObject_t *obj = GUI_CreateLabelBox(&gui->name[i], COL1, row, LABEL_WIDTH, 16, &LABEL_FONT, STDMIX_channelname_cb, NULL, (void *)(ch));
         if (! mp->firstObj)
             mp->firstObj = obj;
-        GUI_CreateTextSelect(&gui->value[i], 150 + ((LCD_WIDTH - 320) / 2), row, TEXTSELECT_128, toggle_reverse_cb, reverse_cb, (void *)(ch));
+        GUI_CreateTextSelect(&gui->value[i], COL2, row, TEXTSELECT_128, toggle_reverse_cb, reverse_cb, (void *)(ch));
     }
 }
 
