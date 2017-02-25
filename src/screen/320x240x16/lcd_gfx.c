@@ -377,8 +377,10 @@ static int image_read_header(FILE *fh, u16 *w, u16 *h, u32 *black, u32 *white)
                 err = 1;
                 break;
             }
-            if (IS_WHITESPACE(*ptr))
+            if (IS_WHITESPACE(*ptr)) {
+                ptr++;
                 break;
+            }
             *v = *v * 10 + *ptr - '0';
             ptr++;
         }
