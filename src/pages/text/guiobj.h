@@ -211,6 +211,12 @@ struct usb_obj {
     guiLabel_t label;
 };
 
+#define DEBUG_LINE_COUNT SCROLLABLE_ROWS
+struct debuglog_obj {
+    guiLabel_t      line[DEBUG_LINE_COUNT];
+    guiScrollable_t scrollable;
+};
+
 /****Advanced ****/
 struct advcurve_obj {
     guiTextSelect_t name;
@@ -358,6 +364,7 @@ struct gui_objs {
         struct tx_obj tx;
         struct calibrate_obj calibrate;
         struct usb_obj usb;
+        struct debuglog_obj debuglog;
 
         struct advcurve_obj advcurve;
         struct advlimit_obj advlimit;
