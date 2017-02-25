@@ -6,8 +6,6 @@ env:
       - TARGET=devo10
       - TARGET=devo12
       - TARGET=devo7e
-      - TARGET=devo12e
-      - TARGET=devof7
       - TARGET=devof12e
       - TARGET=at9
       - MAKETARGET=win_emu_devo8
