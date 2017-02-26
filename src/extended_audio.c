@@ -20,6 +20,10 @@
 #include "extended_audio.h"
 #include "stdlib.h"
 
+#ifndef EMULATOR
+#include <libopencm3/stm32/usart.h>
+#endif // EMULATOR
+
 #if HAS_EXTENDED_AUDIO
 
 static u32 audio_queue_time = 0;

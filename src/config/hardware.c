@@ -18,10 +18,6 @@
 #include "music.h"
 #include "tx.h"
 
-#ifndef EMULATOR
-#include <libopencm3/stm32/usart.h>
-#endif // EMULATOR
-
 #include <stdlib.h>
 #include <string.h>
 
