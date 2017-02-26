@@ -40,11 +40,7 @@ void UART_Initialize()
                   //GPIO_USART1_RX);
 
     /* Setup UART parameters. */
-#if !defined(BUILDTYPE_DEV) && HAS_EXTENDED_AUDIO
-    usart_set_baudrate(_USART, 9600);
-#else
     usart_set_baudrate(_USART, 115200);
-#endif
     usart_set_databits(_USART, 8);
     usart_set_stopbits(_USART, USART_STOPBITS_1);
     usart_set_mode(_USART, USART_MODE_TX);
@@ -82,9 +78,6 @@ void UART_Initialize()
 void UART_Stop()
 {
     usart_disable(_USART);
-#if HAS_AUDIO_UART5
-    // usart_disable(UART5);	// When using PPM, it will call UART_Stop resulting in closing UART5 unexpectedly
-#endif
 }
 
 void UART_SetDataRate(u32 bps)
@@ -133,4 +126,3 @@ void _USART_DMA_ISR(void)
 
     busy = 0;
 }
-

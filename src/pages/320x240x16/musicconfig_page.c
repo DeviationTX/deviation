@@ -46,7 +46,13 @@ void PAGE_MusicconfigInit(int page)
     int init_y = 40;
     PAGE_SetModal(0);
     if (Transmitter.audio_player == 0) {
-        GUI_CreateLabelBox(&gui->msg, 20, 80, 280, 100, &NARROW_FONT, NULL, NULL, _tr("MP3 player support must\nbe enabled in hardware.ini"));
+        GUI_CreateLabelBox(&gui->msg, 20, 80, 280, 100, &NARROW_FONT, NULL, NULL,
+             _tr("External audio support\nmust be enabled\nin hardware.ini"));
+        return;
+    }
+    if (PPMin_Mode() || Model.protocol == PROTOCOL_PPM ) {
+        GUI_CreateLabelBox(&gui->msg, 20, 80, 280, 100, &NARROW_FONT, NULL, NULL,
+            _tr("External audio not\n available while\nPPM in use"));
         return;
     }
     PAGE_ShowHeader(PAGE_GetName(PAGEID_MUSICCFG));

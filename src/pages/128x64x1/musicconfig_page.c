@@ -57,7 +57,12 @@ void PAGE_MusicconfigInit(int page)
     PAGE_SetModal(0);
     if (!Transmitter.audio_player) {
         GUI_CreateLabelBox(&gui->msg, MSG_X, MSG_Y, 0, 0, &DEFAULT_FONT, NULL, NULL,
-            _tr("MP3 player support must\nbe enabled in hardware.ini"));
+            _tr("External audio support\nmust be enabled\nin hardware.ini"));
+        return;
+    }
+    if (PPMin_Mode() || Model.protocol == PROTOCOL_PPM ) {
+        GUI_CreateLabelBox(&gui->msg, MSG_X, MSG_Y, 0, 0, &DEFAULT_FONT, NULL, NULL,
+            _tr("External audio not\n available while\nPPM in use"));
         return;
     }
     PAGE_RemoveAllObjects();

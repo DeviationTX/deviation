@@ -24,8 +24,42 @@
 
 static u32 audio_queue_time = 0;
 
-#if HAS_AUDIO_UART5 || !defined(BUILDTYPE_DEV)
+// Initialize UART for extended-audio
+void AUDIO_Init() {
+#ifdef BUILDTYPE_DEV
+    printf("Audio: Initializing UART for extended-audio\n");
+#endif
 
+#if HAS_AUDIO_UART5
+    if (Transmitter.audio_uart5) {
+#ifdef BUILDTYPE_DEV
+        printf("Audio: UART5 already initialized\n");
+#endif
+        return;
+    }
+#endif
+
+#ifndef EMULATOR
+    if ( PPMin_Mode() || Model.protocol == PROTOCOL_PPM ) {
+#ifdef BUILDTYPE_DEV
+        printf("Audio: Cannot initialize USART for extended-audio, PPM in use\n");
+#endif
+        usart_disable(_USART);
+        usart_set_baudrate(_USART, 115200);
+        usart_enable(_USART);
+    }
+    else {
+#ifdef BUILDTYPE_DEV
+        printf("Audio: Setting up USART for extended-audio\n");
+#endif
+        usart_disable(_USART);
+        usart_set_baudrate(_USART, 9600);
+        usart_enable(_USART);
+    }
+#endif // EMULATOR
+}
+
+#ifndef EMULATOR
 // Send a block of len bytes to the Audio device.
 void
 AUDIO_Send(u8 *data, int len) {
@@ -40,7 +74,7 @@ void
 AUDIO_Print(char *string) {
   AUDIO_Send((u8 *)string, strlen(string));
 }
-#endif
+#endif // EMULATOR
 
 void u16ToArray(u16 value, u8 *array){
     *array = (u8)(value>>8);
@@ -72,21 +106,22 @@ int AUDIO_Play(u16 music) {
     }
 
 #ifdef BUILDTYPE_DEV
-    // dev builds log to the serial port, so just report it. On emulators call mpg123 to play mp3s
     printf("Audio: Playing music #%d (%s)\n", music_map[music].musicid, music_map[music].label);
 #endif
-#ifdef EMULATOR
+
+#ifdef EMULATOR     // On emulators call mpg123 to play mp3s
     char cmd[70];
     u16 vol_val = Transmitter.audio_vol * 32786/30;
 #ifdef _WIN32
     sprintf(cmd, "start /B ..\\..\\mpg123 -f %d -q ..\\..\\mp3\\%04d*.mp3 > nul 2>&1", vol_val, music_map[music].musicid);
 #else
     sprintf(cmd, "mpg123 -f %d -q ../../mp3/%04d*.mp3 > /dev/null 2>&1 &", vol_val, music_map[music].musicid);
-#endif
+#endif // _WIN32
     system(cmd);
-#endif
+    return 1;
+#endif // EMULATOR
 
-#if !defined(BUILDTYPE_DEV) || HAS_AUDIO_UART5
+#ifndef EMULATOR
   switch (Transmitter.audio_player) {
     case AUDIO_LAST: // Sigh. Shut up the warnings
     case AUDIO_NONE: return 0;	// Play beeps...
@@ -106,12 +141,12 @@ int AUDIO_Play(u16 music) {
         break;
     }
   }
-  #endif
   return 1;
+ #endif // EMULATOR
 }
 
-void AUDIO_SetVolume(void) {
-    if ( PPMin_Mode() ) { //don't send volume command when using PPM port
+void AUDIO_SetVolume() {
+    if ( PPMin_Mode() || Model.protocol == PROTOCOL_PPM ) { // don't send volume command when using PPM port
 #ifdef BUILDTYPE_DEV
         printf("Audio: PPM port in use\n");
 #endif
@@ -137,7 +172,7 @@ void AUDIO_SetVolume(void) {
 #endif
 }
 
-void AUDIO_CheckQueue(void) {
+void AUDIO_CheckQueue() {
     u32 t = CLOCK_getms();
     if (next_audio < num_audio) {
         if (t > audio_queue_time) {

@@ -17,9 +17,8 @@
 #include "model.h"
 #include "telemetry.h"
 #include "tx.h"
-#if HAS_EXTENDED_AUDIO
-#include "../music.h"
-#endif
+#include "music.h"
+#include "extended_audio.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -1428,7 +1427,9 @@ u8 CONFIG_ReadModel(u8 model_num) {
         PPMin_Start();
     else
         PPMin_Stop();
-
+#if HAS_EXTENDED_AUDIO
+    AUDIO_Init();
+#endif
     STDMIXER_Preset(); // bug fix: this must be invoked in all modes
     return 1;
 }
