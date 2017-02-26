@@ -190,9 +190,13 @@ void TIMER_Update()
                     timer_val[i] < (s32)Transmitter.countdown_timer_settings.prealert_time + 1000) { // give extra 1seconds
                     warn_time = ((timer_val[i] / Transmitter.countdown_timer_settings.prealert_interval)
                             * Transmitter.countdown_timer_settings.prealert_interval);
+#if HAS_EXTENDED_AUDIO
+                    warn_time += music_map[MUSIC_TIMER_WARNING].duration;
+#endif
+printf("S1:timer_val[%d]=%d, warn_time=%d, delta=%d\n", i, timer_val[i], warn_time, delta);
                     if (timer_val[i] > warn_time && (timer_val[i] - delta) <= warn_time) {
 #if HAS_EXTENDED_AUDIO
-                        MUSIC_PlayValue(MUSIC_TIMER_WARNING,timer_val[i]/1000,TELEM_UNIT_SECONDS,0);
+                        MUSIC_PlayValue(MUSIC_TIMER_WARNING,(timer_val[i]-music_map[MUSIC_TIMER_WARNING].duration)/1000,TELEM_UNIT_SECONDS,0);
 #else
                         MUSIC_Play(MUSIC_TIMER_WARNING);
 #endif
@@ -202,15 +206,20 @@ void TIMER_Update()
                 if (timer_val[i] < 0 && Transmitter.countdown_timer_settings.timeup_interval != 0) {
                     warn_time = ((timer_val[i] - Transmitter.countdown_timer_settings.timeup_interval) / Transmitter.countdown_timer_settings.timeup_interval)
                             * Transmitter.countdown_timer_settings.timeup_interval;
+#if HAS_EXTENDED_AUDIO
+                    warn_time += music_map[MUSIC_ALARM1 + i].duration;
+#endif
+printf("S2:timer_val[%d]=%d, warn_time=%d, delta=%d\n", i, timer_val[i], warn_time, delta);
                     if (timer_val[i] > warn_time && (timer_val[i] - delta) <= warn_time) {
 #if HAS_EXTENDED_AUDIO
-                        MUSIC_PlayValue(MUSIC_ALARM1 + i,timer_val[i]/-1000+1,TELEM_UNIT_SECONDS,0);
+                        MUSIC_PlayValue(MUSIC_ALARM1 + i,(timer_val[i]-music_map[MUSIC_ALARM1 + i].duration)/-1000+1,TELEM_UNIT_SECONDS,0);
 #else
                         MUSIC_Play(MUSIC_ALARM1 + i + 2);
 #endif
                     }
                 }
                 if (timer_val[i] >= 0 && timer_val[i] < delta) {
+printf("S3:timer_val[%d]=%d, warn_time=%d, delta=%d\n", i, timer_val[i], warn_time, delta);
                     MUSIC_Play(MUSIC_ALARM1 + i);
                 }
                 timer_val[i] -= delta;
