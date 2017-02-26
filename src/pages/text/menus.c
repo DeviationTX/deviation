@@ -20,10 +20,10 @@
 
 #define OVERRIDE_PLACEMENT
 enum {
-    LABELNUM_X        = 0,
-    LABELNUM_WIDTH    = ITEM_SPACE*2,
-    LABEL_X           = ITEM_SPACE*2,
-    LABEL_WIDTH       = LCD_WIDTH-ITEM_SPACE*2,
+    NUM_X             = 0,
+    NUM_WIDTH         = ITEM_SPACE*2,
+    MENU_X            = ITEM_SPACE*2,
+    MENU_WIDTH        = LCD_WIDTH-ITEM_SPACE*2,
 };
 
 #include "../128x64x1/menus.c"

@@ -48,14 +48,10 @@ static void _show_titlerow()
     mp->entries_per_page = 2;
     memset(gui, 0, sizeof(*gui));
 
-    enum LabelType oldStyle = labelDesc.style;
-    labelDesc.style = LABEL_UNDERLINE;
-    labelDesc.align = ALIGN_LEFT;
-    labelDesc.font_color = labelDesc.fill_color = labelDesc.outline_color = 0xffff;
-    GUI_CreateLabelBox(&gui->chan, LABEL_X, 0 , TYPE_X - LABEL_X, HEADER_HEIGHT, &labelDesc,
+    GUI_CreateLabelBox(&gui->chan, LABEL_X, 0 , TYPE_X - LABEL_X, HEADER_HEIGHT, &TITLE_FONT,
             MIXPAGE_ChanNameProtoCB, NULL, (void *)((long)mp->cur_mixer->dest));
+    labelDesc.font_color = labelDesc.fill_color = labelDesc.outline_color = 0xffff;
     labelDesc.align = ALIGN_CENTER;
-    labelDesc.style = oldStyle;
     GUI_CreateTextSelectPlate(&gui->tmpl, TYPE_X, 0,  TYPE_W, HEADER_WIDGET_HEIGHT, &labelDesc, NULL, templatetype_cb, (void *)((long)mp->channel));
     GUI_CreateButtonPlateText(&gui->save, SAVE_X, 0, SAVE_W, HEADER_WIDGET_HEIGHT, &labelDesc, NULL, okcancel_cb, (void *)_tr("Save"));
 }
@@ -97,8 +93,7 @@ static int simple_row_cb(int absrow, int relrow, int y, void *data)
             value = set_number100_cb; data = &mp->mixer[0].offset;
             break;
     }
-    labelDesc.align = ALIGN_LEFT;
-    GUI_CreateLabelBox(&gui->label[relrow].lbl, LABEL_X, y, LABEL_W, LINE_HEIGHT, &labelDesc, NULL, NULL, _tr(label));
+    GUI_CreateLabelBox(&gui->label[relrow].lbl, LABEL_X, y, LABEL_W, LINE_HEIGHT, &LABEL_FONT, NULL, NULL, _tr(label));
     labelDesc.align = ALIGN_CENTER;
     GUI_CreateTextSourcePlate(&gui->value[relrow].ts, TEXTSEL_X, y + (LINES_PER_ROW - 1) * LINE_SPACE,
                          TEXTSEL_W, LINE_HEIGHT, &labelDesc,

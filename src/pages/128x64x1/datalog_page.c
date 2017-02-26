@@ -20,8 +20,10 @@
 #include "config/model.h"
 
 enum {
-    LABEL_X     = 63,
-    LABEL_WIDTH = 60,
+    FIELD_X     = 63,
+    FIELD_WIDTH = 60,
+    LABEL_X     = 0,
+    LABEL_WIDTH = FIELD_X - LABEL_X,
 };
 #endif //OVERRIDE_PLACEMENT
 
@@ -113,15 +115,15 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         but_data = (void *)row;
     }
     if (lbl_data || lbl_cb) {
-        GUI_CreateLabelBox(&gui->label[relrow], 0, y,
-            0, LINE_HEIGHT, &DEFAULT_FONT, lbl_cb, NULL, lbl_data);
+        GUI_CreateLabelBox(&gui->label[relrow], LABEL_X, y,
+            LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, lbl_cb, NULL, lbl_data);
     }
     if (but_press) {
-        GUI_CreateButtonPlateText(&gui->col2[relrow].but, LABEL_X, y,
-            LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, but_txt, but_press, but_data);
+        GUI_CreateButtonPlateText(&gui->col2[relrow].but, FIELD_X, y,
+            FIELD_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, but_txt, but_press, but_data);
     } else {
-        GUI_CreateTextSourcePlate(&gui->col2[relrow].ts, LABEL_X, y,
-            LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, selpress_cb, sel_cb, sel_input_cb, sel_data);
+        GUI_CreateTextSourcePlate(&gui->col2[relrow].ts, FIELD_X, y,
+            FIELD_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, selpress_cb, sel_cb, sel_input_cb, sel_data);
     }
     return 1;
 }
@@ -139,12 +141,9 @@ void PAGE_DatalogInit(int page)
     (void)page;
     memset(gui, 0, sizeof(*gui));
     seltype = 0;
-    struct LabelDesc font = DEFAULT_FONT;
-    font.style = LABEL_UNDERLINE;
-    font.align = ALIGN_LEFT;
     int count = DL_SOURCE + DLOG_LAST - (NUM_TELEM - TELEMETRY_GetNumTelemSrc()); //Remove unused telemetry
     GUI_CreateLabelBox(&gui->remaining, 0, 0,
-        LCD_WIDTH-1, LINE_HEIGHT, &font, remaining_str_cb, NULL, NULL);
+        LCD_WIDTH, LINE_HEIGHT, &TITLE_FONT, remaining_str_cb, NULL, NULL);
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                          LINE_SPACE, count, row_cb, NULL, NULL, NULL);
     PAGE_SetScrollable(&gui->scrollable, &current_selected);

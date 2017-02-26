@@ -78,9 +78,14 @@ static const char * revert_str_cb(guiObject_t *obj, const void *data)
 
 static void _show_titlerow()
 {
+    enum {
+        TITLE_X     = 40,
+        BUTTON_X    = LCD_WIDTH - 96 - 8,
+        TITLE_WIDTH = BUTTON_X - TITLE_X,
+    };
     PAGE_ShowHeader(NULL);
-    GUI_CreateLabel(&gui->title, 40, 10, MIXPAGE_ChanNameProtoCB, TITLE_FONT, (void *)(long)mp->channel);
-    GUI_CreateButton(&gui->revert, LCD_WIDTH-96-8, 4, BUTTON_96, revert_str_cb, revert_cb, NULL);
+    GUI_CreateLabelBox(&gui->title, TITLE_X, 10, TITLE_WIDTH, 12, &TITLE_FONT, MIXPAGE_ChanNameProtoCB, NULL, (void *)(long)mp->channel);
+    GUI_CreateButton(&gui->revert, BUTTON_X, 4, BUTTON_96, revert_str_cb, revert_cb, NULL);
 }
 
 static inline guiObject_t *_get_obj(int idx, int objid) {
