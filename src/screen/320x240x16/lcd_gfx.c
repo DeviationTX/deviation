@@ -333,7 +333,7 @@ u8 LCD_ImageIsTransparent(const char *file)
 
 static int image_read_header(FILE *fh, u16 *w, u16 *h, u32 *black, u32 *white)
 {
-    u8 buf[16];
+    u8 buf[48];
     int err = 0;
     u16 *w_h[] = {w, h};
     *white = 0xffffff;
@@ -351,6 +351,7 @@ static int image_read_header(FILE *fh, u16 *w, u16 *h, u32 *black, u32 *white)
         return 0;
     }
     if (buf[0] == '#') {
+        /*
         char *ptr1,  *ptr2;
         u32 tmp_black = strtol((char *)buf+1, &ptr1, 16);
         if (ptr1 != (char *)buf+1) {
@@ -363,7 +364,7 @@ static int image_read_header(FILE *fh, u16 *w, u16 *h, u32 *black, u32 *white)
                 r = 0xff & (tmp_white >> 16); g =  0xff & (tmp_white >> 8); b =  0xff & (tmp_white >> 0);
                 *white = RGB888_to_RGB565(r, g, b);
             }
-        }
+        }*/
         if (fgets((char *)buf, sizeof(buf), fh) == NULL) {
             printf("DEBUG: image_read_header: Error: failed to read dimensions\n");
             return 0;
