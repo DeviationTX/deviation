@@ -94,21 +94,22 @@ void PAGE_TrimEditInit(int page)
          ROW4 = (ROW1 + 72),
          ROW5 = (ROW1 + 96),
     };
+
     //Row 1
-    GUI_CreateLabel(&gui_ed->srclbl, COL1, ROW1, NULL, DEFAULT_FONT, _tr("Input"));
+    GUI_CreateLabelBox(&gui_ed->srclbl, COL1, ROW1, COL2-COL1, 0, &LABEL_FONT, NULL, NULL, _tr("Input"));
     GUI_CreateTextSource(&gui_ed->src, COL2, ROW1, TEXTSELECT_96, NULL, set_source_cb, set_input_source_cb, &tp->trim.src);
     //Row 2
-    GUI_CreateLabel(&gui_ed->steplbl, COL1, ROW2, NULL, DEFAULT_FONT, _tr("Trim Step"));
+    GUI_CreateLabelBox(&gui_ed->steplbl, COL1, ROW2, COL2-COL1, 0, &LABEL_FONT, NULL, NULL, _tr("Trim Step"));
     GUI_CreateTextSelect(&gui_ed->step, COL2, ROW2, TEXTSELECT_96, NULL,
                          set_trimstep_cb, (void *)(long)(tp->index + 0x100)); //0x100: Use tp->trim
     //Row 3
-    GUI_CreateLabelBox(&gui_ed->neglbl, COL1, ROW3, COL2-COL1, ROW4-ROW3, &DEFAULT_FONT, NULL, NULL, _tr("Trim -"));
+    GUI_CreateLabelBox(&gui_ed->neglbl, COL1, ROW3, COL2-COL1, 0, &LABEL_FONT, NULL, NULL, _tr("Trim -"));
     GUI_CreateTextSelect(&gui_ed->neg, COL2, ROW3, TEXTSELECT_96, NULL, set_trim_cb, &tp->trim.neg);
     //Row 4
-    GUI_CreateLabel(&gui_ed->poslbl, COL1, ROW4, NULL, DEFAULT_FONT, _tr("Trim +"));
+    GUI_CreateLabelBox(&gui_ed->poslbl, COL1, ROW4, COL2-COL1, 0, &LABEL_FONT, NULL, NULL, _tr("Trim +"));
     GUI_CreateTextSelect(&gui_ed->pos, COL2, ROW4, TEXTSELECT_96, NULL, set_trim_cb, &tp->trim.pos);
     //Row 5
-    GUI_CreateLabelBox(&gui_ed->swlbl, COL1, ROW5, COL2-COL1, ROW5-ROW4, &DEFAULT_FONT, NULL, NULL, _tr("Switch"));
+    GUI_CreateLabelBox(&gui_ed->swlbl, COL1, ROW5, COL2-COL1, 0, &LABEL_FONT, NULL, NULL, _tr("Switch"));
     GUI_CreateTextSource(&gui_ed->sw, COL2, ROW5, TEXTSELECT_96, NULL, set_switch_cb, set_input_switch_cb, &tp->trim.sw);
 }
 

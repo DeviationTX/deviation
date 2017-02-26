@@ -43,7 +43,8 @@ void PAGE_Init()
     PAGE_ChangeByID(PAGEID_SPLASH, 0);
 
     labelDesc.font = DEFAULT_FONT.font;
-    labelDesc.style = LABEL_LEFT;
+    labelDesc.style = LABEL_NO_BOX;
+    labelDesc.align = ALIGN_LEFT;
     labelDesc.font_color = labelDesc.fill_color = labelDesc.outline_color = 0xffff; // not to draw box
 }
 
@@ -78,6 +79,7 @@ void PAGE_ShowHeader(const char *title)
     labelDesc.font = DEFAULT_FONT.font;
     labelDesc.font_color = 0xffff;
     labelDesc.style = LABEL_UNDERLINE;
+    labelDesc.align = ALIGN_LEFT;
     labelDesc.outline_color = 1;
     labelDesc.fill_color = 0;
     GUI_CreateLabelBox(&headerLabel, 0, 0, LCD_WIDTH, HEADER_HEIGHT, &labelDesc, NULL, NULL, title);
@@ -89,6 +91,7 @@ void PAGE_ShowHeaderWithHeight(const char *title, u8 font, u8 width, u8 height)
     labelDesc.font = font;
     labelDesc.font_color = 0xffff;
     labelDesc.style = LABEL_UNDERLINE;
+    labelDesc.align = ALIGN_LEFT;
     labelDesc.outline_color = 1;
     labelDesc.fill_color = 0;
     GUI_CreateLabelBox(&headerLabel, 0, 0, width, height, &labelDesc, NULL, NULL, title);

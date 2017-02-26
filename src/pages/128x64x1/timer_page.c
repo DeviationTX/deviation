@@ -43,6 +43,8 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     (void)data;
     (void)relrow;
     u8 space = LINE_SPACE;
+	enum LabelAlign oldAlign = DEFAULT_FONT.align;
+    DEFAULT_FONT.align = ALIGN_LEFT;
     //Row 1
     GUI_CreateLabelBox(&gui->name, LABEL_X, y,
             LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, timer_str_cb, NULL, (void *)(long)absrow);
@@ -83,6 +85,8 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     GUI_CreateButtonPlateText(&gui->setperm, RESET_X, y,
         RESET_WIDTH, LINE_HEIGHT,&DEFAULT_FONT, show_timerperm_cb, reset_timerperm_cb,(void *)(long)(absrow | 0x80));
 #endif
+
+    DEFAULT_FONT.align = oldAlign;
 
     update_countdown(absrow);
 

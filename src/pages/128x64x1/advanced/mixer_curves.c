@@ -58,7 +58,7 @@ void PAGE_EditCurvesInit(int page)
     }
     edit->curve = *curve;
 
-    labelDesc.style = LABEL_CENTER;
+    labelDesc.align = ALIGN_CENTER;
     GUI_CreateTextSelectPlate(&gui->name, NAME_X, 0, NAME_W, HEADER_HEIGHT, &labelDesc, NULL, set_curvename_cb, NULL);
     GUI_CreateButtonPlateText(&gui->save, SAVE_X, 0, SAVE_W, HEADER_WIDGET_HEIGHT, &labelDesc , NULL, okcancel_cb, (void *)_tr("Save"));
     // Draw a line
@@ -67,7 +67,7 @@ void PAGE_EditCurvesInit(int page)
 
     u8 space = LINE_SPACE;
     u8 y = space;
-    labelDesc.style = LABEL_LEFT;
+    labelDesc.align = ALIGN_LEFT;
 
     if (type >= CURVE_3POINT) {
         GUI_CreateLabelBox(&gui->smoothlbl, LABEL_X, y, LABEL1_W, LINE_HEIGHT, &labelDesc, NULL, NULL, _tr("Smooth"));
@@ -78,15 +78,15 @@ void PAGE_EditCurvesInit(int page)
     } else if(type == CURVE_DEADBAND || type == CURVE_EXPO) {
         GUI_CreateLabelBox(&gui->pointlbl, LABEL_X, y , LABEL_W, LINE_HEIGHT, &labelDesc, NULL, NULL, _tr("Pos/Neg"));
         y += space;
-        labelDesc.style = LABEL_CENTER;
+        labelDesc.align = ALIGN_CENTER;
         GUI_CreateTextSelectPlate(&gui->point, LABEL_X, y, LABEL_W, LINE_HEIGHT, &labelDesc, NULL, set_expopoint_cb, NULL);
     }
 
     y += space;
-    labelDesc.style = LABEL_LEFT;
+    labelDesc.align = ALIGN_LEFT;
     GUI_CreateLabelBox(&gui->valuelbl, LABEL_X, y , LABEL_W, LINE_HEIGHT, &labelDesc, NULL, NULL, _tr("Value"));
     y += VALUE_Y_OFFSET;
-    labelDesc.style = LABEL_CENTER;
+    labelDesc.align = ALIGN_CENTER;
     GUI_CreateTextSelectPlate(&gui->value, VALUE_X, y, LABEL_W, LINE_HEIGHT, &labelDesc, NULL, set_value_cb, NULL);
 
     GUI_CreateXYGraph(&gui->graph, GRAPH_X, GRAPH_Y, GRAPH_W, GRAPH_H,

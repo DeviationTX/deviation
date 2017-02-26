@@ -37,20 +37,20 @@ static const int TELEM_OFFSET_X = ((LCD_WIDTH-320)/2);
 static const int TELEM_OFFSET_Y = ((LCD_HEIGHT-240)/2);
 
 const struct telem_layout devo8_layout[] = {
-          {{15, 40, 40, 18}, {60, 40, 40, 18}, TELEM_DEVO_TEMP1},
-          {{15, 60, 40, 18}, {60, 60, 40, 18}, TELEM_DEVO_TEMP2},
-          {{15, 80, 40, 18}, {60, 80, 40, 18}, TELEM_DEVO_TEMP3},
-          {{15,100, 40, 18}, {60,100, 40, 18}, TELEM_DEVO_TEMP4},
-          {{115, 40, 40, 18}, {160, 40, 40, 18}, TELEM_DEVO_VOLT1},
-          {{115, 60, 40, 18}, {160, 60, 40, 18}, TELEM_DEVO_VOLT2},
-          {{115, 80, 40, 18}, {160, 80, 40, 18}, TELEM_DEVO_VOLT3},
-          {{215, 40, 40, 18}, {260, 40, 40, 18}, TELEM_DEVO_RPM1},
-          {{215, 60, 40, 18}, {260, 60, 40, 18}, TELEM_DEVO_RPM2},
-          {{15, 140, 65, 18}, {85, 140, 190, 18}, TELEM_GPS_LAT},
-          {{15, 160, 65, 18}, {85, 160, 190, 18}, TELEM_GPS_LONG},
-          {{15, 180, 65, 18}, {85, 180, 190, 18}, TELEM_GPS_ALT},
-          {{15, 200, 65, 18}, {85, 200, 190, 18}, TELEM_GPS_SPEED},
-          {{15, 220, 65, 18}, {85, 220, 190, 18}, TELEM_GPS_TIME},
+          {{10, 40, 45, 18}, {60, 40, 40, 18}, TELEM_DEVO_TEMP1},
+          {{10, 60, 45, 18}, {60, 60, 40, 18}, TELEM_DEVO_TEMP2},
+          {{10, 80, 45, 18}, {60, 80, 40, 18}, TELEM_DEVO_TEMP3},
+          {{10,100, 45, 18}, {60,100, 40, 18}, TELEM_DEVO_TEMP4},
+          {{110, 40, 45, 18}, {160, 40, 40, 18}, TELEM_DEVO_VOLT1},
+          {{110, 60, 45, 18}, {160, 60, 40, 18}, TELEM_DEVO_VOLT2},
+          {{110, 80, 45, 18}, {160, 80, 40, 18}, TELEM_DEVO_VOLT3},
+          {{210, 40, 45, 18}, {260, 40, 40, 18}, TELEM_DEVO_RPM1},
+          {{210, 60, 45, 18}, {260, 60, 40, 18}, TELEM_DEVO_RPM2},
+          {{10, 140, 70, 18}, {85, 140, 190, 18}, TELEM_GPS_LAT},
+          {{10, 160, 70, 18}, {85, 160, 190, 18}, TELEM_GPS_LONG},
+          {{10, 180, 70, 18}, {85, 180, 190, 18}, TELEM_GPS_ALT},
+          {{10, 200, 70, 18}, {85, 200, 190, 18}, TELEM_GPS_SPEED},
+          {{10, 220, 70, 18}, {85, 220, 190, 18}, TELEM_GPS_TIME},
           {{0, 0, 0, 0}, {0, 0, 0, 0}, 0},
 };
 const struct telem_layout frsky_layout[] = {
@@ -122,18 +122,15 @@ static void show_page()
     const struct telem_layout *layout = _get_layout();
     
     int i = 0;
-    enum LabelType style = TELEM_TXT_FONT.style;
-    TELEM_TXT_FONT.style = LABEL_RIGHT;
     for(const struct telem_layout *ptr = layout; ptr->source; ptr++) {
         GUI_CreateLabelBox(&gui->label[i], ptr->label.x + TELEM_OFFSET_X, ptr->label.y + TELEM_OFFSET_Y,
-                           ptr->label.width, ptr->label.height, &TELEM_TXT_FONT,
+                           ptr->label.width, ptr->label.height, &LABEL_FONT,
                            label_cb, NULL, (void *)(long)ptr->source);
         GUI_CreateLabelBox(&gui->value[i], ptr->value.x + TELEM_OFFSET_X, ptr->value.y + TELEM_OFFSET_Y,
                            ptr->value.width, ptr->value.height, &TELEM_ERR_FONT,
                            telem_cb, NULL, (void *)(long)ptr->source);
         i++;
     }
-    TELEM_TXT_FONT.style = style;
     tp->telem = Telemetry;
     //memset(tp->telem.time, 0, sizeof(tp->telem.time));
 }

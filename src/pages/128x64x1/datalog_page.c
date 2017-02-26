@@ -141,6 +141,7 @@ void PAGE_DatalogInit(int page)
     seltype = 0;
     struct LabelDesc font = DEFAULT_FONT;
     font.style = LABEL_UNDERLINE;
+    font.align = ALIGN_LEFT;
     int count = DL_SOURCE + DLOG_LAST - (NUM_TELEM - TELEMETRY_GetNumTelemSrc()); //Remove unused telemetry
     GUI_CreateLabelBox(&gui->remaining, 0, 0,
         LCD_WIDTH-1, LINE_HEIGHT, &font, remaining_str_cb, NULL, NULL);

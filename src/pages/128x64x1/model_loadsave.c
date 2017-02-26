@@ -41,11 +41,11 @@ static void icon_notify_cb(guiObject_t *obj)
     int absrow = (idx >> 8) + (idx & 0xff);
     change_icon(absrow);
 }
-    
+
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
-    labelDesc.style = LABEL_LEFT;
+    labelDesc.align = ALIGN_LEFT;
     GUI_CreateLabelBox(&gui->name[relrow], 0, y,
         LABEL_WIDTH, LINE_HEIGHT, &labelDesc, name_cb, press_cb, (const void *)(long)absrow);
     return 0;

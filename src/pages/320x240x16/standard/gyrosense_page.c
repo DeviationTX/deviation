@@ -44,6 +44,7 @@ void PAGE_GyroSenseInit(int page)
         ROW3 = (90 + ((LCD_HEIGHT - 240) / 2)),
         ROW4 = (110 + ((LCD_HEIGHT - 240) / 2)),
         ROW5 = (130 + ((LCD_HEIGHT - 240) / 2)),
+        LABEL_WIDTH = (COL2 - COL1),
     };
     PAGE_ShowHeader(NULL);
     PAGE_ShowHeader_SetLabel(STDMIX_TitleString, SET_TITLE_DATA(PAGEID_GYROSENSE, SWITCHFUNC_GYROSENSE));
@@ -60,23 +61,23 @@ void PAGE_GyroSenseInit(int page)
     gyro_output = mp->mixer_ptr[0]->dest;
     convert_output_to_percentile();
     /* Row 1 */
-    GUI_CreateLabelBox(&gui->chanlbl, COL1, ROW1, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Channel"));
+    GUI_CreateLabelBox(&gui->chanlbl, COL1, ROW1, LABEL_WIDTH, 16, &LABEL_FONT, NULL, NULL, _tr("Channel"));
     GUI_CreateTextSelect(&gui->chan, COL2, ROW1, TEXTSELECT_128, NULL, gyro_output_cb, NULL);
 
     /* Row 2 */
     GUI_CreateLabelBox(&gui->rangelbl, COL2, ROW2, 128, 16, &NARROW_FONT, NULL, NULL, "0% - 100%");
 
     /* Row 3 */
-    GUI_CreateLabelBox(&gui->gyrolbl[0], COL1, ROW3, 0, 16, &DEFAULT_FONT, label_cb, NULL, (void *)1L);
+    GUI_CreateLabelBox(&gui->gyrolbl[0], COL1, ROW3, LABEL_WIDTH, 16, &LABEL_FONT, label_cb, NULL, (void *)1L);
     GUI_CreateTextSelect(&gui->gyro[0], COL2, ROW3, TEXTSELECT_128, NULL, gyro_val_cb, (void *)0L);
 
     /* Row 4 */
-    GUI_CreateLabelBox(&gui->gyrolbl[1], COL1, ROW4, 0, 16, &DEFAULT_FONT, label_cb, NULL, (void *)2L);
+    GUI_CreateLabelBox(&gui->gyrolbl[1], COL1, ROW4, LABEL_WIDTH, 16, &LABEL_FONT, label_cb, NULL, (void *)2L);
     GUI_CreateTextSelect(&gui->gyro[1], COL2, ROW4, TEXTSELECT_128, NULL, gyro_val_cb, (void *)1);
 
     if(expected == 3) {
         /* Row 5 */
-        GUI_CreateLabelBox(&gui->gyrolbl[2], COL1, ROW5, 0, 16, &DEFAULT_FONT, label_cb, NULL, (void *)3L);
+        GUI_CreateLabelBox(&gui->gyrolbl[2], COL1, ROW5, LABEL_WIDTH, 16, &LABEL_FONT, label_cb, NULL, (void *)3L);
         GUI_CreateTextSelect(&gui->gyro[2], COL2, ROW5, TEXTSELECT_128, NULL, gyro_val_cb, (void *)2);
     }
 }

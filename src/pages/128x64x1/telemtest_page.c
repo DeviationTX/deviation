@@ -353,18 +353,18 @@ static void _show_page()
     tp->font.font_color = 0xffff;
     tp->font.fill_color = 0;
     tp->font.style = LABEL_SQUAREBOX;
-    DEFAULT_FONT.style = LABEL_CENTER;
+    DEFAULT_FONT.align = ALIGN_CENTER;
     long i = 0;
     for(const struct telem_layout *ptr = page->header; ptr->source; ptr++, i++) {
         GUI_CreateLabelBox(&gui->header[i], ptr->x, 0, ptr->width, HEADER_HEIGHT,
                            ptr->source == ARROW_LABEL ? &NARROW_FONT : &DEFAULT_FONT,
                            header_cb, NULL, (void *)(long)ptr->source);
     }
-    DEFAULT_FONT.style = LABEL_RIGHT;
+    DEFAULT_FONT.align = ALIGN_RIGHT;
     u8 row_height = page->row_height * LINE_SPACE;
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                          row_height, page->num_items, row_cb, NULL, NULL, (void *)page->layout);
-    DEFAULT_FONT.style = LABEL_LEFT;
+    DEFAULT_FONT.align = ALIGN_LEFT;
     tp->telem = Telemetry;
 }
 

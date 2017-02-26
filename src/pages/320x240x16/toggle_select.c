@@ -28,7 +28,7 @@ static void show_iconsel_page(int idx);
 static void show_icons(int SelectedIcon, int idx);
 extern void PAGE_MainLayoutRestoreDialog(int);
 
-static const struct LabelDesc outline = {0, 0, 0, 0, LABEL_TRANSPARENT};
+static const struct LabelDesc outline = {0, 0, 0, 0, 0, LABEL_TRANSPARENT};
 
 static void show_icons(int SelectedIcon, int idx)
 {

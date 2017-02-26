@@ -50,7 +50,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             break;
         if (idx == absrow) {
             GUI_CreateLabelBox(&gui->idx[relrow], LABELNUM_X, y,
-                LABELNUM_WIDTH, LINE_HEIGHT,  &DEFAULT_FONT, idx_string_cb, NULL, (void *)(absrow+ 1L));
+                LABELNUM_WIDTH, LINE_HEIGHT, &LABEL_FONT, idx_string_cb, NULL, (void *)(absrow+ 1L));
             GUI_CreateLabelBox(&gui->name[relrow], LABEL_X, y,
                 LCD_WIDTH - LABEL_X * 2, LINE_HEIGHT, &MENU_FONT, menu_name_cb, menu_press_cb, (const void *)(long)i);
             break;
