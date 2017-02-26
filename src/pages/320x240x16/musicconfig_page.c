@@ -52,7 +52,7 @@ void PAGE_MusicconfigInit(int page)
     }
     if (PPMin_Mode() || Model.protocol == PROTOCOL_PPM ) {
         GUI_CreateLabelBox(&gui->msg, 20, 80, 280, 100, &NARROW_FONT, NULL, NULL,
-            _tr("External audio not\n available while\nPPM in use"));
+            _tr("External audio not\navailable while\nPPM in use"));
         return;
     }
     PAGE_ShowHeader(PAGE_GetName(PAGEID_MUSICCFG));
