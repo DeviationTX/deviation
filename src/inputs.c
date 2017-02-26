@@ -118,6 +118,12 @@ const char *tx_stick_names[4] = {
     _tr_noop("LEFT_H"),
 };
 
+#if HAS_EXTENDED_AUDIO && NUM_AUX_KNOBS
+u8 aux_up = 0;
+u8 aux_changed = 0;
+u32 aux_time[NUM_AUX_KNOBS];
+#endif
+
 static void get_input_str(int src, const char **ptr, int *idx)
 {
     *ptr = "";
@@ -302,9 +308,6 @@ void INPUT_CheckChanges(void) {
     s32 changed_analog_value;
     s8 changed_input = INP_NONE;
     s8 value;
-#if HAS_EXTENDED_AUDIO && NUM_AUX_KNOBS
-    s8 aux_up = 0;
-#endif
     for (int i=1; i <= NUM_INPUTS; i++) {
       if(i <= INP_HAS_CALIBRATION) {
           changed_analog_value = CHAN_ReadInput(i);
@@ -338,21 +341,38 @@ void INPUT_CheckChanges(void) {
 #if NUM_AUX_KNOBS
         if ((changed_input > NUM_STICKS) && (changed_input <= NUM_STICKS + NUM_AUX_KNOBS)) {
             music_idx = changed_input - (NUM_STICKS+1);
+            aux_time[music_idx] = CLOCK_getms();
+            aux_changed = music_idx + 1;
             if (aux_up) {
-                if (Model.music.aux[music_idx * 2 + 1].music)
-                    MUSIC_Play(Model.music.aux[music_idx * 2 + 1].music);
+                //if (Model.music.aux[music_idx * 2 + 1].music)
+                    //MUSIC_Play(Model.music.aux[music_idx * 2 + 1].music);
             } else {
-                if (Model.music.aux[music_idx * 2].music)
-                    MUSIC_Play(Model.music.aux[music_idx * 2].music);
+                //if (Model.music.aux[music_idx * 2].music)
+                    //MUSIC_Play(Model.music.aux[music_idx * 2].music);
             }
             return;
-	      }
+	    }
 #endif
-	      music_idx = changed_input - INP_HAS_CALIBRATION - 1;
-	      /* Skip pots & Play music file if the switch has a voice file number defined */
-	      if (changed_input >= INP_HAS_CALIBRATION && Model.music.switches[music_idx].music) {
+	    music_idx = changed_input - INP_HAS_CALIBRATION - 1;
+	    /* Skip pots & Play music file if the switch has a voice file number defined */
+	    if (changed_input >= INP_HAS_CALIBRATION && Model.music.switches[music_idx].music) {
             MUSIC_Play(Model.music.switches[music_idx].music);
         }
 #endif //HAS_EXTENDED_AUDIO
     }
+#if HAS_EXTENDED_AUDIO && NUM_AUX_KNOBS
+    // Play AUX music if value was changed and left for 1000 ms at the same value
+    if (aux_changed && aux_time[aux_changed - 1] <= CLOCK_getms() - 1000) {
+        if (aux_up) {
+            if (Model.music.aux[(aux_changed - 1) * 2 + 1].music)
+                MUSIC_PlayValue(Model.music.aux[(aux_changed - 1) * 2 + 1].music,
+                    CHAN_ReadInput(aux_changed + NUM_STICKS)/100,TELEM_UNIT_NONE,0);
+        } else {
+            if (Model.music.aux[(aux_changed - 1) * 2].music)
+                MUSIC_PlayValue(Model.music.aux[(aux_changed - 1) * 2].music,
+                    CHAN_ReadInput(aux_changed + NUM_STICKS)/100,TELEM_UNIT_NONE,0);
+        }
+        aux_changed = 0;
+    }
+#endif // HAS_EXTENDED_AUDIO && NUM_AUX_KNOBS
 }

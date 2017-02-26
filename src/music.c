@@ -234,7 +234,7 @@ u16 MUSIC_GetTelemetryAlarm(enum Music music) {
 
 #if HAS_EXTENDED_AUDIO
 
-void MUSIC_PlayValue(u16 music, u32 value, u8 unit, u8 prec)
+void MUSIC_PlayValue(u16 music, s32 value, u8 unit, u8 prec)
 {
     u32 i;
     char digits[6]; // Do we need more?
@@ -245,6 +245,12 @@ void MUSIC_PlayValue(u16 music, u32 value, u8 unit, u8 prec)
         || !Transmitter.audio_vol) {
             MUSIC_Play(music);
         return;
+    }
+    AUDIO_AddQueue(music);
+    //Add minus sign for negative number
+    if (value < 0) {
+        AUDIO_AddQueue(10); //"minus" not added to music.map yet
+        value *= -1;
     }
 
     //Add precision digits
@@ -285,8 +291,7 @@ void MUSIC_PlayValue(u16 music, u32 value, u8 unit, u8 prec)
         }
     }
 
-    // Fill music queue
-    AUDIO_AddQueue(music);
+    // Fill music queue with digits
     for (i = digit_count; i > 0; i--) {
         AUDIO_AddQueue(digits[i-1] + MUSIC_TOTAL);
     }

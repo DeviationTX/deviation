@@ -98,7 +98,7 @@ struct MusicMap {
 struct MusicMap music_map[MAX_MUSICMAP_ENTRIES];
 
 u16 MUSIC_GetTelemetryAlarm(enum Music music);
-void MUSIC_PlayValue(u16 music, u32 value, u8 unit, u8 prec);
+void MUSIC_PlayValue(u16 music, s32 value, u8 unit, u8 prec);
 
 #endif //HAS_EXTENDED_AUDIO
 
