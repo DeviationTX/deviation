@@ -172,9 +172,8 @@ static int complex_row_cb(int absrow, int relrow, int y, void *data)
             value = set_number100_cb; data = &mp->cur_mixer->offset;
             break;
     }
-    labelDesc.align = ALIGN_LEFT;
     GUI_CreateLabelBox(&gui->label[relrow].lbl, LABEL_X, y, LABEL_W, LINE_HEIGHT,
-            &labelDesc, NULL, NULL, _tr(label));
+            &LABEL_FONT, NULL, NULL, _tr(label));
     labelDesc.align = ALIGN_CENTER;
     GUI_CreateTextSourcePlate(&gui->value[relrow].ts, TEXTSEL_X, y + (LINES_PER_ROW - 1) * LINE_SPACE,
                          TEXTSEL_W, LINE_HEIGHT, &labelDesc, tgl, value, input_value, data);

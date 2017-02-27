@@ -273,6 +273,8 @@ struct advmixcfg_obj {
 
 /******* Standard ********/
 struct stdcurve_obj {
+    guiLabel_t title;
+    guiRect_t rect;
     guiLabel_t msg;
     guiTextSelect_t mode;
     guiTextSelect_t hold;
@@ -283,6 +285,7 @@ struct stdcurve_obj {
 };
 
 struct stddrexp_obj {
+    guiRect_t rect;
     union {
         guiLabel_t msg;
         guiTextSelect_t type;

@@ -78,7 +78,7 @@ void PAGE_ShowHeader(const char *title)
     GUI_CreateLabelBox(&headerLabel, 0, 0, LCD_WIDTH, HEADER_HEIGHT, &TITLE_FONT, NULL, NULL, title);
 }
 
-void PAGE_ShowHeaderWithHeight(const char *title, u8 width, u8 height)
+void PAGE_ShowHeaderWithSize(const char *title, u16 width, u16 height)
 {
     GUI_CreateLabelBox(&headerLabel, 0, 0, width, height, &TITLE_FONT, NULL, NULL, title);
 }
