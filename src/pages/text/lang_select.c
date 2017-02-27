@@ -19,26 +19,8 @@
 #include "config/tx.h"
 #include <string.h>
 
-#include "../common/_lang_select.c"
-
-
-static struct lang_obj * const gui = &gui_objs.u.lang;
-
-static int row_cb(int absrow, int relrow, int y, void *data)
-{
-    (void)data;
-    GUI_CreateLabelBox(&gui->label[relrow], 0, y,
-            0, ITEM_HEIGHT, &DEFAULT_FONT, string_cb, press_cb, (void *)(long)absrow);
-    return 1;
-}
-
-void PAGE_LanguageInit(int page)
-{
-    (void)page;
-    int num_lang = count_num_languages();
-    PAGE_ShowHeader(_tr("Press ENT to change"));
-
-    GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
-                     LINE_SPACE, num_lang, row_cb, NULL, NULL, NULL);
-    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, Transmitter.language));
-}
+#define OVERRIDE_PLACEMENT
+enum {
+    LABEL_WIDTH = LCD_WIDTH,
+};
+#include "../128x64x1/lang_select.c"

@@ -43,7 +43,6 @@ static void menu_press_cb(guiObject_t *obj, s8 press_type, const void *data)
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
-    labelDesc.style = LABEL_LEFT;
     int idx = 0;
     unsigned i = 0;
     while(1) {
@@ -54,7 +53,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             GUI_CreateLabelBox(&gui->idx[relrow], LABELNUM_X, y,
                 LABELNUM_WIDTH, LINE_HEIGHT,  &DEFAULT_FONT, idx_string_cb, NULL, (void *)(absrow+ 1L));
             GUI_CreateLabelBox(&gui->name[relrow], LABEL_X, y,
-                LABEL_WIDTH, LINE_HEIGHT, &labelDesc, menu_name_cb, menu_press_cb, (const void *)(long)i);
+                LCD_WIDTH - LABEL_X * 2, LINE_HEIGHT, &MENU_FONT, menu_name_cb, menu_press_cb, (const void *)(long)i);
             break;
         }
         idx++;

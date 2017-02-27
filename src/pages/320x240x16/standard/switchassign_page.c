@@ -35,6 +35,7 @@ void PAGE_SwitchAssignInit(int page)
     (void)page;
     const int COL1 = (10 + ((LCD_WIDTH - 320) / 2));
     const int COL2 = (150 + ((LCD_WIDTH - 320) / 2));
+    const int LABEL_WIDTH = COL2 - COL1;
     const int ROW_SPACE = 30;
 
     PAGE_ShowHeader(PAGE_GetName(PAGEID_SWITCHASSIGN));
@@ -42,28 +43,28 @@ void PAGE_SwitchAssignInit(int page)
 
     /* Row 1 */
     int row = 40 + ((LCD_HEIGHT - 240) / 2);
-    GUI_CreateLabelBox(&gui->modelbl, COL1, row, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Fly mode"));
+    GUI_CreateLabelBox(&gui->modelbl, COL1, row, LABEL_WIDTH, 16, &LABEL_FONT, NULL, NULL, _tr("Fly mode"));
     GUI_CreateTextSelect(&gui->mode, COL2, row, TEXTSELECT_128, NULL, switch_cb2, (void *)(long)SWITCHFUNC_FLYMODE);
 
     /* Row 2 */
     row += ROW_SPACE;
-    GUI_CreateLabelBox(&gui->tholdlbl, COL1, row, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Thr hold"));
+    GUI_CreateLabelBox(&gui->tholdlbl, COL1, row, LABEL_WIDTH, 16, &LABEL_FONT, NULL, NULL, _tr("Thr hold"));
     GUI_CreateTextSelect(&gui->thold, COL2, row, TEXTSELECT_128, NULL, switch_cb2, (void *)(long)SWITCHFUNC_HOLD);
 
     /* Row 3 */
     row += ROW_SPACE;
-    GUI_CreateLabelBox(&gui->gyrolbl, COL1, row, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Gyro sense"));
+    GUI_CreateLabelBox(&gui->gyrolbl, COL1, row, LABEL_WIDTH, 16, &LABEL_FONT, NULL, NULL, _tr("Gyro sense"));
     GUI_CreateTextSelect(&gui->gyro, COL2, row, TEXTSELECT_128, NULL, switch_cb2, (void *)(long)SWITCHFUNC_GYROSENSE);
     row += ROW_SPACE;
-    GUI_CreateLabelBox(&gui->draillbl, COL1, row, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("D/R&Exp -AIL"));
+    GUI_CreateLabelBox(&gui->draillbl, COL1, row, LABEL_WIDTH, 16, &LABEL_FONT, NULL, NULL, _tr("D/R&Exp -AIL"));
     GUI_CreateTextSelect(&gui->drail, COL2, row, TEXTSELECT_128, NULL, switch_cb2, (void *)(long)SWITCHFUNC_DREXP_AIL);
 
     row += ROW_SPACE;
-    GUI_CreateLabelBox(&gui->drelelbl, COL1, row, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("D/R&Exp -ELE"));
+    GUI_CreateLabelBox(&gui->drelelbl, COL1, row, LABEL_WIDTH, 16, &LABEL_FONT, NULL, NULL, _tr("D/R&Exp -ELE"));
     GUI_CreateTextSelect(&gui->drele, COL2, row, TEXTSELECT_128, NULL, switch_cb2, (void *)(long)SWITCHFUNC_DREXP_ELE);
 
     row += ROW_SPACE;
-    GUI_CreateLabelBox(&gui->drrudlbl, COL1, row, 0, 16, &DEFAULT_FONT, NULL, NULL,  _tr("D/R&Exp -RUD"));
+    GUI_CreateLabelBox(&gui->drrudlbl, COL1, row, LABEL_WIDTH, 16, &LABEL_FONT, NULL, NULL,  _tr("D/R&Exp -RUD"));
     GUI_CreateTextSelect(&gui->drrud, COL2, row, TEXTSELECT_128, NULL, switch_cb2, (void *)(long)SWITCHFUNC_DREXP_RUD);
 }
 #endif //HAS_STANDARD_GUI

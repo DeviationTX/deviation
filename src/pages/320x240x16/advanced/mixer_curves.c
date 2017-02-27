@@ -38,17 +38,17 @@ void PAGE_EditCurvesInit(int page)
     PAGE_CreateOkButton(LCD_WIDTH-56, 4, okcancel_cb);
     int y = 40;
     if (type >= CURVE_3POINT) {
-        GUI_CreateLabel(&gui->smoothlbl, 8, y, NULL, DEFAULT_FONT, _tr("Smooth"));
+        GUI_CreateLabelBox(&gui->smoothlbl, 8, y, 96, 0, &LABEL_FONT, NULL, NULL, _tr("Smooth"));
         GUI_CreateTextSelect(&gui->smooth, 8, y+16, TEXTSELECT_96, NULL, set_smooth_cb, NULL);
         y += 40;
-        GUI_CreateLabel(&gui->pointlbl, 8, y, NULL, DEFAULT_FONT, _tr("Point"));
+        GUI_CreateLabelBox(&gui->pointlbl, 8, y, 96, 0, &LABEL_FONT, NULL, NULL, _tr("Point"));
         GUI_CreateTextSelect(&gui->point, 8, y+16, TEXTSELECT_96, NULL, set_pointnum_cb, NULL);
     } else if(type == CURVE_DEADBAND || type == CURVE_EXPO) {
-        GUI_CreateLabel(&gui->pointlbl, 8, y, NULL, DEFAULT_FONT, _tr("Pos/Neg"));
+        GUI_CreateLabelBox(&gui->pointlbl, 8, y, 96, 0, &LABEL_FONT, NULL, NULL, _tr("Pos/Neg"));
         GUI_CreateTextSelect(&gui->point, 8, y+16, TEXTSELECT_96, NULL, set_expopoint_cb, NULL);
     }
     y += 40;
-    GUI_CreateLabel(&gui->valuelbl, 8, y, NULL, DEFAULT_FONT, _tr("Value"));
+    GUI_CreateLabelBox(&gui->valuelbl, 8, y, 96, 0, &LABEL_FONT, NULL, NULL, _tr("Value"));
     GUI_CreateTextSelect(&gui->value, 8, y+16, TEXTSELECT_96, NULL, set_value_cb, NULL);
     GUI_CreateXYGraph(&gui->graph, LCD_WIDTH-208-ADDITIONAL_H, 36, 200+ADDITIONAL_H, 200+ADDITIONAL_H,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,

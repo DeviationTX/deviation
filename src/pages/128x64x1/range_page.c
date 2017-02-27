@@ -13,9 +13,16 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef OVERRIDE_PLACEMENT
 #include "common.h"
 #include "pages.h"
 #include "gui/gui.h"
+
+enum {
+    LABELBOX_Y = 15,
+    LABELBOX_H = LCD_HEIGHT - 15,
+};
+#endif //OVERRIDE_PLACEMENT
 
 #include "../common/_range_page.c"
 
@@ -50,6 +57,6 @@ static void _draw_page(int has_pa) {
                      _tr("Press ENT to start test."));
         }
     }
-    GUI_CreateLabelBox(&gui->label, 0, 15, LCD_WIDTH, LCD_HEIGHT-15, &DEFAULT_FONT,
+    GUI_CreateLabelBox(&gui->label, 0, LABELBOX_Y, LCD_WIDTH, LABELBOX_H, &DEFAULT_FONT,
                        NULL, NULL, tempstring);
 }

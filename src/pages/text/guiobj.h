@@ -132,7 +132,7 @@ struct telemcfg_obj {
 struct telemtest_obj {
     guiLabel_t msg;
     guiLabel_t header[SCROLLABLE_ROWS];
-    guiLabel_t box[20];
+    guiLabel_t box[31];
     guiScrollable_t scrollable;
 };
 
@@ -209,6 +209,12 @@ struct calibrate_obj {
 
 struct usb_obj {
     guiLabel_t label;
+};
+
+#define DEBUG_LINE_COUNT SCROLLABLE_ROWS
+struct debuglog_obj {
+    guiLabel_t      line[DEBUG_LINE_COUNT];
+    guiScrollable_t scrollable;
 };
 
 #ifdef HAS_MUSIC_CONFIG
@@ -290,12 +296,11 @@ struct stddrexp_obj {
         guiLabel_t msg;
         guiTextSelect_t type;
     } u;
-    guiLabel_t label[SCROLLABLE_ROWS];
-    guiTextSelect_t value1[SCROLLABLE_ROWS];
-    guiTextSelect_t value2[SCROLLABLE_ROWS];
+    guiLabel_t label[3];
+    guiTextSelect_t value1[3];
+    guiTextSelect_t value2[3];
     guiXYGraph_t graph;
     guiScrollable_t scrollable;
-
 };
 
 struct stdchan_obj {
@@ -304,6 +309,7 @@ struct stdchan_obj {
     guiTextSelect_t value[SCROLLABLE_ROWS];
     guiScrollable_t scrollable;
 };
+
 struct stdgyro_obj {
     guiLabel_t msg;
     guiLabel_t chanlbl;
@@ -369,6 +375,7 @@ struct gui_objs {
         struct tx_obj tx;
         struct calibrate_obj calibrate;
         struct usb_obj usb;
+        struct debuglog_obj debuglog;
 #ifdef HAS_MUSIC_CONFIG
         struct musicconfig_obj musicconfig;
 #endif

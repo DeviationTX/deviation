@@ -38,14 +38,18 @@ void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_w, u16 obj_h, const char 
         obj_x+=2; obj_w-=4;
     }
 
-    if (desc->style == LABEL_RIGHT) {
+    if (desc->align == ALIGN_RIGHT) {
         txt_x = obj_x + obj_w - txt_w - (is_selected ? Display.select_width : 0);
-    } else if (obj_w > txt_w && !(desc->style == LABEL_LEFT)) {
-        txt_x = obj_x+1 + (obj_w - txt_w + 1) / 2;
+    } else if (obj_w > txt_w && !(desc->align == ALIGN_LEFT)) {
+        txt_x = obj_x + 1 + (obj_w - txt_w + 1) / 2;
     } else {
-        txt_x = obj_x+1 + (is_selected ? Display.select_width : 0);
+        txt_x = obj_x + 1 + (is_selected ? Display.select_width : 0);
     }
     txt_y = obj_y + offset + (obj_h - txt_h + 1) / 2;
+
+    if (desc->style == LABEL_UNDERLINE) {
+        LCD_DrawFastHLine(txt_x, txt_y + txt_h - 1, obj_w, desc->font_color);
+    }
 
     if (desc->style == LABEL_LISTBOX) {
         LCD_SetFontColor(is_selected ? Display.listbox.fg_select : Display.listbox.bg_select);

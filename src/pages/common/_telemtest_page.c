@@ -17,7 +17,6 @@ static struct telemtest_page * const tp  = &pagemem.u.telemtest_page;
 static struct telemtest_obj  * const gui = &gui_objs.u.telemtest1;
 
 #define TELEM_FONT NORMALBOX_FONT
-#define TELEM_TXT_FONT DEFAULT_FONT
 #define TELEM_ERR_FONT NORMALBOXNEG_FONT
 
 static u8 telem_state_check()

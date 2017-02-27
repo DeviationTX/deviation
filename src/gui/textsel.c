@@ -277,8 +277,10 @@ void GUI_TextSelectEnablePress(guiTextSelect_t *select, u8 enable)
     if (select->type == TEXTSELECT_DEVO10) { // plate text for Devo10
         if (enable)
             select->desc.style = LABEL_BOX;
-        else
-            select->desc.style = LABEL_CENTER;
+        else {
+            select->desc.style = LABEL_NO_BOX;
+            select->desc.align = ALIGN_CENTER;
+        }
         return;
     }
     enum ImageNames fileidx;

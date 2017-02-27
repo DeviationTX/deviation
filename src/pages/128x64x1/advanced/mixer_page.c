@@ -62,7 +62,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     if (channel >= Model.num_channels)
         channel += (NUM_OUT_CHANNELS - Model.num_channels);
     if (channel < NUM_OUT_CHANNELS) {
-        labelDesc.style = LABEL_LEFT;
+        labelDesc.align = ALIGN_LEFT;
         GUI_CreateButtonPlateText(&gui->limit[relrow], COL1_X, y, COL1_W, LINE_HEIGHT, &labelDesc, MIXPAGE_ChanNameProtoCB,
                 limitselect_cb, (void *)((long)channel));
     } else if(! _is_virt_cyclic(channel)) {
@@ -73,7 +73,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
                 MIXPAGE_ChanNameProtoCB, NULL, (const void *)((long)channel));
         selectable = 1;
     }
-    labelDesc.style = LABEL_CENTER;
+    labelDesc.align = ALIGN_CENTER;
     GUI_CreateButtonPlateText(&gui->tmpl[relrow], COL2_X, y, COL2_W, LINE_HEIGHT , &labelDesc, template_name_cb,
         templateselect_cb, (void *)((long)channel));
    
@@ -83,7 +83,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     if (idx != NUM_MIXERS) {
         // don't show source if curve type is fixed, works only for the first mix per channel
         if(CURVE_TYPE(&mix[idx].curve) != CURVE_FIXED){
-            labelDesc.style = LABEL_LEFT;
+            labelDesc.align = ALIGN_LEFT;
             GUI_CreateLabelBox(&gui->src[relrow], COL3_X, y, COL3_W , LINE_HEIGHT, &labelDesc, show_source, NULL, &mix[idx].src);
         }
     }

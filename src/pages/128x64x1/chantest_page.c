@@ -51,7 +51,7 @@ static void draw_chan(int disp, int row, int y)
     int idx = row * NUM_BARS_PER_ROW + (disp%2 ? 1 : 0);
     int height;
     struct LabelDesc labelValue = MICRO_FONT;
-    labelValue.style = LABEL_RIGHT;
+    labelValue.align = ALIGN_RIGHT;
     if (cp->type == MONITOR_RAWINPUT) {
         labelDesc.font = RAW_FONT;  // Could be translated to other languages, hence using 12normal
         height = LINE_HEIGHT;

@@ -73,13 +73,13 @@ void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_w, u16 obj_h, const char 
     else if (desc->style == LABEL_FILL) {
         LCD_FillRect(obj_x, obj_y, obj_w, obj_h, desc->fill_color);
     }
-    if (desc->style == LABEL_RIGHT) {
+
+    if (desc->align == ALIGN_RIGHT) {
         txt_x = obj_x + obj_w - txt_w;
-    } else if (obj_w > txt_w && !(desc->style == LABEL_LEFT || desc->style == LABEL_NO_BOX
-                                                            || desc->style == LABEL_UNDERLINE)) {
-        txt_x = obj_x+1 + (obj_w - txt_w + 1) / 2;
+    } else if (obj_w > txt_w && !(desc->align == ALIGN_LEFT)) {
+        txt_x = obj_x + 1 + (obj_w - txt_w + 1) / 2;
     } else {
-        txt_x = obj_x+1;
+        txt_x = obj_x + 1;
     }
     txt_y = obj_y + offset + (obj_h - txt_h + 1) / 2;
 

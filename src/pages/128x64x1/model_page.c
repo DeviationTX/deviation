@@ -26,10 +26,10 @@ enum {
     DEFAULT_TEXTSEL_X = 63,
     LEFT_TEXTSEL_X    = 0,
     TEXTSEL_WIDTH     = 60,
-    LABEL_X           = 0,
-    LABEL_WIDTH       = 0,
     BUTTON_X          = 63,
     BUTTON_WIDTH      = 60,
+    LABEL_X           = 0,
+    LABEL_WIDTH       = BUTTON_X - LABEL_X,
 };
 #endif //OVERRIDE_PLACEMENT
 
@@ -132,7 +132,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     }
     if (label)
         GUI_CreateLabelBox(&gui->col1[relrow].label, LABEL_X, y,
-           LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr(label));
+           LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, NULL, NULL, _tr(label));
     if (ts_value) {
         GUI_CreateTextSelectPlate(but_txt ? &gui->col1[relrow].ts : &gui->col2[relrow].ts, ts_x, y,
             TEXTSEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, ts_tgl, ts_value, NULL);

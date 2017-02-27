@@ -74,7 +74,7 @@ void PAGE_LayoutEditInit(int page)
 
     struct LabelDesc micro = MICRO_FONT;
     struct LabelDesc rect = MICRO_FONT;
-    micro.style = LABEL_LEFT;
+    micro.align = ALIGN_LEFT;
     rect.fill_color = 0x0000;
     rect.outline_color = 0x0000;
     GUI_CreateRect(&gui->editelem, 41, 1, 9, 5, &rect);

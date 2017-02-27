@@ -216,10 +216,11 @@ static void add_dlg_cb(guiObject_t *obj, const void *data)
         ADD_DIALOG_W,
         ADD_DIALOG_H,
         _tr("Page Config"), NULL, dialog_ok_cb, dtOk, "");
-    GUI_CreateLabel(&gui->dlglbl[0],
+    GUI_CreateLabelBox(&gui->dlglbl[0],
         ADD_LBL_X,
         ADD_DIALOG_Y + 30,
-        NULL, DEFAULT_FONT, _tr("Type"));
+        ADD_TS_X - ADD_LBL_X, 0,
+        &LABEL_FONT, NULL, NULL, _tr("Type"));
     GUI_CreateTextSelect(&gui->dlgts[0],
         ADD_TS_X,
         ADD_DIALOG_Y + 30,
@@ -229,17 +230,18 @@ static void add_dlg_cb(guiObject_t *obj, const void *data)
         ADD_DIALOG_Y + 30,
         BUTTON_64x16, add_dlgbut_str_cb, newelem_press_cb, (void *)1L);
 
-    GUI_CreateLabel(&gui->dlglbl[1],
+    GUI_CreateLabelBox(&gui->dlglbl[1],
         ADD_LBL_X,
         ADD_DIALOG_Y + 60,
-        NULL, DEFAULT_FONT, _tr("Template"));
+        ADD_BUT_X - ADD_LBL_X, 0,
+        &LABEL_FONT, NULL, NULL, _tr("Template"));
     GUI_CreateButton(&gui->dlgbut[1],
         ADD_BUT_X,
         ADD_DIALOG_Y + 60,
         BUTTON_96x16, add_dlgbut_str_cb, add_dlgbut_cb, (void *)0L);
     int y = ADD_DIALOG_Y + 90;
     for (long i = 0; i < NUM_QUICKPAGES; i++) {
-        GUI_CreateLabel(&gui->dlglbl[i+2], ADD_LBL_X, y, menulabel_cb, DEFAULT_FONT, (void *)i);
+        GUI_CreateLabelBox(&gui->dlglbl[i+2], ADD_LBL_X, y, ADD_MENU_X - ADD_LBL_X, 0, &LABEL_FONT, menulabel_cb, NULL, (void *)i);
         GUI_CreateTextSelect(&gui->dlgts[i+2], ADD_MENU_X, y, TEXTSELECT_224, NULL, menusel_cb, (void *)i);
         y += 24;
     }
@@ -268,9 +270,9 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     int del_x = X + 15 + 110;
     int num_objs = 2;
     if (type == ELEM_MODELICO) {
-        GUI_CreateLabelBox(&gui->dlglbl[relrow], X, y, 115, LAYDLG_TEXT_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Model"));
+        GUI_CreateLabelBox(&gui->dlglbl[relrow], X, y, 115, LAYDLG_TEXT_HEIGHT, &LABEL_FONT, NULL, NULL, _tr("Model"));
     } else {
-        GUI_CreateLabelBox(&gui->dlglbl[relrow], X, y, 10, 16, &DEFAULT_FONT, label_cb, NULL, (void *)(long)(absrow));
+        GUI_CreateLabelBox(&gui->dlglbl[relrow], X, y, 10, 16, &LABEL_FONT, label_cb, NULL, (void *)(long)(absrow));
         GUI_CreateTextSelect(&gui->dlgts[relrow], X + 15, y, TEXTSELECT_96, NULL, dlgts_cb, (void *)elemidx);
         if (type == ELEM_TOGGLE) {
             GUI_CreateButton(&gui->dlgbut2[relrow], del_x, y, BUTTON_64x16, dlgbut_str_cb, toggle_press_cb, (void *)elemidx);

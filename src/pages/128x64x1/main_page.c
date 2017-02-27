@@ -41,7 +41,7 @@ enum {
      TXPOWER_H    = 6,
 //
     MODEL_NAME_X  = 0,
-    MODEL_NAME_Y  = 1,
+    MODEL_NAME_Y  = 0,
 };
 
 #endif //OVERRIDE_PLACEMENT
@@ -72,7 +72,7 @@ void PAGE_MainInit(int page)
     next_scan = CLOCK_getms()+BATTERY_SCAN_MSEC;
 
     GUI_CreateLabelBox(&gui->name, MODEL_NAME_X, MODEL_NAME_Y, //64, 12,
-            0, 0, &SMALL_FONT, NULL, NULL, Model.name);
+            LCD_WIDTH, LINE_HEIGHT, &MODELNAME_FONT, NULL, NULL, Model.name);
 
 
     show_elements();
@@ -86,7 +86,7 @@ static void _check_voltage(guiLabel_t *obj)
         next_scan = CLOCK_getms() + BATTERY_SCAN_MSEC;
         s16 batt = PWR_ReadVoltage();
         if (batt < Transmitter.batt_alarm) {
-            obj->desc.style = LABEL_INVERTED;
+            obj->desc = BATTALARM_FONT;
             GUI_Redraw(obj);
         }
         if (batt / 10 != mp->battery / 10 && batt / 10 != mp->battery / 10 + 1) {
