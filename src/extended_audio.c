@@ -158,7 +158,8 @@ void AUDIO_SetVolume() {
     }
 #ifdef BUILDTYPE_DEV
     printf("Audio: Setting external audio volume to %d\n", Transmitter.audio_vol);
-#else
+#endif
+#ifndef EMULATOR
     switch (Transmitter.audio_player) {
       case AUDIO_LAST: // Sigh. Shut up the warnings
       case AUDIO_AUDIOFX: // AUDIOFX only allows up down selection of volume...not implemented
