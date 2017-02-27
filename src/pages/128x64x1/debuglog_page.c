@@ -13,12 +13,21 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef OVERRIDE_PLACEMENT
 #include "common.h"
 #include "pages.h"
 #include "gui/gui.h"
+#endif //OVERRIDE_PLACEMENT
 
 #if DEBUG_WINDOW_SIZE
 #include "../common/_debuglog_page.c"
+
+static int row_cb(int absrow, int relrow, int y, void *data)
+{
+    (void)data;
+    GUI_CreateLabelBox(&gui->line[relrow], 0, y, LCD_WIDTH - ARROW_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, str_cb, NULL, (void *)(long)absrow);
+    return 0;
+}
 
 void PAGE_DebuglogInit(int page)
 {
