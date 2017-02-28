@@ -23,10 +23,12 @@
 
 #define OVERRIDE_PLACEMENT
 enum {
-    MESSAGE_Y      = LINE_HEIGHT,
-    LABEL_X        = 10*ITEM_SPACE,
-    LABEL_WIDTH1   = 10*ITEM_SPACE,
-    LABEL_WIDTH2   = 5*ITEM_SPACE,
     HEADER_OFFSET  = LINE_HEIGHT,
+    MESSAGE_Y      = LINE_HEIGHT,
+    FIELD_X        = 10*ITEM_SPACE,
+    FIELD_WIDTH1   = 10*ITEM_SPACE,
+    FIELD_WIDTH2   = 5*ITEM_SPACE,
+    LABEL_X        = 0,
+    LABEL_WIDTH    = FIELD_X - LABEL_X,
 };
 #include "../../128x64x1/standard/gyrosense_page.c"

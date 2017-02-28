@@ -36,6 +36,7 @@ extern struct pagemem pagemem;
 
 void PAGE_RemoveHeader();
 void PAGE_ShowHeader(const char *title);
+void PAGE_ShowHeaderWithSize(const char *title, u16 width, u16 height);
 void PAGE_ShowHeader_SetLabel(const char *(*label_cb)(guiObject_t *obj, const void *data), void *data);
 
 u8 PAGE_SetModal(u8 _modal);

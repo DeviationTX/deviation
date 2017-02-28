@@ -69,7 +69,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         GUI_CreateButtonPlateText(&gui->limit[relrow], COL1_X, y, COL1_W, LINE_HEIGHT, &labelDesc, MIXPAGE_ChanNameProtoCB,
                 virtname_cb, (void *)((long)channel));
     } else {
-        GUI_CreateLabelBox(&gui->name[relrow], COL1_X, y, COL1_W, LINE_HEIGHT, &labelDesc,
+        GUI_CreateLabelBox(&gui->name[relrow], COL1_X, y, COL1_W, LINE_HEIGHT, &LABEL_FONT,
                 MIXPAGE_ChanNameProtoCB, NULL, (const void *)((long)channel));
         selectable = 1;
     }
@@ -83,8 +83,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     if (idx != NUM_MIXERS) {
         // don't show source if curve type is fixed, works only for the first mix per channel
         if(CURVE_TYPE(&mix[idx].curve) != CURVE_FIXED){
-            labelDesc.align = ALIGN_LEFT;
-            GUI_CreateLabelBox(&gui->src[relrow], COL3_X, y, COL3_W , LINE_HEIGHT, &labelDesc, show_source, NULL, &mix[idx].src);
+            GUI_CreateLabelBox(&gui->src[relrow], COL3_X, y, COL3_W , LINE_HEIGHT, &DEFAULT_FONT, show_source, NULL, &mix[idx].src);
         }
     }
     return selectable;

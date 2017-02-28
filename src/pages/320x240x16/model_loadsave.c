@@ -99,12 +99,13 @@ void PAGE_LoadSaveInit(int page)
       case LOAD_ICON:       name = _tr("Select Icon"); break;
       case LOAD_LAYOUT:     name = _tr("Load Layout"); break;
     }
-    PAGE_ShowHeader(name);
+    //PAGE_ShowHeader(name);
 
     num_models = mp->total_items;
     if (num_models < LISTBOX_ITEMS)
         num_models = LISTBOX_ITEMS;
     if (page != LOAD_TEMPLATE && page != LOAD_LAYOUT) {
+        PAGE_ShowHeaderWithSize(name, LCD_WIDTH - 88, 0);
         u16 w = 0, h = 0;
         char *img = mp->iconstr;
         if(! fexists(img))
@@ -114,6 +115,9 @@ void PAGE_LoadSaveInit(int page)
         PAGE_CreateOkButton(LCD_WIDTH - 48, 4, ok_cb);
         GUI_SelectionNotify(icon_notify_cb);
     }
+    else
+        PAGE_ShowHeader(name);
+
     GUI_CreateScrollable(&gui->scrollable, 8 + ((LCD_WIDTH - 320) / 2), 40, 200, LISTBOX_ITEMS * 24,
                          24, num_models, row_cb, NULL, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowCol(&gui->scrollable, selected, 0));

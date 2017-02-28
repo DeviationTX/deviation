@@ -21,11 +21,13 @@
 
 enum {
     //"Reverse", "Subtrim" and "Fail-safe" pages
-    LABEL_X        = 63,
-    LABEL_W        = 60,
+    FIELD_X        = 63,
+    FIELD_WIDTH    = 60,
+    LABEL_X        = 0,
+    LABEL_WIDTH    = FIELD_X - LABEL_X,
     //"Throttle curve" and "Pitch curve" pages XY-graph points
     #define LINE_Y LINE_SPACE
-    WIDTH1         = 5,
+    WIDTH1         = 6,
     WIDTH2         = 32,
     WIDTH2_ADD     = 2,
     LINE_H         = 9,
@@ -47,10 +49,10 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     struct page_defs *page_defs = (struct page_defs *)data;
     (void)data;
 
-    GUI_CreateLabelBox(&gui->name[relrow], 0, y,
-            0, LINE_HEIGHT, &DEFAULT_FONT, STDMIX_channelname_cb, NULL, (void *)(long)absrow);
-    GUI_CreateTextSelectPlate(&gui->value[relrow], LABEL_X, y,
-            LABEL_W, LINE_HEIGHT, &DEFAULT_FONT, page_defs->tgl, page_defs->value, (void *)(long)absrow);
+    GUI_CreateLabelBox(&gui->name[relrow], LABEL_X, y,
+            LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, STDMIX_channelname_cb, NULL, (void *)(long)absrow);
+    GUI_CreateTextSelectPlate(&gui->value[relrow], FIELD_X, y,
+            FIELD_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, page_defs->tgl, page_defs->value, (void *)(long)absrow);
     return 1;
 }
 

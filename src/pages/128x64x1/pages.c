@@ -75,26 +75,12 @@ void PAGE_ChangeByID(enum PageID id, s8 menuPage)
 static guiLabel_t headerLabel;
 void PAGE_ShowHeader(const char *title)
 {
-    struct LabelDesc labelDesc;
-    labelDesc.font = DEFAULT_FONT.font;
-    labelDesc.font_color = 0xffff;
-    labelDesc.style = LABEL_UNDERLINE;
-    labelDesc.align = ALIGN_LEFT;
-    labelDesc.outline_color = 1;
-    labelDesc.fill_color = 0;
-    GUI_CreateLabelBox(&headerLabel, 0, 0, LCD_WIDTH, HEADER_HEIGHT, &labelDesc, NULL, NULL, title);
+    GUI_CreateLabelBox(&headerLabel, 0, 0, LCD_WIDTH, HEADER_HEIGHT, &TITLE_FONT, NULL, NULL, title);
 }
 
-void PAGE_ShowHeaderWithHeight(const char *title, u8 font, u8 width, u8 height)
+void PAGE_ShowHeaderWithSize(const char *title, u16 width, u16 height)
 {
-    struct LabelDesc labelDesc;
-    labelDesc.font = font;
-    labelDesc.font_color = 0xffff;
-    labelDesc.style = LABEL_UNDERLINE;
-    labelDesc.align = ALIGN_LEFT;
-    labelDesc.outline_color = 1;
-    labelDesc.fill_color = 0;
-    GUI_CreateLabelBox(&headerLabel, 0, 0, width, height, &labelDesc, NULL, NULL, title);
+    GUI_CreateLabelBox(&headerLabel, 0, 0, width, height, &TITLE_FONT, NULL, NULL, title);
 }
 
 void PAGE_ShowHeader_SetLabel(const char *(*label_cb)(guiObject_t *obj, const void *data), void *data)
@@ -102,6 +88,7 @@ void PAGE_ShowHeader_SetLabel(const char *(*label_cb)(guiObject_t *obj, const vo
     (void)label_cb;
     (void)data;
 }
+
 void PAGE_RemoveHeader()
 {}
 

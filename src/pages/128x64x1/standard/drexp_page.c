@@ -62,7 +62,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     (void)data;
 
     GUI_CreateLabelBox(&gui->label[relrow], LABEL_X, y,
-        0, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, STDMIX_ModeName(absrow - PITTHROMODE_NORMAL));
+        LABEL3_X + LABEL3_WIDTH, LINE_HEIGHT, &LABEL_FONT, NULL, NULL, STDMIX_ModeName(absrow - PITTHROMODE_NORMAL));
     y += LINE_SPACE;
     GUI_CreateTextSelectPlate(&gui->value1[relrow], LABEL_X, y,
         LABEL2_WIDTH, LINE_HEIGHT, &TINY_FONT, NULL, set_dr_cb, (void *)(long)(absrow - PITTHROMODE_NORMAL));
@@ -77,7 +77,8 @@ void PAGE_DrExpInit(int page)
     (void)page;
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
-    PAGE_ShowHeader("");
+    // draw a underline only:
+    GUI_CreateRect(&gui->rect, 0, HEADER_WIDGET_HEIGHT, LCD_WIDTH, 1, &labelDesc);
     memset(mp, 0, sizeof(*mp));
     int count = get_mixers();
     int expected = INPUT_NumSwitchPos(mapped_std_channels.switches[SWITCHFUNC_DREXP_AIL + drexp_type]);
