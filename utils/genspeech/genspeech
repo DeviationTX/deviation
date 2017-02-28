@@ -75,7 +75,7 @@ do
 	do		
 		LABEL=`echo $LINE | cut -d':' -f2`
 		LABEL=`echo $LABEL | sed -e 's/^[ \t]+//g'`
-		MSG=`echo $LABEL | sed -e 's/^ *//;s/ *$//' | tr [a-z] [A-Z]`
+		MSG=`echo $LABEL | sed -e 's/^ *//;s/ *$//'`
 		IDXTEXTID=`printf '%04d' $IDX`
 		IDXTEXT=`echo ${IDXTEXTID}_${MSG} | tr -d ' '`
 		$TTSCMD ${TTSOPT}${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT} "$MSG"
@@ -99,7 +99,7 @@ do
 	do
 		LABEL=`echo $LINE | cut -d':' -f2`
 		LABEL=`echo $LABEL | sed -e 's/^[ \t]+//g'`
-		MSG=`echo $LABEL | sed -e 's/^ *//;s/ *$//' | tr [a-z] [A-Z]`
+		MSG=`echo $LABEL | sed -e 's/^ *//;s/ *$//'`
 		R=`grep "@${MSG}@" $TMPFILE`
 		if [ $? != 0 ]
 		then
