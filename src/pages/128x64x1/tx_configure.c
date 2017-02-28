@@ -175,6 +175,10 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             label = _tr_noop("Length");
             value = units_cb; data = (void *)0L; x = MED_SEL_X_OFFSET;
             break;
+        case ITEM_TELEM_IVAL:
+            label = _tr_noop("Alert intvl");
+            value = telem_interval_cb; data = &Transmitter.telem_alert_interval; x = MED_SEL_X_OFFSET;
+            break;
     }
     if (title) {
         enum LabelType oldType = labelDesc.style;

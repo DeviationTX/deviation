@@ -339,6 +339,8 @@ struct tx_obj {
              guiTextSelect_t temp;
              guiLabel_t lengthlbl;
              guiTextSelect_t length;
+             guiLabel_t telemivllbl;
+             guiTextSelect_t telemivl;
              //These are for the virating motor which may or may-not be installed
              guiLabel_t head3_3;
              guiLabel_t viblbl;

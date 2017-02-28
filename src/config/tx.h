@@ -9,6 +9,7 @@
 #define DEFAULT_BATTERY_WARNING_INTERVAL 30
 #define MIN_BATTERY_WARNING_INTERVAL 0
 #define MAX_BATTERY_WARNING_INTERVAL 60
+#define DEFAULT_TELEM_INTERVAL 15
 #define DEFAULT_SPLASH_DELAY 35 //3.5sec
 
 enum {
@@ -68,6 +69,7 @@ struct Transmitter {
     u16 batt_alarm;
     u16 batt_critical;
     u16 batt_warning_interval;
+    u16 telem_alert_interval;
     u8 power_alarm;
     u8 splash_delay;
     u8 volume;

@@ -40,6 +40,7 @@ enum {
     ITEM_TIMEUP,
     ITEM_TELEMTEMP,
     ITEM_TELEMLEN,
+    ITEM_TELEM_IVAL,
     ITEM_LAST,
 };
 
@@ -399,7 +400,8 @@ static const char *_audio_vol_cb(guiObject_t *obj, int dir, void *data)
         *unsigned_data = GUI_TextSelectHelper(*unsigned_data, 0, 30, dir, 1, 5, &changed);
         if (changed) {
             AUDIO_SetVolume();
-            MUSIC_Play(MUSIC_VOLUME);
+            if (!num_audio)
+                MUSIC_Play(MUSIC_VOLUME);
         }
     }
     if (*unsigned_data == 0)
@@ -408,3 +410,12 @@ static const char *_audio_vol_cb(guiObject_t *obj, int dir, void *data)
     return tempstring;
 }
 #endif //HAS_EXTENDED_AUDIO
+
+static const char *telem_interval_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void)obj;
+    u8 *value = (u8 *)data;
+    *value = GUI_TextSelectHelper(*value, 1, 255, dir, 1, 5, NULL);
+    sprintf(tempstring, "%d", *value);
+    return tempstring;
+}

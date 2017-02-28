@@ -79,6 +79,7 @@ static const char TELEM_TEMP[] = "temp";
 static const char * const TELEM_TEMP_VAL[2] = { "celcius", "farenheit"};
 static const char TELEM_LENGTH[] = "length";
 static const char * const TELEM_LENGTH_VAL[2] = { "meters", "feet" };
+static const char TELEM_ALERT_INTERVAL[] ="alertinterval";
 
 #define MATCH_SECTION(s) strcasecmp(section, s) == 0
 #define MATCH_START(x,y) strncasecmp(x, y, sizeof(y)-1) == 0
@@ -240,6 +241,10 @@ static int ini_handler(void* user, const char* section, const char* name, const 
                 t->telem |= TELEMUNIT_FEET;
             return 1;
         }
+        if (MATCH_KEY(TELEM_ALERT_INTERVAL)) {
+            t->telem_alert_interval = value_int;
+            return 1;
+        }
     }
     printf("Unknown values section: %s key: %s\n", section, name);
     return 0;
@@ -300,6 +305,7 @@ void CONFIG_WriteTx()
     fprintf(fh, "[%s]\n", SECTION_TELEMETRY);
     fprintf(fh, "%s=%s\n", TELEM_TEMP, TELEM_TEMP_VAL[(t->telem & TELEMUNIT_FAREN) ? 1 : 0]);
     fprintf(fh, "%s=%s\n", TELEM_LENGTH, TELEM_LENGTH_VAL[(t->telem & TELEMUNIT_FEET) ? 1 : 0]);
+    fprintf(fh, "%s=%u\n", TELEM_ALERT_INTERVAL, t->telem_alert_interval);
 
     CONFIG_EnableLanguage(1);
     fclose(fh);
@@ -325,6 +331,7 @@ void CONFIG_LoadTx()
     Transmitter.countdown_timer_settings.prealert_time = DEFAULT_PERALERT_TIME;
     Transmitter.countdown_timer_settings.prealert_interval = DEFAULT_PREALERT_INTERVAL;
     Transmitter.countdown_timer_settings.timeup_interval = DEFAULT_TIMEUP_INTERVAL;
+    Transmitter.telem_alert_interval = DEFAULT_TELEM_INTERVAL;
 #if HAS_EXTRA_SWITCHES
     CHAN_SetSwitchCfg("");
 #endif

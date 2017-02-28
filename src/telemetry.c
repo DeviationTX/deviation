@@ -38,7 +38,6 @@ static u32 last_updated[TELEM_UPDATE_SIZE] = {0};
 static u32 music_time = 0;
 static u32 error_time = 0;
 #define CHECK_DURATION 500
-#define MUSIC_INTERVAL 15000 // DON'T need to play music in every 100ms
 
 void _get_value_str(char *str, s32 value, u8 decimals, char units)
 {
@@ -334,7 +333,7 @@ void TELEMETRY_Alarm()
     }
 
     if (alarm_state[k]==1 && current_time >= music_time) {
-        music_time = current_time + MUSIC_INTERVAL;
+        music_time = current_time + Transmitter.telem_alert_interval*1000;
         // K > 2 is exclude first 3 alarms from jump action (interim solution)
         // <= (9 + type) is limit jump action to only visible telemetry monitor values
         if (k > 2 && Model.telem_alarm[k] <= (9 + TELEMETRY_Type()))

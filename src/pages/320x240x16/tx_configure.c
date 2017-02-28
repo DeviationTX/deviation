@@ -183,7 +183,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         GUI_CreateLabelBox(&gui2->dimtgtlbl, col1, row, col2 - col1, 0, &LABEL_FONT, NULL, NULL, _tr("Dimmer target"));
         GUI_CreateTextSelect(&gui2->dimtgt, col2, row, TEXTSELECT_96, NULL, common_select_cb,
                 (void *)&Transmitter.auto_dimmer.backlight_dim_value);
-        row += space + 8;
+        row += space + 0;
         if (row+8 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
     }
     if (page_num == 2 || LCD_WIDTH == 480) {
@@ -202,7 +202,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         GUI_CreateLabelBox(&gui3->timeuplbl, col1, row, col2 - col1, 0, &LABEL_FONT, NULL, NULL,_tr("Timeup interval"));
         GUI_CreateTextSelect(&gui3->timeup, col2, row, TEXTSELECT_96, NULL, timer_interval_cb,
                 &Transmitter.countdown_timer_settings.timeup_interval);
-        row += space + 8;
+        row += space + 3;
         if (row+8 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
         GUI_CreateLabelBox(&gui3->head3_2, col1, row, col2 + BUTTON_WIDTH - col1, 0, &SECTION_FONT, NULL, NULL, _tr("Telemetry settings"));
         row += space;
@@ -213,9 +213,15 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         if (row+8 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
         GUI_CreateLabelBox(&gui3->lengthlbl, col1, row, col2 - col1, 0, &LABEL_FONT, NULL, NULL, _tr("Length"));
         GUI_CreateTextSelect(&gui3->length, col2, row, TEXTSELECT_96, NULL, units_cb, (void *)0L);
+        row += space;
+        if (row+8 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
+        GUI_CreateLabelBox(&gui3->telemivllbl, col1, row, col2 - col1, 0, &LABEL_FONT, NULL, NULL, _tr("Alert interval"));
+        GUI_CreateTextSelect(&gui3->telemivl, col2, row, TEXTSELECT_96, NULL, telem_interval_cb,
+                &Transmitter.telem_alert_interval);
+
 #if HAS_VIBRATINGMOTOR
         if(Transmitter.extra_hardware & VIBRATING_MOTOR) {
-            row += space + 8;
+            row += space + 3;
             GUI_CreateLabelBox(&gui3->head3_3, col1, row, col2 + BUTTON_WIDTH - col1, 0, &SECTION_FONT, NULL, NULL, _tr("Vibration settings"));
             row += space;
             GUI_CreateLabelBox(&gui3->viblbl, col1, row, col2 - col1, 0, &LABEL_FONT, NULL, NULL, _tr("Vibration:"));
