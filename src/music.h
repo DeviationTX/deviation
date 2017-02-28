@@ -3,6 +3,22 @@
 
 #include <telemetry.h>
 
+
+#if HAS_EXTENDED_AUDIO
+#define MAX_MUSICMAP_ENTRIES 240 // arbitraty chosen
+#if HAS_RTC // Check for Devo12 screen
+#define MAX_MUSIC_LABEL 35 // limit label length due to limited screen width
+#else
+#define MAX_MUSIC_LABEL 26
+#endif
+#define MUSIC_UNIT_OFFSET 130
+#define CUSTOM_ALARM_ID 151 // start of custom MP3 IDs
+#define MUSIC_DEC_SEP 110  // MP3 ID of DECSEP = 110 + MUSIC_TOTAL
+#define NUM_STICKS	4
+#define NUM_AUX_KNOBS	(INP_HAS_CALIBRATION - NUM_STICKS)	// Exclude sticks
+#define NUM_SWITCHES (NUM_INPUTS - INP_HAS_CALIBRATION)
+#define MODEL_CUSTOM_ALARMS (NUM_SWITCHES + NUM_AUX_KNOBS * 2 + TELEM_NUM_ALARMS)
+
 enum Music {
     MUSIC_STARTUP = 0,
     MUSIC_SHUTDOWN,
@@ -42,28 +58,29 @@ enum AudioDevices {
     AUDDEV_LAST
 };
 
-#if HAS_EXTENDED_AUDIO
-#define MAX_MUSICMAP_ENTRIES 240 // arbitraty chosen
-#if HAS_RTC // Check for Devo12 screen
-#define MAX_MUSIC_LABEL 35 // limit label length due to limited screen width
-#else
-#define MAX_MUSIC_LABEL 26
-#endif
-#define CUSTOM_ALARM_ID 138 // start of custom MP3 IDs
-#define NUM_STICKS	4
-#define NUM_AUX_KNOBS	(INP_HAS_CALIBRATION - NUM_STICKS)	// Exclude sticks
-#define NUM_SWITCHES (NUM_INPUTS - INP_HAS_CALIBRATION)
-#define MODEL_CUSTOM_ALARMS (NUM_SWITCHES + NUM_AUX_KNOBS * 2 + TELEM_NUM_ALARMS)
-
 enum {
-    TELEM_UNIT_NONE = 0,
-    TELEM_UNIT_TEMP,
-    TELEM_UNIT_VOLT,
-    TELEM_UNIT_RPM,
-    TELEM_UNIT_AMPS,
-    TELEM_UNIT_ALTITUDE,
-    TELEM_UNIT_GFORCE,
-    TELEM_UNIT_SECONDS,
+    MUSIC_UNIT_NONE = 0,
+    MUSIC_UNIT_MINUS,
+    MUSIC_UNIT_TEMP,
+    MUSIC_UNIT_VOLT,
+    MUSIC_UNIT_RPM,
+    MUSIC_UNIT_AMPS,
+    MUSIC_UNIT_ALTITUDE,
+    MUSIC_UNIT_GFORCE,
+    MUSIC_UNIT_KMH,
+    MUSIC_UNIT_MPS,
+    MUSIC_UNIT_MPH,
+    MUSIC_UNIT_KNOTS,
+    MUSIC_UNIT_METERS,
+    MUSIC_UNIT_CELSIUS,
+    MUSIC_UNIT_FAHRENHEIT,
+    MUSIC_UNIT_PERCENT,
+    MUSIC_UNIT_WATT,
+    MUSIC_UNIT_DB,
+    MUSIC_UNIT_SECONDS,
+    MUSIC_UNIT_MINUTES,
+    MUSIC_UNIT_HOURS,
+    MUSIC_UNIT_TOTAL
 };
 
 struct ButtonMusic {

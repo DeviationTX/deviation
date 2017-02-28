@@ -127,12 +127,25 @@ NUMBER600:	600
 NUMBER700:	700
 NUMBER800:	800
 NUMBER900:	900
-NUMBER1000:	1000
+NUMBER1000:	thousand
 DECSEP:		point
+MINUS:		minus
 DEGREES:	degrees
 VOLTS:		volt
 RPMS:		rounds per minute
 AMPERES:	amperes
 ALTITUDE:	meters
 GFORCE:		g
+KMH:		kilometers per hour
+MPS:		meters per second
+MPH:		miles per hour
+KNOTS:		knots
+METERS:		meters
+CELSIUS:	celsius
+FAHRENHEIT:	fahrenheit
+PERCENT:	percent
+WATT:		watts
+DB:		decibel
 SECONDS:	seconds
+MINUTES:	minutes
+HOURS:		hours

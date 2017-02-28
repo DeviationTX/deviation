@@ -249,7 +249,7 @@ void MUSIC_PlayValue(u16 music, s32 value, u8 unit, u8 prec)
     AUDIO_AddQueue(music);
     //Add minus sign for negative number
     if (value < 0) {
-        AUDIO_AddQueue(10); //"minus" not added to music.map yet
+        AUDIO_AddQueue(MUSIC_UNIT_MINUS + MUSIC_UNIT_OFFSET);
         value *= -1;
     }
 
@@ -260,9 +260,12 @@ void MUSIC_PlayValue(u16 music, s32 value, u8 unit, u8 prec)
     }
     //Add decimal seperator
     if (prec > 0) {
-        digits[digit_count++] = 110;
+        digits[digit_count++] = MUSIC_DEC_SEP;
     }
 
+    // Special case value == 0
+    if (value == 0)
+        digits[digit_count++] = 0;
     // Get single digits from remaining value
     while (value > 0) {
         if(value > 999) {
@@ -296,7 +299,7 @@ void MUSIC_PlayValue(u16 music, s32 value, u8 unit, u8 prec)
         AUDIO_AddQueue(digits[i-1] + MUSIC_TOTAL);
     }
     // Add unit for value if specified
-    if (unit > TELEM_UNIT_NONE)
-        AUDIO_AddQueue(unit + 130);
+    if (unit > MUSIC_UNIT_NONE)
+        AUDIO_AddQueue(unit + MUSIC_UNIT_OFFSET);
 }
 #endif

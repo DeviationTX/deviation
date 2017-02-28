@@ -343,13 +343,6 @@ void INPUT_CheckChanges(void) {
             music_idx = changed_input - (NUM_STICKS+1);
             aux_time[music_idx] = CLOCK_getms();
             aux_changed = music_idx + 1;
-            if (aux_up) {
-                //if (Model.music.aux[music_idx * 2 + 1].music)
-                    //MUSIC_Play(Model.music.aux[music_idx * 2 + 1].music);
-            } else {
-                //if (Model.music.aux[music_idx * 2].music)
-                    //MUSIC_Play(Model.music.aux[music_idx * 2].music);
-            }
             return;
 	    }
 #endif
@@ -366,11 +359,11 @@ void INPUT_CheckChanges(void) {
         if (aux_up) {
             if (Model.music.aux[(aux_changed - 1) * 2 + 1].music)
                 MUSIC_PlayValue(Model.music.aux[(aux_changed - 1) * 2 + 1].music,
-                    CHAN_ReadInput(aux_changed + NUM_STICKS)/100,TELEM_UNIT_NONE,0);
+                    CHAN_ReadInput(aux_changed + NUM_STICKS)/100,MUSIC_UNIT_PERCENT,0);
         } else {
             if (Model.music.aux[(aux_changed - 1) * 2].music)
                 MUSIC_PlayValue(Model.music.aux[(aux_changed - 1) * 2].music,
-                    CHAN_ReadInput(aux_changed + NUM_STICKS)/100,TELEM_UNIT_NONE,0);
+                    CHAN_ReadInput(aux_changed + NUM_STICKS)/100,MUSIC_UNIT_PERCENT,0);
         }
         aux_changed = 0;
     }
