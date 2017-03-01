@@ -65,16 +65,19 @@ void PAGE_LoadSaveInit(int page)
     } else {
         name = _tr("Press ENT to load");
     }
-    if (page == LOAD_ICON) {
-        width = SCROLL_W;
-        GUI_CreateImage(&gui->image, IMAGE_X, IMAGE_Y, IMAGE_W, IMAGE_H, mp->iconstr);
-        GUI_SelectionNotify(icon_notify_cb);
-    }
+
     selected = get_scroll_count(page);
 
+    if (page == LOAD_ICON) {
+        width = SCROLL_W;
+    }
     num_models = mp->total_items; /* set by get_scroll_page */
     PAGE_ShowHeader(name);
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, width, LCD_HEIGHT - HEADER_HEIGHT,
                          LINE_SPACE, num_models, row_cb, NULL, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowCol(&gui->scrollable, selected, 0));
+    if (page == LOAD_ICON) {
+        GUI_CreateImage(&gui->image, IMAGE_X, IMAGE_Y, IMAGE_W, IMAGE_H, mp->iconstr);
+        GUI_SelectionNotify(icon_notify_cb);
+    }
 }
