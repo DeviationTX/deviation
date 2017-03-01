@@ -59,6 +59,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 
     int selectable = 2;
     int channel = absrow;
+    labelDesc.style = LABEL_NO_BOX;
     if (channel >= Model.num_channels)
         channel += (NUM_OUT_CHANNELS - Model.num_channels);
     if (channel < NUM_OUT_CHANNELS) {
