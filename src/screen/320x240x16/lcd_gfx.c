@@ -352,7 +352,7 @@ static int image_read_header(FILE *fh, u16 *w, u16 *h, u32 *black, u32 *white)
     }
     if (buf[0] == '#') {
         if (fgets((char *)buf, sizeof(buf), fh) == NULL) {
-            printf("DEBUG: image_read_header: Error: failed to read header comment\n");
+            printf("DEBUG: image_read_header: Error: failed to read header dimensions\n");
             return 0;
         }
     }
