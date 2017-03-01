@@ -27,6 +27,6 @@ enum {
     IMAGE_Y     = 6,
     IMAGE_W     = 6,
     IMAGE_H     = 4,
-    SCROLL_W    = 23*ITEM_SPACE,
+    SCROLL_W    = 22*ITEM_SPACE,
 };
 #include "../128x64x1/model_loadsave.c"
