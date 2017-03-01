@@ -22,7 +22,7 @@
 
 #define OVERRIDE_PLACEMENT
 enum {
-    LABEL_WIDTH = LCD_WIDTH,
+    LABEL_WIDTH = 0,
     IMAGE_X     = 46,
     IMAGE_Y     = 6,
     IMAGE_W     = 6,
