@@ -13,6 +13,8 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "lcd_page_props.h"
+
 const struct ImageMap *_button_image_map(enum ButtonType type)
 {
     switch (type) {
@@ -43,8 +45,10 @@ void _DrawButton(struct guiObject *obj)
         w = text_w;
     if (box->height == 0)
         h = text_h;
-    if (obj != objSELECTED)
-        LCD_PrintCharXY(x++, obj->box.y, ' '); // Box width should be constant, and LabelHelper will be different if selected
+    //if (obj != objSELECTED) {
+    //    LCD_PrintCharXY(x, obj->box.y, ' '); // Box width should be constant, and LabelHelper will be different if selected
+    //    x = x + ITEM_SPACE;                  // But with it commented out text GUI looks more aligned
+    //}
     GUI_DrawLabelHelper(x, obj->box.y, w, h, txt, &button->desc, obj == objSELECTED);
     return;
 }
