@@ -430,7 +430,7 @@ void LCD_SetMappedWindow(unsigned val)
         if (window < 4) {
             TW8816_LoadFont(font_map, 200, 6 * 4);
             for (int i = 0; i < 24; i++) {
-                TW8816_DisplayCharacter(i, 0x100 + 200 + i, 7);
+                TW8816_DisplayCharacter(i, 0x300 + 200 + i, 7);
             }
         } else {
             TW8816_LoadFont(font_map, window-4, 1);
