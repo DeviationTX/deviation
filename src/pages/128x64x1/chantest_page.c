@@ -59,6 +59,7 @@ static void draw_chan(int disp, int row, int y)
         labelDesc.font = CHAN_FONT;  // only digits, can use smaller font to show more channels
         height = LABEL_CHAN_H;
     }
+    labelDesc.style = LABEL_NO_BOX;
     GUI_CreateLabelBox(&gui->chan[idx], x, y,
         LABEL_IDX_W, height, &labelDesc, channum_cb, NULL, (void *)(long)get_channel_idx(disp));
     GUI_CreateLabelBox(&gui->value[idx], x+CHAN_X_OFFSET, y,
