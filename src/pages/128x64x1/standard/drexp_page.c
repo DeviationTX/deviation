@@ -78,7 +78,7 @@ void PAGE_DrExpInit(int page)
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
     // draw a underline only:
-    GUI_CreateRect(&gui->rect, 0, HEADER_WIDGET_HEIGHT, LCD_WIDTH, 1, &labelDesc);
+    GUI_CreateRect(&gui->rect, 0, HEADER_WIDGET_HEIGHT, LCD_WIDTH, 1, &DEFAULT_FONT);
     memset(mp, 0, sizeof(*mp));
     int count = get_mixers();
     int expected = INPUT_NumSwitchPos(mapped_std_channels.switches[SWITCHFUNC_DREXP_AIL + drexp_type]);
