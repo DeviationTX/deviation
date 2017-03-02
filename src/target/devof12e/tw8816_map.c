@@ -51,6 +51,7 @@ u32 TW8816_map_char(u32 c)
                 return 't';   //Latin Small Letter T
             //Other languages workarounds
             //FIXME
+            return c;
         }
         switch(c) {
             //...
