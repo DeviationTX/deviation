@@ -88,6 +88,7 @@ void _GUI_ChangeImage(struct guiImage *image, const char *file, u16 x_off, u16 y
     u32 crc = Crc(file, strlen(file));
     if (image->file != file || image->crc != crc || image->x_off != x_off || image->y_off != y_off) {
         if (replace) {
+            _GUI_DrawMappedStart();
             // draw background where the old picture was bigger
             struct guiBox *box = &obj->box;
             u16 w, h;
@@ -96,6 +97,7 @@ void _GUI_ChangeImage(struct guiImage *image, const char *file, u16 x_off, u16 y
             if (w < box->width) GUI_DrawBackground(box->x + w, box->y, box->width - w, h < box->height ? h : box->height);    // remove upper right part of old image
             box->width = w;
             box->height = h;
+            _GUI_DrawMappedStop();
         }
         image->crc = crc;
         image->file = file;
