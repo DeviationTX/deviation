@@ -120,10 +120,10 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     }
     if (but_press) {
         GUI_CreateButtonPlateText(&gui->col2[relrow].but, FIELD_X, y,
-            FIELD_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, but_txt, but_press, but_data);
+            FIELD_WIDTH, LINE_HEIGHT, &BUTTON_FONT, but_txt, but_press, but_data);
     } else {
         GUI_CreateTextSourcePlate(&gui->col2[relrow].ts, FIELD_X, y,
-            FIELD_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, selpress_cb, sel_cb, sel_input_cb, sel_data);
+            FIELD_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT, selpress_cb, sel_cb, sel_input_cb, sel_data);
     }
     return 1;
 }

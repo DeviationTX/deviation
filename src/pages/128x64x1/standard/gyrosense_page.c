@@ -57,20 +57,20 @@ void PAGE_GyroSenseInit(int page)
 
     u8 y = HEADER_HEIGHT + HEADER_OFFSET;
     GUI_CreateLabelBox(&gui->chanlbl, LABEL_X, y, LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, NULL, NULL, _tr("Channel"));
-    GUI_CreateTextSelectPlate(&gui->chan, FIELD_X, y, FIELD_WIDTH1, LINE_HEIGHT, &DEFAULT_FONT, NULL, gyro_output_cb, NULL);
+    GUI_CreateTextSelectPlate(&gui->chan, FIELD_X, y, FIELD_WIDTH1, LINE_HEIGHT, &TEXTSEL_FONT, NULL, gyro_output_cb, NULL);
 
     y += LINE_SPACE;
     GUI_CreateLabelBox(&gui->gyrolbl[0], LABEL_X, y, LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, label_cb, NULL, (void *)(long)0);
-    GUI_CreateTextSelectPlate(&gui->gyro[0], FIELD_X, y, FIELD_WIDTH2, LINE_HEIGHT, &DEFAULT_FONT, NULL, gyro_val_cb, (void *)0);
+    GUI_CreateTextSelectPlate(&gui->gyro[0], FIELD_X, y, FIELD_WIDTH2, LINE_HEIGHT, &TEXTSEL_FONT, NULL, gyro_val_cb, (void *)0);
 
     y += LINE_SPACE;
     GUI_CreateLabelBox(&gui->gyrolbl[1], LABEL_X, y, LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, label_cb, NULL, (void *)(long)1);
-    GUI_CreateTextSelectPlate(&gui->gyro[1], FIELD_X, y, FIELD_WIDTH2, LINE_HEIGHT, &DEFAULT_FONT, NULL, gyro_val_cb, (void *)1);
+    GUI_CreateTextSelectPlate(&gui->gyro[1], FIELD_X, y, FIELD_WIDTH2, LINE_HEIGHT, &TEXTSEL_FONT, NULL, gyro_val_cb, (void *)1);
 
     if(INPUT_NumSwitchPos(mapped_std_channels.switches[SWITCHFUNC_GYROSENSE]) == 3) {
         y += LINE_SPACE;
         GUI_CreateLabelBox(&gui->gyrolbl[2], LABEL_X, y, LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, label_cb, NULL, (void *)(long)2);
-        GUI_CreateTextSelectPlate(&gui->gyro[2], FIELD_X, y, FIELD_WIDTH2, LINE_HEIGHT, &DEFAULT_FONT, NULL, gyro_val_cb, (void *)2);
+        GUI_CreateTextSelectPlate(&gui->gyro[2], FIELD_X, y, FIELD_WIDTH2, LINE_HEIGHT, &TEXTSEL_FONT, NULL, gyro_val_cb, (void *)2);
     }
 
     GUI_Select1stSelectableObj();

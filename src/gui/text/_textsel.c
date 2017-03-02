@@ -56,6 +56,6 @@ void _DrawTextSelectHelper(struct guiTextSelect *select, const char *str)
             selected = 1;
         }
     }
-    GUI_DrawLabelHelper(box->x + 1 , box->y, box->width - 2 , box->height,
+    GUI_DrawLabelHelper(box->x + 1, box->y, box->width - 2, box->height,
             str, &select->desc, selected);
 }

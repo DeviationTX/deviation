@@ -41,19 +41,19 @@ void PAGE_SwashInit(int page)
     PAGE_RemoveAllObjects();
     get_swash();
     PAGE_ShowHeaderWithSize(_tr("SwashType"), LABEL_WIDTH, HEADER_HEIGHT);
-    GUI_CreateTextSelectPlate(&gui->type, FIELD_X, 0, FIELD_WIDTH, HEADER_WIDGET_HEIGHT, &DEFAULT_FONT, NULL, swash_val_cb, NULL); // FIXME: need a special value for header button/textsels
+    GUI_CreateTextSelectPlate(&gui->type, FIELD_X, 0, FIELD_WIDTH, HEADER_WIDGET_HEIGHT, &TEXTSEL_FONT, NULL, swash_val_cb, NULL); // FIXME: need a special value for header button/textsels
 
     u8 y = HEADER_HEIGHT + 1;
     GUI_CreateLabelBox(&gui->lbl[0], LABEL_X, y, LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, NULL, NULL, _tr("ELE Mix"));
-    GUI_CreateTextSelectPlate(&gui->mix[0], FIELD_X, y, FIELD_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, swashmix_val_cb, (void *)1);
+    GUI_CreateTextSelectPlate(&gui->mix[0], FIELD_X, y, FIELD_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT, NULL, swashmix_val_cb, (void *)1);
 
     y += LINE_SPACE;
     GUI_CreateLabelBox(&gui->lbl[1], LABEL_X, y, LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, NULL, NULL, _tr("AIL Mix"));
-    GUI_CreateTextSelectPlate(&gui->mix[1], FIELD_X, y, FIELD_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, swashmix_val_cb, (void *)0);
+    GUI_CreateTextSelectPlate(&gui->mix[1], FIELD_X, y, FIELD_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT, NULL, swashmix_val_cb, (void *)0);
 
     y += LINE_SPACE;
     GUI_CreateLabelBox(&gui->lbl[2], LABEL_X, y, LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, NULL, NULL, _tr("PIT Mix"));
-    GUI_CreateTextSelectPlate(&gui->mix[2], FIELD_X, y, FIELD_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, swashmix_val_cb, (void *)2);
+    GUI_CreateTextSelectPlate(&gui->mix[2], FIELD_X, y, FIELD_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT, NULL, swashmix_val_cb, (void *)2);
 
     update_swashmixes();
     GUI_Select1stSelectableObj();

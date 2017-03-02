@@ -59,7 +59,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     (void)data;
     struct Trim *trim = MIXER_GetAllTrims();
     GUI_CreateButtonPlateText(&gui->src[relrow], BUTTON_X, y, BUTTON_WIDTH, LINE_HEIGHT,
-            &DEFAULT_FONT, trimsource_name_cb, edit_trim_cb, (void *)((long)absrow));
+            &BUTTON_FONT, trimsource_name_cb, edit_trim_cb, (void *)((long)absrow));
     GUI_CreateTextSelectPlate(&gui->item[relrow], TEXTSEL_X, y,
             TEXTSEL_WIDTH, LINE_HEIGHT, &TINY_FONT,  NULL, set_trimstep_cb, (void *)(long)(absrow+0x000)); //0x000: Use Model.trims
     GUI_CreateLabelBox(&gui->name[relrow], LABEL_X, y, LABEL_WIDTH, LINE_HEIGHT,
@@ -126,7 +126,7 @@ static int row2_cb(int absrow, int relrow, int y, void *data)
     GUI_CreateLabelBox(&guit->label[relrow], LABEL2_X, y, LABEL2_WIDTH, LINE_HEIGHT,
             &LABEL_FONT, NULL, NULL, _tr(label));
     GUI_CreateTextSourcePlate(&guit->value[relrow], TEXTSEL2_X, y,
-            TEXTSEL2_WIDTH, LINE_HEIGHT, &DEFAULT_FONT,  NULL, value, input_value, data);
+            TEXTSEL2_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT,  NULL, value, input_value, data);
     return 1;
 } 
 
@@ -137,7 +137,7 @@ void PAGE_TrimEditInit(int page)
     tp->trim = trim[tp->index];
     GUI_CreateLabelBox(&guit->header, 0, 0, LABEL2_WIDTH, HEADER_HEIGHT, &TITLE_FONT, NULL, NULL, _tr("Edit"));
     GUI_CreateButtonPlateText(&guit->save, BUTTON2_X, BUTTON2_Y, BUTTON2_WIDTH, LINE_HEIGHT,
-            &DEFAULT_FONT, NULL, okcancel_cb, (void *)_tr("Save"));
+            &BUTTON_FONT, NULL, okcancel_cb, (void *)_tr("Save"));
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                          LINE_SPACE, ITEM_LAST, row2_cb, getobj2_cb, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
