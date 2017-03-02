@@ -74,7 +74,6 @@ void PAGE_MainInit(int page)
     GUI_CreateLabelBox(&gui->name, MODEL_NAME_X, MODEL_NAME_Y, //64, 12,
             LCD_WIDTH, LINE_HEIGHT, &MODELNAME_FONT, NULL, NULL, Model.name);
 
-
     show_elements();
     //Battery
     mp->battery = PWR_ReadVoltage();

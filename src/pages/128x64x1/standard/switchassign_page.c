@@ -66,7 +66,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     (void)data;
     GUI_CreateLabelBox(&gui->name[relrow], LABEL_X, y, LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, label_cb, NULL, (void *)(long)absrow);
     GUI_CreateTextSelectPlate(&gui->value[relrow], FIELD_X, y,
-        FIELD_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, switch_cb, (void *)(long)absrow);
+        FIELD_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT, NULL, switch_cb, (void *)(long)absrow);
     return 1;
 }
 

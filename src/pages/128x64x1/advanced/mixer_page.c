@@ -59,23 +59,20 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 
     int selectable = 2;
     int channel = absrow;
-    labelDesc.style = LABEL_NO_BOX;
     if (channel >= Model.num_channels)
         channel += (NUM_OUT_CHANNELS - Model.num_channels);
     if (channel < NUM_OUT_CHANNELS) {
-        labelDesc.align = ALIGN_LEFT;
-        GUI_CreateButtonPlateText(&gui->limit[relrow], COL1_X, y, COL1_W, LINE_HEIGHT, &labelDesc, MIXPAGE_ChanNameProtoCB,
+        GUI_CreateButtonPlateText(&gui->limit[relrow], COL1_X, y, COL1_W, LINE_HEIGHT, &BUTTON_FONT, MIXPAGE_ChanNameProtoCB,
                 limitselect_cb, (void *)((long)channel));
     } else if(! _is_virt_cyclic(channel)) {
-        GUI_CreateButtonPlateText(&gui->limit[relrow], COL1_X, y, COL1_W, LINE_HEIGHT, &labelDesc, MIXPAGE_ChanNameProtoCB,
+        GUI_CreateButtonPlateText(&gui->limit[relrow], COL1_X, y, COL1_W, LINE_HEIGHT, &BUTTON_FONT, MIXPAGE_ChanNameProtoCB,
                 virtname_cb, (void *)((long)channel));
     } else {
         GUI_CreateLabelBox(&gui->name[relrow], COL1_X, y, COL1_W, LINE_HEIGHT, &LABEL_FONT,
                 MIXPAGE_ChanNameProtoCB, NULL, (const void *)((long)channel));
         selectable = 1;
     }
-    labelDesc.align = ALIGN_CENTER;
-    GUI_CreateButtonPlateText(&gui->tmpl[relrow], COL2_X, y, COL2_W, LINE_HEIGHT , &labelDesc, template_name_cb,
+    GUI_CreateButtonPlateText(&gui->tmpl[relrow], COL2_X, y, COL2_W, LINE_HEIGHT, &BUTTON_FONT, template_name_cb,
         templateselect_cb, (void *)((long)channel));
    
     for (idx = 0; idx < NUM_MIXERS; idx++)
@@ -84,7 +81,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     if (idx != NUM_MIXERS) {
         // don't show source if curve type is fixed, works only for the first mix per channel
         if(CURVE_TYPE(&mix[idx].curve) != CURVE_FIXED){
-            GUI_CreateLabelBox(&gui->src[relrow], COL3_X, y, COL3_W , LINE_HEIGHT, &DEFAULT_FONT, show_source, NULL, &mix[idx].src);
+            GUI_CreateLabelBox(&gui->src[relrow], COL3_X, y, COL3_W , LINE_HEIGHT, &TEXTSEL_FONT, show_source, NULL, &mix[idx].src);
         }
     }
     return selectable;

@@ -87,7 +87,7 @@ void PAGE_DrExpInit(int page)
         return;
     }
     GUI_CreateTextSelectPlate(&gui->u.type, HEADER_X, 0, HEADER_W, HEADER_WIDGET_HEIGHT,
-                     &DEFAULT_FONT, NULL, set_type_cb, (void *)NULL);
+                     &TEXTSEL_FONT, NULL, set_type_cb, (void *)NULL);
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT + SCROLL_Y, SCROLL_W, LCD_HEIGHT - HEADER_HEIGHT - SCROLL_Y,
                      2 * LINE_SPACE, count, row_cb, NULL, NULL, NULL);
 

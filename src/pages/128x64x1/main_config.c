@@ -146,21 +146,21 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 #if HAS_LAYOUT_EDITOR
     if (absrow == num_elems + NUM_QUICKPAGES) {
         GUI_CreateTextSelectPlate(&gui->value[relrow], NEWTEXTSEL_X, y_ts,
-                 NEWTEXTSEL_W, LINE_HEIGHT, &DEFAULT_FONT, NULL, newelem_cb, NULL);
+                 NEWTEXTSEL_W, LINE_HEIGHT, &TEXTSEL_FONT, NULL, newelem_cb, NULL);
         GUI_CreateButtonPlateText(&gui->col1[relrow].button, NEWBUTTON_X, y,  NEWBUTTON_W,
-                 LINE_HEIGHT, &DEFAULT_FONT, add_dlgbut_str_cb, newelem_press_cb, (void *)1);
+                 LINE_HEIGHT, &BUTTON_FONT, add_dlgbut_str_cb, newelem_press_cb, (void *)1);
         return 2;
     }
 #endif
     if (absrow >= num_elems + NUM_QUICKPAGES) {
         GUI_CreateButtonPlateText(&gui->col1[relrow].button, QPBUTTON_X, y, QPBUTTON_W, LINE_HEIGHT,
-                 &DEFAULT_FONT, add_dlgbut_str_cb, add_dlgbut_cb, (void *)0);
+                 &BUTTON_FONT, add_dlgbut_str_cb, add_dlgbut_cb, (void *)0);
         return 1;
     }
     if (absrow >= num_elems && absrow < num_elems + NUM_QUICKPAGES) {
-        GUI_CreateLabelBox(&gui->col1[relrow].label, MENULABEL_X, y,  MENULABEL_W, LINE_HEIGHT, &DEFAULT_FONT, menulabel_cb, NULL, (void *)(long)(absrow - num_elems));
+        GUI_CreateLabelBox(&gui->col1[relrow].label, MENULABEL_X, y,  MENULABEL_W, LINE_HEIGHT, &LABEL_FONT, menulabel_cb, NULL, (void *)(long)(absrow - num_elems));
         GUI_CreateTextSelectPlate(&gui->value[relrow], MENUTEXT_X, y + LINE_HEIGHT * LINE_OFFSET,
-             MENUTEXT_W, LINE_HEIGHT, &DEFAULT_FONT, NULL, menusel_cb, (void *)(long)(absrow - num_elems));
+             MENUTEXT_W, LINE_HEIGHT, &TEXTSEL_FONT, NULL, menusel_cb, (void *)(long)(absrow - num_elems));
         return 1;
     }
     for(int type = 0; type < ELEM_LAST; type++) {
@@ -180,18 +180,19 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         int selectable = 1;
         if (type == ELEM_TOGGLE) {
             GUI_CreateButtonPlateText(&gui->col1[relrow].button, ELEMBUT_X, y, ELEMBUT_W,
-                    LINE_HEIGHT, &DEFAULT_FONT, cfglabel_cb, switchicon_press_cb, (void *)item);
+                    LINE_HEIGHT, &BUTTON_FONT, cfglabel_cb, switchicon_press_cb, (void *)item);
             selectable = 2;
         }
         else
-            GUI_CreateLabelBox(&gui->col1[relrow].label, ELEMLBL_X, y, ELEMLBL_W, LINE_HEIGHT, &DEFAULT_FONT, cfglabel_cb, NULL, (void *)item);
+            GUI_CreateLabelBox(&gui->col1[relrow].label, ELEMLBL_X, y, ELEMLBL_W, LINE_HEIGHT, &LABEL_FONT, cfglabel_cb, NULL, (void *)item);
 
         GUI_CreateTextSelectPlate(&gui->value[relrow], ELEMTXT_X, y_ts,
-             ELEMTXT_W, LINE_HEIGHT, &DEFAULT_FONT, (void(*)(guiObject_t *, void *))dlgbut_cb, dlgts1_cb, (void *)item);
+             ELEMTXT_W, LINE_HEIGHT, &TEXTSEL_FONT, (void(*)(guiObject_t *, void *))dlgbut_cb, dlgts1_cb, (void *)item);
         return selectable;
     }
     return 0;
 }
+
 void show_config()
 {
     long count = 0;

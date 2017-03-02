@@ -135,17 +135,17 @@ static int row_cb(int absrow, int relrow, int y, void *data)
            LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, NULL, NULL, _tr(label));
     if (ts_value) {
         GUI_CreateTextSelectPlate(but_txt ? &gui->col1[relrow].ts : &gui->col2[relrow].ts, ts_x, y,
-            TEXTSEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, ts_tgl, ts_value, NULL);
+            TEXTSEL_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT, ts_tgl, ts_value, NULL);
         count++;
     }
     if (but_tgl) {
         GUI_CreateButtonPlateText(&gui->col2[relrow].but, BUTTON_X, y,
-            BUTTON_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, but_txt, but_tgl, but_data);
+            BUTTON_WIDTH, LINE_HEIGHT, &BUTTON_FONT, but_txt, but_tgl, but_data);
         count++;
     }
     return count;
 }
-        
+
 void PAGE_ModelInit(int page)
 {
     (void)page;

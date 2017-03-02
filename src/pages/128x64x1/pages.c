@@ -23,6 +23,7 @@ static unsigned action_cb(u32 button, unsigned flags, void *data);
 static u8 quick_page_enabled;
 static u16 *current_selected;
 static guiScrollable_t *page_scrollable;
+
 void PAGE_Init()
 {
     cur_page = 0;

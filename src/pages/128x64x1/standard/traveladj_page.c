@@ -19,6 +19,7 @@
 #include "gui/gui.h"
 #include "config/model.h"
 #include "standard.h"
+
 enum {
     HEADER1_X      = 52,
     HEADER1_WIDTH  = 35,
@@ -47,9 +48,9 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     GUI_CreateLabelBox(&gui->chan[relrow], LABEL_X, y,
             LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, STDMIX_channelname_cb, NULL, (void *)(long)absrow);
     GUI_CreateTextSelectPlate(&gui->dn[relrow], FIELD1_X, y,
-            FIELD1_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, traveldown_cb, (void *)(long)absrow);
+            FIELD1_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT, NULL, traveldown_cb, (void *)(long)absrow);
     GUI_CreateTextSelectPlate(&gui->up[relrow], FIELD2_X, y,
-            FIELD2_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, travelup_cb, (void *)(long)absrow);
+            FIELD2_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT, NULL, travelup_cb, (void *)(long)absrow);
     return 2;
 }
 
