@@ -65,19 +65,12 @@ static void press1_cb(guiObject_t *obj, s8 press_type, const void *data)
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
-    struct LabelDesc listbox = {
-        .font = DEFAULT_FONT.font,
-        .style = LABEL_LISTBOX,
-        .font_color = DEFAULT_FONT.font_color,
-        .fill_color = DEFAULT_FONT.fill_color,
-        .outline_color = DEFAULT_FONT.outline_color
-    };
     if (absrow >= mp->total_items) {
         GUI_CreateLabelBox(&gui->label[relrow], 8 + ((LCD_WIDTH - 320) / 2), y,
-            200 - ARROW_WIDTH, 24, &listbox, NULL, NULL, "");
+            200 - ARROW_WIDTH, 24, &LISTBOX_FONT, NULL, NULL, "");
     } else {
         GUI_CreateLabelBox(&gui->label[relrow], 8 + ((LCD_WIDTH - 320) / 2), y,
-            200 - ARROW_WIDTH, 24, &listbox, name_cb, press1_cb, (void *)(long)absrow);
+            200 - ARROW_WIDTH, 24, &LISTBOX_FONT, name_cb, press1_cb, (void *)(long)absrow);
     }
     return 0;
 }

@@ -42,7 +42,8 @@ static const char * const FONT_VAL[] = {
     [font_index(SECTION_FONT)]      = "section",
     [font_index(TEXTSEL_FONT)]      = "textsel", 
     [font_index(BUTTON_FONT)]       = "button",
-    [font_index(MENU_FONT)]         = "menu"
+    [font_index(MENU_FONT)]         = "menu",
+    [font_index(LISTBOX_FONT)]      = "listbox"
     };
 static const char COLOR[] = "color";
 static const char BG_COLOR[] = "bg_color";
@@ -69,6 +70,8 @@ static const char * const BOX_VAL[] = {
 #if LCD_DEPTH == 1
     [LABEL_SQUAREBOX]   = "squarebox",
     [LABEL_INVERTED]    = "inverted"
+#else
+    [LABEL_LISTBOX]     = "listbox"
 #endif
     };
 static const char ALIGN[] = "align";

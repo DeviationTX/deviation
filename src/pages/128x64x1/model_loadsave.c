@@ -45,10 +45,8 @@ static void icon_notify_cb(guiObject_t *obj)
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
-    struct LabelDesc listbox = DEFAULT_FONT;
-    listbox.align = ALIGN_LEFT;
     GUI_CreateLabelBox(&gui->name[relrow], 0, y,
-        LABEL_WIDTH, LINE_HEIGHT, &listbox, name_cb, press_cb, (const void *)(long)absrow);
+        LABEL_WIDTH, LINE_HEIGHT, &LISTBOX_FONT, name_cb, press_cb, (const void *)(long)absrow);
     return 0;
 }
 
