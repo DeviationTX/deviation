@@ -48,7 +48,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
     GUI_CreateLabelBox(&gui->name[relrow], LABEL_X, y, LABEL_WIDTH, LINE_HEIGHT,
-            &DEFAULT_FONT, list_cb, NULL, (void *)(long)absrow);
+            &LISTBOX_FONT, list_cb, NULL, (void *)(long)absrow);
     return 0;
 }
 
