@@ -14,11 +14,35 @@
 */
 
 #include "common.h"
+
+static const u8 char_mapping[] = {
+           // 0     1     2     3     4     5     6     7     8     9     A     B     C     D     E     F
+/* 0 */    0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
+/* 1 */    0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F,
+/* 2 */     ' ',  '!',  '"',  '#',  '$',  '%',  '&', 0x27,  '(',  ')', 0x82,  '+',  ',',  '-',  '.',  '/',
+/* 3 */     '0',  '1',  '2',  '3',  '4',  '5',  '6',  '7',  '8',  '9',  ':',  ';',  '<',  '=',  '>',  '?',
+/* 4 */     '@',  'A',  'B',  'C',  'D',  'E',  'F',  'G',  'H',  'I',  'J',  'K',  'L',  'M',  'N',  'O',
+/* 5 */     'P',  'Q',  'R',  'S',  'T',  'U',  'V',  'W',  'X',  'Y',  'Z',  '[', 0x80,  ']',  '?',  '-',
+/* 6 */     '?',  'a',  'b',  'c',  'd',  'e',  'f',  'g',  'h',  'i',  'j',  'k',  'l',  'm',  'n',  'o',
+/* 7 */     'p',  'q',  'r',  's',  't',  'u',  'v',  'w',  'x',  'y',  'z',  '(',  '!',  ')', 0x86, 0x7F,
+/* 8 */    0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x8A, 0x8B, 0x8C, 0x8D, 0x8E, 0x8F,
+/* 9 */    0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97, 0x98, 0x99, 0x9A, 0x9B, 0x9C, 0x9D, 0x9E, 0x9F,
+/* A */     ' ', 0x69, 0x85, 0x8B,  '?', 0x1F,  '!',  '?',  '?',  'C',  '?',  '<',  '?',  '-', 0x87,  '?',
+/* B */    0x89,  '?',  '?',  '?',  '?',  'm',  '?', 0x00,  ',',  '?',  '?',  '>',  '?', 0x8A,  '?', 0x84,
+/* C */    0xAF, 0xC3, 0xB4, 0xB9, 0xBE, 0xC9,  '?',  'C', 0xB0, 0xC4, 0xB5, 0xBF, 0xB1, 0xC5, 0xB6, 0xC0,
+/* D */     '?', 0x7D, 0xB2, 0xC6, 0xB7, 0xBC, 0xC1,  'x',  'O', 0xB3, 0xC7, 0xB8, 0xC2,  'Y',  '?',  's',
+/* E */    0x9B, 0x2A, 0xA0, 0xA5, 0xAA, 0xC8,  '?', 0x7B, 0x9C, 0x5C, 0xA1, 0xAB, 0x9D, 0x5E, 0xA2, 0xAC,
+/* F */     '?', 0x7E, 0x9E, 0x5F, 0xA3, 0xA8, 0xAD, 0x7C,  'o', 0x9F, 0x60, 0xA4, 0xAE,  'y',  'p',  'y'
+};
+
 u32 TW8816_map_char(u32 c)
 {
     if(c < 0x300) {           //from 0x300 start RAM fonts
                               //c = Unicode character code U+0XXX
-        if(c >= 0x100) {
+        if(c < 0x100) {
+            return char_mapping[c];
+        }
+        else {
             //Hungarian workaround (replace letters be lacking at ROM font)
             if(c == 0x150)    //Latin Capital Letter O with double acute
                 return 0xBC;  //Latin Capital letter O with tilde
@@ -49,123 +73,46 @@ u32 TW8816_map_char(u32 c)
                 return 'T';   //Latin Capital letter T
             if(c == 0x21B)    //Latin Small Letter T with comma
                 return 't';   //Latin Small Letter T
+            //Czech workaround (replace letters be lacking at ROM font)
+            if(c == 0x10C)    //Latin Capital Letter C with caron
+                return 'C';   //Latin Capital letter C
+            if(c == 0x10D)    //Latin Small Letter C with caron
+                return 'c';   //Latin Small Letter C
+            if(c == 0x10E)    //Latin Capital Letter D with caron
+                return 'D';   //Latin Capital letter D
+            if(c == 0x10F)    //Latin Small Letter D with caron
+                return 'd';   //Latin Small Letter D
+            if(c == 0x11A)    //Latin Capital Letter E with caron
+                return 'E';   //Latin Capital letter E
+            if(c == 0x11B)    //Latin Small Letter E with caron
+                return 'e';   //Latin Small Letter E
+            if(c == 0x147)    //Latin Capital Letter N with caron
+                return 'N';   //Latin Capital letter N
+            if(c == 0x148)    //Latin Small Letter N with caron
+                return 'n';   //Latin Small Letter N
+            if(c == 0x158)    //Latin Capital Letter R with caron
+                return 'R';   //Latin Capital letter R
+            if(c == 0x159)    //Latin Small Letter R with caron
+                return 'r';   //Latin Small Letter R
+            if(c == 0x160)    //Latin Capital Letter S with caron
+                return 'S';   //Latin Capital letter S
+            if(c == 0x161)    //Latin Small Letter S with caron
+                return 's';   //Latin Small Letter S
+            if(c == 0x164)    //Latin Capital Letter T with caron
+                return 'T';   //Latin Capital letter T
+            if(c == 0x165)    //Latin Small Letter T with caron
+                return 't';   //Latin Small Letter T
+            if(c == 0x16E)    //Latin Capital Letter U with ring above
+                return 'U';   //Latin Capital letter U
+            if(c == 0x16F)    //Latin Small Letter U with ring above
+                return 'u';   //Latin Small Letter U
+            if(c == 0x17D)    //Latin Capital Letter Z with caron
+                return 'Z';   //Latin Capital letter Z
+            if(c == 0x17E)    //Latin Small Letter Z with caron
+                return 'z';   //Latin Small Letter Z
             //Other languages workarounds
             //FIXME
             return '?';
-        }
-        switch(c) {
-            //...
-            case 0x2A: return 0x82; //Asterisk
-            //...
-            case 0x5C: return 0x80; //Backslash
-            //...
-            case 0x5E: return '?';  //-Circumflex accent
-            case 0x5F: return '-';  //'_' -Low line
-            case 0x60: return '?';  //-Grave accent
-            //...
-            case 0x7B: return '(';  //-Left Curly Bracket
-            case 0x7C: return '!';  //-Vertical bar
-            case 0x7D: return ')';  //-Right Curly Bracket
-            case 0x7E: return 0x86; //Tilde
-            //...Control codes 0x80 to 0x9F
-            case 0xA0: return ' ';  //Non-breaking space
-            case 0xA1: return 0x69; //Inverted Exclamation Mark
-            case 0XA2: return 0x85; //Cent sign
-            case 0xA3: return 0x8B; //Pound sign
-            case 0xA4: return '?';  //-Currency sign
-            case 0xA5: return 0x1F; //Yen sign
-            case 0xA6: return '!';  //-Broken bar
-            case 0xA7: return '?';  //-Section sign
-            case 0xA8: return '?';  //-Diaeresis (Umlaut)
-            case 0xA9: return 'C';  //-Copyright sign
-            case 0xAA: return '?';  //-Feminine Ordinal Indicator
-            case 0xAB: return '<';  //-Left-pointing double angle quotation mark
-            case 0xAC: return '?';  //-Not sign
-            case 0xAD: return '-';  //-Soft hyphen
-            case 0xAE: return 0x87; //Registered sign
-            case 0xAF: return '?';  //-Macron
-            case 0xB0: return 0x89; //Degree symbol
-            case 0xB1: return '?';  //-Plus-minus sign
-            case 0xB2: return '?';  //-Superscript two
-            case 0xB3: return '?';  //-Superscript three
-            case 0xB4: return '?';  //-Acute accent
-            case 0xB5: return 'm';  //-Micro sign
-            case 0xB6: return '?';  //-Pilcrow sign
-            case 0xB7: return 0x00; //Middle dot
-            case 0xB8: return ',';  //-Cedilla
-            case 0xB9: return '?';  //-Superscript one
-            case 0xBA: return '?';  //-Masculine ordinal indicator
-            case 0xBB: return '>';  //-Right-pointing double angle quotation mark
-            case 0xBC: return '?';  //-Vulgar fraction one quarter
-            case 0xBD: return 0x8A; //Vulgar fraction one half
-            case 0xBE: return '?';  //-Vulgar fraction three quarters
-            case 0xBF: return 0x84; //Inverted Question Mark
-            case 0xC0: return 0xAF; //Latin Capital Letter A with grave
-            case 0xC1: return 0xC3; //Latin Capital letter A with acute
-            case 0xC2: return 0xB4; //Latin Capital letter A with circumflex
-            case 0xC3: return 0xB9; //Latin Capital letter A with tilde
-            case 0xC4: return 0xBE; //Latin Capital letter A with diaeresis
-            case 0xC5: return 0xC9; //Latin Capital letter A with ring above
-            case 0xC6: return '?';  //-Latin Capital letter AE
-            case 0xC7: return 'C';  //-Latin Capital letter C with cedilla
-            case 0xC8: return 0xB0; //Latin Capital letter E with grave
-            case 0xC9: return 0xC4; //Latin Capital letter E with acute
-            case 0xCA: return 0xB5; //Latin Capital letter E with circumflex
-            case 0xCB: return 0xBF; //Latin Capital letter E with diaeresis
-            case 0xCC: return 0xB1; //Latin Capital letter I with grave
-            case 0xCD: return 0xC5; //Latin Capital letter I with acute
-            case 0xCE: return 0xB6; //Latin Capital letter I with circumflex
-            case 0xCF: return 0xC0; //Latin Capital letter I with diaeresis
-            case 0xD0: return '?';  //-Latin Capital letter Eth
-            case 0xD1: return 0x7D; //Latin Capital letter N with tilde
-            case 0xD2: return 0xB2; //Latin Capital letter O with grave
-            case 0xD3: return 0xC6; //Latin Capital letter O with acute
-            case 0xD4: return 0xB7; //Latin Capital letter O with circumflex
-            case 0xD5: return 0xBC; //Latin Capital letter O with tilde
-            case 0xD6: return 0xC1; //Latin Capital letter O with diaeresis
-            case 0xD7: return 'x';  //Multiplication sign
-            case 0xD8: return 'O';  //-Latin Capital letter O with stroke
-            case 0xD9: return 0xB3; //Latin Capital letter U with grave
-            case 0xDA: return 0xC7; //Latin Capital letter U with acute
-            case 0xDB: return 0xB8; //Latin Capital Letter U with circumflex
-            case 0xDC: return 0xC2; //Latin Capital Letter U with diaeresis
-            case 0xDD: return 'Y';  //-Latin Capital Letter Y with acute
-            case 0xDE: return '?';  //-Latin Capital Letter Thorn
-            case 0xDF: return 's';  //-Latin Small Letter sharp S
-            case 0xE0: return 0x9B; //Latin Small Letter A with grave
-            case 0xE1: return 0x2A; //Latin Small Letter A with acute
-            case 0xE2: return 0xA0; //Latin Small Letter A with circumflex
-            case 0xE3: return 0xA5; //Latin Small Letter A with tilde
-            case 0xE4: return 0xAA; //Latin Small Letter A with diaeresis
-            case 0xE5: return 0xC8; //Latin Small Letter A with ring above
-            case 0xE6: return '?';  //-Latin Small Letter AE
-            case 0xE7: return 0x7B; //Latin Small Letter C with cedilla
-            case 0xE8: return 0x9C; //Latin Small Letter E with grave
-            case 0xE9: return 0x5C; //Latin Small Letter E with acute
-            case 0xEA: return 0xA1; //Latin Small Letter E with circumflex
-            case 0xEB: return 0xAB; //Latin Small Letter E with diaeresis
-            case 0xEC: return 0x9D; //Latin Small Letter I with grave
-            case 0xED: return 0x5E; //Latin Small Letter I with acute
-            case 0xEE: return 0xA2; //Latin Small Letter I with circumflex
-            case 0xEF: return 0xAC; //Latin Small Letter I with diaeresis
-            case 0xF0: return '?';  //-Latin Small Letter Eth
-            case 0xF1: return 0x7E; //Latin Small Letter N with tilde
-            case 0xF2: return 0x9E; //Latin Small Letter O with grave
-            case 0xF3: return 0x5F; //Latin Small Letter O with acute
-            case 0xF4: return 0xA3; //Latin Small Letter O with circumflex
-            case 0xF5: return 0xA8; //Latin Small Letter O with tilde
-            case 0xF6: return 0xAD; //Latin Small Letter O with diaeresis
-            case 0xF7: return 0x7C; //Division sign
-            case 0xF8: return 'o';  //-Latin Small Letter O with stroke
-            case 0xF9: return 0x9F; //Latin Small Letter U with grave
-            case 0xFA: return 0x60; //Latin Small Letter U with acute
-            case 0xFB: return 0xA4; //Latin Small Letter U with circumflex
-            case 0xFC: return 0xAE; //Latin Small Letter U with diaeresis
-            case 0xFD: return 'y';  //-Latin Small Letter Y with acute
-            case 0xFE: return 'p';  //-Latin Small Letter Thorn
-            case 0xFF: return 'y';  //-Latin Small Letter Y with diaeresis
-
-            default : return c;
         }
     }
     return c;
