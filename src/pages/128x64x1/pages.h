@@ -46,7 +46,6 @@ struct pagemem {
 #define TOGGLEICON_WIDTH 8
 #define TOGGLEICON_HEIGHT 11
 
-extern struct LabelDesc labelDesc;
 void PAGE_SaveMixerSetup(struct mixer_page * const mp);
 //void PAGE_ShowHeaderWithSize(const char *title, u8 width, u8 height);
 void PAGE_ChangeByID(enum PageID id, s8 page);

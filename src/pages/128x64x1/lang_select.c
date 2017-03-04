@@ -33,7 +33,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
     GUI_CreateLabelBox(&gui->label[relrow], 0, y,
-            LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, string_cb, press_cb, (void *)(long)absrow);
+            LABEL_WIDTH, LINE_HEIGHT, &LISTBOX_FONT, string_cb, press_cb, (void *)(long)absrow);
     return 1;
 }
 

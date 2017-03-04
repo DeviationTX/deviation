@@ -14,8 +14,6 @@
  */
 #include "pages.h"
 
-struct LabelDesc labelDesc; // create a style-customizable font so that it can be shared for all pages
-
 static unsigned action_cb(u32 button, unsigned flags, void *data);
 
 #include "../common/_pages.c"
@@ -42,11 +40,6 @@ void PAGE_Init()
           BUTTON_PRESS | BUTTON_LONGPRESS | BUTTON_RELEASE | BUTTON_PRIORITY, action_cb, NULL);
     //PAGE_ChangeByID(PAGEID_MAIN, 0);
     PAGE_ChangeByID(PAGEID_SPLASH, 0);
-
-    labelDesc.font = DEFAULT_FONT.font;
-    labelDesc.style = LABEL_NO_BOX;
-    labelDesc.align = ALIGN_LEFT;
-    labelDesc.font_color = labelDesc.fill_color = labelDesc.outline_color = 0xffff; // not to draw box
 }
 
 void PAGE_ChangeByID(enum PageID id, s8 menuPage)

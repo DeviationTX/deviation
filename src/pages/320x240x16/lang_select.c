@@ -26,19 +26,12 @@ static struct lang_obj * const gui = &gui_objs.u.lang;
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     int row_count = (long)data;
-    struct LabelDesc listbox = {
-        .font = DEFAULT_FONT.font,
-        .style = LABEL_LISTBOX,
-        .font_color = DEFAULT_FONT.font_color,
-        .fill_color = DEFAULT_FONT.fill_color,
-        .outline_color = DEFAULT_FONT.outline_color
-    };
     if (absrow >= row_count) {
         GUI_CreateLabelBox(&gui->label[relrow], LCD_WIDTH/2-100, y,
-                200 - ARROW_WIDTH, LINE_HEIGHT, &listbox, NULL, NULL, "");
+                200 - ARROW_WIDTH, LINE_HEIGHT, &LISTBOX_FONT, NULL, NULL, "");
     } else {
         GUI_CreateLabelBox(&gui->label[relrow], LCD_WIDTH/2-100, y,
-                200 - ARROW_WIDTH, LINE_HEIGHT, &listbox, string_cb, press_cb, (void *)(long)absrow);
+                200 - ARROW_WIDTH, LINE_HEIGHT, &LISTBOX_FONT, string_cb, press_cb, (void *)(long)absrow);
     }
     return 1;
 }

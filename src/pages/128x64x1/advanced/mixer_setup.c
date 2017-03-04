@@ -317,7 +317,7 @@ static int expo_row_cb(int absrow, int relrow, int y, void *data)
         GUI_CreateLabelBox(&gui->label[relrow].lbl, LABEL_X, y, LABEL_W, LINE_HEIGHT,
             &LABEL_FONT, label_cb, NULL, label);
         if(underline)
-            GUI_CreateRect(&gui->rect1, LABEL_X, y, LABEL_W, 1, &labelDesc);
+            GUI_CreateRect(&gui->rect1, LABEL_X, y, LABEL_W, 1, &DEFAULT_FONT);
         y += (LINES_PER_ROW - 1) * LINE_SPACE;
     }
     GUI_CreateTextSourcePlate(&gui->value[relrow].ts, TEXTSEL_X, y,

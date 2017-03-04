@@ -62,7 +62,7 @@ void PAGE_EditCurvesInit(int page)
     GUI_CreateButtonPlateText(&gui->save, SAVE_X, 0, SAVE_W, HEADER_WIDGET_HEIGHT, &BUTTON_FONT , NULL, okcancel_cb, (void *)_tr("Save"));
     // Draw a line
     if (UNDERLINE)
-        GUI_CreateRect(&gui->rect, 0, HEADER_WIDGET_HEIGHT, LCD_WIDTH, 1, &labelDesc);
+        GUI_CreateRect(&gui->rect, 0, HEADER_WIDGET_HEIGHT, LCD_WIDTH, 1, &DEFAULT_FONT);
 
     u8 space = LINE_SPACE;
     u8 y = space;
