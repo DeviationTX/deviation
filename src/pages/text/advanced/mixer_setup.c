@@ -17,15 +17,17 @@
 #include "../pages.h"
 #include "config/model.h"
 
+#if LCD_WIDTH == 66
+//devof12e
 enum {
    TYPE_X     = 10*ITEM_SPACE,
-   TYPE_W     = 7*ITEM_SPACE,
+   TYPE_W     = 8*ITEM_SPACE,
    SAVE_X     = LCD_WIDTH - 6*ITEM_SPACE,
    SAVE_W     = 6*ITEM_SPACE,
    LABEL_X    = 1*ITEM_SPACE,
    LABEL_W    = 9*ITEM_SPACE,
    TEXTSEL_X  = 12*ITEM_SPACE,
-   TEXTSEL_W  = 8*ITEM_SPACE,
+   TEXTSEL_W  = 9*ITEM_SPACE,
    GRAPH_X    = 46,
    GRAPH_Y    = 6,
    GRAPH_W    = 6,
@@ -35,5 +37,24 @@ enum {
    LINES_PER_ROW     = 1,
    UNDERLINE         = 0,
 };
-
+#else
+enum {
+   TYPE_X     = 9*ITEM_SPACE,
+   TYPE_W     = 8*ITEM_SPACE,
+   SAVE_X     = LCD_WIDTH - 5*ITEM_SPACE,
+   SAVE_W     = 6*ITEM_SPACE,
+   LABEL_X    = 1*ITEM_SPACE,
+   LABEL_W    = 9*ITEM_SPACE,
+   TEXTSEL_X  = 12*ITEM_SPACE,
+   TEXTSEL_W  = 9*ITEM_SPACE,
+   GRAPH_X    = 46,
+   GRAPH_Y    = 6,
+   GRAPH_W    = 6,
+   GRAPH_H    = 4,
+   LEFT_VIEW_WIDTH   = 23*ITEM_SPACE,
+   RIGHT_VIEW_HEIGHT = 12,
+   LINES_PER_ROW     = 1,
+   UNDERLINE         = 0,
+};
+#endif
 #include "../../128x64x1/advanced/mixer_setup.c"
