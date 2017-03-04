@@ -1360,6 +1360,7 @@ u8 CONFIG_GetCurrentModel() {
 }
 
 const char *CONFIG_GetIcon(enum ModelType type) {
+    if(type < 0 || type > 2) return UNKNOWN_ICON;
     const char *const icons[] = {
        "modelico/heli" IMG_EXT,
        "modelico/plane" IMG_EXT,
