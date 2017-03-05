@@ -21,7 +21,9 @@
 
 #define OVERRIDE_PLACEMENT
 enum {
-    LABEL_X        = 16*ITEM_SPACE,
-    LABEL_WIDTH    = 7*ITEM_SPACE,
+    FIELD_X        = 16*ITEM_SPACE,
+    FIELD_WIDTH    = 7*ITEM_SPACE,
+    LABEL_X        = 0,
+    LABEL_WIDTH    = FIELD_X - LABEL_X,
 };
 #include "../../128x64x1/standard/switchassign_page.c"

@@ -257,7 +257,7 @@ void PAGE_TouchInit(int page)
 {
     (void)page;
     //PAGE_ShowHeader_ExitOnly("Touch Calibrate", okcancel_cb); //Can't do this while calibrating
-    GUI_CreateLabel(&guic->title, 40, 10, NULL, TITLE_FONT, _tr("Touch Calibrate"));
+    GUI_CreateLabelBox(&guic->title, 40, 10, LCD_WIDTH - 40, 14, &TITLE_FONT, NULL, NULL, _tr("Touch Calibrate"));
     GUI_CreateLabelBox(&guic->msg, XCOORD - 5, YCOORD + 32 - 5, 11, 11, &SMALLBOX_FONT, NULL, NULL, "");
     GUI_CreateLabelBox(&guic->msg1, (LCD_WIDTH - 100) /2, (LCD_HEIGHT - 20)/2, 100, 20, &NARROW_FONT, show_msg_cb, NULL, NULL);
     memset(&cp->coords, 0, sizeof(cp->coords));

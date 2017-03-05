@@ -30,9 +30,10 @@ static void _show_title()
                           Model.num_channels + NUM_VIRT_CHANNELS - ENTRIES_PER_PAGE
                         : Model.num_channels + NUM_VIRT_CHANNELS;
     memset(gui, 0, sizeof(*gui));
-    PAGE_ShowHeader(PAGE_GetName(PAGEID_MIXER));
-    GUI_CreateIcon(&gui->testico, LCD_WIDTH-128, 0, &icons[ICON_CHANTEST], show_chantest_cb, NULL);
-    GUI_CreateIcon(&gui->reorderico, LCD_WIDTH-96, 0, &icons[ICON_ORDER], reorder_cb, NULL);
+    //PAGE_ShowHeader(PAGE_GetName(PAGEID_MIXER));
+    PAGE_ShowHeaderWithSize(PAGE_GetName(PAGEID_MIXER), LCD_WIDTH - 104, 0);
+    GUI_CreateIcon(&gui->testico, LCD_WIDTH-64, 0, &icons[ICON_CHANTEST], show_chantest_cb, NULL);
+    GUI_CreateIcon(&gui->reorderico, LCD_WIDTH-32, 0, &icons[ICON_ORDER], reorder_cb, NULL);
 }
 
 #undef XOFFSET

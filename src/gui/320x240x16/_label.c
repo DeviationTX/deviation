@@ -27,7 +27,7 @@ void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_w, u16 obj_h, const char 
     if (obj_h == 0)
         obj_h = txt_h;
     if (desc->style == LABEL_LISTBOX) {
-        LCD_FillRect(obj_x, obj_y, obj_w, obj_h, is_selected ? Display.listbox.fg_color : Display.listbox.bg_color);
+        LCD_FillRect(obj_x, obj_y, obj_w, obj_h, is_selected ? Display.listbox.bg_select : Display.listbox.bg_color);
     } else if (desc->style == LABEL_FILL) {
         LCD_FillRect(obj_x, obj_y, obj_w, obj_h, desc->fill_color);
     } else {
@@ -52,7 +52,7 @@ void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_w, u16 obj_h, const char 
     }
 
     if (desc->style == LABEL_LISTBOX) {
-        LCD_SetFontColor(is_selected ? Display.listbox.fg_select : Display.listbox.bg_select);
+        LCD_SetFontColor(is_selected ? Display.listbox.fg_select : Display.listbox.fg_color);
     } else {
         if (desc->style != LABEL_FILL && is_selected) {
             LCD_SetFontColor(~desc->font_color);

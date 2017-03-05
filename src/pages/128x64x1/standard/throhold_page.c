@@ -21,9 +21,11 @@
 #include "standard.h"
 
 enum {
-    LABEL_X        = 75,
-    LABEL_WIDTH    = 40,
     HEADER_OFFSET  = 1,
+    FIELD_X        = 75,
+    FIELD_WIDTH    = 40,
+    LABEL_X        = 0,
+    LABEL_WIDTH    = FIELD_X - LABEL_X,
 };
 #endif //OVERRIDE_PLACEMENT
 
@@ -39,12 +41,12 @@ void PAGE_ThroHoldInit(int page)
     PAGE_ShowHeader(_tr("Throttle hold"));
 
     u8 y = HEADER_HEIGHT + HEADER_OFFSET;
-    GUI_CreateLabelBox(&gui->enlbl, 0, y, 0, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Thr hold"));
-    GUI_CreateTextSelectPlate(&gui->en, LABEL_X, y, LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, throhold_cb,  NULL);
+    GUI_CreateLabelBox(&gui->enlbl, LABEL_X, y, LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, NULL, NULL, _tr("Thr hold"));
+    GUI_CreateTextSelectPlate(&gui->en, FIELD_X, y, FIELD_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT, NULL, throhold_cb,  NULL);
 
     y += LINE_SPACE;
-    GUI_CreateLabelBox(&gui->valuelbl, 0, y, 0, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Hold position"));
-    GUI_CreateTextSelectPlate(&gui->value, LABEL_X, y, LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, holdpostion_cb,  NULL);
+    GUI_CreateLabelBox(&gui->valuelbl, LABEL_X, y, LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, NULL, NULL, _tr("Hold position"));
+    GUI_CreateTextSelectPlate(&gui->value, FIELD_X, y, FIELD_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT, NULL, holdpostion_cb,  NULL);
 
     GUI_Select1stSelectableObj();
 

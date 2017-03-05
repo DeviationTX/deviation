@@ -104,13 +104,13 @@ static void _show_settimer_page(u8 index)
 
     //Row 2
     y += space;
-    GUI_CreateTextSelectPlate(&guiset->hms, TEXTSEL1_X, y, TEXTSEL1_W, LINE_HEIGHT, &DEFAULT_FONT, NULL, settimer_select_cb, (void *)(long)SELECT_HMS);
-    GUI_CreateTextSelectPlate(&guiset->value, TEXTSEL2_X, y, TEXTSEL2_W, LINE_HEIGHT, &DEFAULT_FONT, NULL, settimer_select_cb, (void *)(long)SELECT_VALUE);
+    GUI_CreateTextSelectPlate(&guiset->hms, TEXTSEL1_X, y, TEXTSEL1_W, LINE_HEIGHT, &TEXTSEL_FONT, NULL, settimer_select_cb, (void *)(long)SELECT_HMS);
+    GUI_CreateTextSelectPlate(&guiset->value, TEXTSEL2_X, y, TEXTSEL2_W, LINE_HEIGHT, &TEXTSEL_FONT, NULL, settimer_select_cb, (void *)(long)SELECT_VALUE);
 
     //Row 3
     y += space;
     GUI_CreateLabelBox(&guiset->addtime, LABEL_X, y, LABEL_W, LINE_HEIGHT, &DEFAULT_FONT, timer_value_str_cb, NULL, (void *)(long)ADD_TIMER);
-    GUI_CreateTextSelectPlate(&guiset->addset, TEXTSEL1_X, y , TEXTSEL1_W, LINE_HEIGHT, &DEFAULT_FONT, add_set_button_cb, settimer_select_cb, (void *)(long)ADDSET_SELECT);
+    GUI_CreateTextSelectPlate(&guiset->addset, TEXTSEL1_X, y , TEXTSEL1_W, LINE_HEIGHT, &TEXTSEL_FONT, add_set_button_cb, settimer_select_cb, (void *)(long)ADDSET_SELECT);
     y += space;
 
     //Row 4

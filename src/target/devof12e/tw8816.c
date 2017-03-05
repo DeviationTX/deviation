@@ -220,7 +220,7 @@ void TW8816_DisplayCharacter(unsigned pos, unsigned chr, unsigned attr)
 {
     if (window == 1)
         pos += 430;
-    LCD_WriteReg(0x94, (chr & 0x100) ? 0x80 : 0x00); // isRamFont
+    LCD_WriteReg(0x94, ((chr & 0xFF00) >= 0x300) ? 0x80 : 0x00); // isRamFont
     LCD_WriteReg(0x95, pos >> 8);
     LCD_WriteReg(0x96, pos & 0xff);
     LCD_WriteReg(0x97, chr & 0xff);

@@ -231,7 +231,6 @@ typedef struct guiTextSelect {
     const struct ImageMap *button;
     u8 state;
     enum TextSelectType type;
-    u16 fontColor;
     const char *(*ValueCB)(guiObject_t *obj, int dir, void *data);
     void (*SelectCB)(guiObject_t *obj, void *data);
     const char *(*InputValueCB)(guiObject_t *obj, int src, int value, void *data);

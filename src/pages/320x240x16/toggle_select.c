@@ -111,17 +111,17 @@ static void show_iconsel_page(int SelectedIcon)
     if(num_positions < 2)
         num_positions = 2;
 
-    GUI_CreateLabel(&gui->togglelabel[0], 94, 50, NULL, DEFAULT_FONT, _tr("Pos 0"));
+    GUI_CreateLabelBox(&gui->togglelabel[0], 94, 50, 30, 14, &LABEL_FONT, NULL, NULL, _tr("Pos 0"));
     img = TGLICO_GetImage(Model.pagecfg2.elem[tp->tglidx].extra[0]);
     GUI_CreateImageOffset(&gui->toggleicon[0], 124, 40, TOGGLEICON_WIDTH, TOGGLEICON_HEIGHT, img.x_off, img.y_off, img.file,
              SelectedIcon == 0 ? tglico_reset_cb : tglico_setpos_cb, (void *)0L);
 
-    GUI_CreateLabel(&gui->togglelabel[1], 174, 50, NULL, DEFAULT_FONT, _tr("Pos 1"));
+    GUI_CreateLabelBox(&gui->togglelabel[1], 174, 50, 30, 14, &LABEL_FONT, NULL, NULL, _tr("Pos 1"));
     img = TGLICO_GetImage(Model.pagecfg2.elem[tp->tglidx].extra[1]);
     GUI_CreateImageOffset(&gui->toggleicon[1], 204, 40, TOGGLEICON_WIDTH, TOGGLEICON_HEIGHT, img.x_off, img.y_off, img.file,
              SelectedIcon == 1 ? tglico_reset_cb : tglico_setpos_cb, (void *)1L);
     if (num_positions == 3) {
-        GUI_CreateLabel(&gui->togglelabel[2], 254, 50, NULL, DEFAULT_FONT, _tr("Pos 2"));
+        GUI_CreateLabelBox(&gui->togglelabel[2], 254, 50, 30, 14, &LABEL_FONT, NULL, NULL, _tr("Pos 2"));
         img = TGLICO_GetImage(Model.pagecfg2.elem[tp->tglidx].extra[2]);
         GUI_CreateImageOffset(&gui->toggleicon[2], 284, 40, TOGGLEICON_WIDTH, TOGGLEICON_HEIGHT, img.x_off, img.y_off, img.file,
              SelectedIcon == 2 ? tglico_reset_cb : tglico_setpos_cb, (void *)2L);

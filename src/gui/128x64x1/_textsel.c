@@ -36,9 +36,8 @@ void _DrawTextSelectHelper(struct guiTextSelect *select, const char *str)
     } else {
         if (!select->enable) { // avoid drawing button box when it is disable
             select->desc.style = LABEL_NO_BOX;
-            select->desc.align = ALIGN_CENTER;
         }
     }
-    GUI_DrawLabelHelper(box->x + arrow_width , box->y, box->width - 2 * arrow_width , box->height,
+    GUI_DrawLabelHelper(box->x + arrow_width, box->y, box->width - 2 * arrow_width, box->height,
             str, &select->desc, (guiObject_t *)select == objSELECTED);
 }

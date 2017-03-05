@@ -26,7 +26,7 @@ enum {
   MED_SEL_X_OFFSET   = 68 + 8,
   SMALL_SEL_X_OFFSET = 68 + 15,
   TITLE_X_OFFSET     = 0,
-  TITLE_WIDTH        = 0,
+  TITLE_WIDTH        = LCD_WIDTH - ARROW_WIDTH - 1,
   LABEL_X_OFFSET     = 0,
   LABEL_WIDTH        = 0,
   CALIB_Y            = 0,
@@ -164,21 +164,18 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             break;
     }
     if (title) {
-        enum LabelType oldType = labelDesc.style;
-        labelDesc.style = LABEL_UNDERLINE;
         GUI_CreateLabelBox(&gui->title[relrow], TITLE_X_OFFSET, y,
-                TITLE_WIDTH, LINE_HEIGHT, &labelDesc, NULL, NULL, _tr(title));
-        labelDesc.style = oldType;
+                TITLE_WIDTH, LINE_HEIGHT, &SECTION_FONT, NULL, NULL, _tr(title));
         y += LINE_SPACE;
     }
     GUI_CreateLabelBox(&gui->label[relrow], LABEL_X_OFFSET, y,
-            LABEL_WIDTH, LINE_HEIGHT,  &DEFAULT_FONT, NULL, NULL, _tr(label));
+            LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, NULL, NULL, _tr(label));
     if(but_str) {
         GUI_CreateButtonPlateText(&gui->value[relrow].but, x, y,
-            TEXTSEL_X_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, but_str, tgl, data);
+            TEXTSEL_X_WIDTH, LINE_HEIGHT, &BUTTON_FONT, but_str, tgl, data);
     } else {
         GUI_CreateTextSelectPlate(&gui->value[relrow].ts, x, y,
-            TEXTSEL_X_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, value, data);
+            TEXTSEL_X_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT, NULL, value, data);
     }
     return 1;
 }

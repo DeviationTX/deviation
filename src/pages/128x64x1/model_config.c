@@ -20,10 +20,10 @@
 #include "config/model.h"
 
 enum {
-    LABEL_X      = 0,
-    LABEL_WIDTH  = 0,
     SELECT_X     = 63,
     SELECT_WIDTH = 60,
+    LABEL_X      = 0,
+    LABEL_WIDTH  = SELECT_X - LABEL_X,
 };
 #endif //OVERRIDE_PLACEMENT
 
@@ -45,10 +45,6 @@ enum {
 static void show_titlerow(const char *header)
 {
     PAGE_ShowHeader(header);
-    //u8 w = 40;
-    // I don't think there is a need for the save button
-    //GUI_CreateButtonPlateText(LCD_WIDTH - w -5, 0,
-    //        w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, okcancel_cb, _tr("Save"));
 }
 
 static int row_cb(int absrow, int relrow, int y, void *data)
@@ -87,11 +83,12 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             break;
     }
     GUI_CreateLabelBox(&gui->label[relrow], LABEL_X, y,
-                LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, label);
+                LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, NULL, NULL, label);
     GUI_CreateTextSelectPlate(&gui->value[relrow], SELECT_X, y,
-                SELECT_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, tgl, value, data);
+                SELECT_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT, tgl, value, data);
     return 1;
 }
+
 void PAGE_ModelConfigInit(int page)
 {
     (void)page;
@@ -121,9 +118,9 @@ static int row2_cb(int absrow, int relrow, int y, void *data)
         idx++;
     }
     GUI_CreateLabelBox(&gui->label[relrow], LABEL_X, y,
-            LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr(proto_strs[pos]));
+            LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, NULL, NULL, _tr(proto_strs[pos]));
     GUI_CreateTextSelectPlate(&gui->value[relrow], SELECT_X, y,
-            SELECT_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, proto_opt_cb, (void *)(long)absrow);
+            SELECT_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT, NULL, proto_opt_cb, (void *)(long)absrow);
     return 1;
 }
 
@@ -161,11 +158,12 @@ static int row3_cb(int absrow, int relrow, int y, void *data)
         break;
     }
     GUI_CreateLabelBox(&gui->label[relrow], LABEL_X, y,
-            LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, label_cmd, NULL, label_cmd ? label : _tr(label));
+            LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, label_cmd, NULL, label_cmd ? label : _tr(label));
     GUI_CreateTextSourcePlate(&gui->value[relrow], SELECT_X, y,
-            SELECT_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, ts_press, ts, input_ts, ts_data);
+            SELECT_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT, ts_press, ts, input_ts, ts_data);
     return 1;
 }
+
 #if HAS_VIDEO
 static int row4_cb(int absrow, int relrow, int y, void *data)
 {
@@ -195,9 +193,9 @@ static int row4_cb(int absrow, int relrow, int y, void *data)
         break;
     }
     GUI_CreateLabelBox(&gui->label[relrow], LABEL_X, y,
-            LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr(label));
+            LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, NULL, NULL, _tr(label));
     GUI_CreateTextSourcePlate(&gui->value[relrow], SELECT_X, y,
-            SELECT_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, ts_press, ts, input_ts, ts_data);
+            SELECT_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT, ts_press, ts, input_ts, ts_data);
     return 1;
 }
 

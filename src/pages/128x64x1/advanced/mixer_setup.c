@@ -48,18 +48,11 @@ static void _show_titlerow()
     mp->entries_per_page = 2;
     memset(gui, 0, sizeof(*gui));
 
-    enum LabelType oldStyle = labelDesc.style;
-    labelDesc.style = LABEL_UNDERLINE;
-    labelDesc.align = ALIGN_LEFT;
-    labelDesc.font_color = labelDesc.fill_color = labelDesc.outline_color = 0xffff;
-    GUI_CreateLabelBox(&gui->chan, LABEL_X, 0 , TYPE_X - LABEL_X, HEADER_HEIGHT, &labelDesc,
+    GUI_CreateLabelBox(&gui->chan, LABEL_X, 0 , TYPE_X - LABEL_X, HEADER_HEIGHT, &TITLE_FONT,
             MIXPAGE_ChanNameProtoCB, NULL, (void *)((long)mp->cur_mixer->dest));
-    labelDesc.align = ALIGN_CENTER;
-    labelDesc.style = oldStyle;
-    GUI_CreateTextSelectPlate(&gui->tmpl, TYPE_X, 0,  TYPE_W, HEADER_WIDGET_HEIGHT, &labelDesc, NULL, templatetype_cb, (void *)((long)mp->channel));
-    GUI_CreateButtonPlateText(&gui->save, SAVE_X, 0, SAVE_W, HEADER_WIDGET_HEIGHT, &labelDesc, NULL, okcancel_cb, (void *)_tr("Save"));
+    GUI_CreateTextSelectPlate(&gui->tmpl, TYPE_X, 0,  TYPE_W, HEADER_WIDGET_HEIGHT, &TEXTSEL_FONT, NULL, templatetype_cb, (void *)((long)mp->channel));
+    GUI_CreateButtonPlateText(&gui->save, SAVE_X, 0, SAVE_W, HEADER_WIDGET_HEIGHT, &BUTTON_FONT, NULL, okcancel_cb, (void *)_tr("Save"));
 }
-
 
 static guiObject_t *simple_getobj_cb(int relrow, int col, void *data)
 {
@@ -67,6 +60,7 @@ static guiObject_t *simple_getobj_cb(int relrow, int col, void *data)
     (void)col;
     return (guiObject_t *)&gui->value[relrow];
 }
+
 enum {
     SIMPLE_OFFSET = COMMON_LAST,
     SIMPLE_LAST,
@@ -97,14 +91,13 @@ static int simple_row_cb(int absrow, int relrow, int y, void *data)
             value = set_number100_cb; data = &mp->mixer[0].offset;
             break;
     }
-    labelDesc.align = ALIGN_LEFT;
-    GUI_CreateLabelBox(&gui->label[relrow].lbl, LABEL_X, y, LABEL_W, LINE_HEIGHT, &labelDesc, NULL, NULL, _tr(label));
-    labelDesc.align = ALIGN_CENTER;
+    GUI_CreateLabelBox(&gui->label[relrow].lbl, LABEL_X, y, LABEL_W, LINE_HEIGHT, &LABEL_FONT, NULL, NULL, _tr(label));
     GUI_CreateTextSourcePlate(&gui->value[relrow].ts, TEXTSEL_X, y + (LINES_PER_ROW - 1) * LINE_SPACE,
-                         TEXTSEL_W, LINE_HEIGHT, &labelDesc,
+                         TEXTSEL_W, LINE_HEIGHT, &TEXTSEL_FONT,
                          tgl, value, input_value, data);
     return 1;
 }
+
 static void _show_simple()
 {
     GUI_SelectionNotify(NULL);
@@ -138,7 +131,7 @@ static int complex_row_cb(int absrow, int relrow, int y, void *data)
     data = NULL;
     if (absrow + COMMON_LAST == COMPLEX_TRIM) {
         GUI_CreateButtonPlateText(&gui->value[relrow].but, LABEL_X, y,
-            LABEL_W, LINE_HEIGHT, &labelDesc, show_trim_cb, toggle_trim_cb, NULL);
+            LABEL_W, LINE_HEIGHT, &BUTTON_FONT, show_trim_cb, toggle_trim_cb, NULL);
         if (! MIXER_SourceHasTrim(MIXER_SRC(mp->mixer[0].src)))
             GUI_SetHidden((guiObject_t *)&gui->label[relrow], 1);
         return 1;
@@ -177,12 +170,10 @@ static int complex_row_cb(int absrow, int relrow, int y, void *data)
             value = set_number100_cb; data = &mp->cur_mixer->offset;
             break;
     }
-    labelDesc.align = ALIGN_LEFT;
     GUI_CreateLabelBox(&gui->label[relrow].lbl, LABEL_X, y, LABEL_W, LINE_HEIGHT,
-            &labelDesc, NULL, NULL, _tr(label));
-    labelDesc.align = ALIGN_CENTER;
+            &LABEL_FONT, NULL, NULL, _tr(label));
     GUI_CreateTextSourcePlate(&gui->value[relrow].ts, TEXTSEL_X, y + (LINES_PER_ROW - 1) * LINE_SPACE,
-                         TEXTSEL_W, LINE_HEIGHT, &labelDesc, tgl, value, input_value, data);
+                         TEXTSEL_W, LINE_HEIGHT, &TEXTSEL_FONT, tgl, value, input_value, data);
     if (absrow + COMMON_LAST == COMPLEX_SRC)
         set_src_enable(CURVE_TYPE(&mp->cur_mixer->curve));
     return 1;
@@ -238,6 +229,7 @@ printf("Getobj: 1\n");
     printf("Getobj: label\n");
     return (guiObject_t *)&gui->label[relrow];
 }
+
 static int expo_size_cb(int absrow, void *data)
 {
     (void)data;
@@ -251,6 +243,7 @@ static int expo_size_cb(int absrow, void *data)
     }
     return LINES_PER_ROW;
 }
+
 static int expo_row_cb(int absrow, int relrow, int y, void *data)
 {
     const char *label = NULL;
@@ -313,25 +306,22 @@ static int expo_row_cb(int absrow, int relrow, int y, void *data)
     }
     int count = 1;
     if (but) {
-        labelDesc.align = ALIGN_CENTER;
         GUI_CreateButtonPlateText(&gui->label[relrow].but, LABEL_X, y,
-            LABEL_W, LINE_HEIGHT, &labelDesc, label_cb, buttgl, butdata);
+            LABEL_W, LINE_HEIGHT, &BUTTON_FONT, label_cb, buttgl, butdata);
         if(disable) {
             GUI_ButtonEnable((guiObject_t *)&gui->label[relrow].but, 0);
         }
         count++;
         y += (LINES_PER_ROW - 1) * LINE_SPACE;
     } else if(label || label_cb) {
-        labelDesc.align = ALIGN_LEFT;
         GUI_CreateLabelBox(&gui->label[relrow].lbl, LABEL_X, y, LABEL_W, LINE_HEIGHT,
-            &labelDesc, label_cb, NULL, label);
+            &LABEL_FONT, label_cb, NULL, label);
         if(underline)
-            GUI_CreateRect(&gui->rect1, LABEL_X, y, LABEL_W, 1, &labelDesc);
+            GUI_CreateRect(&gui->rect1, LABEL_X, y, LABEL_W, 1, &DEFAULT_FONT);
         y += (LINES_PER_ROW - 1) * LINE_SPACE;
     }
-    labelDesc.align = ALIGN_CENTER;
     GUI_CreateTextSourcePlate(&gui->value[relrow].ts, TEXTSEL_X, y,
-        TEXTSEL_W, LINE_HEIGHT, &labelDesc, tgl, value, input_value, data);
+        TEXTSEL_W, LINE_HEIGHT, &TEXTSEL_FONT, tgl, value, input_value, data);
     if(disable) {
         GUI_TextSelectEnable(&gui->value[relrow].ts, 0);
     }
