@@ -349,22 +349,17 @@ static void _show_page()
     PAGE_ShowHeader((page->header==devo_header_basic
                      || page->header==frsky_header_basic)
                     ? "" : _tr("Telemetry monitor"));
-    tp->font.font = TINY_FONT.font;
-    tp->font.font_color = 0xffff;
-    tp->font.fill_color = 0;
+    tp->font = TINY_FONT;
     tp->font.style = LABEL_SQUAREBOX;
-    DEFAULT_FONT.align = ALIGN_CENTER;
     long i = 0;
     for(const struct telem_layout *ptr = page->header; ptr->source; ptr++, i++) {
         GUI_CreateLabelBox(&gui->header[i], ptr->x, 0, ptr->width, HEADER_HEIGHT,
                            ptr->source == ARROW_LABEL ? &NARROW_FONT : &DEFAULT_FONT,
                            header_cb, NULL, (void *)(long)ptr->source);
     }
-    DEFAULT_FONT.align = ALIGN_RIGHT;
     u8 row_height = page->row_height * LINE_SPACE;
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                          row_height, page->num_items, row_cb, NULL, NULL, (void *)page->layout);
-    DEFAULT_FONT.align = ALIGN_LEFT;
     tp->telem = Telemetry;
 }
 
@@ -439,7 +434,7 @@ static void _press_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    current_page = current_page == telemetry_gps?telemetry_basic: telemetry_gps;
+    current_page = current_page == telemetry_gps ? telemetry_basic : telemetry_gps;
     _show_page();
 }
 
