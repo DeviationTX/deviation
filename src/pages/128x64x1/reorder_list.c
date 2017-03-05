@@ -44,12 +44,11 @@ static const char *_show_button_cb(guiObject_t *obj, const void *data)
     return "";
 }
 
-
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
     GUI_CreateLabelBox(&gui->name[relrow], LABEL_X, y, LABEL_WIDTH, LINE_HEIGHT,
-            &DEFAULT_FONT, list_cb, NULL, (void *)(long)absrow);
+            &LISTBOX_FONT, list_cb, NULL, (void *)(long)absrow);
     return 0;
 }
 
@@ -71,31 +70,30 @@ void PAGE_ReorderInit(int page)
     u8 y = 0;
 
     guiObject_t *obj = GUI_CreateButtonPlateText(&gui->up, ROW1_X, y, ROW1_W, LINE_HEIGHT,
-            &DEFAULT_FONT,  _show_button_cb, press_button_cb, (void *)MOVE_UP);
+            &BUTTON_FONT,  _show_button_cb, press_button_cb, (void *)MOVE_UP);
     GUI_SetSelected(obj);
     GUI_CreateButtonPlateText(&gui->down, ROW2_X, y, ROW1_W , LINE_HEIGHT,
-            &DEFAULT_FONT, _show_button_cb, press_button_cb, (void *)MOVE_DOWN);
+            &BUTTON_FONT, _show_button_cb, press_button_cb, (void *)MOVE_DOWN);
     y += space;
     GUI_CreateTextSelectPlate(&gui->value, ROW1_X, y, BUTTON_W, LINE_HEIGHT,
-            &DEFAULT_FONT, NULL, value_val_cb, NULL);
+            &TEXTSEL_FONT, NULL, value_val_cb, NULL);
     y += space;
     GUI_CreateButtonPlateText(&gui->apply, ROW1_X, y, BUTTON_W, LINE_HEIGHT,
-            &DEFAULT_FONT, _show_button_cb, press_button_cb, (void *)APPLY);
+            &BUTTON_FONT, _show_button_cb, press_button_cb, (void *)APPLY);
     y += space;
     GUI_CreateTextSelectPlate(&gui->copy, ROW1_X, y, BUTTON_W, LINE_HEIGHT,
-            &DEFAULT_FONT, NULL, copy_val_cb, NULL);
+            &TEXTSEL_FONT, NULL, copy_val_cb, NULL);
     if (requested) {
         y += space;
         GUI_CreateButtonPlateText(&gui->insert, ROW1_X, y, ROW1_W, LINE_HEIGHT,
-                    &DEFAULT_FONT, _show_button_cb, press_button_cb, (void *)INSERT);
+                    &BUTTON_FONT, _show_button_cb, press_button_cb, (void *)INSERT);
         GUI_CreateButtonPlateText(&gui->remove, ROW2_X, y, ROW1_W, LINE_HEIGHT,
-                    &DEFAULT_FONT, _show_button_cb, press_button_cb, (void *)REMOVE);
+                    &BUTTON_FONT, _show_button_cb, press_button_cb, (void *)REMOVE);
     }
     GUI_CreateButtonPlateText(&gui->save, SAVE_X, 0, SAVE_W, LINE_HEIGHT,
-        &DEFAULT_FONT, NULL, okcancel_cb, (void *)_tr("Save"));
+        &BUTTON_FONT, NULL, okcancel_cb, (void *)_tr("Save"));
 
     GUI_CreateScrollable(&gui->scrollable, LABEL_X, LINE_HEIGHT, LCD_WIDTH - LABEL_X , LCD_HEIGHT-LINE_HEIGHT,
                          LINE_SPACE, rl.max, row_cb, NULL, NULL, NULL);
     GUI_SetSelectable((guiObject_t *)&gui->scrollable, 0);
 }
-

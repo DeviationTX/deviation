@@ -45,7 +45,7 @@ static const int GRAPH_Y = ((220 - 40 - 150) / 2 + 40);
 
 static void _show_titlerow()
 {
-    GUI_CreateLabel(&gui->chan, 4, 10, MIXPAGE_ChanNameProtoCB, TITLE_FONT, (void *)((long)mp->cur_mixer->dest));
+    GUI_CreateLabelBox(&gui->chan, 4, 10, COL_TEMPLATE - 4, 14, &TITLE_FONT, MIXPAGE_ChanNameProtoCB, NULL, (void *)((long)mp->cur_mixer->dest));
     GUI_CreateTextSelect(&gui->tmpl, COL_TEMPLATE, 8, TEXTSELECT_96, NULL, templatetype_cb, (void *)((long)mp->channel));
     PAGE_CreateCancelButton(LCD_WIDTH-160, 4, okcancel_cb);
     PAGE_CreateOkButton(LCD_WIDTH-56, 4, okcancel_cb);

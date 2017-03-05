@@ -16,16 +16,16 @@
 #include "char_map.h"
 #include "lcd_page_props.h"
 
-#define TEXTBOX_X_OFFSET 3
-#define TEXTBOX_Y_OFFSET 3
-#define TEXTBOX_HEIGHT  1*2
+#define TEXTBOX_X_OFFSET 2*ITEM_SPACE
+#define TEXTBOX_Y_OFFSET 2*LINE_SPACE
+#define TEXTBOX_HEIGHT   1*LINE_SPACE
 #define TEXTBOX_ROUND    1
 #define TEXTBOX_BG_COLOR 0x0000
 #define TEXTBOX_COLOR    0xFFFF
 #define TEXTBOX_OUTLINE  0xFFFF
 
-#define Y_OFFSET (5*ITEM_SPACE)
-#define KEY_H (1*ITEM_SPACE)
+#define Y_OFFSET (5*LINE_SPACE)
+#define KEY_H  (1*LINE_SPACE)
 #define KEY_W1 (2*ITEM_SPACE)
 #define KEY_W2 (4*ITEM_SPACE)  // 3 chars
 #define KEY_W3 (5*ITEM_SPACE)  // 4 chars
@@ -40,8 +40,8 @@ static void _make_box(struct guiBox *box, u16 x, u16 y, u16 width, u16 height)
 {
     box->x = x;
     box->y = y;
-    box->width = width + 2 ;
-    box->height = height -1;
+    box->width = width + 1*ITEM_SPACE;
+    box->height = height;
 }
 
 void _draw_key_bg(struct guiBox *box, int pressed, u32 color)
@@ -56,5 +56,5 @@ void _draw_key_bg(struct guiBox *box, int pressed, u32 color)
 
 static void _kb_draw_text(const char *str)
 {
-    GUI_DrawLabelHelper(TEXTBOX_X_OFFSET, TEXTBOX_Y_OFFSET, LCD_WIDTH - TEXTBOX_X_OFFSET, 1, str, NULL, 0);
+    GUI_DrawLabelHelper(TEXTBOX_X_OFFSET, TEXTBOX_Y_OFFSET, LCD_WIDTH - TEXTBOX_X_OFFSET, TEXTBOX_HEIGHT, str, NULL, 0);
 }

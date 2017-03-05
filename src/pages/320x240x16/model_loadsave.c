@@ -65,19 +65,12 @@ static void press1_cb(guiObject_t *obj, s8 press_type, const void *data)
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
-    struct LabelDesc listbox = {
-        .font = DEFAULT_FONT.font,
-        .style = LABEL_LISTBOX,
-        .font_color = DEFAULT_FONT.font_color,
-        .fill_color = DEFAULT_FONT.fill_color,
-        .outline_color = DEFAULT_FONT.outline_color
-    };
     if (absrow >= mp->total_items) {
         GUI_CreateLabelBox(&gui->label[relrow], 8 + ((LCD_WIDTH - 320) / 2), y,
-            200 - ARROW_WIDTH, 24, &listbox, NULL, NULL, "");
+            200 - ARROW_WIDTH, 24, &LISTBOX_FONT, NULL, NULL, "");
     } else {
         GUI_CreateLabelBox(&gui->label[relrow], 8 + ((LCD_WIDTH - 320) / 2), y,
-            200 - ARROW_WIDTH, 24, &listbox, name_cb, press1_cb, (void *)(long)absrow);
+            200 - ARROW_WIDTH, 24, &LISTBOX_FONT, name_cb, press1_cb, (void *)(long)absrow);
     }
     return 0;
 }
@@ -99,12 +92,13 @@ void PAGE_LoadSaveInit(int page)
       case LOAD_ICON:       name = _tr("Select Icon"); break;
       case LOAD_LAYOUT:     name = _tr("Load Layout"); break;
     }
-    PAGE_ShowHeader(name);
+    //PAGE_ShowHeader(name);
 
     num_models = mp->total_items;
     if (num_models < LISTBOX_ITEMS)
         num_models = LISTBOX_ITEMS;
     if (page != LOAD_TEMPLATE && page != LOAD_LAYOUT) {
+        PAGE_ShowHeaderWithSize(name, LCD_WIDTH - 88, 0);
         u16 w = 0, h = 0;
         char *img = mp->iconstr;
         if(! fexists(img))
@@ -114,6 +108,9 @@ void PAGE_LoadSaveInit(int page)
         PAGE_CreateOkButton(LCD_WIDTH - 48, 4, ok_cb);
         GUI_SelectionNotify(icon_notify_cb);
     }
+    else
+        PAGE_ShowHeader(name);
+
     GUI_CreateScrollable(&gui->scrollable, 8 + ((LCD_WIDTH - 320) / 2), 40, 200, LISTBOX_ITEMS * 24,
                          24, num_models, row_cb, NULL, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowCol(&gui->scrollable, selected, 0));

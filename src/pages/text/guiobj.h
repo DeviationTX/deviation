@@ -167,6 +167,7 @@ struct settimer_obj {
 #endif
 
 struct trim_obj {
+    guiLabel_t inputlbl;
     guiLabel_t steplbl;
     guiLabel_t trimposlbl;
     guiButton_t src[SCROLLABLE_ROWS];
@@ -175,6 +176,7 @@ struct trim_obj {
     guiScrollable_t scrollable;
 };
 struct trim2_obj {
+    guiLabel_t header;
     guiButton_t save;
     guiLabel_t label[SCROLLABLE_ROWS];
     guiTextSelect_t value[SCROLLABLE_ROWS];
@@ -282,6 +284,8 @@ struct advmixcfg_obj {
 
 /******* Standard ********/
 struct stdcurve_obj {
+    guiLabel_t title;
+    guiRect_t rect;
     guiLabel_t msg;
     guiTextSelect_t mode;
     guiTextSelect_t hold;
@@ -292,6 +296,7 @@ struct stdcurve_obj {
 };
 
 struct stddrexp_obj {
+    guiRect_t rect;
     union {
         guiLabel_t msg;
         guiTextSelect_t type;

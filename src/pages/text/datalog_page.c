@@ -19,8 +19,11 @@
 #include "config/model.h"
 
 #define OVERRIDE_PLACEMENT
+#define X_OFFSET (ITEM_SPACE*2 - 2)
 enum {
-    LABEL_X     = 12*ITEM_SPACE,
-    LABEL_WIDTH =  9*ITEM_SPACE,
+    FIELD_X     = 12*ITEM_SPACE,
+    FIELD_WIDTH = 9*ITEM_SPACE,
+    LABEL_X     = X_OFFSET,
+    LABEL_WIDTH = FIELD_X - LABEL_X,
 };
 #include "../128x64x1/datalog_page.c"

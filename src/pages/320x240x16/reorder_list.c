@@ -38,15 +38,8 @@ static const char *_show_button_cb(guiObject_t *obj, const void *data)
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
-    struct LabelDesc listbox = {
-        .font = DEFAULT_FONT.font,
-        .style = LABEL_LISTBOX,
-        .font_color = DEFAULT_FONT.font_color,
-        .fill_color = DEFAULT_FONT.fill_color,
-        .outline_color = DEFAULT_FONT.outline_color
-    };
     GUI_CreateLabelBox(&gui->name[relrow], 112 + REORD_XOFFSET, y,
-            200 - ARROW_WIDTH, 24, &listbox, list_cb, NULL, (void *)(long)absrow);
+            200 - ARROW_WIDTH, 24, &LISTBOX_FONT, list_cb, NULL, (void *)(long)absrow);
     return 1;
 }
 

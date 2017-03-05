@@ -81,12 +81,10 @@ static void show_iconsel_page(int SelectedIcon) {
 
     //Header
     PAGE_ShowHeader(INPUT_SourceNameAbbrevSwitch(tempstring, toggleinput));
-    labelDesc.style = LABEL_NO_BOX;
-    labelDesc.align = ALIGN_CENTER;
-    GUI_CreateButtonPlateText(&gui->revert, REVERT_X, 0, REVERT_W, HEADER_WIDGET_HEIGHT, &labelDesc, NULL, revert_cb, (void *)_tr("Revert"));
+    GUI_CreateButtonPlateText(&gui->revert, REVERT_X, 0, REVERT_W, HEADER_WIDGET_HEIGHT, &BUTTON_FONT, NULL, revert_cb, (void *)_tr("Revert"));
 
 #if SEPARATOR
-    GUI_CreateRect(&gui->separator, SEPARATOR_X, HEADER_WIDGET_HEIGHT, 1, LCD_HEIGHT-HEADER_HEIGHT, &labelDesc);
+    GUI_CreateRect(&gui->separator, SEPARATOR_X, HEADER_WIDGET_HEIGHT, 1, LCD_HEIGHT-HEADER_HEIGHT, &DEFAULT_FONT);
 #endif
 
     int row = ROW_Y;
@@ -95,9 +93,11 @@ static void show_iconsel_page(int SelectedIcon) {
         num_positions = 2;
 
     static const char * const tglidx[3] = {"0:", "1:", "2:"};
-    labelDesc.style = LABEL_INVERTED;
+    struct LabelDesc inverted = DEFAULT_FONT;
+    inverted.style = LABEL_INVERTED;
+    inverted.align = ALIGN_CENTER;
     for (int i = 0; i < num_positions; i++) {
-        GUI_CreateLabelBox(&gui->togglelabel[i], LABEL_X, row, LABEL_W, LABEL_H, SelectedIcon == i ? &labelDesc : &DEFAULT_FONT, NULL, NULL, tglidx[i]);
+        GUI_CreateLabelBox(&gui->togglelabel[i], LABEL_X, row, LABEL_W, LABEL_H, SelectedIcon == i ? &inverted : &DEFAULT_FONT, NULL, NULL, tglidx[i]);
 #ifdef HAS_CHAR_ICONS
         GUI_CreateLabelBox(&gui->toggleicon[i], ICON_X, row, ICON_W, LABEL_H, &DEFAULT_FONT, TGLICO_font_cb,
                            NULL, (void *)(long)Model.pagecfg2.elem[tp->tglidx].extra[i]); 

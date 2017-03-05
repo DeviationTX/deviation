@@ -22,11 +22,11 @@
 
 #define OVERRIDE_PLACEMENT
 enum {
-    LABEL_WIDTH = LCD_WIDTH,
+    LABEL_WIDTH = 0,
     IMAGE_X     = 46,
     IMAGE_Y     = 6,
     IMAGE_W     = 6,
     IMAGE_H     = 4,
-    SCROLL_W    = 23*ITEM_SPACE,
+    SCROLL_W    = 22*ITEM_SPACE,
 };
 #include "../128x64x1/model_loadsave.c"

@@ -57,7 +57,6 @@ guiObject_t *GUI_CreateTextSelect(guiTextSelect_t *select, u16 x, u16 y, enum Te
     connect_object(obj);
 
     select->state     = 0;
-    select->fontColor = 0;
     select->ValueCB   = value_cb;
     select->SelectCB  = select_cb;
     select->InputValueCB = NULL;
@@ -103,7 +102,6 @@ guiObject_t *GUI_CreateTextSelectPlate(guiTextSelect_t *select, u16 x, u16 y, u1
 
     select->button    = NULL; 
     select->state     = 0;
-    select->fontColor = 0xffff;
     select->desc       = *desc;
     select->ValueCB   = value_cb;
     select->SelectCB  = select_cb;

@@ -21,8 +21,10 @@
 #define OVERRIDE_PLACEMENT
 enum {
     //"Reverse", "Subtrim" and "Fail-safe" pages
-    LABEL_X        = 10*ITEM_SPACE,
-    LABEL_W        = 10*ITEM_SPACE,
+    FIELD_X        = 10*ITEM_SPACE,
+    FIELD_WIDTH    = 10*ITEM_SPACE,
+    LABEL_X        = 0,
+    LABEL_WIDTH    = FIELD_X - LABEL_X,
     //"Throttle curve" and "Pitch curve" pages XY-graph points
     LINE_Y         = 2*LINE_HEIGHT,
     WIDTH1         = 3*ITEM_SPACE,

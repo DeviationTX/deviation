@@ -23,9 +23,9 @@
 
 #define OVERRIDE_PLACEMENT
 enum {
-    LABEL_X         = 11*ITEM_SPACE,
-    LABEL_WIDTH     = 5*ITEM_SPACE,
-    LABEL_WIDTH_ADD = 7*ITEM_SPACE,
-    LABEL_OFFSET    = 0,
+    FIELD_X         = 11*ITEM_SPACE,
+    FIELD_WIDTH     = 12*ITEM_SPACE,
+    LABEL_X         = 0,
+    LABEL_WIDTH     = 11*ITEM_SPACE,
 };
 #include "../../128x64x1/standard/swash_page.c"

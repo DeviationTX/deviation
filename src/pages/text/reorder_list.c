@@ -19,15 +19,15 @@
 #include "pages.h"
 #include "gui/gui.h"
 
-#define X_OFFSET (ITEM_SPACE*2 - 2)
+#define X_OFFSET ITEM_SPACE
 enum {
-    LABEL_X      = X_OFFSET + 10 * ITEM_SPACE,
+    LABEL_X      = X_OFFSET + 12 * ITEM_SPACE,
+    LABEL_WIDTH  = LCD_WIDTH - LABEL_X - ITEM_SPACE,
     ROW1_X       = X_OFFSET,
     ROW1_W       = 4 * ITEM_SPACE,
     ROW2_X       = X_OFFSET + 5 * ITEM_SPACE,
     BUTTON_W     = 9 * ITEM_SPACE,
-    SAVE_X       = X_OFFSET + 10 * ITEM_SPACE,
-    SAVE_W       = 5 * ITEM_SPACE,
-    LABEL_WIDTH  = (LCD_WIDTH-X_OFFSET + 10 * ITEM_SPACE)
+    SAVE_X       = LABEL_X,
+    SAVE_W       = LABEL_WIDTH,
 };
 #include "../128x64x1/reorder_list.c"
