@@ -34,7 +34,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         int row = y;
         int music_num = absrow;
         //Row 1
-        GUI_CreateLabelBox(&gui->name[relrow], COL1, row, COL2-COL1, 18, &DEFAULT_FONT,musicconfig_str_cb, NULL, (void *)(long)music_num);
+        GUI_CreateLabelBox(&gui->name[relrow], COL1, row, COL2-COL1, 18, &LABEL_FONT,musicconfig_str_cb, NULL, (void *)(long)music_num);
         GUI_CreateTextSelect(&gui->musicidx[relrow],  COL2, row, TEXTSELECT_64, music_test_cb, musicid_cb, (void *)(long)music_num);
         GUI_CreateLabelBox(&gui->musiclbl[relrow], COL3, row, LCD_WIDTH - COL3 - ARROW_WIDTH, 18, &TINY_FONT, musiclbl_cb, NULL, (void *)(long)music_num);
     return 1;

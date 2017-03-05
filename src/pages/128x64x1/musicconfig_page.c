@@ -41,9 +41,9 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 
     //Row 1
     GUI_CreateLabelBox(&gui->name[relrow], LABEL_X, y,
-            LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, musicconfig_str_cb, NULL, (void *)(long)absrow);
+            LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, musicconfig_str_cb, NULL, (void *)(long)absrow);
     GUI_CreateTextSelectPlate(&gui->musicidx[relrow], TEXTSEL_X, y,
-            TEXTSEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, music_test_cb, musicid_cb, (void *)(long)absrow);
+            TEXTSEL_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT, music_test_cb, musicid_cb, (void *)(long)absrow);
     //Row 2
     y += LINE_SPACE;
     GUI_CreateLabelBox(&gui->musiclbl[relrow], LABEL_X, y,
@@ -56,12 +56,12 @@ void PAGE_MusicconfigInit(int page)
     (void)page;
     PAGE_SetModal(0);
     if (!Transmitter.audio_player) {
-        GUI_CreateLabelBox(&gui->msg, MSG_X, MSG_Y, 0, 0, &DEFAULT_FONT, NULL, NULL,
+        GUI_CreateLabelBox(&gui->msg, MSG_X, MSG_Y, 0, 0, &LABEL_FONT, NULL, NULL,
             _tr("External audio support\nmust be enabled\nin hardware.ini"));
         return;
     }
     if (PPMin_Mode() || Model.protocol == PROTOCOL_PPM ) {
-        GUI_CreateLabelBox(&gui->msg, MSG_X, MSG_Y, 0, 0, &DEFAULT_FONT, NULL, NULL,
+        GUI_CreateLabelBox(&gui->msg, MSG_X, MSG_Y, 0, 0, &LABEL_FONT, NULL, NULL,
             _tr("External audio not\navailable while\nPPM in use"));
         return;
     }
