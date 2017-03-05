@@ -3,22 +3,6 @@
 
 #include <telemetry.h>
 
-
-#if HAS_EXTENDED_AUDIO
-#define MAX_MUSICMAP_ENTRIES 240 // arbitraty chosen
-#if HAS_RTC // Check for Devo12 screen
-#define MAX_MUSIC_LABEL 35 // limit label length due to limited screen width
-#else
-#define MAX_MUSIC_LABEL 26
-#endif
-#define MUSIC_UNIT_OFFSET 130
-#define CUSTOM_ALARM_ID 151 // start of custom MP3 IDs
-#define MUSIC_DEC_SEP 110  // MP3 ID of DECSEP = 110 + MUSIC_TOTAL
-#define NUM_STICKS	4
-#define NUM_AUX_KNOBS	(INP_HAS_CALIBRATION - NUM_STICKS)	// Exclude sticks
-#define NUM_SWITCHES (NUM_INPUTS - INP_HAS_CALIBRATION)
-#define MODEL_CUSTOM_ALARMS (NUM_SWITCHES + NUM_AUX_KNOBS * 2 + TELEM_NUM_ALARMS)
-
 enum Music {
     MUSIC_STARTUP = 0,
     MUSIC_SHUTDOWN,
@@ -42,6 +26,21 @@ enum Music {
     MUSIC_INACTIVITY_ALARM,
     MUSIC_TOTAL,	// Indicate total number of system music entries
 };
+
+#if HAS_EXTENDED_AUDIO
+#define MAX_MUSICMAP_ENTRIES 240 // arbitraty chosen
+#if HAS_RTC // Check for Devo12 screen
+#define MAX_MUSIC_LABEL 35 // limit label length due to limited screen width
+#else
+#define MAX_MUSIC_LABEL 26
+#endif
+#define MUSIC_UNIT_OFFSET 130
+#define CUSTOM_ALARM_ID 151 // start of custom MP3 IDs
+#define MUSIC_DEC_SEP 110  // MP3 ID of DECSEP = 110 + MUSIC_TOTAL
+#define NUM_STICKS	4
+#define NUM_AUX_KNOBS	(INP_HAS_CALIBRATION - NUM_STICKS)	// Exclude sticks
+#define NUM_SWITCHES (NUM_INPUTS - INP_HAS_CALIBRATION)
+#define MODEL_CUSTOM_ALARMS (NUM_SWITCHES + NUM_AUX_KNOBS * 2 + TELEM_NUM_ALARMS)
 
 enum AudioPlayers {
   AUDIO_NONE = 0,	// Just use Tx beeps.

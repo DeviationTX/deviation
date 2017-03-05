@@ -25,7 +25,7 @@ enum {
     LABEL_X        = X_OFFSET,
     LABEL_WIDTH    = 10 * ITEM_SPACE,
     TEXTSEL_X      = X_OFFSET + 11 * ITEM_SPACE,
-    TEXTSEL_WIDTH  = 4 * ITEM_SPACE,
+    TEXTSEL_WIDTH  = 5 * ITEM_SPACE,
     LABELID_WIDTH  = 26 * ITEM_SPACE,
     MSG_X          = X_OFFSET,
     MSG_Y          = 5*ITEM_SPACE,
