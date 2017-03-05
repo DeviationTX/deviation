@@ -198,7 +198,7 @@ clean:
 		filesystem/$(FILESYSYTEM) 2> /dev/null || true
 
 distclean:
-	rm -f *.$(EXEEXT) dev*.exe emu*.exe *.bin *.dfu *.list *.map
+	rm -f *.$(EXEEXT) *.exe *.bin *.dfu *.list *.map
 	rm -rf objs
 	rm -rf  filesystem
 	$(MAKE) -C libopencm3 clean > /dev/null

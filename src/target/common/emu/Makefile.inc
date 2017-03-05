@@ -24,6 +24,7 @@ ifdef WINDOWS
     ifdef CROSS
         FLTK_DIR      ?= /opt/fltk-w32
         PORTAUDIO_DIR ?= /opt/portaudio-w32
+		MPG123_DIR ?= /opt/mpg123-w32
         LFLAGS += -mno-cygwin
         CFLAGS += -mno-cygwin
     else
@@ -31,7 +32,7 @@ ifdef WINDOWS
         PORTAUDIO_DIR ?= /usr/local
         LFLAGS += -static-libgcc -static-libstdc++
     endif
-    LFLAGS := -L$(FLTK_DIR)/lib -L$(PORTAUDIO_DIR)/lib $(LFLAGS) -lole32 -luuid -lcomctl32 -lwsock32 -lgdi32 -lcomdlg32 -lportaudio 
+    LFLAGS := -L$(FLTK_DIR)/lib -L$(PORTAUDIO_DIR)/lib $(LFLAGS) -lole32 -luuid -lcomctl32 -lwsock32 -lgdi32 -lcomdlg32 -lportaudio
     CFLAGS += -I$(FLTK_DIR)/include -I$(PORTAUDIO_DIR)/include -DWIN32
     EXEEXT = exe
     ODIREXT = -w32
@@ -51,7 +52,7 @@ $(TARGET).zip: $(TARGET).$(EXEEXT) $(TARGET).fs_wrapper
 	rm -f deviation-$(HGVERSION).zip
 	zip deviation-$(HGVERSION).zip deviation-$(HGVERSION).$(EXEEXT)
 ifdef WINDOWS
-	zip -uj deviation-$(HGVERSION).zip $(PORTAUDIO_DIR)/bin/libportaudio-2.dll
+	zip -uj deviation-$(HGVERSION).zip $(PORTAUDIO_DIR)/bin/libportaudio-2.dll ; zip -u deviation-$(HGVERSION).zip $(MPG123_DIR)/bin/mpg123.exe
 endif
 ifeq "$(INCLUDE_FS)" "1"
 	zip -ur deviation-$(HGVERSION).zip filesystem/$(FILESYSTEM)
