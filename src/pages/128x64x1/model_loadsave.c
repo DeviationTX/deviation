@@ -56,8 +56,14 @@ void PAGE_LoadSaveInit(int page)
     int num_models;
     int selected;
     int width = LCD_WIDTH;
+    
+    memset(mp, 0, sizeof(struct model_page));  // Bug fix: must initialize this
     mp->menu_type = page;
+    mp->modeltype = Model.type;
     OBJ_SET_USED(&gui->image, 0);
+
+    selected = get_scroll_count(page);
+    num_models = mp->total_items; /* set by get_scroll_count */
 
     if (page == SAVE_MODEL) {
         name = _tr("Press ENT to copy to");
@@ -69,9 +75,6 @@ void PAGE_LoadSaveInit(int page)
         GUI_CreateImage(&gui->image, IMAGE_X, IMAGE_Y, IMAGE_W, IMAGE_H, mp->iconstr);
         GUI_SelectionNotify(icon_notify_cb);
     }
-    selected = get_scroll_count(page);
-
-    num_models = mp->total_items; /* set by get_scroll_page */
     PAGE_ShowHeader(name);
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, width, LCD_HEIGHT - HEADER_HEIGHT,
                          LINE_SPACE, num_models, row_cb, NULL, NULL, NULL);
