@@ -196,7 +196,7 @@ void TIMER_Update()
                     if (timer_val[i] > warn_time && (timer_val[i] - delta) <= warn_time) {
 #if HAS_EXTENDED_AUDIO
                         MUSIC_PlayValue(MUSIC_TIMER_WARNING,
-                            (timer_val[i]-music_map[MUSIC_TIMER_WARNING].duration-1000)/1000,MUSIC_UNIT_SECONDS,0);
+                            (timer_val[i]-music_map[MUSIC_TIMER_WARNING].duration-1000)/1000,MUSIC_UNIT_TIME,0);
 #else
                         MUSIC_Play(MUSIC_TIMER_WARNING);
 #endif
@@ -211,7 +211,7 @@ void TIMER_Update()
 #endif
                     if (timer_val[i] > warn_time && (timer_val[i] - delta) <= warn_time) {
 #if HAS_EXTENDED_AUDIO
-                        MUSIC_PlayValue(MUSIC_ALARM1 + i,(timer_val[i]-music_map[MUSIC_ALARM1 + i].duration)/-1000+1,MUSIC_UNIT_SECONDS,0);
+                        MUSIC_PlayValue(MUSIC_ALARM1 + i,(timer_val[i]-music_map[MUSIC_ALARM1 + i].duration)/-1000+1,MUSIC_UNIT_TIME,0);
 #else
                         MUSIC_Play(MUSIC_ALARM1 + i + 2);
 #endif

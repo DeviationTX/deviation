@@ -29,7 +29,7 @@ enum Music {
 
 #if HAS_EXTENDED_AUDIO
 #define MAX_MUSICMAP_ENTRIES 240 // arbitraty chosen
-#if HAS_RTC // Check for Devo12 screen
+#ifdef _DEVO12_TARGET_H_ // Check for Devo12 screen
 #define MAX_MUSIC_LABEL 35 // limit label length due to limited screen width
 #else
 #define MAX_MUSIC_LABEL 26
@@ -79,6 +79,7 @@ enum {
     MUSIC_UNIT_SECONDS,
     MUSIC_UNIT_MINUTES,
     MUSIC_UNIT_HOURS,
+    MUSIC_UNIT_TIME, // used for auto-splitting to hours/minutes/seconds
     MUSIC_UNIT_TOTAL
 };
 

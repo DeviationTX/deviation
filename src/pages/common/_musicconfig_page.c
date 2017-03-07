@@ -114,7 +114,7 @@ static const char *musiclbl_cb(guiObject_t *obj, const void *data)
 
 static const char *musicid_cb(guiObject_t *obj, int dir, void *data)
 {
-    (void)obj;
+    (void) obj;
     int idx = (long)data;
     int cur_row = idx - GUI_ScrollableCurrentRow(&gui->scrollable);
     struct CustomMusic *musicpt;
@@ -132,6 +132,7 @@ static const char *musicid_cb(guiObject_t *obj, int dir, void *data)
         musicpt->music = 0;
     if (dir == 1 && musicpt->music == 0) // set to CUSTOM_ALARM_ID when currently none
         musicpt->music = CUSTOM_ALARM_ID - 1;
+    GUI_TextSelectEnablePress((guiTextSelect_t *)obj, musicpt->music);
 
     if (musicpt->music == 0) {
         GUI_Redraw(&gui->musiclbl[cur_row]);

@@ -246,8 +246,30 @@ void MUSIC_PlayValue(u16 music, s32 value, u8 unit, u8 prec)
             MUSIC_Play(music);
         return;
     }
-    AUDIO_AddQueue(music);
-    //Add minus sign for negative number
+    AUDIO_AddQueue(music); // Play main alert MP3 requested
+
+    // Play minutes/hours/seconds for timers
+    if (unit == MUSIC_UNIT_TIME) {
+        if (value >= 3600) {
+            i = value / 3600;
+            AUDIO_AddQueue(i + MUSIC_TOTAL);
+            AUDIO_AddQueue(MUSIC_UNIT_HOURS + MUSIC_UNIT_OFFSET);
+            value %= 3600;
+        }
+        if (value >= 60) {
+            i = value / 60;
+            AUDIO_AddQueue(i + MUSIC_TOTAL);
+            AUDIO_AddQueue(MUSIC_UNIT_MINUTES + MUSIC_UNIT_OFFSET);
+            value %= 60;
+        }
+        if (value > 0) {
+            AUDIO_AddQueue(value + MUSIC_TOTAL);
+            AUDIO_AddQueue(MUSIC_UNIT_SECONDS + MUSIC_UNIT_OFFSET);
+        }
+        return;
+    }
+
+    // Add minus sign for negative number
     if (value < 0) {
         AUDIO_AddQueue(MUSIC_UNIT_MINUS + MUSIC_UNIT_OFFSET);
         value *= -1;
@@ -263,8 +285,8 @@ void MUSIC_PlayValue(u16 music, s32 value, u8 unit, u8 prec)
         digits[digit_count++] = MUSIC_DEC_SEP;
     }
 
-    // Special case value == 0
-    if (value == 0)
+    // Special case value == 0 and not playing TIME
+    if (value == 0 && unit != MUSIC_UNIT_TIME)
         digits[digit_count++] = 0;
     // Get single digits from remaining value
     while (value > 0) {
@@ -277,7 +299,7 @@ void MUSIC_PlayValue(u16 music, s32 value, u8 unit, u8 prec)
             value /= 100;
             digits[digit_count++] = value + 99;
             if (thousands){
-              digits[digit_count++] = 109;
+              digits[digit_count++] = 109; // MP3 for "thousands"
               digits[digit_count++] = thousands;
             }
             break;
@@ -288,7 +310,7 @@ void MUSIC_PlayValue(u16 music, s32 value, u8 unit, u8 prec)
         }
         else {
             if (thousands){
-                digits[digit_count++] = 109;
+                digits[digit_count++] = 109; // MP3 for "thousands"
                 digits[digit_count++] = thousands;
             }
         }
