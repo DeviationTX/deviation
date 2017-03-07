@@ -171,6 +171,7 @@ void TIMER_Update()
         }
         if (timer_state[i]) {
             s32 delta = t - last_time[i];
+            s32 warn_time;
             if (Model.timer[i].type == TIMER_STOPWATCH_PROP || Model.timer[i].type == TIMER_COUNTDOWN_PROP) {
                 delta = delta * chan_val / 100;
             }
@@ -181,8 +182,23 @@ void TIMER_Update()
                 Model.timer[i].val = timer_val[i];
             } else if (Model.timer[i].type == TIMER_STOPWATCH || Model.timer[i].type == TIMER_STOPWATCH_PROP) {
                 timer_val[i] += delta;
+#if HAS_EXTENDED_AUDIO
+                warn_time = 60000; // Begin stopwatch alerts after 1 minute
+                while(timer_val[i]/(warn_time+1)){
+                    if (timer_val[i] >= 60000 && timer_val[i] < 360000)
+                        warn_time += 60000; // 1-minute alerts up to 6 minutes
+                    if (timer_val[i] >= 360000 && timer_val[i] < 600000)
+                        warn_time += 120000; // 2-minute alerts between 6 and 10 minutes
+                    if (timer_val[i] >= 600000)
+                        warn_time += 300000; // 5-minute alerts above 10 minutes
+                }
+                warn_time -= music_map[MUSIC_ALARM1 + i].duration;
+                if (timer_val[i] > warn_time && (timer_val[i] - delta) <= warn_time)
+                    MUSIC_PlayValue(MUSIC_ALARM1 + i, (timer_val[i]+music_map[MUSIC_ALARM1 + i].duration)/1000, MUSIC_UNIT_TIME, 0);
+#endif
+printf("timer_val=%d  warn_time=%d  delta=%d\n", timer_val[i], warn_time, delta);
             } else {
-                s32 warn_time;
+                // s32 warn_time;
                 // start to beep  for each prealert_interval at the last prealert_time(seconds)
                 if (Transmitter.countdown_timer_settings.prealert_time != 0 &&
                     Transmitter.countdown_timer_settings.prealert_interval != 0 &&
