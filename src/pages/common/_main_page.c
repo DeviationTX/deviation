@@ -407,10 +407,10 @@ void show_elements()
                 break;
             }
             case ELEM_BATTERY:
-                GUI_CreateLabelBox(&gui->elem[i].box, x, y, w, h, &BATTERY_FONT,  voltage_cb, NULL, NULL);
+                GUI_CreateLabelBox(&gui->elem[i].box, x, y, w, h, &BATTERY_FONT, voltage_cb, NULL, NULL);
                 break; 
             case ELEM_TXPOWER:
-                GUI_CreateLabelBox(&gui->elem[i].box, x, y, w, h, &MICRO_FONT,  _power_to_string, NULL, NULL);
+                GUI_CreateLabelBox(&gui->elem[i].box, x, y, w, h, &TINY_FONT, _power_to_string, NULL, NULL);
                 break; 
         }
     }
