@@ -159,6 +159,8 @@ static unsigned _layaction_cb(u32 button, unsigned flags, void *data)
     }
     if (! GUI_GetSelected() || flags & BUTTON_RELEASE)
         return 0;
+    if (CHAN_ButtonIsPressed(button, BUT_ENTER) && (flags & BUTTON_LONGPRESS))
+        return 1;
     if (CHAN_ButtonIsPressed(button, BUT_ENTER) && lp->selected_for_move < 0) {
         select_for_move((guiLabel_t *)GUI_GetSelected());
         return 1;

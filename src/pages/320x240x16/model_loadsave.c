@@ -80,7 +80,10 @@ void PAGE_LoadSaveInit(int page)
     int selected;
     const char * name = NULL;
     enum loadSaveType menu_type = page;
+    
+    memset(mp, 0, sizeof(struct model_page));  // Bug fix: must initialize this
     mp->menu_type = page;
+    mp->modeltype = Model.type; 
     OBJ_SET_USED(&gui->image, 0);
 
     selected = get_scroll_count(page);
