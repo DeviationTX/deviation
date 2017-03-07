@@ -196,9 +196,7 @@ void TIMER_Update()
                 if (timer_val[i] > warn_time && (timer_val[i] - delta) <= warn_time)
                     MUSIC_PlayValue(MUSIC_ALARM1 + i, (timer_val[i]+music_map[MUSIC_ALARM1 + i].duration)/1000, MUSIC_UNIT_TIME, 0);
 #endif
-printf("timer_val=%d  warn_time=%d  delta=%d\n", timer_val[i], warn_time, delta);
             } else {
-                // s32 warn_time;
                 // start to beep  for each prealert_interval at the last prealert_time(seconds)
                 if (Transmitter.countdown_timer_settings.prealert_time != 0 &&
                     Transmitter.countdown_timer_settings.prealert_interval != 0 &&
