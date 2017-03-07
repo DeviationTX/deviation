@@ -110,7 +110,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
                     emptystr_cb, press_cb, (void *)(long)absrow1);
         GUI_CreateLabelBox(&gui->source[relrow],
                     SCROLLABLE_X + 25, y, 80, 18,
-                    &DEFAULT_FONT, source_cb, NULL, (void *)(long)absrow1);
+                    &LIST_FONT, source_cb, NULL, (void *)(long)absrow1);
         count++;
     }
     if (absrow < ROW2) {
@@ -122,7 +122,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
                     emptystr_cb, press_cb, (void *)(long)(absrow+ROW1));
         GUI_CreateLabelBox(&gui->source2[relrow],
                     SCROLLABLE_X + 180, y, 80, 18, 
-                    &DEFAULT_FONT, source_cb, NULL, (void *)(long)(absrow+ROW1));
+                    &LIST_FONT, source_cb, NULL, (void *)(long)(absrow+ROW1));
         count++;
     }
     return count;

@@ -23,7 +23,7 @@
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
-    GUI_CreateLabelBox(&gui->line[relrow], 5, y, LCD_WIDTH - ARROW_WIDTH - 5, 16, &DEFAULT_FONT, str_cb, NULL, (void *)(long)absrow);
+    GUI_CreateLabelBox(&gui->line[relrow], 5, y, LCD_WIDTH - ARROW_WIDTH - 5, 16, &LIST_FONT, str_cb, NULL, (void *)(long)absrow);
     return 0;
 }
 
