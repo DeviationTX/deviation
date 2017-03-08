@@ -56,7 +56,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         GUI_CreateButton(&gui->name[relrow].but, XOFFSET+4, row, BUTTON_64x16, MIXPAGE_ChanNameProtoCB,
                                virtname_cb, (void *)(long)ch);
     } else {
-        GUI_CreateLabelBox(&gui->name[relrow].lbl, XOFFSET+4, row, 64, 18, &DEFAULT_FONT,
+        GUI_CreateLabelBox(&gui->name[relrow].lbl, XOFFSET+4, row, 64, 18, &LABEL_FONT,
                                MIXPAGE_ChanNameProtoCB, NULL, (void *)((long)ch));
         selectable = 1;
     }
