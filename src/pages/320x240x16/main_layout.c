@@ -206,6 +206,16 @@ static void dialog_ok_cb(u8 state, void * data)
         select_for_move((guiLabel_t *)obj);
 }
 
+static void add_dlgbut_cb(struct guiObject *obj, const void *data)
+{
+    (void)obj;
+    if(!data) {
+        if (OBJ_IS_USED(&gui->dialog))
+            GUI_RemoveHierObjects((guiObject_t *)&gui->dialog);
+        PAGE_PushByID(PAGEID_LOADSAVE, LOAD_LAYOUT);
+    }
+}
+
 static void add_dlg_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;

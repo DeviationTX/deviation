@@ -201,14 +201,6 @@ static void dlgbut_cb(struct guiObject *obj, const void *data)
     show_config();
 }
 
-static void add_dlgbut_cb(struct guiObject *obj, const void *data)
-{
-    (void)obj;
-    if(!data) {
-        PAGE_PushByID(PAGEID_LOADSAVE, LOAD_LAYOUT);
-    }
-}
-
 const char *menulabel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
