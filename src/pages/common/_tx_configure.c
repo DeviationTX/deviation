@@ -239,7 +239,7 @@ static const char *prealert_time_cb(guiObject_t *obj, int dir, void *data)
     u8 changed;
     u16 prealert_time = Transmitter.countdown_timer_settings.prealert_time/1000;
     prealert_time = GUI_TextSelectHelper(prealert_time,
-            MIN_PERALERT_TIME, MAX_PERALERT_TIME, dir, 5, 10, &changed);
+            MIN_PREALERT_TIME, MAX_PREALERT_TIME, dir, 5, 30, &changed);
     if (changed)
         Transmitter.countdown_timer_settings.prealert_time = prealert_time * 1000;
     if (prealert_time == 0)

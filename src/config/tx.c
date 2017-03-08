@@ -328,7 +328,7 @@ void CONFIG_LoadTx()
     Transmitter.splash_delay = DEFAULT_SPLASH_DELAY;
     Transmitter.auto_dimmer.timer = DEFAULT_BACKLIGHT_DIMTIME;
     Transmitter.auto_dimmer.backlight_dim_value = DEFAULT_BACKLIGHT_DIMVALUE;
-    Transmitter.countdown_timer_settings.prealert_time = DEFAULT_PERALERT_TIME;
+    Transmitter.countdown_timer_settings.prealert_time = DEFAULT_PREALERT_TIME;
     Transmitter.countdown_timer_settings.prealert_interval = DEFAULT_PREALERT_INTERVAL;
     Transmitter.countdown_timer_settings.timeup_interval = DEFAULT_TIMEUP_INTERVAL;
     Transmitter.telem_alert_interval = DEFAULT_TELEM_INTERVAL;
