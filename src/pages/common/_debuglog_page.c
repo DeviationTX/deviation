@@ -19,10 +19,10 @@ ctassert((DEBUG_WINDOW_SIZE < 255), debug_window_size_too_big);
 #define PREV_PTR(ptr) ((ptr == logstr) ? logstr + DEBUG_WINDOW_SIZE - 1 : ptr-1)
 
 static struct debuglog_obj * const gui = &gui_objs.u.debuglog;
-static volatile char logstr[DEBUG_WINDOW_SIZE];
+static volatile char logstr[DEBUG_WINDOW_SIZE]= { 0 }; // all elements 0;
 static volatile char *wptr = logstr;
 static volatile char *rptr = logstr;
-static u8 line_pos[NUM_ROWS];
+static u8 line_pos[NUM_ROWS]= { 0xFF }; // all elements 0xFF;
 static u32 changed = 0;
 
 static const char *str_cb(guiObject_t *obj, const void *data)
