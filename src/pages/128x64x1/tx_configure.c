@@ -43,7 +43,9 @@ static struct tx_obj * const gui = &gui_objs.u.tx;
 static const char *_contrast_select_cb(guiObject_t *obj, int dir, void *data);
 static const char *_vibration_state_cb(guiObject_t *obj, int dir, void *data);
 static const char *_buzz_vol_cb(guiObject_t *obj, int dir, void *data);
+#if HAS_EXTENDED_AUDIO
 static const char *_audio_vol_cb(guiObject_t *obj, int dir, void *data);
+#endif
 
 static u16 current_selected = 0;  // do not put current_selected into pagemem as it shares the same structure with other pages by using union
 
