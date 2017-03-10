@@ -710,7 +710,7 @@ FLASH_Status FLASH_ProgramWord(uint32_t Address, uint32_t Data)
         *(__IO uint16_t*) tmp = Data >> 16;
     
         /* Wait for last operation to be completed */
-        status = FLASH_WaitForLastOperation(ProgramTimeout);
+        status = FLASH_WaitForLastOperation(ProgramTimeout);
         
         /* Disable the PG Bit */
         FLASH->CR &= CR_PG_Reset;
