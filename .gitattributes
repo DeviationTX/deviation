@@ -1,4 +1,6 @@
-* text=auto
+* text eol=lf
 src/libopencm3/scripts/* eol=lf
 *.pl eol=lf
 *.py eol=lf
+*.ini eol=lf
+src/fs/language/* eol=lf
