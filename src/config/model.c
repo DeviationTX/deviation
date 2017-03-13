@@ -186,7 +186,10 @@ static const char GUI_QUICKPAGE[] = "quickpage";
 /* Section: Music */
 static const char SECTION_VOICE[] = "voice";
 static const char * const VOICE_TELEMALARM[TELEM_NUM_ALARMS] =
-     { "telemalarm1", "telemalarm2", "telemalarm3", "telemalarm4", "telemalarm5", "telemalarm6" };
+    { "telemalarm1", "telemalarm2", "telemalarm3", "telemalarm4", "telemalarm5", "telemalarm6" };
+static const char * const VOICE_TIMER[NUM_TIMERS] =
+    { "timer1", "timer2", "timer3", "timer4" };
+
 #endif
 
 
@@ -1035,6 +1038,12 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
             }
         }
 #endif
+        for (int i = 0; i < NUM_TIMERS; i++) {
+            if (MATCH_KEY(VOICE_TIMER[i])) {
+                m->music.timer[i].music = val;
+                return 1;
+            }
+        }
         for (int i = 0; i < TELEM_NUM_ALARMS; i++) {
             if (MATCH_KEY(VOICE_TELEMALARM[i])) {
                 m->music.telemetry[i].music = val;
@@ -1356,9 +1365,13 @@ u8 CONFIG_WriteModel(u8 model_num) {
         }
     }
 #endif
+    for (idx = 0; idx < NUM_TIMERS; idx++) {
+        if (m->music.timer[idx].music)
+            fprintf(fh, "timer%d=%d\n", idx + 1, m->music.timer[idx].music);
+    }
     for (idx = 0; idx < TELEM_NUM_ALARMS; idx++) {
         if (m->music.telemetry[idx].music)
-            fprintf(fh, "TELEMALARM%d=%d\n", idx + 1, m->music.telemetry[idx].music);
+            fprintf(fh, "telemalarm%d=%d\n", idx + 1, m->music.telemetry[idx].music);
     }
 #endif
     CONFIG_EnableLanguage(1);

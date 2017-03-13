@@ -342,7 +342,7 @@ void TELEMETRY_Alarm()
         printf("beep: %d\n\n", k);
 #endif
 
-#if HAS_EXTENDED_AUDIO && HAS_MUSIC_CONFIG
+#if HAS_EXTENDED_AUDIO
         if (TELEMETRY_Type() == TELEM_DEVO) {
             switch(Model.telem_alarm[k]) {
                 case TELEM_DEVO_VOLT1:
@@ -433,7 +433,7 @@ void TELEMETRY_Alarm()
         }
 #else
         MUSIC_Play(MUSIC_TELEMALARM1 + k);
-#endif //HAS_EXTENDED_AUDIO && HAS_MUSIC_CONFIG
+#endif //HAS_EXTENDED_AUDIO
 
     }
 }

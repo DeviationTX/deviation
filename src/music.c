@@ -222,7 +222,7 @@ void MUSIC_Play(u16 music)
     SOUND_Start((u16)Notes[0].duration * 10, next_note_cb, vibrate);
 }
 
-#if HAS_MUSIC_CONFIG
+#if HAS_EXTENDED_AUDIO
 
 u16 MUSIC_GetTelemetryAlarm(enum Music music) {
     if (Model.music.telemetry[music - MUSIC_TELEMALARM1].music > 0 && Transmitter.audio_vol)
@@ -230,9 +230,11 @@ u16 MUSIC_GetTelemetryAlarm(enum Music music) {
     return music;
 }
 
-#endif
-
-#if HAS_EXTENDED_AUDIO
+u16 MUSIC_GetTimerAlarm(enum Music music) {
+    if (Model.music.timer[music - MUSIC_ALARM1].music > 0 && Transmitter.audio_vol)
+        return Model.music.timer[music - MUSIC_ALARM1].music;
+    return music;
+}
 
 void MUSIC_PlayValue(u16 music, s32 value, u8 unit, u8 prec)
 {

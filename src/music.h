@@ -2,6 +2,7 @@
 #define _MUSIC_H_
 
 #include <telemetry.h>
+#include <timer.h>
 
 enum Music {
     MUSIC_STARTUP = 0,
@@ -37,10 +38,10 @@ enum Music {
 #define MUSIC_UNIT_OFFSET 130
 #define CUSTOM_ALARM_ID 161 // start of custom MP3 IDs
 #define MUSIC_DEC_SEP 110  // MP3 ID of DECSEP = 110 + MUSIC_TOTAL
-#define NUM_STICKS	4
+#define NUM_STICKS 4
 #define NUM_AUX_KNOBS	(INP_HAS_CALIBRATION - NUM_STICKS)	// Exclude sticks
 #define NUM_SWITCHES (NUM_INPUTS - INP_HAS_CALIBRATION)
-#define MODEL_CUSTOM_ALARMS (NUM_SWITCHES + NUM_AUX_KNOBS * 2 + TELEM_NUM_ALARMS)
+#define MODEL_CUSTOM_ALARMS (NUM_SWITCHES + NUM_AUX_KNOBS * 2 + NUM_TIMERS + TELEM_NUM_ALARMS)
 
 enum AudioPlayers {
   AUDIO_NONE = 0,	// Just use Tx beeps.
@@ -96,6 +97,7 @@ struct CustomMusic {
 struct  Music_Nr {
     struct CustomMusic switches[NUM_SWITCHES];	//Switch array to point to music file number, no pots
     struct CustomMusic telemetry[TELEM_NUM_ALARMS]; //Telemetry Alarm array to point to music file number
+    struct CustomMusic timer[NUM_TIMERS]; //Timer Alarm array to point to music file number
     struct ButtonMusic buttons[NUM_TX_BUTTONS];	//Button array to point to music file number
 #if NUM_AUX_KNOBS
     struct CustomMusic aux[NUM_AUX_KNOBS * 2]; //two per knob for up and down
@@ -115,6 +117,7 @@ struct MusicMap {
 struct MusicMap music_map[MAX_MUSICMAP_ENTRIES];
 
 u16 MUSIC_GetTelemetryAlarm(enum Music music);
+u16 MUSIC_GetTimerAlarm(enum Music music);
 void MUSIC_PlayValue(u16 music, s32 value, u8 unit, u8 prec);
 
 #endif //HAS_EXTENDED_AUDIO
