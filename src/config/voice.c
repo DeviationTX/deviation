@@ -33,7 +33,7 @@ static const char* getfield(char* value, int num) {
         if (!--num)
             return tok;
     }
-    return NULL;
+    return "";
 }
 
 static int ini_handler(void* user, const char* section, const char* name, const char* value)
