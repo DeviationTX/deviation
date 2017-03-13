@@ -29,14 +29,14 @@ const char BUTTON_CFG[] = "extra-buttons";
 #endif
 const char HAPTIC_ENABLE[] = "enable-haptic";
 #if HAS_EXTENDED_AUDIO
-const char AUDIO_CFG[] = "extended-audio";
+const char AUDIO_CFG[] = "voice";
 static char * const AUDIO_PLAYER[AUDIO_LAST] = {
     [AUDIO_AUDIOFX] = "audiofx",
     [AUDIO_DF_PLAYER] = "dfplayer",
     };
 #endif
 #if HAS_AUDIO_UART5
-const char UART5_ENABLE[] = "extended-audio-uart5";
+const char UART5_ENABLE[] = "voice-uart5";
 #endif
 /* Section: TX Module */
 static const char SECTION_MODULES[] = "modules";
