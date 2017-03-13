@@ -18,7 +18,7 @@
 #include "gui/gui.h"
 #include "tx.h"
 #include "rtc.h"
-#include "alertcfg.h"
+#include "voice.h"
 
 #include <stdlib.h>
 #include <string.h>
