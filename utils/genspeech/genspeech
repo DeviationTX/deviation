@@ -65,7 +65,7 @@ mkdir $SPEECHDIR 2>/dev/null
 rm -f ${SPEECHDIR}/* >/dev/null 2>&1
 rm -f voice.ini >/dev/null 2>&1
 
-for INFILE in models/globalAlert$1.txt
+for INFILE in globalAlert$1.txt
 do
 	echo "Processing global alerts..."
 	echo ";This file contains the MP3 mapping for external MP3 player modules (currently AudioFX or DFPlayer Mini)" >> $OUTFILE
@@ -92,7 +92,7 @@ done
 
 IDX=161
 
-for INFILE in models/modelAlert$1.txt
+for INFILE in modelAlert$1.txt
 do
 	echo "Processing file $INFILE..."
 	echo ";Below are custom alarms for individual models (switch, trim, telemetry etc.), MP3 ID must be greater than 160" >> $OUTFILE
@@ -122,8 +122,10 @@ do
                 
 	done < $INFILE
 done
+zip -r voice$1.zip voice.ini mp3
 echo "Finished writing $OUTFILE"
 echo "Please copy $OUTFILE to the media folder of your deviation transmitter."
 echo "The folder mp3 has to be placed on the SD card of your MP3 player."
+echo "Zip created as voice$1.zip."
 rm $TMPFILE
 exit 0
