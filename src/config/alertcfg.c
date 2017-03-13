@@ -19,51 +19,65 @@
 #include "model.h"
 #include "../music.h"
 
+#define MATCH_SECTION(s) (strcasecmp(section, s) == 0)
+#define MATCH_KEY(s)     (strcasecmp(name,    s) == 0)
+
 #if HAS_EXTENDED_AUDIO
 
-void CONFIG_AlertParse(const char* filename)
-{
-    FILE *file;
-    char *pt;
-    int textlen;
-    int val;
-    u32 j = 0;
-    music_map_entries = 0;
-    memset(music_map,0,sizeof(music_map));
-    char line[MAX_MUSICMAP_ENTRIES];
-    file = fopen(filename, "r");
-    if (!file) {
-	printf("Can't open music mapping file: %s\n", filename);
-        return;
-    }
+const char SECTION_VOICE_GLOBAL[] = "global";
+const char SECTION_VOICE_CUSTOM[] = "custom";
 
-    while ((fgets(line, sizeof(line), file) != NULL) && music_map_entries < MAX_MUSICMAP_ENTRIES) {
-        j=0;
-        textlen = strlen(line);
-        // strip LF or CRLF
-        if (line[textlen-1] == '\n') {
-            line[--textlen] = '\0';
-            if ((textlen > 0) && (line[textlen-1] == '\r'))
-                line[--textlen] = '\0';
-        }
-        // Ignore comments or empty lines
-        if ((line[0] == '\0') || (line[0] == ';'))
-            continue;
-        pt = strtok(line,":");
-        while(pt != NULL) {
-            j++;
-            val = atoi(pt);
-            switch (j) {
-              case 1: music_map[music_map_entries].musicid = val; break;
-              case 2: music_map[music_map_entries].duration = val; break;
-#if HAS_MUSIC_CONFIG
-              case 3: strlcpy(music_map[music_map_entries].label,pt,MAX_MUSIC_LABEL);
-#endif
-            }
-            pt = strtok(NULL, ":");
-        }
-            music_map_entries++;
+static const char* getfield(char* value, int num) {
+    const char* tok;
+    for (tok = strtok(value, ","); tok && *tok; tok = strtok(NULL, ",\n")) {
+        if (!--num)
+            return tok;
     }
-    fclose(file);
+    return NULL;
+}
+
+static int ini_handler(void* user, const char* section, const char* name, const char* value)
+{
+    (void) user;
+    char tmp[100];
+    strlcpy(tmp, value, 100);
+    int duration = atoi(getfield(tmp,2));
+#if HAS_MUSIC_CONFIG
+    char label[MAX_MUSIC_LABEL];
+    strlcpy(label,getfield(tmp, 1), MAX_MUSIC_LABEL);
+#endif
+
+    if (MATCH_SECTION(SECTION_VOICE_GLOBAL)) {
+        for (int i = 0; i < CUSTOM_ALARM_ID; i++) {
+            snprintf(tempstring, 4, "%d", i);
+            if (MATCH_KEY(tempstring)) {
+                music_map[i].duration = duration;
+                music_map[i].musicid = i;
+#if HAS_MUSIC_CONFIG
+                strcpy(music_map[i].label, label);
+#endif
+                return 1;
+            }
+        }
+    }
+    if (MATCH_SECTION(SECTION_VOICE_CUSTOM)) {
+        music_map[music_map_entries].duration = duration;
+        music_map[music_map_entries].musicid = atoi(name);
+#if HAS_MUSIC_CONFIG
+        strcpy(music_map[music_map_entries].label, label);
+#endif
+        music_map_entries++;
+        return 1;
+    }
+    printf("Unknown entry in voice.ini: %s\n", value);
+    return 0;
+}
+
+void CONFIG_VoiceParse()
+{
+    music_map_entries = CUSTOM_ALARM_ID;
+    if (CONFIG_IniParse("media/voice.ini", ini_handler, NULL)) {
+        printf("Failed to parse voice.ini\n");
+    }
 }
 #endif

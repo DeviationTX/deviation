@@ -85,4 +85,5 @@ void CONFIG_ResetModel();
 u8 CONFIG_ReadTemplateByIndex(u8 template_num);
 u8 CONFIG_ReadTemplate(const char *filename);
 u8 CONFIG_ReadLayout(const char *filename);
+
 #endif /*_MODEL_H_*/

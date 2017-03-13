@@ -184,8 +184,8 @@ static const char GUI_QUICKPAGE[] = "quickpage";
 
 #if HAS_EXTENDED_AUDIO
 /* Section: Music */
-static const char SECTION_MUSIC[] = "music";
-static const char * const MUSIC_TELEMALARM[TELEM_NUM_ALARMS] =
+static const char SECTION_VOICE[] = "voice";
+static const char * const VOICE_TELEMALARM[TELEM_NUM_ALARMS] =
      { "telemalarm1", "telemalarm2", "telemalarm3", "telemalarm4", "telemalarm5", "telemalarm6" };
 #endif
 
@@ -989,7 +989,7 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
     char src_name[20];
     const char *button_name;
 
-    if (MATCH_SECTION(SECTION_MUSIC)) {
+    if (MATCH_SECTION(SECTION_VOICE)) {
         u16 val = atoi(value);
         if(val>MAX_MUSICMAP_ENTRIES-1 || music_map[val].duration == 0 || val < CUSTOM_ALARM_ID) {
             printf("%s: Music %s not found in music.map or below ID %d\n", section, value, CUSTOM_ALARM_ID);
@@ -1036,7 +1036,7 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
         }
 #endif
         for (int i = 0; i < TELEM_NUM_ALARMS; i++) {
-            if (MATCH_KEY(MUSIC_TELEMALARM[i])) {
+            if (MATCH_KEY(VOICE_TELEMALARM[i])) {
                 m->music.telemetry[i].music = val;
                 return 1;
             }
@@ -1341,7 +1341,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
         }
     }
 #if HAS_EXTENDED_AUDIO
-    fprintf(fh, "[%s]\n", SECTION_MUSIC);
+    fprintf(fh, "[%s]\n", SECTION_VOICE);
     for (idx = 0; idx < NUM_SWITCHES; idx++) {
         if (m->music.switches[idx].music)
             fprintf(fh, "%s=%d\n", INPUT_SourceName(file,idx + INP_HAS_CALIBRATION + 1), m->music.switches[idx].music);
