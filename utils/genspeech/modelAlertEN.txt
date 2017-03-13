@@ -1,0 +1,12 @@
+low rate selected
+medium rate selected
+high rate selected
+flight mode activated
+flight mode deactivated
+gear up
+gear down
+throttle hold
+throttle hold deactivated
+mix 0
+mix 1
+mix 2
