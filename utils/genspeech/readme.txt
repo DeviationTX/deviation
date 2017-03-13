@@ -2,51 +2,20 @@ The genspeech utility needs to be run under OSX or linux.  On OSX, it will use t
 to generate the aiff speech files.  On Linux, it will use text-to-speech commands pico2wave or espeak to generate wave speech files. Then, it will use "lame" to convert aiff or wave files to mp3 format. Once generated, the duration of each audio file gets checked with mplayer (linux) or afinfo (OSX). Please make sure you've installed these command line utilities onto your system.
 
 Usage:
-1. For global alerts as well as numerical values, decimal seperator and units the file globalAlert.txt is processed. Please note you can not change the labels defined but only the texts after ": in each line.
+1. For global alerts as well as numerical values, decimal seperator and units the file globalAlert.txt is processed. Please note you can not change the labels defined but only the texts after ":" in each line.
 
-2. For each model file, you can optionally provide a Switch/Trim Button/Auxillary Knob to Alert Message file.  For example,
-   File: Model1Alert.txt
-   Content: FMODE0:		Acro Mode
-            FMODE1:		Angle Mode
-            HOLD1:		GPS Hold Activated
-            HOLD0:		GPS Hold Deactivated
-            TRIMLV+:		Beeper On
-            TRIMLV-:		Beeper Off
-            TRIMLH+:		Taking Photo
-            TRIMRV+_ON:		Lights On
-            TRIMRV+_OFF:	Lights Off
-            AUX4_UP:		Camera Up
-            AUX4_DOWN:		Camera Down
+2. For custom alerts a file modelAlert.txt will be read to generate model specific messages selectable in the voice menu. 
 
-   Description: The 1st field is the Switch, Trim Button or Auxillary Knob, followed by a colon.
-                Then the message to be spoken.
-                Switch: Switch name following by its postion, such as FMODE0, FMODE1, SW B0, etc.
-                Trim Button: When trim buttons are used as virtual switches, they can also have voice feedback.
-                             Trim buttons as ON/OFF switches, Momentary switches & Toggles switches are all
-                             supported.  When used as ON/OFF switches, use only the Trim button name, such as
-                             TRIMLV+, TRIMLV-, etc.  When used as Momentary switches or Toggles switches, each
-                             Trim button can have 2 states, indicated by suffix "_ON" & "_OFF".  Example,
-                             TRIMRV+_ON & TRIMRV+_OFF representing its toggle on/off or momentary on/off states.
-                Auxillary Knob: Auxillary knob name followed by its controlling direction, "_UP" or "_DOWN"
-                                (turning up or down).  For example, AUX4_UP indicating knob has been turned up;
-                                and AUX4_DOWN indicating knob has been turned down.
+3. Run "genspeech" and it will generate a mapping file named "voice.ini" which contains all messages created as well as each files duration.
 
-3. Place all the Switch to Alert Message files under "models" directory.  There is a sample Alert Message file
-   provided in the "models" directory.  You can remove it before placing your own files.
+4. The voice.ini will need to be copied to your Transmitter under "media" directory.
 
-3. Run "genspeech" and it will generate a mapping file for each Switch to Alert Message file, such as
-   model1.map, model2.map, etc.  The mapping file contains the mapping of Switches and their corresponding
-   voice message number. Also included will be the global alerts. For example, below model1.map will be
-   generated from the above Model1Alert.txt file.
-   File: model1.map
-   Content: [... global alerts 0000-0019 and 1000-1016...]
-            FMODE0:0100
-            FMODE1:0101
-            HOLD1:0102
-            HOLD0:0103
-
-4. All the mapping files above will need to be copied to your Transmitter under "models" directory.
-
-5. A new directory named "mp3" will also be generated with various voice files in it.  These voice files will
+5. A new directory named "mp3" will also be generated with the voice files in it.  These voice files will
    need to be moved to your DFPlayer Mini or other hardware players.
+   
+6. A voice.zip file containing voice.ini and the mp3 directory for further use (for example uploading to deviationtx.com).
 
+7. You can supply an command-line option which will be appended to all filenames created. For example:
+   genspeech EN
+   will generate all files from modelAlertEN.txt and globalAlertEN.txt, generate voice.ini and mp3 folders and zip it
+   all into voiceEN.ini. This especially useful for creating "language" packs from the sample files in the genspeech folder.
