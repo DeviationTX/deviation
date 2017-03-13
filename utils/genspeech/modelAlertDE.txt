@@ -1,0 +1,12 @@
+niedrige Rate ausgewählt
+mittlere Rate ausgewählt
+hohe Rate ausgewählt
+flugmodus aktiviert
+flugmodus deaktiviert
+Fahrgestell hoch
+Fahrgestell runter
+Gas aus
+Gas an
+mix 0
+mix 1
+mix 2
