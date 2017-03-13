@@ -21,7 +21,7 @@
 #ifndef OVERRIDE_PLACEMENT
 
 #define RAW_FONT    DEFAULT_FONT.font
-#define CHAN_FONT   MICRO_FONT.font
+#define CHAN_FONT   TINY_FONT.font
 #define RAW_HEIGHT  (LINE_HEIGHT + 5)
 #define CHAN_HEIGHT 13
 enum {
@@ -50,7 +50,7 @@ static void draw_chan(int disp, int row, int y)
     int x = disp%2 ? LABEL_COL2_X : LABEL_COL1_X;
     int idx = row * NUM_BARS_PER_ROW + (disp%2 ? 1 : 0);
     int height;
-    struct LabelDesc labelValue = MICRO_FONT;
+    struct LabelDesc labelValue = TINY_FONT;
     labelValue.align = ALIGN_RIGHT;
     struct LabelDesc labelSource = DEFAULT_FONT;
     if (cp->type == MONITOR_RAWINPUT) {

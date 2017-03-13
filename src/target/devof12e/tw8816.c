@@ -210,10 +210,12 @@ void TW8816_SetVideoMode(unsigned enable)
 
 void TW8816_ReinitPixelClock()
 {
-    LCD_WriteReg(0xB6, 0xB4);
-    LCD_WriteReg(0xB2, 0x20);
+    u8 reg1 = LCD_ReadReg(0xB6);
+    u8 reg2 = LCD_ReadReg(0xB2);
+    LCD_WriteReg(0xB6, reg1 | 0x80);
+    LCD_WriteReg(0xB2, reg2);
     Delay(0x60000);
-    LCD_WriteReg(0xB6, 0x34);
+    LCD_WriteReg(0xB6, reg1);
 }
 
 void TW8816_DisplayCharacter(unsigned pos, unsigned chr, unsigned attr)

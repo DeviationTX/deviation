@@ -137,6 +137,14 @@ static const char *dlgts1_cb(guiObject_t *obj, int dir, void *data)
     return dlgts_cb(obj, dir, data);
 }
 
+static void add_dlgbut_cb(struct guiObject *obj, const void *data)
+{
+    (void)obj;
+    if(!data) {
+        PAGE_PushByID(PAGEID_LOADSAVE, LOAD_LAYOUT);
+    }
+}
+
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     int num_elems = (long)data;

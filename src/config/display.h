@@ -11,7 +11,7 @@
 #define BATTERY_FONT   (Display.font[5])
 #define BATTALARM_FONT (Display.font[6])
 #define TINY_FONT      (Display.font[7])
-#define MICRO_FONT     (Display.font[8])
+#define LIST_FONT      (Display.font[8])
 #define LABEL_FONT     (Display.font[9])
 #define NARROW_FONT    (Display.font[10])
 #define SMALL_FONT     (Display.font[11])
