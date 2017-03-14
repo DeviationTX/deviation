@@ -31,13 +31,13 @@ static u32 audio_queue_time = 0;
 // Initialize UART for extended-audio
 void AUDIO_Init() {
 #ifdef BUILDTYPE_DEV
-    printf("Audio: Initializing UART for extended-audio\n");
+    printf("Voice: Initializing UART for extended-audio\n");
 #endif
 
 #if HAS_AUDIO_UART5
     if (Transmitter.audio_uart5) {
 #ifdef BUILDTYPE_DEV
-        printf("Audio: UART5 already initialized\n");
+        printf("Voice: UART5 already initialized\n");
 #endif
         return;
     }
@@ -46,7 +46,7 @@ void AUDIO_Init() {
 #ifndef EMULATOR
     if ( PPMin_Mode() || Model.protocol == PROTOCOL_PPM ) {
 #ifdef BUILDTYPE_DEV
-        printf("Audio: Cannot initialize USART for extended-audio, PPM in use\n");
+        printf("Voice: Cannot initialize USART for extended-audio, PPM in use\n");
 #endif
         usart_disable(_USART);
         usart_set_baudrate(_USART, 115200);
@@ -54,7 +54,7 @@ void AUDIO_Init() {
     }
     else {
 #ifdef BUILDTYPE_DEV
-        printf("Audio: Setting up USART for extended-audio\n");
+        printf("Voice: Setting up USART for extended-audio\n");
 #endif
         usart_disable(_USART);
         usart_set_baudrate(_USART, 9600);
@@ -103,14 +103,14 @@ int AUDIO_Play(u16 music) {
     if ( PPMin_Mode() || Model.protocol == PROTOCOL_PPM
     || music == MUSIC_KEY_PRESSING || music == MUSIC_MAXLEN) {
 #ifdef BUILDTYPE_DEV
-        printf("Audio: PPM port in use\n");
+        printf("Voice: PPM port in use\n");
 #endif
 #endif
         return 0;
     }
 
 #ifdef BUILDTYPE_DEV
-    printf("Audio: Playing music #%d (%s)\n", music_map[music].musicid, music_map[music].label);
+    printf("Voice: Playing music #%d (%s)\n", music_map[music].musicid, music_map[music].label);
 #endif
 
 #ifdef EMULATOR     // On emulators call mpg123 to play mp3s
@@ -152,12 +152,12 @@ int AUDIO_Play(u16 music) {
 void AUDIO_SetVolume() {
     if ( PPMin_Mode() || Model.protocol == PROTOCOL_PPM ) { // don't send volume command when using PPM port
 #ifdef BUILDTYPE_DEV
-        printf("Audio: PPM port in use\n");
+        printf("Voice: PPM port in use\n");
 #endif
         return;
     }
 #ifdef BUILDTYPE_DEV
-    printf("Audio: Setting external audio volume to %d\n", Transmitter.audio_vol);
+    printf("Voice: Setting external audio volume to %d\n", Transmitter.audio_vol);
 #endif
 #ifndef EMULATOR
     switch (Transmitter.audio_player) {
@@ -187,7 +187,7 @@ void AUDIO_CheckQueue() {
         }
     } else if (num_audio && t > audio_queue_time) {
 #ifdef BUILDTYPE_DEV
-        printf("Audio: Queue finished, resetting.\n");
+        printf("Voice: Queue finished, resetting.\n");
 #endif
         num_audio = 0;
         next_audio = 0;
@@ -198,7 +198,7 @@ void AUDIO_CheckQueue() {
 void AUDIO_AddQueue(u16 music) {
     if (num_audio == AUDIO_QUEUE_LENGTH) {
 #ifdef BUILDTYPE_DEV
-        printf("Audio: Queue full, cannot add new music #%d\n",music);
+        printf("Voice: Queue full, cannot add new music #%d\n",music);
 #endif
         return;
     }
