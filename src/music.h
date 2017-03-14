@@ -36,7 +36,7 @@ enum Music {
 #define MAX_MUSIC_LABEL 26
 #endif
 #define MUSIC_UNIT_OFFSET 130
-#define CUSTOM_ALARM_ID 161 // start of custom MP3 IDs
+#define CUSTOM_ALARM_ID 200 // start of custom MP3 IDs
 #define MUSIC_DEC_SEP 110  // MP3 ID of DECSEP = 110 + MUSIC_TOTAL
 #define NUM_STICKS 4
 #define NUM_AUX_KNOBS	(INP_HAS_CALIBRATION - NUM_STICKS)	// Exclude sticks

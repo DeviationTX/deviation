@@ -90,7 +90,7 @@ do
  	done < $INFILE
 done
 
-IDX=161
+IDX=200
 
 for INFILE in modelAlert$1.txt
 do
