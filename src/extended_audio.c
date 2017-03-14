@@ -191,6 +191,7 @@ void AUDIO_CheckQueue() {
 #endif
         num_audio = 0;
         next_audio = 0;
+        AUDIO_SetVolume();
     }
 }
 

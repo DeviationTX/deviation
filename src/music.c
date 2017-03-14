@@ -243,8 +243,7 @@ void MUSIC_PlayValue(u16 music, s32 value, u8 unit, u8 prec)
     char thousands = 0;
     u8 digit_count = 0;
 
-    if ((Transmitter.audio_player && playback_device == AUDDEV_BUZZER) || !Transmitter.audio_player
-        || !Transmitter.audio_vol) {
+    if (!Transmitter.audio_player || !Transmitter.audio_vol) {
             MUSIC_Play(music);
         return;
     }
