@@ -41,7 +41,7 @@ enum Music {
 #define NUM_STICKS 4
 #define NUM_AUX_KNOBS	(INP_HAS_CALIBRATION - NUM_STICKS)	// Exclude sticks
 #define NUM_SWITCHES (NUM_INPUTS - INP_HAS_CALIBRATION)
-#define MODEL_CUSTOM_ALARMS (NUM_SWITCHES + NUM_AUX_KNOBS * 2 + NUM_TIMERS + TELEM_NUM_ALARMS)
+#define MODEL_CUSTOM_ALARMS (NUM_SWITCHES + NUM_AUX_KNOBS * 2 + NUM_TIMERS + TELEM_NUM_ALARMS + NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS)
 
 enum AudioPlayers {
   AUDIO_NONE = 0,	// Just use Tx beeps.
@@ -98,6 +98,7 @@ struct  Music_Nr {
     struct CustomMusic switches[NUM_SWITCHES];	//Switch array to point to music file number, no pots
     struct CustomMusic telemetry[TELEM_NUM_ALARMS]; //Telemetry Alarm array to point to music file number
     struct CustomMusic timer[NUM_TIMERS]; //Timer Alarm array to point to music file number
+    struct CustomMusic mixer[NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS];
     struct ButtonMusic buttons[NUM_TX_BUTTONS];	//Button array to point to music file number
 #if NUM_AUX_KNOBS
     struct CustomMusic aux[NUM_AUX_KNOBS * 2]; //two per knob for up and down

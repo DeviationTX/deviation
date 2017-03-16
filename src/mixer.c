@@ -339,7 +339,19 @@ void MIXER_ApplyMixer(struct Mixer *mixer, volatile s32 *raw, s32 *orig_value)
             s32 new = value / (CHAN_MULTIPLIER / 10);
             if (new != *orig_value / (CHAN_MULTIPLIER / 10)
             && new == raw[mixer->dest + NUM_INPUTS + 1] / (CHAN_MULTIPLIER / 10))
-                MUSIC_Play(MUSIC_TELEMALARM1 + 5);
+                MUSIC_Play(MUSIC_SAVING);
+          }
+        value = raw[mixer->dest + NUM_INPUTS + 1];	// Use input value
+        break;
+#endif
+#if HAS_EXTENDED_AUDIO
+    case MUX_VOICE:
+        if (orig_value) {
+            s32 new = value / (CHAN_MULTIPLIER / 10);
+            if (new != *orig_value / (CHAN_MULTIPLIER / 10)
+            && new == raw[mixer->dest + NUM_INPUTS + 1] / (CHAN_MULTIPLIER / 10))
+                if (Model.music.mixer[mixer->dest].music)
+                    MUSIC_Play(Model.music.mixer[mixer->dest].music);
           }
         value = raw[mixer->dest + NUM_INPUTS + 1];	// Use input value
         break;

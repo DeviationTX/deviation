@@ -98,6 +98,9 @@ int AUDIO_Play(u16 music) {
 #if HAS_AUDIO_UART5
     // If we are just playing beeps....
     if (music == MUSIC_KEY_PRESSING || music == MUSIC_MAXLEN) {
+#ifdef BUILDTYPE_DEV
+        printf("beep\n");
+#endif
 #else
     // If we are using the PPM port or are just playing beeps anyway....
     if ( PPMin_Mode() || Model.protocol == PROTOCOL_PPM
@@ -115,7 +118,7 @@ int AUDIO_Play(u16 music) {
 
 #ifdef EMULATOR     // On emulators call mpg123 to play mp3s
     char cmd[70];
-    u16 vol_val = Transmitter.audio_vol * 32786/30;
+    u16 vol_val = Transmitter.audio_vol * 32786/10;
 #ifdef _WIN32
     sprintf(cmd, "start /B ..\\..\\mpg123 -f %d -q ..\\..\\mp3\\%04d*.mp3 > nul 2>&1", vol_val, music_map[music].musicid);
 #else
@@ -168,7 +171,7 @@ void AUDIO_SetVolume() {
           static u8 buffer[] =
               {0x7E, 0xFF, 0x06, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0xEF};
           // Fill in volume and checksum
-          u16ToArray(Transmitter.audio_vol, buffer+5);
+          u16ToArray(Transmitter.audio_vol * 3, buffer+5); // DFPlayer has volume range 0-30
           u16ToArray(AUDIO_CalculateChecksum(buffer), buffer+7);
           AUDIO_Send(buffer, sizeof(buffer));
           break;

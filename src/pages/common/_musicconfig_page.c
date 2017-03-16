@@ -28,6 +28,7 @@ enum {
 #endif
     MUSIC_SRC_TIMER,
     MUSIC_SRC_TELEMETRY,
+    MUSIC_SRC_MIXER,
 };
 
 static u8 musicconfig_getsrctype (u8 idx)
@@ -42,7 +43,9 @@ static u8 musicconfig_getsrctype (u8 idx)
 #endif
     if (idx < NUM_SWITCHES + NUM_AUX_KNOBS * 2 + NUM_TIMERS)
         return MUSIC_SRC_TIMER;
-    return MUSIC_SRC_TELEMETRY;
+    if (idx < NUM_SWITCHES + NUM_AUX_KNOBS * 2 + NUM_TIMERS + TELEM_NUM_ALARMS)
+        return MUSIC_SRC_TELEMETRY;
+    return MUSIC_SRC_MIXER;
 }
 
 const char *musicconfig_str_cb(guiObject_t *obj, const void *data)
@@ -67,10 +70,14 @@ const char *musicconfig_str_cb(guiObject_t *obj, const void *data)
 #endif
     if (musicconfig_getsrctype(idx) == MUSIC_SRC_TIMER)
         snprintf(tempstring, sizeof(tempstring), _tr("Timer %d"),
-            idx - (MODEL_CUSTOM_ALARMS - NUM_TIMERS - TELEM_NUM_ALARMS) + 1);
+            idx - (MODEL_CUSTOM_ALARMS - NUM_TIMERS - TELEM_NUM_ALARMS - NUM_OUT_CHANNELS - NUM_VIRT_CHANNELS) + 1);
     if (musicconfig_getsrctype(idx) == MUSIC_SRC_TELEMETRY)
         snprintf(tempstring, sizeof(tempstring), _tr("Telem %d"),
-            idx - (MODEL_CUSTOM_ALARMS - TELEM_NUM_ALARMS) + 1);
+            idx - (MODEL_CUSTOM_ALARMS - TELEM_NUM_ALARMS - NUM_OUT_CHANNELS - NUM_VIRT_CHANNELS) + 1);
+    if (musicconfig_getsrctype(idx) == MUSIC_SRC_MIXER)
+        INPUT_SourceNameReal(tempstring,
+                (idx - (MODEL_CUSTOM_ALARMS - NUM_OUT_CHANNELS - NUM_VIRT_CHANNELS) + NUM_INPUTS + 1));
+
     return tempstring;
 }
 
@@ -88,12 +95,16 @@ static void music_test_cb(guiObject_t *obj, void *data)
             MUSIC_Play(Model.music.aux[idx - NUM_SWITCHES].music);
 #endif
     if (musicconfig_getsrctype(idx) == MUSIC_SRC_TIMER) {
-        if (Model.music.timer[idx - (MODEL_CUSTOM_ALARMS - NUM_TIMERS - TELEM_NUM_ALARMS)].music)
-            MUSIC_Play(Model.music.timer[idx - (MODEL_CUSTOM_ALARMS - NUM_TIMERS - TELEM_NUM_ALARMS)].music);
+        if (Model.music.timer[idx - (MODEL_CUSTOM_ALARMS - NUM_TIMERS - TELEM_NUM_ALARMS - NUM_OUT_CHANNELS - NUM_VIRT_CHANNELS)].music)
+            MUSIC_Play(Model.music.timer[idx - (MODEL_CUSTOM_ALARMS - NUM_TIMERS - TELEM_NUM_ALARMS - NUM_OUT_CHANNELS - NUM_VIRT_CHANNELS)].music);
     }
     if (musicconfig_getsrctype(idx) == MUSIC_SRC_TELEMETRY) {
-        if (Model.music.telemetry[idx - (MODEL_CUSTOM_ALARMS - TELEM_NUM_ALARMS)].music)
-            MUSIC_Play(Model.music.telemetry[idx - (MODEL_CUSTOM_ALARMS - TELEM_NUM_ALARMS)].music);
+        if (Model.music.telemetry[idx - (MODEL_CUSTOM_ALARMS - TELEM_NUM_ALARMS - NUM_OUT_CHANNELS - NUM_VIRT_CHANNELS)].music)
+            MUSIC_Play(Model.music.telemetry[idx - (MODEL_CUSTOM_ALARMS - TELEM_NUM_ALARMS - NUM_OUT_CHANNELS - NUM_VIRT_CHANNELS)].music);
+    }
+    if (musicconfig_getsrctype(idx) == MUSIC_SRC_MIXER) {
+        if (Model.music.mixer[idx - (MODEL_CUSTOM_ALARMS - NUM_OUT_CHANNELS - NUM_VIRT_CHANNELS)].music)
+            MUSIC_Play(Model.music.mixer[idx - (MODEL_CUSTOM_ALARMS - NUM_OUT_CHANNELS - NUM_VIRT_CHANNELS)].music);
     }
 }
 
@@ -116,12 +127,16 @@ static const char *musiclbl_cb(guiObject_t *obj, const void *data)
             return music_map[Model.music.buttons[idx - (NUM_INPUTS - INP_HAS_CALIBRATION)].music].label;
     }*/
     if (musicconfig_getsrctype(idx) == MUSIC_SRC_TIMER) {
-        if (Model.music.timer[idx - (MODEL_CUSTOM_ALARMS - NUM_TIMERS - TELEM_NUM_ALARMS)].music)
-            return music_map[Model.music.timer[idx - (MODEL_CUSTOM_ALARMS - NUM_TIMERS - TELEM_NUM_ALARMS)].music].label;
+        if (Model.music.timer[idx - (MODEL_CUSTOM_ALARMS - NUM_TIMERS - TELEM_NUM_ALARMS - NUM_OUT_CHANNELS - NUM_VIRT_CHANNELS)].music)
+            return music_map[Model.music.timer[idx - (MODEL_CUSTOM_ALARMS - NUM_TIMERS - TELEM_NUM_ALARMS - NUM_OUT_CHANNELS - NUM_VIRT_CHANNELS)].music].label;
     }
     if (musicconfig_getsrctype(idx) == MUSIC_SRC_TELEMETRY) {
-        if (Model.music.telemetry[idx - (MODEL_CUSTOM_ALARMS - TELEM_NUM_ALARMS)].music)
-            return music_map[Model.music.telemetry[idx - (MODEL_CUSTOM_ALARMS - TELEM_NUM_ALARMS)].music].label;
+        if (Model.music.telemetry[idx - (MODEL_CUSTOM_ALARMS - TELEM_NUM_ALARMS - NUM_OUT_CHANNELS - NUM_VIRT_CHANNELS)].music)
+            return music_map[Model.music.telemetry[idx - (MODEL_CUSTOM_ALARMS - TELEM_NUM_ALARMS - NUM_OUT_CHANNELS - NUM_VIRT_CHANNELS)].music].label;
+    }
+    if (musicconfig_getsrctype(idx) == MUSIC_SRC_MIXER) {
+        if (Model.music.mixer[idx - (MODEL_CUSTOM_ALARMS - NUM_OUT_CHANNELS - NUM_VIRT_CHANNELS)].music)
+            return music_map[Model.music.mixer[idx - (MODEL_CUSTOM_ALARMS - NUM_OUT_CHANNELS - NUM_VIRT_CHANNELS)].music].label;
     }
     return strcpy(tempstring, "");
 }
@@ -140,10 +155,13 @@ static const char *musicid_cb(guiObject_t *obj, int dir, void *data)
         musicpt = &Model.music.aux[idx - NUM_SWITCHES];
 #endif
     if (musicconfig_getsrctype(idx) == MUSIC_SRC_TIMER)
-        musicpt = &Model.music.timer[idx - (MODEL_CUSTOM_ALARMS - NUM_TIMERS - TELEM_NUM_ALARMS)];
+        musicpt = &Model.music.timer[idx - (MODEL_CUSTOM_ALARMS - NUM_TIMERS - TELEM_NUM_ALARMS - NUM_OUT_CHANNELS - NUM_VIRT_CHANNELS)];
 
     if (musicconfig_getsrctype(idx) == MUSIC_SRC_TELEMETRY)
-        musicpt = &Model.music.telemetry[idx - (MODEL_CUSTOM_ALARMS - TELEM_NUM_ALARMS)];
+        musicpt = &Model.music.telemetry[idx - (MODEL_CUSTOM_ALARMS - TELEM_NUM_ALARMS - NUM_OUT_CHANNELS - NUM_VIRT_CHANNELS)];
+
+    if (musicconfig_getsrctype(idx) == MUSIC_SRC_MIXER)
+        musicpt = &Model.music.mixer[idx - (MODEL_CUSTOM_ALARMS - NUM_OUT_CHANNELS - NUM_VIRT_CHANNELS)];
 
     if (dir == -1 && musicpt->music == CUSTOM_ALARM_ID) // set to none below 1
         musicpt->music = 0;

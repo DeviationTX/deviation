@@ -90,7 +90,7 @@ void MIXPAGE_ChangeTemplate(int show_header)
         PAGE_RemoveAllObjects();
         _show_titlerow();
     } else {
-        GUI_RemoveHierObjects(mp->firstObj); 
+        GUI_RemoveHierObjects(mp->firstObj);
     }
     mp->firstObj = NULL;
     switch(mp->cur_template)  {
@@ -141,7 +141,7 @@ static u8 touch_cb(s16 x, s16 y, void *data);
 
 static void show_none()
 {
-    mp->firstObj = NULL;   
+    mp->firstObj = NULL;
     //Row 0
 }
 
@@ -156,7 +156,7 @@ static void toggle_trim_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    
+
     u8 trim = MIXER_APPLY_TRIM(mp->cur_mixer) ? 1 : 0;
     MIXER_SET_APPLY_TRIM(mp->cur_mixer, trim ^ 0x01);
 }
@@ -346,6 +346,7 @@ const char *set_mux_cb(guiObject_t *obj, int dir, void *data)
         case MUX_DELAY:    return _tr("delay");
 #if     HAS_EXTENDED_AUDIO
         case MUX_BEEP:     return _tr("beep");
+        case MUX_VOICE:    return _tr("voice");
 #endif
         case MUX_LAST: break;
     }
@@ -447,7 +448,7 @@ const char *set_drsource_cb(guiObject_t *obj, int dir, void *data)
                 else if(data == &mp->mixer[2].sw)
                     _update_rate_widgets(1);
             }
-        } else {    
+        } else {
             MIXPAGE_RedrawGraphs();
         }
     }

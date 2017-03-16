@@ -47,12 +47,12 @@ void PAGE_MusicconfigInit(int page)
     PAGE_SetModal(0);
     if (Transmitter.audio_player == 0) {
         GUI_CreateLabelBox(&gui->msg, 20, 80, 280, 100, &NARROW_FONT, NULL, NULL,
-             _tr("External audio support\nmust be enabled\nin hardware.ini"));
+             _tr("External voice support\nmust be enabled\nin hardware.ini"));
         return;
     }
     if (PPMin_Mode() || Model.protocol == PROTOCOL_PPM ) {
         GUI_CreateLabelBox(&gui->msg, 20, 80, 280, 100, &NARROW_FONT, NULL, NULL,
-            _tr("External audio not\navailable while\nPPM in use"));
+            _tr("External voice not\navailable while\nPPM in use"));
         return;
     }
     PAGE_ShowHeader(PAGE_GetName(PAGEID_MUSICCFG));

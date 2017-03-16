@@ -79,7 +79,7 @@ static const char MIXER_MUXTYPE[] = "muxtype";
 static const char * const MIXER_MUXTYPE_VAL[MUX_LAST]  = {
   "replace", "multiply", "add", "max", "min", "delay",
 #if HAS_EXTENDED_AUDIO
-  "beep",
+  "beep","voice",
 #endif
 };
 
@@ -1050,6 +1050,13 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
                 return 1;
             }
         }
+        for (int i = 0; i < (NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS); i++) {
+            INPUT_SourceNameReal(src_name, i + NUM_INPUTS + 1);
+            if (MATCH_KEY(src_name)) {
+                m->music.mixer[i].music = val;
+                return 1;
+            }
+        }
         printf("%s: unknown source name '%s'\n", section, name);
         return 0;
     }
@@ -1372,6 +1379,10 @@ u8 CONFIG_WriteModel(u8 model_num) {
     for (idx = 0; idx < TELEM_NUM_ALARMS; idx++) {
         if (m->music.telemetry[idx].music)
             fprintf(fh, "telemalarm%d=%d\n", idx + 1, m->music.telemetry[idx].music);
+    }
+    for (idx = 0; idx < (NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS); idx++) {
+        if (m->music.mixer[idx].music)
+            fprintf(fh, "%s=%d\n", INPUT_SourceNameReal(tempstring, idx + NUM_INPUTS + 1), m->music.mixer[idx].music);
     }
 #endif
     CONFIG_EnableLanguage(1);
