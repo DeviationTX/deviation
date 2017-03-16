@@ -22,7 +22,7 @@
 #include "_menus.h"
 #include "config/display.h"
 #include "rtc_config.h"
-#include "musicconfig_page.h"
+#include "voiceconfig_page.h"
 
 #define PAGE_NAME_MAX 10
 
