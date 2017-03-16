@@ -57,12 +57,12 @@ void PAGE_VoiceconfigInit(int page)
     PAGE_SetModal(0);
     if (!Transmitter.audio_player) {
         GUI_CreateLabelBox(&gui->msg, MSG_X, MSG_Y, 0, 0, &LABEL_FONT, NULL, NULL,
-            _tr("External audio support\nmust be enabled\nin hardware.ini"));
+            _tr("External voice \nmust be enabled\nin hardware.ini"));
         return;
     }
     if (PPMin_Mode() || Model.protocol == PROTOCOL_PPM ) {
         GUI_CreateLabelBox(&gui->msg, MSG_X, MSG_Y, 0, 0, &LABEL_FONT, NULL, NULL,
-            _tr("External audio not\navailable while\nPPM in use"));
+            _tr("External voice not\navailable while\nPPM in use"));
         return;
     }
     PAGE_RemoveAllObjects();

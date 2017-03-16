@@ -990,7 +990,7 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
     }
 #if HAS_EXTENDED_AUDIO
     char src_name[20];
-    const char *button_name;
+//    const char *button_name;
 
     if (MATCH_SECTION(SECTION_VOICE)) {
         u16 val = atoi(value);

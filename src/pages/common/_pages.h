@@ -159,10 +159,10 @@ void PAGE_DebuglogInit();
 void PAGE_DebuglogEvent();
 void PAGE_DebuglogExit();
 
-/* Musicconfig */
-void PAGE_MusicconfigInit();
-void PAGE_MusicconfigEvent();
-void PAGE_MusicconfigExit();
+/* Voiceconfig */
+void PAGE_VoiceconfigInit();
+void PAGE_VoiceconfigEvent();
+void PAGE_VoiceconfigExit();
 
 void PAGE_ChangeByID(enum PageID id, s8 menuPage);
 void PAGE_PushByID(enum PageID id, int page);

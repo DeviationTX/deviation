@@ -16,7 +16,7 @@ struct pagemem {
         struct range_page range_page;
         //struct scanner_page scanner_page;
 #if HAS_MUSIC_CONFIG
-        struct musicconfig_page musicconfig_page;
+        struct voiceconfig_page voiceconfig_page;
 #endif
         struct usb_page usb_page;
         struct tx_configure_page tx_configure_page;
