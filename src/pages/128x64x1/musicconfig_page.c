@@ -33,7 +33,7 @@ enum {
 
 #if HAS_MUSIC_CONFIG
 
-#include "../common/_musicconfig_page.c"
+#include "../common/_voiceconfig_page.c"
 
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
@@ -41,17 +41,17 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 
     //Row 1
     GUI_CreateLabelBox(&gui->name[relrow], LABEL_X, y,
-            LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, musicconfig_str_cb, NULL, (void *)(long)absrow);
-    GUI_CreateTextSelectPlate(&gui->musicidx[relrow], TEXTSEL_X, y,
-            TEXTSEL_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT, music_test_cb, musicid_cb, (void *)(long)absrow);
+            LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, voiceconfig_str_cb, NULL, (void *)(long)absrow);
+    GUI_CreateTextSelectPlate(&gui->voiceidx[relrow], TEXTSEL_X, y,
+            TEXTSEL_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT, voice_test_cb, voiceid_cb, (void *)(long)absrow);
     //Row 2
     y += LINE_SPACE;
-    GUI_CreateLabelBox(&gui->musiclbl[relrow], LABEL_X, y,
-            LABELID_WIDTH, LINE_HEIGHT, &TINY_FONT, musiclbl_cb, NULL, (void *)(long)absrow);
+    GUI_CreateLabelBox(&gui->voicelbl[relrow], LABEL_X, y,
+            LABELID_WIDTH, LINE_HEIGHT, &TINY_FONT, voicelbl_cb, NULL, (void *)(long)absrow);
     return 1;
 }
 
-void PAGE_MusicconfigInit(int page)
+void PAGE_VoiceconfigInit(int page)
 {
     (void)page;
     PAGE_SetModal(0);
@@ -66,7 +66,7 @@ void PAGE_MusicconfigInit(int page)
         return;
     }
     PAGE_RemoveAllObjects();
-    PAGE_ShowHeader(PAGE_GetName(PAGEID_MUSICCFG));
+    PAGE_ShowHeader(PAGE_GetName(PAGEID_VOICECFG));
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                      LINE_SPACE * 2, MODEL_CUSTOM_ALARMS, row_cb, NULL, NULL, NULL);
     PAGE_SetScrollable(&gui->scrollable, &current_selected);

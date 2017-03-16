@@ -220,12 +220,12 @@ struct debuglog_obj {
 };
 
 #ifdef HAS_MUSIC_CONFIG
-struct musicconfig_obj {
+struct voiceconfig_obj {
     guiLabel_t msg;
     guiScrollable_t scrollable;
     guiLabel_t name[SCROLLABLE_ROWS];
-    guiTextSelect_t musicidx[SCROLLABLE_ROWS];
-    guiLabel_t musiclbl[SCROLLABLE_ROWS];
+    guiTextSelect_t voiceidx[SCROLLABLE_ROWS];
+    guiLabel_t voicelbl[SCROLLABLE_ROWS];
 
 };
 #endif
@@ -382,7 +382,7 @@ struct gui_objs {
         struct usb_obj usb;
         struct debuglog_obj debuglog;
 #ifdef HAS_MUSIC_CONFIG
-        struct musicconfig_obj musicconfig;
+        struct voiceconfig_obj voiceconfig;
 #endif
 
         struct advcurve_obj advcurve;

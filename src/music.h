@@ -29,15 +29,15 @@ enum Music {
 };
 
 #if HAS_EXTENDED_AUDIO
-#define MAX_MUSICMAP_ENTRIES 240 // arbitraty chosen
+#define MAX_VOICEMAP_ENTRIES 240 // arbitraty chosen
 #ifdef _DEVO12_TARGET_H_ // Check for Devo12 screen
-#define MAX_MUSIC_LABEL 35 // limit label length due to limited screen width
+#define MAX_VOICE_LABEL 35 // limit label length due to limited screen width
 #else
-#define MAX_MUSIC_LABEL 26
+#define MAX_VOICE_LABEL 26
 #endif
-#define MUSIC_UNIT_OFFSET 130
+#define VOICE_UNIT_OFFSET 130
 #define CUSTOM_ALARM_ID 200 // start of custom MP3 IDs
-#define MUSIC_DEC_SEP 110  // MP3 ID of DECSEP = 110 + MUSIC_TOTAL
+#define VOICE_DEC_SEP 110  // MP3 ID of DECSEP = 110 + MUSIC_TOTAL
 #define NUM_STICKS 4
 #define NUM_AUX_KNOBS	(INP_HAS_CALIBRATION - NUM_STICKS)	// Exclude sticks
 #define NUM_SWITCHES (NUM_INPUTS - INP_HAS_CALIBRATION)
@@ -59,63 +59,63 @@ enum AudioDevices {
 };
 
 enum {
-    MUSIC_UNIT_NONE = 0,
-    MUSIC_UNIT_MINUS,
-    MUSIC_UNIT_TEMP,
-    MUSIC_UNIT_VOLT,
-    MUSIC_UNIT_RPM,
-    MUSIC_UNIT_AMPS,
-    MUSIC_UNIT_ALTITUDE,
-    MUSIC_UNIT_GFORCE,
-    MUSIC_UNIT_KMH,
-    MUSIC_UNIT_MPS,
-    MUSIC_UNIT_MPH,
-    MUSIC_UNIT_KNOTS,
-    MUSIC_UNIT_METERS,
-    MUSIC_UNIT_CELSIUS,
-    MUSIC_UNIT_FAHRENHEIT,
-    MUSIC_UNIT_PERCENT,
-    MUSIC_UNIT_WATT,
-    MUSIC_UNIT_DB,
-    MUSIC_UNIT_SECONDS,
-    MUSIC_UNIT_MINUTES,
-    MUSIC_UNIT_HOURS,
-    MUSIC_UNIT_TIME, // used for auto-splitting to hours/minutes/seconds
-    MUSIC_UNIT_TOTAL
+    VOICE_UNIT_NONE = 0,
+    VOICE_UNIT_MINUS,
+    VOICE_UNIT_TEMP,
+    VOICE_UNIT_VOLT,
+    VOICE_UNIT_RPM,
+    VOICE_UNIT_AMPS,
+    VOICE_UNIT_ALTITUDE,
+    VOICE_UNIT_GFORCE,
+    VOICE_UNIT_KMH,
+    VOICE_UNIT_MPS,
+    VOICE_UNIT_MPH,
+    VOICE_UNIT_KNOTS,
+    VOICE_UNIT_METERS,
+    VOICE_UNIT_CELSIUS,
+    VOICE_UNIT_FAHRENHEIT,
+    VOICE_UNIT_PERCENT,
+    VOICE_UNIT_WATT,
+    VOICE_UNIT_DB,
+    VOICE_UNIT_SECONDS,
+    VOICE_UNIT_MINUTES,
+    VOICE_UNIT_HOURS,
+    VOICE_UNIT_TIME, // used for auto-splitting to hours/minutes/seconds
+    VOICE_UNIT_TOTAL
 };
 
-struct ButtonMusic {
+struct ButtonVoice {
     u16 on;             // Music to be played when button is On
     u16 off;
     u8 music;            // Music to be played when button is Off
 };
 
-struct CustomMusic {
+struct CustomVoice {
     u8 music;
 };
 
-struct  Music_Nr {
-    struct CustomMusic switches[NUM_SWITCHES];	//Switch array to point to music file number, no pots
-    struct CustomMusic telemetry[TELEM_NUM_ALARMS]; //Telemetry Alarm array to point to music file number
-    struct CustomMusic timer[NUM_TIMERS]; //Timer Alarm array to point to music file number
-    struct CustomMusic mixer[NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS];
-    struct ButtonMusic buttons[NUM_TX_BUTTONS];	//Button array to point to music file number
+struct  Voice {
+    struct CustomVoice switches[NUM_SWITCHES];	//Switch array to point to music file number, no pots
+    struct CustomVoice telemetry[TELEM_NUM_ALARMS]; //Telemetry Alarm array to point to music file number
+    struct CustomVoice timer[NUM_TIMERS]; //Timer Alarm array to point to music file number
+    struct CustomVoice mixer[NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS];
+    struct ButtonVoice buttons[NUM_TX_BUTTONS];	//Button array to point to music file number
 #if NUM_AUX_KNOBS
-    struct CustomMusic aux[NUM_AUX_KNOBS * 2]; //two per knob for up and down
+    struct CustomVoice aux[NUM_AUX_KNOBS * 2]; //two per knob for up and down
 #endif
 };
 
-u8 music_map_entries;
+u8 voice_map_entries;
 
-struct MusicMap {
-    u16 musicid;
+struct VoiceMap {
+    u16 id;
     u16 duration;
 #if HAS_MUSIC_CONFIG
-    char label[MAX_MUSIC_LABEL];
+    char label[MAX_VOICE_LABEL];
 #endif
 };
 
-struct MusicMap music_map[MAX_MUSICMAP_ENTRIES];
+struct VoiceMap voice_map[MAX_VOICEMAP_ENTRIES];
 
 u16 MUSIC_GetTelemetryAlarm(enum Music music);
 u16 MUSIC_GetTimerAlarm(enum Music music);

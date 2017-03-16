@@ -21,26 +21,26 @@
 #if HAS_MUSIC_CONFIG
 
 enum {
-    MUSICROWSPACER = (LCD_WIDTH == 480 ? 23 : 20),
+    VOICEROWSPACER = (LCD_WIDTH == 480 ? 23 : 20),
     COL1 = 5,
     COL2 = 75,
     COL3 = 140,
 };
-#include "../common/_musicconfig_page.c"
+#include "../common/_voiceconfig_page.c"
 
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
         int row = y;
-        int music_num = absrow;
+        int voice_num = absrow;
         //Row 1
-        GUI_CreateLabelBox(&gui->name[relrow], COL1, row, COL2-COL1, 18, &LABEL_FONT,musicconfig_str_cb, NULL, (void *)(long)music_num);
-        GUI_CreateTextSelect(&gui->musicidx[relrow],  COL2, row, TEXTSELECT_64, music_test_cb, musicid_cb, (void *)(long)music_num);
-        GUI_CreateLabelBox(&gui->musiclbl[relrow], COL3, row, LCD_WIDTH - COL3 - ARROW_WIDTH, 18, &TINY_FONT, musiclbl_cb, NULL, (void *)(long)music_num);
+        GUI_CreateLabelBox(&gui->name[relrow], COL1, row, COL2-COL1, 18, &LABEL_FONT,voiceconfig_str_cb, NULL, (void *)(long)voice_num);
+        GUI_CreateTextSelect(&gui->voiceidx[relrow],  COL2, row, TEXTSELECT_64, voice_test_cb, voiceid_cb, (void *)(long)voice_num);
+        GUI_CreateLabelBox(&gui->voicelbl[relrow], COL3, row, LCD_WIDTH - COL3 - ARROW_WIDTH, 18, &TINY_FONT, voicelbl_cb, NULL, (void *)(long)voice_num);
     return 1;
 }
 
-void PAGE_MusicconfigInit(int page)
+void PAGE_VoiceconfigInit(int page)
 {
     (void)page;
     int init_y = 40;
@@ -55,10 +55,10 @@ void PAGE_MusicconfigInit(int page)
             _tr("External voice not\navailable while\nPPM in use"));
         return;
     }
-    PAGE_ShowHeader(PAGE_GetName(PAGEID_MUSICCFG));
+    PAGE_ShowHeader(PAGE_GetName(PAGEID_VOICECFG));
 
     GUI_CreateScrollable(&gui->scrollable, 0, init_y, LCD_WIDTH, LCD_HEIGHT-init_y,
-                     MUSICROWSPACER, MODEL_CUSTOM_ALARMS, row_cb, NULL, NULL, NULL);
+                     VOICEROWSPACER, MODEL_CUSTOM_ALARMS, row_cb, NULL, NULL, NULL);
     PAGE_SetScrollable(&gui->scrollable, &current_selected);
 
 }

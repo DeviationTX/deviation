@@ -68,7 +68,7 @@ struct Model {
     struct datalog datalog;
 #endif
 #if HAS_EXTENDED_AUDIO
-    struct Music_Nr music;
+    struct Voice voice;
 #endif // HAS_EXTENDED_AUDIO
 };
 extern struct Model Model;

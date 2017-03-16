@@ -43,30 +43,30 @@ static int ini_handler(void* user, const char* section, const char* name, const 
     strlcpy(tmp, value, 100);
     int duration = atoi(getfield(tmp,2));
 #if HAS_MUSIC_CONFIG
-    char label[MAX_MUSIC_LABEL];
-    strlcpy(label,getfield(tmp, 1), MAX_MUSIC_LABEL);
+    char label[MAX_VOICE_LABEL];
+    strlcpy(label,getfield(tmp, 1), MAX_VOICE_LABEL);
 #endif
 
     if (MATCH_SECTION(SECTION_VOICE_GLOBAL)) {
         for (int i = 0; i < CUSTOM_ALARM_ID; i++) {
             snprintf(tempstring, 4, "%d", i);
             if (MATCH_KEY(tempstring)) {
-                music_map[i].duration = duration;
-                music_map[i].musicid = i;
+                voice_map[i].duration = duration;
+                voice_map[i].id = i;
 #if HAS_MUSIC_CONFIG
-                strcpy(music_map[i].label, label);
+                strcpy(voice_map[i].label, label);
 #endif
                 return 1;
             }
         }
     }
     if (MATCH_SECTION(SECTION_VOICE_CUSTOM)) {
-        music_map[music_map_entries].duration = duration;
-        music_map[music_map_entries].musicid = atoi(name);
+        voice_map[voice_map_entries].duration = duration;
+        voice_map[voice_map_entries].id = atoi(name);
 #if HAS_MUSIC_CONFIG
-        strcpy(music_map[music_map_entries].label, label);
+        strcpy(voice_map[voice_map_entries].label, label);
 #endif
-        music_map_entries++;
+        voice_map_entries++;
         return 1;
     }
     printf("Unknown entry in voice.ini: %s\n", value);
@@ -75,7 +75,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
 
 void CONFIG_VoiceParse()
 {
-    music_map_entries = CUSTOM_ALARM_ID;
+    voice_map_entries = CUSTOM_ALARM_ID;
     if (CONFIG_IniParse("media/voice.ini", ini_handler, NULL)) {
         printf("Failed to parse voice.ini\n");
     }

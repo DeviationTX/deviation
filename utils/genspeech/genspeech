@@ -95,7 +95,7 @@ IDX=200
 for INFILE in modelAlert$1.txt
 do
 	echo "Processing file $INFILE..."
-	echo ";Below are custom alarms for individual models (switch, trim, telemetry etc.), MP3 ID must be greater than 160" >> $OUTFILE
+	echo ";Below are custom alarms for individual models (switch, trim, telemetry etc.), MP3 ID must be greater than $IDX" >> $OUTFILE
 	echo "[custom]" >> $OUTFILE
 	while read LINE
 	do

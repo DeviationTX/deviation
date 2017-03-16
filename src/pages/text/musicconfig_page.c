@@ -30,4 +30,4 @@ enum {
     MSG_X          = X_OFFSET,
     MSG_Y          = 5*ITEM_SPACE,
 };
-#include "../128x64x1/musicconfig_page.c"
+#include "../128x64x1/voiceconfig_page.c"

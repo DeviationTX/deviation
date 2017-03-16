@@ -350,8 +350,8 @@ void MIXER_ApplyMixer(struct Mixer *mixer, volatile s32 *raw, s32 *orig_value)
             s32 new = value / (CHAN_MULTIPLIER / 10);
             if (new != *orig_value / (CHAN_MULTIPLIER / 10)
             && new == raw[mixer->dest + NUM_INPUTS + 1] / (CHAN_MULTIPLIER / 10))
-                if (Model.music.mixer[mixer->dest].music)
-                    MUSIC_Play(Model.music.mixer[mixer->dest].music);
+                if (Model.voice.mixer[mixer->dest].music)
+                    MUSIC_Play(Model.voice.mixer[mixer->dest].music);
           }
         value = raw[mixer->dest + NUM_INPUTS + 1];	// Use input value
         break;
@@ -682,11 +682,11 @@ static void _trim_music_play(int trim_idx, int is_neg, int on_state)
     else
         button_idx = Model.trims[trim_idx].pos - 1;
     if (on_state) {
-        if (Model.music.buttons[button_idx].on)
-            MUSIC_Play(Model.music.buttons[button_idx].on);
+        if (Model.voice.buttons[button_idx].on)
+            MUSIC_Play(Model.voice.buttons[button_idx].on);
     } else {
-        if (Model.music.buttons[button_idx].off)
-            MUSIC_Play(Model.music.buttons[button_idx].off);
+        if (Model.voice.buttons[button_idx].off)
+            MUSIC_Play(Model.voice.buttons[button_idx].off);
     }
 }
 #endif

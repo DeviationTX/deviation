@@ -206,7 +206,7 @@ void MUSIC_Play(u16 music)
     if (MUSIC_GetSound(music)) return;
 
 #if HAS_EXTENDED_AUDIO
-    if (Transmitter.audio_player && Transmitter.audio_vol && music_map[music].duration) {
+    if (Transmitter.audio_player && Transmitter.audio_vol && voice_map[music].duration) {
         if ((playback_device == AUDDEV_EXTAUDIO) || (playback_device == AUDDEV_UNDEF)) {
             AUDIO_AddQueue(music);
             Volume = 0; // Just activate the haptic sensor, no buzzer
@@ -225,14 +225,14 @@ void MUSIC_Play(u16 music)
 #if HAS_EXTENDED_AUDIO
 
 u16 MUSIC_GetTelemetryAlarm(enum Music music) {
-    if (Model.music.telemetry[music - MUSIC_TELEMALARM1].music > 0 && Transmitter.audio_vol)
-        return Model.music.telemetry[music - MUSIC_TELEMALARM1].music;
+    if (Model.voice.telemetry[music - MUSIC_TELEMALARM1].music > 0 && Transmitter.audio_vol)
+        return Model.voice.telemetry[music - MUSIC_TELEMALARM1].music;
     return music;
 }
 
 u16 MUSIC_GetTimerAlarm(enum Music music) {
-    if (Model.music.timer[music - MUSIC_ALARM1].music > 0 && Transmitter.audio_vol)
-        return Model.music.timer[music - MUSIC_ALARM1].music;
+    if (Model.voice.timer[music - MUSIC_ALARM1].music > 0 && Transmitter.audio_vol)
+        return Model.voice.timer[music - MUSIC_ALARM1].music;
     return music;
 }
 
@@ -250,29 +250,29 @@ void MUSIC_PlayValue(u16 music, s32 value, u8 unit, u8 prec)
     AUDIO_AddQueue(music); // Play main alert MP3 requested
 
     // Play minutes/hours/seconds for timers
-    if (unit == MUSIC_UNIT_TIME) {
+    if (unit == VOICE_UNIT_TIME) {
         if (value >= 3600) {
             i = value / 3600;
             AUDIO_AddQueue(i + MUSIC_TOTAL);
-            AUDIO_AddQueue(MUSIC_UNIT_HOURS + MUSIC_UNIT_OFFSET);
+            AUDIO_AddQueue(VOICE_UNIT_HOURS + VOICE_UNIT_OFFSET);
             value %= 3600;
         }
         if (value >= 60) {
             i = value / 60;
             AUDIO_AddQueue(i + MUSIC_TOTAL);
-            AUDIO_AddQueue(MUSIC_UNIT_MINUTES + MUSIC_UNIT_OFFSET);
+            AUDIO_AddQueue(VOICE_UNIT_MINUTES + VOICE_UNIT_OFFSET);
             value %= 60;
         }
         if (value > 0) {
             AUDIO_AddQueue(value + MUSIC_TOTAL);
-            AUDIO_AddQueue(MUSIC_UNIT_SECONDS + MUSIC_UNIT_OFFSET);
+            AUDIO_AddQueue(VOICE_UNIT_SECONDS + VOICE_UNIT_OFFSET);
         }
         return;
     }
 
     // Add minus sign for negative number
     if (value < 0) {
-        AUDIO_AddQueue(MUSIC_UNIT_MINUS + MUSIC_UNIT_OFFSET);
+        AUDIO_AddQueue(VOICE_UNIT_MINUS + VOICE_UNIT_OFFSET);
         value *= -1;
     }
 
@@ -283,11 +283,11 @@ void MUSIC_PlayValue(u16 music, s32 value, u8 unit, u8 prec)
     }
     //Add decimal seperator
     if (prec > 0) {
-        digits[digit_count++] = MUSIC_DEC_SEP;
+        digits[digit_count++] = VOICE_DEC_SEP;
     }
 
     // Special case value == 0 and not playing TIME
-    if (value == 0 && unit != MUSIC_UNIT_TIME)
+    if (value == 0 && unit != VOICE_UNIT_TIME)
         digits[digit_count++] = 0;
     // Get single digits from remaining value
     while (value > 0) {
@@ -322,7 +322,7 @@ void MUSIC_PlayValue(u16 music, s32 value, u8 unit, u8 prec)
         AUDIO_AddQueue(digits[i-1] + MUSIC_TOTAL);
     }
     // Add unit for value if specified
-    if (unit > MUSIC_UNIT_NONE)
-        AUDIO_AddQueue(unit + MUSIC_UNIT_OFFSET);
+    if (unit > VOICE_UNIT_NONE)
+        AUDIO_AddQueue(unit + VOICE_UNIT_OFFSET);
 }
 #endif

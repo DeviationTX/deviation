@@ -61,7 +61,7 @@ PAGEDEF(PAGEID_DATALOG,  PAGE_DatalogInit,     PAGE_DatalogEvent,     NULL,     
 #endif
 PAGEDEF(PAGEID_MAINCFG,  PAGE_MainLayoutInit,  NULL,                  NULL,               MODEL_MENU,  _tr_noop("Main page config"))
 #if HAS_MUSIC_CONFIG
-PAGEDEF(PAGEID_MUSICCFG, PAGE_MusicconfigInit,    NULL,    NULL,               MODEL_MENU,   _tr_noop("Voice config"))
+PAGEDEF(PAGEID_VOICECFG, PAGE_VoiceconfigInit,    NULL,    NULL,               MODEL_MENU,   _tr_noop("Voice config"))
 #endif
 
 // Transmitter menu

@@ -35,7 +35,7 @@ u8 BATTERY_Check()
     }
     if ((warned & BATTERY_LOW) && ms >= next_battery_warning) {
 #if HAS_EXTENDED_AUDIO
-        MUSIC_PlayValue(MUSIC_BATT_ALARM, battery/10,MUSIC_UNIT_VOLT,2);
+        MUSIC_PlayValue(MUSIC_BATT_ALARM, battery/10,VOICE_UNIT_VOLT,2);
 #else
         MUSIC_Play(MUSIC_BATT_ALARM);
 #endif

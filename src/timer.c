@@ -192,10 +192,10 @@ void TIMER_Update()
                     if (timer_val[i] >= 600000)
                         warn_time += 300000; // 5-minute alerts above 10 minutes
                 }
-                warn_time -= music_map[MUSIC_ALARM1 + i].duration;
+                warn_time -= voice_map[MUSIC_ALARM1 + i].duration;
                 if (timer_val[i] > warn_time && (timer_val[i] - delta) <= warn_time)
                     MUSIC_PlayValue(MUSIC_GetTimerAlarm(MUSIC_ALARM1 + i),
-                    (timer_val[i]+music_map[MUSIC_GetTimerAlarm(MUSIC_ALARM1 + i)].duration)/1000, MUSIC_UNIT_TIME, 0);
+                    (timer_val[i]+voice_map[MUSIC_GetTimerAlarm(MUSIC_ALARM1 + i)].duration)/1000, VOICE_UNIT_TIME, 0);
 #endif
             } else {
                 // start to beep  for each prealert_interval at the last prealert_time(seconds)
@@ -206,12 +206,12 @@ void TIMER_Update()
                     warn_time = ((timer_val[i] / Transmitter.countdown_timer_settings.prealert_interval)
                             * Transmitter.countdown_timer_settings.prealert_interval);
 #if HAS_EXTENDED_AUDIO
-                    warn_time += music_map[MUSIC_TIMER_WARNING].duration + 1000;
+                    warn_time += voice_map[MUSIC_TIMER_WARNING].duration + 1000;
 #endif
                     if (timer_val[i] > warn_time && (timer_val[i] - delta) <= warn_time) {
 #if HAS_EXTENDED_AUDIO
                         MUSIC_PlayValue(MUSIC_TIMER_WARNING,
-                            (timer_val[i]-music_map[MUSIC_TIMER_WARNING].duration-1000)/1000,MUSIC_UNIT_TIME,0);
+                            (timer_val[i]-voice_map[MUSIC_TIMER_WARNING].duration-1000)/1000,VOICE_UNIT_TIME,0);
 #else
                         MUSIC_Play(MUSIC_TIMER_WARNING);
 #endif
@@ -222,12 +222,12 @@ void TIMER_Update()
                     warn_time = ((timer_val[i] - Transmitter.countdown_timer_settings.timeup_interval) / Transmitter.countdown_timer_settings.timeup_interval)
                             * Transmitter.countdown_timer_settings.timeup_interval;
 #if HAS_EXTENDED_AUDIO
-                    warn_time += music_map[MUSIC_ALARM1 + i].duration;
+                    warn_time += voice_map[MUSIC_ALARM1 + i].duration;
 #endif
                     if (timer_val[i] > warn_time && (timer_val[i] - delta) <= warn_time) {
 #if HAS_EXTENDED_AUDIO
                         MUSIC_PlayValue(MUSIC_GetTimerAlarm(MUSIC_ALARM1 + i),
-                            (timer_val[i]-music_map[MUSIC_GetTimerAlarm(MUSIC_ALARM1 + i)].duration)/-1000+1,MUSIC_UNIT_TIME,0);
+                            (timer_val[i]-voice_map[MUSIC_GetTimerAlarm(MUSIC_ALARM1 + i)].duration)/-1000+1,VOICE_UNIT_TIME,0);
 #else
                         MUSIC_Play(MUSIC_ALARM1 + i + 2);
 #endif

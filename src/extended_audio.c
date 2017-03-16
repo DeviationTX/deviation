@@ -113,16 +113,16 @@ int AUDIO_Play(u16 music) {
     }
 
 #ifdef BUILDTYPE_DEV
-    printf("Voice: Playing music #%d (%s)\n", music_map[music].musicid, music_map[music].label);
+    printf("Voice: Playing music #%d (%s)\n", voice_map[music].id, voice_map[music].label);
 #endif
 
 #ifdef EMULATOR     // On emulators call mpg123 to play mp3s
     char cmd[70];
     u16 vol_val = Transmitter.audio_vol * 32786/10;
 #ifdef _WIN32
-    sprintf(cmd, "start /B ..\\..\\mpg123 -f %d -q ..\\..\\mp3\\%04d*.mp3 > nul 2>&1", vol_val, music_map[music].musicid);
+    sprintf(cmd, "start /B ..\\..\\mpg123 -f %d -q ..\\..\\mp3\\%04d*.mp3 > nul 2>&1", vol_val, voice_map[music].id);
 #else
-    sprintf(cmd, "mpg123 -f %d -q ../../mp3/%04d*.mp3 > /dev/null 2>&1 &", vol_val, music_map[music].musicid);
+    sprintf(cmd, "mpg123 -f %d -q ../../mp3/%04d*.mp3 > /dev/null 2>&1 &", vol_val, voice_map[music].id);
 #endif // _WIN32
     system(cmd);
     return 1;
@@ -134,7 +134,7 @@ int AUDIO_Play(u16 music) {
     case AUDIO_NONE: return 0;	// Play beeps...
     case AUDIO_AUDIOFX: {
       char buffer[5];
-      snprintf(buffer, sizeof(buffer), "#%d\n", music_map[music].musicid);
+      snprintf(buffer, sizeof(buffer), "#%d\n", voice_map[music].id);
       AUDIO_Print(buffer);
       break;
     }
@@ -142,7 +142,7 @@ int AUDIO_Play(u16 music) {
         static u8 buffer[] =
             {0x7E, 0xFF, 0x06, 0x12, 0x00, 0x00, 0x00, 0x00, 0x00, 0xEF};
         // Fill in track number and checksum
-        u16ToArray(music_map[music].musicid, buffer+5);
+        u16ToArray(voice_map[music].id, buffer+5);
         u16ToArray(AUDIO_CalculateChecksum(buffer), buffer+7);
         AUDIO_Send(buffer, sizeof(buffer));
         break;
@@ -185,7 +185,7 @@ void AUDIO_CheckQueue() {
     if (next_audio < num_audio) {
         if (t > audio_queue_time) {
             AUDIO_Play(audio_queue[next_audio]);
-            audio_queue_time = CLOCK_getms() + music_map[audio_queue[next_audio]].duration;
+            audio_queue_time = CLOCK_getms() + voice_map[audio_queue[next_audio]].duration;
             next_audio++;
         }
     } else if (num_audio && t > audio_queue_time) {

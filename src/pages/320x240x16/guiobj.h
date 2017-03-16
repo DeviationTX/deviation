@@ -392,12 +392,12 @@ struct debuglog_obj {
 };
 
 #ifdef HAS_MUSIC_CONFIG
-struct musicconfig_obj {
+struct voiceconfig_obj {
     guiLabel_t msg;
     guiScrollable_t scrollable;
     guiLabel_t name[10];
-    guiTextSelect_t musicidx[10];
-    guiLabel_t musiclbl[10];
+    guiTextSelect_t voiceidx[10];
+    guiLabel_t voicelbl[10];
 };
 #endif
 
@@ -625,7 +625,7 @@ struct gui_objs {
         struct rtc_obj rtc;
         struct debuglog_obj debuglog;
 #ifdef HAS_MUSIC_CONFIG
-        struct musicconfig_obj musicconfig;
+        struct voiceconfig_obj voiceconfig;
 #endif
 
         struct advcurve_obj advcurve;

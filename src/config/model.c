@@ -994,14 +994,14 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
 
     if (MATCH_SECTION(SECTION_VOICE)) {
         u16 val = atoi(value);
-        if(val>MAX_MUSICMAP_ENTRIES-1 || music_map[val].duration == 0 || val < CUSTOM_ALARM_ID) {
+        if(val>MAX_VOICEMAP_ENTRIES-1 || voice_map[val].duration == 0 || val < CUSTOM_ALARM_ID) {
             printf("%s: Music %s not found in voice.ini or below ID %d\n", section, value, CUSTOM_ALARM_ID);
             return 0;
         }
         for (int i = INP_HAS_CALIBRATION+1; i <= NUM_INPUTS; i++) {
             INPUT_SourceName(src_name, i);
             if (MATCH_KEY(src_name)) {
-                m->music.switches[i - INP_HAS_CALIBRATION - 1].music = val;
+                m->voice.switches[i - INP_HAS_CALIBRATION - 1].music = val;
                 return 1;
             }
         }
@@ -1011,13 +1011,13 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
             strcat(src_name, "_ON");
             // Button name alone or with suffix "_ON" will be considered the same
             if (MATCH_KEY(button_name) || MATCH_KEY(src_name)) {
-                m->music.buttons[i-1].on = val;
+                m->voice.buttons[i-1].on = val;
                 return 1;
             }
             strcpy(src_name, button_name);
             strcat(src_name, "_OFF");
             if (MATCH_KEY(src_name)) {
-                m->music.buttons[i-1].off = val;
+                m->voice.buttons[i-1].off = val;
                 return 1;
             }
         }
@@ -1027,33 +1027,33 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
             INPUT_SourceName(src_name, i + NUM_STICKS + 1);
             strcat(src_name, "_UP");
             if (MATCH_KEY(src_name)) {
-                m->music.aux[i * 2 + 1].music = val;
+                m->voice.aux[i * 2 + 1].music = val;
                 return 1;
             }
             INPUT_SourceName(src_name, i + NUM_STICKS + 1);
             strcat(src_name, "_DOWN");
             if (MATCH_KEY(src_name)) {
-                m->music.aux[i * 2].music = val;
+                m->voice.aux[i * 2].music = val;
                 return 1;
             }
         }
 #endif
         for (int i = 0; i < NUM_TIMERS; i++) {
             if (MATCH_KEY(VOICE_TIMER[i])) {
-                m->music.timer[i].music = val;
+                m->voice.timer[i].music = val;
                 return 1;
             }
         }
         for (int i = 0; i < TELEM_NUM_ALARMS; i++) {
             if (MATCH_KEY(VOICE_TELEMALARM[i])) {
-                m->music.telemetry[i].music = val;
+                m->voice.telemetry[i].music = val;
                 return 1;
             }
         }
         for (int i = 0; i < (NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS); i++) {
             INPUT_SourceNameReal(src_name, i + NUM_INPUTS + 1);
             if (MATCH_KEY(src_name)) {
-                m->music.mixer[i].music = val;
+                m->voice.mixer[i].music = val;
                 return 1;
             }
         }
@@ -1359,30 +1359,30 @@ u8 CONFIG_WriteModel(u8 model_num) {
 #if HAS_EXTENDED_AUDIO
     fprintf(fh, "[%s]\n", SECTION_VOICE);
     for (idx = 0; idx < NUM_SWITCHES; idx++) {
-        if (m->music.switches[idx].music)
-            fprintf(fh, "%s=%d\n", INPUT_SourceName(file,idx + INP_HAS_CALIBRATION + 1), m->music.switches[idx].music);
+        if (m->voice.switches[idx].music)
+            fprintf(fh, "%s=%d\n", INPUT_SourceName(file,idx + INP_HAS_CALIBRATION + 1), m->voice.switches[idx].music);
     }
 #if NUM_AUX_KNOBS
     for (idx = 0; idx < NUM_AUX_KNOBS * 2; idx++) {
-        if (m->music.aux[idx].music) {
+        if (m->voice.aux[idx].music) {
             if (idx % 2)
-                fprintf(fh, "%s_UP=%d\n", INPUT_SourceName(tempstring,(idx-1) / 2 + NUM_STICKS + 1), m->music.aux[idx].music);
+                fprintf(fh, "%s_UP=%d\n", INPUT_SourceName(tempstring,(idx-1) / 2 + NUM_STICKS + 1), m->voice.aux[idx].music);
             else
-                fprintf(fh, "%s_DOWN=%d\n", INPUT_SourceName(tempstring,idx / 2 + NUM_STICKS + 1), m->music.aux[idx].music);
+                fprintf(fh, "%s_DOWN=%d\n", INPUT_SourceName(tempstring,idx / 2 + NUM_STICKS + 1), m->voice.aux[idx].music);
         }
     }
 #endif
     for (idx = 0; idx < NUM_TIMERS; idx++) {
-        if (m->music.timer[idx].music)
-            fprintf(fh, "timer%d=%d\n", idx + 1, m->music.timer[idx].music);
+        if (m->voice.timer[idx].music)
+            fprintf(fh, "timer%d=%d\n", idx + 1, m->voice.timer[idx].music);
     }
     for (idx = 0; idx < TELEM_NUM_ALARMS; idx++) {
-        if (m->music.telemetry[idx].music)
-            fprintf(fh, "telemalarm%d=%d\n", idx + 1, m->music.telemetry[idx].music);
+        if (m->voice.telemetry[idx].music)
+            fprintf(fh, "telemalarm%d=%d\n", idx + 1, m->voice.telemetry[idx].music);
     }
     for (idx = 0; idx < (NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS); idx++) {
-        if (m->music.mixer[idx].music)
-            fprintf(fh, "%s=%d\n", INPUT_SourceNameReal(tempstring, idx + NUM_INPUTS + 1), m->music.mixer[idx].music);
+        if (m->voice.mixer[idx].music)
+            fprintf(fh, "%s=%d\n", INPUT_SourceNameReal(tempstring, idx + NUM_INPUTS + 1), m->voice.mixer[idx].music);
     }
 #endif
     CONFIG_EnableLanguage(1);

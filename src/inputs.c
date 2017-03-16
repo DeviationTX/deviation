@@ -348,8 +348,8 @@ void INPUT_CheckChanges(void) {
 #endif
 	    music_idx = changed_input - INP_HAS_CALIBRATION - 1;
 	    /* Skip pots & Play music file if the switch has a voice file number defined */
-	    if (changed_input >= INP_HAS_CALIBRATION && Model.music.switches[music_idx].music) {
-            MUSIC_Play(Model.music.switches[music_idx].music);
+	    if (changed_input >= INP_HAS_CALIBRATION && Model.voice.switches[music_idx].music) {
+            MUSIC_Play(Model.voice.switches[music_idx].music);
         }
 #endif //HAS_EXTENDED_AUDIO
     }
@@ -357,13 +357,13 @@ void INPUT_CheckChanges(void) {
     // Play AUX music if value was changed and left for 1000 ms at the same value
     if (aux_changed && aux_time[aux_changed - 1] <= CLOCK_getms() - 1000) {
         if (aux_up) {
-            if (Model.music.aux[(aux_changed - 1) * 2 + 1].music)
-                MUSIC_PlayValue(Model.music.aux[(aux_changed - 1) * 2 + 1].music,
-                    CHAN_ReadInput(aux_changed + NUM_STICKS)/100,MUSIC_UNIT_PERCENT,0);
+            if (Model.voice.aux[(aux_changed - 1) * 2 + 1].music)
+                MUSIC_PlayValue(Model.voice.aux[(aux_changed - 1) * 2 + 1].music,
+                    CHAN_ReadInput(aux_changed + NUM_STICKS)/100,VOICE_UNIT_PERCENT,0);
         } else {
-            if (Model.music.aux[(aux_changed - 1) * 2].music)
-                MUSIC_PlayValue(Model.music.aux[(aux_changed - 1) * 2].music,
-                    CHAN_ReadInput(aux_changed + NUM_STICKS)/100,MUSIC_UNIT_PERCENT,0);
+            if (Model.voice.aux[(aux_changed - 1) * 2].music)
+                MUSIC_PlayValue(Model.voice.aux[(aux_changed - 1) * 2].music,
+                    CHAN_ReadInput(aux_changed + NUM_STICKS)/100,VOICE_UNIT_PERCENT,0);
         }
         aux_changed = 0;
     }
