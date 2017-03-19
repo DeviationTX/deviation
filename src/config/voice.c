@@ -78,6 +78,7 @@ void CONFIG_VoiceParse()
     voice_map_entries = CUSTOM_ALARM_ID;
     if (CONFIG_IniParse("media/voice.ini", ini_handler, NULL)) {
         printf("Failed to parse voice.ini\n");
+        Transmitter.audio_player = AUDIO_NONE; // disable external voice output
     }
 }
 #endif
