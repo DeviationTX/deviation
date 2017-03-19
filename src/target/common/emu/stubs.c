@@ -130,6 +130,8 @@ void VIDEO_SetChannel(int ch) {printf("Video Channel: %d\n", ch); }
 void VIDEO_Enable(int on)     {printf("Video Enable: %s\n", on ? "On" : "Off"); }
 void VIDEO_Brightness(int brightness) { printf("Video Brightness: %d\n", brightness); }
 void VIDEO_Contrast(int contrast) { printf("Video Contrast: %d\n", contrast); }
+u8 VIDEO_GetStandard() { return 0xFE; }
+void VIDEO_SetStandard(u8 standard) { printf("Video Standard: %d\n", standard); }
 
 void PPMin_Start() {}
 void PPMin_Stop() {}
