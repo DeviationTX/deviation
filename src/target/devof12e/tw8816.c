@@ -322,6 +322,7 @@ u8 TW8816_GetVideoStandard()
 void TW8816_SetVideoStandard(u8 standard)
 {
     u8  val;
+    u8  page;
     u16 Vactive;
     u32 Yscale;
     u16 Hperiod;
@@ -349,8 +350,12 @@ void TW8816_SetVideoStandard(u8 standard)
             Hperiod = 1268; //1268*525*50 = 33285000 Hz
             break;
     }
-    //Set Decode Window
+
+    //Save index page
+    page = LCD_ReadReg(0xFF);
     LCD_WriteReg(0xFF, 0x00); // index page 0
+
+    //Set Decode Window
     LCD_WriteReg(0x1C, 0x0F); // Disable the shadow registers.
     val = LCD_ReadReg(0x07);
     val &= 0xCF; //clear bit4-bit5
@@ -374,4 +379,7 @@ void TW8816_SetVideoStandard(u8 standard)
     val |= (u8)((Hperiod & 0xF00)>>8);
     LCD_WriteReg(0xB6, val);
     LCD_WriteReg(0xB2, (u8)(Hperiod & 0xFF));
+
+    //Restore index page
+    LCD_WriteReg(0xFF, page);
 }
