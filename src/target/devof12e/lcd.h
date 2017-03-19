@@ -23,7 +23,8 @@ void TW8816_Contrast(unsigned contrast);
 void TW8816_Brightness(int brightness);
 void TW8816_Sharpness(unsigned sharpness);
 void TW8816_Chroma(unsigned chromau, unsigned chromav);
-
+u8 TW8816_GetVideoStandard();
+void TW8816_SetVideoStandard(u8 standard);
 
 void LCD_WriteReg(unsigned reg, u8 val);
 void LCD_WriteBuffer(u16 periphAddr, u8 *buffer, unsigned len);
