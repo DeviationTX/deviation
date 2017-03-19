@@ -18,6 +18,7 @@
 #include "common.h"
 #include "model.h"
 #include "../music.h"
+#include "tx.h"
 
 #define MATCH_SECTION(s) (strcasecmp(section, s) == 0)
 #define MATCH_KEY(s)     (strcasecmp(name,    s) == 0)
