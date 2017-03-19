@@ -507,3 +507,12 @@ void VIDEO_Enable(int on)
     }
 }
 
+u8 VIDEO_GetStandard()
+{
+    return TW8816_GetVideoStandard();
+}
+
+void VIDEO_SetStandard(u8 standard)
+{
+    TW8816_SetVideoStandard(standard);
+}
