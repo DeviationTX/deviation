@@ -188,6 +188,7 @@ static void mt99xx_send_packet()
         case PROTOOPTS_FORMAT_MT99:
         case PROTOOPTS_FORMAT_H7:
         case PROTOOPTS_FORMAT_LS:
+        case PROTOOPTS_FORMAT_FY805:
             packet[0] = scale_channel(CHANNEL3, 0xe1, 0x00); // throttle
             packet[1] = scale_channel(CHANNEL4, 0x00, 0xe1); // rudder
             packet[2] = scale_channel(CHANNEL1, 0xe1, 0x00); // aileron
