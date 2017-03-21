@@ -710,6 +710,7 @@ static u16 frskyx_cb() {
           seq_last_rcvd = 8;
       }
 #else
+      (void)len;
       memcpy(packet, &telem_test[telem_idx], sizeof(telem_test[0]));
       telem_idx = (telem_idx + 1) % (sizeof(telem_test)/sizeof(telem_test[0]));
       packet[1] = fixed_id & 0xff;
