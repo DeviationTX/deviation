@@ -23,8 +23,8 @@
 //Set this to the number of trials
 #define DEBUG_SCREEN_ALIGNMENT 0
 //#include "tw8816_init_1.5.h"
-#include "tw8816_init_1.3.h"
-//#include "tw8816_init_bl1.3a.h"
+//#include "tw8816_init_1.3.h"
+#include "tw8816_init_bl1.3a.h"
 //#include "tw8816_init_bl1.6a.h"
 
 void wait_button() {
@@ -155,6 +155,9 @@ void TW8816_Init()
     window = 0;
     //for(int i = 0; i < 24; i++)
     //    TW8816_DisplayCharacter(i, 'A' + i, 7);
+    
+    //Hide XY Graph placeholder
+    TW8816_UnmapWindow(0);
 }
 
 void TW8816_Reset()
