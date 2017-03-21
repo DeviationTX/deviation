@@ -14,22 +14,28 @@
  */
 
 #include "lcd_page_props.h"
-//char SELECT_CHAR[] = "☼";
+
 void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height,
         const char *str, const struct LabelDesc *desc, u8 is_selected) {
-	u16 txt_w, txt_h;
-    (void)obj_height;
+
+    u16 txt_w, txt_h;
     u16 cx, cy;
+
     LCD_GetStringDimensions((const u8 *)str, &txt_w, &txt_h);
     LCD_GetCharDimensions(LCD_SELECT_CHAR, &cx, &cy);
+
+    txt_w += cx;
+    if (obj_width == 0)
+        obj_width = txt_w;
+    if (obj_height == 0)
+        obj_height = txt_h;
     if (desc && (desc->style == LABEL_INVERTED || (desc->style != LABEL_FILL && is_selected))) {
         LCD_PrintCharXY(obj_x, obj_y, LCD_SELECT_CHAR);
-        txt_w += cx;
         obj_x += cx;
     }
-
+    else {
+        GUI_DrawBackground(obj_x, obj_y, obj_width, obj_height);
+    }
     //printf("%s, %d, %d\n", tempstring, txt_w, obj_width);
     LCD_PrintStringXY(obj_x, obj_y, str);
-    for(;txt_w < obj_width;txt_w += cx)
-    	LCD_PrintCharXY(obj_x+txt_w, obj_y, ' ');
 }
