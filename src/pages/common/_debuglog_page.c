@@ -15,14 +15,14 @@
 
 ctassert((DEBUG_WINDOW_SIZE < 255), debug_window_size_too_big);
 #define NUM_ROWS 20
-#define NEXT_PTR(ptr) ((ptr == logstr + DEBUG_WINDOW_SIZE -1) ? logstr : ptr+1)
-#define PREV_PTR(ptr) ((ptr == logstr) ? logstr + DEBUG_WINDOW_SIZE - 1 : ptr-1)
+#define NEXT_PTR(ptr) ((ptr == logstr + DEBUG_WINDOW_SIZE - 1) ? logstr : ptr + 1)
+#define PREV_PTR(ptr) ((ptr == logstr) ? logstr + DEBUG_WINDOW_SIZE - 1 : ptr - 1)
 
 static struct debuglog_obj * const gui = &gui_objs.u.debuglog;
 static volatile char logstr[DEBUG_WINDOW_SIZE];
 static volatile char *wptr = logstr;
 static volatile char *rptr = logstr;
-static u8 line_pos[NUM_ROWS];
+static u8 line_pos[NUM_ROWS] = { [0 ... NUM_ROWS - 1] = 0xFF};
 static u32 changed = 0;
 
 static const char *str_cb(guiObject_t *obj, const void *data)
@@ -35,7 +35,7 @@ static const char *str_cb(guiObject_t *obj, const void *data)
     const char *dptr = (char *)&logstr[line_pos[idx]];
     const char *w = (char *)wptr;
     sprintf(tempstring, "%d:", (long)data);
-    char *ptr = tempstring+strlen(tempstring);
+    char *ptr = tempstring + strlen(tempstring);
     while(dptr != w && *dptr != 0) {
         *ptr++ = *dptr++;
     }
@@ -73,11 +73,16 @@ static void find_line_ends()
         while (*prev_w != 0) {
             if (w == r) {
                 line_pos[i] = r - logstr;
-                memset(line_pos+i+1, 255, NUM_ROWS-i-1);
+                memset(line_pos + i + 1, 255, NUM_ROWS - i - 1);
                 return;
             }
             w = prev_w;
             prev_w = (char *)PREV_PTR(w);
+        }
+        if (w == r) {
+            line_pos[i] = r - logstr;
+            memset(line_pos + i + 1, 255, NUM_ROWS - i - 1);
+            return;
         }
         line_pos[i] = w - logstr;
         w = prev_w;
@@ -116,8 +121,8 @@ void DEBUGLOG_Putc(char c)
 }
 void DEBUGLOG_AddStr(const char *str)
 {
-    unsigned len = strlen(str)+1;
-    if (*str == '3' && *(str+1) == '3') {
+    unsigned len = strlen(str) + 1;
+    if (*str == '3' && *(str + 1) == '3') {
         printf("here\n");
     }
     while (len) {
