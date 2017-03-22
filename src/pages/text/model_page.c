@@ -25,24 +25,24 @@
 #if LCD_WIDTH == 66
 //devof12e
 enum {
-    DEFAULT_TEXTSEL_X = 14*2,
-    LEFT_TEXTSEL_X    = 4,
-    TEXTSEL_WIDTH     = 22,
-    LABEL_X           = 4,
-    LABEL_WIDTH       = 14*2,
-    BUTTON_X          = 14*2,
-    BUTTON_WIDTH      = 14*2,
+    DEFAULT_TEXTSEL_X = 14*ITEM_SPACE,
+    LEFT_TEXTSEL_X    = 1*ITEM_SPACE,
+    TEXTSEL_WIDTH     = 11*ITEM_SPACE,
+    LABEL_X           = 1*ITEM_SPACE,
+    LABEL_WIDTH       = 13*ITEM_SPACE,
+    BUTTON_X          = 14*ITEM_SPACE,
+    BUTTON_WIDTH      = 14*ITEM_SPACE,
 };
 #else
-#define TEXTSEL_WIDTH   ((ts_x != LEFT_TEXTSEL_X) ? LCD_WIDTH - ts_x - 1: 12)
+#define TEXTSEL_WIDTH   ((ts_x != LEFT_TEXTSEL_X) ? LCD_WIDTH - ts_x - 1: 11)
 //devof7
 enum {
-    DEFAULT_TEXTSEL_X = 14,
-    LEFT_TEXTSEL_X    = 1,
+    DEFAULT_TEXTSEL_X = 14*ITEM_SPACE,
+    LEFT_TEXTSEL_X    = 1*ITEM_SPACE,
     LABEL_X           = 0,
-    LABEL_WIDTH       = 14,
-    BUTTON_X          = 14,
-    BUTTON_WIDTH      = LCD_WIDTH - 14,
+    LABEL_WIDTH       = 13*ITEM_SPACE,
+    BUTTON_X          = 14*ITEM_SPACE,
+    BUTTON_WIDTH      = LCD_WIDTH - BUTTON_X,
 };
 #endif
 #include "../128x64x1/model_page.c"
