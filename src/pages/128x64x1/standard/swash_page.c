@@ -13,6 +13,7 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef OVERRIDE_PLACEMENT
 #include "common.h"
 #include "../pages.h"
 #include "gui/gui.h"
@@ -20,6 +21,15 @@
 #include "mixer.h"
 #include "standard.h"
 #include "mixer_standard.h"
+
+enum {
+    LABEL_X         = 63,
+    LABEL_WIDTH     = 60,
+    LABEL_WIDTH_ADD =  8,
+    LABEL_OFFSET    =  3,
+    HEADER_OFFSET   =  1,
+};
+#endif //OVERRIDE_PLACEMENT
 
 #if HAS_STANDARD_GUI
 #include "../../common/standard/_swash_page.c"
@@ -35,21 +45,19 @@ void PAGE_SwashInit(int page)
     get_swash();
     PAGE_ShowHeader(_tr("SwashType"));
 
-    u8 w = 60;
-    u8 x = 63;
-    GUI_CreateTextSelectPlate(&gui->type, x-3, 0, w + 8, HEADER_WIDGET_HEIGHT, &DEFAULT_FONT, NULL, swash_val_cb, NULL); // FIXME: need a special value for header button/textsels
+    GUI_CreateTextSelectPlate(&gui->type, LABEL_X - LABEL_OFFSET, 0, LABEL_WIDTH + LABEL_WIDTH_ADD, HEADER_WIDGET_HEIGHT, &DEFAULT_FONT, NULL, swash_val_cb, NULL); // FIXME: need a special value for header button/textsels
 
-    u8 y = HEADER_HEIGHT + 1;
+    u8 y = HEADER_HEIGHT + HEADER_OFFSET;
     GUI_CreateLabelBox(&gui->lbl[0], 0, y, 0, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("ELE Mix"));
-    GUI_CreateTextSelectPlate(&gui->mix[0], x, y, w, LINE_HEIGHT, &DEFAULT_FONT, NULL, swashmix_val_cb, (void *)1);
+    GUI_CreateTextSelectPlate(&gui->mix[0], LABEL_X, y, LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, swashmix_val_cb, (void *)1);
 
     y += LINE_SPACE;
     GUI_CreateLabelBox(&gui->lbl[1], 0, y, 0, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("AIL Mix"));
-    GUI_CreateTextSelectPlate(&gui->mix[1], x, y, w, LINE_HEIGHT, &DEFAULT_FONT, NULL, swashmix_val_cb, (void *)0);
+    GUI_CreateTextSelectPlate(&gui->mix[1], LABEL_X, y, LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, swashmix_val_cb, (void *)0);
 
     y += LINE_SPACE;
     GUI_CreateLabelBox(&gui->lbl[2], 0, y, 0, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("PIT Mix"));
-    GUI_CreateTextSelectPlate(&gui->mix[2], x, y, w, LINE_HEIGHT, &DEFAULT_FONT, NULL, swashmix_val_cb, (void *)2);
+    GUI_CreateTextSelectPlate(&gui->mix[2], LABEL_X, y, LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, swashmix_val_cb, (void *)2);
 
     update_swashmixes();
     GUI_Select1stSelectableObj();

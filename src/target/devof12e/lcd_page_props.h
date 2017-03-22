@@ -5,7 +5,7 @@
 #define HEADER_SPACE 2
 #define ITEM_SPACE 2
 #define PAGE_ITEM_MAX 8
-#define HEADER_WIDGET_HEIGHT 1
+#define HEADER_WIDGET_HEIGHT 2
 
 #define LCD_SELECT_CHAR 0x1c
 #define LCD_RIGHT_ARROW 0x1c
@@ -20,4 +20,3 @@
 #define LCD_HTRIM_LT    '<'
 #define LCD_HTRIM_GT    '>'
 #define LCD_VTRIM_CTR   0x2b
-
