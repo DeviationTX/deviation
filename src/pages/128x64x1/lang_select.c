@@ -13,11 +13,17 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef OVERRIDE_PLACEMENT
 #include "common.h"
 #include "pages.h"
 #include "gui/gui.h"
 #include "config/tx.h"
 #include <string.h>
+
+enum {
+    LABEL_WIDTH = 0,
+};
+#endif //OVERRIDE_PLACEMENT
 
 #include "../common/_lang_select.c"
 
@@ -44,7 +50,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
     GUI_CreateLabelBox(&gui->label[relrow], 0, y,
-            0, LINE_HEIGHT, &DEFAULT_FONT, _string_cb, press_cb, (void *)(long)absrow);
+            LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, _string_cb, press_cb, (void *)(long)absrow);
     return 1;
 }
 
