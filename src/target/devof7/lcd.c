@@ -385,3 +385,13 @@ u8 LCD_SetFont(unsigned int idx)
     cur_str.font = (idx <= 1) ? default_font : big_font;
     return old;
 }
+
+u8 VIDEO_GetStandard()
+{
+    return 0xFE;
+}
+
+void VIDEO_SetStandard(u8 standard)
+{
+    (void)standard;
+}

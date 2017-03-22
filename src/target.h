@@ -85,6 +85,9 @@ void VIDEO_SetChannel(int ch);
 void VIDEO_Enable(int on);
 void VIDEO_Contrast(int contrast);
 void VIDEO_Brightness(int brightness);
+u8 VIDEO_GetStandard(void);
+void VIDEO_SetStandard(u8 standard);
+
 /* Touchscreen */
 struct touch {
     u16 x;
