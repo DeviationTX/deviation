@@ -19,19 +19,5 @@
 #include "config/model.h"
 #include "standard.h"
 
-#if HAS_STANDARD_GUI
-#include "../../common/standard/_reverse_page.c"
-
-static const struct page_defs reverse_defs = {
-    _tr_noop("Reverse"),
-    reverse_cb,
-    NULL
-};
-
-void PAGE_ReverseInit(int page)
-{
-    (void)page;
-    STANDARD_Init(&reverse_defs);
-}
-#endif //HAS_STANDARD_GUI
-
+#define OVERRIDE_PLACEMENT
+#include "../../128x64x1/standard/reverse_page.c"

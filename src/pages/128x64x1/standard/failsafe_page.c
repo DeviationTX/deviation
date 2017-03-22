@@ -13,11 +13,13 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef OVERRIDE_PLACEMENT
 #include "common.h"
 #include "../pages.h"
 #include "gui/gui.h"
 #include "config/model.h"
 #include "standard.h"
+#endif //OVERRIDE_PLACEMENT
 
 #if HAS_STANDARD_GUI
 #include "../../common/standard/_failsafe_page.c"
