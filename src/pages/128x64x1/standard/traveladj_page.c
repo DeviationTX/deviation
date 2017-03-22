@@ -13,11 +13,24 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef OVERRIDE_PLACEMENT
 #include "common.h"
 #include "../pages.h"
 #include "gui/gui.h"
 #include "config/model.h"
 #include "standard.h"
+
+enum {
+    LABEL_X        = 50,
+    LABEL_WIDTH    = 35,
+    LABEL_OFFSET   = 3,
+    HEADER_X       = 50,
+    HEADER_WIDTH   = 35,
+    HEADER_OFFSET1 = 2,
+    HEADER_OFFSET2 = 5,
+};
+#endif //OVERRIDE_PLACEMENT
+
 #if HAS_STANDARD_GUI
 #include "../../common/standard/_traveladj_page.c"
 
@@ -38,15 +51,13 @@ static guiObject_t *getobj_cb(int relrow, int col, void *data)
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
-    u8 w = 35;
-    u8 x = 50;
     MIXER_GetLimit(absrow, &mp->limit);
     GUI_CreateLabelBox(&gui->chan[relrow], 0, y,
             0, LINE_HEIGHT, &DEFAULT_FONT, STDMIX_channelname_cb, NULL, (void *)(long)absrow);
-    GUI_CreateTextSelectPlate(&gui->dn[relrow], x, y,
-            w, LINE_HEIGHT, &DEFAULT_FONT, NULL, traveldown_cb, (void *)(long)absrow);
-    GUI_CreateTextSelectPlate(&gui->up[relrow], x + w + 3, y,
-            w, LINE_HEIGHT, &DEFAULT_FONT, NULL, travelup_cb, (void *)(long)absrow);
+    GUI_CreateTextSelectPlate(&gui->dn[relrow], LABEL_X, y,
+            LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, traveldown_cb, (void *)(long)absrow);
+    GUI_CreateTextSelectPlate(&gui->up[relrow], LABEL_X + LABEL_WIDTH + LABEL_OFFSET, y,
+            LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, travelup_cb, (void *)(long)absrow);
     return 2;
 }
 
@@ -60,10 +71,8 @@ void PAGE_TravelAdjInit(int page)
     PAGE_RemoveAllObjects();
 
     PAGE_ShowHeader(("")); // draw a underline only
-    u8 w = 35;
-    u8 x = 50;
-    GUI_CreateLabelBox(&gui->dnlbl, x+2, 0,  w, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Down"));
-    GUI_CreateLabelBox(&gui->uplbl, x + w +5, 0,  w, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Up"));
+    GUI_CreateLabelBox(&gui->dnlbl, HEADER_X + HEADER_OFFSET1, 0,  HEADER_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Down"));
+    GUI_CreateLabelBox(&gui->uplbl, HEADER_X + HEADER_WIDTH + HEADER_OFFSET2, 0,  HEADER_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Up"));
 
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                          LINE_SPACE, Model.num_channels, row_cb, getobj_cb, NULL, NULL);
