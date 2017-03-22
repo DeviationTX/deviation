@@ -17,24 +17,5 @@
 #include "pages.h"
 #include "gui/gui.h"
 
-#if DEBUG_WINDOW_SIZE
-#include "../common/_debuglog_page.c"
-
-
-static int row_cb(int absrow, int relrow, int y, void *data)
-{
-    (void)data;
-    GUI_CreateLabelBox(&gui->line[relrow], 5, y, LCD_WIDTH - ARROW_WIDTH - 5, 16, &DEFAULT_FONT, str_cb, NULL, (void *)(long)absrow);
-    return 0;
-}
-
-void PAGE_DebuglogInit(int page)
-{
-    (void)page;
-    const int ROW_HEIGHT = 20;
-    PAGE_ShowHeader(PAGE_GetName(PAGEID_DEBUGLOG));
-    find_line_ends();
-    GUI_CreateScrollable(&gui->scrollable,
-         0, 40, LCD_WIDTH, LCD_HEIGHT - 40, ROW_HEIGHT, NUM_ROWS, row_cb, getobj_cb, NULL, NULL);
-}
-#endif //DEBUG_WINDOW_SIZE
+#define OVERRIDE_PLACEMENT
+#include "../128x64x1/debuglog_page.c"

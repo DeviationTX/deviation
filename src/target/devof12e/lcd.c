@@ -367,7 +367,7 @@ void LCD_Init()
 
 void LCD_Clear(unsigned int color) {
     (void)color;
-    printf("Clearing display\n");
+    //printf("Clearing display\n");
     TW8816_ClearDisplay();
 }
 
@@ -506,4 +506,3 @@ void VIDEO_Enable(int on)
         LCD_ShowVideo(0);
     }
 }
-
