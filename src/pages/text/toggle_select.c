@@ -47,7 +47,7 @@ const char *TGLICO_font_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     int idx = (long)data  & 0xff;
-    tempstring[0] = 0xc4 | (idx >> 6);
+    tempstring[0] = 0xCC | (idx >> 6);
     tempstring[1] = 0x80 | (idx & 0x3f);
     tempstring[2] = 0;
     return tempstring;
