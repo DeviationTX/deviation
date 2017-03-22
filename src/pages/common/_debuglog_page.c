@@ -43,14 +43,6 @@ static const char *str_cb(guiObject_t *obj, const void *data)
     return tempstring;
 }
 
-static int row_cb(int absrow, int relrow, int y, void *data)
-{
-    (void)data;
-    GUI_CreateLabelBox(&gui->line[relrow], 5, y, LCD_WIDTH - ARROW_WIDTH - 5, 16, &DEFAULT_FONT, str_cb, NULL, (void *)(long)absrow);
-    return 0;
-}
-
-
 static guiObject_t *getobj_cb(int relrow, int col, void *data)
 {
 
