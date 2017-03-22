@@ -13,11 +13,19 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef OVERRIDE_PLACEMENT
 #include "common.h"
 #include "../pages.h"
 #include "gui/gui.h"
 #include "config/model.h"
 #include "standard.h"
+
+enum {
+    LABEL_X        = 75,
+    LABEL_WIDTH    = 40,
+    HEADER_OFFSET  = 1,
+};
+#endif //OVERRIDE_PLACEMENT
 
 #if HAS_STANDARD_GUI
 #include "../../common/standard/_throhold_page.c"
@@ -36,14 +44,13 @@ void PAGE_ThroHoldInit(int page)
 
     PAGE_ShowHeader(_tr("Throttle hold"));
 
-    u8 y = HEADER_HEIGHT + 1;
+    u8 y = HEADER_HEIGHT + HEADER_OFFSET;
     GUI_CreateLabelBox(&gui->enlbl, 0, y, 0, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Thr hold"));
-    u8 w = 40;
-    GUI_CreateTextSelectPlate(&gui->en, 75, y, w, LINE_HEIGHT, &DEFAULT_FONT, NULL, throhold_cb,  NULL);
+    GUI_CreateTextSelectPlate(&gui->en, LABEL_X, y, LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, throhold_cb,  NULL);
 
     y += LINE_SPACE;
     GUI_CreateLabelBox(&gui->valuelbl, 0, y, 0, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Hold position"));
-    GUI_CreateTextSelectPlate(&gui->value, 75, y, w, LINE_HEIGHT, &DEFAULT_FONT, NULL, holdpostion_cb,  NULL);
+    GUI_CreateTextSelectPlate(&gui->value, LABEL_X, y, LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, holdpostion_cb,  NULL);
 
     GUI_Select1stSelectableObj();
 
