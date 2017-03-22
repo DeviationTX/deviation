@@ -13,10 +13,17 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef OVERRIDE_PLACEMENT
 #include "common.h"
 #include "pages.h"
 #include "gui/gui.h"
 #include "config/model.h"
+
+enum {
+    LABEL_X     = 63,
+    LABEL_WIDTH = 59,
+};
+#endif //OVERRIDE_PLACEMENT
 
 #if HAS_DATALOG
 #include "../common/_datalog_page.c"
@@ -81,8 +88,6 @@ static guiObject_t *getobj_cb(int relrow, int col, void *data)
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
-    int x = 63;
-    int w = 59;
     const void *lbl_data = NULL;
     void *lbl_cb = NULL;
     void *but_press = NULL;
@@ -120,11 +125,11 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             0, LINE_HEIGHT, &DEFAULT_FONT, lbl_cb, NULL, lbl_data);
     }
     if (but_press) {
-        GUI_CreateButtonPlateText(&gui->col2[relrow].but, x, y,
-            w, LINE_HEIGHT, &DEFAULT_FONT, but_txt, but_press, but_data);
+        GUI_CreateButtonPlateText(&gui->col2[relrow].but, LABEL_X, y,
+            LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, but_txt, but_press, but_data);
     } else {
-        GUI_CreateTextSourcePlate(&gui->col2[relrow].ts, x, y,
-            w, LINE_HEIGHT, &DEFAULT_FONT, selpress_cb, sel_cb, sel_input_cb, sel_data);
+        GUI_CreateTextSourcePlate(&gui->col2[relrow].ts, LABEL_X, y,
+            LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, selpress_cb, sel_cb, sel_input_cb, sel_data);
     }
     return 1;
 }
@@ -162,7 +167,7 @@ void PAGE_DatalogInit(int page)
     font.style = LABEL_UNDERLINE;
     int count = DL_SOURCE + DLOG_LAST - (NUM_TELEM - TELEMETRY_GetNumTelemSrc()); //Remove unused telemetry
     GUI_CreateLabelBox(&gui->remaining, 0, 0,
-        LCD_WIDTH-1, LINE_HEIGHT, &font, remaining_str_cb, NULL, NULL);
+        LCD_WIDTH - 1, LINE_HEIGHT, &font, remaining_str_cb, NULL, NULL);
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                          LINE_SPACE, count, row_cb, getobj_cb, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
@@ -172,4 +177,4 @@ void PAGE_DatalogExit()
 {
     current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
 }
-#endif //HAS_DATLOG
+#endif //HAS_DATALOG

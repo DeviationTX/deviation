@@ -18,17 +18,6 @@
 #include "gui/gui.h"
 #include "config/model.h"
 #include "standard.h"
-#if HAS_STANDARD_GUI
-#include "../../common/standard/_subtrim_page.c"
 
-static const struct page_defs subtrim_defs = {
-    _tr_noop("Subtrim"),
-    subtrim_cb,
-    NULL,
-};
-void PAGE_SubtrimInit(int page)
-{
-    (void)page;
-    STANDARD_Init(&subtrim_defs);
-}
-#endif //HAS_STANDARD_GUI
+#define OVERRIDE_PLACEMENT
+#include "../../128x64x1/standard/subtrim_page.c"
