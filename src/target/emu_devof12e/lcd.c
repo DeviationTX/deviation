@@ -116,7 +116,9 @@ void DrawMappedChar(int pos, u8 *data);
 void LCD_PrintCharXY(unsigned int x, unsigned int y, u32 c)
 {
     u8 row, col, width;
-    if (c > 0xff) {
+
+    c = TW8816_map_char(c);
+    if ((c & 0xFF00) >= 0x300) {
         window_mult = cur_str.font.zoom;
         window_x = x * 12;
         window_y = y * 18;
@@ -125,7 +127,6 @@ void LCD_PrintCharXY(unsigned int x, unsigned int y, u32 c)
         LCD_DrawStop();
         return;
     }
-    c = TW8816_map_char(c);
     int font_size = cur_str.font.zoom;
     const u8 *offset = char_offset(c, &width);
     if (! offset || ! width) {
