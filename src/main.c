@@ -291,6 +291,7 @@ void TOUCH_Handler() {
 void VIDEO_Update()
 {
     static u8 video_enable = 0;
+    static u8 video_standard_in_use = 0xFE; //unknown
     //FIXME This is just like DATALOG_IsEnabled
     int enabled = MIXER_SourceAsBoolean(Model.videosrc);
 
@@ -301,6 +302,15 @@ void VIDEO_Update()
             VIDEO_SetChannel(Model.videoch);
             VIDEO_Contrast(Model.video_contrast);
             VIDEO_Brightness(Model.video_brightness);
+        }
+    }
+    if(video_enable) {
+        u8 video_standard_current = VIDEO_GetStandard();
+        if((video_standard_current > 0) &&
+           (video_standard_current < 7) &&
+           (video_standard_current != video_standard_in_use)) {
+            video_standard_in_use = video_standard_current;
+            VIDEO_SetStandard(video_standard_current);
         }
     }
 }
