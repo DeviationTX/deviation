@@ -53,6 +53,7 @@
 
 #define PACKET_PERIOD_MT 2625 // Timeout for callback in uSec
 #define PACKET_PERIOD_YZ 3125 // Yi Zhan i6S
+#define PACKET_PERIOD_FY 2460 // Fayee FY805
 #define INITIAL_WAIT     500
 #define PACKET_SIZE 9
 
@@ -112,6 +113,11 @@ enum{
     FLAG_LS_FLIP    = 0x80,
 };
 
+enum{
+    // flags going to packet[7] (FY805)
+    FLAG_FY805_HEADLESS= 0x10,
+};
+
 enum {
     MT99XX_INIT = 0,
     MT99XX_BIND,
@@ -119,7 +125,7 @@ enum {
 };
 
 static const char * const mt99xx_opts[] = {
-    _tr_noop("Format"), "MT9916", "H7", "YZ i6S", "LS114", NULL,
+    _tr_noop("Format"), "MT9916", "H7", "YZ i6S", "LS114", "FY805", NULL,
     NULL
 };
 
@@ -134,6 +140,7 @@ enum {
     PROTOOPTS_FORMAT_H7,
     PROTOOPTS_FORMAT_YZ,
     PROTOOPTS_FORMAT_LS,
+    PROTOOPTS_FORMAT_FY805,
 };
 
 static u8 packet[PACKET_SIZE];
@@ -181,6 +188,7 @@ static void mt99xx_send_packet()
         case PROTOOPTS_FORMAT_MT99:
         case PROTOOPTS_FORMAT_H7:
         case PROTOOPTS_FORMAT_LS:
+        case PROTOOPTS_FORMAT_FY805:
             packet[0] = scale_channel(CHANNEL3, 0xe1, 0x00); // throttle
             packet[1] = scale_channel(CHANNEL4, 0x00, 0xe1); // rudder
             packet[2] = scale_channel(CHANNEL1, 0xe1, 0x00); // aileron
@@ -207,6 +215,13 @@ static void mt99xx_send_packet()
                 packet[7] = ls_mys_byte[ls_counter++];
                 if(ls_counter >= sizeof(ls_mys_byte))
                     ls_counter = 0;
+            }
+            else if (Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_FY805) {
+                packet[6] = 0x20;
+                packet[7] = 0x01 // high rate ?
+                          | GET_FLAG( CHANNEL_FLIP, FLAG_MT_FLIP)
+                          | GET_FLAG( CHANNEL_HEADLESS, FLAG_FY805_HEADLESS);
+                checksum_offset = 0;
             }
            
             packet[8] = calcChecksum();
@@ -239,6 +254,9 @@ static void mt99xx_send_packet()
     
     if (Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_LS) {
         NRF24L01_WriteReg(NRF24L01_05_RF_CH, 0x2d); // LS always transmits on the same channel
+    }
+    else if (Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_FY805) {
+        NRF24L01_WriteReg(NRF24L01_05_RF_CH, 0x4B); // FY805 always transmits on the same channel
     }
     else {
         NRF24L01_WriteReg(NRF24L01_05_RF_CH, data_freq[rf_chan] + channel_offset);
@@ -340,6 +358,10 @@ static void initialize_txid()
         txid[0] = 0x53; // test (SB id)
         txid[1] = 0x00;
     }
+    else if(Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_FY805) {
+        txid[0] = 0x81;
+        txid[1] = 0x0f;
+    }
     checksum_offset = (Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_LS) ? 0xcc : 0;
     checksum_offset += txid[0];
     checksum_offset += txid[1];
@@ -375,6 +397,9 @@ static u16 mt99xx_callback()
         } else {
             if(Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_LS) {
                 NRF24L01_WriteReg(NRF24L01_05_RF_CH, 0x2d);
+            }
+            else if(Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_FY805) {
+                NRF24L01_WriteReg(NRF24L01_05_RF_CH, 0x4b);
             }
             else {
                 NRF24L01_WriteReg(NRF24L01_05_RF_CH, data_freq[rf_chan]);
@@ -429,6 +454,14 @@ static void initialize()
             packet[1] = 0x14;
             packet[2] = 0x05;
             packet[3] = 0x11;
+            break;
+        case PROTOOPTS_FORMAT_FY805:
+            packet_period = PACKET_PERIOD_FY;
+            packet[0] = 0x20;
+            packet[1] = 0x15;
+            packet[2] = 0x12;
+            packet[3] = 0x17;
+            break;
     }
     
     if(Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_LS) {

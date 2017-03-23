@@ -314,7 +314,7 @@ void VIDEO_Update()
     if(video_enable) {
         u8 video_standard_current = VIDEO_GetStandard();
         if((video_standard_current > 0) &&
-           (video_standard_current < 7) &&
+           (video_standard_current < 8) &&
            (video_standard_current != video_standard_in_use)) {
             video_standard_in_use = video_standard_current;
             VIDEO_SetStandard(video_standard_current);
