@@ -126,6 +126,7 @@ static u16 scale_channel(u8 ch, u16 destMin, u16 destMax)
 }
 
 #define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
+#define GET_FLAG_INV(ch, mask) (Channels[ch] <= 0 ? mask : 0)
 
 static void DM002_send_packet(u8 bind)
 {
@@ -150,7 +151,7 @@ static void DM002_send_packet(u8 bind)
         // Features
         packet[9] =   DM002_FLAG_HIGH // high rate
                     | GET_FLAG(CHANNEL_FLIP,    DM002_FLAG_FLIP)
-                    | GET_FLAG(!CHANNEL_LED,    DM002_FLAG_LED)
+                    | GET_FLAG_INV(CHANNEL_LED, DM002_FLAG_LED)
                     | GET_FLAG(CHANNEL_CAMERA1, DM002_FLAG_CAMERA1)
                     | GET_FLAG(CHANNEL_CAMERA2, DM002_FLAG_CAMERA2)
                     | GET_FLAG(CHANNEL_HEADLESS,DM002_FLAG_HEADLESS)
