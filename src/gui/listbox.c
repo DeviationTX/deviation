@@ -62,8 +62,8 @@ guiObject_t *GUI_CreateListBoxPlateText(guiListbox_t *listbox, u16 x, u16 y, u16
         listbox->style = LISTBOX_DEVO10;
         listbox->desc = *desc;
         LCD_SetFont(listbox->desc.font);
-        //LCD_GetCharDimensions('A', &text_w, &text_h);
-        listbox->text_height = Display.metrics.line_space;
+        LCD_GetCharDimensions('A', &text_w, &text_h);
+        listbox->text_height = text_h;  //Display.metrics.line_space;
         listbox->entries_per_page = height / listbox->text_height;
     } else {
         listbox->style = LISTBOX_OTHERS;
@@ -168,50 +168,7 @@ static int scroll_cb(struct guiObject *parent, u8 pos, s8 direction, void *data)
 
 void GUI_DrawListbox(struct guiObject *obj, u8 redraw_all)
 {
-    struct guiListbox *listbox = (struct guiListbox *)obj;
-    unsigned int font;
-    if (listbox->item_count <= listbox->entries_per_page)
-        GUI_SetHidden((guiObject_t *)&listbox->scrollbar, 1);
-    else
-        GUI_SetHidden((guiObject_t *)&listbox->scrollbar, 0);
-    if (listbox->style == LISTBOX_DEVO10) {
-        font = listbox->desc.font;
-   } else {
-        font = Display.listbox.font ? Display.listbox.font : DEFAULT_FONT.font;
-    }
-    if (redraw_all) {
-        LCD_FillRect(obj->box.x, obj->box.y, obj->box.width, obj->box.height, FILL);
-    }
-    LCD_SetXY(obj->box.x + (listbox->style == LISTBOX_DEVO10 ? 1 : 5), obj->box.y + LINE_SPACING -1);
-    if(listbox->selected >= listbox->cur_pos && listbox->selected < listbox->cur_pos + listbox->entries_per_page) {
-        // Bug fix: each line of row contains both text and line-spacing, so the height should take line-spacing into account
-        if (listbox->style == LISTBOX_DEVO10) {
-            if (obj != objSELECTED)  // only draw a box when the listbox is not selected
-                LCD_DrawRect(obj->box.x,
-                    obj->box.y + (listbox->selected - listbox->cur_pos) * listbox->text_height,
-                    obj->box.width, listbox->text_height, SELECT);
-            else
-                LCD_FillRect(obj->box.x,
-                    obj->box.y + (listbox->selected - listbox->cur_pos) * listbox->text_height,
-                    obj->box.width, listbox->text_height, SELECT);
-        } else {
-            LCD_FillRect(obj->box.x,
-            obj->box.y + (listbox->selected - listbox->cur_pos) * (listbox->text_height),
-            obj->box.width, listbox->text_height, SELECT);
-        }
-    }
-    LCD_SetFont(font);
-    for(s32 i = 0; i < listbox->entries_per_page; i++) {
-        const char *str = listbox->string_cb(i + listbox->cur_pos, listbox->cb_data);
-        if (listbox->style == LISTBOX_DEVO10) {
-            LCD_SetFontColor((i + listbox->cur_pos == listbox->selected && obj == objSELECTED)? SELECT_TXT : TEXT);
-            LCD_PrintStringXY(obj->box.x, obj->box.y + listbox->text_height * i + 1, str);
-        } else{
-            LCD_SetFontColor(i + listbox->cur_pos == listbox->selected ? SELECT_TXT : TEXT);
-            LCD_PrintString(str);
-            LCD_PrintString("\n");
-        }
-    }
+    _DrawListbox(obj, redraw_all);
 }
 
 u8 GUI_TouchListbox(struct guiObject *obj, struct touch *coords, u8 long_press)
