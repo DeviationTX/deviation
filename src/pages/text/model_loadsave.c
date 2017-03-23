@@ -20,96 +20,13 @@
 #include "config/ini.h"
 #include <stdlib.h>
 
-#include "../common/_model_loadsave.c"
-
-static unsigned _action_cb(u32 button, unsigned flags, void *data);
-static void _press_cb(guiObject_t *obj, u16 selected, void *data) _UNUSED;
-
-static u8 load_save;
-
-static void _show_buttons(int loadsave)
-{
-    (void)show_loadsave_cb;
-    load_save = loadsave;
-    PAGE_SetActionCB(_action_cb);
-    if (loadsave == LOAD_TEMPLATE || loadsave == LOAD_MODEL || loadsave == LOAD_ICON)
-        PAGE_ShowHeader(_tr("Press ENT to load"));
-    else if (loadsave == SAVE_MODEL)
-        PAGE_ShowHeader(_tr("Press ENT to copy to"));
-    //u8 w = 40;
-    //GUI_CreateButtonPlateText(LCD_WIDTH -w -5, 0, w, ITEM_HEIGHT, &DEFAULT_FONT, show_loadsave_cb, okcancel_cb, (void *)(loadsave+1L));
-}
-
-static const char *iconstr_cb(guiObject_t *obj, int dir, void *data) _UNUSED;
-static const char *iconstr_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void)obj;
-    long num_icons = (long)data;
-    u8 changed;
-    mp->selected = GUI_TextSelectHelper(mp->selected, 1, num_icons, dir, 1, 1, &changed);
-    if (changed)
-        select_cb(NULL, mp->selected-1, (void *)LOAD_ICON);
-    return string_cb(mp->selected-1, (void *)LOAD_ICON);
-}
-
-static void iconpress_cb(guiObject_t *obj, void *data) _UNUSED;
-static void iconpress_cb(guiObject_t *obj, void *data)
-{
-    (void)obj;
-    (void)data;
-    okcancel_cb(NULL, (void *)(LOAD_ICON+1));
-}
-
-static const char *model_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    int absrow = (long)data;
-    return string_cb(absrow, (void *)(long)LOAD_MODEL);
-}
-
-void modelpress_cb(guiObject_t *obj, s8 press_type, const void *data)
-{
-    (void)obj;
-    (void)press_type;
-    int absrow = (long)data;
-    mp->selected = absrow+1;
-    okcancel_cb(NULL, (void *)(long)(load_save +1));
-}
-
-static int row_cb(int absrow, int relrow, int y, void *data)
-{
-    (void) data;
-    GUI_CreateLabelBox(&gui->label[relrow], 0, y,
-       LCD_WIDTH, 0, &DEFAULT_FONT, model_cb, modelpress_cb, (void *)(long)absrow);
-    return 1;
-}
-static void _show_list(int loadsave,u8 num_models)
-{
-    (void) loadsave;
-    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT,
-                         ITEM_SPACE, num_models, row_cb, NULL, NULL, NULL);
-    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, mp->selected-1));
-}
-
-static void _press_cb(guiObject_t *obj, u16 selected, void *data)
-{
-    (void)obj;
-    (void)data;
-    mp->selected = selected + 1;
-    okcancel_cb(NULL, (void *)(long)(load_save +1));
-}
-
-static unsigned _action_cb(u32 button, unsigned flags, void *data)
-{
-    (void)data;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT) || load_save == LOAD_LAYOUT) {
-            okcancel_cb(NULL, 0);
-        }
-        else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
-    }
-    return 1;
-}
+#define OVERRIDE_PLACEMENT
+enum {
+    ICON_X      = LCD_WIDTH/2 - 6*ITEM_SPACE,
+    ICON_W      = 12*ITEM_SPACE,
+    IMAGE_X     = LCD_WIDTH/2 - 4*ITEM_SPACE,
+    IMAGE_Y     = LCD_HEIGHT - 9*ITEM_SPACE,
+    IMAGE_W     = 6,
+    IMAGE_H     = 4,
+};
+#include "../128x64x1/model_loadsave.c"

@@ -13,12 +13,23 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef OVERRIDE_PLACEMENT
 #include "common.h"
 #include "pages.h"
 #include "gui/gui.h"
 #include "config/model.h"
 #include "config/ini.h"
 #include <stdlib.h>
+
+enum {
+    ICON_X      = 10,
+    ICON_W      = LCD_WIDTH - 20,
+    IMAGE_X     = LCD_WIDTH/2 - 18,
+    IMAGE_Y     = LCD_HEIGHT - 37,
+    IMAGE_W     = 52,
+    IMAGE_H     = 36,
+};
+#endif //OVERRIDE_PLACEMENT
 
 #include "../common/_model_loadsave.c"
 
@@ -47,30 +58,30 @@ static const char *iconstr_cb(guiObject_t *obj, int dir, void *data)
     u8 changed;
     mp->selected = GUI_TextSelectHelper(mp->selected, 1, num_icons, dir, 1, 1, &changed);
     if (changed)
-        select_cb(NULL, mp->selected-1, (void *)LOAD_ICON);
-    return string_cb(mp->selected-1, (void *)LOAD_ICON);
+        select_cb(NULL, mp->selected - 1, (void *)LOAD_ICON);
+    return string_cb(mp->selected - 1, (void *)LOAD_ICON);
 }
 
 static void iconpress_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
     (void)data;
-    okcancel_cb(NULL, (void *)(LOAD_ICON+1));
+    okcancel_cb(NULL, (void *)(LOAD_ICON + 1));
 }
 
 static void _show_list(int loadsave,u8 num_models)
 {
     if (loadsave == LOAD_ICON) {
         mp->modeltype = Model.type;
-        guiObject_t *obj = GUI_CreateTextSelectPlate(&gui->ico, 10, HEADER_HEIGHT, LCD_WIDTH - 20, 
+        guiObject_t *obj = GUI_CreateTextSelectPlate(&gui->ico, ICON_X, HEADER_HEIGHT, ICON_W,
                                 LINE_HEIGHT, &DEFAULT_FONT, iconpress_cb, iconstr_cb, (void *)(long)num_models);
-        GUI_CreateImage(&gui->image, LCD_WIDTH / 2 - 18, LCD_HEIGHT-37, 52, 36, mp->iconstr);
+        GUI_CreateImage(&gui->image, IMAGE_X, IMAGE_Y, IMAGE_W, IMAGE_H, mp->iconstr);
         GUI_SetSelected(obj);
     } else {
         OBJ_SET_USED(&gui->image, 0);
         guiObject_t *obj = GUI_CreateListBoxPlateText(&gui->listbox, 0, HEADER_HEIGHT, LCD_WIDTH,
                                 LCD_HEIGHT - HEADER_HEIGHT, num_models,
-                                mp->selected-1, &DEFAULT_FONT, LISTBOX_KEY_UPDOWN, // change listbox's browser key to up/down since there is only 1 widget in this page
+                                mp->selected - 1, &DEFAULT_FONT, LISTBOX_KEY_UPDOWN, // change listbox's browser key to up/down since there is only 1 widget in this page
                 string_cb, select_cb, _press_cb, (void *)(long)loadsave);
         GUI_SetSelected(obj);
     }
@@ -81,7 +92,7 @@ static void _press_cb(guiObject_t *obj, u16 selected, void *data)
     (void)obj;
     (void)data;
     mp->selected = selected + 1;
-    okcancel_cb(NULL, (void *)(long)(load_save +1));
+    okcancel_cb(NULL, (void *)(long)(load_save + 1));
 }
 
 static unsigned _action_cb(u32 button, unsigned flags, void *data)
