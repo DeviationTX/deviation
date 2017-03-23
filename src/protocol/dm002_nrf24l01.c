@@ -41,7 +41,7 @@
 
 #ifdef EMULATOR
     #define USE_FIXED_MFGID
-    #define BIND_COUNT 20
+    #define DM002_BIND_COUNT 20
     #define PACKET_PERIOD 150
     #define dbgprintf printf
 #else
