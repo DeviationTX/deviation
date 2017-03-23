@@ -43,7 +43,7 @@ PROTO_MODULES += $(ODIR)/protocol/fq777.mod
 PROTO_MODULES += $(ODIR)/protocol/inav.mod
 PROTO_MODULES += $(ODIR)/protocol/q303.mod
 PROTO_MODULES += $(ODIR)/protocol/gw008.mod
-PROTO_MODEULS += $(ODIR)/protocol/dm002.mod
+PROTO_MODULES += $(ODIR)/protocol/dm002.mod
 
 ALL += $(PROTO_MODULES)
 else #BUILD_TARGET
