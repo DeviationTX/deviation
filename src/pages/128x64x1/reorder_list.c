@@ -13,9 +13,31 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef OVERRIDE_PLACEMENT
 #include "common.h"
 #include "pages.h"
 #include "gui/gui.h"
+
+enum {
+    MOVE_UP_X      = 0,
+    MOVE_UP_W      = 25,
+    MOVE_DOWN_X    = 27,
+    MOVE_DOWN_W    = 25,
+    VALUE_X        = 0,
+    VALUE_W        = 55,
+    APPLY_X        = 0,
+    APPLY_W        = 55,
+    INSERT_X       = 0,
+    INSERT_W       = 25,
+    REMOVE_X       = 27,
+    REMOVE_W       = 25,
+    SAVE_X         = 0,
+    SAVE_W         = 55,
+    SAVE_Y_OFFS    = 1,
+    LIST_X         = 58,
+    LIST_W         = LCD_WIDTH - LIST_X - 1,
+};
+#endif //OVERRIDE_PLACEMENT
 
 #include "../common/_reorder_list.c"
 static s8 current_selected = 0;
@@ -55,39 +77,37 @@ void PAGE_ShowReorderList(u8 *list, u8 count, u8 selected, u8 max_allowed, const
     int i;
     for(i = 0; i < rl.max; i++) {
         if (i < count)
-            list[i] = i+1;
+            list[i] = i + 1;
         else
             list[i] = 0;
     }
 
     u8 space = LINE_HEIGHT;
     u8 y = 0;
-    u8 w = 55;
 
-    guiObject_t *obj = GUI_CreateButtonPlateText(&gui->up, 0, y, w/2 -2, LINE_HEIGHT,
+    guiObject_t *obj = GUI_CreateButtonPlateText(&gui->up, MOVE_UP_X, y, MOVE_UP_W, LINE_HEIGHT,
             &DEFAULT_FONT,  _show_button_cb, press_button_cb, (void *)MOVE_UP);
     GUI_SetSelected(obj);
-    GUI_CreateButtonPlateText(&gui->down, w/2, y, w/2 -2 , LINE_HEIGHT,
+    GUI_CreateButtonPlateText(&gui->down, MOVE_DOWN_X, y, MOVE_DOWN_W, LINE_HEIGHT,
             &DEFAULT_FONT, _show_button_cb, press_button_cb, (void *)MOVE_DOWN);
     y += space;
-    GUI_CreateTextSelectPlate(&gui->value, 0, y, w, LINE_HEIGHT,
+    GUI_CreateTextSelectPlate(&gui->value, VALUE_X, y, VALUE_W, LINE_HEIGHT,
             &DEFAULT_FONT, NULL, copy_val_cb, NULL);
     y += space;
-    GUI_CreateButtonPlateText(&gui->apply, 0, y, w, LINE_HEIGHT,
+    GUI_CreateButtonPlateText(&gui->apply, APPLY_X, y, APPLY_W, LINE_HEIGHT,
             &DEFAULT_FONT, _show_button_cb, press_button_cb, (void *)APPLY);
     if (max_allowed) {
         y += space;
-        GUI_CreateButtonPlateText(&gui->insert, 0, y, w/2 -2, LINE_HEIGHT,
+        GUI_CreateButtonPlateText(&gui->insert, INSERT_X, y, INSERT_W, LINE_HEIGHT,
                     &DEFAULT_FONT, _show_button_cb, press_button_cb, (void *)INSERT);
-        GUI_CreateButtonPlateText(&gui->remove, w/2, y, w/2 - 2, LINE_HEIGHT,
+        GUI_CreateButtonPlateText(&gui->remove, REMOVE_X, y, REMOVE_W, LINE_HEIGHT,
                     &DEFAULT_FONT, _show_button_cb, press_button_cb, (void *)REMOVE);
     }
-    y += space;
-    GUI_CreateButtonPlateText(&gui->save, (w -30)/2, y, 30, LINE_HEIGHT,
+    y += space + SAVE_Y_OFFS;
+    GUI_CreateButtonPlateText(&gui->save, SAVE_X, y, SAVE_W, LINE_HEIGHT,
         &DEFAULT_FONT, NULL, _okcancel_cb, (void *)_tr("Save"));
 
-    u8 x = w + 4;
-    GUI_CreateListBoxPlateText(&gui->list, x, 0, LCD_WIDTH - x , LCD_HEIGHT, rl.max, selected, &DEFAULT_FONT,
+    GUI_CreateListBoxPlateText(&gui->list, LIST_X, 0, LIST_W, LCD_HEIGHT, rl.max, selected, &DEFAULT_FONT,
         LISTBOX_KEY_RIGHTLEFT, string_cb, select_cb, NULL, NULL);
     GUI_SetSelectable((guiObject_t *)&gui->list, 0);
 
