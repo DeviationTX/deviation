@@ -28,11 +28,11 @@
 #include "telemetry.h"
 
 #ifdef MODULAR
-  //Some versions of gcc apply this to definitions, others to calls
-  //So just use long_calls everywhere
-  //#pragma long_calls_off
-  extern unsigned _data_loadaddr;
-  const unsigned long protocol_type = (unsigned long)&_data_loadaddr;
+    //Some versions of gcc apply this to definitions, others to calls
+    //So just use long_calls everywhere
+    //#pragma long_calls_off
+    extern unsigned _data_loadaddr;
+    const unsigned long protocol_type = (unsigned long)&_data_loadaddr;
 #endif
 
 #ifdef PROTO_HAS_NRF24L01
@@ -45,7 +45,6 @@
     #define PACKET_PERIOD 150
     #define dbgprintf printf
 #else
-    #define BIND_COUNT 655
     #define PACKET_PERIOD 6100 // Timeout for callback in uSec
     #define DM002_BIND_COUNT 655 // 4 seconds
     //printf inside an interrupt handler is really dangerous
@@ -130,60 +129,60 @@ static u16 scale_channel(u8 ch, u16 destMin, u16 destMax)
 
 static void DM002_send_packet(u8 bind)
 {
-	memcpy(&packet[5],(uint8_t *)"\x00\x7F\x7F\x7F\x00\x00\x00",7);
-	if(bind)
-	{
-		packet[0] = 0xAA;
-		packet[1] = rx_tx_addr[0]; 
-		packet[2] = rx_tx_addr[1];
-		packet[3] = rx_tx_addr[2];
-		packet[4] = rx_tx_addr[3];
-	}
-	else
-	{
-		packet[0]=0x55;
-		// Throttle : 0 .. 200
-		packet[1]=scale_channel(CHANNEL3,0,200);
-		// Other channels min 0x57, mid 0x7F, max 0xA7
-		packet[2] = scale_channel(CHANNEL4,0xA7,0x57);     // rudder
-		packet[3] = scale_channel(CHANNEL1, 0xA7,0x57);  // aileron
-		packet[4] = scale_channel(CHANNEL2, 0xA7, 0x57); // elevator
-		// Features
-		packet[9] =   DM002_FLAG_HIGH // high rate
+    memcpy(&packet[5],(uint8_t *)"\x00\x7F\x7F\x7F\x00\x00\x00",7);
+    if(bind)
+    {
+        packet[0] = 0xAA;
+        packet[1] = rx_tx_addr[0]; 
+        packet[2] = rx_tx_addr[1];
+        packet[3] = rx_tx_addr[2];
+        packet[4] = rx_tx_addr[3];
+    }
+    else
+    {
+        packet[0]=0x55;
+        // Throttle : 0 .. 200
+        packet[1]=scale_channel(CHANNEL3,0,200);
+        // Other channels min 0x57, mid 0x7F, max 0xA7
+        packet[2] = scale_channel(CHANNEL4,0xA7,0x57);     // rudder
+        packet[3] = scale_channel(CHANNEL1, 0xA7,0x57);  // aileron
+        packet[4] = scale_channel(CHANNEL2, 0xA7, 0x57); // elevator
+        // Features
+        packet[9] =   DM002_FLAG_HIGH // high rate
                     | GET_FLAG(CHANNEL_FLIP,    DM002_FLAG_FLIP)
-					| GET_FLAG(!CHANNEL_LED,    DM002_FLAG_LED)
-					| GET_FLAG(CHANNEL_CAMERA1, DM002_FLAG_CAMERA1)
-					| GET_FLAG(CHANNEL_CAMERA2, DM002_FLAG_CAMERA2)
-					| GET_FLAG(CHANNEL_HEADLESS,DM002_FLAG_HEADLESS)
-					| GET_FLAG(CHANNEL_RTH,     DM002_FLAG_RTH);
-		// Packet counter
-		if(packet_count&0x03)
-		{
-			packet_count++;
-			hopping_frequency_no++;
-			hopping_frequency_no&=4;
-		}
-		packet_count&=0x0F;
-		packet[10] = packet_count;
-		packet_count++;
-	}
-	//CRC
-	for(uint8_t i=0;i<DM002_PACKET_SIZE-1;i++)
-		packet[11]+=packet[i];
-	
-	// Power on, TX mode, 2byte CRC
-	// Why CRC0? xn297 does not interpret it - either 16-bit CRC or nothing
-	XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
-	if (bind)
-		NRF24L01_WriteReg(NRF24L01_05_RF_CH, DM002_RF_BIND_CHANNEL);
-	else
-		NRF24L01_WriteReg(NRF24L01_05_RF_CH, hopping_frequency[hopping_frequency_no]);
-	// clear packet status bits and TX FIFO
-	NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
-	NRF24L01_FlushTx();
-	XN297_WritePayload(packet, DM002_PACKET_SIZE);
+                    | GET_FLAG(!CHANNEL_LED,    DM002_FLAG_LED)
+                    | GET_FLAG(CHANNEL_CAMERA1, DM002_FLAG_CAMERA1)
+                    | GET_FLAG(CHANNEL_CAMERA2, DM002_FLAG_CAMERA2)
+                    | GET_FLAG(CHANNEL_HEADLESS,DM002_FLAG_HEADLESS)
+                    | GET_FLAG(CHANNEL_RTH,     DM002_FLAG_RTH);
+        // Packet counter
+        if(packet_count&0x03)
+        {
+            packet_count++;
+            hopping_frequency_no++;
+            hopping_frequency_no&=4;
+        }
+        packet_count&=0x0F;
+        packet[10] = packet_count;
+        packet_count++;
+    }
+    //CRC
+    for(uint8_t i=0;i<DM002_PACKET_SIZE-1;i++)
+        packet[11]+=packet[i];
+    
+    // Power on, TX mode, 2byte CRC
+    // Why CRC0? xn297 does not interpret it - either 16-bit CRC or nothing
+    XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
+    if (bind)
+        NRF24L01_WriteReg(NRF24L01_05_RF_CH, DM002_RF_BIND_CHANNEL);
+    else
+        NRF24L01_WriteReg(NRF24L01_05_RF_CH, hopping_frequency[hopping_frequency_no]);
+    // clear packet status bits and TX FIFO
+    NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
+    NRF24L01_FlushTx();
+    XN297_WritePayload(packet, DM002_PACKET_SIZE);
 
-	if (tx_power != Model.tx_power) {
+    if (tx_power != Model.tx_power) {
         //Keep transmit power updated
         tx_power = Model.tx_power;
         NRF24L01_SetPower(tx_power);
@@ -194,7 +193,7 @@ static void DM002_init()
 {
     NRF24L01_Initialize();
     NRF24L01_SetTxRxMode(TX_EN);
-	XN297_SetTXAddr((uint8_t *)"\x26\xA8\x67\x35\xCC", DM002_ADDRESS_SIZE);
+    XN297_SetTXAddr((uint8_t *)"\x26\xA8\x67\x35\xCC", DM002_ADDRESS_SIZE);
 
     NRF24L01_FlushTx();
     NRF24L01_FlushRx();
@@ -258,14 +257,14 @@ static u16 dm002_callback()
 
 static void DM002_initialize_txid()
 {
-	// Not figured out tcix / rf channels yet
+    // Not figured out txid / rf channels yet
     // Only 2 IDs/RFs are available, model txid (even/odd) is used to switch between them
-	if(Model.fixed_id & 1) { 
-		memcpy(hopping_frequency,(uint8_t *)"\x34\x39\x43\x48",DM002_NUM_RF_CHANNEL);
+    if(Model.fixed_id & 1) { 
+        memcpy(hopping_frequency,(uint8_t *)"\x34\x39\x43\x48",DM002_NUM_RF_CHANNEL);
         memcpy(rx_tx_addr,(uint8_t *)"\x47\x93\x00\x00\xD5",DM002_ADDRESS_SIZE);
     }
     else {
-		memcpy(hopping_frequency,(uint8_t *)"\x35\x39\x3B\x3D",DM002_NUM_RF_CHANNEL);
+        memcpy(hopping_frequency,(uint8_t *)"\x35\x39\x3B\x3D",DM002_NUM_RF_CHANNEL);
         memcpy(rx_tx_addr,(uint8_t *)"\xAC\xA1\x00\x00\xD5",DM002_ADDRESS_SIZE);
     }
 }
