@@ -52,7 +52,7 @@ $(TARGET).zip: $(TARGET).$(EXEEXT) $(TARGET).fs_wrapper
 	rm -f deviation-$(HGVERSION).zip
 	zip deviation-$(HGVERSION).zip deviation-$(HGVERSION).$(EXEEXT)
 ifdef WINDOWS
-	zip -uj deviation-$(HGVERSION).zip $(PORTAUDIO_DIR)/bin/libportaudio-2.dll ; zip -u deviation-$(HGVERSION).zip $(MPG123_DIR)/bin/mpg123.exe
+	zip -uj deviation-$(HGVERSION).zip $(PORTAUDIO_DIR)/bin/libportaudio-2.dll ; zip -uj deviation-$(HGVERSION).zip $(MPG123_DIR)/bin/mpg123.exe
 endif
 ifeq "$(INCLUDE_FS)" "1"
 	zip -ur deviation-$(HGVERSION).zip filesystem/$(FILESYSTEM)
