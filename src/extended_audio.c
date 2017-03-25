@@ -30,36 +30,32 @@ static u32 audio_queue_time = 0;
 
 // Initialize UART for extended-audio
 void AUDIO_Init() {
-#ifdef BUILDTYPE_DEV
     printf("Voice: Initializing UART for extended-audio\n");
-#endif
 
 #if HAS_AUDIO_UART5
     if (Transmitter.audio_uart5) {
-#ifdef BUILDTYPE_DEV
         printf("Voice: UART5 already initialized\n");
-#endif
         return;
     }
 #endif
 
 #ifndef EMULATOR
+#ifndef _DEVO12_TARGET_H_
     if ( PPMin_Mode() || Model.protocol == PROTOCOL_PPM ) {
-#ifdef BUILDTYPE_DEV
         printf("Voice: Cannot initialize USART for extended-audio, PPM in use\n");
-#endif
         usart_disable(_USART);
         usart_set_baudrate(_USART, 115200);
         usart_enable(_USART);
     }
     else {
-#ifdef BUILDTYPE_DEV
+#endif // _DEVO12_TARGET_H_
         printf("Voice: Setting up USART for extended-audio\n");
-#endif
         usart_disable(_USART);
         usart_set_baudrate(_USART, 9600);
         usart_enable(_USART);
+#ifndef _DEVO12_TARGET_H_
     }
+#endif // _DEVO12_TARGET_H_
 #endif // EMULATOR
 }
 
@@ -95,25 +91,28 @@ u16 AUDIO_CalculateChecksum(u8 *buffer) {
 
 // Generate a string to play.
 int AUDIO_Play(u16 music) {
+#ifndef _DEVO12_TARGET_H_
 #if HAS_AUDIO_UART5
+    if ( !Transmitter.audio_uart5 && (PPMin_Mode() || Model.protocol == PROTOCOL_PPM) ) { // don't send play command when using PPM port
+#else
+    if ( PPMin_Mode() || Model.protocol == PROTOCOL_PPM ) { // don't send play command when using PPM port
+#endif
+        printf("Voice: PPM port in use\n");
+
+        return 0;
+    }
+#endif // _DEVO12_TARGET_H_
+
     // If we are just playing beeps....
     if (music == MUSIC_KEY_PRESSING || music == MUSIC_MAXLEN) {
-#ifdef BUILDTYPE_DEV
         printf("beep\n");
-#endif
-#else
-    // If we are using the PPM port or are just playing beeps anyway....
-    if ( PPMin_Mode() || Model.protocol == PROTOCOL_PPM
-    || music == MUSIC_KEY_PRESSING || music == MUSIC_MAXLEN) {
-#ifdef BUILDTYPE_DEV
-        printf("Voice: PPM port in use\n");
-#endif
-#endif
         return 0;
     }
 
-#ifdef BUILDTYPE_DEV
-    printf("Voice: Playing music #%d (%s)\n", voice_map[music].id, voice_map[music].label);
+#if HAS_MUSIC_CONFIG
+    printf("Voice: Playing mp3 #%d (%s)\n", voice_map[music].id, voice_map[music].label);
+#else
+    printf("Voice: Playing mp3 #%d\n", voice_map[music].id);
 #endif
 
 #ifdef EMULATOR     // On emulators call mpg123 to play mp3s
@@ -149,19 +148,22 @@ int AUDIO_Play(u16 music) {
     }
   }
   return 1;
- #endif // EMULATOR
+#endif // EMULATOR
 }
 
 void AUDIO_SetVolume() {
+#ifndef _DEVO12_TARGET_H_
+#if HAS_AUDIO_UART5
+    if ( !Transmitter.audio_uart5 && (PPMin_Mode() || Model.protocol == PROTOCOL_PPM) ) { // don't send volume command when using PPM port
+#else
     if ( PPMin_Mode() || Model.protocol == PROTOCOL_PPM ) { // don't send volume command when using PPM port
-#ifdef BUILDTYPE_DEV
-        printf("Voice: PPM port in use\n");
 #endif
+        printf("Voice: PPM port in use, cannot set volume\n");
         return;
     }
-#ifdef BUILDTYPE_DEV
+#endif //_DEVO12_TARGET_H_
     printf("Voice: Setting external audio volume to %d\n", Transmitter.audio_vol);
-#endif
+
 #ifndef EMULATOR
     switch (Transmitter.audio_player) {
       case AUDIO_LAST: // Sigh. Shut up the warnings
@@ -189,9 +191,7 @@ void AUDIO_CheckQueue() {
             next_audio++;
         }
     } else if (num_audio && t > audio_queue_time) {
-#ifdef BUILDTYPE_DEV
         printf("Voice: Queue finished, resetting.\n");
-#endif
         num_audio = 0;
         next_audio = 0;
         AUDIO_SetVolume();
@@ -200,9 +200,7 @@ void AUDIO_CheckQueue() {
 
 void AUDIO_AddQueue(u16 music) {
     if (num_audio == AUDIO_QUEUE_LENGTH) {
-#ifdef BUILDTYPE_DEV
         printf("Voice: Queue full, cannot add new music #%d\n",music);
-#endif
         return;
     }
     audio_queue[num_audio++] = music;
