@@ -18,19 +18,20 @@
 #include "gui/gui.h"
 
 #define OVERRIDE_PLACEMENT
+
 #define X_OFFSET (ITEM_SPACE*2 - 2)
+
+#if LCD_WIDTH == 66
+//devof12e
 enum {
     BUTTON_X      = X_OFFSET,
-    BUTTON_WIDTH  = 6 * ITEM_SPACE,
-    TEXTSEL_X     = X_OFFSET + 7 * ITEM_SPACE,
-    TEXTSEL_WIDTH = 7 * ITEM_SPACE,
-    LABEL_X       = X_OFFSET + 16 * ITEM_SPACE,
+    BUTTON_WIDTH  = 8 * ITEM_SPACE,
+    TEXTSEL_X     = X_OFFSET + 9 * ITEM_SPACE,
+    TEXTSEL_WIDTH = 9 * ITEM_SPACE,
+    LABEL_X       = X_OFFSET + 20 * ITEM_SPACE,
     LABEL_WIDTH   = 8 * ITEM_SPACE,
-    STEP_X        = X_OFFSET + 7 * ITEM_SPACE,
     STEP_Y        = 0,
-    STEP_WIDTH    = 8,
-    TRIMPOS_X     = X_OFFSET + 16 * ITEM_SPACE,
-    TRIMPOS_WIDTH = 8,
+    TRIMPOS_X     = X_OFFSET + 20 * ITEM_SPACE,
 //
     LABEL2_X      = X_OFFSET,
     LABEL2_WIDTH  = 0,
@@ -41,4 +42,25 @@ enum {
     BUTTON2_Y     = 0,
     BUTTON2_WIDTH = 8 * ITEM_SPACE,
 };
+#else
+enum {
+    BUTTON_X      = X_OFFSET,
+    BUTTON_WIDTH  = 6 * ITEM_SPACE,
+    TEXTSEL_X     = X_OFFSET + 7 * ITEM_SPACE,
+    TEXTSEL_WIDTH = 9 * ITEM_SPACE,
+    LABEL_X       = X_OFFSET + 17 * ITEM_SPACE,
+    LABEL_WIDTH   = 8 * ITEM_SPACE,
+    STEP_Y        = 0,
+    TRIMPOS_X     = X_OFFSET + 17 * ITEM_SPACE,
+//
+    LABEL2_X      = X_OFFSET,
+    LABEL2_WIDTH  = 0,
+    TEXTSEL2_X    = X_OFFSET + 13 * ITEM_SPACE,
+    TEXTSEL2_WIDTH= 9 * ITEM_SPACE,
+//
+    BUTTON2_X     = X_OFFSET + 13 * ITEM_SPACE,
+    BUTTON2_Y     = 0,
+    BUTTON2_WIDTH = 8 * ITEM_SPACE,
+};
+#endif
 #include "../128x64x1/trim_page.c"

@@ -25,11 +25,8 @@ enum {
     TEXTSEL_WIDTH = 52,
     LABEL_X       = 90,
     LABEL_WIDTH   = 34,
-    STEP_X        = 50,
     STEP_Y        = 0,
-    STEP_WIDTH    = 31,
     TRIMPOS_X     = 90,
-    TRIMPOS_WIDTH = 30,
 //
     TEXTSEL2_X    = 60,
     TEXTSEL2_WIDTH= 63,
@@ -61,7 +58,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     GUI_CreateButtonPlateText(&gui->src[relrow], BUTTON_X, y, BUTTON_WIDTH, LINE_HEIGHT,
             &BUTTON_FONT, trimsource_name_cb, edit_trim_cb, (void *)((long)absrow));
     GUI_CreateTextSelectPlate(&gui->item[relrow], TEXTSEL_X, y,
-            TEXTSEL_WIDTH, LINE_HEIGHT, &TINY_FONT,  NULL, set_trimstep_cb, (void *)(long)(absrow+0x000)); //0x000: Use Model.trims
+            TEXTSEL_WIDTH, LINE_HEIGHT, &TINY_FONT,  NULL, set_trimstep_cb, (void *)(long)(absrow + 0x000)); //0x000: Use Model.trims
     GUI_CreateLabelBox(&gui->name[relrow], LABEL_X, y, LABEL_WIDTH, LINE_HEIGHT,
             &TINY_FONT, NULL, NULL,  (void *)INPUT_ButtonName(trim[absrow].pos));
     return 2;
