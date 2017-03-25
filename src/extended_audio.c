@@ -91,21 +91,10 @@ u16 AUDIO_CalculateChecksum(u8 *buffer) {
 
 // Generate a string to play.
 int AUDIO_Play(u16 music) {
-#ifndef _DEVO12_TARGET_H_
-#if HAS_AUDIO_UART5
-    if ( !Transmitter.audio_uart5 && (PPMin_Mode() || Model.protocol == PROTOCOL_PPM) ) { // don't send play command when using PPM port
-#else
-    if ( PPMin_Mode() || Model.protocol == PROTOCOL_PPM ) { // don't send play command when using PPM port
-#endif
-        printf("Voice: PPM port in use\n");
-
-        return 0;
-    }
-#endif // _DEVO12_TARGET_H_
 
     // If we are just playing beeps....
     if (music == MUSIC_KEY_PRESSING || music == MUSIC_MAXLEN) {
-        printf("beep\n");
+        printf("Voice: beep only\n");
         return 0;
     }
 
@@ -183,6 +172,9 @@ void AUDIO_SetVolume() {
 }
 
 void AUDIO_CheckQueue() {
+    if ( !AUDIO_VoiceAvailable() )
+        return;
+
     u32 t = CLOCK_getms();
     if (next_audio < num_audio) {
         if (t > audio_queue_time) {
@@ -198,12 +190,37 @@ void AUDIO_CheckQueue() {
     }
 }
 
-void AUDIO_AddQueue(u16 music) {
-    if (num_audio == AUDIO_QUEUE_LENGTH) {
-        printf("Voice: Queue full, cannot add new music #%d\n",music);
-        return;
+int AUDIO_VoiceAvailable () {
+#ifndef _DEVO12_TARGET_H_
+#if HAS_AUDIO_UART5
+    if ( !Transmitter.audio_uart5 && (PPMin_Mode() || Model.protocol == PROTOCOL_PPM) ) { // don't send play command when using PPM port
+#else
+    if ( PPMin_Mode() || Model.protocol == PROTOCOL_PPM ) { // don't send play command when using PPM port
+#endif
+        printf("Voice: PPM port in use\n");
+        return 0;
     }
+#endif // _DEVO12_TARGET_H_
+
+    if ( (Transmitter.audio_player == AUDIO_NONE) || !Transmitter.audio_vol ) {
+        return 0;
+    }
+
+    return 1;
+}
+
+int AUDIO_AddQueue(u16 music) {
+    if (num_audio == AUDIO_QUEUE_LENGTH) {
+        printf("Voice: Queue full, cannot add new mp3 #%d\n",music);
+        return 0;
+    }
+    if (!voice_map[music].duration) {
+        printf("Voice: mp3 length is zero\n");
+        return 0;
+    }
+
     audio_queue[num_audio++] = music;
+    return 1;
 }
 
 #endif

@@ -78,7 +78,7 @@ static const char *const audio_devices[] = {
     NULL,
     "all",
     "buzzer",
-    "extaudio",
+    "voice",
 };
 
 static u8 playback_device;
@@ -192,7 +192,7 @@ void MUSIC_Play(u16 music)
 {
 #if HAS_EXTENDED_AUDIO
     // Play audio for switch
-    if (Transmitter.audio_player && Transmitter.audio_vol && (music > MUSIC_TOTAL)) {
+    if ( music > MUSIC_TOTAL ) {
         AUDIO_AddQueue(music);
         return;
     }
@@ -205,14 +205,14 @@ void MUSIC_Play(u16 music)
 
     if (MUSIC_GetSound(music)) return;
 
+
 #if HAS_EXTENDED_AUDIO
-    if (Transmitter.audio_player && Transmitter.audio_vol && voice_map[music].duration) {
-        if ((playback_device == AUDDEV_EXTAUDIO) || (playback_device == AUDDEV_UNDEF)) {
-            AUDIO_AddQueue(music);
-            Volume = 0; // Just activate the haptic sensor, no buzzer
-            return;
-        } else if (playback_device == AUDDEV_ALL) {
-            AUDIO_AddQueue(music);
+    if ( !(playback_device == AUDDEV_BUZZER) ) {
+        if (  AUDIO_VoiceAvailable() && AUDIO_AddQueue(music) ) {
+            if ((playback_device == AUDDEV_EXTAUDIO) || (playback_device == AUDDEV_UNDEF)) {
+                Volume = 0;
+                return;
+            }
         }
     }
 #endif
@@ -225,13 +225,13 @@ void MUSIC_Play(u16 music)
 #if HAS_EXTENDED_AUDIO
 
 u16 MUSIC_GetTelemetryAlarm(enum Music music) {
-    if (Model.voice.telemetry[music - MUSIC_TELEMALARM1].music > 0 && Transmitter.audio_vol)
+    if ( Model.voice.telemetry[music - MUSIC_TELEMALARM1].music > 0 )
         return Model.voice.telemetry[music - MUSIC_TELEMALARM1].music;
     return music;
 }
 
 u16 MUSIC_GetTimerAlarm(enum Music music) {
-    if (Model.voice.timer[music - MUSIC_ALARM1].music > 0 && Transmitter.audio_vol)
+    if ( Model.voice.timer[music - MUSIC_ALARM1].music > 0 )
         return Model.voice.timer[music - MUSIC_ALARM1].music;
     return music;
 }
@@ -243,11 +243,11 @@ void MUSIC_PlayValue(u16 music, s32 value, u8 unit, u8 prec)
     char thousands = 0;
     u8 digit_count = 0;
 
-    if (!Transmitter.audio_player || !Transmitter.audio_vol) {
+    if ( !AUDIO_VoiceAvailable() || !AUDIO_AddQueue(music)) {
+        if (music < MUSIC_TOTAL)
             MUSIC_Play(music);
         return;
     }
-    AUDIO_AddQueue(music); // Play main alert MP3 requested
 
     // Play minutes/hours/seconds for timers
     if (unit == VOICE_UNIT_TIME) {

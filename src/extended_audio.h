@@ -9,7 +9,8 @@ void AUDIO_Init();
 int AUDIO_Play(u16 music);
 void AUDIO_SetVolume();
 void AUDIO_CheckQueue();
-void AUDIO_AddQueue(u16 music);
+int AUDIO_AddQueue(u16 music);
+int AUDIO_VoiceAvailable();
 
 u16 audio_queue[AUDIO_QUEUE_LENGTH];
 u8 next_audio;
