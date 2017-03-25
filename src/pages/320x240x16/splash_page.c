@@ -63,6 +63,7 @@ void PAGE_SplashEvent()
     }
 #if HAS_EXTENDED_AUDIO
     if (time_startup_msg && (CLOCK_getms() > time_startup_msg) ) {
+        AUDIO_Init();
         AUDIO_SetVolume();
         MUSIC_Play(MUSIC_STARTUP);
         time_startup_msg = 0;
