@@ -77,7 +77,20 @@ static int ini_handler(void* user, const char* section, const char* name, const 
 void CONFIG_VoiceParse()
 {
     voice_map_entries = CUSTOM_ALARM_ID;
-    if (CONFIG_IniParse("media/voice.ini", ini_handler, NULL)) {
+    char filename[] = "media/voice.ini\0\0\0"; // placeholder for longer folder name
+    #ifdef _DEVO12_TARGET_H_
+    static u8 checked;
+        if(!checked) {
+            FILE *fh;
+            fh = fopen("mymedia/voice.ini", "r");
+            if(fh) {
+                sprintf(filename, "mymedia/voice.ini");
+                fclose(fh);
+            }
+            checked = 1;
+        }
+    #endif
+    if (CONFIG_IniParse(filename, ini_handler, NULL)) {
         printf("Failed to parse voice.ini\n");
         Transmitter.audio_player = AUDIO_NONE; // disable external voice output
     }
