@@ -66,7 +66,8 @@ void PAGE_SplashEvent()
     }
 #if HAS_EXTENDED_AUDIO
     if (time_startup_msg && (CLOCK_getms() > time_startup_msg) ) {
-        AUDIO_SetVolume();
+        AUDIO_Init(); // could have happened before on model load, but won't hurt to do again
+        AUDIO_SetVolume(); // could have happened before on model load, but won't hurt to do again
         MUSIC_Play(MUSIC_STARTUP);
         time_startup_msg = 0;
     }

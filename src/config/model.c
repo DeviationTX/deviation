@@ -990,7 +990,6 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
     }
 #if HAS_EXTENDED_AUDIO
     char src_name[20];
-//    const char *button_name;
 
     if (MATCH_SECTION(SECTION_VOICE)) {
         u16 val = atoi(value);
@@ -1005,23 +1004,6 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
                 return 1;
             }
         }
-/*        for (int i = 1; i <= NUM_TX_BUTTONS; i++) {
-            button_name = INPUT_ButtonName(i);
-            strcpy(src_name, button_name);
-            strcat(src_name, "_ON");
-            // Button name alone or with suffix "_ON" will be considered the same
-            if (MATCH_KEY(button_name) || MATCH_KEY(src_name)) {
-                m->voice.buttons[i-1].on = val;
-                return 1;
-            }
-            strcpy(src_name, button_name);
-            strcat(src_name, "_OFF");
-            if (MATCH_KEY(src_name)) {
-                m->voice.buttons[i-1].off = val;
-                return 1;
-            }
-        }
-*/
 #if NUM_AUX_KNOBS
         for (int i = 0; i < NUM_AUX_KNOBS; i++) {
             INPUT_SourceName(src_name, i + NUM_STICKS + 1);

@@ -89,16 +89,10 @@ static int ini_handler(void* user, const char* section, const char* name, const 
 #if HAS_EXTENDED_AUDIO
         if (MATCH_KEY(AUDIO_CFG)) {
             for (int i = 1; i < AUDIO_LAST; i += 1) {
-                unsigned len = strlen(AUDIO_PLAYER[i]);
-                if (strncasecmp(value, AUDIO_PLAYER[i], len) == 0) {
+                if (strcasecmp(value, AUDIO_PLAYER[i]) == 0) {
                     Transmitter.audio_player = i;
-                    if (strlen(value) == len)
-                        Transmitter.audio_2way = 0;
-                    else if (strcasecmp(value + len, "-2") == 0)
-                        Transmitter.audio_2way = 1;
-                    // Ignore invalid values
-                    else Transmitter.audio_player = AUDIO_NONE;
                 }
+                else Transmitter.audio_player = AUDIO_NONE;
             }
         }
 #endif

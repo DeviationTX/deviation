@@ -59,7 +59,6 @@ struct Transmitter {
     u8 extra_hardware;
 #if HAS_EXTENDED_AUDIO
     enum AudioPlayers audio_player;
-    u8 audio_2way;	// Currently unused.
     u8 audio_vol;
 #endif
 #if HAS_AUDIO_UART5

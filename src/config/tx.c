@@ -337,7 +337,6 @@ void CONFIG_LoadTx()
 #endif
 #if HAS_EXTENDED_AUDIO
     Transmitter.audio_player = AUDIO_NONE;
-    Transmitter.audio_2way = 0;
     Transmitter.audio_vol = 10;
 #endif
 #if HAS_AUDIO_UART5
