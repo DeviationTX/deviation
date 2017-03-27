@@ -101,8 +101,8 @@ void PAGE_DrExpInit(int page)
     //GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
 
     GUI_CreateXYGraph(&gui->graph, GRAPH_X, GRAPH_Y, GRAPH_W, GRAPH_H,
-                      CHAN_MIN_VALUE, CHAN_MIN_VALUE * 5 / 4, 
-                      CHAN_MAX_VALUE, CHAN_MAX_VALUE * 5 / 4,
+                      CHAN_MIN_VALUE, CHAN_MIN_VALUE * 1251 / 1000,
+                      CHAN_MAX_VALUE, CHAN_MAX_VALUE * 1251 / 1000,
                       0, 0, show_curve_cb, curpos_cb, NULL, NULL);
 
     GUI_Select1stSelectableObj();
