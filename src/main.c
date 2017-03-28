@@ -312,6 +312,7 @@ void VIDEO_Update()
             video_standard_in_use = video_standard_current;
             VIDEO_SetStandard(video_standard_current);
         }
+        AUTODIMMER_Check();
     }
 }
 #endif //HAS_VIDEO
