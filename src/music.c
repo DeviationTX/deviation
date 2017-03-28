@@ -193,7 +193,8 @@ void MUSIC_Play(u16 music)
 #if HAS_EXTENDED_AUDIO
     // Play audio for switch
     if ( music > MUSIC_TOTAL ) {
-        AUDIO_AddQueue(music);
+        if (AUDIO_VoiceAvailable())
+            AUDIO_AddQueue(music);
         return;
     }
     playback_device = AUDDEV_UNDEF;
