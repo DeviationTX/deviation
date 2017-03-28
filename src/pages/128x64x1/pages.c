@@ -159,7 +159,6 @@ void PAGE_SaveMixerSetup(struct mixer_page * const mp)
 {
     MIXER_SetTemplate(mp->channel, mp->cur_template);
     MIXER_SetMixers(mp->mixer, mp->num_mixers);
-    MUSIC_Play(MUSIC_SAVING); // no saving tone in the sound.ini
+    MUSIC_Play(MUSIC_SAVING);
     BUTTON_InterruptLongPress();
 }
-

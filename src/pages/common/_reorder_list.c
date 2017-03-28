@@ -51,6 +51,7 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
     (void)obj;
     if (data) {
         rl.return_page(rl.list);
+        MUSIC_Play(MUSIC_SAVING);
     }
     rl.return_page(NULL);
     PAGE_Pop();

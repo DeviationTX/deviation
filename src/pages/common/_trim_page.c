@@ -138,6 +138,7 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
         struct Trim *trim = MIXER_GetAllTrims();
         trim[tp->index] = tp->trim;
         MIXER_RegisterTrimButtons();
+        MUSIC_Play(MUSIC_SAVING);
     }
     PAGE_Pop();
 }
@@ -149,4 +150,3 @@ void PAGE_TrimInit(int page)
 
     _show_page();
 }
-

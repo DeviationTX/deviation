@@ -30,7 +30,7 @@ s32 show_curve_cb(s32 xval, void *data)
     s16 oldpoint;
     s32 yval;
     if (edit->reverse)
-        xval = -xval; 
+        xval = -xval;
     if (edit->pointnum < 0) {
         oldpoint = edit->curve.points[1];
         edit->curve.points[1] = edit->curve.points[0];
@@ -41,7 +41,7 @@ s32 show_curve_cb(s32 xval, void *data)
     }
     return yval;
 }
-    
+
 static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)data;
@@ -66,6 +66,7 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
         if (edit->pointnum < 0)
             edit->curve.points[1] = edit->curve.points[0];
         *edit->curveptr = edit->curve;
+        MUSIC_Play(MUSIC_SAVING);
     }
     PAGE_Pop();
 }
@@ -91,7 +92,7 @@ static const char *set_value_cb(guiObject_t *obj, int dir, void *data)
     }
     return ret;
 }
-   
+
 static const char *set_pointnum_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)data;
