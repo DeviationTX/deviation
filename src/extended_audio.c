@@ -172,9 +172,6 @@ void AUDIO_SetVolume() {
 }
 
 void AUDIO_CheckQueue() {
-    if ( !AUDIO_VoiceAvailable() )
-        return;
-
     u32 t = CLOCK_getms();
     if (next_audio < num_audio) {
         if (t > audio_queue_time) {
@@ -190,7 +187,7 @@ void AUDIO_CheckQueue() {
     }
 }
 
-int AUDIO_VoiceAvailable () {
+int AUDIO_VoiceAvailable() {
 #ifndef _DEVO12_TARGET_H_
 #if HAS_AUDIO_UART5
     if ( !Transmitter.audio_uart5 && (PPMin_Mode() || Model.protocol == PROTOCOL_PPM) ) { // don't send play command when using PPM port
@@ -198,11 +195,15 @@ int AUDIO_VoiceAvailable () {
     if ( PPMin_Mode() || Model.protocol == PROTOCOL_PPM ) { // don't send play command when using PPM port
 #endif
         printf("Voice: PPM port in use\n");
+        num_audio = 0; // Reset queue when audio not available
+        next_audio = 0;
         return 0;
     }
 #endif // _DEVO12_TARGET_H_
 
     if ( (Transmitter.audio_player == AUDIO_NONE) || !Transmitter.audio_vol ) {
+        num_audio = 0; // Reset queue when audio not available
+        next_audio = 0;
         return 0;
     }
 
