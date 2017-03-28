@@ -17,6 +17,7 @@
 #include "pages.h"
 #include "gui/gui.h"
 #include "music.h"
+#include "extended_audio.h"
 
 #if HAS_MUSIC_CONFIG
 
@@ -45,14 +46,10 @@ void PAGE_VoiceconfigInit(int page)
     (void)page;
     int init_y = 40;
     PAGE_SetModal(0);
-    if (Transmitter.audio_player == 0) {
+
+    if ( !AUDIO_VoiceAvailable() ) {
         GUI_CreateLabelBox(&gui->msg, 20, 80, 280, 100, &NARROW_FONT, NULL, NULL,
-             _tr("External voice support\nmust be enabled\nin hardware.ini"));
-        return;
-    }
-    if (PPMin_Mode() || Model.protocol == PROTOCOL_PPM ) {
-        GUI_CreateLabelBox(&gui->msg, 20, 80, 280, 100, &NARROW_FONT, NULL, NULL,
-            _tr("External voice not\navailable while\nPPM in use"));
+            _tr("External voice\ncurrently not\navailable"));
         return;
     }
     PAGE_ShowHeader(PAGE_GetName(PAGEID_VOICECFG));
