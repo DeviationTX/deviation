@@ -66,9 +66,9 @@ void GUI_DrawXYGraph(struct guiObject *obj)
     u32 x, y;
 
     #define VAL_TO_X(xval) \
-        (u32)(box->x + (((s32)(xval)) - graph->min_x) * box->width / (1 + graph->max_x - graph->min_x))
+        (u32)(box->x + (((s32)(xval)) - graph->min_x + 1) * box->width / (1 + graph->max_x - graph->min_x))
     #define VAL_TO_Y(yval) \
-        (u32)(box->y + box->height - (((s32)(yval)) - graph->min_y) * box->height / (1 + graph->max_y - graph->min_y))
+        (u32)(box->y + box->height - (((s32)(yval)) - graph->min_y + 1) * box->height / (1 + graph->max_y - graph->min_y))
     _GUI_DrawMappedStart();
     _GUI_ClearMappedBox(box, Display.xygraph.bg_color);
     if (graph->grid_x) {
