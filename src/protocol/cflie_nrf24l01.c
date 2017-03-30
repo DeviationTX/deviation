@@ -59,9 +59,11 @@
 enum {
     CRTP_PORT_CONSOLE = 0x00,
     CRTP_PORT_PARAM = 0x02,
-    CRTP_PORT_COMMANDER = 0x03,
+    CRTP_PORT_SETPOINT = 0x03,
     CRTP_PORT_MEM = 0x04,
     CRTP_PORT_LOG = 0x05,
+    CRTP_PORT_POSITION = 0x06,
+    CRTP_PORT_SETPOINT_GENERIC = 0x07,
     CRTP_PORT_PLATFORM = 0x0D,
     CRTP_PORT_LINK = 0x0F,
 };
@@ -104,6 +106,14 @@ enum {
 #define CFLIE_TELEM_LOG_BLOCK_ID            0x01
 #define CFLIE_TELEM_LOG_BLOCK_PERIOD_10MS   50 // 50*10 = 500ms
 
+// Setpoint type definitions for the generic setpoint channel
+enum {
+    CRTP_SETPOINT_GENERIC_STOP_TYPE = 0x00,
+    CRTP_SETPOINT_GENERIC_VELOCITY_WORLD_TYPE = 0x01,
+    CRTP_SETPOINT_GENERIC_Z_DISTANCE_TYPE = 0x02,
+    CRTP_SETPOINT_GENERIC_CPPM_EMU_TYPE = 0x03,
+};
+
 static inline u8 crtp_create_header(u8 port, u8 channel)
 {
     return ((port)&0x0F)<<4 | (channel & 0x03);
@@ -119,22 +129,11 @@ static inline u8 crtp_create_header(u8 port, u8 channel)
 // Timeout for callback in uSec, 10ms=10000us for Crazyflie
 #define PACKET_PERIOD 10000
 
-
-// Channel numbers
-enum {
-    CHANNEL1 = 0,
-    CHANNEL2,
-    CHANNEL3,
-    CHANNEL4,
-    CHANNEL5,
-    CHANNEL6,
-    CHANNEL7,
-    CHANNEL8,
-    CHANNEL9,
-    CHANNEL10
-};
-
 #define MAX_PACKET_SIZE 32  // CRTP is 32 bytes
+
+// CPPM CRTP supports up to 10 aux channels but deviation only
+// supports a total of 12 channels. R,P,Y,T leaves 8 aux channels left
+#define MAX_CPPM_AUX_CHANNELS 8
 
 static u8 tx_payload_len = 0; // Length of the packet stored in tx_packet
 static u8 tx_packet[MAX_PACKET_SIZE]; // For writing Tx payloads
@@ -177,10 +176,10 @@ enum {
 };
 
 // State variables for the telemetry_setup_state_machine
-static u8 toc_size;				// Size of the TOC read from the crazyflie
-static u8 next_toc_variable;	// State variable keeping track of the next var to read
-static u8 vbat_var_id;			// ID of the vbatMV variable
-static u8 extvbat_var_id;		// ID of the extVbatMV variable
+static u8 toc_size;             // Size of the TOC read from the crazyflie
+static u8 next_toc_variable;    // State variable keeping track of the next var to read
+static u8 vbat_var_id;          // ID of the vbatMV variable
+static u8 extvbat_var_id;       // ID of the extVbatMV variable
 
 // Constants used for finding var IDs from the toc
 static const char* pm_group_name = "pm";
@@ -191,16 +190,21 @@ static const u8 extvbat_var_type = LOG_UINT16;
 
 static const char * const cflie_opts[] = {
   _tr_noop("Telemetry"),  _tr_noop("Off"), _tr_noop("On"), NULL,
+  _tr_noop("CRTP Mode"), _tr_noop("RPYT"), _tr_noop("CPPM"), NULL,
   NULL
 };
 enum {
     PROTOOPTS_TELEMETRY = 0,
+    PROTOOPTS_CRTP_MODE = 1,
     LAST_PROTO_OPT,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 #define TELEM_OFF 0
 #define TELEM_ON 1
+
+#define CRTP_MODE_RPYT 0
+#define CRTP_MODE_CPPM 1
 
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
@@ -318,7 +322,7 @@ static void frac2float(s32 n, float* res)
     *((u32 *) res) = m;
 }
 
-static void send_cmd_packet()
+static void send_crtp_rpyt_packet()
 {
     s32 f_roll;
     s32 f_pitch;
@@ -326,13 +330,13 @@ static void send_cmd_packet()
     s32 thrust_truncated;
     u16 thrust;
 
-    struct CommanderPacker
+    struct CommanderPacketRPYT
     {
-      float roll;
-      float pitch;
-      float yaw;
-      uint16_t thrust;
-    } __attribute__((packed)) cpkt;
+        float roll;
+        float pitch;
+        float yaw;
+        uint16_t thrust;
+    }__attribute__((packed)) cpkt;
 
     // Channels in AETR order
     // Roll, aka aileron, float +- 50.0 in degrees
@@ -347,15 +351,15 @@ static void send_cmd_packet()
     // No space for overshoot here, hard limit Channel3 by -10000..10000
     thrust_truncated = Channels[2];
     if (thrust_truncated < CHAN_MIN_VALUE) {
-      thrust_truncated = CHAN_MIN_VALUE;
+        thrust_truncated = CHAN_MIN_VALUE;
     } else if (thrust_truncated > CHAN_MAX_VALUE) {
-      thrust_truncated = CHAN_MAX_VALUE;
+        thrust_truncated = CHAN_MAX_VALUE;
     }
 
     thrust = thrust_truncated*3L + 35535L;
     // Crazyflie needs zero thrust to unlock
     if (thrust < 6000)
-      cpkt.thrust = 0;
+        cpkt.thrust = 0;
     else
       cpkt.thrust = thrust;
 
@@ -378,19 +382,79 @@ static void send_cmd_packet()
     }
 
     // Construct and send packet
-    tx_packet[0] = crtp_create_header(CRTP_PORT_COMMANDER, 0); // Commander packet to channel 0
+    tx_packet[0] = crtp_create_header(CRTP_PORT_SETPOINT, 0); // Commander packet to channel 0
     memcpy(&tx_packet[1], (char*) &cpkt, sizeof(cpkt));
     tx_payload_len = 1 + sizeof(cpkt);
     send_packet();
+}
 
-    // Print channels every 2 seconds or so
-    if ((packet_counter & 0xFF) == 1) {
-        dbgprintf("Raw channels: %d, %d, %d, %d, %d, %d, %d, %d\n",
-               Channels[0], Channels[1], Channels[2], Channels[3],
-               Channels[4], Channels[5], Channels[6], Channels[7]);
-        dbgprintf("Roll %d, pitch %d, yaw %d, thrust %d\n",
-               (int) f_roll*100/FRAC_SCALE, (int) f_pitch*100/FRAC_SCALE, (int) f_yaw*100/FRAC_SCALE, (int) thrust);
+static void send_crtp_cppm_emu_packet()
+{
+    struct CommanderPacketCppmEmu {
+        struct {
+            uint8_t numAuxChannels : 4; // Set to 0 through MAX_AUX_RC_CHANNELS
+            uint8_t reserved : 4;
+        } hdr;
+        uint16_t channelRoll;
+        uint16_t channelPitch;
+        uint16_t channelYaw;
+        uint16_t channelThrust;
+        uint16_t channelAux[10];
+    } __attribute__((packed)) cpkt;
 
+    // To emulate PWM RC signals, rescale channels from (-10000,10000) to (1000,2000)
+    // This is done by dividing by 20 to get a total range of 1000 (-500,500)
+    // and then adding 1500 to to rebase the offset
+#define RESCALE_RC_CHANNEL_TO_PWM(chan) ((chan / 20) + 1500)
+
+    // Make sure the number of aux channels in use is capped to MAX_CPPM_AUX_CHANNELS
+    uint8_t numAuxChannels = Model.num_channels - 4;
+    if(numAuxChannels > MAX_CPPM_AUX_CHANNELS)
+    {
+        numAuxChannels = MAX_CPPM_AUX_CHANNELS;
+    }
+
+    cpkt.hdr.numAuxChannels = numAuxChannels;
+
+    // Remap AETR to AERT (RPYT)
+    cpkt.channelRoll = RESCALE_RC_CHANNEL_TO_PWM(Channels[0]);
+    cpkt.channelPitch = RESCALE_RC_CHANNEL_TO_PWM(Channels[1]);
+    cpkt.channelYaw = RESCALE_RC_CHANNEL_TO_PWM(Channels[3]); // T & R Swapped
+    cpkt.channelThrust = RESCALE_RC_CHANNEL_TO_PWM(Channels[2]);
+
+    // Rescale the rest of the aux channels - RC channel 4 and up
+    uint8_t i;
+    for (i = 0; i < numAuxChannels; i++)
+    {
+        cpkt.channelAux[i] = RESCALE_RC_CHANNEL_TO_PWM(Channels[i + 4]);
+    }
+
+    // Total size of the commander packet is a 1-byte header, 4 2-byte channels and
+    // a variable number of 2-byte auxiliary channels
+    uint8_t commanderPacketSize = 1 + 8 + (2*numAuxChannels);
+
+    // Construct and send packet
+    tx_packet[0] = crtp_create_header(CRTP_PORT_SETPOINT_GENERIC, 0); // Generic setpoint packet to channel 0
+    tx_packet[1] = CRTP_SETPOINT_GENERIC_CPPM_EMU_TYPE;
+
+    // Copy the header (1) plus 4 2-byte channels (8) plus whatever number of 2-byte aux channels are in use
+    memcpy(&tx_packet[2], (char*)&cpkt, commanderPacketSize);
+    tx_payload_len = 2 + commanderPacketSize; // CRTP header, commander type, and packet
+    send_packet();
+}
+
+static void send_cmd_packet()
+{
+    switch(Model.proto_opts[PROTOOPTS_CRTP_MODE])
+    {
+    case CRTP_MODE_CPPM:
+        send_crtp_cppm_emu_packet();
+        break;
+    case CRTP_MODE_RPYT:
+        send_crtp_rpyt_packet();
+        break;
+    default:
+        send_crtp_rpyt_packet();
     }
 }
 
@@ -689,13 +753,13 @@ static void update_telemetry()
                     // Bytes 6 and 7 are the Vbat in mV units
                     u16 vBat;
                     memcpy(&vBat, &rx_packet[5], sizeof(u16));
-                    Telemetry.value[TELEM_DSM_FLOG_VOLT2] = (s32) (vBat / 10); // The log value expects tenths of volts
+                    Telemetry.value[TELEM_DSM_FLOG_VOLT2] = (s32) (vBat / 10); // The log value expects centivolts
                     TELEMETRY_SetUpdated(TELEM_DSM_FLOG_VOLT2);
 
                     // Bytes 8 and 9 are the ExtVbat in mV units
                     u16 extVBat;
                     memcpy(&extVBat, &rx_packet[7], sizeof(u16));
-                    Telemetry.value[TELEM_DSM_FLOG_VOLT1] = (s32) (extVBat / 10); // The log value expects tenths of volts
+                    Telemetry.value[TELEM_DSM_FLOG_VOLT1] = (s32) (extVBat / 10); // The log value expects centivolts
                     TELEMETRY_SetUpdated(TELEM_DSM_FLOG_VOLT1);
                 }
             }
@@ -811,7 +875,14 @@ const void *CFlie_Cmds(enum ProtoCmds cmd)
             return 0;
         case PROTOCMD_CHECK_AUTOBIND: return (void *)0L; // never Autobind // always Autobind
         case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 5L; // A, E, T, R, + or x mode,
+        case PROTOCMD_NUMCHAN:
+            switch(Model.proto_opts[PROTOOPTS_CRTP_MODE]) {
+                case CRTP_MODE_CPPM:
+                    return (void *)12L;  // A, E, R, T, up to 8 additional aux channels
+                case CRTP_MODE_RPYT:
+                default:
+                    return (void *)5L; // A, E, R, T, + or x mode
+            }
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)5L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_GETOPTIONS: return cflie_opts;
