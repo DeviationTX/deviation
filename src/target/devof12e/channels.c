@@ -111,7 +111,7 @@ s32 CHAN_ReadInput(int channel)
     } else {
         value = value ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
     }
-    if (channel == INP_ELEVATOR || channel == INP_AILERON)
+    if (channel == INP_ELEVATOR || channel == INP_AILERON || channel == INP_AUX4 || channel == INP_AUX6)
         value = -value;
     return value;
 }
