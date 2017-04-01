@@ -22,6 +22,9 @@ struct pagemem {
 #if HAS_SCANNER
         struct scanner_page scanner_page;
 #endif
+#if HAS_MUSIC_CONFIG
+        struct voiceconfig_page voiceconfig_page;
+#endif
         struct usb_page usb_page;
         struct tx_configure_page tx_configure_page;
         struct telemtest_page telemtest_page;

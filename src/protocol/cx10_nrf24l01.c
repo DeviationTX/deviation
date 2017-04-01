@@ -375,7 +375,7 @@ static u16 cx10_callback()
 {
     switch (phase) {
     case CX10_INIT1:
-        MUSIC_Play(MUSIC_TELEMALARM1);
+        // MUSIC_Play(MUSIC_TELEMALARM1);	// Shouldn't play telemetry alarm doing bind init
         phase = bind_phase;
         break;
 

@@ -118,6 +118,12 @@ const char *tx_stick_names[4] = {
     _tr_noop("LEFT_H"),
 };
 
+#if HAS_EXTENDED_AUDIO && NUM_AUX_KNOBS
+u8 aux_up = 0;
+u8 aux_changed = 0;
+u32 aux_time[NUM_AUX_KNOBS];
+#endif
+
 static void get_input_str(int src, const char **ptr, int *idx)
 {
     *ptr = "";
@@ -308,6 +314,12 @@ void INPUT_CheckChanges(void) {
           value = changed_analog_value >> 7;
           if (changed_input == INP_NONE && abs(value - last_analogs[i]) > 35) {
              changed_input = MIXER_MapChannel(i);
+#if HAS_EXTENDED_AUDIO && NUM_AUX_KNOBS
+             if (value - last_analogs[i] > 0)
+                 aux_up = 1;
+             else
+                 aux_up = 0;
+#endif
              last_analogs[i] = value;
           }
       } else {
@@ -324,5 +336,36 @@ void INPUT_CheckChanges(void) {
     }
     if (changed_input != INP_NONE) {
         GUI_HandleInput(changed_input, changed_input <= INP_HAS_CALIBRATION ? changed_analog_value : CHAN_MAX_VALUE);
+#if HAS_EXTENDED_AUDIO
+        s8 music_idx;
+#if NUM_AUX_KNOBS
+        if ((changed_input > NUM_STICKS) && (changed_input <= NUM_STICKS + NUM_AUX_KNOBS)) {
+            music_idx = changed_input - (NUM_STICKS+1);
+            aux_time[music_idx] = CLOCK_getms();
+            aux_changed = music_idx + 1;
+            return;
+	    }
+#endif
+	    music_idx = changed_input - INP_HAS_CALIBRATION - 1;
+	    /* Skip pots & Play music file if the switch has a voice file number defined */
+	    if (changed_input >= INP_HAS_CALIBRATION && Model.voice.switches[music_idx].music) {
+            MUSIC_Play(Model.voice.switches[music_idx].music);
+        }
+#endif //HAS_EXTENDED_AUDIO
     }
+#if HAS_EXTENDED_AUDIO && NUM_AUX_KNOBS
+    // Play AUX music if value was changed and left for 1000 ms at the same value
+    if (aux_changed && aux_time[aux_changed - 1] <= CLOCK_getms() - 1000) {
+        if (aux_up) {
+            if (Model.voice.aux[(aux_changed - 1) * 2 + 1].music)
+                MUSIC_PlayValue(Model.voice.aux[(aux_changed - 1) * 2 + 1].music,
+                    CHAN_ReadInput(aux_changed + NUM_STICKS)/100,VOICE_UNIT_PERCENT,0);
+        } else {
+            if (Model.voice.aux[(aux_changed - 1) * 2].music)
+                MUSIC_PlayValue(Model.voice.aux[(aux_changed - 1) * 2].music,
+                    CHAN_ReadInput(aux_changed + NUM_STICKS)/100,VOICE_UNIT_PERCENT,0);
+        }
+        aux_changed = 0;
+    }
+#endif // HAS_EXTENDED_AUDIO && NUM_AUX_KNOBS
 }

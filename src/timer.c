@@ -120,15 +120,15 @@ void TIMER_Power(){
     elevator = 2 == mode ? abs(CHAN_ReadInput(INP_THROTTLE)) : abs(CHAN_ReadInput(INP_ELEVATOR));
     new_throttle = 2 == mode ?  abs(CHAN_ReadInput(INP_ELEVATOR)) : abs(CHAN_ReadInput(INP_THROTTLE));
     new_throttle = abs(new_throttle - throttle);
-     
-    if( elevator < 1000 && abs(CHAN_ReadInput(INP_AILERON)) < 1000 && 
+
+    if( elevator < 1000 && abs(CHAN_ReadInput(INP_AILERON)) < 1000 &&
                 new_throttle < 1000 && abs(CHAN_ReadInput(INP_RUDDER)) < 1000 &&
                 !ScanButtons() && (!HAS_TOUCH || !SPITouch_IRQ()) ) {
         if ( CLOCK_getms() > timer ) {
-            timer =  CLOCK_getms() + 2000;
-            MUSIC_Play(MUSIC_SHUTDOWN);
-        }                
-    } else 
+            timer =  CLOCK_getms() + 10000;
+            MUSIC_Play(MUSIC_INACTIVITY_ALARM);
+        }
+    } else
            timer =  CLOCK_getms() + alert;
     throttle = 2 == mode ?  abs(CHAN_ReadInput(INP_ELEVATOR)) : abs(CHAN_ReadInput(INP_THROTTLE));
 }
@@ -171,6 +171,7 @@ void TIMER_Update()
         }
         if (timer_state[i]) {
             s32 delta = t - last_time[i];
+            s32 warn_time;
             if (Model.timer[i].type == TIMER_STOPWATCH_PROP || Model.timer[i].type == TIMER_COUNTDOWN_PROP) {
                 delta = delta * chan_val / 100;
             }
@@ -181,8 +182,22 @@ void TIMER_Update()
                 Model.timer[i].val = timer_val[i];
             } else if (Model.timer[i].type == TIMER_STOPWATCH || Model.timer[i].type == TIMER_STOPWATCH_PROP) {
                 timer_val[i] += delta;
+#if HAS_EXTENDED_AUDIO
+                warn_time = 60000; // Begin stopwatch alerts after 1 minute
+                while(timer_val[i]/(warn_time+1)){
+                    if (timer_val[i] >= 60000 && timer_val[i] < 360000)
+                        warn_time += 60000; // 1-minute alerts up to 6 minutes
+                    if (timer_val[i] >= 360000 && timer_val[i] < 600000)
+                        warn_time += 120000; // 2-minute alerts between 6 and 10 minutes
+                    if (timer_val[i] >= 600000)
+                        warn_time += 300000; // 5-minute alerts above 10 minutes
+                }
+                warn_time -= voice_map[MUSIC_ALARM1 + i].duration;
+                if (timer_val[i] > warn_time && (timer_val[i] - delta) <= warn_time)
+                    MUSIC_PlayValue(MUSIC_GetTimerAlarm(MUSIC_ALARM1 + i),
+                    (timer_val[i]+voice_map[MUSIC_GetTimerAlarm(MUSIC_ALARM1 + i)].duration)/1000, VOICE_UNIT_TIME, 0);
+#endif
             } else {
-                s32 warn_time;
                 // start to beep  for each prealert_interval at the last prealert_time(seconds)
                 if (Transmitter.countdown_timer_settings.prealert_time != 0 &&
                     Transmitter.countdown_timer_settings.prealert_interval != 0 &&
@@ -190,20 +205,40 @@ void TIMER_Update()
                     timer_val[i] < (s32)Transmitter.countdown_timer_settings.prealert_time + 1000) { // give extra 1seconds
                     warn_time = ((timer_val[i] / Transmitter.countdown_timer_settings.prealert_interval)
                             * Transmitter.countdown_timer_settings.prealert_interval);
+#if HAS_EXTENDED_AUDIO
+                    warn_time += voice_map[MUSIC_TIMER_WARNING].duration + 1000;
+#endif
                     if (timer_val[i] > warn_time && (timer_val[i] - delta) <= warn_time) {
+#if HAS_EXTENDED_AUDIO
+                        MUSIC_PlayValue(MUSIC_TIMER_WARNING,
+                            (timer_val[i]-voice_map[MUSIC_TIMER_WARNING].duration-1000)/1000,VOICE_UNIT_TIME,0);
+#else
                         MUSIC_Play(MUSIC_TIMER_WARNING);
+#endif
                     }
                 }
                 // Beep once for each timeup_interval past 0
                 if (timer_val[i] < 0 && Transmitter.countdown_timer_settings.timeup_interval != 0) {
                     warn_time = ((timer_val[i] - Transmitter.countdown_timer_settings.timeup_interval) / Transmitter.countdown_timer_settings.timeup_interval)
                             * Transmitter.countdown_timer_settings.timeup_interval;
+#if HAS_EXTENDED_AUDIO
+                    warn_time += voice_map[MUSIC_ALARM1 + i].duration;
+#endif
                     if (timer_val[i] > warn_time && (timer_val[i] - delta) <= warn_time) {
-                        MUSIC_Play(MUSIC_ALARM1 + i);
+#if HAS_EXTENDED_AUDIO
+                        MUSIC_PlayValue(MUSIC_GetTimerAlarm(MUSIC_ALARM1 + i),
+                            (timer_val[i]-voice_map[MUSIC_GetTimerAlarm(MUSIC_ALARM1 + i)].duration)/-1000+1,VOICE_UNIT_TIME,0);
+#else
+                        MUSIC_Play(MUSIC_ALARM1 + i + 2);
+#endif
                     }
                 }
                 if (timer_val[i] >= 0 && timer_val[i] < delta) {
-                    MUSIC_Play(MUSIC_ALARM1 + i);
+#if HAS_EXTENDED_AUDIO
+                    MUSIC_Play(MUSIC_GetTimerAlarm(MUSIC_ALARM1 + i));
+#else
+                    MUSIC_Play(MUSIC_ALARM1+i);
+#endif
                 }
                 timer_val[i] -= delta;
             }

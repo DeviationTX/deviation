@@ -6,6 +6,9 @@
 *.gz
 *.map
 src/objs/
+utils/genspeech/mp3
+utils/genspeech/*.ini
+utils/genspeech/*.zip
 ##src/gz*
 ##src/elf*
 #src/push

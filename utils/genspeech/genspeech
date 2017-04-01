@@ -1,0 +1,131 @@
+#!/bin/bash
+
+# Check for machine type
+if [ "`uname`" = "Darwin" ]
+then
+	TTSCMD="say"
+        TTSCMD2="pico2wave"
+	TTSOPT="-o"
+	TTSFILEEXT="aiff"
+	TTSLCMD="afinfo"
+	TTSLOPT=""
+	TTSLPP=" | grep duration | cut -d' ' -f3"
+else
+	TTSCMD="espeak"
+	TTSCMD2="pico2wave"
+	TTSOPT="-z -w "
+	TTSOPT2="--wave="
+	TTSFILEEXT="wav"
+	TTSLCMD="mplayer"
+	TTSLOPT="-vo null -ao null -frames 0 -identify"
+	TTSLPP=" | grep 'ID_LENGTH' | cut -d'=' -f2"
+fi
+
+# Test for TTS command existance
+command -v $TTSCMD2 >/dev/null 2>&1
+if [ $? != 0 ]
+then
+	echo "$TTSCMD2 unavailable, trying $TTSCMD..."
+else
+        TTSCMD=$TTSCMD2
+	TTSOPT=$TTSOPT2
+fi
+
+command -v $TTSCMD >/dev/null 2>&1
+if [ $? != 0 ]
+then
+	echo "Please install $TTSCMD or $TTSCMD2 onto your system"
+        exit 1
+fi
+
+# Test for lame command existance
+command -v lame >/dev/null 2>&1
+if [ $? != 0 ]
+then
+	echo "Please install lame onto your system"
+        exit 1
+fi
+
+# Test for TTS length command existance
+command -v $TTSLCMD >/dev/null 2>&1
+if [ $? != 0 ]
+then
+	echo "Please install $TTSLCMD onto your system"
+	exit 1
+fi
+
+echo "Generating voice files with $TTSCMD".
+FILENUM=1
+IDX=0
+TMPFILE="/tmp/speechidx.tmp"
+OUTFILE="voice.ini"
+cp /dev/null $TMPFILE
+SPEECHDIR="mp3"
+mkdir $SPEECHDIR 2>/dev/null
+rm -f ${SPEECHDIR}/* >/dev/null 2>&1
+rm -f voice.ini >/dev/null 2>&1
+
+for INFILE in globalAlert$1.txt
+do
+	echo "Processing global alerts..."
+	echo ";This file contains the MP3 mapping for external MP3 player modules (currently AudioFX or DFPlayer Mini)" >> $OUTFILE
+	echo ";Each entry is in the format mp3id=label,duration in ms" >> $OUTFILE
+	echo ";The global alarms are currently hardcoded, index numbers cannot be changed!" >> $OUTFILE
+	echo "[global]" >> $OUTFILE
+	while read LINE
+	do		
+		LABEL=`echo $LINE | cut -d':' -f2`
+		LABEL=`echo $LABEL | sed -e 's/^[ \t]+//g'`
+		MSG=`echo $LABEL | sed -e 's/^ *//;s/ *$//'`
+		IDXTEXTID=`printf '%04d' $IDX`
+		IDXTEXT=`echo ${IDXTEXTID}_${MSG} | tr -d ' '`
+		$TTSCMD ${TTSOPT}${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT} "$MSG"
+		eval TTSLEN=\`$TTSLCMD $TTSLOPT ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT} $TTSLPP\`
+		TTSLEN=`echo 'scale=0;' $TTSLEN '* 1000/1' | bc`
+		lame --quiet ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT} ${SPEECHDIR}/${IDXTEXT}.mp3
+		echo "${IDX}=${LABEL},${TTSLEN}" >> $OUTFILE
+		rm ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT}
+		echo "Alert ${IDXTEXT}.mp3 generated (length $TTSLEN ms)"
+		IDX=`expr $IDX + 1`
+ 	done < $INFILE
+done
+
+IDX=200
+
+for INFILE in modelAlert$1.txt
+do
+	echo "Processing file $INFILE..."
+	echo ";Below are custom alarms for individual models (switch, trim, telemetry etc.), MP3 ID must be greater than $IDX" >> $OUTFILE
+	echo "[custom]" >> $OUTFILE
+	while read LINE
+	do
+		LABEL=`echo $LINE | cut -d':' -f2`
+		LABEL=`echo $LABEL | sed -e 's/^[ \t]+//g'`
+		MSG=`echo $LABEL | sed -e 's/^ *//;s/ *$//'`
+		R=`grep "@${MSG}@" $TMPFILE`
+		if [ $? != 0 ]
+		then
+			IDXTEXTID=`printf '%04d' $IDX`
+			IDXTEXT=`echo ${IDXTEXTID}_${MSG} | tr -d ' '`
+			$TTSCMD ${TTSOPT}${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT} "$MSG"
+			eval TTSLEN=\`$TTSLCMD $TTSLOPT ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT} $TTSLPP\`
+			TTSLEN=`echo 'scale=0;' $TTSLEN '* 1000/1' | bc`
+			lame --quiet ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT} ${SPEECHDIR}/${IDXTEXT}.mp3
+			echo "${IDX}=${LABEL},${TTSLEN}" >> $OUTFILE
+			rm ${SPEECHDIR}/${IDXTEXT}.${TTSFILEEXT}
+			echo "@${MSG}@:${IDXTEXTID}:${TTSLEN}" >> $TMPFILE
+			echo "Alert ${IDXTEXT}.mp3 generated (length $TTSLEN ms)"
+			IDX=`expr $IDX + 1`
+		else
+			`echo $R|cut -d':' -f2,3` >> $OUTFILE
+		fi
+                
+	done < $INFILE
+done
+zip -r voice$1.zip voice.ini mp3
+echo "Finished writing $OUTFILE"
+echo "Please copy $OUTFILE to the media folder of your deviation transmitter."
+echo "The folder mp3 has to be placed on the SD card of your MP3 player."
+echo "Zip created as voice$1.zip."
+rm $TMPFILE
+exit 0

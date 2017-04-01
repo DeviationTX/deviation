@@ -16,6 +16,7 @@
 #include "common.h"
 #include "pages.h"
 #include "gui/gui.h"
+#include "extended_audio.h"
 
 static struct splash_obj * const gui = &gui_objs.u.splash;
 
@@ -34,7 +35,7 @@ void PAGE_SplashInit(int page)
     u16 w, h;
     LCD_ImageDimensions(SPLASH_FILE, &w, &h);
     //GUI_CreateImageOffset(&gui->splash_image, 15, 10, w-offset, h-5, offset, 0, SPLASH_FILE, NULL, NULL);
-    if( w < LCD_WIDTH - 1 && h < LCD_HEIGHT - LINE_HEIGHT - 3) 
+    if( w < LCD_WIDTH - 1 && h < LCD_HEIGHT - LINE_HEIGHT - 3)
     	GUI_CreateImageOffset(&gui->splash_image, (LCD_WIDTH-w)/2, (LCD_HEIGHT-h-LINE_HEIGHT)/2, w, h, 0, 0, SPLASH_FILE, NULL, NULL);
     GUI_CreateLabelBox(&gui->version, 0, LCD_HEIGHT - LINE_HEIGHT - 1 , LCD_WIDTH, LINE_HEIGHT, &TINY_FONT, NULL, NULL, DeviationVersion);
 }
@@ -51,12 +52,28 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
 void PAGE_SplashEvent()
 {
     static unsigned int time=0;
+#if HAS_EXTENDED_AUDIO
+    static unsigned int time_startup_msg;
+#endif
     if(GUI_IsModal())
        return;
 //    u8 step = 5;
-    if ( 0 == time )
+    if ( 0 == time ) {
     	time = CLOCK_getms() + Transmitter.splash_delay * 100;
-    if ( CLOCK_getms() > time ) 
+#if HAS_EXTENDED_AUDIO
+        time_startup_msg = CLOCK_getms() + 5 * 100;	// Dealy 0.5 second to play startup audio
+#endif
+    }
+#if HAS_EXTENDED_AUDIO
+    if (time_startup_msg && (CLOCK_getms() > time_startup_msg) ) {
+        AUDIO_Init(); // could have happened before on model load, but won't hurt to do again
+        AUDIO_SetVolume(); // could have happened before on model load, but won't hurt to do again
+        MUSIC_Play(MUSIC_STARTUP);
+        time_startup_msg = 0;
+    }
+#endif
+
+    if ( CLOCK_getms() > time )
 	PAGE_ChangeByID(PAGEID_MAIN,0);
 /*     if ( offset > 0 ) {
 	offset -= step;

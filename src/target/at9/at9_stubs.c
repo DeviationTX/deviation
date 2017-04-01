@@ -30,9 +30,10 @@ void SOUND_SetFrequency(unsigned frequency, unsigned volume) {
     (void)frequency;
     (void)volume;
 }
-void SOUND_Start(unsigned msec, u16(*next_note_cb)()) {
+void SOUND_Start(unsigned msec, u16(*next_note_cb)(), u8 vibrate) {
     (void)msec;
     (void)next_note_cb;
+    (void)vibrate;
 }
 void SOUND_StartWithoutVibrating(unsigned msec, u16(*next_note_cb)()) {
     (void)msec;

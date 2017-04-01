@@ -20,6 +20,7 @@
 #include "config/tx.h"
 #include "config/model.h"
 #include "autodimmer.h"
+#include "extended_audio.h"
 
 enum {
   LARGE_SEL_X_OFFSET = 68,
@@ -42,6 +43,10 @@ static struct tx_obj * const gui = &gui_objs.u.tx;
 static const char *_contrast_select_cb(guiObject_t *obj, int dir, void *data);
 static const char *_vibration_state_cb(guiObject_t *obj, int dir, void *data);
 static const char *_buzz_vol_cb(guiObject_t *obj, int dir, void *data);
+#if HAS_EXTENDED_AUDIO
+static const char *_audio_vol_cb(guiObject_t *obj, int dir, void *data);
+#endif
+
 static u16 current_selected = 0;  // do not put current_selected into pagemem as it shares the same structure with other pages by using union
 
 static int size_cb(int absrow, void *data)
@@ -99,10 +104,20 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             but_str = calibratestr_cb; tgl = press_cb; data = (void *)CALIB_STICK;
             break;
         case ITEM_BUZZ:
+#if HAS_EXTENDED_AUDIO
+            title = _tr_noop("Audio settings");
+#else
             title = _tr_noop("Buzz settings");
+#endif
             label = _tr_noop("Buzz volume");
             value = _buzz_vol_cb; data = &Transmitter.volume; x = MED_SEL_X_OFFSET;
             break;
+#if HAS_EXTENDED_AUDIO
+        case ITEM_AUDIO:
+            label = _tr_noop("Audio volume");
+            value = _audio_vol_cb; data = &Transmitter.audio_vol; x = MED_SEL_X_OFFSET;
+            break;
+#endif
         case ITEM_HAPTIC:
             label = _tr_noop("Vibration");
             value = _vibration_state_cb; data = &Transmitter.vibration_state; x = MED_SEL_X_OFFSET;
@@ -161,6 +176,10 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         case ITEM_TELEMLEN:
             label = _tr_noop("Length");
             value = units_cb; data = (void *)0L; x = MED_SEL_X_OFFSET;
+            break;
+        case ITEM_TELEM_IVAL:
+            label = _tr_noop("Alert intvl");
+            value = telem_interval_cb; data = &Transmitter.telem_alert_interval; x = MED_SEL_X_OFFSET;
             break;
     }
     if (title) {

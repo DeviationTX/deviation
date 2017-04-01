@@ -20,6 +20,7 @@
 #include "config/tx.h"
 #include "config/model.h"
 #include "autodimmer.h"
+#include "extended_audio.h"
 
 #if LCD_WIDTH == 66
 //devof12e
