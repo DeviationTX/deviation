@@ -153,6 +153,7 @@ static const char *voiceid_cb(guiObject_t *obj, int dir, void *data)
     int idx = (long)data;
     int cur_row = idx - GUI_ScrollableCurrentRow(&gui->scrollable);
     struct CustomVoice *vpt;
+    vpt = NULL;
 
     switch (voiceconfig_getsrctype(idx)) {
         case VOICE_SRC_SWITCH:

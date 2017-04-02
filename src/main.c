@@ -71,6 +71,9 @@ int main() {
 #if !HAS_EXTENDED_AUDIO
     // If Extended Audio is present, move startup msg to Splash page to allow additional audio hardware initialization time
     MUSIC_Play(MUSIC_STARTUP);
+#else
+    if (Transmitter.splash_delay < 5)
+        MUSIC_Play(MUSIC_STARTUP); // if no splash page startup msg is used force playing here
 #endif
     GUI_HandleButtons(1);
 
