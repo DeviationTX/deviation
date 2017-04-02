@@ -153,6 +153,7 @@ static const char *voiceid_cb(guiObject_t *obj, int dir, void *data)
     int idx = (long)data;
     int cur_row = idx - GUI_ScrollableCurrentRow(&gui->scrollable);
     struct CustomVoice *vpt;
+    vpt = NULL;
 
     switch (voiceconfig_getsrctype(idx)) {
         case VOICE_SRC_SWITCH:
@@ -170,9 +171,6 @@ static const char *voiceid_cb(guiObject_t *obj, int dir, void *data)
             vpt = &Model.voice.telemetry[idx - VOICE_SRC_TELEMETRY];
             break;
         case VOICE_SRC_MIXER:
-            vpt = &Model.voice.mixer[idx - VOICE_SRC_MIXER];
-            break;
-        default:
             vpt = &Model.voice.mixer[idx - VOICE_SRC_MIXER];
             break;
     }
