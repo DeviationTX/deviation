@@ -60,6 +60,16 @@ before_install:
          make install;
          popd;
       fi;
+   - if [ ! -d "$HOME/mpg123-w32/bin" ]; then
+         mkdir $HOME/src;
+         mkdir $HOME/mpg123-w32;
+         pushd $HOME/src;
+         curl --retry 10 --retry-max-time 120 -L "http://www.mpg123.de/download/mpg123-1.23.8.tar.bz2" | tar xjf -;
+         cd mpg123-1.23.8;
+         ./configure --prefix=$HOME/mpg123-w32 --host=i586-mingw32msvc --disable-shared && make;
+         make install;
+         strip --strip-unneeded $HOME/mpg123-w32/bin/mpg123.exe;
+         popd;
    - openssl aes-256-cbc -K $encrypted_39cc7b34336f_key -iv $encrypted_39cc7b34336f_iv -in install_nightlies.tar.enc -out install_nightlies.tar -d;
          tar -xf install_nightlies.tar;
          rm -f install_nightlies.tar
