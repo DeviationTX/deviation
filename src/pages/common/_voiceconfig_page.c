@@ -172,6 +172,9 @@ static const char *voiceid_cb(guiObject_t *obj, int dir, void *data)
         case VOICE_SRC_MIXER:
             vpt = &Model.voice.mixer[idx - VOICE_SRC_MIXER];
             break;
+        default:
+            vpt = &Model.voice.mixer[idx - VOICE_SRC_MIXER];
+            break;
     }
     if (dir == -1 && vpt->music == CUSTOM_ALARM_ID) // set to none below 1
         vpt->music = 0;
