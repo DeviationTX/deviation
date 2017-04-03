@@ -2,11 +2,11 @@
 env:
 #Do not define 'global' env vars here.  They cannot be used with API builds
     matrix:
-      - TARGET=zip_devo8
-      - TARGET=zip_devo10
-      - TARGET=zip_devo12
-      - TARGET=zip_devo7e
-      - TARGET=zip_devof12e
+      - MAKETARGET=zip_devo8
+      - MAKETARGET=zip_devo10
+      - MAKETARGET=zip_devo12
+      - MAKETARGET=zip_devo7e
+      - MAKETARGET=zip_devof12e
       - TARGET=at9
       - MAKETARGET=zip_win_emu_devo8
 #      - COMPILER=latest TARGET=devo8
