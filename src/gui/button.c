@@ -156,6 +156,7 @@ int GUI_TouchButton(struct guiObject *obj, int press_type)
             button->CallBack(objTOUCHED, button->cb_data);
             //The object may have been destroyed by now, the obj may be invalid
         }
+        objTOUCHED = NULL;
     }
     return 1;
 }
