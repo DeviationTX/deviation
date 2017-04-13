@@ -85,6 +85,10 @@ Riasztás
 Riaszt. int.
 :Alarm intvl
 Riaszt. int.
+:Alert interval
+Figyelm. int.
+:Alert intvl
+Figy. int.
 :All
 Mind
 :AllCell
@@ -105,6 +109,10 @@ Magasság
 Csill.: -20dB
 :Att.: 0dB
 Csill.: 0dB
+:Audio settings
+Audió beállítások
+:Audio volume
+Audió hangerő
 :Auto
 Auto
 :Average
@@ -165,6 +173,10 @@ Koll. limit
 Kollektív mix
 |devo10:COL Mix
 Koll. mix
+:CPPM
+CPPM
+:CRTP Mode
+CRTP mód
 :CYC
 CYC
 :Calibrate
@@ -299,6 +311,8 @@ Haladó
 Expó+DR
 :Extend
 Kiterj.
+:External voice\ncurrently not\navailable
+Külső hang\njelenleg nem\nelérhető
 :F.Log filter
 Napló szűrés
 :FMODE
@@ -623,8 +637,12 @@ JOBB_V
 JOBB_F
 :RPM
 Ford.
+:RPYT
+RPYT
 :RSSI
 RSSI
+:RSSIChan
+RSSI cs.
 :RTC Time
 Idő
 :RUD
@@ -805,6 +823,8 @@ TRIM_J+
 TRIM_J-
 :TRN
 TRN
+:Telem %d
+Telem. %d
 :TelemRPM
 TelemFord
 :TelemRSSI
@@ -841,6 +861,8 @@ Idő
 Idő formátum
 :Timer
 Időzítő
+:Timer %d
+Időzítő %d
 :Timer settings
 Időzítő beállítások
 :Timer%d
@@ -933,6 +955,8 @@ Videó enged.
 Videó beáll.
 :Virt
 Virt.
+:Voice config
+Hang konfiguráció
 :Volt
 Fesz.
 :Welcome
@@ -951,6 +975,8 @@ Nulla/Max
 Aktuális érték
 :add
 hozzáad
+:beep
+csipogás
 :cntdn-prop
 Gázf. időz.
 :countdown
@@ -959,6 +985,8 @@ Időzítő
 késleltetés
 |devo10:delay
 késlelt.
+:down
+le
 :from
 -ra, erről:
 :is not supported
@@ -981,9 +1009,13 @@ cserél
 Gázf. stop.
 :stopwatch
 Stopper
+:up
+fel
 :vTX MHz
 vTX MHz
 :value to add or set
 Beállítandó/hozzáadandó
 :value to set
 Beállítandó érték
+:voice
+hang
