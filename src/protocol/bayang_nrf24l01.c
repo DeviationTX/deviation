@@ -80,7 +80,7 @@ enum {
     CHANNEL9,                   // Headless
     CHANNEL10,                  // Return To Home
     CHANNEL11,                  // Calibrate
-	CHANNEL12,                  // Emg. stop
+    CHANNEL12,                  // Emg. stop
 };
 #define CHANNEL_INVERTED    CHANNEL5    // inverted flight on Floureon H101
 #define CHANNEL_FLIP        CHANNEL6
@@ -182,7 +182,7 @@ static void send_packet(u8 bind)
             | GET_FLAG(CHANNEL_VIDEO, 0x10)
             | GET_FLAG(CHANNEL_PICTURE, 0x20);
         packet[3] = GET_FLAG(CHANNEL_INVERTED, 0x80)
-			| GET_FLAG(CHANNEL_EMGSTOP, 0x04);
+		    | GET_FLAG(CHANNEL_EMGSTOP, 0x04);
         chanval.value = scale_channel(CHANNEL1, 0x3ff, 0);      // aileron
         packet[4] = chanval.bytes.msb + DYNTRIM(chanval.value);
         packet[5] = chanval.bytes.lsb;
