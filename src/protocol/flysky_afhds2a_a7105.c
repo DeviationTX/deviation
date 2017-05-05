@@ -268,7 +268,8 @@ static void build_packet(u8 type)
 
 // telemetry sensors ID
 enum{
-    SENSOR_VOLTAGE   = 0x00,
+    SENSOR_VOLTAGE      = 0x00,
+    SENSOR_RPM          = 0x02,
     SENSOR_RX_ERR_RATE  = 0xfe,
     SENSOR_RX_RSSI      = 0xfc,
     SENSOR_RX_NOISE     = 0xfb,
@@ -302,6 +303,12 @@ static void update_telemetry()
                 }
 #endif
                 break;
+#if HAS_EXTENDED_TELEMETRY
+            case SENSOR_RPM:
+                Telemetry.value[TELEM_FRSKY_RPM] = packet[index+3]<<8 | packet[index+2];
+                TELEMETRY_SetUpdated(TELEM_FRSKY_RPM);
+                break;
+#endif
             case SENSOR_RX_ERR_RATE:
                 Telemetry.value[TELEM_FRSKY_LQI] = 100 - packet[index+2];
                 TELEMETRY_SetUpdated(TELEM_FRSKY_LQI);
