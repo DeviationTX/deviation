@@ -291,7 +291,7 @@ static void update_telemetry()
                 // packet[index+2];
                 break;
             case SENSOR_RX_RSSI:
-                Telemetry.value[TELEM_FRSKY_RSSI] = -packet[index+2];
+                Telemetry.value[TELEM_FRSKY_RSSI] = packet[index+2];
                 TELEMETRY_SetUpdated(TELEM_FRSKY_RSSI);
                 break;
             case 0xff:
