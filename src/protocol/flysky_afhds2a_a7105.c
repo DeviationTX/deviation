@@ -268,7 +268,7 @@ static void build_packet(u8 type)
 
 // telemetry sensors ID
 enum{
-    SENSOR_RX_VOLTAGE   = 0x00,
+    SENSOR_VOLTAGE   = 0x00,
     SENSOR_RX_ERR_RATE  = 0xfe,
     SENSOR_RX_RSSI      = 0xfc,
     SENSOR_RX_NOISE     = 0xfb,
@@ -283,12 +283,28 @@ static void update_telemetry()
     for(u8 sensor=0; sensor<7; sensor++) {
         u8 index = 9+(4*sensor);
         switch(packet[index]) {
-            case SENSOR_RX_VOLTAGE:
-                Telemetry.value[TELEM_FRSKY_VOLT1] = packet[index+3]<<8 | packet[index+2];
-                TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT1);
+            case SENSOR_VOLTAGE:
+                if(packet[index+1] == 0) // Rx voltage
+                {
+                    Telemetry.value[TELEM_FRSKY_VOLT1] = packet[index+3]<<8 | packet[index+2];
+                    TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT1);
+                }
+                else if(packet[index+1] == 1) // external voltage sensor #1
+                {
+                    Telemetry.value[TELEM_FRSKY_VOLT2] = packet[index+3]<<8 | packet[index+2];
+                    TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT2);
+                }
+#if HAS_EXTENDED_TELEMETRY
+                else if(packet[index+1] == 2) // external voltage sensor #2
+                {
+                    Telemetry.value[TELEM_FRSKY_VOLT3] = packet[index+3]<<8 | packet[index+2];
+                    TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT3);
+                }
+#endif
                 break;
             case SENSOR_RX_ERR_RATE:
-                // packet[index+2];
+                Telemetry.value[TELEM_FRSKY_LQI] = 100 - packet[index+2];
+                TELEMETRY_SetUpdated(TELEM_FRSKY_LQI);
                 break;
             case SENSOR_RX_RSSI:
                 Telemetry.value[TELEM_FRSKY_RSSI] = packet[index+2];
