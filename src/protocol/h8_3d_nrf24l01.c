@@ -56,6 +56,23 @@
 #define PACKET_SIZE        20
 #define RF_NUM_CHANNELS    4
 #define ADDRESS_LENGTH     5
+#define H20H_BIND_RF       0x49
+
+static const char * const h8_3d_opts[] = {
+    _tr_noop("Format"), "H8 3D", "H20H", NULL,
+    NULL
+};
+
+enum {
+    PROTOOPTS_FORMAT = 0,
+    LAST_PROTO_OPT,
+};
+
+enum{
+    FORMAT_H8_3D,
+    FORMAT_H20H,
+};
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 // For code readability
 enum {
@@ -100,8 +117,8 @@ enum {
     // flags going to packet[18]
     FLAG_CAM_UP   = 0x04,
     FLAG_CAM_DOWN = 0x08,
-    FLAG_CALIBRATE2=0x10, // acc calib. (H11D, H20)
-    FLAG_CALIBRATE= 0x20, // acc calib. (H8 3D), headless calib (H20)
+    FLAG_CALIBRATE2=0x10, // acc calib. (H11D, H20, H20H)
+    FLAG_CALIBRATE= 0x20, // acc calib. (H8 3D), headless calib (H20, H20H)
     FLAG_SNAPSHOT = 0x40,
     FLAG_VIDEO    = 0x80,
 };
@@ -114,7 +131,16 @@ static u8 txid[4];
 static u8 rf_chan; 
 static u8 rf_channels[RF_NUM_CHANNELS]; 
 static const u8 rx_tx_addr[ADDRESS_LENGTH] = { 0xc4, 0x57, 0x09, 0x65, 0x21};
+static const u8 h20h_rx_tx_addr[ADDRESS_LENGTH] = {0xee, 0xdd, 0xcc, 0xbb, 0x11};
 
+// captured from H20H stock transmitters
+static const struct {
+    u8 txid[4];
+    u8 rfchan[2];
+}
+h20h_tx_rf_map[] = {{{0x83, 0x3c, 0x60, 0x00}, {0x47, 0x3e}},
+                    {{0x5c, 0x2b, 0x60, 0x00}, {0x4a, 0x3c}},
+                    {{0x57, 0x07, 0x00, 0x00}, {0x41, 0x48}}};
 
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
@@ -163,10 +189,27 @@ static s16 scale_channel(u8 ch)
     return (range * (chanval - CHAN_MIN_VALUE)) / CHAN_RANGE + destMin;
 }
 
+static s16 h20h_scale_channel(u8 ch)
+{
+    s32 chanval = Channels[ch];
+    s16 destMin=0x43, destMax=0xbb;   
+    s32 range = destMax - destMin;
+    if      (chanval < CHAN_MIN_VALUE) chanval = CHAN_MIN_VALUE;
+    else if (chanval > CHAN_MAX_VALUE) chanval = CHAN_MAX_VALUE;
+    return (range * (chanval - CHAN_MIN_VALUE)) / CHAN_RANGE + destMin;
+}
+
 #define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
 static void send_packet(u8 bind)
 {
-    packet[0] = 0x13;
+    switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
+            case FORMAT_H8_3D:
+                packet[0] = 0x13;
+                break;
+            case FORMAT_H20H:
+                packet[0] = 0x14;
+                break;
+    }
     packet[1] = txid[0];
     packet[2] = txid[1];
     packet[3] = txid[2];
@@ -179,37 +222,67 @@ static void send_packet(u8 bind)
         packet[7] = 0x01;
     } else {
         packet[5] = rf_chan;
-        packet[6] = 0x08;
         packet[7] = 0x03;
-        packet[9] = scale_channel( CHANNEL3); // throttle
-        packet[10] = scale_channel( CHANNEL4); // rudder
-        packet[11]= scale_channel( CHANNEL2); // elevator
-        packet[12]= scale_channel( CHANNEL1); // aileron
+        switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
+            case FORMAT_H8_3D:
+                packet[6] = 0x08;
+                packet[9] = scale_channel( CHANNEL3); // throttle
+                packet[10] = scale_channel( CHANNEL4); // rudder
+                packet[11]= scale_channel( CHANNEL2); // elevator
+                packet[12]= scale_channel( CHANNEL1); // aileron
+                packet[15] = 0x20; // trims
+                packet[16] = 0x20; // trims
+                break;
+            case FORMAT_H20H:
+                packet[6] = rf_chan == 0 ? 8 - counter : 16 - counter;
+                packet[9] = h20h_scale_channel(CHANNEL3); // throttle
+                packet[10] = h20h_scale_channel( CHANNEL4); // rudder
+                packet[11]= h20h_scale_channel( CHANNEL2); // elevator
+                packet[12]= h20h_scale_channel( CHANNEL1); // aileron
+                packet[15] = 0x40; // trims
+                packet[16] = 0x40; // trims
+                break;
+        }
         // neutral trims
         packet[13] = 0x20;
         packet[14] = 0x20;
-        packet[15] = 0x20;
-        packet[16] = 0x20;
+    
+        // flags
         packet[17] = FLAG_RATE_HIGH
-                   | GET_FLAG( CHANNEL_LED, FLAG_LED)
+                   | GET_FLAG( CHANNEL_LED, FLAG_LED) // emergency stop on H20H
                    | GET_FLAG( CHANNEL_FLIP, FLAG_FLIP)
                    | GET_FLAG( CHANNEL_HEADLESS, FLAG_HEADLESS)
                    | GET_FLAG( CHANNEL_RTH, FLAG_RTH); // 180/360 flip mode on H8 3D
         packet[18] = GET_FLAG( CHANNEL_SNAPSHOT, FLAG_SNAPSHOT)
                    | GET_FLAG( CHANNEL_VIDEO, FLAG_VIDEO);
-         // camera gimball
+        // camera gimball
         if(Channels[CHANNEL_GIMBALL] < CHAN_MIN_VALUE / 2)
             packet[18] |= FLAG_CAM_DOWN;
         else if(Channels[CHANNEL_GIMBALL] > CHAN_MAX_VALUE / 2)
             packet[18] |= FLAG_CAM_UP;
         
-        // both sticks bottom left: calibrate acc
-        if(packet[9] <= 0x05 && packet[10] >= 0xa7 && packet[11] <= 0x57 && packet[12] >= 0xa7)
-            packet[18] |= FLAG_CALIBRATE;
-        
-        // both sticks bottom right: calib2
-        if(packet[9] <= 0x05 && (packet[10] >= 0x27 && packet[10] <= 0x3c) && packet[11] <= 0x57 && packet[12] <= 0x57)
-            packet[18] |= FLAG_CALIBRATE2;
+        // calibration
+        switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
+            case FORMAT_H8_3D:
+                // both sticks bottom left: calibrate acc
+                if(packet[9] <= 0x05 && packet[10] >= 0xa7 && packet[11] <= 0x57 && packet[12] >= 0xa7)
+                    packet[18] |= FLAG_CALIBRATE;
+                
+                // both sticks bottom right: calib2
+                else if(packet[9] <= 0x05 && (packet[10] >= 0x27 && packet[10] <= 0x3c) && packet[11] <= 0x57 && packet[12] <= 0x57)
+                    packet[18] |= FLAG_CALIBRATE2;
+                break;
+            case FORMAT_H20H:
+                // calibrate acc
+                if(packet[9] < 0x46 && packet[10] < 0x46 && packet[11] < 0x46 && packet[12] < 0x46)
+                    packet[18] |= FLAG_CALIBRATE2;
+                
+                // calibrate (reset) headless
+                else if(packet[9] < 0x46 && packet[10] > 0xb8 && packet[11] < 0x46 && packet[12] > 0xb8)
+                    packet[18] |= FLAG_CALIBRATE;
+                
+                break;
+        }
     }
     packet[19] = checksum(); // data checksum
     
@@ -217,8 +290,37 @@ static void send_packet(u8 bind)
     // Why CRC0? xn297 does not interpret it - either 16-bit CRC or nothing
     XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
 
-    NRF24L01_WriteReg(NRF24L01_05_RF_CH, bind ? rf_channels[0] : rf_channels[rf_chan++]);
-        rf_chan %= sizeof(rf_channels);
+#ifdef EMULATOR
+    u8 i;
+#endif
+    
+    switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
+            case FORMAT_H8_3D:
+                NRF24L01_WriteReg(NRF24L01_05_RF_CH, bind ? rf_channels[0] : rf_channels[rf_chan++]);
+                rf_chan %= sizeof(rf_channels);
+                break;
+            case FORMAT_H20H:
+                NRF24L01_WriteReg(NRF24L01_05_RF_CH, bind ? H20H_BIND_RF : rf_channels[(u8)(counter/8)]);
+                
+#ifdef EMULATOR
+                dbgprintf("\n%02x | ", rf_channels[(u8)((counter)/8)]);
+                for(i=0; i<20; i++)
+                    dbgprintf("%02x ", packet[i]);
+                dbgprintf("\n");
+#endif
+                
+                if(!bind) {
+                    counter++;
+                    if(counter>15) {
+                        counter = 0;
+                        rf_chan = 0;
+                    }
+                    else if(counter > 7) {
+                        rf_chan = 1;
+                    }
+                }
+                break;
+    }
     
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
     NRF24L01_FlushTx();
@@ -241,8 +343,14 @@ static void h8_3d_init()
     NRF24L01_Initialize();
     NRF24L01_SetTxRxMode(TX_EN);
 
-    XN297_SetTXAddr(rx_tx_addr, ADDRESS_LENGTH);
-
+    switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
+        case FORMAT_H8_3D:
+            XN297_SetTXAddr(rx_tx_addr, ADDRESS_LENGTH);
+            break;
+        case FORMAT_H20H:
+            XN297_SetTXAddr(h20h_rx_tx_addr, ADDRESS_LENGTH);
+            break;
+    }
     NRF24L01_FlushTx();
     NRF24L01_FlushRx();
     NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);      // No Auto Acknowldgement on all data pipes
@@ -316,12 +424,13 @@ static u16 h8_3d_callback()
 static void initialize_txid()
 {
     u32 lfsr = 0xb2c54a2ful;
-
+    u8 i,j,ch;
+    
 #ifndef USE_FIXED_MFGID
     u8 var[12];
     MCU_SerialNumber(var, 12);
     dbgprintf("Manufacturer id: ");
-    for (int i = 0; i < 12; ++i) {
+    for (i = 0; i < 12; ++i) {
         dbgprintf("%02X", var[i]);
         rand32_r(&lfsr, var[i]);
     }
@@ -329,21 +438,29 @@ static void initialize_txid()
 #endif
 
     if (Model.fixed_id) {
-       for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
+       for (i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
            rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
     }
     // Pump zero bytes for LFSR to diverge more
-    for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
+    for (i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
 
-    // tx id
-    txid[0] = (lfsr >> 24) & 0xFF;
-    txid[1] = (lfsr >> 16) & 0xFF;
-    txid[2] = (lfsr >> 8) & 0xFF;
-    txid[3] = lfsr & 0xFF;
-    
-    // rf channels
-    for(u8 ch=0; ch<4; ch++)
-        rf_channels[ch] = 6 + (0x0f*ch) + (((txid[ch] >> 4) + (txid[ch] & 0x0f)) % 0x0f);
+    switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
+        case FORMAT_H8_3D:
+            // tx id
+            txid[0] = (lfsr >> 24) & 0xFF;
+            txid[1] = (lfsr >> 16) & 0xFF;
+            txid[2] = (lfsr >> 8) & 0xFF;
+            txid[3] = lfsr & 0xFF;
+            
+            // rf channels
+            for(ch=0; ch<4; ch++)
+                rf_channels[ch] = 6 + (0x0f*ch) + (((txid[ch] >> 4) + (txid[ch] & 0x0f)) % 0x0f);
+            break;
+        case FORMAT_H20H:
+            memcpy(txid, h20h_tx_rf_map[Model.fixed_id % (sizeof(h20h_tx_rf_map)/sizeof(h20h_tx_rf_map[0]))].txid, 4);
+            memcpy(rf_channels, h20h_tx_rf_map[Model.fixed_id % (sizeof(h20h_tx_rf_map)/sizeof(h20h_tx_rf_map[0]))].rfchan, 2);
+            break;
+    }
 }
 
 static void initialize()
@@ -373,7 +490,7 @@ const void *H8_3D_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_NUMCHAN: return (void *) 11L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)11L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
-        case PROTOCMD_GETOPTIONS: return 0;
+        case PROTOCMD_GETOPTIONS: return h8_3d_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
         default: break;
     }
