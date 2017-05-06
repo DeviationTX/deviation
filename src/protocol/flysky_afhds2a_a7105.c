@@ -313,7 +313,7 @@ static void update_telemetry()
                 break;
 #if HAS_EXTENDED_TELEMETRY
             case SENSOR_TEMPERATURE:
-                Telemetry.value[TELEM_FRSKY_TEMP1] = 400 + packet[index+3]<<8 | packet[index+2];
+                Telemetry.value[TELEM_FRSKY_TEMP1] = 400 + (packet[index+3]<<8 | packet[index+2]);
                 TELEMETRY_SetUpdated(TELEM_FRSKY_TEMP1);
                 break;
             case SENSOR_CELL_VOLTAGE:
