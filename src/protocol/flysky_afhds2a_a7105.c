@@ -269,7 +269,9 @@ static void build_packet(u8 type)
 // telemetry sensors ID
 enum{
     SENSOR_VOLTAGE      = 0x00,
+    SENSOR_TEMPERATURE  = 0x01,
     SENSOR_RPM          = 0x02,
+    SENSOR_CELL_VOLTAGE = 0x03,
     SENSOR_RX_ERR_RATE  = 0xfe,
     SENSOR_RX_RSSI      = 0xfc,
     SENSOR_RX_NOISE     = 0xfb,
@@ -282,7 +284,10 @@ static void update_telemetry()
     // max 7 sensors per packet
     
     u8 voltage_index = 0;
-    
+#if HAS_EXTENDED_TELEMETRY
+    u8 cell_index = 0;
+#endif
+
     for(u8 sensor=0; sensor<7; sensor++) {
         u8 index = 9+(4*sensor);
         switch(packet[index]) {
@@ -307,6 +312,17 @@ static void update_telemetry()
 #endif
                 break;
 #if HAS_EXTENDED_TELEMETRY
+            case SENSOR_TEMPERATURE:
+                Telemetry.value[TELEM_FRSKY_TEMP1] = 400 + packet[index+3]<<8 | packet[index+2];
+                TELEMETRY_SetUpdated(TELEM_FRSKY_TEMP1);
+                break;
+            case SENSOR_CELL_VOLTAGE:
+                if(cell_index < 6) {
+                    Telemetry.value[TELEM_FRSKY_CELL1 + cell_index] = packet[index+3]<<8 | packet[index+2];
+                    TELEMETRY_SetUpdated(TELEM_FRSKY_CELL1 + cell_index);
+                }
+                cell_index++;
+                break;
             case SENSOR_RPM:
                 Telemetry.value[TELEM_FRSKY_RPM] = packet[index+3]<<8 | packet[index+2];
                 TELEMETRY_SetUpdated(TELEM_FRSKY_RPM);
