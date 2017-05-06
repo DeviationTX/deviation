@@ -46,6 +46,7 @@
 #else
 #define BIND_COUNT       1000
 #define PACKET_PERIOD    1800 // Timeout for callback in uSec
+#define H20H_PACKET_PERIOD 9340
 //printf inside an interrupt handler is really dangerous
 //this shouldn't be enabled even in debug builds without explicitly
 //turning it on
@@ -125,6 +126,7 @@ enum {
 
 static u16 counter;
 static u8 phase;
+static u16 packet_period;
 static u8 packet[PACKET_SIZE];
 static u8 tx_power;
 static u8 txid[4];
@@ -418,7 +420,7 @@ static u16 h8_3d_callback()
         send_packet(0);
         break;
     }
-    return PACKET_PERIOD;
+    return packet_period;
 }
 
 static void initialize_txid()
@@ -472,7 +474,14 @@ static void initialize()
     initialize_txid();
     h8_3d_init();
     phase = H8_3D_INIT1;
-
+    switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
+        case FORMAT_H8_3D:
+            packet_period = PACKET_PERIOD;
+            break;
+        case FORMAT_H20H:
+            packet_period = H20H_PACKET_PERIOD;
+            break;
+    }
     PROTOCOL_SetBindState(BIND_COUNT * PACKET_PERIOD / 1000);
     CLOCK_StartTimer(INITIAL_WAIT, h8_3d_callback);
 }
