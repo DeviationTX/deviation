@@ -41,18 +41,17 @@
 #ifdef EMULATOR
 #define USE_FIXED_MFGID
 #define BIND_COUNT 10
-#define PACKET_PERIOD    450
 #define dbgprintf printf
 #else
 #define BIND_COUNT       1000
-#define PACKET_PERIOD    1800 // Timeout for callback in uSec
-#define H20H_PACKET_PERIOD 9340
 //printf inside an interrupt handler is really dangerous
 //this shouldn't be enabled even in debug builds without explicitly
 //turning it on
 #define dbgprintf if(0) printf
 #endif
 
+#define PACKET_PERIOD    1800 // Timeout for callback in uSec
+#define H20H_PACKET_PERIOD 9340
 #define INITIAL_WAIT       500
 #define PACKET_SIZE        20
 #define RF_NUM_CHANNELS    4
