@@ -338,10 +338,8 @@ static void update_telemetry()
                 Telemetry.value[TELEM_FRSKY_RSSI] = packet[index+2];
                 TELEMETRY_SetUpdated(TELEM_FRSKY_RSSI);
                 break;
-            case 0xff:
-                return;
             default:
-                // unknown sensor ID
+                // unknown sensor ID or end of list
                 break;
             }
     }
