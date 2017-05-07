@@ -80,7 +80,7 @@ enum {
     CHANNEL2,     // Elevator
     CHANNEL3,     // Throttle
     CHANNEL4,     // Rudder
-    CHANNEL5,     // LED Light
+    CHANNEL5,     // LED Light / motors on/off (H20H)
     CHANNEL6,     // Flip
     CHANNEL7,     // Picture snapshot
     CHANNEL8,     // Video recording
@@ -108,7 +108,7 @@ enum {
     FLAG_FLIP     = 0x01,
     FLAG_RATE_MID = 0x02,
     FLAG_RATE_HIGH= 0x04,
-    FLAG_LED      = 0x08,
+    FLAG_LED      = 0x08, // motors on/off (H20H)
     FLAG_HEADLESS = 0x10, // RTH + headless on H8, headless on JJRC H20
     FLAG_RTH      = 0x20, // 360° flip mode on H8 3D, RTH on JJRC H20
 };
@@ -290,10 +290,6 @@ static void send_packet(u8 bind)
     // Power on, TX mode, 2byte CRC
     // Why CRC0? xn297 does not interpret it - either 16-bit CRC or nothing
     XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
-
-#ifdef EMULATOR
-    u8 i;
-#endif
     
     switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
             case FORMAT_H8_3D:
@@ -301,15 +297,7 @@ static void send_packet(u8 bind)
                 rf_chan %= sizeof(rf_channels);
                 break;
             case FORMAT_H20H:
-                NRF24L01_WriteReg(NRF24L01_05_RF_CH, bind ? H20H_BIND_RF : rf_channels[(u8)(counter/8)]);
-                
-#ifdef EMULATOR
-                dbgprintf("\n%02x | ", rf_channels[(u8)((counter)/8)]);
-                for(i=0; i<20; i++)
-                    dbgprintf("%02x ", packet[i]);
-                dbgprintf("\n");
-#endif
-                
+                NRF24L01_WriteReg(NRF24L01_05_RF_CH, bind ? H20H_BIND_RF : rf_channels[(u8)(counter/8)]);  
                 if(!bind) {
                     counter++;
                     if(counter>15) {
