@@ -286,6 +286,7 @@ static void update_telemetry()
     u8 voltage_index = 0;
 #if HAS_EXTENDED_TELEMETRY
     u8 cell_index = 0;
+    u16 cell_total = 0;
 #endif
 
     for(u8 sensor=0; sensor<7; sensor++) {
@@ -320,6 +321,7 @@ static void update_telemetry()
                 if(cell_index < 6) {
                     Telemetry.value[TELEM_FRSKY_CELL1 + cell_index] = packet[index+3]<<8 | packet[index+2];
                     TELEMETRY_SetUpdated(TELEM_FRSKY_CELL1 + cell_index);
+                    cell_total += packet[index+3]<<8 | packet[index+2];
                 }
                 cell_index++;
                 break;
@@ -343,6 +345,12 @@ static void update_telemetry()
                 break;
             }
     }
+#if HAS_EXTENDED_TELEMETRY
+    if(cell_index > 0) {
+        Telemetry.value[TELEM_FRSKY_ALL_CELL] = cell_total;
+        TELEMETRY_SetUpdated(TELEM_FRSKY_ALL_CELL);
+    }
+#endif 
 }
 
 static void build_bind_packet()
