@@ -577,6 +577,7 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
         //*mp->limit = mp->tmplimit;
         MIXER_SetTemplate(mp->channel, mp->cur_template);
         MIXER_SetMixers(mp->mixer, mp->num_mixers);
+        MUSIC_Play(MUSIC_SAVING);
     }
     PAGE_Pop();
 }
