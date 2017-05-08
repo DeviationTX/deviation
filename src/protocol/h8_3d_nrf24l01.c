@@ -52,6 +52,7 @@
 
 #define PACKET_PERIOD    1800 // Timeout for callback in uSec
 #define H20H_PACKET_PERIOD 9340
+#define H20MINI_PACKET_PERIOD 3100
 #define INITIAL_WAIT       500
 #define PACKET_SIZE        20
 #define RF_NUM_CHANNELS    4
@@ -59,7 +60,7 @@
 #define H20H_BIND_RF       0x49
 
 static const char * const h8_3d_opts[] = {
-    _tr_noop("Format"), "H8 3D", "H20H", NULL,
+    _tr_noop("Format"), "H8 3D", "H20H", "H20 Mini", NULL,
     NULL
 };
 
@@ -71,6 +72,7 @@ enum {
 enum{
     FORMAT_H8_3D,
     FORMAT_H20H,
+    FORMAT_H20MINI,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
@@ -142,6 +144,14 @@ static const struct {
 h20h_tx_rf_map[] = {{{0x83, 0x3c, 0x60, 0x00}, {0x47, 0x3e}},
                     {{0x5c, 0x2b, 0x60, 0x00}, {0x4a, 0x3c}},
                     {{0x57, 0x07, 0x00, 0x00}, {0x41, 0x48}}};
+                    
+// captured from H20 Mini / H30 Mini stock transmitters
+static const struct {
+    u8 txid[4];
+    u8 rfchan[4];
+}
+h20mini_tx_rf_map[] = {{{0xb4, 0xbb, 0x09, 0x00}, {0x3e, 0x45, 0x47, 0x4a}},
+                       {{0x94, 0x9d, 0x0b, 0x00}, {0x3e, 0x43, 0x49, 0x4a}}};
 
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
@@ -205,6 +215,7 @@ static void send_packet(u8 bind)
 {
     switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
             case FORMAT_H8_3D:
+            case FORMAT_H20MINI:
                 packet[0] = 0x13;
                 break;
             case FORMAT_H20H:
@@ -226,6 +237,7 @@ static void send_packet(u8 bind)
         packet[7] = 0x03;
         switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
             case FORMAT_H8_3D:
+            case FORMAT_H20MINI:
                 packet[6] = 0x08;
                 packet[9] = scale_channel( CHANNEL3); // throttle
                 packet[10] = scale_channel( CHANNEL4); // rudder
@@ -265,6 +277,7 @@ static void send_packet(u8 bind)
         // calibration
         switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
             case FORMAT_H8_3D:
+            case FORMAT_H20MINI:
                 // both sticks bottom left: calibrate acc
                 if(packet[9] <= 0x05 && packet[10] >= 0xa7 && packet[11] <= 0x57 && packet[12] >= 0xa7)
                     packet[18] |= FLAG_CALIBRATE;
@@ -293,6 +306,7 @@ static void send_packet(u8 bind)
     
     switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
             case FORMAT_H8_3D:
+            case FORMAT_H20MINI:
                 NRF24L01_WriteReg(NRF24L01_05_RF_CH, bind ? rf_channels[0] : rf_channels[rf_chan++]);
                 rf_chan %= sizeof(rf_channels);
                 break;
@@ -334,6 +348,7 @@ static void h8_3d_init()
 
     switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
         case FORMAT_H8_3D:
+        case FORMAT_H20MINI:
             XN297_SetTXAddr(rx_tx_addr, ADDRESS_LENGTH);
             break;
         case FORMAT_H20H:
@@ -449,6 +464,10 @@ static void initialize_txid()
             memcpy(txid, h20h_tx_rf_map[Model.fixed_id % (sizeof(h20h_tx_rf_map)/sizeof(h20h_tx_rf_map[0]))].txid, 4);
             memcpy(rf_channels, h20h_tx_rf_map[Model.fixed_id % (sizeof(h20h_tx_rf_map)/sizeof(h20h_tx_rf_map[0]))].rfchan, 2);
             break;
+        case FORMAT_H20MINI:
+            memcpy(txid, h20mini_tx_rf_map[Model.fixed_id % (sizeof(h20mini_tx_rf_map)/sizeof(h20mini_tx_rf_map[0]))].txid, 4);
+            memcpy(rf_channels, h20mini_tx_rf_map[Model.fixed_id % (sizeof(h20mini_tx_rf_map)/sizeof(h20mini_tx_rf_map[0]))].rfchan, 4);
+            break;
     }
 }
 
@@ -467,6 +486,9 @@ static void initialize()
             break;
         case FORMAT_H20H:
             packet_period = H20H_PACKET_PERIOD;
+            break;
+        case FORMAT_H20MINI:
+            packet_period = H20MINI_PACKET_PERIOD;
             break;
     }
     PROTOCOL_SetBindState(BIND_COUNT * PACKET_PERIOD / 1000);
