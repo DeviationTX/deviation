@@ -200,10 +200,13 @@ static s16 scale_channel(u8 ch)
     return (range * (chanval - CHAN_MIN_VALUE)) / CHAN_RANGE + destMin;
 }
 
+#define H20H_STEP CHAN_MAX_VALUE / 60
 static s16 h20h_scale_channel(u8 ch)
 {
     s32 chanval = Channels[ch];
-    s16 destMin=0x43, destMax=0xbb;   
+    const s16 destMin=0x43, destMax=0xbb;   
+    if(ch == CHANNEL4 && chanval > -H20H_STEP && chanval < H20H_STEP)
+        return 0x7f;
     s32 range = destMax - destMin;
     if      (chanval < CHAN_MIN_VALUE) chanval = CHAN_MIN_VALUE;
     else if (chanval > CHAN_MAX_VALUE) chanval = CHAN_MAX_VALUE;
