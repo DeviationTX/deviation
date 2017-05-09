@@ -51,6 +51,7 @@ static inline void LCD_ForceUpdate() {}
 #define HAS_AUDIO_UART5     0
 #define HAS_MUSIC_CONFIG    0
 #define HAS_HARD_POWER_OFF  1
+#define HAS_ROTARY_ENCODER  1
 
 #ifdef BUILDTYPE_DEV
    #define DEBUG_WINDOW_SIZE 200

@@ -11,6 +11,7 @@ FILESYSTEMS := common base_fonts 320x240x1
 SCREENSIZE  := 320x240x16
 FONTS        = filesystem/$(FILESYSTEM)/media/23bold.fon
 endif
+
 DFU_ARGS    := -D 0x0483:0xdf12 -b 0x08003000
 
 ifndef BUILD_TARGET
@@ -21,7 +22,12 @@ EXTRA_DFUS = $(TARGET)-fs.dfu
 endif
 
 ALL = $(LIBOPENCM3) $(TARGET).dfu $(EXTRA_DFUS)
+
+ifeq "$(HAS_4IN1_FLASH)" "1"
+NUM_MODELS ?= 30
+else
 NUM_MODELS ?= 10
+endif
 
 LINKFILE = $(SDIR)/target/$(TARGET)/$(TARGET).ld
 LIBOPENCM3 = $(SDIR)/libopencm3/lib/libopencm3_stm32f1.a
