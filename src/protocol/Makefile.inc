@@ -43,6 +43,7 @@ PROTO_MODULES += $(ODIR)/protocol/fq777.mod
 PROTO_MODULES += $(ODIR)/protocol/inav.mod
 PROTO_MODULES += $(ODIR)/protocol/q303.mod
 PROTO_MODULES += $(ODIR)/protocol/gw008.mod
+PROTO_MODULES += $(ODIR)/protocol/dm002.mod
 
 ALL += $(PROTO_MODULES)
 else #BUILD_TARGET
@@ -216,6 +217,10 @@ $(ODIR)/protocol/q303.mod : $(ODIR)/q303_nrf24l01.bin
 
 $(ODIR)/protocol/gw008.mod : $(ODIR)/gw008_nrf24l01.bin
 	@echo Building 'gw008' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
+
+$(ODIR)/protocol/dm002.mod : $(ODIR)/dm002_nrf24l01.bin
+	@echo Building 'dm002' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
     
 endif #BUILD_TARGET
