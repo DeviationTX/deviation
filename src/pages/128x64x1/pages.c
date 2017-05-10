@@ -163,3 +163,7 @@ void PAGE_SaveMixerSetup(struct mixer_page * const mp)
     BUTTON_InterruptLongPress();
 }
 
+int PAGE_ModelDoneEditing()
+{
+    return cur_page <= PAGEID_MODELMNU;
+}

@@ -19,7 +19,13 @@
 
 #include "common.h"
 
+// To use interpretation of rapid rotary movement as long press
+// this timeout should be less than long press timeout, 100ms
+#define ROTARY_TIMEOUT 50
+
 static volatile int rotary = 0;
+static u32 last_rotary_clock = 0;
+
 void Initialize_ButtonMatrix()
 {
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPAEN);
@@ -53,7 +59,8 @@ void Initialize_ButtonMatrix()
 /* returns change in encoder state (-1,0,1) */
 int handle_rotary_encoder(unsigned val)
 {
-  static const s8 enc_states[] = {0,-1,1,0,1,0,0,-1,-1,0,0,1,0,1,-1,0};
+//  static const s8 enc_states[] = {0,-1,1,0,1,0,0,-1,-1,0,0,1,0,1,-1,0};
+  static const s8 enc_states[] = {0,0,0,0,0,0,0,-1,0,0,0,1,0,0,0,0};
   static unsigned old_AB = 0;
   /**/
   old_AB <<= 2;                   //remember previous state
@@ -73,6 +80,7 @@ void exti15_10_isr()
         rotary = dir;
     }
 }
+
 u32 ScanButtons()
 {
     int last_rotary;
@@ -86,13 +94,20 @@ u32 ScanButtons()
     result |= ! gpio_get(GPIOB, GPIO4)  ? CHAN_ButtonMask(BUT_TRIM_RH_NEG) : 0;
     result |= ! gpio_get(GPIOB, GPIO3)  ? CHAN_ButtonMask(BUT_TRIM_RH_POS) : 0;
 
-    result |= ! gpio_get(GPIOA, GPIO14) ? CHAN_ButtonMask(BUT_DOWN) : 0; // MODE
+    result |= ! gpio_get(GPIOA, GPIO14) ? CHAN_ButtonMask(BUT_RIGHT) : 0; // MODE
     result |= ! gpio_get(GPIOC, GPIO15) ? CHAN_ButtonMask(BUT_ENTER) : 0;
     result |= ! gpio_get(GPIOA, GPIO15) ? CHAN_ButtonMask(BUT_EXIT) : 0;
 
     last_rotary = rotary;
     if (last_rotary) {
-        result |= last_rotary > 0 ? CHAN_ButtonMask(BUT_DOWN) : CHAN_ButtonMask(BUT_UP); 
+        u32 rotary_clock = CLOCK_getms();
+        // To prevent rotary to generate button clicks too frequently we register
+        // an event in 'result' not more often than every ROTARY_TIMEOUT msec
+        if (rotary_clock > last_rotary_clock) {
+            result |= last_rotary > 0 ? CHAN_ButtonMask(BUT_DOWN) : CHAN_ButtonMask(BUT_UP);
+            last_rotary_clock = rotary_clock + ROTARY_TIMEOUT;
+        }
+        rotary = 0;
     }
     return result;
 }

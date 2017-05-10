@@ -126,12 +126,14 @@ static int get_channel_idx(int chan)
 static int num_disp_bars() {
     int j = 0;
     if (cp->type == MONITOR_MIXEROUTPUT) {
+        //printf("MONITOR_MIXEROUTPUT ");
         for (int i = 0; i < NUM_CHANNELS; i++) {
             if (Model.templates[i] != MIXERTEMPLATE_NONE) {
                 j++;
             }
         }
     } else {
+        //printf(cp->type == MONITOR_RAWINPUT ? "MONITOR_RAWINPUT " : "MONITOR_BUTTONTEST ");
         for (int i = 0; i < NUM_INPUTS; i++) {
             if (!(Transmitter.ignore_src & (1 << (i+1)))) {
                 j++;
@@ -141,5 +143,6 @@ static int num_disp_bars() {
             j += Model.num_ppmin & 0x3f;
         }
     }
+    //printf("%d\n", j);
     return j;
 }
