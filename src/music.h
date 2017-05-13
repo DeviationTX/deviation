@@ -87,11 +87,11 @@ enum {
 struct ButtonVoice {
     u16 on;             // Music to be played when button is On
     u16 off;
-    u8 music;            // Music to be played when button is Off
+    u16 music;            // Music to be played when button is Off
 };
 
 struct CustomVoice {
-    u8 music;
+    u16 music;
 };
 
 struct  Voice {
@@ -105,7 +105,7 @@ struct  Voice {
 #endif
 };
 
-u8 voice_map_entries;
+u16 voice_map_entries;
 
 struct VoiceMap {
     u16 id;
