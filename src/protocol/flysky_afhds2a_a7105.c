@@ -208,8 +208,8 @@ static void build_sticks_packet()
     // override channel with telemetry LQI
     if(Model.proto_opts[PROTOOPTS_LQI_OUT] > 0) {
         u16 val = 1000 + (Telemetry.value[TELEM_FRSKY_LQI] * 10);
-        packet[17+(Model.proto_opts[PROTOOPTS_LQI_OUT-1]*2)] = val & 0xff;
-        packet[18+(Model.proto_opts[PROTOOPTS_LQI_OUT-1]*2)] = (val >> 8) & 0xff;
+        packet[17+((Model.proto_opts[PROTOOPTS_LQI_OUT]-1)*2)] = val & 0xff;
+        packet[18+((Model.proto_opts[PROTOOPTS_LQI_OUT]-1)*2)] = (val >> 8) & 0xff;
     }
     packet[37] = 0x00;
 }
