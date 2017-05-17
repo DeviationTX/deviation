@@ -149,37 +149,38 @@ static u8 rx_tx_addr[TX_ADDR_SIZE];
 static u8 phase;
 enum {
     CFLIE_INIT_SEARCH = 0,
-    CFLIE_INIT_TELEMETRY,
+    CFLIE_INIT_CRTP_LOG,
     CFLIE_INIT_DATA,
     CFLIE_SEARCH,
     CFLIE_DATA
 };
 
-static u8 telemetry_setup_state;
+static u8 crtp_log_setup_state;
 enum {
-    CFLIE_TELEM_SETUP_STATE_INIT = 0,
-    CFLIE_TELEM_SETUP_STATE_SEND_CMD_GET_INFO,
-    CFLIE_TELEM_SETUP_STATE_ACK_CMD_GET_INFO,
-    CFLIE_TELEM_SETUP_STATE_SEND_CMD_GET_ITEM,
-    CFLIE_TELEM_SETUP_STATE_ACK_CMD_GET_ITEM,
+    CFLIE_CRTP_LOG_SETUP_STATE_INIT = 0,
+    CFLIE_CRTP_LOG_SETUP_STATE_SEND_CMD_GET_INFO,
+    CFLIE_CRTP_LOG_SETUP_STATE_ACK_CMD_GET_INFO,
+    CFLIE_CRTP_LOG_SETUP_STATE_SEND_CMD_GET_ITEM,
+    CFLIE_CRTP_LOG_SETUP_STATE_ACK_CMD_GET_ITEM,
     // It might be a good idea to add a state here
     // to send the command to reset the logging engine
     // to avoid log block ID conflicts. However, there
     // is not a conflict with the current defaults in
     // cfclient and I'd rather be able to log from the Tx
     // and cfclient simultaneously
-    CFLIE_TELEM_SETUP_STATE_SEND_CONTROL_CREATE_BLOCK,
-    CFLIE_TELEM_SETUP_STATE_ACK_CONTROL_CREATE_BLOCK,
-    CFLIE_TELEM_SETUP_STATE_SEND_CONTROL_START_BLOCK,
-    CFLIE_TELEM_SETUP_STATE_ACK_CONTROL_START_BLOCK,
-    CFLIE_TELEM_SETUP_STATE_COMPLETE,
+    CFLIE_CRTP_LOG_SETUP_STATE_SEND_CONTROL_CREATE_BLOCK,
+    CFLIE_CRTP_LOG_SETUP_STATE_ACK_CONTROL_CREATE_BLOCK,
+    CFLIE_CRTP_LOG_SETUP_STATE_SEND_CONTROL_START_BLOCK,
+    CFLIE_CRTP_LOG_SETUP_STATE_ACK_CONTROL_START_BLOCK,
+    CFLIE_CRTP_LOG_SETUP_STATE_COMPLETE,
 };
 
-// State variables for the telemetry_setup_state_machine
+// State variables for the crtp_log_setup_state_machine
 static u8 toc_size;             // Size of the TOC read from the crazyflie
 static u8 next_toc_variable;    // State variable keeping track of the next var to read
 static u8 vbat_var_id;          // ID of the vbatMV variable
 static u8 extvbat_var_id;       // ID of the extVbatMV variable
+static u8 rssi_var_id;          // ID of the RSSI variable
 
 // Constants used for finding var IDs from the toc
 static const char* pm_group_name = "pm";
@@ -187,9 +188,17 @@ static const char* vbat_var_name = "vbatMV";
 static const u8 vbat_var_type = LOG_UINT16;
 static const char* extvbat_var_name = "extVbatMV";
 static const u8 extvbat_var_type = LOG_UINT16;
+static const char* radio_group_name = "radio";
+static const char* rssi_var_name = "rssi";
+static const u8 rssi_var_type = LOG_UINT8;
+
+// Repurposing DSM Telemetry fields
+#define TELEM_CFLIE_INTERNAL_VBAT   TELEM_DSM_FLOG_VOLT2    // Onboard voltage
+#define TELEM_CFLIE_EXTERNAL_VBAT   TELEM_DSM_FLOG_VOLT1    // Voltage from external pin (BigQuad)
+#define TELEM_CFLIE_RSSI            TELEM_DSM_FLOG_FADESA   // Repurpose FADESA for RSSI
 
 static const char * const cflie_opts[] = {
-  _tr_noop("Telemetry"),  _tr_noop("Off"), _tr_noop("On"), NULL,
+  _tr_noop("Telemetry"),  _tr_noop("Off"), _tr_noop("ACKPKT"), _tr_noop("CRTPLOG"), NULL,
   _tr_noop("CRTP Mode"), _tr_noop("RPYT"), _tr_noop("CPPM"), NULL,
   NULL
 };
@@ -201,7 +210,8 @@ enum {
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 #define TELEM_OFF 0
-#define TELEM_ON 1
+#define TELEM_ON_ACKPKT 1
+#define TELEM_ON_CRTPLOG 2
 
 #define CRTP_MODE_RPYT 0
 #define CRTP_MODE_CPPM 1
@@ -313,7 +323,7 @@ static void frac2float(s32 n, float* res)
     }
     u32 m = n < 0 ? -n : n;
     int i;
-    for (i = (31-FRAC_MANTISSA); (m & 0x80000000) == 0; i--, m <<= 1) ;
+    for (i = (31-FRAC_MANTISSA); (m & 0x80000000) == 0; i--, m <<= 1);
     m <<= 1; // Clear implicit leftmost 1
     m >>= 9;
     u32 e = 127 + i;
@@ -458,9 +468,9 @@ static void send_cmd_packet()
     }
 }
 
-// State machine for setting up telemetry
+// State machine for setting up CRTP logging
 // returns 1 when the state machine has completed, 0 otherwise
-static u8 telemetry_setup_state_machine()
+static u8 crtp_log_setup_state_machine()
 {
     u8 state_machine_completed = 0;
     // A note on the design of this state machine:
@@ -480,23 +490,23 @@ static u8 telemetry_setup_state_machine()
     // desired ACK has still not been received, it was likely dropped and the
     // request should be re-transmit.
 
-    switch (telemetry_setup_state) {
-    case CFLIE_TELEM_SETUP_STATE_INIT:
+    switch (crtp_log_setup_state) {
+    case CFLIE_CRTP_LOG_SETUP_STATE_INIT:
         toc_size = 0;
         next_toc_variable = 0;
         vbat_var_id = 0;
         extvbat_var_id = 0;
-        telemetry_setup_state = CFLIE_TELEM_SETUP_STATE_SEND_CMD_GET_INFO;
+        crtp_log_setup_state = CFLIE_CRTP_LOG_SETUP_STATE_SEND_CMD_GET_INFO;
         // fallthrough
-    case CFLIE_TELEM_SETUP_STATE_SEND_CMD_GET_INFO:
-        telemetry_setup_state = CFLIE_TELEM_SETUP_STATE_ACK_CMD_GET_INFO;
+    case CFLIE_CRTP_LOG_SETUP_STATE_SEND_CMD_GET_INFO:
+        crtp_log_setup_state = CFLIE_CRTP_LOG_SETUP_STATE_ACK_CMD_GET_INFO;
         tx_packet[0] = crtp_create_header(CRTP_PORT_LOG, CRTP_LOG_CHAN_TOC);
         tx_packet[1] = CRTP_LOG_TOC_CMD_INFO;
         tx_payload_len = 2;
         send_packet();
         break;
 
-    case CFLIE_TELEM_SETUP_STATE_ACK_CMD_GET_INFO:
+    case CFLIE_CRTP_LOG_SETUP_STATE_ACK_CMD_GET_INFO:
         if (packet_ack() == PKT_ACKED) {
             if (rx_payload_len >= 3
                     && rx_packet[0] == crtp_create_header(CRTP_PORT_LOG, CRTP_LOG_CHAN_TOC)
@@ -504,15 +514,15 @@ static u8 telemetry_setup_state_machine()
                 // Received the ACK payload. Save the toc_size
                 // and advance to the next state
                 toc_size = rx_packet[2];
-                telemetry_setup_state =
-                        CFLIE_TELEM_SETUP_STATE_SEND_CMD_GET_ITEM;
+                crtp_log_setup_state =
+                        CFLIE_CRTP_LOG_SETUP_STATE_SEND_CMD_GET_ITEM;
                 return state_machine_completed;
             } else if (rx_packet[0] == 0xF3 || rx_packet[0] == 0xF7) {
                 // "empty" ACK packet received - likely missed the ACK
                 // payload we are waiting for.
                 // return to the send state and retransmit the request
-                telemetry_setup_state =
-                        CFLIE_TELEM_SETUP_STATE_SEND_CMD_GET_INFO;
+                crtp_log_setup_state =
+                        CFLIE_CRTP_LOG_SETUP_STATE_SEND_CMD_GET_INFO;
                 return state_machine_completed;
             }
         }
@@ -521,8 +531,8 @@ static u8 telemetry_setup_state_machine()
         send_cmd_packet();
         break;
 
-    case CFLIE_TELEM_SETUP_STATE_SEND_CMD_GET_ITEM:
-        telemetry_setup_state = CFLIE_TELEM_SETUP_STATE_ACK_CMD_GET_ITEM;
+    case CFLIE_CRTP_LOG_SETUP_STATE_SEND_CMD_GET_ITEM:
+        crtp_log_setup_state = CFLIE_CRTP_LOG_SETUP_STATE_ACK_CMD_GET_ITEM;
         tx_packet[0] = crtp_create_header(CRTP_PORT_LOG, CRTP_LOG_CHAN_TOC);
         tx_packet[1] = CRTP_LOG_TOC_CMD_ELEMENT;
         tx_packet[2] = next_toc_variable;
@@ -530,7 +540,7 @@ static u8 telemetry_setup_state_machine()
         send_packet();
         break;
 
-    case CFLIE_TELEM_SETUP_STATE_ACK_CMD_GET_ITEM:
+    case CFLIE_CRTP_LOG_SETUP_STATE_ACK_CMD_GET_ITEM:
         if (packet_ack() == PKT_ACKED) {
             if (rx_payload_len >= 3
                     && rx_packet[0] == crtp_create_header(CRTP_PORT_LOG, CRTP_LOG_CHAN_TOC)
@@ -545,6 +555,7 @@ static u8 telemetry_setup_state_machine()
                 // Currently enabled for logging:
                 //  - vbatMV (LOG_UINT16)
                 //  - extVbatMV (LOG_UINT16)
+                //  - rssi (LOG_UINT8)
                 if(rx_packet[3] == vbat_var_type
                         && (0 == strcmp((char*)&rx_packet[4], pm_group_name))
                         && (0 == strcmp((char*)&rx_packet[4 + strlen(pm_group_name) + 1], vbat_var_name))) {
@@ -559,23 +570,30 @@ static u8 telemetry_setup_state_machine()
                     extvbat_var_id = next_toc_variable;
                 }
 
+                if(rx_packet[3] == rssi_var_type
+                        && (0 == strcmp((char*)&rx_packet[4], radio_group_name))
+                        && (0 == strcmp((char*)&rx_packet[4 + strlen(radio_group_name) + 1], rssi_var_name))) {
+                    // Found the rssi element - save it for later
+                    rssi_var_id = next_toc_variable;
+                }
+
                 // Advance the toc variable counter
                 // If there are more variables, read them
                 // If not, move on to the next state
                 next_toc_variable += 1;
                 if(next_toc_variable >= toc_size) {
-                    telemetry_setup_state = CFLIE_TELEM_SETUP_STATE_SEND_CONTROL_CREATE_BLOCK;
+                    crtp_log_setup_state = CFLIE_CRTP_LOG_SETUP_STATE_SEND_CONTROL_CREATE_BLOCK;
                 } else {
                     // There are more TOC elements to get
-                    telemetry_setup_state = CFLIE_TELEM_SETUP_STATE_SEND_CMD_GET_ITEM;
+                    crtp_log_setup_state = CFLIE_CRTP_LOG_SETUP_STATE_SEND_CMD_GET_ITEM;
                 }
                 return state_machine_completed;
             } else if (rx_packet[0] == 0xF3 || rx_packet[0] == 0xF7) {
                 // "empty" ACK packet received - likely missed the ACK
                 // payload we are waiting for.
                 // return to the send state and retransmit the request
-                telemetry_setup_state =
-                        CFLIE_TELEM_SETUP_STATE_SEND_CMD_GET_INFO;
+                crtp_log_setup_state =
+                        CFLIE_CRTP_LOG_SETUP_STATE_SEND_CMD_GET_INFO;
                 return state_machine_completed;
             }
         }
@@ -584,8 +602,8 @@ static u8 telemetry_setup_state_machine()
         send_cmd_packet();
         break;
 
-    case CFLIE_TELEM_SETUP_STATE_SEND_CONTROL_CREATE_BLOCK:
-        telemetry_setup_state = CFLIE_TELEM_SETUP_STATE_ACK_CONTROL_CREATE_BLOCK;
+    case CFLIE_CRTP_LOG_SETUP_STATE_SEND_CONTROL_CREATE_BLOCK:
+        crtp_log_setup_state = CFLIE_CRTP_LOG_SETUP_STATE_ACK_CONTROL_CREATE_BLOCK;
         tx_packet[0] = crtp_create_header(CRTP_PORT_LOG, CRTP_LOG_CHAN_SETTINGS);
         tx_packet[1] = CRTP_LOG_SETTINGS_CMD_CREATE_BLOCK;
         tx_packet[2] = CFLIE_TELEM_LOG_BLOCK_ID; // Log block ID
@@ -593,25 +611,27 @@ static u8 telemetry_setup_state_machine()
         tx_packet[4] = vbat_var_id; // ID of the VBAT variable
         tx_packet[5] = extvbat_var_type; // Variable type
         tx_packet[6] = extvbat_var_id; // ID of the ExtVBat variable
-        tx_payload_len = 7;
+        tx_packet[7] = rssi_var_type; // Variable type
+        tx_packet[8] = rssi_var_id; // ID of the RSSI variable
+        tx_payload_len = 9;
         send_packet();
         break;
 
-    case CFLIE_TELEM_SETUP_STATE_ACK_CONTROL_CREATE_BLOCK:
+    case CFLIE_CRTP_LOG_SETUP_STATE_ACK_CONTROL_CREATE_BLOCK:
         if (packet_ack() == PKT_ACKED) {
             if (rx_payload_len >= 2
                     && rx_packet[0] == crtp_create_header(CRTP_PORT_LOG, CRTP_LOG_CHAN_SETTINGS)
                     && rx_packet[1] == CRTP_LOG_SETTINGS_CMD_CREATE_BLOCK) {
                 // Received the ACK payload. Advance to the next state
-                telemetry_setup_state =
-                        CFLIE_TELEM_SETUP_STATE_SEND_CONTROL_START_BLOCK;
+                crtp_log_setup_state =
+                        CFLIE_CRTP_LOG_SETUP_STATE_SEND_CONTROL_START_BLOCK;
                 return state_machine_completed;
             } else if (rx_packet[0] == 0xF3 || rx_packet[0] == 0xF7) {
                 // "empty" ACK packet received - likely missed the ACK
                 // payload we are waiting for.
                 // return to the send state and retransmit the request
-                telemetry_setup_state =
-                        CFLIE_TELEM_SETUP_STATE_SEND_CONTROL_CREATE_BLOCK;
+                crtp_log_setup_state =
+                        CFLIE_CRTP_LOG_SETUP_STATE_SEND_CONTROL_CREATE_BLOCK;
                 return state_machine_completed;
             }
         }
@@ -620,8 +640,8 @@ static u8 telemetry_setup_state_machine()
         send_cmd_packet();
         break;
 
-    case CFLIE_TELEM_SETUP_STATE_SEND_CONTROL_START_BLOCK:
-        telemetry_setup_state = CFLIE_TELEM_SETUP_STATE_ACK_CONTROL_START_BLOCK;
+    case CFLIE_CRTP_LOG_SETUP_STATE_SEND_CONTROL_START_BLOCK:
+        crtp_log_setup_state = CFLIE_CRTP_LOG_SETUP_STATE_ACK_CONTROL_START_BLOCK;
         tx_packet[0] = crtp_create_header(CRTP_PORT_LOG, CRTP_LOG_CHAN_SETTINGS);
         tx_packet[1] = CRTP_LOG_SETTINGS_CMD_START_LOGGING;
         tx_packet[2] = CFLIE_TELEM_LOG_BLOCK_ID; // Log block ID 1
@@ -630,21 +650,21 @@ static u8 telemetry_setup_state_machine()
         send_packet();
         break;
 
-    case CFLIE_TELEM_SETUP_STATE_ACK_CONTROL_START_BLOCK:
+    case CFLIE_CRTP_LOG_SETUP_STATE_ACK_CONTROL_START_BLOCK:
         if (packet_ack() == PKT_ACKED) {
             if (rx_payload_len >= 2
                     && rx_packet[0] == crtp_create_header(CRTP_PORT_LOG, CRTP_LOG_CHAN_SETTINGS)
                     && rx_packet[1] == CRTP_LOG_SETTINGS_CMD_START_LOGGING) {
                 // Received the ACK payload. Advance to the next state
-                telemetry_setup_state =
-                        CFLIE_TELEM_SETUP_STATE_COMPLETE;
+                crtp_log_setup_state =
+                        CFLIE_CRTP_LOG_SETUP_STATE_COMPLETE;
                 return state_machine_completed;
             } else if (rx_packet[0] == 0xF3 || rx_packet[0] == 0xF7) {
                 // "empty" ACK packet received - likely missed the ACK
                 // payload we are waiting for.
                 // return to the send state and retransmit the request
-                telemetry_setup_state =
-                        CFLIE_TELEM_SETUP_STATE_SEND_CONTROL_START_BLOCK;
+                crtp_log_setup_state =
+                        CFLIE_CRTP_LOG_SETUP_STATE_SEND_CONTROL_START_BLOCK;
                 return state_machine_completed;
             }
         }
@@ -653,7 +673,7 @@ static u8 telemetry_setup_state_machine()
         send_cmd_packet();
         break;
 
-    case CFLIE_TELEM_SETUP_STATE_COMPLETE:
+    case CFLIE_CRTP_LOG_SETUP_STATE_COMPLETE:
         state_machine_completed = 1;
         return state_machine_completed;
         break;
@@ -732,7 +752,8 @@ static int cflie_init()
     return 50000;
 }
 
-static void update_telemetry()
+// Update telemetry using the CRTP logging framework
+static void update_telemetry_crtplog()
 {
     static u8 frameloss = 0;
 
@@ -750,18 +771,52 @@ static void update_telemetry()
             if (rx_packet[0] == crtp_create_header(CRTP_PORT_LOG, CRTP_LOG_CHAN_LOGDATA)) {
                 // The log block ID
                 if (rx_packet[1] == CFLIE_TELEM_LOG_BLOCK_ID) {
-                    // Bytes 6 and 7 are the Vbat in mV units
+                    // Bytes 5 and 6 are the Vbat in mV units
                     u16 vBat;
                     memcpy(&vBat, &rx_packet[5], sizeof(u16));
-                    Telemetry.value[TELEM_DSM_FLOG_VOLT2] = (s32) (vBat / 10); // The log value expects centivolts
-                    TELEMETRY_SetUpdated(TELEM_DSM_FLOG_VOLT2);
+                    Telemetry.value[TELEM_CFLIE_INTERNAL_VBAT] = (s32) (vBat / 10); // The log value expects centivolts
+                    TELEMETRY_SetUpdated(TELEM_CFLIE_INTERNAL_VBAT);
 
-                    // Bytes 8 and 9 are the ExtVbat in mV units
+                    // Bytes 7 and 8 are the ExtVbat in mV units
                     u16 extVBat;
                     memcpy(&extVBat, &rx_packet[7], sizeof(u16));
-                    Telemetry.value[TELEM_DSM_FLOG_VOLT1] = (s32) (extVBat / 10); // The log value expects centivolts
-                    TELEMETRY_SetUpdated(TELEM_DSM_FLOG_VOLT1);
+                    Telemetry.value[TELEM_CFLIE_EXTERNAL_VBAT] = (s32) (extVBat / 10); // The log value expects centivolts
+                    TELEMETRY_SetUpdated(TELEM_CFLIE_EXTERNAL_VBAT);
+
+                    // Byte 9 is the RSSI
+                    Telemetry.value[TELEM_CFLIE_RSSI] = rx_packet[9];
+                    TELEMETRY_SetUpdated(TELEM_CFLIE_RSSI);
                 }
+            }
+        }
+    }
+}
+
+// Update telemetry using the ACK packet payload
+static void update_telemetry_ackpkt()
+{
+    static u8 frameloss = 0;
+
+    // Read and reset count of dropped packets
+    frameloss += NRF24L01_ReadReg(NRF24L01_08_OBSERVE_TX) >> 4;
+    NRF24L01_WriteReg(NRF24L01_05_RF_CH, rf_channel); // reset packet loss counter
+    Telemetry.value[TELEM_DSM_FLOG_FRAMELOSS] = frameloss;
+    TELEMETRY_SetUpdated(TELEM_DSM_FLOG_FRAMELOSS);
+
+    if (packet_ack() == PKT_ACKED) {
+        // Make sure this is an ACK packet (first byte will alternate between 0xF3 and 0xF7
+        if (rx_packet[0] == 0xF3 || rx_packet[0] == 0xF7) {
+            // If ACK packet contains RSSI (proper length and byte 1 is 0x01)
+            if(rx_payload_len >= 3 && rx_packet[1] == 0x01) {
+                Telemetry.value[TELEM_CFLIE_RSSI] = rx_packet[2];
+                TELEMETRY_SetUpdated(TELEM_CFLIE_RSSI);
+            }
+            // If ACK packet contains VBAT (proper length and byte 3 is 0x02)
+            if(rx_payload_len >= 8 && rx_packet[3] == 0x02) {
+                u32 vBat = 0;
+                memcpy(&vBat, &rx_packet[4], sizeof(u32));
+                Telemetry.value[TELEM_CFLIE_INTERNAL_VBAT] = (s32)(vBat / 10); // The log value expects centivolts
+                TELEMETRY_SetUpdated(TELEM_CFLIE_INTERNAL_VBAT);
             }
         }
     }
@@ -775,8 +830,8 @@ static u16 cflie_callback()
         send_search_packet();
         phase = CFLIE_SEARCH;
         break;
-    case CFLIE_INIT_TELEMETRY:
-        if (telemetry_setup_state_machine()) {
+    case CFLIE_INIT_CRTP_LOG:
+        if (crtp_log_setup_state_machine()) {
             phase = CFLIE_INIT_DATA;
         }
         break;
@@ -800,7 +855,12 @@ static u16 cflie_callback()
         break;
 
     case CFLIE_DATA:
-        update_telemetry();
+        if (Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON_CRTPLOG) {
+            update_telemetry_crtplog();
+        } else if (Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON_ACKPKT) {
+            update_telemetry_ackpkt();
+        }
+
         if (packet_ack() == PKT_PENDING)
             return PACKET_CHKTIME;         // packet send not yet complete
         send_cmd_packet();
@@ -835,8 +895,8 @@ static u8 initialize_rx_tx_addr()
             break;
         }
 
-        if (Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON) {
-            return CFLIE_INIT_TELEMETRY;
+        if (Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON_CRTPLOG) {
+            return CFLIE_INIT_CRTP_LOG;
         } else {
             return CFLIE_INIT_DATA;
         }
@@ -852,7 +912,7 @@ static void initialize()
     CLOCK_StopTimer();
     tx_power = Model.tx_power;
     phase = initialize_rx_tx_addr();
-    telemetry_setup_state = CFLIE_TELEM_SETUP_STATE_INIT;
+    crtp_log_setup_state = CFLIE_CRTP_LOG_SETUP_STATE_INIT;
     packet_counter = 0;
 
     int delay = cflie_init();
@@ -887,7 +947,7 @@ const void *CFlie_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_GETOPTIONS: return cflie_opts;
         case PROTOCMD_TELEMETRYSTATE:
-            return (void *)(long)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
+            return (void *)(long)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_OFF ? PROTO_TELEM_OFF : PROTO_TELEM_ON);
         case PROTOCMD_TELEMETRYTYPE: 
             return (void *)(long) TELEM_DSM;
         default: break;

@@ -1,4 +1,4 @@
-Crazyflie/Crazyflie 2.0 Protocol (uses NRF24L01) 2017 April 1
+Crazyflie/Crazyflie 2.0 Protocol (uses NRF24L01) 2017 May 18
 
 # Description #
 This protocol is for supporting the Crazyflie and Crazyflie 2.0 nanocopter.
@@ -49,6 +49,22 @@ none are sign inverted. Channels 0-3 are used for RPYT (AERT) and channels
 firmware.
 
 # Logging/Telemetry #
-This protocol supports basic logging and telemetry -- currently voltage and
-RSSI. Protocol is configured to use the DSM telemetry variables and UI in
-DeviationTx.
+This protocol supports two different telemetry modes, selectable from the
+protocol settings menu. In both cases, the protocol overloads the DSM
+telemetry variables and UI as described below.
+
+ACKPKT: Reports basic RSSI/VBat information contained in the ACK packet. This
+information may not be present depending on the firmware version running on
+the CFlie's NRF51. Telemetry UI mapping is as follows:
+A (FADESA): RSSI (dB)
+F (FRAMELOSS): Count of dropped packets
+Bat (VOLT2): Voltage of the CFlie internal battery
+
+CRTPLOG: Telemtry mode that utilizes the more complicated/extensible CRTP logging
+framework (https://wiki.bitcraze.io/doc:crazyflie:crtp:log). Takes several
+seconds at startup to initialize and start logging, but offers much more
+flexibility to log any number of variables. Telemtry UI mapping is as follows:
+A (FADESA): RSSI (dB)
+F (FRAMELOSS): Count of dropped packets
+Bat (VOLT2): Voltage of the CFlie internal battery
+RxV (VOLT1): Voltage of the external battery (if present, i.e. on BigQuad deck)
