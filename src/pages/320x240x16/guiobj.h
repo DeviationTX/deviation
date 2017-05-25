@@ -306,6 +306,8 @@ struct tx_obj {
              guiLabel_t head2_1;
              guiLabel_t buzzlbl;
              guiTextSelect_t buzz;
+             guiLabel_t audiolbl;
+             guiTextSelect_t audio;
              guiTextSelect_t power_alarm;
              guiLabel_t power_alarmlbl;
              guiLabel_t battalrmlbl;
@@ -337,6 +339,8 @@ struct tx_obj {
              guiTextSelect_t temp;
              guiLabel_t lengthlbl;
              guiTextSelect_t length;
+             guiLabel_t telemivllbl;
+             guiTextSelect_t telemivl;
              //These are for the virating motor which may or may-not be installed
              guiLabel_t head3_3;
              guiLabel_t viblbl;
@@ -357,7 +361,7 @@ struct usb_obj {
     guiLabel_t msg;
     guiLabel_t time;
     guiLabel_t date;
-};    
+};
 
 struct rtc_obj {
     guiLabel_t      title;
@@ -386,6 +390,16 @@ struct debuglog_obj {
     guiLabel_t      line[DEBUG_LINE_COUNT];
     guiScrollable_t scrollable;
 };
+
+#ifdef HAS_MUSIC_CONFIG
+struct voiceconfig_obj {
+    guiLabel_t msg;
+    guiScrollable_t scrollable;
+    guiLabel_t name[10];
+    guiTextSelect_t voiceidx[10];
+    guiLabel_t voicelbl[10];
+};
+#endif
 
 /****Advanced ****/
 struct advcurve_obj {
@@ -610,6 +624,9 @@ struct gui_objs {
         struct usb_obj usb;
         struct rtc_obj rtc;
         struct debuglog_obj debuglog;
+#ifdef HAS_MUSIC_CONFIG
+        struct voiceconfig_obj voiceconfig;
+#endif
 
         struct advcurve_obj advcurve;
         struct advlimit_obj advlimit;

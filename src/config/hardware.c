@@ -15,6 +15,7 @@
 #include "common.h"
 #include "target.h"
 #include "gui/gui.h"
+#include "music.h"
 #include "tx.h"
 
 #include <stdlib.h>
@@ -27,6 +28,16 @@ const char SWITCH_CFG[] = "extra-switches";
 const char BUTTON_CFG[] = "extra-buttons";
 #endif
 const char HAPTIC_ENABLE[] = "enable-haptic";
+#if HAS_EXTENDED_AUDIO
+const char AUDIO_CFG[] = "voice";
+static char * const AUDIO_PLAYER[AUDIO_LAST] = {
+    [AUDIO_AUDIOFX] = "audiofx",
+    [AUDIO_DF_PLAYER] = "dfplayer",
+    };
+#endif
+#if HAS_AUDIO_UART5
+const char UART5_ENABLE[] = "voice-uart5";
+#endif
 /* Section: TX Module */
 static const char SECTION_MODULES[] = "modules";
 static const char MODULE_ENABLE_PIN[] = "enable";
@@ -75,6 +86,22 @@ static int ini_handler(void* user, const char* section, const char* name, const 
                 Transmitter.extra_hardware |= VIBRATING_MOTOR;
         }
 #endif
+#if HAS_EXTENDED_AUDIO
+        if (MATCH_KEY(AUDIO_CFG)) {
+            for (int i = 1; i < AUDIO_LAST; i += 1) {
+                if (strcasecmp(value, AUDIO_PLAYER[i]) == 0) {
+                    Transmitter.audio_player = i;
+                }
+                else Transmitter.audio_player = AUDIO_NONE;
+            }
+        }
+#endif
+#if HAS_AUDIO_UART5
+        if (MATCH_KEY(UART5_ENABLE)) {
+            if (value_int)
+                Transmitter.audio_uart5 = 1;
+        }
+#endif
         if(MATCH_KEY("txid")) {
             Transmitter.txid = strtol(value, NULL, 16);
         }
@@ -111,6 +138,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
     }
     return 0;
 }
+
 void CONFIG_LoadHardware()
 {
     CONFIG_IniParse("hardware.ini", ini_handler, NULL);

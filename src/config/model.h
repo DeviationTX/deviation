@@ -12,6 +12,9 @@
 #include "telemetry.h"
 #include "datalog.h"
 #include "pagecfg.h"
+#if HAS_EXTENDED_AUDIO
+#include "music.h"
+#endif
 
 /* INI file consts */
 const char *MODEL_NAME;
@@ -21,7 +24,7 @@ const char *MODEL_TEMPLATE;
 #define UNKNOWN_ICON ("media/noicon" IMG_EXT)
 
 //This cannot be computed, and must be manually updated
-#define NUM_PROTO_OPTS 4
+#define NUM_PROTO_OPTS 5
 #define VIRT_NAME_LEN 10 
 
 struct Model {
@@ -64,6 +67,9 @@ struct Model {
 #if HAS_DATALOG
     struct datalog datalog;
 #endif
+#if HAS_EXTENDED_AUDIO
+    struct Voice voice;
+#endif // HAS_EXTENDED_AUDIO
 };
 extern struct Model Model;
 extern const char * const RADIO_TX_POWER_VAL[TXPOWER_LAST];
@@ -79,4 +85,5 @@ void CONFIG_ResetModel();
 u8 CONFIG_ReadTemplateByIndex(u8 template_num);
 u8 CONFIG_ReadTemplate(const char *filename);
 u8 CONFIG_ReadLayout(const char *filename);
+
 #endif /*_MODEL_H_*/

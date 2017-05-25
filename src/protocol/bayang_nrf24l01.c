@@ -80,6 +80,7 @@ enum {
     CHANNEL9,                   // Headless
     CHANNEL10,                  // Return To Home
     CHANNEL11,                  // Calibrate
+    CHANNEL12,                  // Emg. stop
 };
 #define CHANNEL_INVERTED    CHANNEL5    // inverted flight on Floureon H101
 #define CHANNEL_FLIP        CHANNEL6
@@ -88,7 +89,7 @@ enum {
 #define CHANNEL_HEADLESS    CHANNEL9
 #define CHANNEL_RTH         CHANNEL10
 #define CHANNEL_CALIBRATE   CHANNEL11
-
+#define CHANNEL_EMGSTOP     CHANNEL12
 enum {
     Bayang_INIT1 = 0,
     Bayang_BIND2,
@@ -180,7 +181,8 @@ static void send_packet(u8 bind)
             | GET_FLAG(CHANNEL_RTH, 0x01)
             | GET_FLAG(CHANNEL_VIDEO, 0x10)
             | GET_FLAG(CHANNEL_PICTURE, 0x20);
-        packet[3] = GET_FLAG(CHANNEL_INVERTED, 0x80);
+        packet[3] = GET_FLAG(CHANNEL_INVERTED, 0x80)
+		    | GET_FLAG(CHANNEL_EMGSTOP, 0x04);
         chanval.value = scale_channel(CHANNEL1, 0x3ff, 0);      // aileron
         packet[4] = chanval.bytes.msb + DYNTRIM(chanval.value);
         packet[5] = chanval.bytes.lsb;
@@ -361,7 +363,7 @@ MODULE_CALLTYPE static u16 bay_callback()
 {
     switch (phase) {
     case Bayang_INIT1:
-        MUSIC_Play(MUSIC_TELEMALARM1);
+        // MUSIC_Play(MUSIC_TELEMALARM1);	// Shouldn't play telemetry alarm doing bind init
         phase = Bayang_BIND2;
         break;
 
@@ -498,9 +500,9 @@ const void *Bayang_Cmds(enum ProtoCmds cmd)
         initialize();
         return 0;
     case PROTOCMD_NUMCHAN:
-        return (void *) 11L;
+        return (void *) 12L;
     case PROTOCMD_DEFAULT_NUMCHAN:
-        return (void *) 11L;
+        return (void *) 12L;
     case PROTOCMD_CURRENT_ID:
         return Model.fixed_id ? (void *) ((unsigned long) Model.
                                           fixed_id) : 0;

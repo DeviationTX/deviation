@@ -1,7 +1,8 @@
 ﻿Français
 :# Channels
 Nbr canaux
->:%d bytes left
+:%d bytes left
+%d bytes restant
 : is %d%%, safe value = %d%%\n
  = %d%%,valeur sécu. = %d%%\n
 : is %d%%,\nsafe value = %d%%
@@ -55,7 +56,8 @@ AUX5
 >:AUX7
 :About Deviation
 A propos...
->:Add
+:Add
+Ajouter
 :Advanced
 Expert
 :Airplane
@@ -66,7 +68,8 @@ Alarme
 Tempo alarme
 :Alarm intvl
 Tempo alarme
->:All
+:All
+Tous
 :Altitude
 Altitude
 >:Auto
@@ -82,7 +85,8 @@ Alarme batt.
 Alarme batterie
 :Battery too low,\ncan't save!
 Batterie vide!\n Sauvegarde \n impossible.
->:Big-box
+:Big-box
+Grande boite
 :Bind
 Appairer
 :Binding
@@ -91,7 +95,8 @@ Appairage
 Appairage en cours...\nS'assurer que le récepteur fonctionne\n\nAppuyer sur OK n'annule pas la procédure \nmais permet le contrôle du TX.
 :Binding %s...\nPress ENT to stop
 Appairage %s...\nENT pour arrêter
->:Box
+:Box
+Boite
 :Button monitor
 Ctrl des boutons
 :Buzz settings
@@ -135,14 +140,16 @@ Canaux
 Ctrl. des Canaux
 :Channel output
 Sorties canaux
->:Clock
+:Clock
+Horloge
 :Complex
 Complexe
 :Configure
 Configurer
 :Contrast
 Contraste
->:Control
+:Control
+Contrôle
 :Copy To
 Copier
 :Copy To...
@@ -160,21 +167,28 @@ Cyclique3
 :D/R & Exp
 D/R & Exp
 >:D/R&Exp -AIL
->:D/R&Exp -ELE
->:D/R&Exp -RUD
+:D/R&Exp -ELE
+D/R&Exp -PROF
+:D/R&Exp -RUD
+D/R&Exp -DERIVE
 :DR
 DR
->:Datalog
+:Datalog
+Journal de données
 >:Date
->:Date / Time
->:Date format
+:Date / Time
+Date / Heure
+:Date format
+Format date
 >:Date:
->:Day
+:Day
+Jour
 :Deadband
-Deadband
+Zone inerte
 :Default
 Défaut
->:Delete
+:Delete
+Efface
 :Delta PW
 Delta Imp.
 :Deviation FW version:
@@ -190,26 +204,28 @@ Remise à zéro\n du totalisateur %d?
 :Down
 Bas
 :ELE
-ELE
+PROF
 :ELE DR
-ELE DR
+DR PROF
 :ELE Inv
-Sens ELE
+Sens PROF
 :ELE Mix
-Mix. ELE
+Mix. PROF
 :EXPO %d
 EXP. %d
 >:Edit
->:Enable
+:Enable
+Active
 :Enabled
 Etat
 :Enter
-Entrée
+Entrer
 :Exit
 Sortie
 :Expo&DR
 Expo&DR
->:Extend
+:Extend
+Etendu
 :FMODE
 FMODE
 >:Fades
@@ -230,7 +246,7 @@ Pied
 :Frame Size
 Larg. Signal
 :GEAR
-GEAR
+TRAIN
 :GPS
 GPS
 >:GPS Alt.
@@ -243,7 +259,8 @@ Réglages
 Gain gyro
 >:H
 >:H-trim
->:HOLD
+:HOLD
+Maintien
 :Heli
 Heli
 :Heli/Standard GUI
@@ -251,11 +268,12 @@ Heli/Interface Std.
 :Helicopter
 Helicoptère
 :High-Rate
-Petit Déb.
+Grand Déb.
 :Hold position
 Valeur gaz
 >:Holds
->:Hour
+:Hour
+Heure
 :Icon
 Icône
 :Idle Up 1
@@ -295,11 +313,12 @@ Charger
 Charger...
 :Longitude
 Longitude
->:Loss
+:Loss
+Perte
 :Low Battery
 Batterie vide
 :Low-Rate
-Grand Déb.
+Petit Déb.
 >:M
 >:MIX
 :Main menu
@@ -308,7 +327,8 @@ Menu principal
 Ecran d'accueil
 :Main page config
 Conf. écran accueil
->:Manual
+:Manual
+Manuel
 :Max Limit
 Limite Max
 :Menu
@@ -331,7 +351,8 @@ Nbr mixers
 >:Mode
 :Mode %d
 Mode %d
->:Model
+:Model
+Modèle
 :Model menu
 Menu Modèle
 :Model name
@@ -344,8 +365,10 @@ Pour le mode de réglage standard,\n le modèle doit être réinitialisé.
 Config. Modèle
 :Model type
 Type Modèle
->:Momentary
->:Month
+:Momentary
+Momentané
+:Month
+Mois
 :Move Down
 Baisser
 :Move Up
@@ -367,27 +390,32 @@ Néant
 Normal
 :Notch PW
 Imp. Fin
->:Num Channels
+:Num Channels
+Nombre canaux
 :Off
 Arrêt
 :Offset
-Offset
+Décalage
 :Ok
 Ok
 :On
 Marche
->:On/Off
+:On/Off
+Marche/Arrêt
 :PIT
 PAS
 :PIT Mix
 Mix. PAS
 >:PPM
->:PPM In
+:PPM In
+Entrée PPM
 >:PPM%d
->:PPMIn Cfg (Extend)
+:PPMIn Cfg (Extend)
+Cfg PPMIn (Etendu) 
 :Page
 Page
->:Page Config
+:Page Config
+Config Page
 :Pitch curves
 Courbes de pas
 :Plane
@@ -402,8 +430,10 @@ Pos.
 :Pos/Neg
 Pos./Neg.
 >:Position %d
->:Power On alarm
->:Power-down alert
+:Power On alarm
+Alarme d'inactivité
+:Power-down alert
+Alerte arrêt
 :Prealert interval
 Tempo préAlarm
 :Prealert intvl
@@ -424,22 +454,26 @@ Appuyer sur ENT\n pour passer \n le mode USB sur
 Protocole
 :PwrDn alert
 Mélodie arrêt
->:PwrOn alarm
+:PwrOn alarm
+Alarme Inactivité
 :RIGHT_H
 DROITE_H
 :RIGHT_V
 DROITE_V
 :RPM
 T/mn
->:RTC Time
+:RTC Time
+Horloge tps réel
 :RUD
-RUD
+DERIVE
 :RUD DR
-RUD DR
->:Rate
+DR DERIVE
+:Rate
+Taux
 :Re-Init
 Réinit.
->:Real Time Clock
+:Real Time Clock
+Horloge tps réel
 :Remove
 Supprimer
 :Reset
@@ -463,44 +497,57 @@ Sécurité
 >:Sample Rate
 :Save
 Sauve
->:Scale
+:Scale
+Echelle
 :Scale%s
 Echelle%s
 :Scanner
 Scanner
->:Second
->:Select
+:Second
+Seconde
+:Select
+Choix
 >:Servo
->:Set
->:Set date
->:Set permanent timer
->:Set time
->:Set to
->:Set:
+:Set
+Entrer
+:Set date
+Entrer date
+:Set permanent timer
+Entrer chrono permanent
+:Set time
+Entrer heurs
+:Set to
+Entrer
+:Set:
+Entrer :
 :Simple
 Simple
 :Simple 4 Channel
 4Ch. Simple
->:Small-box
->:Smooth
+:Small-box
+Petite boite
+:Smooth
+Lissage
 :Speed
 Vitesse
 :Src
 Source
 :Standard
 Standard
->:Standard Mixer
+:Standard Mixer
+Réglages standard
 :Start
 Durée
 :Step
 <Pas>
->:Stick
+:Stick
+Manche
 :Stick input
 Entrées  sticks/aux.
 :Stick mode
 Mode
 :Sticks
-Sticks
+Manches
 :Subtrim
 Subtrim
 :Swash
@@ -508,7 +555,7 @@ Plateau cycl.
 :SwashType
 Plateau cycl.
 :Switch
-Commande
+Interrupteur
 :Switch assignment
 Affect. Inters
 :Switch1
@@ -518,7 +565,7 @@ Inter2
 :Symmetric
 Symétrique
 :THR
-THR
+GAZ
 :TRIMLH+
 TRIMGH+
 :TRIMLH-
@@ -562,7 +609,8 @@ Réglages télémétrie
 T°
 :Temperature
 Unité T°
->:Template
+:Template
+Gabarit
 :Template..
 Gabarit...
 :Thr hold
@@ -573,7 +621,8 @@ Courbes de gaz
 Coupure gaz
 :Time
 Heure
->:Time format
+:Time format
+Format Heure
 :Timer
 Chrono
 :Timer settings
@@ -586,7 +635,8 @@ Chronos
 Tempo Alarme
 :Timeup intvl
 Tempo Alarme
->:Toggle
+:Toggle
+Basculant
 :Touch Calibrate
 Calibration du tactile
 :Touch Test
@@ -599,9 +649,12 @@ Toucher la cible %d
 Toucher pour verrouiller
 :Touch to Unlock
 Toucher pour déverrouiller
->:Trainer Cfg (Channel)
->:Trainer Cfg (Stick)
->:Trainer Sw
+:Trainer Cfg (Channel)
+Cfg écolage (Canal)
+:Trainer Cfg (Stick)
+Cfg écolage (Manche)
+:Trainer Sw
+Inter écolage
 :Transmitter config
 Config. Emetteur
 :Transmitter menu
@@ -616,7 +669,8 @@ Trim +
 Trim -
 :Trim Step
 Finesse
->:Trimbar
+:Trimbar
+Barre de trim
 :Trims
 Trims
 :Turn Off
@@ -642,22 +696,28 @@ Vibreur
 Virt
 :Volt
 Volt
->:Welcome
->:Year
->:Yes
+:Welcome
+Bienvenue
+:Year
+Année
+:Yes
+Oui
 :Zero/Max
 0/Max
 :\n%d seconds left
 \n%d secondes restant
 :\n\nBinding will end in %d seconds...
 \n\nAppairage terminé dans %d secondes...
->:actual value
+:actual value
+Valeur réelle
 :add
 ajouter
->:cntdn-prop
+:cntdn-prop
+A rebours prop
 :countdown
 A rebours
->:delay
+:delay
+Retard
 :is not supported
 Non supporté
 :is turned off
@@ -672,9 +732,13 @@ multiplier
 permanent
 :replace
 remplacer
->:resulting value
->:stop-prop
+:resulting value
+Valeur résultante
+:stop-prop
+Chrono prop
 :stopwatch
 Chrono
->:value to add or set
->:value to set
+:value to add or set
+valeur à ajouter ou fixer
+:value to set
+Valeur à fixer

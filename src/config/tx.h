@@ -4,10 +4,12 @@
 #include "mixer.h"
 #include "autodimmer.h"
 #include "telemetry.h"
+#include "music.h"
 
 #define DEFAULT_BATTERY_WARNING_INTERVAL 30
 #define MIN_BATTERY_WARNING_INTERVAL 0
 #define MAX_BATTERY_WARNING_INTERVAL 60
+#define DEFAULT_TELEM_INTERVAL 15
 #define DEFAULT_SPLASH_DELAY 35 //3.5sec
 
 enum {
@@ -55,10 +57,18 @@ struct Transmitter {
     u8 telem;
     u8 music_shutdown;
     u8 extra_hardware;
+#if HAS_EXTENDED_AUDIO
+    enum AudioPlayers audio_player;
+    u8 audio_vol;
+#endif
+#if HAS_AUDIO_UART5
+    u8 audio_uart5;
+#endif
     enum Mode mode;
     u16 batt_alarm;
     u16 batt_critical;
     u16 batt_warning_interval;
+    u16 telem_alert_interval;
     u8 power_alarm;
     u8 splash_delay;
     u8 volume;
@@ -68,7 +78,7 @@ struct Transmitter {
 #if HAS_RTC
     u8 rtcflags;    // bit0: clock12hr, bit1-3: time format, bit4-7 date format (see pages/320x240x16/rtc_config.c)
 #endif
-    
+
     #ifdef HAS_MORE_THAN_32_INPUTS
         u64 ignore_src;
     #else

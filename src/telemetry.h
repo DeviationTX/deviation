@@ -95,7 +95,6 @@ enum {
     TELEM_DSM_LAST,
 };
 
-
 // FrSky telemetry stream state machine
 typedef enum {
   TS_IDLE = 0,  // waiting for 0x5e frame marker

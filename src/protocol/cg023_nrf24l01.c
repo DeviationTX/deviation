@@ -300,7 +300,7 @@ static u16 cg023_callback()
 {
     switch (phase) {
     case CG023_INIT1:
-        MUSIC_Play(MUSIC_TELEMALARM1);
+        // MUSIC_Play(MUSIC_TELEMALARM1);	// Shouldn't play telemetry alarm doing bind init
         phase = CG023_BIND2;
         break;
 

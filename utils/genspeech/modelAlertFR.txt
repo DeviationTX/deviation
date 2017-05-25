@@ -1,0 +1,10 @@
+Faible taux sélectionné
+Taux moyen sélectionné
+Taux élevé sélectionné
+Mode de vol activé
+Mode de vol désactivé
+throttle hold activé
+throttle hold désactivé
+mix 0
+mix 1
+mix 2

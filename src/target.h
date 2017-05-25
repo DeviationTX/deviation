@@ -90,6 +90,9 @@ void VIDEO_SetChannel(int ch);
 void VIDEO_Enable(int on);
 void VIDEO_Contrast(int contrast);
 void VIDEO_Brightness(int brightness);
+u8 VIDEO_GetStandard(void);
+void VIDEO_SetStandard(u8 standard);
+
 /* Touchscreen */
 struct touch {
     u16 x;
@@ -165,7 +168,7 @@ void SPI_FlashBlockWriteEnable(unsigned enable);
 /* Sound */
 void SOUND_Init();
 void SOUND_SetFrequency(unsigned freq, unsigned volume);
-void SOUND_Start(unsigned msec, u16 (*next_note_cb)());
+void SOUND_Start(unsigned msec, u16 (*next_note_cb)(), u8 vibrate);
 void SOUND_StartWithoutVibrating(unsigned msec, u16(*next_note_cb)());
 void SOUND_Stop();
 

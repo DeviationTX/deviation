@@ -1,0 +1,31 @@
+A.	Voice Feedback on the following are supported.  For additonal details, refer to src/osx/readme.txt.
+	- Changing Switch Positions.
+	- Turning of Auxillary Knobs.
+	  Different voice files can be specified for turning up & turning down of knobs.
+	- Trim buttons as virtual switches.
+	  Different voice files can be specified for the same trim button when used as
+          Momentary or Toggle switch.
+
+B.	Following options have been added to media/sound.ini file.
+1)	Specify a different playback device for each alert message.
+	Syntax:
+		device = <device name>
+	Description:
+		Possible playback device names are: buzzer, extaudio, all. 
+        	buzzer: internal buzzer
+        	extaudio: Extended-audio device, such as DFPlayer Mini
+        	all: will play alert messages through both internal buzzer & extend-audio device.
+	Default:
+		Use extended-audio device if not defined when extended-audio is enabled in hardware.ini.
+	Example:
+		device=buzzer
+
+2)	Allow each alert message to control the vibrator.
+	Syntax:
+		vibrate = off
+	Description:
+		By default, vibrator will be turned on.  Set it to off to turn off vibrator for 
+                the specific alert message.
+	Example:
+		vibrate = off
+

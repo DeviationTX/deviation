@@ -23,6 +23,9 @@ enum {
     ITEM_MODE,
     ITEM_STICKS,
     ITEM_BUZZ,
+#if HAS_EXTENDED_AUDIO
+    ITEM_AUDIO,
+#endif
     ITEM_HAPTIC,
     ITEM_PWR_ALARM,
     ITEM_BATT,
@@ -37,6 +40,7 @@ enum {
     ITEM_TIMEUP,
     ITEM_TELEMTEMP,
     ITEM_TELEMLEN,
+    ITEM_TELEM_IVAL,
     ITEM_LAST,
 };
 
@@ -235,7 +239,7 @@ static const char *prealert_time_cb(guiObject_t *obj, int dir, void *data)
     u8 changed;
     u16 prealert_time = Transmitter.countdown_timer_settings.prealert_time/1000;
     prealert_time = GUI_TextSelectHelper(prealert_time,
-            MIN_PERALERT_TIME, MAX_PERALERT_TIME, dir, 5, 10, &changed);
+            MIN_PREALERT_TIME, MAX_PREALERT_TIME, dir, 5, 30, &changed);
     if (changed)
         Transmitter.countdown_timer_settings.prealert_time = prealert_time * 1000;
     if (prealert_time == 0)
@@ -277,7 +281,7 @@ static const char *batalarm_select_cb(guiObject_t *obj, int dir, void *data)
     (void)data;
     (void)obj;
     u8 changed;
-    Transmitter.batt_alarm = GUI_TextSelectHelper(Transmitter.batt_alarm, 
+    Transmitter.batt_alarm = GUI_TextSelectHelper(Transmitter.batt_alarm,
             MIN_BATTERY_ALARM, MAX_BATTERY_ALARM, dir, MIN_BATTERY_ALARM_STEP, 500, &changed);
     sprintf(tempstring, "%2d.%02dV", Transmitter.batt_alarm / 1000, (Transmitter.batt_alarm % 1000) / 10);
     return tempstring;
@@ -381,5 +385,37 @@ static const char *_buzz_vol_cb(guiObject_t *obj, int dir, void *data)
     if (*unsigned_data == 0)
         return _tr("Off");
     sprintf(tempstring, "%d", *unsigned_data);
+    return tempstring;
+}
+
+#if HAS_EXTENDED_AUDIO
+static const char *_audio_vol_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void)data;
+    u8 *unsigned_data = (u8 *)data;
+    if (Transmitter.audio_player == AUDIO_AUDIOFX)
+        return "----";
+    u8 changed;
+    if (GUI_IsTextSelectEnabled(obj)) {
+        *unsigned_data = GUI_TextSelectHelper(*unsigned_data, 0, 10, dir, 1, 5, &changed);
+        if (changed) {
+            AUDIO_SetVolume();
+            if (!num_audio)
+                MUSIC_Play(MUSIC_VOLUME);
+        }
+    }
+    if (*unsigned_data == 0)
+        return _tr("Off");
+    sprintf(tempstring, "%d", *unsigned_data);
+    return tempstring;
+}
+#endif //HAS_EXTENDED_AUDIO
+
+static const char *telem_interval_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void)obj;
+    u8 *value = (u8 *)data;
+    *value = GUI_TextSelectHelper(*value, 1, 255, dir, 1, 5, NULL);
+    sprintf(tempstring, "%d", *value);
     return tempstring;
 }

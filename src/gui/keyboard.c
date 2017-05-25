@@ -298,7 +298,14 @@ u8 GUI_TouchKeyboard(struct guiObject *obj, struct touch *coords, s8 press_type)
     return 1;
 }
 
-static void navigate_item(struct guiKeyboard *keyboard, short leftRight, short upDown) {
+#if defined(HAS_ROTARY_ENCODER) && HAS_ROTARY_ENCODER
+// As rotary generates up/down, and we want it to move along horizontal
+// axis, we swap upDown and leftRight
+static void navigate_item(struct guiKeyboard *keyboard, short upDown, short leftRight)
+#else
+static void navigate_item(struct guiKeyboard *keyboard, short leftRight, short upDown)
+#endif
+{
     const char * const *keys = array[keyboard->type];
     MUSIC_Play(MUSIC_KEY_PRESSING);
     short i = keyboard->last_row;
@@ -311,22 +318,33 @@ static void navigate_item(struct guiKeyboard *keyboard, short leftRight, short u
     if (leftRight != 0) {
         const char *ptr = keys[i];
         col_len = strlen(ptr);
-        if (i < 3 || keyboard->type == KEYBOARD_NUM) {
-            j = keyboard->last_col;
-            j += leftRight;
-            if (j < 0) j = col_len -1;
-            if (j >= col_len) j = 0;
-            keyboard->last_col = j;
-        } else {  // when row = 3, don't keep track of its col
-            for (j = 0; j < col_len; j++) {
-                if (ptr[j] == keyboard->lastchar) {
-                    break;
-                }
+        for (j = 0; j < col_len; j++) {
+            if (ptr[j] == keyboard->lastchar) {
+                break;
             }
-            j += leftRight;
-            if (j < 0) j = col_len -1;
-            if (j >= col_len) j = 0;
         }
+        j += leftRight;
+#if defined(HAS_ROTARY_ENCODER) && HAS_ROTARY_ENCODER
+        if (j < 0) {
+            if (--i < 0) i = 3;
+            keyboard->last_row = i;
+            col_len = strlen(keys[i]);
+            j = col_len - 1;
+        }
+        if (j >= col_len) {
+            if (++i >= 4) i = 0;
+            keyboard->last_row = i;
+            j = 0;
+        }
+#else
+        if (j < 0) j = col_len - 1;
+        if (j >= col_len) j = 0;
+#endif
+
+        // when row = 3, don't keep track of its col
+        if (i < 3 || keyboard->type == KEYBOARD_NUM) {
+            keyboard->last_col = j;
+        }  
     } else {
         i += upDown;
         if (i < 0) i = 3;

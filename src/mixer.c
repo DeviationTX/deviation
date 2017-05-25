@@ -42,7 +42,7 @@ extern volatile u8 ppmin_num_channels;
 // volatile makes sure, each access to the array
 // will be an actual access to the memory location
 // an element is stored in.
-// If it is omitted, the optimizer might create a 
+// If it is omitted, the optimizer might create a
 // 'short cut', removing seemingly unneccessary memory accesses,
 // and thereby preventing the propagation of an update from
 // the main loop to the interrupt routine (since the optimizer
@@ -270,7 +270,7 @@ s32 MIXER_CreateCyclicOutput(volatile s32 *raw, unsigned cycnum)
         cyc[2] = collective - aileron;
         break;
     }
-    
+
     return cyc[cycnum-1];
 }
 
@@ -333,6 +333,29 @@ void MIXER_ApplyMixer(struct Mixer *mixer, volatile s32 *raw, s32 *orig_value)
             else if(value - *orig_value < -rate)
                 value = *orig_value - rate;
         }
+#if HAS_EXTENDED_AUDIO
+    case MUX_BEEP:
+        if (orig_value) {
+            s32 new = value / (CHAN_MULTIPLIER / 10);
+            if (new != *orig_value / (CHAN_MULTIPLIER / 10)
+            && new == raw[mixer->dest + NUM_INPUTS + 1] / (CHAN_MULTIPLIER / 10))
+                MUSIC_Play(MUSIC_SAVING);
+          }
+        value = raw[mixer->dest + NUM_INPUTS + 1];	// Use input value
+        break;
+#endif
+#if HAS_EXTENDED_AUDIO
+    case MUX_VOICE:
+        if (orig_value) {
+            s32 new = value / (CHAN_MULTIPLIER / 10);
+            if (new != *orig_value / (CHAN_MULTIPLIER / 10)
+            && new == raw[mixer->dest + NUM_INPUTS + 1] / (CHAN_MULTIPLIER / 10))
+                if (Model.voice.mixer[mixer->dest].music)
+                    MUSIC_Play(Model.voice.mixer[mixer->dest].music);
+          }
+        value = raw[mixer->dest + NUM_INPUTS + 1];	// Use input value
+        break;
+#endif
     case MUX_LAST: break;
     }
 
@@ -392,7 +415,7 @@ s32 MIXER_ApplyLimits(unsigned channel, struct Limit *limit, volatile s32 *_raw,
             value = INT16_MAX;
         else if (value < INT16_MIN)
             value = INT16_MIN;
-    }      
+    }
     return value;
 }
 
@@ -493,7 +516,7 @@ int compact_mixers() {
     unsigned j;
     while(i < max) {
         unsigned src = MIXER_SRC(Model.mixers[i].src);
-        if(! src 
+        if(! src
            || Model.templates[Model.mixers[i].dest] == MIXERTEMPLATE_NONE
            || Model.templates[Model.mixers[i].dest] == MIXERTEMPLATE_CYC1
            || Model.templates[Model.mixers[i].dest] == MIXERTEMPLATE_CYC2
@@ -526,7 +549,7 @@ unsigned find_dependencies(unsigned ch, unsigned *deps)
             found = 1;
             if (MIXER_SRC(mixer->src) > NUM_SOURCES && MIXER_SRC(mixer->src) != NUM_SOURCES + 1 + ch) {
                 deps[MIXER_SRC(mixer->src) - NUM_SOURCES - 1] = 1;
-            } 
+            }
             if (MIXER_SRC(mixer->sw) > NUM_SOURCES && MIXER_SRC(mixer->sw) != NUM_SOURCES + 1 + ch) {
                 deps[MIXER_SRC(mixer->sw) - NUM_SOURCES - 1] = 1;
             }
@@ -649,6 +672,25 @@ void MIXER_InitMixer(struct Mixer *mixer, unsigned ch)
         mixer->curve.points[i] = 0;
 }
 
+#if HAS_EXTENDED_AUDIO
+static void _trim_music_play(int trim_idx, int is_neg, int on_state)
+{
+    int button_idx;
+
+    if (is_neg)
+        button_idx = Model.trims[trim_idx].neg - 1;
+    else
+        button_idx = Model.trims[trim_idx].pos - 1;
+    if (on_state) {
+        if (Model.voice.buttons[button_idx].on)
+            MUSIC_Play(Model.voice.buttons[button_idx].on);
+    } else {
+        if (Model.voice.buttons[button_idx].off)
+            MUSIC_Play(Model.voice.buttons[button_idx].off);
+    }
+}
+#endif
+
 static void _trim_as_switch(unsigned flags, int i, int is_neg)
 {
     s8 *value = MIXER_GetTrim(i);
@@ -656,16 +698,28 @@ static void _trim_as_switch(unsigned flags, int i, int is_neg)
         //Momentarty
         if (flags & BUTTON_PRESS) {
             *value = 100;
+#if HAS_EXTENDED_AUDIO
+            _trim_music_play(i, is_neg, 1);
+#endif
         } else if (flags & BUTTON_RELEASE) {
             *value = -100;
+#if HAS_EXTENDED_AUDIO
+            _trim_music_play(i, is_neg, 0);
+#endif
         }
     } else if (flags & BUTTON_PRESS) {
         if (Model.trims[i].step == TRIM_ONOFF) {
             //On/Off
             *value = is_neg ? -100 : 100;
+#if HAS_EXTENDED_AUDIO
+            _trim_music_play(i, is_neg, 1);
+#endif
         } else {
             //Toggle
             *value = *value == -100 ? 100 : -100;
+#if HAS_EXTENDED_AUDIO
+            _trim_music_play(i, is_neg, *value == -100 ? 0 : 1);
+#endif
         }
     }
 }

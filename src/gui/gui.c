@@ -579,14 +579,21 @@ unsigned GUI_ObjButton(struct guiObject *obj, u32 button, unsigned flags)
         switch (obj->Type) {
           case Button:
             objTOUCHED = obj;
-            return GUI_TouchButton(obj, press_type);
+            int retcode = GUI_TouchButton(obj, press_type);
+            if (is_release)
+                objTOUCHED = NULL;
+            return retcode;
           case Image:
             objTOUCHED = obj;
             GUI_TouchImage(obj, NULL, press_type);
+            if (is_release)
+                objTOUCHED = NULL;
             return 1;
           case Label:
             objTOUCHED = obj;
             GUI_TouchLabel(obj, NULL, press_type);
+            if (is_release)
+                objTOUCHED = NULL;
             return 1;
           default:
             break;

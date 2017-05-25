@@ -25,6 +25,7 @@
 #include "config/tx.h"
 #include "config/display.h"
 #include "rtc.h"
+#include "extended_audio.h"
 
 void Init();
 void Banner();
@@ -37,7 +38,7 @@ void PAGE_Test();
 
 #ifndef DUMP_BOOTLOADER
 int main() {
-    
+
     Init();
 #ifndef MODULAR
     //Banner();
@@ -55,7 +56,7 @@ int main() {
         LCD_Clear(0x0000);
         FS_Mount(NULL, NULL);
     }
-    
+
     CONFIG_LoadTx();
     SPI_ProtoInit();
     CONFIG_ReadDisplay();
@@ -67,12 +68,18 @@ int main() {
     LCD_SetFont(DEFAULT_FONT.font);
     LCD_SetFontColor(DEFAULT_FONT.font_color);
 
+#if !HAS_EXTENDED_AUDIO
+    // If Extended Audio is present, move startup msg to Splash page to allow additional audio hardware initialization time
     MUSIC_Play(MUSIC_STARTUP);
+#else
+    if (Transmitter.splash_delay < 5)
+        MUSIC_Play(MUSIC_STARTUP); // if no splash page startup msg is used force playing here
+#endif
     GUI_HandleButtons(1);
 
     MIXER_Init();
     PAGE_Init();
-    
+
     CLOCK_StartWatchdog();
 
 #if HAS_DATALOG
@@ -179,7 +186,7 @@ void Banner()
             mfgdata[3],
             mfgdata[4],
             mfgdata[5]);
-    
+
 }
 
 void medium_priority_cb()
@@ -210,6 +217,7 @@ void EventLoop()
     debug_timing(0, 0);
 #endif
     priority_ready &= ~(1 << MEDIUM_PRIORITY);
+#if !defined(HAS_HARD_POWER_OFF) || !HAS_HARD_POWER_OFF
     if(PWR_CheckPowerSwitch()) {
         if(! (BATTERY_Check() & BATTERY_CRITICAL)) {
             PAGE_Test();
@@ -225,6 +233,7 @@ void EventLoop()
 
         PWR_Shutdown();
     }
+#endif
     BUTTON_Handler();
     TOUCH_Handler();
     INPUT_CheckChanges();
@@ -243,7 +252,15 @@ void EventLoop()
 #if HAS_VIDEO
         VIDEO_Update();
 #endif
+#if HAS_EXTENDED_AUDIO
+        AUDIO_CheckQueue();
+#endif
         GUI_RefreshScreen();
+#if defined(HAS_HARD_POWER_OFF) && HAS_HARD_POWER_OFF
+        if (PAGE_ModelDoneEditing())
+            CONFIG_SaveModelIfNeeded();
+        CONFIG_SaveTxIfNeeded();
+#endif
     }
 #ifdef TIMING_DEBUG
     debug_timing(0, 1);
@@ -259,7 +276,7 @@ void TOUCH_Handler() {
     static u32 pen_down_long_at=0;
 
     struct touch t;
-    
+
     if(SPITouch_IRQ()) {
         pen_down=1;
         t=SPITouch_GetCoords();
@@ -268,16 +285,16 @@ void TOUCH_Handler() {
     } else {
         pen_down=0;
     }
- 
+
     if(pen_down && (!pen_down_last)) {
         AUTODIMMER_Check();
         GUI_CheckTouch(&t, 0);
     }
-    
+
     if(!pen_down && pen_down_last) {
         GUI_TouchRelease();
     }
-    
+
     if(pen_down && pen_down_last) {
         if(CLOCK_getms()>pen_down_long_at) {
             GUI_CheckTouch(&t, 1);
@@ -291,6 +308,7 @@ void TOUCH_Handler() {
 void VIDEO_Update()
 {
     static u8 video_enable = 0;
+    static u8 video_standard_in_use = 0xFE; //unknown
     //FIXME This is just like DATALOG_IsEnabled
     int enabled = MIXER_SourceAsBoolean(Model.videosrc);
 
@@ -302,6 +320,16 @@ void VIDEO_Update()
             VIDEO_Contrast(Model.video_contrast);
             VIDEO_Brightness(Model.video_brightness);
         }
+    }
+    if(video_enable) {
+        u8 video_standard_current = VIDEO_GetStandard();
+        if((video_standard_current > 0) &&
+           (video_standard_current < 8) &&
+           (video_standard_current != video_standard_in_use)) {
+            video_standard_in_use = video_standard_current;
+            VIDEO_SetStandard(video_standard_current);
+        }
+	AUTODIMMER_Check();
     }
 }
 #endif //HAS_VIDEO
@@ -382,7 +410,7 @@ void debug_switches()
         }
         if (changed) { printf("\n"); }
         if(PWR_CheckPowerSwitch()) PWR_Shutdown();
-    }    
+    }
 }
 void debug_buttons()
 {
@@ -400,5 +428,5 @@ void debug_buttons()
             data = val;
         }
         if(PWR_CheckPowerSwitch()) PWR_Shutdown();
-    }    
+    }
 }

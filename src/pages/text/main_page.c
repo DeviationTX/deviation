@@ -34,7 +34,7 @@ enum {
      HTRIM_H      =  2,
      MODEL_ICO_W  =  6,
      MODEL_ICO_H  =  4,
-     BOX_W        = 10,
+     BOX_W        = 12,
      SMALLBOX_H   =  2,
      BIGBOX_H     =  2,
      GRAPH_W      = (VTRIM_W),

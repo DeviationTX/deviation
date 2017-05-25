@@ -114,7 +114,11 @@ static void sound_test_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
     u8 idx = (long)data;
+#if HAS_EXTENDED_AUDIO && HAS_MUSIC_CONFIG
+    MUSIC_Play(MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + idx));
+#else
     MUSIC_Play(MUSIC_TELEMALARM1 + idx);
+#endif
 }
 
 void PAGE_TelemconfigEvent() {

@@ -17,6 +17,9 @@
 #include "model.h"
 #include "telemetry.h"
 #include "tx.h"
+#include "music.h"
+#include "extended_audio.h"
+
 #include <stdlib.h>
 #include <string.h>
 extern const u8 EATRG[PROTO_MAP_LEN];
@@ -73,7 +76,12 @@ static const char MIXER_OFFSET[] = "offset";
 static const char MIXER_USETRIM[] = "usetrim";
 
 static const char MIXER_MUXTYPE[] = "muxtype";
-static const char * const MIXER_MUXTYPE_VAL[MUX_LAST]  = { "replace", "multiply", "add", "max", "min", "delay" };
+static const char * const MIXER_MUXTYPE_VAL[MUX_LAST]  = {
+  "replace", "multiply", "add", "max", "min", "delay",
+#if HAS_EXTENDED_AUDIO
+  "beep","voice",
+#endif
+};
 
 static const char MIXER_CURVETYPE[] = "curvetype";
 static const char * const MIXER_CURVETYPE_VAL[CURVE_MAX+1] = {
@@ -174,7 +182,17 @@ static const char DATALOG_RATE[] = "rate";
 static const char SECTION_GUI[] = "gui-" STRINGIFY(LCD_WIDTH) "x" STRINGIFY(LCD_HEIGHT);
 static const char GUI_QUICKPAGE[] = "quickpage";
 
- 
+#if HAS_EXTENDED_AUDIO
+/* Section: Music */
+static const char SECTION_VOICE[] = "voice";
+static const char * const VOICE_TELEMALARM[TELEM_NUM_ALARMS] =
+    { "telemalarm1", "telemalarm2", "telemalarm3", "telemalarm4", "telemalarm5", "telemalarm6" };
+static const char * const VOICE_TIMER[NUM_TIMERS] =
+    { "timer1", "timer2", "timer3", "timer4" };
+
+#endif
+
+
 s8 mapstrcasecmp(const char *s1, const char *s2)
 {
     int i = 0;
@@ -378,7 +396,7 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
         }
         seen_res = HIRES;
     }
-#else 
+#else
     if (! MATCH_SECTION(SECTION_GUI))
         return 1;
 #endif
@@ -386,7 +404,7 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
         if (! ELEM_USED(Model.pagecfg2.elem[idx]))
             break;
     }
-    
+
     if (idx == NUM_ELEMS) {
         printf("No free element available (max = %d)\n", NUM_ELEMS);
         return 1;
@@ -730,7 +748,7 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
             }
             return 1;
         }
-       
+
         if(assign_int(&m->limits[idx], _seclimit, MAPSIZE(_seclimit)))
             return 1;
         if (MATCH_KEY(CHAN_LIMIT_MIN)) {
@@ -820,17 +838,17 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
             return 1;
         }
         if (MATCH_KEY(SWASH_ELE_INV)) {
-            if (value_int) 
+            if (value_int)
                 m->swash_invert |= 0x01;
             return 1;
         }
         if (MATCH_KEY(SWASH_AIL_INV)) {
-            if (value_int) 
+            if (value_int)
                 m->swash_invert |= 0x02;
             return 1;
         }
         if (MATCH_KEY(SWASH_COL_INV)) {
-            if (value_int) 
+            if (value_int)
                 m->swash_invert |= 0x04;
             return 1;
         }
@@ -929,7 +947,7 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
             src = get_source(section, name);
         }
         if(found || src) {
-            u8 i;
+            u32 i;
             for (i = 0; i < NUM_STR_ELEMS(SAFETY_VAL); i++) {
                 if (MATCH_VALUE(SAFETY_VAL[i])) {
                     m->safety[src] = i;
@@ -970,6 +988,61 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
             return 1;
         }
     }
+#if HAS_EXTENDED_AUDIO
+    char src_name[20];
+
+    if (MATCH_SECTION(SECTION_VOICE)) {
+        u16 val = atoi(value);
+        if(val>MAX_VOICEMAP_ENTRIES-1 || voice_map[val].duration == 0 || val < CUSTOM_ALARM_ID) {
+            printf("%s: Music %s not found in voice.ini or below ID %d\n", section, value, CUSTOM_ALARM_ID);
+            return 0;
+        }
+        for (int i = INP_HAS_CALIBRATION+1; i <= NUM_INPUTS; i++) {
+            INPUT_SourceName(src_name, i);
+            if (MATCH_KEY(src_name)) {
+                m->voice.switches[i - INP_HAS_CALIBRATION - 1].music = val;
+                return 1;
+            }
+        }
+#if NUM_AUX_KNOBS
+        for (int i = 0; i < NUM_AUX_KNOBS; i++) {
+            INPUT_SourceName(src_name, i + NUM_STICKS + 1);
+            strcat(src_name, "_UP");
+            if (MATCH_KEY(src_name)) {
+                m->voice.aux[i * 2 + 1].music = val;
+                return 1;
+            }
+            INPUT_SourceName(src_name, i + NUM_STICKS + 1);
+            strcat(src_name, "_DOWN");
+            if (MATCH_KEY(src_name)) {
+                m->voice.aux[i * 2].music = val;
+                return 1;
+            }
+        }
+#endif
+        for (int i = 0; i < NUM_TIMERS; i++) {
+            if (MATCH_KEY(VOICE_TIMER[i])) {
+                m->voice.timer[i].music = val;
+                return 1;
+            }
+        }
+        for (int i = 0; i < TELEM_NUM_ALARMS; i++) {
+            if (MATCH_KEY(VOICE_TELEMALARM[i])) {
+                m->voice.telemetry[i].music = val;
+                return 1;
+            }
+        }
+        for (int i = 0; i < (NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS); i++) {
+            INPUT_SourceNameReal(src_name, i + NUM_INPUTS + 1);
+            if (MATCH_KEY(src_name)) {
+                m->voice.mixer[i].music = val;
+                return 1;
+            }
+        }
+        printf("%s: unknown source name '%s'\n", section, name);
+        return 0;
+    }
+#endif
     printf("Unknown Section: '%s'\n", section);
     return 0;
 }
@@ -992,7 +1065,7 @@ void write_int(FILE *fh, void* ptr, const struct struct_map *map, int map_size)
         if (map[i].defval == 0xffff)
             continue;
         switch(size) {
-            case 0: 
+            case 0:
             case 2: //SRC
             case 6: //BUTTON
                     value = *((u8 *)((long)ptr + offset)); break;
@@ -1168,7 +1241,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
             continue;
         fprintf(fh, "[%s%d]\n", SECTION_TRIM, idx+1);
         fprintf(fh, "%s=%s\n", TRIM_SOURCE,
-             m->trims[idx].src >= 1 && m->trims[idx].src <= 4 
+             m->trims[idx].src >= 1 && m->trims[idx].src <= 4
              ? tx_stick_names[m->trims[idx].src-1]
              : INPUT_SourceNameReal(file, m->trims[idx].src));
         write_int(fh, &m->trims[idx], _sectrim, MAPSIZE(_sectrim));
@@ -1265,6 +1338,35 @@ u8 CONFIG_WriteModel(u8 model_num) {
             fprintf(fh, "%s%d=%s\n", GUI_QUICKPAGE, idx+1, PAGE_GetName(val));
         }
     }
+#if HAS_EXTENDED_AUDIO
+    fprintf(fh, "[%s]\n", SECTION_VOICE);
+    for (idx = 0; idx < NUM_SWITCHES; idx++) {
+        if (m->voice.switches[idx].music)
+            fprintf(fh, "%s=%d\n", INPUT_SourceName(file,idx + INP_HAS_CALIBRATION + 1), m->voice.switches[idx].music);
+    }
+#if NUM_AUX_KNOBS
+    for (idx = 0; idx < NUM_AUX_KNOBS * 2; idx++) {
+        if (m->voice.aux[idx].music) {
+            if (idx % 2)
+                fprintf(fh, "%s_UP=%d\n", INPUT_SourceName(tempstring,(idx-1) / 2 + NUM_STICKS + 1), m->voice.aux[idx].music);
+            else
+                fprintf(fh, "%s_DOWN=%d\n", INPUT_SourceName(tempstring,idx / 2 + NUM_STICKS + 1), m->voice.aux[idx].music);
+        }
+    }
+#endif
+    for (idx = 0; idx < NUM_TIMERS; idx++) {
+        if (m->voice.timer[idx].music)
+            fprintf(fh, "timer%d=%d\n", idx + 1, m->voice.timer[idx].music);
+    }
+    for (idx = 0; idx < TELEM_NUM_ALARMS; idx++) {
+        if (m->voice.telemetry[idx].music)
+            fprintf(fh, "telemalarm%d=%d\n", idx + 1, m->voice.telemetry[idx].music);
+    }
+    for (idx = 0; idx < (NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS); idx++) {
+        if (m->voice.mixer[idx].music)
+            fprintf(fh, "%s=%d\n", INPUT_SourceNameReal(tempstring, idx + NUM_INPUTS + 1), m->voice.mixer[idx].music);
+    }
+#endif
     CONFIG_EnableLanguage(1);
     fclose(fh);
     return 1;
@@ -1308,7 +1410,7 @@ u8 CONFIG_ReadModel(u8 model_num) {
     Transmitter.current_model = model_num;
     clear_model(1);
 
-    char file[20];
+    char file[30];
     auto_map = 0;
     get_model_file(file, model_num);
     if (CONFIG_IniParse(file, ini_handler, &Model)) {
@@ -1330,7 +1432,9 @@ u8 CONFIG_ReadModel(u8 model_num) {
         PPMin_Start();
     else
         PPMin_Stop();
-
+#if HAS_EXTENDED_AUDIO
+    AUDIO_Init();
+#endif
     STDMIXER_Preset(); // bug fix: this must be invoked in all modes
     return 1;
 }
@@ -1341,8 +1445,11 @@ u8 CONFIG_IsModelChanged() {
 }
 
 u8 CONFIG_SaveModelIfNeeded() {
-    if (CONFIG_IsModelChanged())
+    if (CONFIG_IsModelChanged()) {
+        crc32 = Crc(&Model, sizeof(Model));
+        //printf("Saving model, page %d\n", PAGE_GetID());
         CONFIG_WriteModel(Transmitter.current_model);
+    }
     return 1;
 }
 

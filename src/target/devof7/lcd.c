@@ -31,10 +31,6 @@ static u16 is_double_row = 0x00;
 #define CS_HI() gpio_set(GPIOB, GPIO0)
 #define CS_LO() gpio_clear(GPIOB, GPIO0)
 
-// The screen dimensions
-#define LCD_SCREEN_LINES    11
-#define LCD_SCREEN_CHARS    24
-
 // The IA911 chip defines
 #define LCD_IA911_CLEAR_VRAM        0x00
 #define LCD_IA911_DISPLAY           0x10
@@ -150,22 +146,22 @@ void lcd_convert_string(const char string[], u8 length, u8* output) {
 u8 lcd_string_length(const char string[]) {
     unsigned i = 0;
     unsigned size = 0;
-    while(string[i] != 0 && size < LCD_SCREEN_CHARS) {
+    while(string[i] != 0 && size < LCD_WIDTH) {
          i++;
-         size += CUR_CHAR_SIZE; // chwaracter width
+         size += CUR_CHAR_SIZE; // character width
     }
     return i;
 }
 
 // Show a string at a certain position
 void lcd_show_string(const char string[], u8 line, s8 pos, u16 color) {
-    u8 cmd[LCD_SCREEN_CHARS+2];
+    u8 cmd[LCD_WIDTH + 2];
     u8 length = lcd_string_length(string);
     if(pos < 0)
-        pos = LCD_SCREEN_CHARS-length*CUR_CHAR_SIZE;
+        pos = LCD_WIDTH - length*CUR_CHAR_SIZE;
 
     // Check if it fits inside the screen
-    if(line > LCD_SCREEN_LINES || pos > LCD_SCREEN_CHARS)
+    if(line >= LCD_HEIGHT || pos >= LCD_WIDTH)
         return;
 
     //fix line due to big-font rows
@@ -185,8 +181,8 @@ void lcd_show_string(const char string[], u8 line, s8 pos, u16 color) {
         is_double_row  |= ( 1 << line);
         LCD_Cmd(LCD_IA911_CHAR_SIZE | 0x40 | (line - double_line));
     }
-    if (pos+length * CUR_CHAR_SIZE > LCD_SCREEN_CHARS) {
-        length = (LCD_SCREEN_CHARS - pos) >> (CUR_CHAR_SIZE == 1 ? 0 : 1);
+    if (pos + length * CUR_CHAR_SIZE > LCD_WIDTH) {
+        length = (LCD_WIDTH - pos) >> (CUR_CHAR_SIZE == 1 ? 0 : 1);
     }
 
     line -= double_line;
@@ -205,32 +201,32 @@ void lcd_show_string(const char string[], u8 line, s8 pos, u16 color) {
     lcd_convert_string(string, length, &cmd[1]);
 
     // Send the string
-    cmd[length+1] = LCD_IA911_TRANSFER_END;
-    LCD_CMDLength(cmd, length+2);
+    cmd[length + 1] = LCD_IA911_TRANSFER_END;
+    LCD_CMDLength(cmd, length + 2);
 }
 
 // Show a string at a certain line
 void lcd_show_line(const char string[], u8 line, u8 align, u16 color) {
-    char new_string[LCD_SCREEN_CHARS];
+    char new_string[LCD_WIDTH];
     u8 pos_x, i, j;
     u8 length = lcd_string_length(string);
 
     // Check if it is inside the screen
-    if(line > LCD_SCREEN_LINES || length > LCD_SCREEN_CHARS)
+    if(line >= LCD_HEIGHT || length > LCD_WIDTH)
         return;
 
     // Calculate the X position
     if(align == LCD_ALIGN_LEFT)
         pos_x = 0;
     else if(align == LCD_ALIGN_CENTER)
-        pos_x = (LCD_SCREEN_CHARS - length) / 2;
+        pos_x = (LCD_WIDTH - length) / 2;
     else
-        pos_x = (LCD_SCREEN_CHARS - length);
+        pos_x = (LCD_WIDTH - length);
 
     // Create the new string
     j = 0;
-    for(i = 0; i < LCD_SCREEN_CHARS; i++) {
-        if(i < pos_x || pos_x+length <= i)
+    for(i = 0; i < LCD_WIDTH; i++) {
+        if(i < pos_x || pos_x + length <= i)
             new_string[i] = ' '; //del
         else {
             new_string[i] = string[j];
@@ -313,7 +309,7 @@ void LCD_Init()
 void LCD_Clear(unsigned int i)
 {
     // Set the character size to 1dot for all lines
-    for(i = 0; i < LCD_SCREEN_LINES; i++) {
+    for(i = 0; i < LCD_HEIGHT; i++) {
         LCD_Cmd(LCD_IA911_CHAR_SIZE | i);
         lcd_show_line("", i, LCD_ALIGN_LEFT, 0);
     }
@@ -407,4 +403,14 @@ u8 LCD_SetFont(unsigned int idx)
     u8 old = LCD_GetFont();
     cur_str.font = (idx <= 1) ? default_font : big_font;
     return old;
+}
+
+u8 VIDEO_GetStandard()
+{
+    return 0xFE;
+}
+
+void VIDEO_SetStandard(u8 standard)
+{
+    (void)standard;
 }

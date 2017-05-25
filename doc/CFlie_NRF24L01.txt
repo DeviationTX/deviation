@@ -1,0 +1,70 @@
+Crazyflie/Crazyflie 2.0 Protocol (uses NRF24L01) 2017 May 18
+
+# Description #
+This protocol is for supporting the Crazyflie and Crazyflie 2.0 nanocopter.
+Comprehensive details about this copter can be found on the crazyflie wiki and/or forum:
+wiki: http://wiki.bitcraze.io
+forum: http://forum.bitcraze.io
+
+More specific info on DeviationTx support for the Crazyflie can be found on
+the wiki here: http://wiki.bitcraze.io/misc:hacks:deviation
+
+# Binding #
+Binding is done automatically via a fixed three digit model ID. 
+The first digit specifies the data rate:
+0 = 250kbps
+1 = 1Mbps
+2 = 2Mbps
+
+The next two digits specify the channel number.
+
+Example: 280 = 2Mbps, channel 80.
+Example: 000 = 250kbps, channel 0.
+
+# Data Packets #
+Data packets conform to the CRTP protocol outlined in the wiki
+http://wiki.bitcraze.io/projects:crazyflie:crtp
+
+This deviation protocol supports two types of commander packets, selectible in
+the protocol options menu.
+- RPYT = ordinary RPYT packets sent to CRTP port 3
+  (http://wiki.bitcraze.io/projects:crazyflie:crtp:commander)
+- CPPM = CPPM emulation mode sent to the generic setpoint port
+  (http://wiki.bitcraze.io/projects:crazyflie:crtp:setpointgeneric)
+
+# Channels #
+Channel mapping depends on which CRTP mode is selected in the protocol
+settings.
+
+RPYT: Devo channels 0-3 are used for RPYT (AERT) and reordered (and sign
+inverted as necessary) to match what the Crazyflie expects. Channel 4 is
+optional and is used to rotate 45degrees to switch between '+' mode and 'x'
+mode. This rotation is done in the protocol firmware itself. Channel 4 is not
+transmitted to the Crazyflie.
+
+CPPM: Up to 12 channels supported. All channels are remapped from their Devo
+defaults to an emulated PWM value (1000-2000, where 1500 is the midpoint) and
+none are sign inverted. Channels 0-3 are used for RPYT (AERT) and channels
+4-11 are reserved for auxiliary functions as defined in the Crazyflie
+firmware.
+
+# Logging/Telemetry #
+This protocol supports two different telemetry modes, selectable from the
+protocol settings menu. In both cases, the protocol overloads the DSM
+telemetry variables and UI as described below.
+
+ACKPKT: Reports basic RSSI/VBat information contained in the ACK packet. This
+information may not be present depending on the firmware version running on
+the CFlie's NRF51. Telemetry UI mapping is as follows:
+A (FADESA): RSSI (dB)
+F (FRAMELOSS): Count of dropped packets
+Bat (VOLT2): Voltage of the CFlie internal battery
+
+CRTPLOG: Telemtry mode that utilizes the more complicated/extensible CRTP logging
+framework (https://wiki.bitcraze.io/doc:crazyflie:crtp:log). Takes several
+seconds at startup to initialize and start logging, but offers much more
+flexibility to log any number of variables. Telemtry UI mapping is as follows:
+A (FADESA): RSSI (dB)
+F (FRAMELOSS): Count of dropped packets
+Bat (VOLT2): Voltage of the CFlie internal battery
+RxV (VOLT1): Voltage of the external battery (if present, i.e. on BigQuad deck)

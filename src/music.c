@@ -16,6 +16,8 @@
 #include "common.h"
 #include "music.h"
 #include "config/tx.h"
+#include "extended_audio.h"
+#include "config/model.h"
 #include <stdlib.h>
 
 static struct {u8 note; u8 duration;} Notes[100];
@@ -68,16 +70,44 @@ static const char *const sections[] = {
     "telem_alarm4",
     "telem_alarm5",
     "telem_alarm6",
+    "inactivity_alarm",
 };
+
+#if HAS_EXTENDED_AUDIO
+static const char *const audio_devices[] = {
+    NULL,
+    "all",
+    "buzzer",
+    "voice",
+};
+
+static u8 playback_device;
+#endif
+static u8 vibrate;
 
 #define NUM_NOTES (sizeof(note_map) / sizeof(struct NoteMap))
 
-    
+
 static int ini_handler(void* user, const char* section, const char* name, const char* value)
 {
     u16 i;
     const char *requested_sec = (const char *)user;
     if (strcasecmp(section, requested_sec) == 0) {
+#if HAS_EXTENDED_AUDIO
+        if (strcasecmp("device", name) == 0) {
+            for (i = 1; i < AUDDEV_LAST; i++) {
+                if (strcasecmp(audio_devices[i], value) == 0) {
+                    playback_device = i;
+                    break;
+                }
+            }
+        }
+#endif
+        if (strcasecmp("vibrate", name) == 0) {
+            if (strcasecmp(value, "off") == 0) {
+                vibrate = 0;
+            }
+        }
         if (strcasecmp("volume", name) == 0) {
             Volume = atoi(value);
             if (Volume > 100)
@@ -105,6 +135,7 @@ u16 next_note_cb() {
 
 void MUSIC_Beep(char* note, u16 duration, u16 interval, u8 count)
 {
+    vibrate = 1; // Haptic sensor set to on as default
     u8 tone=0,i;
     next_note = 1;
     Volume = Transmitter.volume * 10;
@@ -126,13 +157,10 @@ void MUSIC_Beep(char* note, u16 duration, u16 interval, u8 count)
         Notes[(i*2)+1].duration = interval / 10;
     }
     SOUND_SetFrequency(note_map[Notes[0].note].note, Volume);
-    SOUND_Start((u16)Notes[0].duration * 10, next_note_cb);
+    SOUND_Start((u16)Notes[0].duration * 10, next_note_cb, vibrate);
 }
 
-void MUSIC_Play(enum Music music)
-{
-    /* NOTE: We need to do all this even if volume is zero, because
-       the haptic sensor may be enabled */
+u16 MUSIC_GetSound(u16 music) {
     num_notes = 0;
     next_note = 1;
     Volume = Transmitter.volume * 10;
@@ -149,12 +177,153 @@ void MUSIC_Play(enum Music music)
             checked = 1;
         }
     #endif
+    if (music >= MUSIC_TOTAL) {
+        printf("ERROR: Music %d can not be found in sound.ini", music);
+        return 1;
+    }
     if(CONFIG_IniParse(filename, ini_handler, (void *)sections[music])) {
         printf("ERROR: Could not read %s\n", filename);
+        return 1;
+    }
+    return 0;
+}
+
+void MUSIC_Play(u16 music)
+{
+#if HAS_EXTENDED_AUDIO
+    // Play audio for switch
+    if ( music > MUSIC_TOTAL ) {
+        if (AUDIO_VoiceAvailable())
+            AUDIO_AddQueue(music);
         return;
     }
-    if(! num_notes)
-        return;
+    playback_device = AUDDEV_UNDEF;
+#endif
+    vibrate = 1;	// Haptic sensor set to on as default
+
+    /* NOTE: We need to do all this even if volume is zero, because
+       the haptic sensor may be enabled */
+
+    if (MUSIC_GetSound(music)) return;
+
+
+#if HAS_EXTENDED_AUDIO
+    if ( !(playback_device == AUDDEV_BUZZER) ) {
+        if (  AUDIO_VoiceAvailable() && AUDIO_AddQueue(music) ) {
+            if ((playback_device == AUDDEV_EXTAUDIO) || (playback_device == AUDDEV_UNDEF)) {
+                Volume = 0;
+                return;
+            }
+        }
+    }
+#endif
+
+    if(! num_notes) return;
     SOUND_SetFrequency(note_map[Notes[0].note].note, Volume);
-    SOUND_Start((u16)Notes[0].duration * 10, next_note_cb);
+    SOUND_Start((u16)Notes[0].duration * 10, next_note_cb, vibrate);
 }
+
+#if HAS_EXTENDED_AUDIO
+
+u16 MUSIC_GetTelemetryAlarm(enum Music music) {
+    if ( Model.voice.telemetry[music - MUSIC_TELEMALARM1].music > 0 )
+        return Model.voice.telemetry[music - MUSIC_TELEMALARM1].music;
+    return music;
+}
+
+u16 MUSIC_GetTimerAlarm(enum Music music) {
+    if ( Model.voice.timer[music - MUSIC_ALARM1].music > 0 )
+        return Model.voice.timer[music - MUSIC_ALARM1].music;
+    return music;
+}
+
+void MUSIC_PlayValue(u16 music, s32 value, u8 unit, u8 prec)
+{
+    u32 i;
+    char digits[6]; // Do we need more?
+    char thousands = 0;
+    u8 digit_count = 0;
+
+    if ( !AUDIO_VoiceAvailable() || !AUDIO_AddQueue(music)) {
+        if (music < MUSIC_TOTAL)
+            MUSIC_Play(music);
+        return;
+    }
+
+    // Play minutes/hours/seconds for timers
+    if (unit == VOICE_UNIT_TIME) {
+        if (value >= 3600) {
+            i = value / 3600;
+            AUDIO_AddQueue(i + MUSIC_TOTAL);
+            AUDIO_AddQueue(VOICE_UNIT_HOURS + VOICE_UNIT_OFFSET);
+            value %= 3600;
+        }
+        if (value >= 60) {
+            i = value / 60;
+            AUDIO_AddQueue(i + MUSIC_TOTAL);
+            AUDIO_AddQueue(VOICE_UNIT_MINUTES + VOICE_UNIT_OFFSET);
+            value %= 60;
+        }
+        if (value > 0) {
+            AUDIO_AddQueue(value + MUSIC_TOTAL);
+            AUDIO_AddQueue(VOICE_UNIT_SECONDS + VOICE_UNIT_OFFSET);
+        }
+        return;
+    }
+
+    // Add minus sign for negative number
+    if (value < 0) {
+        AUDIO_AddQueue(VOICE_UNIT_MINUS + VOICE_UNIT_OFFSET);
+        value *= -1;
+    }
+
+    //Add precision digits
+    for (i=0; i < prec; i++) {
+        digits[digit_count++] = value % 10;
+        value /=10;
+    }
+    //Add decimal seperator
+    if (prec > 0) {
+        digits[digit_count++] = VOICE_DEC_SEP;
+    }
+
+    // Special case value == 0 and not playing TIME
+    if (value == 0 && unit != VOICE_UNIT_TIME)
+        digits[digit_count++] = 0;
+    // Get single digits from remaining value
+    while (value > 0) {
+        if(value > 999) {
+            thousands = value / 1000;
+            value %= 1000;
+        }
+        if(value > 100) {
+            digits[digit_count++] = value % 100;
+            value /= 100;
+            digits[digit_count++] = value + 99;
+            if (thousands){
+              digits[digit_count++] = 109; // MP3 for "thousands"
+              digits[digit_count++] = thousands;
+            }
+            break;
+        }
+        if(value < 101 && value > 0) {
+            digits[digit_count++] = value;
+            break;
+        }
+        else {
+            if (thousands){
+                digits[digit_count++] = 109; // MP3 for "thousands"
+                digits[digit_count++] = thousands;
+            }
+        }
+    }
+
+    // Fill music queue with digits
+    for (i = digit_count; i > 0; i--) {
+        AUDIO_AddQueue(digits[i-1] + MUSIC_TOTAL);
+    }
+    // Add unit for value if specified
+    if (unit > VOICE_UNIT_NONE)
+        AUDIO_AddQueue(unit + VOICE_UNIT_OFFSET);
+}
+#endif

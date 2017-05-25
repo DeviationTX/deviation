@@ -2,13 +2,13 @@
 env:
 #Do not define 'global' env vars here.  They cannot be used with API builds
     matrix:
-      - TARGET=devo8
-      - TARGET=devo10
-      - TARGET=devo12
-      - TARGET=devo7e
-      - TARGET=devof12e
+      - MAKETARGET=zip_devo8
+      - MAKETARGET=zip_devo10
+      - MAKETARGET=zip_devo12
+      - MAKETARGET=zip_devo7e
+      - MAKETARGET=zip_devof12e
       - TARGET=at9
-      - MAKETARGET=win_emu_devo8
+      - MAKETARGET=zip_win_emu_devo8
 #      - COMPILER=latest TARGET=devo8
 
 # use new docker environment
@@ -60,6 +60,17 @@ before_install:
          make install;
          popd;
       fi;
+   - if [ ! -d "$HOME/mpg123-w32/bin" ]; then
+         mkdir $HOME/src;
+         mkdir $HOME/mpg123-w32;
+         pushd $HOME/src;
+         curl --retry 10 --retry-max-time 120 -L "http://www.mpg123.de/download/mpg123-1.23.8.tar.bz2" | tar xjf -;
+         cd mpg123-1.23.8;
+         ./configure --prefix=$HOME/mpg123-w32 --host=i586-mingw32msvc --disable-shared && make;
+         make install;
+         strip --strip-unneeded $HOME/mpg123-w32/bin/mpg123.exe;
+         popd;
+      fi;
    - openssl aes-256-cbc -K $encrypted_39cc7b34336f_key -iv $encrypted_39cc7b34336f_iv -in install_nightlies.tar.enc -out install_nightlies.tar -d;
          tar -xf install_nightlies.tar;
          rm -f install_nightlies.tar
@@ -72,6 +83,7 @@ install:
   - if [[ "$MAKETARGET" == *"win"* ]]; then
        export FLTK_DIR=$HOME/fltk-1.3.0-w32;
        export PORTAUDIO_DIR=$HOME/portaudio-w32;
+       export MPG123_DIR=$HOME/mpg123-w32;
     fi;
 
 before_script:
@@ -104,3 +116,4 @@ cache:
   - $HOME/gcc-arm-none-eabi-4_8-2013q4
   - $HOME/fltk-1.3.0-w32
   - $HOME/portaudio-w32
+  - $HOME/mpg123-w32

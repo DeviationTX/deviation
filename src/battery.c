@@ -34,7 +34,11 @@ u8 BATTERY_Check()
         warned &= ~BATTERY_LOW; // Bat OK... reset  'was low' and counter..
     }
     if ((warned & BATTERY_LOW) && ms >= next_battery_warning) {
+#if HAS_EXTENDED_AUDIO
+        MUSIC_PlayValue(MUSIC_BATT_ALARM, battery/10,VOICE_UNIT_VOLT,2);
+#else
         MUSIC_Play(MUSIC_BATT_ALARM);
+#endif
         next_battery_warning = ms + Transmitter.batt_warning_interval * 1000;
     }
     if (battery < Transmitter.batt_critical && ! (warned & BATTERY_CRITICAL)) {
@@ -50,4 +54,3 @@ u8 BATTERY_Check()
     }
     return warned;
 }
-
