@@ -108,6 +108,9 @@ static const char *set_trimstep_cb(guiObject_t *obj, int dir, void *data)
     } else if (*value == TRIM_ONOFF) {
         tempstring_cpy(_tr("On/Off"));
         hide_switch = 1;
+    } else if (*value == TRIM_3POS) {
+        tempstring_cpy(_tr("3 Pos"));
+        hide_switch = 1;
     } else if (*value < 100) {
         sprintf(tempstring, "%d.%d", *value / 10, *value % 10);
     } else {
