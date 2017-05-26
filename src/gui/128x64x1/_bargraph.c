@@ -28,24 +28,27 @@ void _bargraph_trim_horizontal(int x, int y, int width, int height, s32 val, u32
     (void)color;
     (void)disp;
     GUI_DrawBackground(x, y, width, height);  // to clear back ground
-    LCD_DrawFastVLine(box->x + (box->width -1) / 2, box->y -1, 2, 1); //Center
-    LCD_DrawFastVLine(box->x + (box->width -1) / 2, box->y + box->height -1, 2, 1); //Center
+    u16 ypos1 = box->y -1;            // lower tic
+    u16 ypos2 = ypos1 + box->height;  // upper tic
+    u16 xboxw = box->width -1;        // constant   
+    LCD_DrawFastVLine(box->x + xboxw / 2, ypos1, 2, 1); //Center
+    LCD_DrawFastVLine(box->x + xboxw / 2, ypos2, 2, 1); //Center
     s16 xpos = 0;
     if ((graph->max > 100 && graph->max <= 200) && abs(graph->min) == graph->max) {
-        u8 pos100 = (box->width -1) * (100 - graph->min)/(graph->max - graph->min);
-        xpos = graph->direction == TRIM_HORIZONTAL ? box->x + pos100: box->x + box->width -1 - pos100;
-        LCD_DrawFastVLine(xpos, box->y -1, 2, 1); // -100% position
-        LCD_DrawFastVLine(xpos, box->y + box->height-1, 2, 1);
+        u8 pos100 = xboxw * (100 - graph->min)/(graph->max - graph->min);
+        xpos = graph->direction == TRIM_HORIZONTAL ? box->x + pos100: box->x + xboxw - pos100;
+        LCD_DrawFastVLine(xpos, ypos1, 2, 1); // +100% position
+        LCD_DrawFastVLine(xpos, ypos2, 2, 1);
 
-        pos100 = (box->width -1) * (-100 - graph->min)/(graph->max - graph->min);
-        xpos = graph->direction == TRIM_HORIZONTAL ? box->x + pos100: box->x + box->width -1 - pos100;
-        LCD_DrawFastVLine(xpos, box->y -1, 2, 1); // 100% position
-        LCD_DrawFastVLine(xpos, box->y + box->height-1, 2, 1);
+        pos100 = xboxw * (-100 - graph->min)/(graph->max - graph->min);
+        xpos = graph->direction == TRIM_HORIZONTAL ? box->x + pos100: box->x + xboxw - pos100;
+        LCD_DrawFastVLine(xpos, ypos1, 2, 1); // -100% position
+        LCD_DrawFastVLine(xpos, ypos2, 2, 1);
     }
-    s32 val_scale = (box->width -1) * (val - graph->min) / (graph->max - graph->min);
+    s32 val_scale = xboxw * (val - graph->min) / (graph->max - graph->min);
     xpos = graph->direction == TRIM_HORIZONTAL
               ? box->x + val_scale
-              : box->x + box->width -1 - val_scale;
+              : box->x + xboxw - val_scale;
     s32 center = (graph->max + graph->min) / 2;
     if (val == center) {
         LCD_FillRect(xpos - 1, box->y, 3, box->height, 1);
@@ -60,23 +63,26 @@ void _bargraph_trim_vertical(int x, int y, int width, int height, s32 val, u32 c
     (void)color;
     (void)disp;
     GUI_DrawBackground(x, y, width, height);  // to clear back ground
-    LCD_DrawFastHLine(box->x -1, box->y + (box->height -1) / 2, 2, 1); //Center
-    LCD_DrawFastHLine(box->x + box->width -1, box->y + (box->height -1) / 2, 2, 1); //Center
+    u16 xpos1 = box->x -1;          // left tic
+    u16 xpos2 = xpos1 + box->width; // right tic    
+    u16 yboxh = box->height -1;     // constant    
+    LCD_DrawFastHLine(xpos1, box->y + yboxh / 2, 2, 1); //Center
+    LCD_DrawFastHLine(xpos2, box->y + yboxh / 2, 2, 1); //Center
     s16 ypos = 0;
     if ((graph->max > 100 && graph->max <= 200) && abs(graph->min) == graph->max) {
-        u8 pos100 = (box->height -1) * (100 - graph->min)/(graph->max - graph->min);
-        ypos = box->y + box->height -1 - pos100;
-        LCD_DrawFastHLine(box->x -1, ypos, 2, 1); // -100% position
-        LCD_DrawFastHLine(box->x + box->width -1, ypos, 2, 1);
+        u8 pos100 = yboxh * (100 - graph->min)/(graph->max - graph->min);
+        ypos = box->y + yboxh - pos100;
+        LCD_DrawFastHLine(xpos1, ypos, 2, 1); // +100% position
+        LCD_DrawFastHLine(xpos2, ypos, 2, 1);
 
-        pos100 = (box->height -1) * (-100 - graph->min)/(graph->max - graph->min);
-        ypos = box->y + box->height -1 - pos100;
-        LCD_DrawFastHLine(box->x -1, ypos, 2, 1); // -100% position
-        LCD_DrawFastHLine(box->x + box->width -1, ypos, 2, 1);
+        pos100 = yboxh * (-100 - graph->min)/(graph->max - graph->min);
+        ypos = box->y + yboxh - pos100;
+        LCD_DrawFastHLine(xpos1, ypos, 2, 1); // -100% position
+        LCD_DrawFastHLine(xpos2, ypos, 2, 1);
     }
     s32 center = (graph->max + graph->min) / 2;
-    s32 val_scale = (box->height -1) * (val - graph->min) / (graph->max - graph->min);
-    ypos = box->y + box->height -1 - val_scale;
+    s32 val_scale = yboxh * (val - graph->min) / (graph->max - graph->min);
+    ypos = box->y + yboxh - val_scale;
     if (val == center) {
         LCD_FillRect(box->x, ypos - 1, box->width, 3, 1);
     } else {
