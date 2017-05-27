@@ -75,6 +75,16 @@ def parse(file,dump_images=False,crypt=0):
   if data:
     print "PARSE ERROR"
 
+# see https://github.com/hughsie/fwupd/blob/master/docs/dfu-metadata-store.md
+def build_metadata(keys):
+  data = struct.pack('<2s','MD')
+  data += struct.pack('b', len(keys))
+  for key in keys:
+    for item in [key, keys[key]]:
+      data += struct.pack('b', len(item))
+      data += struct.pack('<' + str(len(item)) + 's', item)
+  return data
+
 def build(file,targets,options):
   data = ''
   for t,target in enumerate(targets):
@@ -86,7 +96,13 @@ def build(file,targets,options):
     data += tdata
   data  = struct.pack('<5sBIB','DfuSe',1,len(data)+11,len(targets)) + data
   v,d=map(lambda x: int(x,0) & 0xFFFF, options.device.split(':',1))
-  data += struct.pack('<4H3sB',options.version,d,v,0x011a,'UFD',16)
+  keys = {}
+  keys['License'] = 'GPL-3.0'
+  if options.crypt > 0:
+    keys['CipherKind'] = 'DEVO'
+  metadata = build_metadata(keys)
+  data += metadata
+  data += struct.pack('<4H3sB',options.version,d,v,0x011a,'UFD',16 + len(metadata))
   crc   = compute_crc(data)
   data += struct.pack('<I',crc)
   open(file,'wb').write(data)
