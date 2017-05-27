@@ -17,7 +17,7 @@ LFLAGS = -lfltk
 
 ALL = $(TARGET).$(EXEEXT)
 
-TYPE ?= dev
+TYPE ?= prd
 
 ifdef WINDOWS
     #CROSS=i586-mingw32msvc-
