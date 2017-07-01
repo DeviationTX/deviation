@@ -49,7 +49,7 @@ static u32 _get_icon_info()
             FILE *fh;
             fh = fopen(toggle_files[3], "r");
             if(!fh)
-                toggle_files[3] = "mymedia/toggle3 " IMG_EXT;
+                toggle_files[3] = "mymedia/toggle3" IMG_EXT;
             else
                 fclose(fh);
             checked = 1;
