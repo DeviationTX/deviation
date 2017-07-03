@@ -347,7 +347,7 @@ void TELEMETRY_Alarm()
             switch(Model.telem_alarm[k]) {
                 case TELEM_DEVO_VOLT1:
                 case TELEM_DEVO_VOLT2:
-                case TELEM_DEVO_VOLT3: MUSIC_PlayValue(MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + k), TELEMETRY_GetValue(Model.telem_alarm[k]),VOICE_UNIT_VOLT,2); break;
+                case TELEM_DEVO_VOLT3: MUSIC_PlayValue(MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + k), TELEMETRY_GetValue(Model.telem_alarm[k]),VOICE_UNIT_VOLT,1); break;
                 case TELEM_DEVO_RPM1:
                 case TELEM_DEVO_RPM2: MUSIC_PlayValue(MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + k), TELEMETRY_GetValue(Model.telem_alarm[k]),VOICE_UNIT_RPM,0); break;
                 default: MUSIC_PlayValue(MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + k), TELEMETRY_GetValue(Model.telem_alarm[k])-20,VOICE_UNIT_TEMP,0); break;
@@ -372,18 +372,18 @@ void TELEMETRY_Alarm()
                 case TELEM_DSM_FLOG_VOLT1:
                 case TELEM_DSM_FLOG_VOLT2: MUSIC_PlayValue(MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + k), TELEMETRY_GetValue(Model.telem_alarm[k]),VOICE_UNIT_VOLT,2); break;
 #if HAS_EXTENDED_TELEMETRY
-                case TELEM_DSM_JETCAT_TEMPEGT:
+                case TELEM_DSM_JETCAT_TEMPEGT: MUSIC_PlayValue(MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + k), TELEMETRY_GetValue(Model.telem_alarm[k]),VOICE_UNIT_TEMP,0); break;
                 case TELEM_DSM_ESC_TEMP1:
                 case TELEM_DSM_ESC_TEMP2:
 #endif
-                case TELEM_DSM_FLOG_TEMP1: MUSIC_PlayValue(MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + k), TELEMETRY_GetValue(Model.telem_alarm[k]),VOICE_UNIT_TEMP,0); break;
+                case TELEM_DSM_FLOG_TEMP1: MUSIC_PlayValue(MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + k), TELEMETRY_GetValue(Model.telem_alarm[k]),VOICE_UNIT_TEMP,1); break;
 #if HAS_EXTENDED_TELEMETRY
                 case TELEM_DSM_RXPCAP_AMPS:
+                case TELEM_DSM_ESC_AMPS1: MUSIC_PlayValue(MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + k), TELEMETRY_GetValue(Model.telem_alarm[k]),VOICE_UNIT_AMPS,2); break;
                 case TELEM_DSM_FPCAP_AMPS:
-                case TELEM_DSM_ESC_AMPS1:
                 case TELEM_DSM_ESC_AMPS2:
 #endif
-                case TELEM_DSM_AMPS1: MUSIC_PlayValue(MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + k), TELEMETRY_GetValue(Model.telem_alarm[k]),VOICE_UNIT_AMPS,2); break;
+                case TELEM_DSM_AMPS1: MUSIC_PlayValue(MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + k), TELEMETRY_GetValue(Model.telem_alarm[k]),VOICE_UNIT_AMPS,1); break;
                 case TELEM_DSM_ALTITUDE:
                 case TELEM_DSM_ALTITUDE_MAX:
                 case TELEM_DSM_VARIO_CLIMBRATE1:
@@ -392,7 +392,7 @@ void TELEMETRY_Alarm()
                 case TELEM_DSM_VARIO_CLIMBRATE4:
                 case TELEM_DSM_VARIO_CLIMBRATE5:
                 case TELEM_DSM_VARIO_CLIMBRATE6:
-                case TELEM_DSM_VARIO_ALTITUDE: MUSIC_PlayValue(MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + k), TELEMETRY_GetValue(Model.telem_alarm[k]),VOICE_UNIT_ALTITUDE,2); break;
+                case TELEM_DSM_VARIO_ALTITUDE: MUSIC_PlayValue(MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + k), TELEMETRY_GetValue(Model.telem_alarm[k]),VOICE_UNIT_ALTITUDE,1); break;
 
                 case TELEM_DSM_GFORCE_X:
                 case TELEM_DSM_GFORCE_Y:
