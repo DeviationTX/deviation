@@ -311,7 +311,9 @@ static void frskyX_data_frame() {
         seq_last_sent = (seq_last_sent + 1) % 4;
     else if (seq_last_rcvd == 0)
         seq_last_sent = 1;
-    
+    else
+        seq_last_rcvd = 8;
+
     chan_offset ^= 0x08;
     
     memset(&packet[22], 0, packet_size-24);
