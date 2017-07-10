@@ -63,7 +63,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     GUI_CreateTextSelectPlate(&gui->gtlt[relrow], TEXTSEL2_X, y,
             TEXTSEL2_W, LINE_HEIGHT, &TINY_FONT, sound_test_cb, gtlt_cb, (void *)(long)absrow);
     GUI_CreateTextSelectPlate(&gui->value[relrow], TEXTSEL3_X, y,
-            TEXTSEL3_W, LINE_HEIGHT, &TEXTSEL_FONT, NULL, limit_cb, (void *)(long)absrow);
+            TEXTSEL3_W, LINE_HEIGHT, &TINY_FONT, limit_th_cb, limit_cb, (void *)(long)absrow);
     return 3;
 }
 

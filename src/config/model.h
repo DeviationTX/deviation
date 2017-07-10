@@ -25,7 +25,7 @@ const char *MODEL_TEMPLATE;
 
 //This cannot be computed, and must be manually updated
 #define NUM_PROTO_OPTS 5
-#define VIRT_NAME_LEN 10 
+#define VIRT_NAME_LEN 10
 
 struct Model {
     u32 fixed_id;
@@ -48,6 +48,7 @@ struct Model {
     u8 safety[NUM_SOURCES+1];
     u8 telem_alarm[TELEM_NUM_ALARMS];
     s32 telem_alarm_val[TELEM_NUM_ALARMS];
+    u8 telem_alarm_th[TELEM_NUM_ALARMS];
     u8 telem_flags;
     MixerMode mixer_mode;
     s8 ppm_map[MAX_PPM_IN_CHANNELS];

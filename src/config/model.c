@@ -169,6 +169,7 @@ static const char SECTION_TELEMALARM[] = "telemalarm";
 static const char TELEM_SRC[] = "source";
 static const char TELEM_ABOVE[] =  "above";
 static const char TELEM_VALUE[] = "value";
+static const char TELEM_TH[] ="threshold";
 
 /* Section: Datalog */
 static const char SECTION_DATALOG[] = "datalog";
@@ -913,6 +914,9 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
             m->telem_alarm_val[idx] = atoi(value);
             return 1;
         }
+        if (MATCH_KEY(TELEM_TH)) {
+            m->telem_alarm_th[idx] = atoi(value);
+        }
     }
 #if HAS_DATALOG
     if (MATCH_SECTION(SECTION_DATALOG)) {
@@ -1282,6 +1286,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
         if(WRITE_FULL_MODEL || (m->telem_flags & (1 << idx)))
             fprintf(fh, "%s=%d\n", TELEM_ABOVE, (m->telem_flags & (1 << idx)) ? 1 : 0);
         fprintf(fh, "%s=%d\n", TELEM_VALUE, m->telem_alarm_val[idx]);
+        fprintf(fh, "%s=%d\n", TELEM_TH, m->telem_alarm_th[idx]);
     }
 #if HAS_DATALOG
     fprintf(fh, "[%s]\n", SECTION_DATALOG);

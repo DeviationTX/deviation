@@ -26,9 +26,9 @@ void PAGE_TelemconfigInit(int page)
     (void)page;
     enum {
         COL1 = (10 + ((LCD_WIDTH - 320) / 2)),
-        COL2 = (COL1 + 55),
-        COL3 = (COL1 + 156),
-        COL4 = (COL1 + 225),
+        COL2 = (COL1 + 40),
+        COL3 = (COL1 + 141),
+        COL4 = (COL1 + 210),
         ROW1 = (70 + ((LCD_HEIGHT - 240) / 2)),
         LABEL_WIDTH = (COL2 - COL1),
     };
@@ -46,7 +46,7 @@ void PAGE_TelemconfigInit(int page)
            label_cb, NULL, (void *)i);
         GUI_CreateTextSelect(&gui->type[i], COL2, ROW1 + row_height * i, TEXTSELECT_96, NULL, telem_name_cb, (void *)i);
         GUI_CreateTextSelect(&gui->gtlt[i], COL3, ROW1 + row_height * i, TEXTSELECT_64, sound_test_cb, gtlt_cb, (void *)i);
-        GUI_CreateTextSelect(&gui->value[i], COL4, ROW1 + row_height * i, TEXTSELECT_64, NULL, limit_cb, (void *)i);
+        GUI_CreateTextSelect(&gui->value[i], COL4, ROW1 + row_height * i, TEXTSELECT_96, limit_th_cb, limit_cb, (void *)i);
     }
 }
 
