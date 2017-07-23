@@ -91,6 +91,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             for (int i = 1; i < AUDIO_LAST; i += 1) {
                 if (strcasecmp(value, AUDIO_PLAYER[i]) == 0) {
                     Transmitter.audio_player = i;
+                    break;
                 }
                 else Transmitter.audio_player = AUDIO_NONE;
             }
