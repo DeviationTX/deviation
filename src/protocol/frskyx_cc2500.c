@@ -626,7 +626,6 @@ static void frsky_check_telemetry(u8 *pkt, u8 len) {
             }
 #if HAS_EXTENDED_TELEMETRY
             else {
-//                dataState = STATE_DATA_IDLE;    // reset sport decoder if sequence number wrong
                 seq_rx_expected = (seq_rx_expected & 0x03) | 0x04;  // incorrect sequence - request resend
                 return;
             }
@@ -740,10 +739,6 @@ static u16 frskyx_cb() {
       if (len && len < MAX_PACKET_SIZE) {
           CC2500_ReadData(packet, len);
           frsky_check_telemetry(packet, len);
-      } else {
-          // restart sequence on missed packet - might need count or timeout instead of one missed
-          seq_rx_expected = 0;
-          seq_tx_send = 8;
       }
 #else
       (void)len;
