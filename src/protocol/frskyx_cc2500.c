@@ -619,7 +619,7 @@ static void frsky_check_telemetry(u8 *pkt, u8 len) {
         Telemetry.value[TELEM_FRSKY_LRSSI] = (s8)pkt[len-2] / 2 - 70;  // Value in dBm
         TELEMETRY_SetUpdated(TELEM_FRSKY_LRSSI);
 
-        if ((pkt[5] & 0x0f) == 0x08) {   // restart
+        if (((pkt[5] & 0x0f) == 0x08) || ((pkt[5] >> 4) == 0x08)) {   // restart
             seq_rx_expected = 8;
             seq_tx_send = 0;
 #if HAS_EXTENDED_TELEMETRY
@@ -651,15 +651,9 @@ static void frsky_check_telemetry(u8 *pkt, u8 len) {
                     telem_save_seq = (seq_rx_expected+1) % 4;
                     memcpy(telem_save_data, &pkt[6], pkt[6]+1);
                 }
-                return;
             }
 #endif
         }
-        if ((pkt[5] >> 4) == 0x08) {   // restart requested by rx
-            seq_tx_send = 0;
-            seq_rx_expected = 8;
-        }
-
     }
 }
 
