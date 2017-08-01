@@ -68,8 +68,8 @@ static u8 channr;
 static u8 counter_rst;
 static u8 ctr;
 static s8 fine;
-static u8 seq_last_sent;
-static u8 seq_last_rcvd;
+static u8 seq_rx_expected;
+static u8 seq_tx_send;
 static u8 packet_size;
 
 
@@ -306,13 +306,7 @@ static void frskyX_data_frame() {
         packet[9+i+2] = chan_1 >> 4;
     }
 
-    packet[21] = seq_last_sent << 4 | seq_last_rcvd;
-    if (seq_last_sent < 8 && seq_last_rcvd < 8)
-        seq_last_sent = (seq_last_sent + 1) % 4;
-    else if (seq_last_rcvd == 0)
-        seq_last_sent = 1;
-    else
-        seq_last_rcvd = 8;
+    packet[21] = seq_rx_expected << 4 | seq_tx_send;
 
     chan_offset ^= 0x08;
     
@@ -347,7 +341,7 @@ static void frskyX_data_frame() {
   [02] TXID2  6D 6D 6D 6D 
   [03] CONST  02 02 02 02 
   [04] RS/RB  2C D0 2C CE // D0,CE = 2*RSSI; ....2C = RX battery voltage(5V from Bec)
-  [05] ?????  03 10 21 32 // TX/RX telemetry hand-shake bytes
+  [05] SEQ    03 10 21 32 // TX/RX telemetry hand-shake sequence number
   [06] NO.BT  00 00 06 03 // No.of valid SPORT frame bytes in the frame    
   [07] STRM1  00 00 7E 00 
   [08] STRM2  00 00 1A 00 
@@ -359,6 +353,13 @@ static void frskyX_data_frame() {
   [14] CHKSUM2
   [15] RSSI
   [16] LQI
+
+  The sequence byte contains 2 nibbles. The low nibble normally contains a 2-bit
+  sequence number (0-3) that is the sequence of sending packets. The high nibble
+  contains the "next expected" packet sequence to be received.
+  Bit 2 of this nibble (bit 6 of the byte) is set to request a re-transmission of a missed packet.
+  Bit 3 of the nibbles is used to indicate/acknowledge startup synchronisation.
+
 */
 
 #define START_STOP              0x7e
@@ -366,6 +367,11 @@ static void frskyX_data_frame() {
 #define STUFF_MASK              0x20
 #define FRSKY_SPORT_PACKET_SIZE    8
 #define TELEM_PKT_SIZE            17
+
+#if HAS_EXTENDED_TELEMETRY
+static s8 telem_save_seq;
+static u8 telem_save_data[FRSKY_SPORT_PACKET_SIZE+1];
+#endif
 
 // FrSky PRIM IDs (1 byte)
 #define DATA_FRAME                0x10
@@ -613,27 +619,41 @@ static void frsky_check_telemetry(u8 *pkt, u8 len) {
         Telemetry.value[TELEM_FRSKY_LRSSI] = (s8)pkt[len-2] / 2 - 70;  // Value in dBm
         TELEMETRY_SetUpdated(TELEM_FRSKY_LRSSI);
 
-        if ((pkt[5] >> 4 & 0x0f) == 0x08) {   // restart or somesuch
-            seq_last_sent = 8;
-            seq_last_rcvd = 0;
+        if (((pkt[5] & 0x0f) == 0x08) || ((pkt[5] >> 4) == 0x08)) {   // restart
+            seq_rx_expected = 8;
+            seq_tx_send = 0;
 #if HAS_EXTENDED_TELEMETRY
             dataState = STATE_DATA_IDLE;    // reset sport decoder
 #endif
         } else {
-            if ((pkt[5] >> 4 & 0x03) == (seq_last_rcvd + 1) % 4) {
-                seq_last_rcvd = (seq_last_rcvd + 1) % 4;
+            if ((pkt[5] & 0x03) == (seq_rx_expected & 0x03)) {
+                seq_rx_expected = (seq_rx_expected + 1) % 4;
+#if HAS_EXTENDED_TELEMETRY
+                if (pkt[6] <= 6) {
+                    for (u8 i=0; i < pkt[6]; i++)
+                        frsky_parse_sport_stream(pkt[7+i]);
+                }
+                // process any saved data from out-of-sequence packet if
+                // it's the next expected packet
+                if (telem_save_seq == seq_rx_expected) {
+                    seq_rx_expected = (seq_rx_expected + 1) % 4;
+                    for (u8 i=0; i < telem_save_data[0]; i++)
+                        frsky_parse_sport_stream(telem_save_data[1+i]);
+                }
+                telem_save_seq = -1;
+#endif
             }
 #if HAS_EXTENDED_TELEMETRY
-            else 
-                dataState = STATE_DATA_IDLE;    // reset sport decoder if sequence number wrong
+            else {
+                seq_rx_expected = (seq_rx_expected & 0x03) | 0x04;  // incorrect sequence - request resend
+                // if this is the packet after the expected one, save the sport data
+                if ((pkt[5] & 0x03) == ((seq_rx_expected+1) % 4) && pkt[6] <= 6) {
+                    telem_save_seq = (seq_rx_expected+1) % 4;
+                    memcpy(telem_save_data, &pkt[6], pkt[6]+1);
+                }
+            }
 #endif
         }
-
-#if HAS_EXTENDED_TELEMETRY
-        if (pkt[6] <= 6)
-            for (u8 i=0; i < pkt[6]; i++)
-                frsky_parse_sport_stream(pkt[7+i]);
-#endif
     }
 }
 
@@ -732,10 +752,6 @@ static u16 frskyx_cb() {
       if (len && len < MAX_PACKET_SIZE) {
           CC2500_ReadData(packet, len);
           frsky_check_telemetry(packet, len);
-      } else {
-          // restart sequence on missed packet - might need count or timeout instead of one missed
-          seq_last_sent = 0;
-          seq_last_rcvd = 8;
       }
 #else
       (void)len;
@@ -745,6 +761,7 @@ static u16 frskyx_cb() {
       packet[2] = fixed_id >> 8;
       frsky_check_telemetry(packet, sizeof(telem_test[0]));
 #endif
+      if (seq_tx_send != 8) seq_tx_send = (seq_tx_send + 1) % 4;
       state = FRSKY_DATA1;
 #ifndef EMULATOR
       return 300;
@@ -862,11 +879,12 @@ static void initialize(int bind)
     channr = 0;
     chanskip = 0;
     ctr = 0;
-    seq_last_sent = 0;
-    seq_last_rcvd = 8;
+    seq_rx_expected = 0;
+    seq_tx_send = 8;
 #if HAS_EXTENDED_TELEMETRY
     Telemetry.value[TELEM_FRSKY_MIN_CELL] = TELEMETRY_GetMaxValue(TELEM_FRSKY_MIN_CELL);
     UART_SetDataRate(57600);    // set for s.port compatibility
+    telem_save_seq = -1;
 #endif
 
     u32 seed = get_tx_id();
