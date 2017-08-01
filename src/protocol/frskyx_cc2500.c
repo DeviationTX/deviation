@@ -368,6 +368,11 @@ static void frskyX_data_frame() {
 #define FRSKY_SPORT_PACKET_SIZE    8
 #define TELEM_PKT_SIZE            17
 
+#if HAS_EXTENDED_TELEMETRY
+static s8 telem_save_seq;
+static u8 telem_save_data[FRSKY_SPORT_PACKET_SIZE+1];
+#endif
+
 // FrSky PRIM IDs (1 byte)
 #define DATA_FRAME                0x10
 
@@ -623,10 +628,29 @@ static void frsky_check_telemetry(u8 *pkt, u8 len) {
         } else {
             if ((pkt[5] & 0x03) == (seq_rx_expected & 0x03)) {
                 seq_rx_expected = (seq_rx_expected + 1) % 4;
+#if HAS_EXTENDED_TELEMETRY
+                if (pkt[6] <= 6) {
+                    for (u8 i=0; i < pkt[6]; i++)
+                        frsky_parse_sport_stream(pkt[7+i]);
+                }
+                // process any saved data from out-of-sequence packet if
+                // it's the next expected packet
+                if (telem_save_seq == seq_rx_expected) {
+                    seq_rx_expected = (seq_rx_expected + 1) % 4;
+                    for (u8 i=0; i < telem_save_data[0]; i++)
+                        frsky_parse_sport_stream(telem_save_data[1+i]);
+                }
+                telem_save_seq = -1;
+#endif
             }
 #if HAS_EXTENDED_TELEMETRY
             else {
                 seq_rx_expected = (seq_rx_expected & 0x03) | 0x04;  // incorrect sequence - request resend
+                // if this is the packet after the expected one, save the sport data
+                if ((pkt[5] & 0x03) == ((seq_rx_expected+1) % 4) && pkt[6] <= 6) {
+                    telem_save_seq = (seq_rx_expected+1) % 4;
+                    memcpy(telem_save_data, &pkt[6], pkt[6]+1);
+                }
                 return;
             }
 #endif
@@ -636,11 +660,6 @@ static void frsky_check_telemetry(u8 *pkt, u8 len) {
             seq_rx_expected = 8;
         }
 
-#if HAS_EXTENDED_TELEMETRY
-        if (pkt[6] <= 6)
-            for (u8 i=0; i < pkt[6]; i++)
-                frsky_parse_sport_stream(pkt[7+i]);
-#endif
     }
 }
 
@@ -871,6 +890,7 @@ static void initialize(int bind)
 #if HAS_EXTENDED_TELEMETRY
     Telemetry.value[TELEM_FRSKY_MIN_CELL] = TELEMETRY_GetMaxValue(TELEM_FRSKY_MIN_CELL);
     UART_SetDataRate(57600);    // set for s.port compatibility
+    telem_save_seq = -1;
 #endif
 
     u32 seed = get_tx_id();
