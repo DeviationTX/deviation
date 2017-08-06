@@ -259,14 +259,20 @@ static u16 dm002_callback()
 static void DM002_initialize_txid()
 {
     // Not figured out txid / rf channels yet
-    // Only 2 IDs/RFs are available, model txid (even/odd) is used to switch between them
-    if(Model.fixed_id & 1) { 
-        memcpy(hopping_frequency,(uint8_t *)"\x34\x39\x43\x48",DM002_NUM_RF_CHANNEL);
-        memcpy(rx_tx_addr,(uint8_t *)"\x47\x93\x00\x00\xD5",DM002_ADDRESS_SIZE);
-    }
-    else {
-        memcpy(hopping_frequency,(uint8_t *)"\x35\x39\x3B\x3D",DM002_NUM_RF_CHANNEL);
-        memcpy(rx_tx_addr,(uint8_t *)"\xAC\xA1\x00\x00\xD5",DM002_ADDRESS_SIZE);
+    // Only 3 IDs/RFs are available, model txid (even/odd) is used to switch between them
+    switch(Model.fixed_id % 3) {
+        case 0:
+            memcpy(hopping_frequency,(uint8_t *)"\x34\x39\x43\x48",DM002_NUM_RF_CHANNEL);
+            memcpy(rx_tx_addr,(uint8_t *)"\x47\x93\x00\x00\xD5",DM002_ADDRESS_SIZE);
+            break;
+        case 1:
+            memcpy(hopping_frequency,(uint8_t *)"\x35\x39\x3B\x3D",DM002_NUM_RF_CHANNEL);
+            memcpy(rx_tx_addr,(uint8_t *)"\xAC\xA1\x00\x00\xD5",DM002_ADDRESS_SIZE);
+            break;
+        case 2:
+            memcpy(hopping_frequency,(uint8_t *)"\x32\x37\x41\x46",DM002_NUM_RF_CHANNEL);
+            memcpy(rx_tx_addr,(uint8_t *)"\x92\x45\x01\x00\xD5",DM002_ADDRESS_SIZE);
+            break;
     }
 }
 
