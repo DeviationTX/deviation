@@ -1,14 +1,14 @@
 #ifndef _DEVO_F7_TARGET_H_
 #define _DEVO_F7_TARGET_H_
 
-#define USE_DEVOFS 0 //Must be before common_devo include
+#define USE_DEVOFS 1 //Must be before common_devo include
 #include "../common/devo/common_devo.h"
 
 #define TXID 0xF7
 #define VECTOR_TABLE_LOCATION 0x3000 //0x3000
 #define SPIFLASH_SECTOR_OFFSET 0
-#define SPIFLASH_SECTORS 512
-//#define SPIFLASH_AAI_AF 1
+#define SPIFLASH_SECTORS 16
+#define SPIFLASH_AAI_AF 1
 
 #define LCD_WIDTH 24
 #define LCD_HEIGHT 12

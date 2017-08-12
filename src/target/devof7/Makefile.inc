@@ -1,6 +1,5 @@
 SCREENSIZE  := text
 FILESYSTEMS := common text
-LANGUAGE    := devo10 
 
 CRC_OFFSET       := 8192
 OPTIMIZE_DFU     := 1
@@ -8,12 +7,12 @@ MODULAR          := 0x20004000
 DFU_ARGS         := -c 7 -b 0x08003000
 # 0x08003000
 
-#PRE_FS = $(ODIR)/.pre_fs
+PRE_FS = $(ODIR)/.pre_fs
 
-#INCLUDE_FS := 0
+INCLUDE_FS := 0
 
 include target/common/devo/Makefile.inc
-#include target/common/devo/Makefile.devofs.inc
+include target/common/devo/Makefile.devofs.inc
 
 ifndef BUILD_TARGET
 
