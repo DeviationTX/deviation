@@ -111,7 +111,7 @@ static const char *limit_cb(guiObject_t *obj, int dir, void *data)
     if (Model.telem_alarm_th[idx] > 0) {
         char tmpstr[sizeof(tempstring)];
         strlcpy(tmpstr, tempstring, sizeof(tmpstr));
-        snprintf(tempstring,sizeof(tempstring),"%ds@%s",Model.telem_alarm_th[idx],tmpstr);
+        snprintf(tempstring,sizeof(tempstring),"%ds%s%s",Model.telem_alarm_th[idx],ALARM_TH_SPACER,tmpstr);
     }
     return tempstring;
 }

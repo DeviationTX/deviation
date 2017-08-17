@@ -19,6 +19,8 @@
 #include "gui/gui.h"
 #include "config/model.h"
 
+#define ALARM_TH_SPACER "@"
+
 #include "../common/_telemconfig_page.c"
 
 void PAGE_TelemconfigInit(int page)

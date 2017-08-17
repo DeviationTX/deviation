@@ -33,6 +33,7 @@ enum {
     MSG_Y      = 10,
 };
 #endif //OVERRIDE_PLACEMENT
+#define ALARM_TH_SPACER "@"
 
 #if HAS_TELEMETRY
 #include "../common/_telemconfig_page.c"
