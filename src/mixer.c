@@ -333,7 +333,9 @@ void MIXER_ApplyMixer(struct Mixer *mixer, volatile s32 *raw, s32 *orig_value)
             else if(value - *orig_value < -rate)
                 value = *orig_value - rate;
         }
-    case MUX_LAST: break;
+        break;
+    case MUX_LAST:
+        break;
     }
 
     //5th: apply trim
