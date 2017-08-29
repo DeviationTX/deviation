@@ -25,7 +25,7 @@
 
 #if defined USE_DEVOFS && USE_DEVOFS
    #define EMULATE_FAT 1
-   #define FAT_OFFSET 3    //boot_sector + fat_sector + root_sector
+  uint32_t fat_offset = 3;    //boot_sector + fat_sector + root_sector
   static const u8 boot[] = {
       0xeb, 0x3c, 0x90,
       'M', 'S', 'D', 'O', 'S', '5', '.', '0',
@@ -68,15 +68,19 @@
   };
 #else
    #define EMULATE_FAT 0
-   #define FAT_OFFSET 0
+   uint32_t fat_offset = 0;
 #endif
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-// uint32_t Mass_Memory_Size[2] = {0x1000 * (FAT_OFFSET + SPIFLASH_SECTORS - SPIFLASH_SECTOR_OFFSET), 0};
+// uint32_t Mass_Memory_Size[2] = {0x1000 * (fat_offset + SPIFLASH_SECTORS - SPIFLASH_SECTOR_OFFSET), 0};
 uint32_t Mass_Block_Size[2] = {4096, 0};
-uint32_t Mass_Block_Count[2] = {FAT_OFFSET + SPIFLASH_SECTORS - SPIFLASH_SECTOR_OFFSET, 0};
+#if defined HAS_FLASH_DETECT && HAS_FLASH_DETECT
+    uint32_t Mass_Block_Count[2] = {0, 0};
+#else
+    uint32_t Mass_Block_Count[2] = {fat_offset + SPIFLASH_SECTORS - SPIFLASH_SECTOR_OFFSET, 0};
+#endif
 volatile uint32_t Status = 0;
 
 /* Private function prototypes -----------------------------------------------*/
@@ -116,16 +120,16 @@ uint16_t MAL_Write(uint8_t lun, uint32_t Memory_Offset, uint32_t *Writebuff, uin
     case 0:
       //DBG("Writing: 0x%08x %d\n", (unsigned int)Memory_Offset, (int)Transfer_Length);
 #if EMULATE_FAT
-      if (Memory_Offset + Transfer_Length < (0x1000 * FAT_OFFSET)) {
+      if (Memory_Offset + Transfer_Length < (0x1000 * fat_offset)) {
           return MAL_OK;
       }
-      if (Memory_Offset < (0x1000 * FAT_OFFSET)) {
-          Transfer_Length -= ((0x1000 * FAT_OFFSET) - Memory_Offset);
-          Writebuff += ((0x1000 * FAT_OFFSET) - Memory_Offset);
-          Memory_Offset = 0x1000 * FAT_OFFSET;
+      if (Memory_Offset < (0x1000 * fat_offset)) {
+          Transfer_Length -= ((0x1000 * fat_offset) - Memory_Offset);
+          Writebuff += ((0x1000 * fat_offset) - Memory_Offset);
+          Memory_Offset = 0x1000 * fat_offset;
       }
 #endif
-      SPIFlash_WriteBytes(Memory_Offset  + ((SPIFLASH_SECTOR_OFFSET - FAT_OFFSET) * 0x1000), Transfer_Length, (u8 *)Writebuff);
+      SPIFlash_WriteBytes(Memory_Offset  + ((SPIFLASH_SECTOR_OFFSET - fat_offset) * 0x1000), Transfer_Length, (u8 *)Writebuff);
       //NAND_Write(Memory_Offset, Writebuff, Transfer_Length);
       break;
     default:
@@ -149,7 +153,7 @@ uint16_t MAL_Read(uint8_t lun, uint32_t Memory_Offset, uint32_t *Readbuff, uint1
       //NAND_Read(Memory_Offset, Readbuff, Transfer_Length);
       //DBG("Reading: 0x%08x %d\n", (unsigned int)Memory_Offset, (int)Transfer_Length);
 #if EMULATE_FAT      
-      if (Memory_Offset < (FAT_OFFSET * 0x1000)) {
+      if (Memory_Offset < (fat_offset * 0x1000)) {
           static const struct {
               u16 addr;
               u16 size;
@@ -181,7 +185,7 @@ uint16_t MAL_Read(uint8_t lun, uint32_t Memory_Offset, uint32_t *Readbuff, uint1
           break;
       }
 #endif
-      SPIFlash_ReadBytes(Memory_Offset  + ((SPIFLASH_SECTOR_OFFSET - FAT_OFFSET) * 0x1000), Transfer_Length, (u8*)Readbuff);
+      SPIFlash_ReadBytes(Memory_Offset  + ((SPIFLASH_SECTOR_OFFSET - fat_offset) * 0x1000), Transfer_Length, (u8*)Readbuff);
       break;
     default:
       return MAL_FAIL;
@@ -201,11 +205,11 @@ uint16_t MAL_Clear(uint8_t lun, uint32_t Memory_Offset)
   (void)lun;
   //printf("Erase: (%d)%06x\n", lun, Memory_Offset);
 #if EMULATE_FAT
-  if (Memory_Offset < (FAT_OFFSET * 0x1000)) {
+  if (Memory_Offset < (fat_offset * 0x1000)) {
       return MAL_OK;
   }
 #endif
-  SPIFlash_EraseSector(Memory_Offset + ((SPIFLASH_SECTOR_OFFSET - FAT_OFFSET) * 0x1000));
+  SPIFlash_EraseSector(Memory_Offset + ((SPIFLASH_SECTOR_OFFSET - fat_offset) * 0x1000));
   return MAL_OK;
 }
 /*******************************************************************************
