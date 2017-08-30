@@ -92,6 +92,11 @@ void detect_memory_type()
      * system
      */
     u32 spiflash_sectors = 0; 
+#if defined USE_DEVOFS && USE_DEVOFS
+    u8 fat_offset = 3;    //boot_sector + fat_sector + root_sector
+#else
+    u8 fat_offset = 0;
+#endif
     u8 mfg_id, memtype, capacity;
     u32 id;
     CS_LO();
@@ -175,7 +180,7 @@ SPIFLASH_USE_AAI      = %d\n",
         SPIFLASH_USE_AAI);     
         
     printf("%d free sectors\n", spiflash_sectors - SPIFLASH_SECTOR_OFFSET);
-    Mass_Block_Count[0] = spiflash_sectors - SPIFLASH_SECTOR_OFFSET;
+    Mass_Block_Count[0] = fat_offset + spiflash_sectors - SPIFLASH_SECTOR_OFFSET;
 }
 #endif
 
