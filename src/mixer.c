@@ -706,6 +706,18 @@ static void _trim_as_switch(unsigned flags, int i, int is_neg)
             _trim_music_play(i, is_neg, 0);
 #endif
         }
+    } else if (Model.trims[i].step == TRIM_3POS) {
+        if (flags & BUTTON_PRESS) {
+            *value = is_neg ? -100 : 100;
+#if HAS_EXTENDED_AUDIO
+            _trim_music_play(i, is_neg, 1);
+#endif
+        } else if (flags & BUTTON_RELEASE) {
+            *value = 0;
+#if HAS_EXTENDED_AUDIO
+            _trim_music_play(i, is_neg, 0);
+#endif
+        }
     } else if (flags & BUTTON_PRESS) {
         if (Model.trims[i].step == TRIM_ONOFF) {
             //On/Off
