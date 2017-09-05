@@ -20,16 +20,34 @@
 #include "gui/gui.h"
 #include "config/model.h"
 
+#if LCD_WIDTH == 66
+//devof12e
 enum {
     LABEL_X    = 0,
     LABEL_W    = 2*ITEM_SPACE,
     TEXTSEL1_X = 3*ITEM_SPACE,
     TEXTSEL1_W = 7*ITEM_SPACE,
     TEXTSEL2_X = 12*ITEM_SPACE,
-    TEXTSEL2_W = 3*ITEM_SPACE,
-    TEXTSEL3_X = 17*ITEM_SPACE,
-    TEXTSEL3_W = 6*ITEM_SPACE,
+    TEXTSEL2_W = 2*ITEM_SPACE,
+    TEXTSEL3_X = 16*ITEM_SPACE,
+    TEXTSEL3_W = 10*ITEM_SPACE,
     MSG_X      = 10*ITEM_SPACE,
     MSG_Y      = 5*ITEM_SPACE,
 };
+#define ALARM_TH_SPACER "@"
+#else
+enum {
+    LABEL_X    = 0,
+    LABEL_W    = 1*ITEM_SPACE,
+    TEXTSEL1_X = 2*ITEM_SPACE,
+    TEXTSEL1_W = 7*ITEM_SPACE,
+    TEXTSEL2_X = 11*ITEM_SPACE,
+    TEXTSEL2_W = 2*ITEM_SPACE,
+    TEXTSEL3_X = 15*ITEM_SPACE,
+    TEXTSEL3_W = 8*ITEM_SPACE,
+    MSG_X      = 10*ITEM_SPACE,
+    MSG_Y      = 5*ITEM_SPACE,
+};
+#define ALARM_TH_SPACER " " // @-sign not available in devof7 charset
+#endif
 #include "../128x64x1/telemconfig_page.c"

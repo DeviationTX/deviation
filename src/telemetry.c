@@ -37,6 +37,7 @@ static u32 alarm_time[TELEM_NUM_ALARMS] = {0};
 static u32 last_updated[TELEM_UPDATE_SIZE] = {0};
 static u32 music_time = 0;
 static u32 error_time = 0;
+static u32 limit_th_time[TELEM_NUM_ALARMS] ={0};
 #define CHECK_DURATION 500
 
 void _get_value_str(char *str, s32 value, u8 decimals, char units)
@@ -320,19 +321,21 @@ void TELEMETRY_Alarm()
                                         Model.telem_alarm_val[k]) == ((Model.telem_flags >> k) & 1)) {
             if (!alarm_state[k]) {
                 alarm_state[k]++;
+                limit_th_time[k] = current_time + (Model.telem_alarm_th[k] * 1000);
 #ifdef DEBUG_TELEMALARM
                 printf("set: 0x%x\n\n", k);
 #endif
             }
         } else if (alarm_state[k]) {
             alarm_state[k] = 0;
+            limit_th_time[k] = 0;
 #ifdef DEBUG_TELEMALARM
             printf("clear: 0x%x\n\n", k);
 #endif
         }
     }
 
-    if (alarm_state[k]==1 && current_time >= music_time) {
+    if (alarm_state[k]==1 && current_time >= music_time && current_time >= limit_th_time[k]) {
         music_time = current_time + Transmitter.telem_alert_interval*1000;
         // K > 2 is exclude first 3 alarms from jump action (interim solution)
         // <= (9 + type) is limit jump action to only visible telemetry monitor values

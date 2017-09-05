@@ -107,7 +107,24 @@ static const char *limit_cb(guiObject_t *obj, int dir, void *data)
     }
 
     Model.telem_alarm_val[idx] = GUI_TextSelectHelper(value, min, max, dir, small_step, big_step, NULL);
-    return TELEMETRY_GetValueStrByValue(tempstring, telem_idx, Model.telem_alarm_val[idx]);
+    TELEMETRY_GetValueStrByValue(tempstring, telem_idx, Model.telem_alarm_val[idx]);
+    if (Model.telem_alarm_th[idx] > 0) {
+        char tmpstr[sizeof(tempstring)];
+        strlcpy(tmpstr, tempstring, sizeof(tmpstr));
+        snprintf(tempstring,sizeof(tempstring),"%ds%s%s",Model.telem_alarm_th[idx],ALARM_TH_SPACER,tmpstr);
+    }
+    return tempstring;
+}
+
+static void limit_th_cb(guiObject_t *obj, void *data)
+{
+    (void)obj;
+    int idx = (long)data;
+    if (Model.telem_alarm_th[idx] < 9) {
+        Model.telem_alarm_th[idx]++;
+    } else {
+        Model.telem_alarm_th[idx] = 0;
+    }
 }
 
 static void sound_test_cb(guiObject_t *obj, void *data)
