@@ -166,16 +166,12 @@ u16 MUSIC_GetSound(u16 music) {
     Volume = Transmitter.volume * 10;
     char filename[] = "media/sound.ini\0\0\0"; // placeholder for longer folder name
     #ifdef _DEVO12_TARGET_H_
-    static u8 checked;
-        if(!checked) {
-            FILE *fh;
-            fh = fopen("mymedia/sound.ini", "r");
-            if(fh) {
-                sprintf(filename, "mymedia/sound.ini");
-                fclose(fh);
-            }
-            checked = 1;
-        }
+    FILE *fh;
+    fh = fopen("mymedia/sound.ini", "r");
+    if(fh) {
+        sprintf(filename, "mymedia/sound.ini");
+        fclose(fh);
+    }
     #endif
     if (music >= MUSIC_TOTAL) {
         printf("ERROR: Music %d can not be found in sound.ini", music);
