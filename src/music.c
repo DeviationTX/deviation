@@ -177,7 +177,7 @@ u16 MUSIC_GetSound(u16 music) {
             checked = 1;
         }
     #else
-    char filename[] = "media/sound.ini\0\0\0"; // placeholder for longer folder name
+    char filename[] = "media/sound.ini";
     #endif
     if (music >= MUSIC_TOTAL) {
         printf("ERROR: Music %d can not be found in sound.ini", music);
