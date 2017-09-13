@@ -110,8 +110,8 @@ void MUSIC_Play(enum Music music)
     num_notes = 0;
     next_note = 1;
     Volume = Transmitter.volume * 10;
-    char filename[] = "media/sound.ini\0\0\0"; // placeholder for longer folder name
     #ifdef _DEVO12_TARGET_H_
+    static char filename[] = "media/sound.ini\0\0\0"; // placeholder for longer folder name
     static u8 checked;
         if(!checked) {
             FILE *fh;
@@ -122,6 +122,8 @@ void MUSIC_Play(enum Music music)
             }
             checked = 1;
         }
+    #else
+    char filename[] = "media/sound.ini";
     #endif
     if(CONFIG_IniParse(filename, ini_handler, (void *)sections[music])) {
         printf("ERROR: Could not read %s\n", filename);
