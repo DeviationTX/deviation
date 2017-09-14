@@ -250,8 +250,8 @@ u8 CONFIG_ReadDisplay()
     memset(&Display, 0, sizeof(Display));
     DEFAULT_FONT.font = 7;
     DEFAULT_FONT.font_color = 0xffff;
-    char filename[] = "media/config.ini\0\0\0"; // placeholder for longer folder name
     #ifdef _DEVO12_TARGET_H_
+    static char filename[] = "media/config.ini\0\0\0"; // placeholder for longer folder name
     static u8 checked;
         if(!checked) {
             FILE *fh;
@@ -262,6 +262,8 @@ u8 CONFIG_ReadDisplay()
             }
             checked = 1;
         }
+    #else
+    char filename[] = "media/config.ini";
     #endif
     return CONFIG_IniParse(filename, ini_handler, (void *)&Display);
 }
