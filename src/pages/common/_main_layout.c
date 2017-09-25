@@ -134,7 +134,7 @@ int guielem_idx(guiObject_t *obj)
 
 void move_elem()
 {
-    guiObject_t *obj = GUI_GetSelected();
+    guiObject_t *obj = (guiObject_t *)&gui->elem[lp->selected_for_move];
     if ((guiLabel_t *)obj < gui->elem)
         return;
     int idx = guielem_idx(obj);
