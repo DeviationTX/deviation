@@ -110,8 +110,8 @@ static unsigned action_cb(u32 button, unsigned flags, void *data)
 void PAGE_ChangeQuick(int dir)
 {
     int quick = 0;
-    for (int i = 0; i < 4; i++) {
-        if(Model.pagecfg2.quickpage[i] > 1 && Model.pagecfg2.quickpage[i] == cur_page) {
+    for (int i = 0; i < NUM_QUICKPAGES; i++) {
+        if(Model.pagecfg2.quickpage[i] && Model.pagecfg2.quickpage[i] == cur_page) {
             quick = i+1;
             break;
         }
