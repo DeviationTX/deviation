@@ -110,8 +110,8 @@ static unsigned action_cb(u32 button, unsigned flags, void *data)
 void PAGE_ChangeQuick(int dir)
 {
     int quick = 0;
-    for (int i = 0; i < 4; i++) {
-        if(Model.pagecfg2.quickpage[i] > 1 && Model.pagecfg2.quickpage[i] == cur_page) {
+    for (int i = 0; i < NUM_QUICKPAGES; i++) {
+        if(Model.pagecfg2.quickpage[i] && Model.pagecfg2.quickpage[i] == cur_page) {
             quick = i+1;
             break;
         }
@@ -119,12 +119,11 @@ void PAGE_ChangeQuick(int dir)
     int increment = dir > 0 ? 1 : NUM_QUICKPAGES;
     while(1) {
        quick = (quick + increment) % 5;
-       if (quick == 0 || Model.pagecfg2.quickpage[quick-1] > 1)
+       if (quick == 0 || (Model.pagecfg2.quickpage[quick-1] && PAGE_IsValidQuickPage(Model.pagecfg2.quickpage[quick-1])))
            break;
     }
     if (quick == 0) {
         PAGE_ChangeByID(PAGEID_MAIN, 0);
-    } else if (Model.pagecfg2.quickpage[quick-1] == 1) { // bug fix: main menu should not be in quick page
     } else {
         PAGE_ChangeByID(Model.pagecfg2.quickpage[quick-1], 0);
     }
@@ -147,7 +146,7 @@ int PAGE_QuickPage(u32 buttons, u8 flags, void *data)
 
 int PAGE_GetStartPage()
 {
-    return 1; // main menu shouldn't be put to quick page
+    return 0;
 }
 
 int PAGE_GetID()
