@@ -57,18 +57,18 @@ void PAGE_SplashEvent()
         return;
     if ( 0 == time ) {
     	time = CLOCK_getms()+ Transmitter.splash_delay * 100; // 3 sec.
-#if HAS_EXTENDED_AUDIO
+/*#if HAS_EXTENDED_AUDIO
         time_startup_msg = CLOCK_getms() + 5 * 100;     // Dealy 0.5 second to play startup audio
-#endif
+#endif */
     }
-#if HAS_EXTENDED_AUDIO
+/*#if HAS_EXTENDED_AUDIO
     if (time_startup_msg && (CLOCK_getms() > time_startup_msg) ) {
         AUDIO_Init(); // could have happened before on model load, but won't hurt to do again
         AUDIO_SetVolume(); // could have happened before on model load, but won't hurt to do again
         MUSIC_Play(MUSIC_STARTUP);
         time_startup_msg = 0;
     }
-#endif
+#endif */
     // We use SPITouch_IRQ() here instead of attaching an event to the image because
     // We want to abort regardless of where on the page the touch occurred
     if ( CLOCK_getms() > time || SPITouch_IRQ())

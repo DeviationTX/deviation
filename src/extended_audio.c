@@ -26,7 +26,7 @@
 
 #if HAS_EXTENDED_AUDIO
 
-static u32 audio_queue_time = 0;
+//static u32 audio_queue_time = 0;
 
 // Initialize UART for extended-audio
 void AUDIO_Init() {
