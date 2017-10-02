@@ -123,12 +123,16 @@ u8 PAGE_TelemStateCheck(char *str, int strlen)
 }
 
 int PAGE_IsValidQuickPage(int page) {
+    switch(page) {
+        case PAGEID_MAIN:
+            return 1;
+    }
 #if HAS_STANDARD_GUI
     int menu = 0;
     #define PAGEDEF(_id, _init, _event, _exit, _menu, _name) \
         case _id: menu = _menu; break;
     switch(page) {
-        #include <pagelist.h>
+        #include "pagelist.h"
     }
     #undef PAGEDEF
     if (! (menu & Model.mixer_mode)) {
@@ -144,6 +148,8 @@ int PAGE_IsValidQuickPage(int page) {
 
 const char *PAGE_GetName(int i)
 {
+    if(i == 0)
+        return _tr("None");
     return _tr(pages[i].pageName);
 }
 

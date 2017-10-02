@@ -53,8 +53,7 @@ void PAGE_ChangeByID(enum PageID id, s8 menuPage)
         return;
     PAGE_SaveCurrentPos();
     page_scrollable = NULL;
-    if (pages[cur_page].exit)
-        pages[cur_page].exit();
+    PAGE_Exit();
     GUI_SelectionNotify(NULL);
     cur_page = id;
     BUTTON_InterruptLongPress(); //Make sure button press is not passed to the new page
@@ -162,16 +161,17 @@ static const char *okcancelstr_cb(guiObject_t *obj, const void *data)
 unsigned page_change_cb(u32 buttons, unsigned flags, void *data)
 {
     (void)data;
-    (void)flags;
     if (PAGE_GetID() == PAGEID_TELEMMON) {
         if(CHAN_ButtonIsPressed(buttons, BUT_ENTER) || CHAN_ButtonIsPressed(buttons, BUT_EXIT))
             TELEMETRY_MuteAlarm();
     }
-    if (ActionCB != NULL)
-        return ActionCB(buttons, flags, data);
     if (flags & BUTTON_LONGPRESS) {
         if (flags & BUTTON_REPEAT)
             return 0;
+        if(quick_page_enabled) { // let the quickpage over other pages
+            if(PAGE_QuickPage(buttons, flags, data))
+                return 1;
+        }        
         if(CHAN_ButtonIsPressed(buttons, BUT_ENTER) && enter_cmd) {
             void (*cmd)(guiObject_t *obj, const void *data) = enter_cmd;
             PAGE_RemoveAllObjects();
@@ -186,8 +186,8 @@ unsigned page_change_cb(u32 buttons, unsigned flags, void *data)
         }
         return 0;
     }
-    if(PAGE_QuickPage(buttons, flags, data))
-        return 1;
+    if (ActionCB != NULL)
+        return ActionCB(buttons, flags, data);
 //    if(CHAN_ButtonIsPressed(buttons, BUT_RIGHT)) {
 //        PAGE_Change(1);
 //        return 1;
@@ -261,18 +261,6 @@ int PAGE_QuickPage(u32 buttons, u8 flags, void *data)
 {
     (void)data;
     (void)flags;
-    //static s8 press = 0;
-    //if(cur_section != 0)
-    //    return 0;
-
-/*    if (press) {
-        if (flags & BUTTON_RELEASE) {
-            PAGE_ChangeQuick(press);
-            press = 0;
-        }
-        return 1;
-    }
-*/
     int i;
     for(i = 0; i < NUM_QUICKPAGES; i++)
         if(Model.pagecfg2.quickpage[i])
@@ -280,11 +268,9 @@ int PAGE_QuickPage(u32 buttons, u8 flags, void *data)
     if(i == NUM_QUICKPAGES)
         return 0;
     if(CHAN_ButtonIsPressed(buttons, BUT_RIGHT)) {
-        //press = 1;
         PAGE_ChangeQuick(1);
         return 1;
     } else if (CHAN_ButtonIsPressed(buttons, BUT_LEFT)) {
-        //press = -1;
         PAGE_ChangeQuick(-1);
         return 1;
     }
