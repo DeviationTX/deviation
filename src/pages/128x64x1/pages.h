@@ -68,4 +68,5 @@ void PAGE_SplashEvent();
 void PAGE_SplashExit();
 void PAGE_VideoSetupInit(int page);
 void PAGE_LayoutEditInit(int page);
+void PAGE_ExternalOSDInit(int page);
 #endif
