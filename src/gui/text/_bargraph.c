@@ -42,7 +42,7 @@ void _bargraph_trim_horizontal(int x, int y, int width, int height, s32 val, u32
     
     s16 xpos = 0;
     s32 center = (graph->max + graph->min) / 2;
-    s32 val_scale = ((box->width - ITEM_SPACE) * (val - graph->min) + (graph->max - graph->min) / 2) / (graph->max - graph->min);
+    s32 val_scale = ((box->width - ITEM_SPACE) / ITEM_SPACE * (val - graph->min) + (graph->max - graph->min) / 2) / (graph->max - graph->min) * ITEM_SPACE;
     xpos = graph->direction == TRIM_HORIZONTAL ? box->x + val_scale : box->x + box->width - ITEM_SPACE - val_scale;
     unsigned c;
     if (val == center) {
@@ -73,7 +73,7 @@ void _bargraph_trim_vertical(int x, int y, int width, int height, s32 val, u32 c
 	
     s16 ypos = 0;
     s32 center = (graph->max + graph->min) / 2;
-    s32 val_scale = ((box->height - LINE_HEIGHT) * (val - graph->min) + (graph->max - graph->min) / 2) / (graph->max - graph->min);
+    s32 val_scale = ((box->height - LINE_HEIGHT) / LINE_HEIGHT * (val - graph->min) + (graph->max - graph->min) / 2) / (graph->max - graph->min) * LINE_HEIGHT;
     ypos = box->y + box->height - LINE_HEIGHT - val_scale;
     unsigned c;
     if (val == center) {
