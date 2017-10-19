@@ -4,13 +4,16 @@
     #define MENUID_MAIN   (1 << 4)
     #define MENUID_MODEL  (2 << 4)
     #define MENUID_TX     (3 << 4)
+    #define MENUID_PAGE   (4 << 4)
 #endif
+
 //                  Menu ID     CONDITION
 #define MAIN_MENU   MENUID_MAIN  |  (MIXER_STANDARD | MIXER_ADVANCED)        // Top-level menu, always shown
 #define MODEL_MENU  MENUID_MODEL |  (MIXER_STANDARD | MIXER_ADVANCED)        // Model-menu, always shown
 #define STDGUI_MENU MENUID_MODEL |  MIXER_STANDARD        // Model-menu, only shown for standard-gui
 #define ADVGUI_MENU MENUID_MODEL |  MIXER_ADVANCED        // Model-menu, only shown for advanced-gui
 #define TX_MENU     MENUID_TX    |  (MIXER_STANDARD | MIXER_ADVANCED)        // Transmitter-menu, always shown
+#define PAGE_MENU   MENUID_PAGE  |  (MIXER_STANDARD | MIXER_ADVANCED)        // Hidden menu, for quick pages only
 
 //The following pages are not part of the menu system
 //---------------------------------------------------
@@ -61,7 +64,7 @@ PAGEDEF(PAGEID_DATALOG,  PAGE_DatalogInit,     PAGE_DatalogEvent,     NULL,     
 #endif
 PAGEDEF(PAGEID_MAINCFG,  PAGE_MainLayoutInit,  NULL,                  NULL,               MODEL_MENU,  _tr_noop("Main page config"))
 #if HAS_MUSIC_CONFIG
-PAGEDEF(PAGEID_VOICECFG, PAGE_VoiceconfigInit,    NULL,    NULL,               MODEL_MENU,   _tr_noop("Voice config"))
+PAGEDEF(PAGEID_VOICECFG, PAGE_VoiceconfigInit, NULL,                  NULL,               MODEL_MENU,  _tr_noop("Voice config"))
 #endif
 
 // Transmitter menu
@@ -71,7 +74,14 @@ PAGEDEF(PAGEID_CHANMON,  PAGE_ChantestInit,    PAGE_ChantestEvent,    PAGE_Chant
 #if HAS_TELEMETRY
 PAGEDEF(PAGEID_TELEMMON, PAGE_TelemtestInit,   PAGE_TelemtestEvent,   NULL,                TX_MENU,    _tr_noop("Telemetry monitor"))
 #endif
-PAGEDEF(PAGEID_RANGE,    PAGE_RangeInit,       NULL,	              PAGE_RangeExit,      TX_MENU,    _tr_noop("Range Test"))
+PAGEDEF(PAGEID_RANGE,    PAGE_RangeInit,       NULL,                  PAGE_RangeExit,      TX_MENU,    _tr_noop("Range Test"))
+//-------------------
+
+// Pages menu
+//-----------
+#if HAS_VIDEO
+PAGEDEF(PAGEID_EXTOSD,   PAGE_ExternalOSDInit, NULL,                  NULL,                PAGE_MENU,  _tr_noop("External OSD"))
+#endif
 //-------------------
 
 //These pages should not be lisetd for quickpages
