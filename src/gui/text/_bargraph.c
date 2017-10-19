@@ -33,32 +33,17 @@ void _bargraph_trim_horizontal(int x, int y, int width, int height, s32 val, u32
     (void)y;
     (void)width;
     (void)height;
-    for(int i=box->x + ITEM_SPACE; i < box->x+box->width-ITEM_SPACE; i+= ITEM_SPACE) 
+    
+    for(int i=box->x + ITEM_SPACE; i < box->x + box->width - ITEM_SPACE; i+= ITEM_SPACE) 
         LCD_PrintCharXY(i, box->y, LCD_CENTER_DOT);
     LCD_PrintCharXY(box->x, box->y, LCD_LEFT_PTR);
-    LCD_PrintCharXY(box->x+box->width-1, box->y, LCD_RIGHT_PTR);
+    LCD_PrintCharXY(box->x + box->width - ITEM_SPACE, box->y, LCD_RIGHT_PTR);
     LCD_PrintCharXY(box->x + (box->width) / 2, box->y, LCD_HTRIM_CTR);
+    
     s16 xpos = 0;
-    if ((graph->max > 100 && graph->max <= 200) && abs(graph->min) == graph->max) {
-        u8 pos100 = (box->width -1) * (100 - graph->min)/(graph->max - graph->min);
-        xpos = graph->direction == TRIM_HORIZONTAL ? box->x + pos100: box->x + box->width -1 - pos100;
-        //LCD_DrawFastVLine(xpos, box->y -1, 2, 1); // -100% position
-        //LCD_PrintStringXY(xpos, box->y -1, "[");
-        //LCD_DrawFastVLine(xpos, box->y + box->height-1, 2, 1);
-
-        pos100 = (box->width -1) * (-100 - graph->min)/(graph->max - graph->min);
-        xpos = graph->direction == TRIM_HORIZONTAL ? box->x + pos100: box->x + box->width -1 - pos100;
-        //LCD_DrawFastVLine(xpos, box->y -1, 2, 1); // 100% position
-        //LCD_PrintStringXY(xpos, box->y-1, "]");
-		
-        //LCD_DrawFastVLine(xpos, box->y + box->height-1, 2, 1);
-    }
-    s32 val_scale = (box->width - 1) * (val - graph->min) / (graph->max - graph->min);
-    xpos = graph->direction == TRIM_HORIZONTAL
-              ? box->x + val_scale
-              : box->x + box->width - 1 - val_scale;
- 
     s32 center = (graph->max + graph->min) / 2;
+    s32 val_scale = ((box->width - ITEM_SPACE) / ITEM_SPACE * (val - graph->min) + (graph->max - graph->min) / 2) / (graph->max - graph->min) * ITEM_SPACE;
+    xpos = graph->direction == TRIM_HORIZONTAL ? box->x + val_scale : box->x + box->width - ITEM_SPACE - val_scale;
     unsigned c;
     if (val == center) {
         c = LCD_UP_ARROW;
@@ -79,27 +64,17 @@ void _bargraph_trim_vertical(int x, int y, int width, int height, s32 val, u32 c
     (void)y;
     (void)width;
     (void)height;
-    for(int i=box->y+LINE_HEIGHT; i < box->y + box->height-LINE_HEIGHT; i+= LINE_HEIGHT) 
+    
+    for(int i=box->y + LINE_HEIGHT; i < box->y + box->height - LINE_HEIGHT; i+= LINE_HEIGHT) 
         LCD_PrintCharXY( box->x, i, LCD_CENTER_DOT);
     LCD_PrintCharXY(box->x, box->y + (box->height ) / 2,  LCD_VTRIM_CTR);
     LCD_PrintCharXY(box->x, box->y, LCD_UP_ARROW);
-    LCD_PrintCharXY(box->x, box->y + box->height - 1, LCD_DOWN_ARROW);
+    LCD_PrintCharXY(box->x, box->y + box->height - LINE_HEIGHT, LCD_DOWN_ARROW);
 	
     s16 ypos = 0;
-    if ((graph->max > 100 && graph->max <= 200) && abs(graph->min) == graph->max) {
-        u8 pos100 = (box->height -1) * (100 - graph->min)/(graph->max - graph->min);
-        ypos = box->y + box->height -1 - pos100;
-        //LCD_DrawFastHLine(box->x -1, ypos, 2, 1); // -100% position
-        //LCD_DrawFastHLine(box->x + box->width -1, ypos, 2, 1);
-
-        pos100 = (box->height -1) * (-100 - graph->min)/(graph->max - graph->min);
-        ypos = box->y + box->height -1 - pos100;
-        //LCD_DrawFastHLine(box->x -1, ypos, 2, 1); // -100% position
-        //LCD_DrawFastHLine(box->x + box->width -1, ypos, 2, 1);
-    }
     s32 center = (graph->max + graph->min) / 2;
-    s32 val_scale = (box->height -1) * (val - graph->min) / (graph->max - graph->min);
-    ypos = box->y + box->height - val_scale;
+    s32 val_scale = ((box->height - LINE_HEIGHT) / LINE_HEIGHT * (val - graph->min) + (graph->max - graph->min) / 2) / (graph->max - graph->min) * LINE_HEIGHT;
+    ypos = box->y + box->height - LINE_HEIGHT - val_scale;
     unsigned c;
     if (val == center) {
         c = LCD_RIGHT_PTR;
@@ -108,5 +83,5 @@ void _bargraph_trim_vertical(int x, int y, int width, int height, s32 val, u32 c
     } else {
         c = LCD_HTRIM_LT;
     }
-    LCD_PrintCharXY(box->x, ypos -1 , c);
+    LCD_PrintCharXY(box->x, ypos, c);
 }
