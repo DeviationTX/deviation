@@ -197,7 +197,7 @@ static void build_sticks_packet()
             packet[10 + ch*2] = 0x05;
             continue;
         }
-        s32 value = (s32)Channels[ch] * 0x1f1 / CHAN_MAX_VALUE + 0x5d9;
+        s32 value = (s32)Channels[ch] * 500 / CHAN_MAX_VALUE + 1500;
         if (value < 875)
             value = 875;
         else if (value > 2125)
