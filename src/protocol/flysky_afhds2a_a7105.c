@@ -49,6 +49,7 @@ static s32 packet_count;
 static u8 bind_reply;
 static u8 state;
 static u8 channel;
+static u8 tx_power;
 
 static const u8 AFHDS2A_regs[] = {
     -1  , 0x42 | (1<<5), 0x00, 0x25, 0x00,   -1,   -1, 0x00, 0x00, 0x00, 0x00, 0x01, 0x3c, 0x05, 0x00, 0x50, // 00 - 0f
@@ -178,8 +179,10 @@ static int afhds2a_init()
     A7105_WriteReg(0x25, 0x0A);
 
     A7105_SetTxRxMode(TX_EN);
+    
     A7105_SetPower(Model.tx_power);
-
+    tx_power = Model.tx_power;
+    
     A7105_Strobe(A7105_STANDBY);
     A7105_SetTxRxMode(TX_EN);
     return 1;
@@ -540,6 +543,11 @@ static u16 afhds2a_cb()
                 packet_type = PACKET_FAILSAFE;
             else
                 packet_type = PACKET_STICKS; // todo : check for settings changes
+            // keep transmit power in sync
+            if(tx_power != Model.tx_power) {
+                A7105_SetPower(Model.tx_power);
+                tx_power = Model.tx_power;
+            }
             // got some data from RX ?
             // we've no way to know if RX fifo has been filled
             // as we can't poll GIO1 or GIO2 to check WTR
