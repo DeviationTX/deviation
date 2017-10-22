@@ -64,6 +64,7 @@ const unsigned long protocol_type = (unsigned long) &_data_loadaddr;
 #define PACKET_SIZE        15
 #define RF_NUM_CHANNELS    4
 #define RF_BIND_CHANNEL    0
+#define RF_BIND_CHANNEL_X16_AH 10
 #define ADDRESS_LENGTH     5
 
 
@@ -79,7 +80,7 @@ enum {
     CHANNEL8,                   // Video camera
     CHANNEL9,                   // Headless
     CHANNEL10,                  // Return To Home
-    CHANNEL11,                  // Calibrate
+    CHANNEL11,                  // Take Off/Landing
     CHANNEL12,                  // Emg. stop
 };
 #define CHANNEL_INVERTED    CHANNEL5    // inverted flight on Floureon H101
@@ -88,7 +89,7 @@ enum {
 #define CHANNEL_VIDEO       CHANNEL8
 #define CHANNEL_HEADLESS    CHANNEL9
 #define CHANNEL_RTH         CHANNEL10
-#define CHANNEL_CALIBRATE   CHANNEL11
+#define CHANNEL_TO          CHANNEL11
 #define CHANNEL_EMGSTOP     CHANNEL12
 enum {
     Bayang_INIT1 = 0,
@@ -98,13 +99,20 @@ enum {
 
 static const char *const bay_opts[] = {
     _tr_noop("Telemetry"), _tr_noop("Off"), _tr_noop("On"), NULL,
+    _tr_noop("Format"), _tr_noop("regular"), _tr_noop("X16-AH"), NULL,
     NULL
 };
 
 
 enum {
     PROTOOPTS_TELEMETRY = 0,
+    PROTOOPTS_FORMAT = 1,
     LAST_PROTO_OPT,
+};
+
+enum {
+    FORMAT_REGULAR,
+    FORMAT_X16_AH,
 };
 
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
@@ -118,6 +126,7 @@ static u8 telemetry;
 static u8 packet[PACKET_SIZE];
 static u8 tx_power;
 static u8 txid[3];
+static u8 bind_chan;
 static u8 rf_chan;
 static u8 rf_channels[RF_NUM_CHANNELS];
 static u8 rx_tx_addr[ADDRESS_LENGTH];
@@ -171,10 +180,26 @@ static void send_packet(u8 bind)
 
         memcpy(&packet[1], rx_tx_addr, 5);
         memcpy(&packet[6], rf_channels, 4);
-        packet[10] = txid[0];
-        packet[11] = txid[1];
+        switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
+                case FORMAT_REGULAR:
+                    packet[10] = txid[0];
+                    packet[11] = txid[1];
+                    break;
+                case FORMAT_X16_AH:
+                    packet[10] = 0x00;
+                    packet[11] = 0x00;
+                    break;
+        }
+
     } else {
-        packet[0] = 0xa5;
+        switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
+                case FORMAT_REGULAR:
+                    packet[0] = 0xa5;
+                    break;
+                case FORMAT_X16_AH:
+                    packet[0] = 0xa6;
+                    break;
+        }
         packet[1] = 0xfa;       // normal mode is 0xf7, expert 0xfa
         packet[2] = GET_FLAG(CHANNEL_FLIP, 0x08)
             | GET_FLAG(CHANNEL_HEADLESS, 0x02)
@@ -182,6 +207,7 @@ static void send_packet(u8 bind)
             | GET_FLAG(CHANNEL_VIDEO, 0x10)
             | GET_FLAG(CHANNEL_PICTURE, 0x20);
         packet[3] = GET_FLAG(CHANNEL_INVERTED, 0x80)
+            | GET_FLAG(CHANNEL_TO, 0x20)
 		    | GET_FLAG(CHANNEL_EMGSTOP, 0x04);
         chanval.value = scale_channel(CHANNEL1, 0x3ff, 0);      // aileron
         packet[4] = chanval.bytes.msb + DYNTRIM(chanval.value);
@@ -196,14 +222,25 @@ static void send_packet(u8 bind)
         packet[10] = chanval.bytes.msb + DYNTRIM(chanval.value);
         packet[11] = chanval.bytes.lsb;
     }
-    packet[12] = txid[2];
-    packet[13] = 0x0a;
+
+    switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
+            case FORMAT_REGULAR:
+                packet[12] = txid[2];
+                packet[13] = 0x0a;
+                break;
+            case FORMAT_X16_AH:
+                packet[12] = 0x00;
+                packet[13] = 0x00;
+                break;
+    }
+
     packet[14] = checksum();
 
 
 
     NRF24L01_WriteReg(NRF24L01_05_RF_CH,
-                      bind ? RF_BIND_CHANNEL : rf_channels[rf_chan++]);
+              bind ? bind_chan : rf_channels[rf_chan++]);
+
     rf_chan %= sizeof(rf_channels);
 
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
@@ -215,7 +252,7 @@ static void send_packet(u8 bind)
     NRF24L01_SetTxRxMode(TX_EN);
 
     // Power on, TX mode, 2byte CRC
-    // Why CRC0? xn297 does not interpret it - either 16-bit CRC or nothing     
+    // Why CRC0? xn297 does not interpret it - either 16-bit CRC or nothing
     XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) |
                     BV(NRF24L01_00_PWR_UP));
 
@@ -235,7 +272,7 @@ static void send_packet(u8 bind)
     }
 #ifdef EMULATOR
     dbgprintf("next chan 0x%02x, bind %d, data %02x",
-              bind ? RF_BIND_CHANNEL : rf_channels[rf_chan], bind,
+              bind ? bind_chan : rf_channels[rf_chan], bind,
               packet[0]);
     for (int i = 1; i < PACKET_SIZE; i++)
         dbgprintf(" %02x", packet[i]);
@@ -258,7 +295,7 @@ static int check_rx(void)
     } chanval;
 
     if (NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR)) {
-        // data received from aircraft 
+        // data received from aircraft
         XN297_ReadPayload(packet, PACKET_SIZE);
 
         NRF24L01_WriteReg(NRF24L01_07_STATUS, 255);
@@ -273,7 +310,7 @@ static int check_rx(void)
             Telemetry.value[TELEM_DSM_FLOG_VOLT1] = chanval.value;
             TELEMETRY_SetUpdated(TELEM_DSM_FLOG_VOLT1);
 
-            // compensated battery volts*100  
+            // compensated battery volts*100
             chanval.bytes.msb = packet[5] & 0x7;
             chanval.bytes.lsb = packet[6] & 0xff;
             Telemetry.value[TELEM_DSM_FLOG_VOLT2] = chanval.value;
@@ -298,15 +335,22 @@ static int check_rx(void)
 static void bay_init()
 {
     u8 bind_address[] = { 0, 0, 0, 0, 0 };
-
+    switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
+            case FORMAT_REGULAR:
+                bind_chan = RF_BIND_CHANNEL;
+                break;
+            case FORMAT_X16_AH:
+                bind_chan = RF_BIND_CHANNEL_X16_AH;
+                break;
+    }
     NRF24L01_Initialize();
     NRF24L01_SetTxRxMode(TX_EN);
 
     // SPI trace of stock TX has these writes to registers that don't appear in
     // nRF24L01 or Beken 2421 datasheets.  Uncomment if you have an XN297 chip?
-    // NRF24L01_WriteRegisterMulti(0x3f, "\x4c\x84\x67,\x9c,\x20", 5); 
-    // NRF24L01_WriteRegisterMulti(0x3e, "\xc9\x9a\xb0,\x61,\xbb,\xab,\x9c", 7); 
-    // NRF24L01_WriteRegisterMulti(0x39, "\x0b\xdf\xc4,\xa7,\x03,\xab,\x9c", 7); 
+    // NRF24L01_WriteRegisterMulti(0x3f, "\x4c\x84\x67,\x9c,\x20", 5);
+    // NRF24L01_WriteRegisterMulti(0x3e, "\xc9\x9a\xb0,\x61,\xbb,\xab,\x9c", 7);
+    // NRF24L01_WriteRegisterMulti(0x39, "\x0b\xdf\xc4,\xa7,\x03,\xab,\x9c", 7);
 
     XN297_SetTXAddr(bind_address, ADDRESS_LENGTH);
 
@@ -385,7 +429,7 @@ MODULE_CALLTYPE static u16 bay_callback()
 
     case Bayang_DATA:
         if (telemetry) {
-            // telemetry is enabled 
+            // telemetry is enabled
             loopcount++;
             if (loopcount > 1000) {
                 //calculate telemetry reception packet rate - packets per second
@@ -472,9 +516,9 @@ static void initialize()
     telemetry_count = 0;
     telemetry = Model.proto_opts[PROTOOPTS_TELEMETRY];
 
-    // set some initial values to show nothing has been received 
+    // set some initial values to show nothing has been received
     if (telemetry)
-        Telemetry.value[TELEM_DSM_FLOG_VOLT1] = Telemetry.value[TELEM_DSM_FLOG_VOLT2] = 888;    //8.88V In 1/100 of Volts   
+        Telemetry.value[TELEM_DSM_FLOG_VOLT1] = Telemetry.value[TELEM_DSM_FLOG_VOLT2] = 888;    //8.88V In 1/100 of Volts
 
     initialize_txid();
     bay_init();
@@ -512,7 +556,7 @@ const void *Bayang_Cmds(enum ProtoCmds cmd)
         return (void *) (long) (Model.proto_opts[PROTOOPTS_TELEMETRY] ==
                                 TELEM_ON ? PROTO_TELEM_ON :
                                 PROTO_TELEM_OFF);
-    case PROTOCMD_TELEMETRYTYPE: 
+    case PROTOCMD_TELEMETRYTYPE:
         return (void *)(long) TELEM_DSM;
     default:
         break;
