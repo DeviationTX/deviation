@@ -68,14 +68,6 @@ int main() {
     LCD_SetFont(DEFAULT_FONT.font);
     LCD_SetFontColor(DEFAULT_FONT.font_color);
 
-
-/*#if !HAS_EXTENDED_AUDIO
-    // If Extended Audio is present, move startup msg to Splash page to allow additional audio hardware initialization time
-    MUSIC_Play(MUSIC_STARTUP);
-#else
-    if (Transmitter.splash_delay < 5)
-        MUSIC_Play(MUSIC_STARTUP); // if no splash page startup msg is used force playing here
-#endif */
     GUI_HandleButtons(1);
 
     MIXER_Init();
@@ -100,6 +92,7 @@ int main() {
     GUI_DrawScreen();
 
     // Add startup delay to make sure audio player is initialized
+    // AUDIO_Init() has already been called by CONFIG_ReadModel()
     audio_queue_time = CLOCK_getms() + 1500;
     num_audio++;
     next_audio++;

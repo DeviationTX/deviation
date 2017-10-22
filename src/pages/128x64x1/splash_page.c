@@ -52,27 +52,12 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
 void PAGE_SplashEvent()
 {
     static unsigned int time=0;
-#if HAS_EXTENDED_AUDIO
-    static unsigned int time_startup_msg;
-#endif
     if(GUI_IsModal())
        return;
 //    u8 step = 5;
     if ( 0 == time ) {
     	time = CLOCK_getms() + Transmitter.splash_delay * 100;
-/*#if HAS_EXTENDED_AUDIO
-        time_startup_msg = CLOCK_getms() + 5 * 100;	// Dealy 0.5 second to play startup audio
-#endif*/
     }
-/*#if HAS_EXTENDED_AUDIO
-    if (time_startup_msg && (CLOCK_getms() > time_startup_msg) ) {
-        AUDIO_Init(); // could have happened before on model load, but won't hurt to do again
-        AUDIO_SetVolume(); // could have happened before on model load, but won't hurt to do again
-        MUSIC_Play(MUSIC_STARTUP);
-        time_startup_msg = 0;
-    }
-#endif */
-
     if ( CLOCK_getms() > time )
 	PAGE_ChangeByID(PAGEID_MAIN,0);
 /*     if ( offset > 0 ) {
