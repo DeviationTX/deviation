@@ -113,7 +113,7 @@ enum {
     FLAG_RATE_HIGH= 0x04,
     FLAG_LED      = 0x08, // motors on/off (H20H)
     FLAG_HEADLESS = 0x10, // RTH + headless on H8, headless on JJRC H20
-    FLAG_RTH      = 0x20, // 360Â° flip mode on H8 3D, RTH on JJRC H20
+    FLAG_RTH      = 0x20, // 360° flip mode on H8 3D, RTH on JJRC H20
 };
 
 enum {
