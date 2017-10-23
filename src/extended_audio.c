@@ -114,8 +114,8 @@ int AUDIO_Play(u16 music) {
 
 #ifndef EMULATOR
   switch (Transmitter.audio_player) {
+    case AUDIO_DISABLED:
     case AUDIO_LAST: // Sigh. Shut up the warnings
-    case AUDIO_DISABLE:
     case AUDIO_NONE: return 0;	// Play beeps...
     case AUDIO_AUDIOFX: {
       char buffer[5];
@@ -152,6 +152,7 @@ void AUDIO_SetVolume() {
 
 #ifndef EMULATOR
     switch (Transmitter.audio_player) {
+      case AUDIO_DISABLED:
       case AUDIO_LAST: // Sigh. Shut up the warnings
       case AUDIO_AUDIOFX: // AUDIOFX only allows up down selection of volume...not implemented
       case AUDIO_NONE: break;	// Play beeps...
