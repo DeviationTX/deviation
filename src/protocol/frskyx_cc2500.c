@@ -403,6 +403,9 @@ static void setup_serial_port() {
     if ( Model.proto_opts[PROTO_OPTS_SPORTOUT] ) {
         UART_SetDataRate(57600);    // set for s.port compatibility
 #if HAS_EXTENDED_AUDIO
+#if HAS_AUDIO_UART5
+        if (Transmitter.audio_uart5) return;
+#endif
         Transmitter.audio_player = AUDIO_DISABLED; // disable voice commands on serial port
 #endif
     }
@@ -896,6 +899,7 @@ static void initialize(int bind)
 #if HAS_EXTENDED_TELEMETRY
     Telemetry.value[TELEM_FRSKY_MIN_CELL] = TELEMETRY_GetMaxValue(TELEM_FRSKY_MIN_CELL);
     telem_save_seq = -1;
+    setup_serial_port();
 #endif
 
     u32 seed = get_tx_id();
@@ -927,12 +931,7 @@ static void initialize(int bind)
 const void *FRSKYX_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
-        case PROTOCMD_INIT:
-            initialize(0);
-#if HAS_EXTENDED_TELEMETRY
-            setup_serial_port();
-#endif
-            return 0;
+        case PROTOCMD_INIT: initialize(0); return 0;
         case PROTOCMD_CHECK_AUTOBIND: return 0; //Never Autobind
         case PROTOCMD_BIND:  initialize(1); return 0;
         case PROTOCMD_NUMCHAN: return (void *)12L;
