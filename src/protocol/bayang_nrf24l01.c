@@ -99,7 +99,7 @@ enum {
 
 static const char *const bay_opts[] = {
     _tr_noop("Telemetry"), _tr_noop("Off"), _tr_noop("On"), NULL,
-    _tr_noop("Format"), _tr_noop("regular"), _tr_noop("X16-AH"), NULL,
+    _tr_noop("Format"), _tr_noop("regular"), "X16-AH", "IRDRONE", NULL,
     NULL
 };
 
@@ -113,6 +113,7 @@ enum {
 enum {
     FORMAT_REGULAR,
     FORMAT_X16_AH,
+    FORMAT_IRDRONE,
 };
 
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
@@ -189,6 +190,10 @@ static void send_packet(u8 bind)
                     packet[10] = 0x00;
                     packet[11] = 0x00;
                     break;
+                case FORMAT_IRDRONE:
+                    packet[10] = 0x30;
+                    packet[11] = 0x01;
+                    break;
         }
 
     } else {
@@ -197,6 +202,7 @@ static void send_packet(u8 bind)
                     packet[0] = 0xa5;
                     break;
                 case FORMAT_X16_AH:
+                case FORMAT_IRDRONE:
                     packet[0] = 0xa6;
                     break;
         }
@@ -231,6 +237,10 @@ static void send_packet(u8 bind)
             case FORMAT_X16_AH:
                 packet[12] = 0x00;
                 packet[13] = 0x00;
+                break;
+            case FORMAT_IRDRONE:
+                packet[12] = 0xe0;
+                packet[13] = 0x2e;
                 break;
     }
 
@@ -340,6 +350,7 @@ static void bay_init()
                 bind_chan = RF_BIND_CHANNEL;
                 break;
             case FORMAT_X16_AH:
+            case FORMAT_IRDRONE:
                 bind_chan = RF_BIND_CHANNEL_X16_AH;
                 break;
     }
