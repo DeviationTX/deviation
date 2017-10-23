@@ -26,10 +26,12 @@
 
 #if HAS_EXTENDED_AUDIO
 
-//static u32 audio_queue_time = 0;
-
 // Initialize UART for extended-audio
 void AUDIO_Init() {
+    if (Transmitter.audio_player == AUDIO_DISABLED) {
+        // Reload hardware.ini if audio_player had been temporarily disabled
+        CONFIG_LoadHardware();
+    }
     printf("Voice: Initializing UART for extended-audio\n");
 
 #if HAS_AUDIO_UART5
@@ -39,24 +41,18 @@ void AUDIO_Init() {
     }
 #endif
 
-#ifndef EMULATOR
 #ifndef _DEVO12_TARGET_H_
     if ( PPMin_Mode() || Model.protocol == PROTOCOL_PPM ) {
-        printf("Voice: Cannot initialize USART for extended-audio, PPM in use\n");
-        usart_disable(_USART);
-        usart_set_baudrate(_USART, 115200);
-        usart_enable(_USART);
+        printf("Voice: Cannot initialize UART for extended-audio, PPM in use\n");
+        UART_SetDataRate(0);
     }
     else {
 #endif // _DEVO12_TARGET_H_
-        printf("Voice: Setting up USART for extended-audio\n");
-        usart_disable(_USART);
-        usart_set_baudrate(_USART, 9600);
-        usart_enable(_USART);
+        printf("Voice: Setting up UART for extended-audio\n");
+        UART_SetDataRate(9600);
 #ifndef _DEVO12_TARGET_H_
     }
 #endif // _DEVO12_TARGET_H_
-#endif // EMULATOR
 }
 
 #ifndef EMULATOR
@@ -119,6 +115,7 @@ int AUDIO_Play(u16 music) {
 #ifndef EMULATOR
   switch (Transmitter.audio_player) {
     case AUDIO_LAST: // Sigh. Shut up the warnings
+    case AUDIO_DISABLE:
     case AUDIO_NONE: return 0;	// Play beeps...
     case AUDIO_AUDIOFX: {
       char buffer[5];
@@ -190,18 +187,18 @@ void AUDIO_CheckQueue() {
 int AUDIO_VoiceAvailable() {
 #ifndef _DEVO12_TARGET_H_
 #if HAS_AUDIO_UART5
-    if ( !Transmitter.audio_uart5 && (PPMin_Mode() || Model.protocol == PROTOCOL_PPM) ) { // don't send play command when using PPM port
+    if ( !Transmitter.audio_uart5 && (PPMin_Mode() || Model.protocol == PROTOCOL_PPM ) ) { // don't send play command when using PPM port
 #else
     if ( PPMin_Mode() || Model.protocol == PROTOCOL_PPM ) { // don't send play command when using PPM port
 #endif
-        printf("Voice: PPM port in use\n");
+        printf("Voice: PPM in use\n");
         num_audio = 0; // Reset queue when audio not available
         next_audio = 0;
         return 0;
     }
 #endif // _DEVO12_TARGET_H_
 
-    if ( (Transmitter.audio_player == AUDIO_NONE) || !Transmitter.audio_vol ) {
+    if ( (Transmitter.audio_player == AUDIO_NONE) || (Transmitter.audio_player == AUDIO_DISABLED) || !Transmitter.audio_vol ) {
         num_audio = 0; // Reset queue when audio not available
         next_audio = 0;
         return 0;
