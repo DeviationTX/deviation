@@ -53,6 +53,7 @@ void AUDIO_Init() {
 #ifndef _DEVO12_TARGET_H_
     }
 #endif // _DEVO12_TARGET_H_
+    AUDIO_SetVolume();
 }
 
 #ifndef EMULATOR

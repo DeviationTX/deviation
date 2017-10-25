@@ -93,9 +93,12 @@ int main() {
 
     // Add startup delay to make sure audio player is initialized
     // AUDIO_Init() has already been called by CONFIG_ReadModel()
+#if HAS_EXTENDED_AUDIO
     audio_queue_time = CLOCK_getms() + 1500;
     num_audio++;
     next_audio++;
+#endif
+
     MUSIC_Play(MUSIC_STARTUP);
 
 #ifdef HAS_EVENT_LOOP
@@ -203,7 +206,9 @@ void medium_priority_cb()
 void EventLoop()
 {
     CLOCK_ResetWatchdog();
+#if !HAS_EXTENDED_AUDIO
     unsigned int time;
+#endif
 
 #ifdef HEAP_DEBUG
     static int heap = 0;
@@ -225,10 +230,19 @@ void EventLoop()
             CONFIG_SaveTxIfNeeded();
         }
     	if(Transmitter.music_shutdown) {
-	    MUSIC_Play(MUSIC_SHUTDOWN);
-            // We wait ~1sec for shutdown music finished
+#if HAS_EXTENDED_AUDIO
+        if(AUDIO_VoiceAvailable()) {
+            MUSIC_Play(MUSIC_SHUTDOWN);
+            while (CLOCK_getms()<audio_queue_time); // Wait for voice to finished
+        } else {
+#else
+        {
+            // We wait ~1sec for shutdown buzzer music finished
+            MUSIC_Play(MUSIC_SHUTDOWN);
             time = CLOCK_getms()+700;
             while(CLOCK_getms()<time);
+#endif
+        }
 	}
 
         PWR_Shutdown();
