@@ -154,7 +154,7 @@ s32 _frsky_get_max_value(u8 telem)
 s32 _frsky_get_min_value(u8 telem)
 {
     switch(telem) {
-        case TELEM_FRSKY_LRSSI:     return -150;
+        case TELEM_FRSKY_LRSSI:     return -200;
 #if HAS_EXTENDED_TELEMETRY
         case TELEM_FRSKY_TEMP1:
         case TELEM_FRSKY_TEMP2:     return -30;
