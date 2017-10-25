@@ -125,11 +125,11 @@ s32 _frsky_get_max_value(u8 telem)
         case TELEM_FRSKY_VOLT2:     return 8538; //should be 33 * AD2gain, but ugh
         case TELEM_FRSKY_RSSI:      return 60000;
         case TELEM_FRSKY_LQI:       return 127;
-        case TELEM_FRSKY_LRSSI:     return 255;
+        case TELEM_FRSKY_LRSSI:     return -10;
 #if HAS_EXTENDED_TELEMETRY
         case TELEM_FRSKY_RPM:       return 60000;
         case TELEM_FRSKY_VOLT3:
-        case TELEM_FRSKY_ALL_CELL:  return 500 * 6;   // in 100ths of volts
+        case TELEM_FRSKY_ALL_CELL:  return 500 * 6; // in 100ths of volts
         case TELEM_FRSKY_MIN_CELL:
         case TELEM_FRSKY_CELL1:
         case TELEM_FRSKY_CELL2:
@@ -154,11 +154,12 @@ s32 _frsky_get_max_value(u8 telem)
 s32 _frsky_get_min_value(u8 telem)
 {
     switch(telem) {
+        case TELEM_FRSKY_LRSSI:     return -200;
 #if HAS_EXTENDED_TELEMETRY
         case TELEM_FRSKY_TEMP1:
         case TELEM_FRSKY_TEMP2:     return -30;
         case TELEM_FRSKY_RPM:       return 60;
-        case TELEM_FRSKY_ALTITUDE:  return -50000; // cm
+        case TELEM_FRSKY_ALTITUDE:  return -50000;  // cm
         case TELEM_FRSKY_VARIO:     return -500000; // cm
 #endif
         default:
