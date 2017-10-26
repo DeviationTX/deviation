@@ -83,6 +83,7 @@ void UART_Stop()
 void UART_SetDataRate(u32 bps)
 {
     switch (bps) {
+    case   9600:
     case  57600:
     case 115200:
       break;

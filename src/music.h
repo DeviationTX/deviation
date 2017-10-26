@@ -47,7 +47,8 @@ enum AudioPlayers {
   AUDIO_NONE = 0,	// Just use Tx beeps.
   AUDIO_AUDIOFX,	// Adafruit AUDIOFX board
   AUDIO_DF_PLAYER,	// DF Player Mini
-  AUDIO_LAST
+  AUDIO_LAST,
+  AUDIO_DISABLED, // to temporary disable voice for other UART usage
 };
 
 enum AudioDevices {

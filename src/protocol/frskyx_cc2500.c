@@ -22,6 +22,7 @@
 #include "interface.h"
 #include "mixer.h"
 #include "config/model.h"
+#include "config/tx.h"
 #include "telemetry.h"
 
 #ifdef MODULAR
@@ -43,6 +44,7 @@ static const char * const frskyx_opts[] = {
   _tr_noop("Freq-Fine"),  "-127", "127", NULL,
   _tr_noop("Format"),  "FCC", "EU", NULL,
   _tr_noop("RSSIChan"),  "None", "LastChan", NULL,
+  _tr_noop("S.PORT Out"), _tr_noop("Disabled"), _tr_noop("Enabled"), NULL,
   NULL
 };
 enum {
@@ -51,6 +53,7 @@ enum {
     PROTO_OPTS_FREQFINE,
     PROTO_OPTS_FORMAT,
     PROTO_OPTS_RSSICHAN,
+    PROTO_OPTS_SPORTOUT,
     LAST_PROTO_OPT,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
@@ -102,7 +105,7 @@ static const u8 hop_data[] = {
   0xC0, 0xA7, 0x8E, 0x75, 0x5C,
   0x43, 0x2A, 0x11, 0xE3, 0xCA,
   0xB1, 0x98, 0x7F, 0x66, 0x4D,
-  0x34, 0x1B, 0x00, 0x1D, 0x03 
+  0x34, 0x1B, 0x00, 0x1D, 0x03
 };
 
 
@@ -152,8 +155,8 @@ static u16 crc(u8 *data, u8 len) {
 
 static void initialize_data(u8 adr)
 {
-  CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);  // Frequency offset hack 
-  CC2500_WriteReg(CC2500_18_MCSM0,    0x8); 
+  CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);  // Frequency offset hack
+  CC2500_WriteReg(CC2500_18_MCSM0,    0x8);
   CC2500_WriteReg(CC2500_09_ADDR, adr ? 0x03 : (fixed_id & 0xff));
   CC2500_WriteReg(CC2500_07_PKTCTRL1,0x05);
 }
@@ -165,19 +168,19 @@ static void set_start(u8 ch) {
   CC2500_WriteReg(CC2500_24_FSCAL2, calData[ch][1]);
   CC2500_WriteReg(CC2500_25_FSCAL1, calData[ch][2]);
   CC2500_WriteReg(CC2500_0A_CHANNR, ch == 47 ? 0 : hop_data[ch]);
-}   
+}
 
 #define RXNUM 16
 static void frskyX_build_bind_packet()
 {
     packet[0] = Model.proto_opts[PROTO_OPTS_FORMAT] ? 0x20 : 0x1D;
-    packet[1] = 0x03;          
-    packet[2] = 0x01;               
+    packet[1] = 0x03;
+    packet[2] = 0x01;
 
     packet[3] = fixed_id;
     packet[4] = fixed_id >> 8;
     int idx = ((state - FRSKY_BIND) % 10) * 5;
-    packet[5] = idx;  
+    packet[5] = idx;
     packet[6] = hop_data[idx++];
     packet[7] = hop_data[idx++];
     packet[8] = hop_data[idx++];
@@ -218,7 +221,7 @@ static u16 scaleForPXX(u8 chan, u8 failsafe)
             return (chan < 8) ? 0 : 2048;       // No Pulses
     else
         chan_val = Channels[chan];
-    
+
     if (Model.proto_opts[PROTO_OPTS_RSSICHAN] && (chan == Model.num_channels - 1) && !failsafe)
         chan_val = Telemetry.value[TELEM_FRSKY_RSSI] * 21;      // Max RSSI value seems to be 99, scale it to around 2000
     else
@@ -231,7 +234,7 @@ static u16 scaleForPXX(u8 chan, u8 failsafe)
 
     return chan_val;
 }
- 
+
 #ifdef EMULATOR
 #define FAILSAFE_TIMEOUT 64
 #else
@@ -248,7 +251,7 @@ static void frskyX_data_frame() {
     // channel packing: H (0)7-4, L (0)3-0; H (1)3-0, L (0)11-8; H (1)11-8, L (1)7-4 etc
 
     u16 chan_0;
-    u16 chan_1; 
+    u16 chan_1;
     static u8 failsafe_chan;
     u8 startChan = 0;
 
@@ -267,7 +270,7 @@ static void frskyX_data_frame() {
     failsafe_count += 1;
 
 
-    packet[0] = Model.proto_opts[PROTO_OPTS_FORMAT] ? 0x20 : 0x1D;       
+    packet[0] = Model.proto_opts[PROTO_OPTS_FORMAT] ? 0x20 : 0x1D;
     packet[1] = fixed_id;
     packet[2] = fixed_id >> 8;
 
@@ -309,13 +312,13 @@ static void frskyX_data_frame() {
     packet[21] = seq_rx_expected << 4 | seq_tx_send;
 
     chan_offset ^= 0x08;
-    
+
     memset(&packet[22], 0, packet_size-24);
 
     u16 lcrc = crc(&packet[3], packet_size-5);
     packet[packet_size-2] = lcrc >> 8;
     packet[packet_size-1] = lcrc;
-} 
+}
 
 
 // Telemetry
@@ -323,31 +326,31 @@ static void frskyX_data_frame() {
   100K 8E2 normal-multiprotocol
   -every 12ms-
   1  2  3  4  5  6  7  8  9  CRC DESCR
-  7E 98 10 05 F1 20 23 0F 00 A6 SWR_ID 
-  7E 98 10 01 F1 33 00 00 00 C9 RSSI_ID 
-  7E 98 10 04 F1 58 00 00 00 A1 BATT_ID 
-  7E BA 10 03 F1 E2 00 00 00 18 ADC2_ID 
-  7E BA 10 03 F1 E2 00 00 00 18 ADC2_ID 
-  7E BA 10 03 F1 E2 00 00 00 18 ADC2_ID 
-  7E BA 10 03 F1 E2 00 00 00 18 ADC2_ID 
-  7E BA 10 03 F1 E2 00 00 00 18 ADC2_ID 
-  7E BA 10 03 F1 E2 00 00 00 18 ADC2_ID   
-  
-  
+  7E 98 10 05 F1 20 23 0F 00 A6 SWR_ID
+  7E 98 10 01 F1 33 00 00 00 C9 RSSI_ID
+  7E 98 10 04 F1 58 00 00 00 A1 BATT_ID
+  7E BA 10 03 F1 E2 00 00 00 18 ADC2_ID
+  7E BA 10 03 F1 E2 00 00 00 18 ADC2_ID
+  7E BA 10 03 F1 E2 00 00 00 18 ADC2_ID
+  7E BA 10 03 F1 E2 00 00 00 18 ADC2_ID
+  7E BA 10 03 F1 E2 00 00 00 18 ADC2_ID
+  7E BA 10 03 F1 E2 00 00 00 18 ADC2_ID
+
+
   Telemetry frames(RF) SPORT info 15 bytes
   SPORT frame 6+3 bytes
-  [00] PKLEN  0E 0E 0E 0E 
-  [01] TXID1  DD DD DD DD 
-  [02] TXID2  6D 6D 6D 6D 
-  [03] CONST  02 02 02 02 
+  [00] PKLEN  0E 0E 0E 0E
+  [01] TXID1  DD DD DD DD
+  [02] TXID2  6D 6D 6D 6D
+  [03] CONST  02 02 02 02
   [04] RS/RB  2C D0 2C CE // D0,CE = 2*RSSI; ....2C = RX battery voltage(5V from Bec)
   [05] SEQ    03 10 21 32 // TX/RX telemetry hand-shake sequence number
-  [06] NO.BT  00 00 06 03 // No.of valid SPORT frame bytes in the frame    
-  [07] STRM1  00 00 7E 00 
-  [08] STRM2  00 00 1A 00 
-  [09] STRM3  00 00 10 00 
-  [10] STRM4  03 03 03 03  
-  [11] STRM5  F1 F1 F1 F1 
+  [06] NO.BT  00 00 06 03 // No.of valid SPORT frame bytes in the frame
+  [07] STRM1  00 00 7E 00
+  [08] STRM2  00 00 1A 00
+  [09] STRM3  00 00 10 00
+  [10] STRM4  03 03 03 03
+  [11] STRM5  F1 F1 F1 F1
   [12] STRM6  D1 D1 D0 D0
   [13] CHKSUM1
   [14] CHKSUM2
@@ -371,7 +374,7 @@ static void frskyX_data_frame() {
 #if HAS_EXTENDED_TELEMETRY
 static s8 telem_save_seq;
 static u8 telem_save_data[FRSKY_SPORT_PACKET_SIZE+1];
-#endif
+#endif // HAS_EXTENDED_TELEMETRY
 
 // FrSky PRIM IDs (1 byte)
 #define DATA_FRAME                0x10
@@ -396,6 +399,18 @@ static u8 sport_crc(u8 *data) {
     return 0x00ff - crc;
 }
 
+static void setup_serial_port() {
+    if ( Model.proto_opts[PROTO_OPTS_SPORTOUT] ) {
+        UART_SetDataRate(57600);    // set for s.port compatibility
+#if HAS_EXTENDED_AUDIO
+#if HAS_AUDIO_UART5
+        if (Transmitter.audio_uart5) return;
+#endif
+        Transmitter.audio_player = AUDIO_DISABLED; // disable voice commands on serial port
+#endif
+    }
+}
+
 static void serial_echo(u8 *packet) {
   static u8 outbuf[FRSKY_SPORT_PACKET_SIZE+2] = {0x7e};
 
@@ -410,7 +425,7 @@ static void processSportPacket(u8 *packet) {
     u8  prim = packet[1];
     u16 id = *((u16 *)(packet+2));
 
-    if (!PPMin_Mode())
+    if (!PPMin_Mode() && Model.proto_opts[PROTO_OPTS_SPORTOUT])
         serial_echo(packet);   // echo to trainer port
 
     if (prim != DATA_FRAME)
@@ -436,7 +451,7 @@ static void processSportPacket(u8 *packet) {
         set_telemetry(TELEM_FRSKY_VOLTA, SPORT_DATA_U8(packet) * 132 / 100);
         break;
     }
-    
+
     s32 data = SPORT_DATA_S32(packet);
     switch (id & 0xfff0) {
     case ALT_FIRST_ID & 0xfff0:
@@ -686,13 +701,13 @@ static const u8 telem_test[][17] = {
 };
 #endif
 
-  
+
 static u16 frskyx_cb() {
   u8 len;
 
-  switch(state) { 
-    default: 
-      set_start(47);    
+  switch(state) {
+    default:
+      set_start(47);
       CC2500_SetPower(Model.tx_power);
       CC2500_Strobe(CC2500_SFRX);
       frskyX_build_bind_packet();
@@ -708,8 +723,8 @@ static u16 frskyx_cb() {
       PROTOCOL_SetBindState(0);
       initialize_data(0);
       channr = 0;
-      state++;      
-      break;    
+      state++;
+      break;
     case FRSKY_DATA1:
       if (fine != (s8)Model.proto_opts[PROTO_OPTS_FREQFINE]) {
           fine = (s8)Model.proto_opts[PROTO_OPTS_FREQFINE];
@@ -717,10 +732,10 @@ static u16 frskyx_cb() {
       }
       CC2500_SetTxRxMode(TX_EN);
       set_start(channr);
-      CC2500_SetPower(Model.tx_power);    
+      CC2500_SetPower(Model.tx_power);
       CC2500_Strobe(CC2500_SFRX);
       frskyX_data_frame();
-      CC2500_Strobe(CC2500_SIDLE);    
+      CC2500_Strobe(CC2500_SIDLE);
       CC2500_WriteData(packet, packet[0]+1);
       channr = (channr + chanskip) % 47;
       state++;
@@ -738,7 +753,7 @@ static u16 frskyx_cb() {
 #else
       return 2;
 #endif
-    case FRSKY_DATA3:   
+    case FRSKY_DATA3:
       CC2500_Strobe(CC2500_SRX);
       state++;
 #ifndef EMULATOR
@@ -747,7 +762,7 @@ static u16 frskyx_cb() {
       return 30;
 #endif
     case FRSKY_DATA4:
-      len = CC2500_ReadReg(CC2500_3B_RXBYTES | CC2500_READ_BURST) & 0x7F; 
+      len = CC2500_ReadReg(CC2500_3B_RXBYTES | CC2500_READ_BURST) & 0x7F;
 #ifndef EMULATOR
       if (len && len < MAX_PACKET_SIZE) {
           CC2500_ReadData(packet, len);
@@ -768,8 +783,8 @@ static u16 frskyx_cb() {
 #else
       return 3;
 #endif
-  }   
-  return 1;   
+  }
+  return 1;
 }
 
 // register, FCC, EU
@@ -793,12 +808,12 @@ static const u8 init_data[][3] = {
     {CC2500_13_MDMCFG1,   0x23,  0x23},
     {CC2500_14_MDMCFG0,   0x7a,  0x7a},
     {CC2500_15_DEVIATN,   0x51,  0x53},
-};                               
+};
 
 // register, value
 static const u8 init_data_shared[][2] = {
     {CC2500_19_FOCCFG,    0x16},
-    {CC2500_1A_BSCFG,     0x6c}, 
+    {CC2500_1A_BSCFG,     0x6c},
     {CC2500_1B_AGCCTRL2,  0x43},
     {CC2500_1C_AGCCTRL1,  0x40},
     {CC2500_1D_AGCCTRL0,  0x91},
@@ -827,24 +842,24 @@ static void frskyX_init() {
       CC2500_WriteReg(init_data_shared[i][0], init_data_shared[i][1]);
 
   CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);
-  CC2500_Strobe(CC2500_SIDLE);    
+  CC2500_Strobe(CC2500_SIDLE);
 
   //calibrate hop channels
   for (u8 c = 0; c < 47; c++) {
-      CC2500_Strobe(CC2500_SIDLE);    
+      CC2500_Strobe(CC2500_SIDLE);
       CC2500_WriteReg(CC2500_0A_CHANNR, hop_data[c]);
       CC2500_Strobe(CC2500_SCAL);
       usleep(900);
       calData[c][0] = CC2500_ReadReg(CC2500_23_FSCAL3);
-      calData[c][1] = CC2500_ReadReg(CC2500_24_FSCAL2); 
+      calData[c][1] = CC2500_ReadReg(CC2500_24_FSCAL2);
       calData[c][2] = CC2500_ReadReg(CC2500_25_FSCAL1);
   }
-  CC2500_Strobe(CC2500_SIDLE);      
+  CC2500_Strobe(CC2500_SIDLE);
   CC2500_WriteReg(CC2500_0A_CHANNR, 0x00);
   CC2500_Strobe(CC2500_SCAL);
   usleep(900);
   calData[47][0] = CC2500_ReadReg(CC2500_23_FSCAL3);
-  calData[47][1] = CC2500_ReadReg(CC2500_24_FSCAL2);  
+  calData[47][1] = CC2500_ReadReg(CC2500_24_FSCAL2);
   calData[47][2] = CC2500_ReadReg(CC2500_25_FSCAL1);
 }
 
@@ -883,8 +898,8 @@ static void initialize(int bind)
     seq_tx_send = 8;
 #if HAS_EXTENDED_TELEMETRY
     Telemetry.value[TELEM_FRSKY_MIN_CELL] = TELEMETRY_GetMaxValue(TELEM_FRSKY_MIN_CELL);
-    UART_SetDataRate(57600);    // set for s.port compatibility
     telem_save_seq = -1;
+    setup_serial_port();
 #endif
 
     u32 seed = get_tx_id();
@@ -894,8 +909,8 @@ static void initialize(int bind)
         ctr = (ctr+1) % 4;
     counter_rst = (chanskip - ctr) >> 2;
 
-    frskyX_init(); 
-    CC2500_SetTxRxMode(TX_EN);  // enable PA 
+    frskyX_init();
+    CC2500_SetTxRxMode(TX_EN);  // enable PA
 
     if (bind) {
         PROTOCOL_SetBindState(0xFFFFFFFF);
@@ -916,7 +931,7 @@ static void initialize(int bind)
 const void *FRSKYX_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
-        case PROTOCMD_INIT:  initialize(0); return 0;
+        case PROTOCMD_INIT: initialize(0); return 0;
         case PROTOCMD_CHECK_AUTOBIND: return 0; //Never Autobind
         case PROTOCMD_BIND:  initialize(1); return 0;
         case PROTOCMD_NUMCHAN: return (void *)12L;
@@ -927,12 +942,14 @@ const void *FRSKYX_Cmds(enum ProtoCmds cmd)
             return frskyx_opts;
         case PROTOCMD_TELEMETRYSTATE:
             return (void *)1L;
-        case PROTOCMD_TELEMETRYTYPE: 
+        case PROTOCMD_TELEMETRYTYPE:
             return (void *)(long) TELEM_FRSKY;
         case PROTOCMD_RESET:
         case PROTOCMD_DEINIT:
 #if HAS_EXTENDED_TELEMETRY
-            UART_SetDataRate(0);  // restore data rate to default
+            if (Model.proto_opts[PROTO_OPTS_SPORTOUT]) {
+                UART_SetDataRate(0); // restore default rate, voice will be reset on next model's load anyways
+            }
 #endif
             CLOCK_StopTimer();
             return (void *)(CC2500_Reset() ? 1L : -1L);
