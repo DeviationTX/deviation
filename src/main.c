@@ -95,8 +95,8 @@ int main() {
     // AUDIO_Init() has already been called by CONFIG_ReadModel()
 #if HAS_EXTENDED_AUDIO
     audio_queue_time = CLOCK_getms() + 1500;
-    num_audio++;
-    next_audio++;
+    num_audio=1;
+    next_audio=1;
     AUDIO_SetVolume(); // Initial setting of voice volume
 #endif
 
