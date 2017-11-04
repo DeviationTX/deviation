@@ -97,6 +97,7 @@ int main() {
     audio_queue_time = CLOCK_getms() + 1500;
     num_audio++;
     next_audio++;
+    AUDIO_SetVolume(); // Initial setting of voice volume
 #endif
 
     MUSIC_Play(MUSIC_STARTUP);
