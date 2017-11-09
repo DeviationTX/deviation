@@ -25,7 +25,7 @@ enum {
     LABEL_W        = 59,
     //"Throttle curve" and "Pitch curve" pages XY-graph points
     #define LINE_Y LINE_SPACE
-    WIDTH1         = 5,
+    WIDTH1         = 6,
     WIDTH2         = 32,
     WIDTH2_ADD     = 2,
     LINE_H         = 9,
