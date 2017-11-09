@@ -25,11 +25,11 @@
 #define RAW_HEIGHT  (LINE_HEIGHT + 5)
 #define CHAN_HEIGHT 13
 enum {
-    LABEL_COL1_X = 0,
-    LABEL_COL2_X = 63,
+    LABEL_COL1_X = 1,
+    LABEL_COL2_X = 64,
     LABEL_IDX_W  = 0,
     LABEL_CHAN_H = 8,
-    CHAN_X_OFFSET = 37,
+    CHAN_X_OFFSET = 35,
     LABEL_CHAN_W = 23,
     BAR_W        = 59,
     BAR_H        = 4,
@@ -61,10 +61,10 @@ static void draw_chan(int disp, int row, int y)
     }
     GUI_CreateLabelBox(&gui->chan[idx], x, y,
         LABEL_IDX_W, height, &labelDesc, channum_cb, NULL, (void *)(long)get_channel_idx(disp));
-    GUI_CreateLabelBox(&gui->value[idx], x+CHAN_X_OFFSET, y,
+    GUI_CreateLabelBox(&gui->value[idx], x + CHAN_X_OFFSET, y,
         LABEL_CHAN_W, height, &labelValue, value_cb, NULL, (void *)(long)disp);
     if (BAR_H) {
-        GUI_CreateBarGraph(&gui->bar[idx], x, y + height,
+        GUI_CreateBarGraph(&gui->bar[idx], x - 1, y + height,
             BAR_W, BAR_H, -125, 125, TRIM_HORIZONTAL, showchan_cb, (void *)(long)disp);
     }
 
@@ -186,4 +186,3 @@ static inline guiObject_t *_get_obj(int chan, int objid)
 {
     return GUI_GetScrollableObj(&gui->scrollable, chan / 2, chan % 2 ? objid + 2 : objid);
 }
-
