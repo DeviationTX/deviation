@@ -162,14 +162,14 @@ void A7105_AdjustLOBaseFreq(s16 offset)
 {
     // LO base frequency = 32e6*(bip+(bfp/(2^16)))
     u8 bip;  // LO base frequency integer part
-    u16 bfp; // LO base frequency fractional part
+    u32 bfp; // LO base frequency fractional part
     if(offset < 0) {
         bip = 0x4a; // 2368 MHz
-        bfp = 0xffff + (offset * 2.048f) + 1;
+        bfp = 0xffff+((offset*2048)/1000)+1;
     }
     else {
         bip = 0x4b; // 2400 MHz (default)
-        bfp = offset * 2.048f;
+        bfp = (offset*2048)/1000;
     }
     if(offset == 0)
         bfp = 0x0002; // as per datasheet, not sure why recommanded, but that's a +1kHz drift only ...
