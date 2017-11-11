@@ -46,10 +46,12 @@
 
 static const char * const flysky_opts[] = {
   "WLToys ext.",  _tr_noop("Off"), "V9x9", "V6x6", "V912", "CX20", NULL,
+  "Freq Tune", "-300", "300", "655361", NULL, // big step 10, little step 1
   NULL
 };
 enum {
     PROTOOPTS_WLTOYS = 0,
+    PROTOOPTS_FREQTUNE,
     LAST_PROTO_OPT,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
@@ -129,6 +131,7 @@ static u16 packet_period;
 static u8 hopping_frequency[16];
 static u8 hopping_frequency_no;
 static u8 tx_power;
+static s16 freq_offset;
 
 static int flysky_init()
 {
@@ -348,6 +351,11 @@ static u16 flysky_cb()
             A7105_SetPower(Model.tx_power);
             tx_power = Model.tx_power;
         }
+        // keep frequency tuning updated
+        if(freq_offset != Model.proto_opts[PROTOOPTS_FREQTUNE]) {
+                freq_offset = Model.proto_opts[PROTOOPTS_FREQTUNE];
+                A7105_AdjustLOBaseFreq(freq_offset);
+        }
     }
     hopping_frequency_no++;
     return packet_period;
@@ -409,6 +417,8 @@ static void initialize(u8 bind) {
     
     tx_power = Model.tx_power;
     A7105_SetPower(Model.tx_power);
+    freq_offset = Model.proto_opts[PROTOOPTS_FREQTUNE];
+    A7105_AdjustLOBaseFreq(freq_offset);
     hopping_frequency_no = 0;
     if (bind || ! Model.fixed_id) {
         counter = BIND_COUNT;

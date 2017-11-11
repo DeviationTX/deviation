@@ -50,6 +50,7 @@ static u8 bind_reply;
 static u8 state;
 static u8 channel;
 static u8 tx_power;
+static s16 freq_offset;
 
 static const u8 AFHDS2A_regs[] = {
     -1  , 0x42 | (1<<5), 0x00, 0x25, 0x00,   -1,   -1, 0x00, 0x00, 0x00, 0x00, 0x01, 0x3c, 0x05, 0x00, 0x50, // 00 - 0f
@@ -76,6 +77,7 @@ static const char * const afhds2a_opts[] = {
     _tr_noop("Outputs"), "PWM/IBUS", "PPM/IBUS", "PWM/SBUS", "PPM/SBUS", NULL,
     _tr_noop("Servo Hz"), "50", "400", "5", NULL,
     _tr_noop("LQI output"), "None", "Ch5", "Ch6", "Ch7", "Ch8", "Ch9", "Ch10", "Ch11", "Ch12", NULL,
+    _tr_noop("Freq Tune"), "-300", "300", "655361", NULL, // big step 10, little step 1
     "RX ID", "-32768", "32767", "1", NULL, // todo: store that elsewhere
     "RX ID2","-32768", "32767", "1", NULL, // ^^^^^^^^^^^^^^^^^^^^^^^^^^
     NULL
@@ -92,6 +94,7 @@ enum {
     PROTOOPTS_OUTPUTS = 0,
     PROTOOPTS_SERVO_HZ,
     PROTOOPTS_LQI_OUT,
+    PROTOOPTS_FREQTUNE,
     PROTOOPTS_RXID, // todo: store that elsewhere
     PROTOOPTS_RXID2,// ^^^^^^^^^^^^^^^^^^^^^^^^^^
     LAST_PROTO_OPT,
@@ -182,6 +185,9 @@ static int afhds2a_init()
     
     A7105_SetPower(Model.tx_power);
     tx_power = Model.tx_power;
+    
+    freq_offset = Model.proto_opts[PROTOOPTS_FREQTUNE];
+    A7105_AdjustLOBaseFreq(freq_offset);
     
     A7105_Strobe(A7105_STANDBY);
     A7105_SetTxRxMode(TX_EN);
@@ -472,6 +478,11 @@ static void initialize_tx_id()
 
 static u16 afhds2a_cb()
 {
+    // keep frequency tuning updated
+    if(freq_offset != Model.proto_opts[PROTOOPTS_FREQTUNE]) {
+            freq_offset = Model.proto_opts[PROTOOPTS_FREQTUNE];
+            A7105_AdjustLOBaseFreq(freq_offset);
+    }
     switch(state) {
         case BIND1:
         case BIND2:
