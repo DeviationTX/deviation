@@ -21,7 +21,7 @@ const char *MODEL_TEMPLATE;
 #define UNKNOWN_ICON ("media/noicon" IMG_EXT)
 
 //This cannot be computed, and must be manually updated
-#define NUM_PROTO_OPTS 5
+#define NUM_PROTO_OPTS 6
 #define VIRT_NAME_LEN 10 
 
 struct Model {
