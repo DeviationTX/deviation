@@ -187,44 +187,42 @@ static void calc_next_chan()
 }
 
 
-// Channel values are 10-bit values between 86 and 906, 496 is the middle.
+// Channel values are 12-bit values between 1020 and 2020, 1520 is the middle
+// Futaba @140% is 2070...1520...970
 // Values grow down and to the right, exact opposite to Deviation, so
-// we just revert every channel.
+// we just revert every channel
 static u16 convert_channel(u8 num)
 {
-    s32 ch = Channels[num];
-    if (ch < CHAN_MIN_VALUE) {
-        ch = CHAN_MIN_VALUE;
-    } else if (ch > CHAN_MAX_VALUE) {
-        ch = CHAN_MAX_VALUE;
-    }
-    return (u16) (496 - (ch * 410 / CHAN_MAX_VALUE));
+    u16 value = 1520 - (s32)Channels[num] * 410 / CHAN_MAX_VALUE;
+    if (value > 2135)     //-150%
+        value = 2135;
+    else if (value < 905) //+150%
+        value = 905;
+    return value;
 }
 
 
 static void build_data_packet()
 {
-#define spacer1 0x02 //0b10
-#define spacer2 (spacer1 << 4)
-    unsigned ch_offset = state == SFHSS_DATA1 ? 0 : 4;
+    u8 ch_offset = state == SFHSS_DATA1 ? 0 : 4;
 
-    u16 ch1 = convert_channel(ch_offset+0);
-    u16 ch2 = convert_channel(ch_offset+1);
-    u16 ch3 = convert_channel(ch_offset+2);
-    u16 ch4 = convert_channel(ch_offset+3);
+    u16 ch1 = convert_channel(ch_offset + 0);
+    u16 ch2 = convert_channel(ch_offset + 1);
+    u16 ch3 = convert_channel(ch_offset + 2);
+    u16 ch4 = convert_channel(ch_offset + 3);
     
     packet[0]  = 0x81; // can be 80, 81, 81 for Orange, only 81 for XK
     packet[1]  = tx_id[0];
     packet[2]  = tx_id[1];
     packet[3]  = 0;
     packet[4]  = 0;
-    packet[5]  = (rf_chan << 3) | spacer1 | ((ch1 >> 9) & 0x01);
+    packet[5]  = (rf_chan << 3) | ((ch1 >> 9) & 0x07);
     packet[6]  = (ch1 >> 1);
-    packet[7]  = (ch1 << 7) | spacer2 | ((ch2 >> 5) & 0x1F /*0b11111*/);
-    packet[8]  = (ch2 << 3) | spacer1  | ((ch3 >> 9) & 0x01);
+    packet[7]  = (ch1 << 7) | ((ch2 >> 5) & 0x7F);
+    packet[8]  = (ch2 << 3) | ((ch3 >> 9) & 0x07);
     packet[9]  = (ch3 >> 1);
-    packet[10] = (ch3 << 7) | spacer2  | ((ch4 >> 5) & 0x1F /*0b11111*/);
-    packet[11] = (ch4 << 3) | ((fhss_code >> 2) & 0x07 /*0b111 */);
+    packet[10] = (ch3 << 7) | ((ch4 >> 5) & 0x7F);
+    packet[11] = (ch4 << 3) | ((fhss_code >> 2) & 0x07);
     packet[12] = (fhss_code << 6) | state;
 }
 
