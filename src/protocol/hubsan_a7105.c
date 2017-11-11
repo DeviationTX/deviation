@@ -112,6 +112,7 @@ static const char * const hubsan4_opts[] = {
     _tr_noop("Format"), "H107", "H301", "H501", NULL,
     _tr_noop("vTX MHz"),  "5645", "5945", VTX_STEP_SIZE, NULL,
     _tr_noop("Telemetry"),  _tr_noop("On"), _tr_noop("Off"), NULL,
+    _tr_noop("Freq Tune"), "-300", "300", "655361", NULL, // big step 10, little step 1
     NULL 
 };
 
@@ -119,6 +120,7 @@ enum {
     PROTOOPTS_FORMAT,
     PROTOOPTS_VTX_FREQ,
     PROTOOPTS_TELEMETRY,
+    PROTOOPTS_FREQTUNE,
     LAST_PROTO_OPT,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
@@ -147,6 +149,7 @@ static u8 state;
 static u8 packet_count;
 static u8 bind_count;
 static u32 id_data;
+static s16 freq_offset;
 
 enum {
     BIND_1,
@@ -253,7 +256,9 @@ static int hubsan_init()
     A7105_SetTxRxMode(TX_EN);
 
     A7105_SetPower(Model.tx_power);
-
+    
+    freq_offset = Model.proto_opts[PROTOOPTS_FREQTUNE];
+    A7105_AdjustLOBaseFreq(freq_offset);
 
     A7105_Strobe(A7105_STANDBY);
     return 1;
@@ -443,6 +448,11 @@ static u16 hubsan_cb()
     static int delay = 0;
     static u8 rfMode=0;
     int i;
+    // keep frequency tuning updated
+    if(freq_offset != Model.proto_opts[PROTOOPTS_FREQTUNE]) {
+            freq_offset = Model.proto_opts[PROTOOPTS_FREQTUNE];
+            A7105_AdjustLOBaseFreq(freq_offset);
+    }
     switch(state) {
     case BIND_1:
         bind_count++;

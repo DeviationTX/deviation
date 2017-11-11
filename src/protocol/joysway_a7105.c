@@ -48,6 +48,20 @@ static u32 id;
 static u8 packet[16];
 static u8 counter;
 static u8 next_ch;
+static u8 tx_power;
+static s16 freq_offset;
+
+static const char * const joysway_opts[] = {
+    _tr_noop("Freq Tune"), "-300", "300", "655361", NULL, // big step 10, little step 1
+    NULL
+};
+
+enum {
+    PROTOOPTS_FREQTUNE = 0,
+    LAST_PROTO_OPT,
+};
+
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 static int joysway_init()
 {
@@ -110,6 +124,10 @@ static int joysway_init()
 
     A7105_SetTxRxMode(TX_EN);
     A7105_SetPower(Model.tx_power);
+    tx_power = Model.tx_power;
+    
+    freq_offset = Model.proto_opts[PROTOOPTS_FREQTUNE];
+    A7105_AdjustLOBaseFreq(freq_offset);
 
     A7105_Strobe(A7105_STANDBY);
     return 1;
@@ -181,6 +199,16 @@ static u16 joysway_cb()
     A7105_Strobe(A7105_STANDBY);
     A7105_WriteData(packet, 16, ch);
     counter++;
+    // keep transmit power in sync
+    if(tx_power != Model.tx_power) {
+        A7105_SetPower(Model.tx_power);
+        tx_power = Model.tx_power;
+    }
+    // keep frequency tuning updated
+    if(freq_offset != Model.proto_opts[PROTOOPTS_FREQTUNE]) {
+            freq_offset = Model.proto_opts[PROTOOPTS_FREQTUNE];
+            A7105_AdjustLOBaseFreq(freq_offset);
+    }
     return 6000;
 }
 
@@ -224,8 +252,7 @@ const void *JOYSWAY_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_NUMCHAN: return (void *)4L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)4L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
-        case PROTOCMD_GETOPTIONS:
-            return NULL;
+        case PROTOCMD_GETOPTIONS: return joysway_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
         default: break;
     }

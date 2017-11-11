@@ -154,5 +154,29 @@ void A7105_Strobe(enum A7105_State state)
     CS_HI();
 }
 
+// fine tune A7105 LO base frequency
+// this is required for some A7105 modules / Rx
+// with inaccurate crystal oscillator
+// arg: offset in +/-kHz
+void A7105_AdjustLOBaseFreq(s16 offset)
+{
+    // LO base frequency = 32e6*(bip+(bfp/(2^16)))
+    u8 bip;  // LO base frequency integer part
+    u32 bfp; // LO base frequency fractional part
+    if(offset < 0) {
+        bip = 0x4a; // 2368 MHz
+        bfp = 0xffff+((offset*2048)/1000)+1;
+    }
+    else {
+        bip = 0x4b; // 2400 MHz (default)
+        bfp = (offset*2048)/1000;
+    }
+    if(offset == 0)
+        bfp = 0x0002; // as per datasheet, not sure why recommanded, but that's a +1kHz drift only ...
+    A7105_WriteReg( A7105_11_PLL_III, bip);
+    A7105_WriteReg( A7105_12_PLL_IV, (bfp >> 8) & 0xff);
+    A7105_WriteReg( A7105_13_PLL_V, bfp & 0xff);
+}
+
 //#pragma long_calls_off
 #endif

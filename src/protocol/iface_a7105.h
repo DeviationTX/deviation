@@ -82,6 +82,6 @@ void A7105_WriteID(u32 id);
 void A7105_Strobe(enum A7105_State);
 void A7105_SetPower(int power);
 void A7105_SetTxRxMode(enum TXRX_State);
-
+void A7105_AdjustLOBaseFreq(s16 offset);
 
 #endif
