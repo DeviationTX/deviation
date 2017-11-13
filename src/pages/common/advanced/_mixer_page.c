@@ -54,6 +54,7 @@ const char *MIXPAGE_ChanNameProtoCB(guiObject_t *obj, const void *data)
 {
     (void)obj;
     u8 ch = (long)data;
+    u8 proto_map_length = PROTO_MAP_LEN;
     char tmp1[30];
 
     /* See if we need to name the cyclic virtual channels */
@@ -64,7 +65,13 @@ const char *MIXPAGE_ChanNameProtoCB(guiObject_t *obj, const void *data)
             case 2: snprintf(tempstring, sizeof(tempstring), "%s-%s", _tr("CYC"), _tr("COL")); return tempstring;
         }
     }
-    if (ch < PROTO_MAP_LEN && ProtocolChannelMap[Model.protocol]) {
+    #if defined(_DEVO7E_256_TARGET_H_) || defined(_T8SG_TARGET_H_)
+    #define SWITCH_NOSTOCK ((1 << INP_HOLD0) | (1 << INP_HOLD1) | \
+                            (1 << INP_FMOD0) | (1 << INP_FMOD1))
+    if ((Transmitter.ignore_src & SWITCH_NOSTOCK) == SWITCH_NOSTOCK)
+        proto_map_length = PROTO_MAP_LEN - 1;
+    #endif
+    if (ch < proto_map_length && ProtocolChannelMap[Model.protocol]) {
         INPUT_SourceNameAbbrevSwitch(tmp1, ProtocolChannelMap[Model.protocol][ch]);
         sprintf(tempstring, "%s%d-%s",
             (Model.limits[ch].flags & CH_REVERSE) ? "!" : "",
