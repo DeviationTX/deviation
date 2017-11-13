@@ -130,7 +130,7 @@ ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 #define FORMAT_SYMAX2  4
 
 #define AUTO_ACK_ENABLE   0
-#define AUTO_ACK_DISSABLE 1
+#define AUTO_ACK_DISABLE  1
 
 #ifdef YD717_TELEMETRY
 #define TELEM_OFF 0
@@ -149,7 +149,7 @@ enum {
 
 static u8 packet_ack()
 {
-    if (Model.proto_opts[PROTOOPTS_SKIPAACK] == AUTO_ACK_DISSABLE)
+    if (Model.proto_opts[PROTOOPTS_SKIPAACK] == AUTO_ACK_DISABLE)
         return PKT_ACKED;
 
     switch (NRF24L01_ReadReg(NRF24L01_07_STATUS) & (BV(NRF24L01_07_TX_DS) | BV(NRF24L01_07_MAX_RT))) {
@@ -305,7 +305,7 @@ static void yd717_init()
     NRF24L01_SetTxRxMode(TX_EN);
     NRF24L01_WriteReg(NRF24L01_00_CONFIG, BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_PWR_UP)); 
     
-    if (Model.proto_opts[PROTOOPTS_SKIPAACK] == AUTO_ACK_DISSABLE)
+    if (Model.proto_opts[PROTOOPTS_SKIPAACK] == AUTO_ACK_DISABLE)
         NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);      // No- Auto Acknoledgement
     else    
         NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x3F);      // Auto Acknoledgement on all data pipes
@@ -415,9 +415,15 @@ static u16 yd717_callback()
 {
     switch (phase) {
     case YD717_INIT1:
-        send_packet(0);      // receiver doesn't re-enter bind mode if connection lost...check if already bound
-        phase = YD717_BIND3;
-        // MUSIC_Play(MUSIC_TELEMALARM1);	// Shouldn't play telemetry alarm doing bind init
+        if (Model.proto_opts[PROTOOPTS_SKIPAACK] == AUTO_ACK_ENABLE) {
+          send_packet(0);      // receiver doesn't re-enter bind mode if connection lost...check if already bound
+          phase = YD717_BIND3;
+        } else {
+          YD717_init1();       // can't tell if bound when auto-ack disabled
+          counter = BIND_COUNT;
+          phase = YD717_BIND2;
+          send_packet(1);
+        }
         break;
 
     case YD717_BIND2:
