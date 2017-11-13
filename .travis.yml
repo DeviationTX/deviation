@@ -7,6 +7,7 @@ env:
       - MAKETARGET=zip_devo12
       - MAKETARGET=zip_devo7e
       - MAKETARGET=zip_devof12e
+      - MAKETARGET=zip_t8sg
       - TARGET=at9
       - MAKETARGET=zip_win_emu_devo8
 #      - COMPILER=latest TARGET=devo8
