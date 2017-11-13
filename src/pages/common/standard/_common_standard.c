@@ -21,15 +21,25 @@ const char *STDMIX_channelname_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     u8 ch = (long)data;
-    if (ch < PROTO_MAP_LEN && ProtocolChannelMap[Model.protocol]) {
+    u8 proto_map_length = PROTO_MAP_LEN;
+
+    #if defined(_DEVO7E_256_TARGET_H_) || defined(_T8SG_TARGET_H_)
+    #define SWITCH_NOSTOCK ((1 << INP_HOLD0) | (1 << INP_HOLD1) | \
+                            (1 << INP_FMOD0) | (1 << INP_FMOD1))
+    if ((Transmitter.ignore_src & SWITCH_NOSTOCK) == SWITCH_NOSTOCK)
+        proto_map_length = PROTO_MAP_LEN - 1;
+    #endif
+    if (ch < proto_map_length && ProtocolChannelMap[Model.protocol]) {
         char tmp1[30];
         INPUT_SourceNameAbbrevSwitch(tmp1, ProtocolChannelMap[Model.protocol][ch]);
-        snprintf(tempstring, sizeof(tempstring), "%d-%s", ch+1, tmp1);
+        snprintf(tempstring, sizeof(tempstring), "%d-%s", ch + 1, tmp1);
     }
+    else if (ch == 4)
+        snprintf(tempstring, sizeof(tempstring), "%d-%s",  ch + 1, _tr("GEAR")); // gear
     else if (ch == 5)
-        snprintf(tempstring, sizeof(tempstring), "%d-%s",  ch+1, _tr("PIT"));  // aux1
+        snprintf(tempstring, sizeof(tempstring), "%d-%s",  ch + 1, _tr("PIT"));  // aux1
     else
-        sprintf(tempstring, "%d-%s%d",ch+1, "AUX", ch -4); //AUX no need to translate
+        sprintf(tempstring, "%d-%s%d",ch+1, "AUX", ch - 4); //AUX no need to translate
     return tempstring;
 }
 
@@ -74,7 +84,7 @@ s32 STDMIX_EvalMixerCb(s32 xval, struct Mixer *mix, s32 max_value, s32 min_value
 
     if (yval > max_value)
         yval = max_value;
-    else if (yval <min_value)
+    else if (yval < min_value)
         yval = min_value;
     return yval;
 }
