@@ -247,7 +247,7 @@ static void build_data_packet_1way()
             packet[2*i + 6] = 0xca;
             packet[2*i + 7] = 0x08;
         } else {
-            s32 value = (s32)Channels[i + idx] * 600 / CHAN_MAX_VALUE + 0x8ca; //1500 * 1.5 = 2250 = 0x8ca
+            s32 value = (s32)Channels[i + idx] * 600 / CHAN_MAX_VALUE + 2250; //400 * 1.5 = 600, 1500 * 1.5 = 2250
             packet[2*i + 6] = value & 0xff;
             packet[2*i + 7] = value >> 8;
         }
