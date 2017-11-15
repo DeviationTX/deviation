@@ -245,10 +245,10 @@ static void build_data_packet_1way()
         packet[5] = 0x00;
     for(int i = 0; i < 4; i++) {
         if(idx + i >= Model.num_channels) {
-            packet[2*i + 6] = 0xc8;
+            packet[2*i + 6] = 0xca;
             packet[2*i + 7] = 0x08;
         } else {
-            s32 value = (s32)Channels[i + idx] * 0x600 / CHAN_MAX_VALUE + 0x8c8;
+            s32 value = (s32)Channels[i + idx] * 600 / CHAN_MAX_VALUE + 0x8ca; //1500 * 1.5 = 2250 = 0x8ca
             packet[2*i + 6] = value & 0xff;
             packet[2*i + 7] = value >> 8;
         }
@@ -346,6 +346,7 @@ const void *FRSKY1WAY_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_NUMCHAN: return (void *)8L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
+        case PROTOCMD_GETOPTIONS: return frsky_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
         default: break;
     }
