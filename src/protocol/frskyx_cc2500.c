@@ -704,9 +704,9 @@ static u16 frskyx_cb() {
       channr = (channr + chanskip) % 47;
       state++;
 #ifndef EMULATOR
-      return 5500;
+      return 5200;
 #else
-      return 55;
+      return 52;
 #endif
     case FRSKY_DATA2:
       CC2500_SetTxRxMode(RX_EN);
@@ -721,9 +721,9 @@ static u16 frskyx_cb() {
       CC2500_Strobe(CC2500_SRX);
       state++;
 #ifndef EMULATOR
-      return 3000;
+      return 3100;
 #else
-      return 30;
+      return 31;
 #endif
     case FRSKY_DATA4:
       len = CC2500_ReadReg(CC2500_3B_RXBYTES | CC2500_READ_BURST) & 0x7F;
@@ -743,9 +743,9 @@ static u16 frskyx_cb() {
       if (seq_tx_send != 8) seq_tx_send = (seq_tx_send + 1) % 4;
       state = FRSKY_DATA1;
 #ifndef EMULATOR
-      return 300;
+      return 500;
 #else
-      return 3;
+      return 5;
 #endif
   }
   return 1;
