@@ -23,6 +23,8 @@ Csatornák
 250kbps
 :3 Point
 3 pont
+:3 Pos
+3 állású
 :30 sec
 30 mp
 :4Ch w/ Dual-Rates
@@ -47,6 +49,8 @@ Csatornák
 9 pont
 :ABSVAL
 ABSZ.É.
+:ACKPKT
+ACKPKT
 :AD2GAIN
 AD2GAIN
 :AIL
@@ -177,6 +181,8 @@ Koll. mix
 CPPM
 :CRTP Mode
 CRTP mód
+:CRTPLOG
+CRTPLOG
 :CYC
 CYC
 :Calibrate
@@ -273,6 +279,8 @@ Deviation\n   USB
 Alvó fényerő
 :Dimmer time
 Alvó mód ideje
+:Disabled
+Letiltva
 :Dn
 Le
 :Do you really want\nto reset the\n permanent timer %d?
@@ -311,6 +319,8 @@ Haladó
 Expó+DR
 :Extend
 Kiterj.
+:External OSD
+Külső OSD
 :External voice\ncurrently not\navailable
 Külső hang\njelenleg nem\nelérhető
 :F.Log filter
@@ -341,6 +351,8 @@ Formátum
 Keret hossza
 |devo10:Frame Size
 Keret
+:Freq Tune
+Frekv. hang.
 :Freq-Coarse
 Frekv. durva
 :Freq-Course
@@ -417,6 +429,8 @@ BAL_F
 LIN
 :LQI
 LQI
+:LQI output
+LQI kimenet
 :LRSSI
 LRSSI
 :Language
@@ -679,6 +693,8 @@ Mégsem
 Jobb
 :RxV
 RxV
+:S.PORT Out
+S.PORT ki
 :SW A
 SW A
 :SW B
@@ -1001,6 +1017,8 @@ min
 szoroz
 :permanent
 Üzemidő
+:regular
+szokásos
 :replace
 cserél
 :resulting value
