@@ -62,6 +62,7 @@ static u8 rf_chan;
 static u8 fhss_code; // 0-27
 static u8 tx_id[TX_ID_LEN];
 static u8 tx_power;
+static u16 counter;
 
 
 #ifdef USE_TUNE_FREQ
@@ -204,7 +205,22 @@ static u16 convert_channel(u8 num)
 
 static void build_data_packet()
 {
-    u8 ch_offset = state == SFHSS_DATA1 ? 0 : 4;
+    // command.bit0 is the packet number indicator: =0 -> SFHSS_DATA1, =1 -> SFHSS_DATA2
+    // command.bit1 is unknown but seems to be linked to the payload[0].bit0 but more dumps are needed: payload[0]=0x82 -> =0, payload[0]=0x81 -> =1
+    // command.bit2 is the failsafe transmission indicator: =0 -> normal data, =1->failsafe data
+    // command.bit3 is the channels indicator: =0 -> CH1-4, =1 -> CH5-8
+    uint8_t command = (state == SFHSS_DATA1) ? 0 : 1; // Building packet for Data1 or Data2
+    counter += command;
+    if(counter&1) command|=0x08; // Transmit lower and upper channels twice in a row
+    if((counter&0x3FE)==0x3FE)
+    {
+        //command|=0x04; // Transmit failsafe data every 7s
+        counter&=0x3FF;	// Reset counter
+    }
+    else
+        command|=0x02; // Assuming packet[0] == 0x81
+    
+    u8 ch_offset = ((command&0x08) >> 1);
 
     u16 ch1 = convert_channel(ch_offset + 0);
     u16 ch2 = convert_channel(ch_offset + 1);
@@ -223,7 +239,7 @@ static void build_data_packet()
     packet[9]  = (ch3 >> 1);
     packet[10] = (ch3 << 7) | ((ch4 >> 5) & 0x7F);
     packet[11] = (ch4 << 3) | ((fhss_code >> 2) & 0x07);
-    packet[12] = (fhss_code << 6) | state;
+    packet[12] = (fhss_code << 6) | command;
 }
 
 
@@ -248,6 +264,7 @@ static u16 SFHSS_cb()
             tune_chan();
         } else {
             rf_chan = 0;
+            counter = 0;
             state = SFHSS_DATA1;
         }
         return 2000;
@@ -257,13 +274,13 @@ static u16 SFHSS_cb()
         build_data_packet();
         send_packet();
         state = SFHSS_DATA2;
-        return 1650;
+        return 1630;
     case SFHSS_DATA2:
         build_data_packet();
         send_packet();
         calc_next_chan();
         state = SFHSS_TUNE;
-        return 2000;
+        return 2020;
     case SFHSS_TUNE:
 #ifdef USE_TUNE_FREQ
         tune_freq();
