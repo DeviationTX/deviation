@@ -51,7 +51,6 @@ enum {
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
-volatile u8 state;
 static void build_data_pkt()
 {
     int i;
@@ -82,6 +81,7 @@ static void initialize()
     CLOCK_StopTimer();
     if (PPMin_Mode())
         return;
+
     PWM_Initialize();
     num_channels = Model.num_channels;
     if (Model.proto_opts[CENTER_PW] == 0) {
@@ -91,9 +91,9 @@ static void initialize()
         Model.proto_opts[PERIOD_PW] = 22500;
     }
     
-    state = 0;
     CLOCK_StartTimer(1000, ppmout_cb);
 }
+
 
 const void * PPMOUT_Cmds(enum ProtoCmds cmd)
 {
