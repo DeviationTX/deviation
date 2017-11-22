@@ -92,8 +92,9 @@ static const struct mcu_pin PROTO_MOSI_PIN  = _SPI_PROTO_MOSI_PIN;
 #endif //_TOUCH_PORT
 
 #ifndef _PWM_PIN
-    #define _PWM_PIN GPIO_USART1_TX    //GPIO9
-    #define _PWM_EXTI EXTI9
+    #define _PWM_PIN                   GPIO_USART1_TX    //GPIO9
+    #define _PWM_EXTI                  EXTI9
+    #define _PWM_TIM_OC                TIM_OC2
 #endif //_PWM_PIN
 
 #ifndef _USART

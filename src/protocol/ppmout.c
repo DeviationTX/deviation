@@ -33,11 +33,6 @@
 static volatile u16 pulses[PPMOUT_MAX_CHANNELS+2];
 u8 num_channels;
 
-/* FIXME:  The original imlementation used a PWM to output the PPM signal.
-           However, I could not get TIM1 woring properly.
-           The current implementation just bit-bangs the output.
-           It works fine but is less efficient
-*/
 #define STEP_SIZE "3276810"  // == 10small/50large == (50 << 16) | 10
 #define STEPSIZE2 "32768100" // == 100small / 500large == (500 << 16) | 100
 static const char * const ppm_opts[] = {
@@ -62,9 +57,9 @@ static void build_data_pkt()
     int i;
     for (i = 0; i < num_channels; i++) {
         s32 value = (s32)Channels[i] * Model.proto_opts[DELTA_PW] / CHAN_MAX_VALUE
-                    + Model.proto_opts[CENTER_PW];
-//this should be correct but have to be backwards compatible        pulses[i] = value;
-        pulses[i] = value + Model.proto_opts[NOTCH_PW];
+                    + Model.proto_opts[CENTER_PW] + Model.proto_opts[NOTCH_PW];
+                   //FIXME fix timing options, remove notch here, center to real center value (e.g. 1500)
+        pulses[i] = value;
     }
     pulses[num_channels] = Model.proto_opts[PERIOD_PW]; // extra period so last preload cycle is run
     pulses[num_channels+1] = 0;
@@ -74,7 +69,7 @@ MODULE_CALLTYPE
 static u16 ppmout_cb()
 {
     build_data_pkt();
-    PPM_Enable(Model.proto_opts[NOTCH_PW], pulses); //400us 'flat notch'
+    PPM_Enable(Model.proto_opts[NOTCH_PW], pulses);
 #ifdef EMULATOR
     return 3000;
 #else

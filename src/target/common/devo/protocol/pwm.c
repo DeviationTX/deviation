@@ -33,10 +33,6 @@
 #include <string.h>
 #include <errno.h>
 
-/* FIXME: The PWM with an output on CH2 (PA9) does not work with the
-          code below.  As I was unable to find a fix the current
-          implementation is to bit-bang the signal instead
-*/
 
 static volatile u16 *pwm;
 void PWM_Initialize()
@@ -62,12 +58,12 @@ void PWM_Initialize()
 
     /* Capture compare output setup*/
     gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO_TIM1_CH2);
-    timer_set_oc_mode(TIM1, TIM_OC2, TIM_OCM_PWM1); // output active while counter below compare
-    timer_enable_oc_preload(TIM1, TIM_OC2);         // must use preload for PWM mode
-    timer_set_oc_polarity_low(TIM1, TIM_OC2);       // notch time is low
-    timer_enable_oc_output(TIM1, TIM_OC2);          // enable OCx to pin
-    timer_enable_break_main_output(TIM1);           // master output enable
+                  GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, _PWM_PIN);
+    timer_set_oc_mode(TIM1, _PWM_TIM_OC, TIM_OCM_PWM1); // output active while counter below compare
+    timer_enable_oc_preload(TIM1, _PWM_TIM_OC);         // must use preload for PWM mode
+    timer_set_oc_polarity_low(TIM1, _PWM_TIM_OC);       // notch time is low
+    timer_enable_oc_output(TIM1, _PWM_TIM_OC);          // enable OCx to pin
+    timer_enable_break_main_output(TIM1);               // master output enable
 
     // interrupt on overflow (reload)
     nvic_enable_irq(NVIC_TIM1_UP_IRQ);
@@ -80,26 +76,17 @@ void PWM_Stop()
     if (PPMin_Mode())
         return;
 
-    if (RCC_APB1ENR & RCC_APB2ENR_TIM1EN) {
-        rcc_peripheral_disable_clock(&RCC_APB1ENR, RCC_APB2ENR_TIM1EN);
-    }
+    timer_disable_counter(TIM1);
+    rcc_peripheral_disable_clock(&RCC_APB2ENR, RCC_APB2ENR_TIM1EN);
 
 #if _PWM_PIN == GPIO_USART1_TX
     UART_Initialize();
 #endif
 }
 
-void PWM_Set(int val)
-{
-    if(val)
-        gpio_set(GPIOA, _PWM_PIN);
-    else
-        gpio_clear(GPIOA, _PWM_PIN);
-}
-
 void PPM_Enable(unsigned low_time, volatile u16 *pulses)
 {
-    timer_set_oc_value(TIM1, TIM_OC2, low_time);
+    timer_set_oc_value(TIM1, _PWM_TIM_OC, low_time);
     pwm = pulses;
     if (*pwm) {
         timer_set_period(TIM1, *pwm++);
@@ -118,7 +105,7 @@ void tim1_up_isr()
     if (*pwm)
         timer_set_period(TIM1, *pwm++);
     else
-        timer_set_oc_value(TIM1, TIM_OC2, 0); // hold output inactive
+        timer_set_oc_value(TIM1, _PWM_TIM_OC, 0); // hold output inactive
 }
 
 #endif //DISABLE_PWM
