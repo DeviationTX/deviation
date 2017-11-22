@@ -30,7 +30,7 @@
   const unsigned long protocol_type = (unsigned long)&_data_loadaddr;
 #endif
 #define PPMOUT_MAX_CHANNELS NUM_OUT_CHANNELS
-static volatile u16 pulses[PPMOUT_MAX_CHANNELS+1];
+static volatile u16 pulses[PPMOUT_MAX_CHANNELS+2];
 u8 num_channels;
 
 /* FIXME:  The original imlementation used a PWM to output the PPM signal.
@@ -38,9 +38,6 @@ u8 num_channels;
            The current implementation just bit-bangs the output.
            It works fine but is less efficient
 */
-#ifndef EMULATOR
-#define BITBANG_PPM
-#endif
 #define STEP_SIZE "3276810"  // == 10small/50large == (50 << 16) | 10
 #define STEPSIZE2 "32768100" // == 100small / 500large == (500 << 16) | 100
 static const char * const ppm_opts[] = {
@@ -66,37 +63,13 @@ static void build_data_pkt()
     for (i = 0; i < num_channels; i++) {
         s32 value = (s32)Channels[i] * Model.proto_opts[DELTA_PW] / CHAN_MAX_VALUE
                     + Model.proto_opts[CENTER_PW];
-        pulses[i] = value;
+//this should be correct but have to be backwards compatible        pulses[i] = value;
+        pulses[i] = value + Model.proto_opts[NOTCH_PW];
     }
-    pulses[num_channels] = 0;
+    pulses[num_channels] = Model.proto_opts[PERIOD_PW]; // extra period so last preload cycle is run
+    pulses[num_channels+1] = 0;
 }
 
-#ifdef BITBANG_PPM
-MODULE_CALLTYPE
-static u16 ppmout_cb()
-{
-    static volatile u16 accum;
-    u16 val;
-    if (state == 0) {
-        accum = 0;
-        build_data_pkt();
-    }
-    if(state & 0x01) {
-        PWM_Set(1);
-        if(state == num_channels * 2 + 1) {
-            state = 0;
-            return Model.proto_opts[PERIOD_PW] - accum;
-        }
-        val = pulses[state / 2];
-    } else {
-        PWM_Set(0);
-        val = Model.proto_opts[NOTCH_PW];
-    }
-    state++;
-    accum += val;
-    return val;
-}
-#else
 MODULE_CALLTYPE
 static u16 ppmout_cb()
 {
@@ -108,7 +81,6 @@ static u16 ppmout_cb()
     return Model.proto_opts[PERIOD_PW];
 #endif
 }
-#endif
 
 static void initialize()
 {

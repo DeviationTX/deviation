@@ -78,6 +78,7 @@ void UART_Initialize()
 void UART_Stop()
 {
     usart_disable(_USART);
+    rcc_peripheral_disable_clock(&_USART_RCC_APB_ENR_USART, _USART_RCC_APB_ENR_USART_EN);
 }
 
 void UART_SetDataRate(u32 bps)
