@@ -44,7 +44,6 @@ void PWM_Initialize()
     rcc_peripheral_enable_clock(&RCC_APB2ENR,
                                 RCC_APB2ENR_TIM1EN | RCC_APB2ENR_IOPAEN | RCC_APB2ENR_AFIOEN);
 
-//TODO Set timer channel as needed based on _PWM_PIN
     timer_reset(TIM1);
 
     // Timer global mode: No divider, Alignment edge, Direction up, auto-preload buffered
