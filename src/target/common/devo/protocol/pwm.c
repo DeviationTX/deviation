@@ -93,7 +93,7 @@ void PPM_Enable(unsigned low_time, volatile u16 *pulses)
 {
     pwm = pulses;
     if (*pwm) {
-        timer_set_period(TIM1, *pwm++);
+        timer_set_period(TIM1, *pwm++ - 1);
         timer_set_oc_value(TIM1, _PWM_TIM_OC, low_time);
         timer_generate_event(TIM1, TIM_EGR_UG); // Force-load shadow registers
 
@@ -108,7 +108,7 @@ void tim1_up_isr()
     timer_clear_flag(TIM1, TIM_SR_UIF);
 
     if (*pwm)
-        timer_set_period(TIM1, *pwm++);
+        timer_set_period(TIM1, *pwm++ - 1);
     else
         timer_set_oc_value(TIM1, _PWM_TIM_OC, 0); // hold output inactive
 }
