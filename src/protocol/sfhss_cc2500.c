@@ -241,7 +241,7 @@ static void build_data_packet()
                 channel[ch] = 0x400; // hold ?
         }
         if((command&0x08)==0) 
-            channel[3]|=0x800; // special flag for throttle 
+            channel[2]|=0x800; // special flag for throttle 
     }
     
     packet[0]  = 0x81; // can be 80, 81, 81 for Orange, only 81 for XK
