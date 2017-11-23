@@ -42,27 +42,31 @@ void PWM_Initialize()
 #endif
 
     rcc_peripheral_enable_clock(&RCC_APB2ENR,
-                                RCC_APB2ENR_TIM1EN | RCC_APB2ENR_IOPAEN | RCC_APB2ENR_AFIOEN);
-
+                                 RCC_APB2ENR_TIM1EN
+                               | RCC_APB2ENR_IOPAEN
+                               | RCC_APB2ENR_AFIOEN);
     timer_reset(TIM1);
 
     // Timer global mode: No divider, Alignment edge, Direction up, auto-preload buffered
-    timer_set_mode(TIM1, TIM_CR1_CKD_CK_INT,
-                   TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
+    timer_set_mode(TIM1, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
     timer_enable_preload(TIM1);
 
     /* timer updates each microsecond */
     timer_set_prescaler(TIM1, 72 - 1);
-    timer_generate_event(TIM1, TIM_EGR_UG);
 
-    /* Capture compare output setup*/
-    gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, _PWM_PIN);
+    /* compare output setup. compare register must match i/o pin */
     timer_set_oc_mode(TIM1, _PWM_TIM_OC, TIM_OCM_PWM1); // output active while counter below compare
     timer_enable_oc_preload(TIM1, _PWM_TIM_OC);         // must use preload for PWM mode
     timer_set_oc_polarity_low(TIM1, _PWM_TIM_OC);       // notch time is low
+    timer_set_oc_value(TIM1, _PWM_TIM_OC, 0);           // hold output inactive
+    timer_set_period(TIM1, 22500);                      // sane default
+    timer_generate_event(TIM1, TIM_EGR_UG);             // load shadow registers
+    timer_enable_counter(TIM1);
+
     timer_enable_oc_output(TIM1, _PWM_TIM_OC);          // enable OCx to pin
     timer_enable_break_main_output(TIM1);               // master output enable
+    gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,       // connect compare output to pin
+                  GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, _PWM_PIN);
 
     // interrupt on overflow (reload)
     nvic_enable_irq(NVIC_TIM1_UP_IRQ);
@@ -76,6 +80,8 @@ void PWM_Stop()
         return;
 
     timer_disable_counter(TIM1);
+    nvic_disable_irq(NVIC_TIM1_UP_IRQ);
+    timer_disable_oc_output(TIM1, _PWM_TIM_OC);
     rcc_peripheral_disable_clock(&RCC_APB2ENR, RCC_APB2ENR_TIM1EN);
 
 #if _PWM_PIN == GPIO_USART1_TX
@@ -85,12 +91,12 @@ void PWM_Stop()
 
 void PPM_Enable(unsigned low_time, volatile u16 *pulses)
 {
-    timer_set_oc_value(TIM1, _PWM_TIM_OC, low_time);
     pwm = pulses;
     if (*pwm) {
         timer_set_period(TIM1, *pwm++);
-        timer_generate_event(TIM1, TIM_EGR_UG); // Force-load first period
-        timer_enable_counter(TIM1);
+        timer_set_oc_value(TIM1, _PWM_TIM_OC, low_time);
+        timer_generate_event(TIM1, TIM_EGR_UG); // Force-load shadow registers
+
         //Create an interrupt on ARR reload
         timer_clear_flag(TIM1, TIM_SR_UIF);
         timer_enable_irq(TIM1, TIM_DIER_UIE);

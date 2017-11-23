@@ -30,7 +30,6 @@ void UART_Initialize()
     rcc_peripheral_enable_clock(&_USART_RCC_APB_ENR_USART, _USART_RCC_APB_ENR_USART_EN);
 
     /* Enable DMA clock */
-    // TODO ENABLED ALREADY FOR ADC?
     rcc_peripheral_enable_clock(&RCC_AHBENR, _RCC_AHBENR_DMAEN);
 
     /* Setup GPIO pin GPIO_USARTX_TX on USART GPIO port for transmit. */
@@ -43,9 +42,9 @@ void UART_Initialize()
     usart_set_baudrate(_USART, 115200);
     usart_set_databits(_USART, 8);
     usart_set_stopbits(_USART, USART_STOPBITS_1);
-    usart_set_mode(_USART, USART_MODE_TX);
     usart_set_parity(_USART, USART_PARITY_NONE);
     usart_set_flow_control(_USART, USART_FLOWCONTROL_NONE);
+    usart_set_mode(_USART, USART_MODE_TX);
     //usart_set_mode(USART1, USART_MODE_TX_RX);
 
     /* Finally enable the USART. */
@@ -77,6 +76,8 @@ void UART_Initialize()
 
 void UART_Stop()
 {
+    nvic_disable_irq(_USART_NVIC_DMA_CHANNEL_IRQ);
+    usart_set_mode(_USART, 0);
     usart_disable(_USART);
     rcc_peripheral_disable_clock(&_USART_RCC_APB_ENR_USART, _USART_RCC_APB_ENR_USART_EN);
 }
