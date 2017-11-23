@@ -205,40 +205,57 @@ static u16 convert_channel(u8 num)
 
 static void build_data_packet()
 {
+    u16 channel[4];
+    u8 ch;
     // command.bit0 is the packet number indicator: =0 -> SFHSS_DATA1, =1 -> SFHSS_DATA2
     // command.bit1 is unknown but seems to be linked to the payload[0].bit0 but more dumps are needed: payload[0]=0x82 -> =0, payload[0]=0x81 -> =1
     // command.bit2 is the failsafe transmission indicator: =0 -> normal data, =1->failsafe data
     // command.bit3 is the channels indicator: =0 -> CH1-4, =1 -> CH5-8
-    uint8_t command = (state == SFHSS_DATA1) ? 0 : 1; // Building packet for Data1 or Data2
-    counter += command;
-    if(counter&1) command|=0x08; // Transmit lower and upper channels twice in a row
-    if((counter&0x3FE)==0x3FE)
-    {
-        //command|=0x04; // Transmit failsafe data every 7s
-        counter&=0x3FF;	// Reset counter
+    u8 command = (state == SFHSS_DATA1) ? 0 : 1; // Building packet for Data1 or Data2
+    counter+=command;
+    if( (counter&0x3FC) == 0x3FC )
+    {	// Transmit failsafe data twice every 7s
+        if( ((counter&1)^(command&1)) == 0 )
+            command|=0x04; // Failsafe
     }
     else
         command|=0x02; // Assuming packet[0] == 0x81
+    counter&=0x3FF; // Reset failsafe counter
+    if(counter&1) command|=0x08; // Transmit lower and upper channels twice in a row
     
     u8 ch_offset = ((command&0x08) >> 1);
-
-    u16 ch1 = convert_channel(ch_offset + 0);
-    u16 ch2 = convert_channel(ch_offset + 1);
-    u16 ch3 = convert_channel(ch_offset + 2);
-    u16 ch4 = convert_channel(ch_offset + 3);
+    if(!(command & 0x04)) { // regular channels
+        channel[0] = convert_channel(ch_offset + 0);
+        channel[1] = convert_channel(ch_offset + 1);
+        channel[2] = convert_channel(ch_offset + 2);
+        channel[3] = convert_channel(ch_offset + 3);
+    }
+    else { // failsafe channels
+        for(ch=0; ch<4; ch++) {
+            if(ch+ch_offset<Model.num_channels && (Model.limits[ch+ch_offset].flags & CH_FAILSAFE_EN)) {
+                channel[ch] = 0xc00 - ((s32)Model.limits[ch+ch_offset].failsafe * 4096/1000);
+                if(channel[ch] > 0xdff)
+                    channel[ch] = 0xdff;
+            }
+            else
+                channel[ch] = 0x400; // hold ?
+        }
+        if((command&0x08)==0) 
+            channel[3]|=0x800; // special flag for throttle 
+    }
     
     packet[0]  = 0x81; // can be 80, 81, 81 for Orange, only 81 for XK
     packet[1]  = tx_id[0];
     packet[2]  = tx_id[1];
     packet[3]  = 0;
     packet[4]  = 0;
-    packet[5]  = (rf_chan << 3) | ((ch1 >> 9) & 0x07);
-    packet[6]  = (ch1 >> 1);
-    packet[7]  = (ch1 << 7) | ((ch2 >> 5) & 0x7F);
-    packet[8]  = (ch2 << 3) | ((ch3 >> 9) & 0x07);
-    packet[9]  = (ch3 >> 1);
-    packet[10] = (ch3 << 7) | ((ch4 >> 5) & 0x7F);
-    packet[11] = (ch4 << 3) | ((fhss_code >> 2) & 0x07);
+    packet[5]  = (rf_chan << 3) | ((channel[0] >> 9) & 0x07);
+    packet[6]  = (channel[0] >> 1);
+    packet[7]  = (channel[0] << 7) | ((channel[1] >> 5) & 0x7F);
+    packet[8]  = (channel[1] << 3) | ((channel[2] >> 9) & 0x07);
+    packet[9]  = (channel[2] >> 1);
+    packet[10] = (channel[2] << 7) | ((channel[3] >> 5) & 0x7F);
+    packet[11] = (channel[3] << 3) | ((fhss_code >> 2) & 0x07);
     packet[12] = (fhss_code << 6) | command;
 }
 
