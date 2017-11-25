@@ -83,7 +83,11 @@ const char *show_box_cb(guiObject_t *obj, const void *data)
     } else if(idx - NUM_RTC - NUM_TIMERS <= NUM_TELEM) {
         TELEMETRY_GetValueStr(tempstring, idx - NUM_RTC - NUM_TIMERS);
     } else {
-        sprintf(tempstring, "%3d%%", RANGE_TO_PCT(MIXER_GetChannel(idx - (NUM_RTC + NUM_TIMERS + NUM_TELEM + 1), APPLY_SAFETY | APPLY_SCALAR)));
+        unsigned channel = idx - (NUM_RTC + NUM_TIMERS + NUM_TELEM + 1);
+        s16 val_raw = MIXER_GetChannel(channel, APPLY_SAFETY | APPLY_SCALAR);
+        s16 val_scale = MIXER_GetChannelDisplayScale(channel);
+
+        sprintf(tempstring, "%5d", val_raw/val_scale);
     }
     return tempstring;
 }

@@ -1,6 +1,7 @@
 #ifndef _MIXER_H_
 #define _MIXER_H_
 
+#define DEFAULT_DISPLAY_SCALE 100
 #define DEFAULT_SERVO_LIMIT 150
 #define SWASH_INV_ELEVATOR_MASK   1
 #define SWASH_INV_AILERON_MASK    2
@@ -163,6 +164,7 @@ struct Limit {
     s8 failsafe;
     u8 speed;     //measured in degrees/100msec
     s16 subtrim;  // need to support value greater than 250
+    s16 displayscale; // display scale factor
 };
 
 struct Trim {
@@ -182,6 +184,7 @@ unsigned CURVE_NumPoints(struct Curve *curve);
 /* Mixer functions */
 volatile s32 *MIXER_GetInputs();
 s32 MIXER_GetChannel(unsigned channel, enum LimitMask flags);
+s16 MIXER_GetChannelDisplayScale(unsigned channel);
 
 int MIXER_GetMixers(int ch, struct Mixer *mixers, int count);
 int MIXER_SetMixers(struct Mixer *mixers, int count);

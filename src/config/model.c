@@ -93,6 +93,7 @@ static const char MIXER_CURVE_SMOOTH[] = "smooth";
 /* Section: Channel */
 static const char SECTION_CHANNEL[] = "channel";
 
+static const char CHAN_DISPLAY_SCALE[] = "display-scale";
 static const char CHAN_LIMIT_REVERSE[] = "reverse";
 static const char CHAN_LIMIT_SAFETYSW[] = "safetysw";
 static const char CHAN_LIMIT_SAFETYVAL[] = "safetyval";
@@ -546,6 +547,7 @@ static const struct struct_map _seclimit[] = {
     {CHAN_SCALAR,          OFFSET(Model.limits[0], servoscale), 100},
     {CHAN_SCALAR_NEG,      OFFSET(Model.limits[0], servoscale_neg), 0},
     {CHAN_SUBTRIM,         OFFSETS(Model.limits[0], subtrim), 0},
+    {CHAN_DISPLAY_SCALE,   OFFSETS(Model.limits[0], displayscale), DEFAULT_DISPLAY_SCALE},
 };
 static const struct struct_map _sectrim[] = {
     {TRIM_SOURCE, OFFSET_SRC(Model.trims[0], src), 0xFFFF},
@@ -757,6 +759,12 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
             } else {
                 m->limits[idx].failsafe = value_int;
                 m->limits[idx].flags |= CH_FAILSAFE_EN;
+            }
+            return 1;
+        }
+        if (MATCH_KEY(CHAN_DISPLAY_SCALE)) {
+            if (value_int) {
+                m->limits[idx].displayscale = value_int;
             }
             return 1;
         }
@@ -1215,6 +1223,8 @@ u8 CONFIG_WriteModel(u8 model_num) {
         }
         if(WRITE_FULL_MODEL || m->limits[idx].min != DEFAULT_SERVO_LIMIT)
             fprintf(fh, "%s=%d\n", CHAN_LIMIT_MIN, -(int)m->limits[idx].min);
+        if(WRITE_FULL_MODEL || m->limits[idx].displayscale != DEFAULT_DISPLAY_SCALE)
+            fprintf(fh, "%s=%d\n", CHAN_DISPLAY_SCALE, m->limits[idx].displayscale);
         if(WRITE_FULL_MODEL || m->templates[idx] != 0)
             fprintf(fh, "%s=%s\n", CHAN_TEMPLATE, CHAN_TEMPLATE_VAL[m->templates[idx]]);
         write_mixer(fh, m, idx);
