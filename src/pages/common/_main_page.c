@@ -86,8 +86,9 @@ const char *show_box_cb(guiObject_t *obj, const void *data)
         unsigned channel = idx - (NUM_RTC + NUM_TIMERS + NUM_TELEM + 1);
         s16 val_raw = MIXER_GetChannel(channel, APPLY_SAFETY | APPLY_SCALAR);
         s16 val_scale = MIXER_GetChannelDisplayScale(channel);
+        const char* val_format = MIXER_GetChannelDisplayFormat(channel);
 
-        sprintf(tempstring, "%5d", val_raw/val_scale);
+        sprintf(tempstring, val_format, val_raw/val_scale);
     }
     return tempstring;
 }
