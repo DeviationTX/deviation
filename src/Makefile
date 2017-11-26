@@ -125,7 +125,8 @@ PROTO_EXTRA_OBJS := $(addprefix $(ODIR)/, $(notdir $(PROTO_EXTRA_C:.c=.o)))
 SYMBOL_FILE := $(ODIR)/symbolfile
 endif
 
-HGVERSION := $(shell ../utils/get_version.pl ${TARGET})
+HGVERSION ?= $(shell ../utils/get_version.pl ${TARGET})
+HGVERSION := $(HGVERSION)
 
 # Rebuild on hg version change.
 # Based on http://mercurial.selenic.com/wiki/VersioningWithMake
