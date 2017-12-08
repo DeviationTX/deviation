@@ -120,14 +120,14 @@ void CC2500_SetPower(int power)
 {
     const unsigned char patable[8]=
     {
-        0xC6,  // -12dbm
+        0x60, // -30dbm
+        0xA0, // -25dbm
+        0x46, // -20dbm
+        0x57, // -15dbm
         0x97, // -10dbm
-        0x6E, // -8dbm
-        0x7F, // -6dbm
-        0xA9, // -4dbm
-        0xBB, // -2dbm
-        0xFE, // 0dbm
-        0xFF // 1.5dbm
+        0xE7, //  -5dbm
+        0xFE, //   0dbm
+        0xFF  // 1.5dbm
     };
     if (power > 7)
         power = 7;
