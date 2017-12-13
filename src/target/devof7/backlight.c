@@ -47,19 +47,14 @@ void BACKLIGHT_Brightness(unsigned brightness)
     timer_disable_counter(TIM3);
     if (brightness == 0) {
         // Turn off Backlight
-        gpio_set_mode(GPIOB, GPIO_MODE_INPUT,
-                  GPIO_CNF_INPUT_FLOAT, GPIO1);
-    } else if(brightness > 9) {
-        // Turn on Backlight full
         gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
                   GPIO_CNF_OUTPUT_PUSHPULL, GPIO1);
         gpio_set(GPIOB, GPIO1);
     } else {
         gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
                   GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO1);
-        u32 duty_cycle = 360 * brightness / 10;  // 720 is too bright,
+        u32 duty_cycle = 720 * (10 - brightness) / 10;
         timer_set_oc_value(TIM3, TIM_OC4, duty_cycle);
         timer_enable_counter(TIM3);
     }
 }
-
