@@ -145,11 +145,7 @@ sub build_font_hash {
 }
 sub align_chars {
     my($font) = @_;
-    my $max_zero = 0;
-    foreach my $c (sort {$a <=> $b} keys %$font) {
-        last if ($c > 2000);
-        $max_zero = $font->{$c}{zero} if($font->{$c}{zero} > $max_zero);
-    }
+    my $max_zero = $ascent;
     #Align to baseline
     foreach my $c (keys %$font) {
         if($font->{$c}{zero} < $max_zero) {
