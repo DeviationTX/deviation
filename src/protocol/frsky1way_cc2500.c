@@ -38,7 +38,7 @@
 
 static const char * const frsky_opts[] = {
   _tr_noop("Freq-Fine"),  "-127", "127", NULL,
-  _tr_noop("Freq-Course"),  "-127", "127", NULL,
+  _tr_noop("Freq-Coarse"),  "-127", "127", NULL,
   NULL
 };
 
