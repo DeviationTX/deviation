@@ -83,9 +83,6 @@ void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_w, u16 obj_h, const char 
     }
     txt_y = obj_y + offset + (obj_h - txt_h + 1) / 2;
 
-    if (desc->font == TINY_FONT.font)
-        txt_y += 1;
-
     if (desc->style == LABEL_UNDERLINE) {
         LCD_DrawFastHLine(--txt_x, txt_y + txt_h - 1, obj_w, 1);
     }
