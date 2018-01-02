@@ -104,7 +104,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         }
 #endif
         if(MATCH_KEY("txid")) {
-            Transmitter.txid = strtol(value, NULL, 16);
+            Transmitter.txid = strtoul(value, NULL, 16);
         }
         return 1;
     }
