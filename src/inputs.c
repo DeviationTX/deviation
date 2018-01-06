@@ -125,7 +125,7 @@ static void get_input_str(int src, const char **ptr, int *idx)
     #define CHANDEF(x) case INP_##x : INPNAME_##x(*ptr, *idx); break;
     switch(src) {
         #include "capabilities.h"
-    };
+    }
     #undef CHANDEF
 }
 
@@ -250,7 +250,7 @@ const char *INPUT_ButtonName(unsigned button)
     #define BUTTONDEF(x) case BUT_##x : return BUTNAME_##x;
     switch(button) {
         #include "capabilities.h"
-    };
+    }
     #undef BUTTONDEF
     return "";
 }
