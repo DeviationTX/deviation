@@ -11,7 +11,9 @@ DFU_ARGS         := -c 7 -b 0x08003000
 include $(SDIR)/target/common/devo/Makefile.inc
 
 ifdef BUILD_TARGET
+
 $(TARGET).fs_wrapper: $(LAST_MODEL)
 	perl -p -i -e 's/; has_pa-cyrf6936 = 1/  has_pa-cyrf6936 = 0/' filesystem/$(FILESYSTEM)/hardware.ini
+	rm -f filesystem/$(FILESYSTEM)/hardware.ini.bak
 
 endif
