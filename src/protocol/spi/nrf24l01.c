@@ -57,7 +57,7 @@ void NRF24L01_Initialize()
 {
     rf_setup = 0x0F;
     XN297_SetScrambledMode(XN297_SCRAMBLED);
-}    
+}
 
 u8 NRF24L01_WriteReg(u8 reg, u8 data)
 {
@@ -179,7 +179,7 @@ u8 NRF24L01_SetBitrate(u8 bitrate)
 }
 
 // Power setting is 0..3 for nRF24L01
-// Claimed power amp for nRF24L01 from eBay is 20dBm. 
+// Claimed power amp for nRF24L01 from eBay is 20dBm.
 //      Raw            w 20dBm PA
 // 0 : -18dBm  (16uW)   2dBm (1.6mW)
 // 1 : -12dBm  (60uW)   8dBm   (6mW)
@@ -209,7 +209,7 @@ u8 NRF24L01_SetPower(u8 power)
         case TXPOWER_100mW: nrf_power = 3; break;
         case TXPOWER_150mW: nrf_power = 3; break;
         default:            nrf_power = 0; break;
-    };
+    }
     // Power is in range 0..3 for nRF24L01
     rf_setup = (rf_setup & 0xF9) | ((nrf_power & 0x03) << 1);
     return NRF24L01_WriteReg(NRF24L01_06_RF_SETUP, rf_setup);
@@ -314,7 +314,7 @@ uint32_t __RBIT_(uint32_t in)
 
 static uint8_t bit_reverse(uint8_t a)
 {
-    return __RBIT_( (unsigned int) a)>>24; 
+    return __RBIT_( (unsigned int) a)>>24;
 }
 #else
 static uint8_t bit_reverse(uint8_t b_in)
@@ -348,7 +348,7 @@ static uint16_t crc16_update(uint16_t crc, unsigned char a, unsigned char bits)
 void XN297_SetTXAddr(const u8* addr, int len)
 {
     if (len > 5) len = 5;
-    if (len < 3) len = 3;  
+    if (len < 3) len = 3;
     u8 buf[] = { 0x55, 0x0F, 0x71, 0x0C, 0x00 }; // bytes for XN297 preamble 0xC710F55 (28 bit)
     xn297_addr_len = len;
     if (xn297_addr_len < 4) {
@@ -373,7 +373,7 @@ void XN297_SetRXAddr(const u8* addr, int len)
     if (len < 3) len = 3;
     u8 buf[] = { 0, 0, 0, 0, 0 };
     memcpy(buf, addr, len);
-    
+
     memcpy(xn297_rx_addr, addr, len);
     for (int i = 0; i < xn297_addr_len; ++i) {
         buf[i] = xn297_rx_addr[i];
@@ -389,7 +389,7 @@ void XN297_Configure(u8 flags)
 {
     xn297_crc = !!(flags & BV(NRF24L01_00_EN_CRC));
     flags &= ~(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO));
-    NRF24L01_WriteReg(NRF24L01_00_CONFIG, flags & 0xff);      
+    NRF24L01_WriteReg(NRF24L01_00_CONFIG, flags & 0xff);
 }
 
 void XN297_SetScrambledMode(const u8 mode)
@@ -401,7 +401,7 @@ u8 XN297_WritePayload(u8* msg, int len)
 {
     u8 packet[32];
     u8 res;
-    
+
     int last = 0;
     if (xn297_addr_len < 4) {
         // If address length (which is defined by receive address length)
@@ -448,7 +448,7 @@ u8 XN297_WriteEnhancedPayload(u8* msg, int len, int noack, u16 crc_xorout)
     u8 res;
     int last = 0;
     static int pid=0;
-    
+
     // address
     if (xn297_addr_len < 4) {
         // If address length (which is defined by receive address length)
@@ -462,19 +462,19 @@ u8 XN297_WriteEnhancedPayload(u8* msg, int len, int noack, u16 crc_xorout)
             packet[last] ^= xn297_scramble[scramble_index++];
         last++;
     }
-    
+
     // pcf
     packet[last] = (len << 1) | (pid>>1);
     if(xn297_scramble_enabled)
         packet[last] ^= xn297_scramble[scramble_index++];
     last++;
     packet[last] = (pid << 7) | (noack << 6);
-    
+
     // payload
     packet[last]|= bit_reverse(msg[0]) >> 2; // first 6 bit of payload
     if(xn297_scramble_enabled)
         packet[last] ^= xn297_scramble[scramble_index++];
-  
+
     for (int i = 0; i < len-1; ++i) {
         last++;
         packet[last] = (bit_reverse(msg[i]) << 6) | (bit_reverse(msg[i+1]) >> 2);
@@ -486,7 +486,7 @@ u8 XN297_WriteEnhancedPayload(u8* msg, int len, int noack, u16 crc_xorout)
     packet[last] = bit_reverse(msg[len-1]) << 6; // last 2 bit of payload
     if(xn297_scramble_enabled)
             packet[last] ^= xn297_scramble[scramble_index++] & 0xc0;
-    
+
     // crc
     if (xn297_crc) {
         int offset = xn297_addr_len < 4 ? 1 : 0;
@@ -496,13 +496,13 @@ u8 XN297_WriteEnhancedPayload(u8* msg, int len, int noack, u16 crc_xorout)
         }
         crc = crc16_update(crc, packet[last] & 0xc0, 2);
         crc ^= crc_xorout;
-        
+
         packet[last++] |= (crc >> 8) >> 2;
         packet[last++] = ((crc >> 8) << 6) | ((crc & 0xff) >> 2);
         packet[last++] = (crc & 0xff) << 6;
     }
     res = NRF24L01_WritePayload(packet, last);
-    
+
     pid++;
     if(pid>3)
         pid=0;
@@ -511,7 +511,7 @@ u8 XN297_WriteEnhancedPayload(u8* msg, int len, int noack, u16 crc_xorout)
 
 u8 XN297_ReadPayload(u8* msg, int len)
 {
-    // TODO: if xn297_crc==1, check CRC before filling *msg 
+    // TODO: if xn297_crc==1, check CRC before filling *msg
     u8 res = NRF24L01_ReadPayload(msg, len);
     for(u8 i=0; i<len; i++) {
       msg[i] = bit_reverse(msg[i]);
@@ -533,7 +533,7 @@ u8 XN297_ReadEnhancedPayload(u8* msg, int len)
     for(int i=0; i<len; i++) {
         msg[i] = bit_reverse((buffer[i+1] << 2) | (buffer[i+2] >> 6));
         if(xn297_scramble_enabled)
-            msg[i] ^= bit_reverse((xn297_scramble[xn297_addr_len+i+1] << 2) | 
+            msg[i] ^= bit_reverse((xn297_scramble[xn297_addr_len+i+1] << 2) |
                                   (xn297_scramble[xn297_addr_len+i+2] >> 6));
     }
     return pcf_size;
