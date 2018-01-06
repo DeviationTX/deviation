@@ -94,7 +94,7 @@ unsigned fix_crlf(char *str)
 
 void CONFIG_ReadLang(u8 idx)
 {
-    u8 cnt = 0;;
+    u8 cnt = 0;
     char file[30];
     char filename[13];
     struct str_map *lookup = lookupmap;
