@@ -106,7 +106,7 @@ int A7105_Reset()
     int result = A7105_ReadReg(0x10) == 0x9E;
     A7105_Strobe(A7105_STANDBY);
     return result;
-    
+
 }
 void A7105_WriteID(u32 id)
 {
@@ -143,7 +143,7 @@ void A7105_SetPower(int power)
         case 6: pac = 3; tbg = 7; break;
         case 7: pac = 3; tbg = 7; break;
         default: pac = 0; tbg = 0; break;
-    };
+    }
     A7105_WriteReg(0x28, (pac << 3) | tbg);
 }
 

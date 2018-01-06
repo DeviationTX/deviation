@@ -467,7 +467,7 @@ static void processSportPacket(u8 *packet) {
         discharge_dAms += data * (CLOCK_getms() - discharge_time);
         discharge_time = CLOCK_getms();
         set_telemetry(TELEM_FRSKY_DISCHARGE, discharge_dAms / 36000);
-        break;;
+        break;
     case VFAS_FIRST_ID & 0xfff0:
         set_telemetry(TELEM_FRSKY_VOLTA, data);
         break;
