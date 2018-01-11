@@ -87,11 +87,12 @@ void LCD_Init()
     LCD_Cmd(0xE2);  //Reset
     volatile int i = 0x8000;
     while(i) i--;
-    LCD_Cmd(0xAE);  //Display off
+    lcd_display(0); //Display Off
     LCD_Cmd(0xA6);  //Normal display
     LCD_Cmd(0xA4);  //All Points Normal
     LCD_Cmd(0xA0);  //Set SEG Direction (Normal)
     LCD_Cmd(0xC8);  //Set COM Direction (Reversed)
+    LCD_Cmd(0xA2);  //Set The LCD Display Driver Voltage Bias Ratio (1/9)
     LCD_Cmd(0x2C);  //Power Controller:Booster ON
     i = 0x8000;
     while(i) i--;
@@ -101,6 +102,7 @@ void LCD_Init()
     LCD_Cmd(0x2F); //Power Controller: VFollower ON
     i = 0x8000;
     while(i) i--;
+    LCD_Cmd(0x26); //Select Internal Resistor Rate (Rb/Ra)
     lcd_set_start_line(0);
     // Display data write (6)
     //Clear the screen
@@ -110,8 +112,8 @@ void LCD_Init()
         for(int col = 0; col < PHY_LCD_WIDTH; col++)
             LCD_Data(0x00);
     }
-    lcd_display(1);
     LCD_Contrast(5);
+    lcd_display(1); //Display On
     memset(img, 0, sizeof(img));
     memset(dirty, 0, sizeof(dirty));
 }
