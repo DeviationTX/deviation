@@ -101,8 +101,8 @@ void LCD_Init()
     while(i) i--;
     LCD_Cmd(0x2F); //Power Controller: VFollower ON
     i = 0x8000;
-    LCD_Cmd(0x26); //Select Internal Resistor Rate (Rb/Ra)
     while(i) i--;
+    LCD_Cmd(0x26); //Select Internal Resistor Rate (Rb/Ra)
     lcd_set_start_line(0);
     // Display data write (6)
     //Clear the screen
@@ -112,8 +112,8 @@ void LCD_Init()
         for(int col = 0; col < PHY_LCD_WIDTH; col++)
             LCD_Data(0x00);
     }
-    lcd_display(1); //Display On
     LCD_Contrast(5);
+    lcd_display(1); //Display On
     memset(img, 0, sizeof(img));
     memset(dirty, 0, sizeof(dirty));
 }
