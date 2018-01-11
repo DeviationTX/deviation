@@ -72,7 +72,7 @@ void PAGE_DrExpInit(int page)
     GUI_CreateTextSelect(&gui->exp[1], COL4, ROW4, TEXTSELECT_96, NULL, set_exp_cb, ((void *)(long)PITTHROMODE_IDLE1));
     GUI_CreateTextSelect(&gui->exp[2], COL5, ROW4, TEXTSELECT_96, NULL, set_exp_cb, ((void *)(long)PITTHROMODE_IDLE2));
     /* Row 5 */
-    u16 ymax = CHAN_MAX_VALUE/100 * MAX_SCALAR;
+    s16 ymax = CHAN_MAX_VALUE/100 * MAX_SCALAR;
     s16 ymin = -ymax;
     GUI_CreateXYGraph(&gui->graph[0], COL3, ROW5, 96, 120,
                               CHAN_MIN_VALUE, ymin,
