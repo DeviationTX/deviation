@@ -215,12 +215,18 @@ s32 MIXER_GetChannel(unsigned channel, enum LimitMask flags)
 
 s16 MIXER_GetChannelDisplayScale(unsigned channel)
 {
-    return Model.limits[channel].displayscale;
+    if (channel < NUM_OUT_CHANNELS)
+        return Model.limits[channel].displayscale;
+    else
+        return DEFAULT_DISPLAY_SCALE;
 }
 
 char* MIXER_GetChannelDisplayFormat(unsigned channel)
 {
-    return Model.limits[channel].displayformat;
+    if (channel < NUM_OUT_CHANNELS)
+        return Model.limits[channel].displayformat;
+    else
+        return DEFAULT_DISPLAY_FORMAT;
 }
 
 #define REZ_SWASH_X(x)  ((x) - (x)/8 - (x)/128 - (x)/512)   //  1024*sin(60) ~= 886
