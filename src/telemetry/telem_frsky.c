@@ -57,12 +57,16 @@ const char * _frsky_short_name(char *str, u8 telem)
     switch(telem) {
         case 0: strcpy(str, _tr("None")); break;
         case TELEM_FRSKY_VOLT1:
-        case TELEM_FRSKY_VOLT2: sprintf(str, "%s%d", _tr("Volt"), telem - TELEM_FRSKY_VOLT1 + 1); break;
+        case TELEM_FRSKY_VOLT2:
+#if HAS_EXTENDED_TELEMETRY
+        case TELEM_FRSKY_VOLT3:
+#endif
+            sprintf(str, "%s%d", _tr("Volt"), telem - TELEM_FRSKY_VOLT1 + 1);
+            break;
         case TELEM_FRSKY_RSSI:  strcpy(str, _tr("RSSI")); break;
         case TELEM_FRSKY_LRSSI: strcpy(str, _tr("LRSSI")); break;
         case TELEM_FRSKY_LQI: strcpy(str, _tr("LQI")); break;
 #if HAS_EXTENDED_TELEMETRY
-        case TELEM_FRSKY_VOLT3: sprintf(str, "%s%d", _tr("Volt"), telem - TELEM_FRSKY_VOLT1 + 1); break;
         case TELEM_FRSKY_VOLTA: sprintf(str, "%s%c", _tr("Volt"), (_tr("Amps"))[0]); break;
         case TELEM_FRSKY_MIN_CELL: strcpy(str, _tr("MinCell")); break;
         case TELEM_FRSKY_ALL_CELL: strcpy(str, _tr("AllCell")); break;
