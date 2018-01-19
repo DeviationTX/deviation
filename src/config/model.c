@@ -767,12 +767,6 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
             strcpy(m->limits[idx].displayformat, value);
             return 1;
         }
-        if (MATCH_KEY(CHAN_DISPLAY_SCALE)) {
-            if (value_int) {
-                m->limits[idx].displayscale = value_int;
-            }
-            return 1;
-        }
 
         if(assign_int(&m->limits[idx], _seclimit, MAPSIZE(_seclimit)))
             return 1;
@@ -1228,8 +1222,6 @@ u8 CONFIG_WriteModel(u8 model_num) {
         }
         if(WRITE_FULL_MODEL || m->limits[idx].min != DEFAULT_SERVO_LIMIT)
             fprintf(fh, "%s=%d\n", CHAN_LIMIT_MIN, -(int)m->limits[idx].min);
-        if(WRITE_FULL_MODEL || m->limits[idx].displayscale != DEFAULT_DISPLAY_SCALE)
-            fprintf(fh, "%s=%d\n", CHAN_DISPLAY_SCALE, m->limits[idx].displayscale);
         if(WRITE_FULL_MODEL || strcmp(m->limits[idx].displayformat, DEFAULT_DISPLAY_FORMAT) != 0)
             fprintf(fh, "%s=%s\n", CHAN_DISPLAY_FORMAT, m->limits[idx].displayformat);
         if(WRITE_FULL_MODEL || m->templates[idx] != 0)
