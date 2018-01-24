@@ -25,7 +25,7 @@ GetOptions("invert" => \$invert);
 my $root = shift(@ARGV);
 my $next_dir = 1;
 my %dirid;
-my (@files) = map {s/^..//; $_} split(/\n/, `chdir $root; find . -type f`);
+my (@files) = map {s/^..//; $_} split(/\n/, `cd $root; find . -type f`);
 foreach my $file (@files) {
     my @dirs = split(/\//, $file);
     my $filename = pop @dirs;
