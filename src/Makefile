@@ -34,7 +34,13 @@ $1:
 	$(MAKE) TARGET=$1
 # This builds Windows emulators on a Linux system.
 win_$1:
+ifeq ($(OS),Windows_NT)
+	# This builds Windows emulators on a Windows system
+	$(MAKE) TARGET=$1 WINDOWS=1
+else
+	# This builds Windows emulators on a Linux system
 	$(MAKE) TARGET=$1 WINDOWS=1 CROSS=i586-mingw32msvc-
+endif
 fs_$1:
 ifneq "$(INCLUDE_FS)" "1"
 	$(MAKE) TARGET=$1 fs
@@ -43,8 +49,14 @@ both_$1: $1 emu_$1
 zip_$1:
 	$(MAKE) TARGET=$1 zip
 zip_win_$1:
+ifeq ($(OS),Windows_NT)
+	# This builds Windows emulators on a Windows system
+	$(MAKE) TARGET=$1 WINDOWS=1 zip
+else
+	# This builds Windows emulators on a Linux system
 	$(MAKE) TARGET=$1 WINDOWS=1 CROSS=i586-mingw32msvc- zip
-release_$1: zip_$1 zip_win_$1 fs_$1
+endif
+release_$1: zip_$1 zip_win_emu_$1 fs_$1
 all_$1:
 	$(MAKE) TARGET=$1 all
 endef
@@ -236,7 +248,7 @@ fs: $(TARGET).fs
 %.fs:
 	rm -f deviation-fs-$(HGVERSION).zip; zip -r deviation-fs-$(HGVERSION).zip filesystem/$(FILESYSTEM)
 
-release:  $(TXS:%=release_%)
+release:  $(TXS:%=zip_%) $(EMUS:%=zip_win_%) $(TXS:%=fs_%)
 
 coverity:
 	rm -rf cov-int 2>/dev/null; $(MAKE) distclean
