@@ -32,7 +32,6 @@ everything: txs emus fss
 define make-target
 $1:
 	$(MAKE) TARGET=$1
-# This builds Windows emulators on a Linux system.
 win_$1:
 ifeq ($(OS),Windows_NT)
 	# This builds Windows emulators on a Windows system
