@@ -401,7 +401,7 @@ s32 MIXER_ApplyLimits(unsigned channel, struct Limit *limit, volatile s32 *_raw,
 s8 *MIXER_GetTrim(unsigned i)
 {
     if (Model.trims[i].sw) {
-        for (int j = 0; j < 3; j++) {
+        for (int j = 0; j < 6; j++) {
             // Assume switch 0/1/2 are in order
             if(raw[Model.trims[i].sw+j] > 0) {
                 return &Model.trims[i].value[j];
