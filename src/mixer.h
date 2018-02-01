@@ -30,7 +30,8 @@ enum {
     TRIM_ONOFF     = 191,
     TRIM_TOGGLE    = 192,
     TRIM_MOMENTARY = 193,
-    TRIM_SWITCH_TYPES = 3,
+    TRIM_3POS      = 194,
+    TRIM_SWITCH_TYPES = 4,
 };
 
 enum Safety {
