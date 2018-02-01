@@ -247,11 +247,13 @@ static void build_packet(u8 bind)
 //    packet[20] = 0;
 //    packet[21] = 0;
 
+#if 0
 printf("packet ");
 for (int i=0; i < PACKET_SIZE; i++) {
   printf("%02x ", packet[i]);
 }
 printf("\n");
+#endif
 
 }
 
@@ -279,7 +281,9 @@ static u16 bugs3_cb() {
         A7105_AdjustLOBaseFreq(freq_offset);
     }
 
+#if 0
 printf("state %d, channel %02x\n", state, channel);
+#endif
     switch(state) {
     case BIND_1:
         bind_count++;
@@ -302,7 +306,7 @@ printf("state %d, channel %02x\n", state, channel);
 
     case BIND_3:
         A7105_SetTxRxMode(TX_EN);
-        if (bind_count < 10) { //if(A7105_ReadReg(A7105_00_MODE) & 0x01) {
+        if (A7105_ReadReg(A7105_00_MODE) & 0x01) {
             state = BIND_1;
             return 1500;         // No received data so restart binding procedure.
         }
