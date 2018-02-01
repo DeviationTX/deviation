@@ -104,55 +104,74 @@ static int bugs3_init()
     u8 vco_calibration0;
     u8 vco_calibration1;
     
+    A7105_WriteReg(A7105_00_MODE, 0x00);
     A7105_WriteReg(A7105_01_MODE_CONTROL, 0x42);
+    A7105_WriteReg(A7105_02_CALC, 0x00);
     A7105_WriteReg(A7105_03_FIFOI, 0x15);
+    A7105_WriteReg(A7105_04_FIFOII, 0x00);
+    A7105_WriteReg(A7105_07_RC_OSC_I, 0x00);
+    A7105_WriteReg(A7105_08_RC_OSC_II, 0x00);
+    A7105_WriteReg(A7105_09_RC_OSC_III, 0x00);
     A7105_WriteReg(A7105_0D_CLOCK, 0x05);
     A7105_WriteReg(A7105_0E_DATA_RATE, 0x01);
+    A7105_WriteReg(A7105_0F_PLL_I, 0x50);
+    A7105_WriteReg(A7105_10_PLL_II, 0x9e);
+    A7105_WriteReg(A7105_11_PLL_III, 0x4b);
+    A7105_WriteReg(A7105_12_PLL_IV, 0x00);
     A7105_WriteReg(A7105_13_PLL_V, 0x02);
+    A7105_WriteReg(A7105_14_TX_I, 0x16);
     A7105_WriteReg(A7105_15_TX_II, 0x2b);
+    A7105_WriteReg(A7105_16_DELAY_I, 0x12);
     A7105_WriteReg(A7105_17_DELAY_II, 0x40);
     A7105_WriteReg(A7105_18_RX, 0x62);
     A7105_WriteReg(A7105_19_RX_GAIN_I, 0x80);
-    A7105_WriteReg(A7105_1C_RX_GAIN_IV, 0x0A);
+    A7105_WriteReg(A7105_1A_RX_GAIN_II, 0x80);
+    A7105_WriteReg(A7105_1B_RX_GAIN_III, 0x00);
+    A7105_WriteReg(A7105_1C_RX_GAIN_IV, 0x0a);
     A7105_WriteReg(A7105_1D_RSSI_THOLD, 0x32);
     A7105_WriteReg(A7105_1E_ADC, 0xc3);
     A7105_WriteReg(A7105_1F_CODE_I, 0x0f);
-    A7105_WriteReg(A7105_20_CODE_II, 0x17);
+    A7105_WriteReg(A7105_20_CODE_II, 0x16);
     A7105_WriteReg(A7105_21_CODE_III, 0x00);
+    A7105_WriteReg(A7105_22_IF_CALIB_I, 0x00);
+    A7105_WriteReg(A7105_24_VCO_CURCAL, 0x00);
+    A7105_WriteReg(A7105_25_VCO_SBCAL_I, 0x00);
+    A7105_WriteReg(A7105_26_VCO_SBCAL_II, 0x3b);
+    A7105_WriteReg(A7105_27_BATTERY_DET, 0x00);
     A7105_WriteReg(A7105_29_RX_DEM_TEST_I, 0x47);
+    A7105_WriteReg(A7105_2A_RX_DEM_TEST_II, 0x80);
     A7105_WriteReg(A7105_2B_CPC, 0x03);
+    A7105_WriteReg(A7105_2C_XTAL_TEST, 0x01);
+    A7105_WriteReg(A7105_2D_PLL_TEST, 0x45);
+    A7105_WriteReg(A7105_2E_VCO_TEST_I, 0x18);
+    A7105_WriteReg(A7105_2F_VCO_TEST_II, 0x00);
+    A7105_WriteReg(A7105_30_IFAT, 0x01);
+    A7105_WriteReg(A7105_31_RSCALE, 0x0f);
 
     A7105_Strobe(A7105_STANDBY);
 
     //IF Filter Bank Calibration
     A7105_WriteReg(0x02, 1);
-    //vco_current =
     A7105_ReadReg(0x02);
     u32 ms = CLOCK_getms();
     CLOCK_ResetWatchdog();
-    while(CLOCK_getms()  - ms < 500) {
-        if(! A7105_ReadReg(0x02))
+    while (CLOCK_getms() - ms < 500) {
+        if (!A7105_ReadReg(0x02))
             break;
     }
     if (CLOCK_getms() - ms >= 500)
         return 0;
     if_calibration1 = A7105_ReadReg(A7105_22_IF_CALIB_I);
-    A7105_ReadReg(A7105_24_VCO_CURCAL);
     if(if_calibration1 & A7105_MASK_FBCF) {
         //Calibration failed...what do we do?
         return 0;
     }
 
-    //VCO Current Calibration
-    //A7105_WriteReg(0x24, 0x13); //Recomended calibration from A7105 Datasheet
+    A7105_WriteReg(A7105_24_VCO_CURCAL, 0x13);
+    A7105_WriteReg(A7105_26_VCO_SBCAL_II, 0x3b);
 
-    //VCO Bank Calibration
-    //A7105_WriteReg(0x26, 0x3b); //Recomended limits from A7105 Datasheet
-
-    //VCO Bank Calibrate channel 0?
-    //Set Channel
-    A7105_WriteReg(A7105_0F_CHANNEL, 0);
     //VCO Calibration
+    A7105_WriteReg(A7105_0F_CHANNEL, 0);
     A7105_WriteReg(0x02, 2);
     ms = CLOCK_getms();
     CLOCK_ResetWatchdog();
@@ -168,15 +187,14 @@ static int bugs3_init()
         return 0;
     }
 
-    //Calibrate channel 0xa0?
     //Set Channel
     A7105_WriteReg(A7105_0F_CHANNEL, 0xa0);
     //VCO Calibration
     A7105_WriteReg(A7105_02_CALC, 2);
     ms = CLOCK_getms();
     CLOCK_ResetWatchdog();
-    while(CLOCK_getms()  - ms < 500) {
-        if(! A7105_ReadReg(A7105_02_CALC))
+    while (CLOCK_getms()  - ms < 500) {
+        if ( !A7105_ReadReg(A7105_02_CALC))
             break;
     }
     if (CLOCK_getms() - ms >= 500)
@@ -187,7 +205,8 @@ static int bugs3_init()
     }
 
     //Reset VCO Band calibration
-    //A7105_WriteReg(0x25, 0x08);
+    A7105_WriteReg(A7105_25_VCO_SBCAL_I, 0x0e);
+
     A7105_SetTxRxMode(TX_EN);
 
     A7105_SetPower(0x0b);   // bind in low-power (from spi capture)
