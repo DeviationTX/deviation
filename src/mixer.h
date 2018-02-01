@@ -167,7 +167,7 @@ struct Trim {
     u8 neg;
     u8 step;
     u8 sw;
-    s8 value[3];
+    s8 value[6];
 };
 
 /* Curve functions */

@@ -813,7 +813,7 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
             return 1;
         }
         if (MATCH_KEY(TRIM_VALUE)) {
-            parse_int_list(value, m->trims[idx].value, 3, S8);
+            parse_int_list(value, m->trims[idx].value, 6, S8);
             return 1;
         }
         printf("%s: Unknown trim setting: %s\n", section, name);
@@ -1185,9 +1185,11 @@ u8 CONFIG_WriteModel(u8 model_num) {
         write_int(fh, &m->trims[idx], _sectrim, MAPSIZE(_sectrim));
         if(WRITE_FULL_MODEL || m->trims[idx].sw)
             fprintf(fh, "%s=%s\n", TRIM_SWITCH, INPUT_SourceNameAbbrevSwitchReal(file, m->trims[idx].sw));
-        if(WRITE_FULL_MODEL || m->trims[idx].value[0] || m->trims[idx].value[1] || m->trims[idx].value[2])
-            fprintf(fh, "%s=%d,%d,%d\n", TRIM_VALUE,
-                    m->trims[idx].value[0], m->trims[idx].value[1], m->trims[idx].value[2]);
+        if(WRITE_FULL_MODEL || m->trims[idx].value[0] || m->trims[idx].value[1] || m->trims[idx].value[2]
+                            || m->trims[idx].value[3] || m->trims[idx].value[4] || m->trims[idx].value[5])
+            fprintf(fh, "%s=%d,%d,%d,%d,%d,%d\n", TRIM_VALUE,
+                               m->trims[idx].value[0], m->trims[idx].value[1], m->trims[idx].value[2],
+                               m->trims[idx].value[3], m->trims[idx].value[4], m->trims[idx].value[5]);
     }
     if (WRITE_FULL_MODEL || m->swash_type) {
         fprintf(fh, "[%s]\n", SECTION_SWASH);
