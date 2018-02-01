@@ -661,6 +661,12 @@ static void _trim_as_switch(unsigned flags, int i, int is_neg)
         } else if (flags & BUTTON_RELEASE) {
             *value = -100;
         }
+    } else if (Model.trims[i].step == TRIM_3POS) {
+        if (flags & BUTTON_PRESS) {
+            *value = is_neg ? -100 : 100;
+        } else if (flags & BUTTON_RELEASE) {
+            *value = 0;
+        }
     } else if (flags & BUTTON_PRESS) {
         if (Model.trims[i].step == TRIM_ONOFF) {
             //On/Off
