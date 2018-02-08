@@ -12,4 +12,4 @@
  You should have received a copy of the GNU General Public License
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
-const char DeviationVersion[33] = HGVERSION;
+const char DeviationVersion[34] = HGVERSION;
