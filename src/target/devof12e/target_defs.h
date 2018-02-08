@@ -2,16 +2,18 @@
 #define _DEVO_F12E_TARGET_H_
 
 #define USE_DEVOFS 1 //Must be before common_devo include
+
 #include "../common/devo/common_devo.h"
 
 #define TXID 0xEC
 #define VECTOR_TABLE_LOCATION 0x4000 //0x3000
+#define SPIFLASH_TYPE SST25VFxxxA
 #define SPIFLASH_SECTOR_OFFSET 0
 #define SPIFLASH_SECTORS 16
-#define SPIFLASH_AAI_AF 1
 
 #define LCD_WIDTH 66
 #define LCD_HEIGHT 26
+
 #define CHAR_WIDTH 12
 #define CHAR_HEIGHT 18
 

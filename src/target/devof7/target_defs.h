@@ -2,13 +2,14 @@
 #define _DEVO_F7_TARGET_H_
 
 #define USE_DEVOFS 1 //Must be before common_devo include
+
 #include "../common/devo/common_devo.h"
 
 #define TXID 0xF7
 #define VECTOR_TABLE_LOCATION 0x3000 //0x3000
+#define SPIFLASH_TYPE SST25VFxxxA
 #define SPIFLASH_SECTOR_OFFSET 0
 #define SPIFLASH_SECTORS 16
-#define SPIFLASH_AAI_AF 1
 
 #define LCD_WIDTH 24
 #define LCD_HEIGHT 12
@@ -34,7 +35,7 @@
 #define HAS_SCANNER         0
 #define HAS_LAYOUT_EDITOR   0
 #define HAS_EXTRA_SWITCHES  OPTIONAL
-#define HAS_EXTRA_BUTTONS  0
+#define HAS_EXTRA_BUTTONS   0
 #define HAS_MULTIMOD_SUPPORT 1
 #define HAS_MAPPED_GFX      0
 #define HAS_CHAR_ICONS      1
@@ -45,9 +46,9 @@
 #define DEBUG_WINDOW_SIZE 0
 #define MIN_BRIGHTNESS 0
 #define DEFAULT_BATTERY_ALARM 6600
-#define DEFAULT_BATTERY_CRITICAL 6200
-#define MAX_BATTERY_ALARM 8700
-#define MIN_BATTERY_ALARM 6000
+#define DEFAULT_BATTERY_CRITICAL 3900
+#define MAX_BATTERY_ALARM 9000
+#define MIN_BATTERY_ALARM 3300
 
 #define MAX_POWER_ALARM 60
 
