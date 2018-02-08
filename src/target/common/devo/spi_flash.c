@@ -17,8 +17,139 @@
 #include <libopencm3/stm32/spi.h>
 #include "common.h"
 
+#ifndef SPIFLASH_TYPE
+    #define SPIFLASH_TYPE SST25VFxxxB
+#endif
+
+#include "spi_flash.h"
+
+#ifndef HAS_FLASH_DETECT
+    #define HAS_FLASH_DETECT 0
+#endif
+
+#if HAS_FLASH_DETECT
+#undef SPIFLASH_SR_ENABLE
+#undef SPIFLASH_PROTECT_MASK
+#undef SPIFLASH_WRITE_SIZE
+#undef SPIFLASH_WRITE_CMD
+#undef SPIFLASH_FAST_READ
+#undef SPIFLASH_USE_AAI
+
+// Defaults for SST25VFxxxB, Devo 10 original memory
+static u8 SPIFLASH_SR_ENABLE    = 0x50;
+static u8 SPIFLASH_PROTECT_MASK = 0x3C;
+static u8 SPIFLASH_WRITE_SIZE   = 2;
+static u8 SPIFLASH_WRITE_CMD    = 0xAD;
+static u8 SPIFLASH_FAST_READ    = 0;
+static u8 SPIFLASH_USE_AAI      = 1;
+#endif
+
 #define CS_HI() gpio_set(GPIOB, GPIO2)
 #define CS_LO() gpio_clear(GPIOB, GPIO2)
+
+#if HAS_FLASH_DETECT
+extern uint32_t Mass_Block_Count[2]; // see mass_mal.c
+/*
+ * Detect flash memory type and set variables controlling
+ * access accordingly.
+ */
+void detect_memory_type()
+{
+    /* When we have an amount of 4096-byte sectors, fill out Structure for file
+     * system
+     */
+    u32 spiflash_sectors = 0;
+#if defined USE_DEVOFS && USE_DEVOFS
+    u8 fat_offset = 3;    //boot_sector + fat_sector + root_sector
+#else
+    u8 fat_offset = 0;
+#endif
+    u8 mfg_id, memtype, capacity;
+    u32 id;
+    CS_LO();
+    spi_xfer(SPI1, 0x9F);
+    mfg_id  = (u8)spi_xfer(SPI1, 0);
+    memtype = (u8)spi_xfer(SPI1, 0);
+    capacity = (u8)spi_xfer(SPI1, 0);
+    CS_HI();
+    switch (mfg_id) {
+    case 0xBF: // Microchip
+        if (memtype == 0x25) {
+            printf("Microchip SST25VFxxxB SPI Flash found\n");
+            spiflash_sectors = 1 << ((capacity & 0x07) + 8);
+        }
+        break;
+    case 0xEF: // Winbond
+        if (memtype == 0x40) {
+            printf("Winbond SPI Flash found\n");
+            SPIFLASH_PROTECT_MASK = 0x1C;
+            SPIFLASH_WRITE_SIZE   = 1;
+            SPIFLASH_WRITE_CMD    = 0x02;
+            SPIFLASH_FAST_READ    = 1;
+            SPIFLASH_USE_AAI      = 0;
+            spiflash_sectors      = 1 << ((capacity & 0x0f) + 4);
+        }
+        break;
+    case 0x7F: // Extension code, older ISSI, maybe some others
+        if (memtype == 0x9D && capacity == 0x46) {
+            printf("ISSI IS25CQ032 SPI Flash found\n");
+            // ISSI IS25CQ032
+            SPIFLASH_SR_ENABLE    = 0x06;  //No EWSR, use standard WREN
+            SPIFLASH_PROTECT_MASK = 0x3C;
+            SPIFLASH_WRITE_SIZE   = 1;
+            SPIFLASH_WRITE_CMD    = 0x02;
+            SPIFLASH_FAST_READ    = 1;
+            SPIFLASH_USE_AAI      = 0;
+            spiflash_sectors      = 512;
+        }
+        break;
+    case 0x9D: // ISSI
+        if (memtype == 0x40 || memtype == 0x30) {
+            printf("ISSI SPI Flash found\n");
+            SPIFLASH_SR_ENABLE    = 0x06;  //No EWSR, use standard WREN
+            SPIFLASH_PROTECT_MASK = 0x3C;
+            SPIFLASH_WRITE_SIZE   = 1;
+            SPIFLASH_WRITE_CMD    = 0x02;
+            SPIFLASH_FAST_READ    = 1;
+            SPIFLASH_USE_AAI      = 0;
+            spiflash_sectors      = 1 << ((capacity & 0x0f) + 4);
+        }
+        break;
+    case 0x01: // Cypress
+        break;
+    default:
+        /* Check older READ ID command */
+        printf("Unknown mfg %02X, type %02X, capacity %02X\n",
+            mfg_id, memtype, capacity);
+        id = SPIFlash_ReadID();
+        if (id == 0xBF48BF48) {
+            printf("Microchip SST25VFxxxA SPI Flash found\n");
+            SPIFLASH_PROTECT_MASK = 0x0C;
+            SPIFLASH_WRITE_SIZE   = 1;
+            SPIFLASH_WRITE_CMD    = 0xAF;
+            spiflash_sectors      = 16;
+        }
+        break;
+    }
+
+    printf("Flash params:\n\
+        SPIFLASH_SR_ENABLE    = %02X\n\
+        SPIFLASH_PROTECT_MASK = %02X\n\
+        SPIFLASH_WRITE_SIZE   = %d\n\
+        SPIFLASH_WRITE_CMD    = %02X\n\
+        SPIFLASH_FAST_READ    = %d\n\
+        SPIFLASH_USE_AAI      = %d\n",
+        SPIFLASH_SR_ENABLE,
+        SPIFLASH_PROTECT_MASK,
+        SPIFLASH_WRITE_SIZE,
+        SPIFLASH_WRITE_CMD,
+        SPIFLASH_FAST_READ,
+        SPIFLASH_USE_AAI);
+
+    printf("%d free sectors\n", spiflash_sectors - SPIFLASH_SECTOR_OFFSET);
+    Mass_Block_Count[0] = fat_offset + spiflash_sectors - SPIFLASH_SECTOR_OFFSET;
+}
+#endif
 
 /*
  *
@@ -42,19 +173,24 @@ void SPIFlash_Init()
     /* MISO */
     gpio_set_mode(GPIOA, GPIO_MODE_INPUT,
                   GPIO_CNF_INPUT_FLOAT, GPIO6);
+
     CS_HI();
     /* Includes enable */
-    spi_init_master(SPI1, 
+    spi_init_master(SPI1,
                     SPI_CR1_BAUDRATE_FPCLK_DIV_4,
                     SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE,
-                    SPI_CR1_CPHA_CLK_TRANSITION_1, 
+                    SPI_CR1_CPHA_CLK_TRANSITION_1,
                     SPI_CR1_DFF_8BIT,
                     SPI_CR1_MSBFIRST);
     spi_enable_software_slave_management(SPI1);
     spi_set_nss_high(SPI1);
 
     spi_enable(SPI1);
+#if HAS_FLASH_DETECT
+    detect_memory_type();
+#endif
 }
+
 static void SPIFlash_SetAddr(unsigned cmd, u32 address)
 {
     CS_LO();
@@ -70,7 +206,6 @@ static void SPIFlash_SetAddr(unsigned cmd, u32 address)
 u32 SPIFlash_ReadID()
 {
     u32 result;
-    CS_LO();
 
     SPIFlash_SetAddr(0x90, 0);
     result  = (u8)spi_xfer(SPI1, 0);
@@ -80,19 +215,24 @@ u32 SPIFlash_ReadID()
     result |= (u8)spi_xfer(SPI1, 0);
     result <<= 8;
     result |= (u8)spi_xfer(SPI1, 0);
-   
+
     CS_HI();
     return result;
 }
 
 void SPI_FlashBlockWriteEnable(unsigned enable)
 {
+    //printf("SPI_FlashBlockWriteEnable: %d\n", enable);
     CS_LO();
-    spi_xfer(SPI1, 0x50);
+    spi_xfer(SPI1, SPIFLASH_SR_ENABLE);
     CS_HI();
     CS_LO();
-    spi_xfer(SPI1, 0x01);
-    spi_xfer(SPI1, enable ? 0 : 0x38);
+    if (SPIFLASH_PROTECT_MASK) {
+        spi_xfer(SPI1, 0x01);
+        spi_xfer(SPI1, enable ? 0 : SPIFLASH_PROTECT_MASK);
+    } else {
+        //Not yet implemented case: SST26
+    }
     CS_HI();
 }
 
@@ -129,19 +269,26 @@ void DisableHWRYBY()
 void WaitForWriteComplete()
 {
     unsigned sr;
-    CS_LO();
-    spi_xfer(SPI1, 0x05);
-    do
-    {
-        sr = spi_xfer(SPI1, 0x00);
-    }while(sr & 0x01); 
-    CS_HI();
+    // We disable interrupts in SPI operation so we
+    // need to periodically re-enable them.
+    while(true) {
+        int i;
+        CS_LO();
+        spi_xfer(SPI1, 0x05);
+        for (i = 0; i < 100; ++i) {
+            sr = spi_xfer(SPI1, 0x00);
+            if (!(sr & 0x01)) break;
+        }
+        CS_HI();
+        if (i < 100) break;
+    }
 }
 /*
  *
  */
 void SPIFlash_EraseSector(u32 sectorAddress)
 {
+    //printf("SPI erase sector, addr %06x\r\n", sectorAddress);
     WriteFlashWriteEnable();
 
     SPIFlash_SetAddr(0x20, sectorAddress);
@@ -165,106 +312,58 @@ void SPIFlash_BulkErase()
     WaitForWriteComplete();
 }
 
-#ifdef SPIFLASH_AAI_AF
-/*
- * Use '0xAF' command to write byte-sized data with auto-increment-address
- */
 void SPIFlash_WriteBytes(u32 writeAddress, u32 length, const u8 * buffer)
 {
-    u32 i;
-
-    DisableHWRYBY();
-
+    u32 i = 0;
     if(!length) return; // just in case...
 
+    if (SPIFLASH_USE_AAI)
+        DisableHWRYBY();
 
-    //printf("SPI write fast mode, length %d\r\n", fast_write_length);
+    //printf("SPI write page_prog, addr %06x, length %d\r\n", writeAddress, length);
     WriteFlashWriteEnable();
 
-    SPIFlash_SetAddr(0xAF, writeAddress);
-    spi_xfer(SPI1, ~buffer[0]);
+    if (SPIFLASH_USE_AAI) {
+        if (SPIFLASH_WRITE_SIZE == 2 && writeAddress & 0x01) {
+            //printf("SPI write slow start(%08x, %d)\n", writeAddress, length);
+            SPIFlash_WriteByte(writeAddress,buffer[0]);
+            buffer++;
+            writeAddress++;
+            length--;
+            if (length == 0)
+                return;
+            WriteFlashWriteEnable();
+        }
+        SPIFlash_SetAddr(SPIFLASH_WRITE_CMD, writeAddress);
+        spi_xfer(SPI1, (u8)~buffer[i++]);
+        if (SPIFLASH_WRITE_SIZE == 2) {
+            spi_xfer(SPI1, i < length ? ~buffer[i++] : 0xff);
+        }
+    } else {
+        SPIFlash_SetAddr(0x02, writeAddress);
+    }
+    while(i < length) {
+        if (SPIFLASH_USE_AAI) {
+            CS_HI();
+            WaitForWriteComplete();
+            CS_LO();
+            spi_xfer(SPI1, SPIFLASH_WRITE_CMD);
+            if (SPIFLASH_WRITE_SIZE == 2) {
+                //Writing 0xff will have no effect even if there is already data at this address
+                spi_xfer(SPI1, i < length ? ~buffer[i++] : 0xff);
+            }
+        }
+        spi_xfer(SPI1, (u8)~buffer[i++]);
+    }
     CS_HI();
-
     WaitForWriteComplete();
 
-    for(i=1;i<length;i++)
-    {
-        CS_LO();
-        spi_xfer(SPI1, 0xAF);
-        spi_xfer(SPI1, ~buffer[i]);
-        CS_HI();
-
-        WaitForWriteComplete();
-    }
     WriteFlashWriteDisable();
 }
 
-#else // ! defined SPIFLASH_AAI_AF
-/*
- * Use '0xAD' command to write word-sized data with auto-increment-address
- * Length should be multiple of 2
- */
-void SPIFlash_WriteBytes(u32 writeAddress, u32 length, const u8 * buffer)
-{
-    u32 i;
-
-    DisableHWRYBY();
-
-    if(!length) return; // just in case...
-
-    // Write single byte at the start, if writeAddress is odd
-
-    if(writeAddress & 0x01) { 
-        //printf("SPI write slow start\r\n");
-        SPIFlash_WriteByte(writeAddress,buffer[0]);
-        buffer++;
-        writeAddress++;
-        length--;       
-    }
-    
-    // More than one byte left to write -> write even number of bytes in fast mode
-    if(length>1) { 
-        u32 fast_write_length=length&0xFFFFFFFE;
-        
-        //printf("SPI write fast mode, length %d\r\n", fast_write_length);
-        WriteFlashWriteEnable();
-
-        SPIFlash_SetAddr(0xAD, writeAddress);
-        spi_xfer(SPI1, ~buffer[0]);
-        spi_xfer(SPI1, ~buffer[1]);
-        CS_HI();
-
-        WaitForWriteComplete();
-
-        for(i=2;i<fast_write_length;i+=2)
-        {
-            CS_LO();
-            spi_xfer(SPI1, 0xAD);
-            spi_xfer(SPI1, ~buffer[i]);
-            spi_xfer(SPI1, ~buffer[i+1]);
-            CS_HI();
-
-            WaitForWriteComplete();
-        }
-        WriteFlashWriteDisable();
-        
-        length-=fast_write_length;
-        buffer+=fast_write_length;
-        writeAddress+=fast_write_length;                
-    }
-
-    // zero or one bytes left to write now
-    if(length) {
-       //printf("SPI write slow finish\r\n");
-       SPIFlash_WriteByte(writeAddress, buffer[0]);
-       
-    }
-
-}
-#endif
-
 void SPIFlash_WriteByte(u32 writeAddress, const unsigned byte) {
-   DisableHWRYBY();
+   if (SPIFLASH_USE_AAI)
+       DisableHWRYBY();
    WriteFlashWriteEnable();
    SPIFlash_SetAddr(0x02, writeAddress);
    spi_xfer(SPI1, (u8)(~byte));
@@ -282,7 +381,12 @@ void SPIFlash_WriteByte(u32 writeAddress, const unsigned byte) {
 void SPIFlash_ReadBytes(u32 readAddress, u32 length, u8 * buffer)
 {
     u32 i;
-    SPIFlash_SetAddr(0x03, readAddress);
+    if (SPIFLASH_FAST_READ) {
+        SPIFlash_SetAddr(0x0b, readAddress);
+        spi_xfer(SPI1, 0); // Dummy read
+    } else {
+        SPIFlash_SetAddr(0x03, readAddress);
+    }
 
     for(i=0;i<length;i++)
     {
@@ -295,7 +399,12 @@ void SPIFlash_ReadBytes(u32 readAddress, u32 length, u8 * buffer)
 int SPIFlash_ReadBytesStopCR(u32 readAddress, u32 length, u8 * buffer)
 {
     u32 i;
-    SPIFlash_SetAddr(0x03, readAddress);
+    if (SPIFLASH_FAST_READ) {
+        SPIFlash_SetAddr(0x0b, readAddress);
+        spi_xfer(SPI1, 0); // Dummy read
+    } else {
+        SPIFlash_SetAddr(0x03, readAddress);
+    }
 
     for(i=0;i<length;i++)
     {
@@ -308,4 +417,52 @@ int SPIFlash_ReadBytesStopCR(u32 readAddress, u32 length, u8 * buffer)
 
     CS_HI();
     return i;
+}
+
+void debug_spi_flash()
+{
+    u8 data[512];
+    u8 check[512];
+    unsigned i;
+    memset(check, 0, sizeof(check));
+    int start = 0x1000*SPIFLASH_SECTOR_OFFSET;
+
+    for (i = 0; i < sizeof(data); i++) {
+        data[i] = rand32();
+    }
+    WriteFlashWriteEnable();
+    SPIFlash_EraseSector(start);
+    SPIFlash_ReadBytes(start, 101, check);
+    for (i = 0; i < 101; i++) {
+        if (check[i] != 0) {
+          printf("Failed to erase at %d (%02x)\n", i, check[i]);
+          break;
+        }
+    }
+    SPIFlash_WriteBytes(start, 101, data);
+    SPIFlash_ReadBytes(start, 101, check);
+    printf("--------1\n");
+    for (i = 0; i < 101; i++) {
+        if (data[i] != check[i])  {
+            printf("%04x: %02x != %02x\n", i, data[i], check[i]);
+        }
+    }
+    printf("--------2\n");
+    SPIFlash_WriteBytes(start +101 , 100, data + 101);
+    SPIFlash_ReadBytes(start  +101 , 100, check + 101);
+    for (i = 100; i < 201; i++) {
+        if (data[i] != check[i])  {
+            printf("%04x: %02x != %02x\n", i, data[i], check[i]);
+        }
+    }
+    SPIFlash_WriteBytes(start + 223, 33, data+223);
+    SPIFlash_WriteBytes(start + 201, 22, data+201);
+    SPIFlash_ReadBytes(start + 200,  56, check + 200);
+    printf("--------3\n");
+    for (i = 200; i < 256; i++) {
+        if (data[i] != check[i])  {
+            printf("%04x: %02x != %02x\n", i, data[i], check[i]);
+        }
+    }
+    while(1) { if(PWR_CheckPowerSwitch()) PWR_Shutdown(); }
 }
