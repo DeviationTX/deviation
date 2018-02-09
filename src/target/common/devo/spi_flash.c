@@ -21,27 +21,20 @@
     #define SPIFLASH_TYPE SST25VFxxxB
 #endif
 
-#include "spi_flash.h"
-
 #ifndef HAS_FLASH_DETECT
     #define HAS_FLASH_DETECT 0
 #endif
 
 #if HAS_FLASH_DETECT
-#undef SPIFLASH_SR_ENABLE
-#undef SPIFLASH_PROTECT_MASK
-#undef SPIFLASH_WRITE_SIZE
-#undef SPIFLASH_WRITE_CMD
-#undef SPIFLASH_FAST_READ
-#undef SPIFLASH_USE_AAI
-
-// Defaults for SST25VFxxxB, Devo 10 original memory
-static u8 SPIFLASH_SR_ENABLE    = 0x50;
-static u8 SPIFLASH_PROTECT_MASK = 0x3C;
-static u8 SPIFLASH_WRITE_SIZE   = 2;
-static u8 SPIFLASH_WRITE_CMD    = 0xAD;
-static u8 SPIFLASH_FAST_READ    = 0;
-static u8 SPIFLASH_USE_AAI      = 1;
+    // Defaults for SST25VFxxxB, Devo 10 original memory
+    static u8 SPIFLASH_SR_ENABLE    = 0x50;
+    static u8 SPIFLASH_PROTECT_MASK = 0x3C;
+    static u8 SPIFLASH_WRITE_SIZE   = 2;
+    static u8 SPIFLASH_WRITE_CMD    = 0xAD;
+    static u8 SPIFLASH_FAST_READ    = 0;
+    static u8 SPIFLASH_USE_AAI      = 1;
+#else
+    #include "spi_flash.h"
 #endif
 
 #define CS_HI() gpio_set(GPIOB, GPIO2)
