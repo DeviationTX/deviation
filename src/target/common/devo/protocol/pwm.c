@@ -34,7 +34,6 @@
 #include <errno.h>
 
 
-static volatile u16 *pwm;
 void PWM_Initialize()
 {
 #if _PWM_PIN == GPIO_USART1_TX
@@ -89,6 +88,7 @@ void PWM_Stop()
 #endif
 }
 
+extern volatile u16 *pwm;  // defined in pwm_rom.c
 void PPM_Enable(unsigned low_time, volatile u16 *pulses)
 {
     pwm = pulses;
@@ -101,16 +101,6 @@ void PPM_Enable(unsigned low_time, volatile u16 *pulses)
         timer_clear_flag(TIM1, TIM_SR_UIF);
         timer_enable_irq(TIM1, TIM_DIER_UIE);
     }
-}
-
-void tim1_up_isr()
-{
-    timer_clear_flag(TIM1, TIM_SR_UIF);
-
-    if (*pwm)
-        timer_set_period(TIM1, *pwm++ - 1);
-    else
-        timer_set_oc_value(TIM1, _PWM_TIM_OC, 0); // hold output inactive
 }
 
 #endif //DISABLE_PWM
