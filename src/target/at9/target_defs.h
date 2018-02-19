@@ -70,7 +70,6 @@ static inline void LCD_ForceUpdate() {}
 #define NUM_VIRT_CHANNELS 10
 
 #define NUM_TRIMS 10
-#define NUM_TOGGLES 5
 #define MAX_POINTS 13
 #define NUM_MIXERS ((NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS) * 4)
 
