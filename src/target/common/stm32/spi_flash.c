@@ -20,8 +20,6 @@
 
 #ifdef SPIFLASH_TYPE
 
-#include "spi_flash.h"
-
 //#define _SPI_CONCAT(x, y, z) x ## y ## z
 //#define SPI_CONCAT(x, y, z)  _SPI_CONCAT(x, y, z)
 //#define SPIx           SPI_CONCAT(SPI,                         _SPI_FLASH_PORT,)
@@ -37,22 +35,15 @@
     #define APB_SPIxEN  RCC_APB1ENR
 #endif
 
-
 #ifndef HAS_4IN1_FLASH
     #define HAS_4IN1_FLASH 0
 #endif
+
 #ifndef HAS_FLASH_DETECT
     #define HAS_FLASH_DETECT 0
 #endif
 
 #if HAS_FLASH_DETECT
-#undef SPIFLASH_SR_ENABLE   
-#undef SPIFLASH_PROTECT_MASK
-#undef SPIFLASH_WRITE_SIZE  
-#undef SPIFLASH_WRITE_CMD   
-#undef SPIFLASH_FAST_READ   
-#undef SPIFLASH_USE_AAI     
-
 // Defaults for SST25VFxxxB, Devo 10 original memory
 static u8 SPIFLASH_SR_ENABLE    = 0x50;
 static u8 SPIFLASH_PROTECT_MASK = 0x3C;
@@ -60,8 +51,9 @@ static u8 SPIFLASH_WRITE_SIZE   = 2;
 static u8 SPIFLASH_WRITE_CMD    = 0xAD;
 static u8 SPIFLASH_FAST_READ    = 0;
 static u8 SPIFLASH_USE_AAI      = 1;
+#else
+    #include "spi_flash.h"
 #endif
-
 
 static void CS_HI()
 {
@@ -111,6 +103,16 @@ void detect_memory_type()
             printf("Microchip SST25VFxxxB SPI Flash found\n");
             spiflash_sectors = 1 << ((capacity & 0x07) + 8);
         }
+        if (memtype == 0x26) {
+            printf("Microchip SST26VFxxxB SPI Flash found\n");
+            SPIFLASH_SR_ENABLE    = 0x06;  //No EWSR, use standard WREN
+            SPIFLASH_PROTECT_MASK = 0;
+            SPIFLASH_WRITE_SIZE   = 1;
+            SPIFLASH_WRITE_CMD    = 0x02;
+            SPIFLASH_FAST_READ    = 1;
+            SPIFLASH_USE_AAI      = 0;
+            spiflash_sectors = 1 << ((capacity & 0x07) + 8);
+        }
         break;
     case 0xEF: // Winbond
         if (memtype == 0x40) {
@@ -126,18 +128,17 @@ void detect_memory_type()
     case 0x7F: // Extension code, older ISSI, maybe some others
         if (memtype == 0x9D && capacity == 0x46) {
             printf("ISSI IS25CQ032 SPI Flash found\n");
-            // ISSI IS25CQ032
             SPIFLASH_SR_ENABLE    = 0x06;  //No EWSR, use standard WREN
             SPIFLASH_PROTECT_MASK = 0x3C;
             SPIFLASH_WRITE_SIZE   = 1;
             SPIFLASH_WRITE_CMD    = 0x02;
             SPIFLASH_FAST_READ    = 1;
             SPIFLASH_USE_AAI      = 0;
-            spiflash_sectors      = 512;
+            spiflash_sectors      = 1024;
         }
         break;
     case 0x9D: // ISSI
-        if (memtype == 0x40 || memtype == 0x30) {
+        if (memtype == 0x60 || memtype == 0x40 || memtype == 0x30) {
             printf("ISSI SPI Flash found\n");
             SPIFLASH_SR_ENABLE    = 0x06;  //No EWSR, use standard WREN
             SPIFLASH_PROTECT_MASK = 0x3C;
@@ -148,7 +149,29 @@ void detect_memory_type()
             spiflash_sectors      = 1 << ((capacity & 0x0f) + 4);
         }
         break;
-    case 0x01: // Cypress
+    case 0xC2: // Macronix
+        if (memtype == 0x20) {
+            printf("Macronix SPI Flash found\n");
+            SPIFLASH_SR_ENABLE    = 0x06;  //No EWSR, use standard WREN
+            SPIFLASH_PROTECT_MASK = 0x3C;
+            SPIFLASH_WRITE_SIZE   = 1;
+            SPIFLASH_WRITE_CMD    = 0x02;
+            SPIFLASH_FAST_READ    = 1;
+            SPIFLASH_USE_AAI      = 0;
+            spiflash_sectors      = 1 << ((capacity & 0x0f) + 4);
+        }
+        break;
+    case 0x1F: // Adesto
+        if ((memtype & 0xE0) == 0x40) {
+            printf("Adesto SPI Flash found\n");
+            SPIFLASH_SR_ENABLE    = 0x06;  //No EWSR, use standard WREN
+            SPIFLASH_PROTECT_MASK = 0x3C;
+            SPIFLASH_WRITE_SIZE   = 1;
+            SPIFLASH_WRITE_CMD    = 0x02;
+            SPIFLASH_FAST_READ    = 1;
+            SPIFLASH_USE_AAI      = 0;
+            spiflash_sectors      = 1 << ((memtype & 0x1f) + 3);
+        }
         break;
     default:
         /* Check older READ ID command */
@@ -166,12 +189,12 @@ void detect_memory_type()
     }
 
     printf("Flash params:\n\
-SPIFLASH_SR_ENABLE    = %02X\n\
-SPIFLASH_PROTECT_MASK = %02X\n\
-SPIFLASH_WRITE_SIZE   = %d\n\
-SPIFLASH_WRITE_CMD    = %02X\n\
-SPIFLASH_FAST_READ    = %d\n\
-SPIFLASH_USE_AAI      = %d\n",
+        SPIFLASH_SR_ENABLE    = %02X\n\
+        SPIFLASH_PROTECT_MASK = %02X\n\
+        SPIFLASH_WRITE_SIZE   = %d\n\
+        SPIFLASH_WRITE_CMD    = %02X\n\
+        SPIFLASH_FAST_READ    = %d\n\
+        SPIFLASH_USE_AAI      = %d\n",
         SPIFLASH_SR_ENABLE,   
         SPIFLASH_PROTECT_MASK,
         SPIFLASH_WRITE_SIZE,  
@@ -183,7 +206,6 @@ SPIFLASH_USE_AAI      = %d\n",
     Mass_Block_Count[0] = fat_offset + spiflash_sectors - SPIFLASH_SECTOR_OFFSET;
 }
 #endif
-
 /*
  *
  */
@@ -230,7 +252,9 @@ void SPIFlash_Init()
     detect_memory_type();
 #endif
 }
-
+/*
+ *
+ */
 static void SPIFlash_SetAddr(unsigned cmd, u32 address)
 {
     CS_LO();
@@ -239,7 +263,6 @@ static void SPIFlash_SetAddr(unsigned cmd, u32 address)
     spi_xfer(SPIx, (u8)(address >>  8));
     spi_xfer(SPIx, (u8)(address));
 }
-
 /*
  *
  */
@@ -259,23 +282,6 @@ u32 SPIFlash_ReadID()
     CS_HI();
     return result;
 }
-
-void SPI_FlashBlockWriteEnable(unsigned enable)
-{
-    //printf("SPI_FlashBlockWriteEnable: %d\n", enable);
-    CS_LO();
-    spi_xfer(SPIx, SPIFLASH_SR_ENABLE);
-    CS_HI();
-    CS_LO();
-    if (SPIFLASH_PROTECT_MASK) {
-        spi_xfer(SPIx, 0x01);
-        spi_xfer(SPIx, enable ? 0 : SPIFLASH_PROTECT_MASK);
-    } else {
-        //Not yet implemented case: SST26
-    }
-    CS_HI();
-}
-
 /*
  *
  */
@@ -292,15 +298,6 @@ void WriteFlashWriteDisable()
 {
     CS_LO();
     spi_xfer(SPIx, 0x04);
-    CS_HI();
-}
-/*
- *
- */
-void DisableHWRYBY()
-{
-    CS_LO();
-    spi_xfer(SPIx, 0x80);
     CS_HI();
 }
 /*
@@ -326,6 +323,53 @@ void WaitForWriteComplete()
 /*
  *
  */
+void SPI_FlashBlockWriteEnable(unsigned enable)
+{
+    //printf("SPI_FlashBlockWriteEnable: %d\n", enable);
+    CS_LO();
+    spi_xfer(SPIx, SPIFLASH_SR_ENABLE);
+    CS_HI();
+    if (SPIFLASH_PROTECT_MASK) {
+        CS_LO();
+        spi_xfer(SPIx, 0x01);
+        spi_xfer(SPIx, enable ? 0 : SPIFLASH_PROTECT_MASK);
+        CS_HI();
+    } else {
+        //Microchip SST26VFxxxB Serial Flash
+        if(enable) {
+            CS_LO();
+            //Global Block Protection unlock
+            spi_xfer(SPI1, 0x98);
+            CS_HI();
+        } else {
+            CS_LO();
+            //Write Block-Protection Register
+            spi_xfer(SPI1, 0x42);
+            //write-protected BPR[79:0] = 5555 FFFFFFFF FFFFFFFF
+            //data input must be most significant bit(s) first
+            spi_xfer(SPI1, 0x55);
+            spi_xfer(SPI1, 0x55);
+            for (int i = 0; i < 8; i++) {
+                spi_xfer(SPI1, 0xFF);
+            }
+            CS_HI();
+            WaitForWriteComplete();
+        }
+    }
+    WriteFlashWriteDisable();
+}
+/*
+ *
+ */
+void DisableHWRYBY()
+{
+    CS_LO();
+    spi_xfer(SPIx, 0x80);
+    CS_HI();
+}
+/*
+ *
+ */
 void SPIFlash_EraseSector(u32 sectorAddress)
 {
     //printf("SPI erase sector, addr %06x\r\n", sectorAddress);
@@ -335,6 +379,7 @@ void SPIFlash_EraseSector(u32 sectorAddress)
     CS_HI();
 
     WaitForWriteComplete();
+    WriteFlashWriteDisable();
 }
 /*
  *
@@ -350,8 +395,11 @@ void SPIFlash_BulkErase()
     CS_HI();
 
     WaitForWriteComplete();
+    WriteFlashWriteDisable();
 }
-
+/*
+ *
+ */
 void SPIFlash_WriteBytes(u32 writeAddress, u32 length, const u8 * buffer)
 {
     u32 i = 0;
@@ -397,10 +445,11 @@ void SPIFlash_WriteBytes(u32 writeAddress, u32 length, const u8 * buffer)
     }
     CS_HI();
     WaitForWriteComplete();
-
     WriteFlashWriteDisable();
 }
-
+/*
+ *
+ */
 void SPIFlash_WriteByte(u32 writeAddress, const unsigned byte) {
    if (SPIFLASH_USE_AAI)
        DisableHWRYBY();
@@ -410,11 +459,7 @@ void SPIFlash_WriteByte(u32 writeAddress, const unsigned byte) {
    CS_HI();
    WaitForWriteComplete();
    WriteFlashWriteDisable();
-
 }
-
-
-
 /*
  *
  */
@@ -470,7 +515,7 @@ void debug_spi_flash()
     for (i = 0; i < sizeof(data); i++) {
         data[i] = rand32();
     }
-    WriteFlashWriteEnable();
+    SPI_FlashBlockWriteEnable(1);
     SPIFlash_EraseSector(start);
     SPIFlash_ReadBytes(start, 101, check);
     for (i = 0; i < 101; i++) {
