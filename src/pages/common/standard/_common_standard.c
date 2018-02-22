@@ -23,12 +23,12 @@ const char *STDMIX_channelname_cb(guiObject_t *obj, const void *data)
     u8 ch = (long)data;
     u8 proto_map_length = PROTO_MAP_LEN;
 
-    #if defined(_DEVO7E_256_TARGET_H_) || defined(_T8SG_TARGET_H_)
+    #if defined(HAS_SWITCHES_NOSTOCK) && HAS_SWITCHES_NOSTOCK
     #define SWITCH_NOSTOCK ((1 << INP_HOLD0) | (1 << INP_HOLD1) | \
                             (1 << INP_FMOD0) | (1 << INP_FMOD1))
     if ((Transmitter.ignore_src & SWITCH_NOSTOCK) == SWITCH_NOSTOCK)
         proto_map_length = PROTO_MAP_LEN - 1;
-    #endif
+    #endif //HAS_SWITCHES_NOSTOCK
     if (ch < proto_map_length && ProtocolChannelMap[Model.protocol]) {
         char tmp1[30];
         INPUT_SourceNameAbbrevSwitch(tmp1, ProtocolChannelMap[Model.protocol][ch]);
