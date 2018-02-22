@@ -48,8 +48,8 @@ void _gui_draw_background(int x, int y, int w, int h)
         } else if(y >= 32) {
             LCD_FillRect(x, y, w, h, Display.background.bg_color);
         } else {
-            LCD_FillRect(x, y, w, h, Display.background.bg_color);
             LCD_FillRect(x, y, w, 32 - y, Display.background.hd_color);
+            LCD_FillRect(x, 32, w, h - 32 + y, Display.background.bg_color);
         }
     } else {
         LCD_DrawWindowedImageFromFile(x, y, "media/backgrnd" IMG_EXT, w, h, x, y);
@@ -90,4 +90,3 @@ u8 GUI_IsObjectInsideCurrentView(u8 view_id, struct guiObject *obj)
     (void)obj;
     return 0;
 }
-
