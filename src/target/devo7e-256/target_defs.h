@@ -20,7 +20,8 @@
 #define HAS_SCANNER         0
 #define HAS_LAYOUT_EDITOR   1
 #define HAS_EXTRA_SWITCHES  OPTIONAL
-#define HAS_EXTRA_BUTTONS  0
+#define HAS_SWITCHES_NOSTOCK 1
+#define HAS_EXTRA_BUTTONS   0
 #define HAS_EXTRA_POTS      OPTIONAL
 #define HAS_MULTIMOD_SUPPORT 1
 #define HAS_VIDEO           0
