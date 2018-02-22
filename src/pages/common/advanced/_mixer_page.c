@@ -65,7 +65,7 @@ const char *MIXPAGE_ChanNameProtoCB(guiObject_t *obj, const void *data)
             case 2: snprintf(tempstring, sizeof(tempstring), "%s-%s", _tr("CYC"), _tr("COL")); return tempstring;
         }
     }
-    #if HAS_SWITCHES_NOSTOCK
+    #if defined(HAS_SWITCHES_NOSTOCK) && HAS_SWITCHES_NOSTOCK
     #define SWITCH_NOSTOCK ((1 << INP_HOLD0) | (1 << INP_HOLD1) | \
                             (1 << INP_FMOD0) | (1 << INP_FMOD1))
     if ((Transmitter.ignore_src & SWITCH_NOSTOCK) == SWITCH_NOSTOCK)
