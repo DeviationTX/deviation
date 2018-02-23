@@ -143,6 +143,14 @@ static const struct struct_map _secbargraph[] =
     {FG_COLOR_ZERO,          OFFSET_COL(Display.bargraph, fg_color_zero)},
     {OUTLINE_COLOR,          OFFSET_COL(Display.bargraph, outline_color)},
 };
+#if (LCD_WIDTH == 480) || (LCD_WIDTH == 320)
+static const struct struct_map _secbackground[] =
+{
+    {"drawn_background",     OFFSET(Display.background, drawn_background)},
+    {"bg_color",             OFFSET_COL(Display.background, bg_color)},
+    {"hd_color",             OFFSET_COL(Display.background, hd_color)},
+};
+#endif
 
 static int ini_handler(void* user, const char* section, const char* name, const char* value)
 {
@@ -218,6 +226,12 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         if(assign_int(&d->xygraph, _secxygraph, MAPSIZE(_secxygraph)))
             return 1;
     }
+#if (LCD_WIDTH == 480) || (LCD_WIDTH == 320)
+    if(MATCH_SECTION("background")) {
+        if(assign_int(&d->background, _secbackground, MAPSIZE(_secbackground)))
+            return 1;
+    }
+#endif
     for (idx = 0; idx < NUM_STR_ELEMS(BARGRAPH_VAL); idx++) {
         if(MATCH_SECTION(BARGRAPH_VAL[idx])) {
             struct disp_bargraph *graph;
