@@ -38,11 +38,10 @@
 #include "iface_cc2500.h"
 
 static const char *const corona_opts[] = {
-    _tr_noop("Format"), "V1", "V2", NULL,
+    _tr_noop("Format"), "V1", "V2", "FDV3", NULL,
     _tr_noop("Freq-Fine"),  "-127", "127", NULL,
     NULL
 };
-
 
 enum {
     PROTO_OPTS_FORMAT = 0,
@@ -52,33 +51,35 @@ enum {
 
 enum {
     FORMAT_V1,
-    FORMAT_V2
+    FORMAT_V2,
+    FORMAT_FDV3,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 
-//#define CORONA_FORCE_ID
+#define CORONA_FORCE_ID
 
-#define CORONA_RF_NUM_CHANNELS  3
-#define CORONA_ADDRESS_LENGTH 4
-#define CORONA_BIND_CHANNEL_V1  0xD1
-#define CORONA_BIND_CHANNEL_V2  0xB8
-#define CORONA_COARSE     0x00
-#define CORONA_CHANNEL_TIMING 1500
+#define CORONA_RF_NUM_CHANNELS    3
+#define CORONA_ADDRESS_LENGTH     4
+#define CORONA_BIND_CHANNEL_V1    0xD1  // also Flydream V3
+#define CORONA_BIND_CHANNEL_V2    0xB8
+#define CORONA_CHANNEL_TIMING     1500
+#define FDV3_BIND_PERIOD          5000
+#define FDV3_CHANNEL_PERIOD       3000
 
-u8  rx_tx_addr[5];
-u8  hopping_frequency[50];
-u16 bind_counter;
-u16 packet_period;
-u8  packet[40];
-u16 state;
-u8  hopping_frequency_no;
-u8  binding;
-s8  fine;
+static u8  rx_tx_addr[CORONA_ADDRESS_LENGTH];
+static u8  hopping_frequency[CORONA_RF_NUM_CHANNELS+1];
+static u8  hopping_frequency_no;
+static u16 bind_counter;
+static u8  packet[40];
+static u16 state;
+static s8  fine;
+static u8  fdv3_id_send;
 
+// V1 radio init also same for Flydream V3
 const u8 CORONA_init_values[] = {
   /* 00 */ 0x29, 0x2E, 0x06, 0x07, 0xD3, 0x91, 0xFF, 0x04,
-  /* 08 */ 0x05, 0x00, CORONA_BIND_CHANNEL_V1, 0x06, 0x00, 0x5C, 0x4E, 0xC4 + CORONA_COARSE,
+  /* 08 */ 0x05, 0x00, CORONA_BIND_CHANNEL_V1, 0x06, 0x00, 0x5C, 0x4E, 0xC4,
   /* 10 */ 0x5B, 0xF8, 0x03, 0x23, 0xF8, 0x47, 0x07, 0x30,
   /* 18 */ 0x18, 0x16, 0x6C, 0x43, 0x40, 0x91, 0x87, 0x6B,
   /* 20 */ 0xF8, 0x56, 0x10, 0xA9, 0x0A, 0x00, 0x11, 0x41,
@@ -91,10 +92,10 @@ static void CORONA_rf_init() {
 
   for (u8 i = 0; i <= 0x2E; ++i) CC2500_WriteReg(i, CORONA_init_values[i]);
 
-  if (Model.proto_opts[PROTO_OPTS_FORMAT] != FORMAT_V1) {
+  if (Model.proto_opts[PROTO_OPTS_FORMAT] == FORMAT_V2) {
     CC2500_WriteReg(CC2500_0A_CHANNR, CORONA_BIND_CHANNEL_V2);
     CC2500_WriteReg(CC2500_0E_FREQ1, 0x80);
-    CC2500_WriteReg(CC2500_0F_FREQ0, 0x00 + CORONA_COARSE);
+    CC2500_WriteReg(CC2500_0F_FREQ0, 0x00);
     CC2500_WriteReg(CC2500_15_DEVIATN, 0x50);
     CC2500_WriteReg(CC2500_17_MCSM1, 0x00);
     CC2500_WriteReg(CC2500_1B_AGCCTRL2, 0x67);
@@ -111,38 +112,73 @@ static void CORONA_rf_init() {
   CC2500_SetPower(Model.tx_power);
 }
 
+// Generate address to use from TX id and manufacturer id (STM32 unique id)
+static void initialize_rx_tx_addr()
+{
+    u32 lfsr = 0xb2c54a2ful;
+
+#ifndef USE_FIXED_MFGID
+    u8 var[12];
+    MCU_SerialNumber(var, 12);
+    for (int i = 0; i < 12; ++i) {
+        rand32_r(&lfsr, var[i]);
+    }
+#endif
+
+    if (Model.fixed_id) {
+       for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
+           rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
+    }
+    // Pump zero bytes for LFSR to diverge more
+    for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
+
+    rx_tx_addr[4] = 0xa2;
+    for (u8 i = 0; i < sizeof(rx_tx_addr)-1; ++i) {
+        rx_tx_addr[i] = lfsr & 0xff;
+        rand32_r(&lfsr, i);
+    }
+}
+
 // Generate id and hopping freq
 static void CORONA_init()
 {
   #ifdef CORONA_FORCE_ID
     // Example of ID and channels taken from dumps
-    if (Model.proto_opts[PROTO_OPTS_FORMAT] == FORMAT_V1) {
+    switch (Model.proto_opts[PROTO_OPTS_FORMAT]) {
+    case FORMAT_V1:
       memcpy((void *)rx_tx_addr,(void *)"\x1F\xFE\x6C\x35",CORONA_ADDRESS_LENGTH);
       memcpy((void *)hopping_frequency,(void *)"\x17\x0D\x03\x49",CORONA_RF_NUM_CHANNELS+1);
-    } else {
+      break;
+    case FORMAT_V2:
       memcpy((void *)rx_tx_addr,(void *)"\xFE\xFE\x02\xFB",CORONA_ADDRESS_LENGTH);
       memcpy((void *)hopping_frequency,(void *)"\x14\x3D\x35",CORONA_RF_NUM_CHANNELS);
+      break;
+    case FORMAT_FDV3:
+      memcpy((void *)rx_tx_addr,(void *)"\x02\xfa\x38\x38",CORONA_ADDRESS_LENGTH);
+      memcpy((void *)hopping_frequency,(void *)"\x71\xb9\x30",CORONA_RF_NUM_CHANNELS);
+      break;
     }
   #else
     // From dumps channels are anything between 0x00 and 0xC5 on V1.
     // But 0x00 and 0xB8 should be avoided on V2 since they are used for bind.
     // Below code make sure channels are between 0x02 and 0xA0, spaced with a minimum of 2 and not ordered (RX only use the 1st channel unless there is an issue).
-    u8 order=rx_tx_addr[3]&0x03;
-    for(u8 i=0; i<CORONA_RF_NUM_CHANNELS+1; i++)
-      hopping_frequency[i^order]=2+rx_tx_addr[3-i]%39+(i<<5)+(i<<3);
+    initialize_rx_tx_addr();
+    u8 order = rx_tx_addr[3] & 0x03;
+    for (u8 i=0; i < CORONA_RF_NUM_CHANNELS+1; i++)
+        hopping_frequency[i^order] = 2+rx_tx_addr[3-i]%39+(i<<5)+(i<<3);
+
+    if (Model.proto_opts[PROTO_OPTS_FORMAT] == FORMAT_FDV3 && rx_tx_addr[3] > 0xa0)
+        rx_tx_addr[3] &= 0x7f;   // Flydream sends identifier using rx_tx_addr[3] as channel number
 
     // ID looks random but on the 15 V1 dumps they all show the same odd/even rule
-    if(rx_tx_addr[3]&0x01)
-    { // If [3] is odd then [0] is odd and [2] is even 
-      rx_tx_addr[0]|=0x01;
-      rx_tx_addr[2]&=0xFE;
+    if (rx_tx_addr[3] & 0x01) { // If [3] is odd then [0] is odd and [2] is even 
+      rx_tx_addr[0] |= 0x01;
+      rx_tx_addr[2] &= 0xFE;
+    } else {                    // If [3] is even then [0] is even and [2] is odd 
+      rx_tx_addr[0] &= 0xFE;
+      rx_tx_addr[2] |= 0x01;
     }
-    else
-    { // If [3] is even then [0] is even and [2] is odd 
-      rx_tx_addr[0]&=0xFE;
-      rx_tx_addr[2]|=0x01;
-    }
-    rx_tx_addr[1]=0xFE;     // Always FE in the dumps of V1 and V2
+    rx_tx_addr[1] = 0xFE;       // Always FE in the dumps of V1 and V2
   #endif
 }
 
@@ -150,42 +186,107 @@ u16 convert_channel_ppm(u8 chan) {
     return (u16)((s32)Channels[chan] * 500 / CHAN_MAX_VALUE + 1500);
 }
 
-// 8 Channels with direct values from PPM
-static void CORONA_build_packet(u8 bind)
-{
+static u16 CORONA_build_bind_pkt(void) {
   // Tune frequency if it has been changed
   if (fine != (s8)Model.proto_opts[PROTO_OPTS_FREQFINE]) {
       fine = (s8)Model.proto_opts[PROTO_OPTS_FREQFINE];
       CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);
   }
 
-  if (!bind) { 
-    if(state==0 || (Model.proto_opts[PROTO_OPTS_FORMAT] == FORMAT_V1)) {
-     // Build standard packet
-
-      // Set RF channel
-      CC2500_WriteReg(CC2500_0A_CHANNR, hopping_frequency[hopping_frequency_no]);
-      // Update RF power
-      CC2500_SetPower(Model.tx_power);
-
-      // Build packet
-      packet[0] = 0x10;   // 17 bytes to follow
-      
-      // Channels
-      memset(packet+9, 0x00, 4);
-      for(u8 i=0; i<8; i++)
-      { // Channel values are packed
-        u16 val=convert_channel_ppm(i);
-        packet[i+1] = val;
-        packet[9 + (i>>1)] |= (i&0x01)?(val>>4)&0xF0:(val>>8)&0x0F;
+    // Build bind packets
+    if (Model.proto_opts[PROTO_OPTS_FORMAT] == FORMAT_V1) {
+      if (bind_counter&1) { // Send TX ID
+        packet[0] = 0x04;    // 5 bytes to follow
+        for(u8 i = 0; i < CORONA_ADDRESS_LENGTH; i++)
+          packet[i+1] = rx_tx_addr[i];
+        packet[5] = 0xCD;    // Unknown but seems to be always the same value for V1
+        return 3689;
+      } else {             // Send hopping freq
+        packet[0] = 0x03;    // 4 bytes to follow
+        for(u8 i = 0; i < CORONA_RF_NUM_CHANNELS+1; i++)
+          packet[i+1] = hopping_frequency[i];
+        // Not sure what the last byte (+1) is for now since only the first 3 channels are used...
+        return 3438;
       }
+    } else { // V2 and FDV3
+      packet[0] = 0x04;   // 5 bytes to follow
+      for(u8 i=0; i < CORONA_ADDRESS_LENGTH; i++)
+        packet[i+1] = rx_tx_addr[i];
+      packet[5] = 0x00;   // Unknown but seems to be always the same value for V2 and FDV3
+      if (Model.proto_opts[PROTO_OPTS_FORMAT] == FORMAT_FDV3)
+          return FDV3_BIND_PERIOD;
+      else
+          return 26791;
+    }
+}
 
-      // TX ID
-      for(u8 i=0; i<CORONA_ADDRESS_LENGTH; i++)
-        packet[i+13] = rx_tx_addr[i];
-      
-      packet[17] = 0x00;
+static u16 CORONA_build_packet(void) {
+    u16 packet_period;
+  // Tune frequency if it has been changed
+  if (fine != (s8)Model.proto_opts[PROTO_OPTS_FREQFINE]) {
+      fine = (s8)Model.proto_opts[PROTO_OPTS_FREQFINE];
+      CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);
+  }
+  // Update RF power
+  CC2500_SetPower(Model.tx_power);
 
+  if (state && (Model.proto_opts[PROTO_OPTS_FORMAT] == FORMAT_V2)) {
+    // Send identifier packet for 2.65sec. This is how the RX learns the hopping table after a bind. Why it's not part of the bind like V1 is a mistery...
+    // Set channel
+    CC2500_WriteReg(CC2500_0A_CHANNR, 0x00);
+    state--;
+    packet[0]=0x07;   // 8 bytes to follow
+    // Send hopping freq
+    for(u8 i=0; i<CORONA_RF_NUM_CHANNELS; i++)
+      packet[i+1]=hopping_frequency[i];
+    // Send TX ID
+    for(u8 i=0; i<CORONA_ADDRESS_LENGTH; i++)
+      packet[i+4]=rx_tx_addr[i];
+    packet[8]=0;
+    return 6647-CORONA_CHANNEL_TIMING;
+  }
+
+
+  // Flydream every fourth packet is identifier packet and is on channel number
+  // same as last byte of rx_tx_addr
+  if (Model.proto_opts[PROTO_OPTS_FORMAT] == FORMAT_FDV3 && fdv3_id_send) {
+      fdv3_id_send = 0;
+      CC2500_WriteReg(CC2500_0A_CHANNR, rx_tx_addr[CORONA_ADDRESS_LENGTH-1]);
+//TODO printf("chan: 0x%02x\n", rx_tx_addr[CORONA_ADDRESS_LENGTH-1]);
+      packet[0] = 0x07;   // 8 bytes to follow
+      // Send TX ID
+      for(u8 i = 0; i < CORONA_ADDRESS_LENGTH; i++)
+        packet[i+1] = rx_tx_addr[i];
+      // Send hopping freq
+      for(u8 i = 0; i < CORONA_RF_NUM_CHANNELS; i++)
+        packet[i+1+CORONA_ADDRESS_LENGTH] = hopping_frequency[i];
+      packet[8] = 0;
+      return 7800;  // extra delay after id packet according to captures
+  }
+
+
+  // Set RF channel
+  CC2500_WriteReg(CC2500_0A_CHANNR, hopping_frequency[hopping_frequency_no]);
+//TODO printf("chan: 0x%02x\n", hopping_frequency[hopping_frequency_no]);
+
+  // Build packet
+  packet[0] = 0x10;   // 17 bytes to follow
+  
+  // Channels
+  memset(packet+9, 0x00, 4);
+  for (u8 i=0; i<8; i++) { // Channel values are packed
+    u16 val=convert_channel_ppm(i);
+    packet[i+1] = val;
+    packet[9 + (i>>1)] |= (i&0x01)?(val>>4)&0xF0:(val>>8)&0x0F;
+  }
+
+  // TX ID
+  for (u8 i=0; i < CORONA_ADDRESS_LENGTH; i++)
+    packet[i+13] = rx_tx_addr[i];
+  
+  packet[17] = 0x00;
+
+  if (Model.proto_opts[PROTO_OPTS_FORMAT] != FORMAT_FDV3) {
       // Packet period is based on hopping
       switch (hopping_frequency_no) {
         case 0:
@@ -202,96 +303,79 @@ static void CORONA_build_packet(u8 bind)
           packet_period = Model.proto_opts[PROTO_OPTS_FORMAT] == FORMAT_V1
                         ? 12520-CORONA_CHANNEL_TIMING
                         : 13468-CORONA_CHANNEL_TIMING;
-          if (Model.proto_opts[PROTO_OPTS_FORMAT] != FORMAT_V1)
-            packet[17] = 0x03;
+          if (Model.proto_opts[PROTO_OPTS_FORMAT] == FORMAT_V2)
+              packet[17] = 0x03;
           break;
       }
-      hopping_frequency_no++;
-      hopping_frequency_no%=CORONA_RF_NUM_CHANNELS;
-    } else {
-      // Send identifier packet for 2.65sec. This is how the RX learns the hopping table after a bind. Why it's not part of the bind like V1 is a mistery...
-      // Set channel
-      CC2500_WriteReg(CC2500_0A_CHANNR, 0x00);
-      state--;
-      packet[0]=0x07;   // 8 bytes to follow
-      // Send hopping freq
-      for(u8 i=0; i<CORONA_RF_NUM_CHANNELS; i++)
-        packet[i+1]=hopping_frequency[i];
-      // Send TX ID
-      for(u8 i=0; i<CORONA_ADDRESS_LENGTH; i++)
-        packet[i+4]=rx_tx_addr[i];
-      packet[8]=0;
-      packet_period=6647-CORONA_CHANNEL_TIMING;
-    }
-  } else {
-    // Build bind packets
-    if(Model.proto_opts[PROTO_OPTS_FORMAT] == FORMAT_V1)
-    { // V1
-      if(bind_counter&1)
-      { // Send TX ID
-        packet[0]=0x04;   // 5 bytes to follow
-        for(u8 i=0; i<CORONA_ADDRESS_LENGTH; i++)
-          packet[i+1]=rx_tx_addr[i];
-        packet[5]=0xCD;   // Unknown but seems to be always the same value for V1
-        packet_period=3689;
-      }
-      else
-      { // Send hopping freq
-        packet[0]=0x03;   // 4 bytes to follow
-        for(u8 i=0; i<CORONA_RF_NUM_CHANNELS+1; i++)
-          packet[i+1]=hopping_frequency[i];
-        // Not sure what the last byte (+1) is for now since only the first 3 channels are used...
-        packet_period=3438;
-      }
-    }
-    else
-    { // V2
-      packet[0]=0x04;   // 5 bytes to follow
-      for(u8 i=0; i<CORONA_ADDRESS_LENGTH; i++)
-        packet[i+1]=rx_tx_addr[i];
-      packet[5]=0x00;   // Unknown but seems to be always the same value for V2
-      packet_period=26791;
-    }
   }
+  hopping_frequency_no++;
+  if (Model.proto_opts[PROTO_OPTS_FORMAT] == FORMAT_FDV3) {
+      if (hopping_frequency_no == CORONA_RF_NUM_CHANNELS) {
+          fdv3_id_send = 1;
+          packet_period = 6000; // extra delay before id packet according to captures
+      } else {
+          packet_period = FDV3_CHANNEL_PERIOD;
+      }
+  }
+  hopping_frequency_no %= CORONA_RF_NUM_CHANNELS;
+
+  return packet_period;
 }
 
 MODULE_CALLTYPE
 static u16 corona_cb() {
-  if (binding) {
+u16 packet_period = 0;
+
+  if (bind_counter) {
     bind_counter--;
-    if (bind_counter == 0) {
-        binding = 0;
-        PROTOCOL_SetBindState(0);
-    }
+    if (bind_counter == 0) PROTOCOL_SetBindState(0);
   }
-  if (packet[0] == 0) {
-    CORONA_build_packet(binding);
-    if (binding)
-      return CORONA_CHANNEL_TIMING;
-  }
+  if (bind_counter)
+      packet_period = CORONA_build_bind_pkt();
+  else
+      packet_period = CORONA_build_packet();
+//TODO printf("period: %d, packet: ", packet_period);
+//TODO for (u8 i=0; i <= packet[0]+1; i++) printf("%02x ", packet[i]);
+//TODO printf("\n");
+
   // Send packet
   CC2500_WriteData(packet, packet[0]+2);
   packet[0]=0;
+
+#ifndef EMULATOR
   return packet_period;
+#else
+  return packet_period / 1000;
+#endif
 }
 
 static void initialize(u8 bind)
 {
   CLOCK_StopTimer();
 
-  if(Model.proto_opts[PROTO_OPTS_FORMAT] == FORMAT_V1)
-    bind_counter=1400;    // Stay in bind mode for 5s
-  else
-    bind_counter=187;   // Stay in bind mode for 5s
-  state=400;          // Used by V2 to send RF channels + ID for 2.65s at startup
-  hopping_frequency_no=0;
-  packet[0]=0;
+  if (bind) {
+      switch (Model.proto_opts[PROTO_OPTS_FORMAT]) {
+      case FORMAT_V1:
+        bind_counter = 1400;    // Stay in bind mode for 5s
+        break;
+      case FORMAT_V2:
+        bind_counter = 187;     // Stay in bind mode for 5s
+        break;
+      case FORMAT_FDV3:
+        bind_counter = 1000;    // Stay in bind mode for 5s
+        break;
+      }
+      PROTOCOL_SetBindState(5500);
+  } else {
+      bind_counter = 0;
+  }
+  state = 400;            // Used by V2 to send RF channels + ID for 2.65s at startup
+  hopping_frequency_no = 0;
+  packet[0] = 0;
   CORONA_init();
   CORONA_rf_init();
-  binding = bind;
-  if (bind) PROTOCOL_SetBindState(0xFFFFFFFF);
 
-  CLOCK_StartTimer(10000, corona_cb);
+  CLOCK_StartTimer(500, corona_cb);
 }
 
 const void *Corona_Cmds(enum ProtoCmds cmd)
