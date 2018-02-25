@@ -57,7 +57,7 @@ enum {
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 
-#define CORONA_FORCE_ID
+//#define CORONA_FORCE_ID
 
 #define CORONA_RF_NUM_CHANNELS    3
 #define CORONA_ADDRESS_LENGTH     4
@@ -130,10 +130,9 @@ static void initialize_rx_tx_addr()
            rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
     }
     // Pump zero bytes for LFSR to diverge more
-    for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
+    for (u8 i = 0; i < sizeof (lfsr); ++i) rand32_r(&lfsr, 0);
 
-    rx_tx_addr[4] = 0xa2;
-    for (u8 i = 0; i < sizeof(rx_tx_addr)-1; ++i) {
+    for (u8 i = 0; i < sizeof (rx_tx_addr); ++i) {
         rx_tx_addr[i] = lfsr & 0xff;
         rand32_r(&lfsr, i);
     }
@@ -142,7 +141,8 @@ static void initialize_rx_tx_addr()
 // Generate id and hopping freq
 static void CORONA_init()
 {
-  #ifdef CORONA_FORCE_ID
+//TODO  #ifdef CORONA_FORCE_ID
+if (!Model.fixed_id) {
     // Example of ID and channels taken from dumps
     switch (Model.proto_opts[PROTO_OPTS_FORMAT]) {
     case FORMAT_V1:
@@ -158,7 +158,8 @@ static void CORONA_init()
       memcpy((void *)hopping_frequency,(void *)"\x71\xb9\x30",CORONA_RF_NUM_CHANNELS);
       break;
     }
-  #else
+//TODO  #else
+} else {
     // From dumps channels are anything between 0x00 and 0xC5 on V1.
     // But 0x00 and 0xB8 should be avoided on V2 since they are used for bind.
     // Below code make sure channels are between 0x02 and 0xA0, spaced with a minimum of 2 and not ordered (RX only use the 1st channel unless there is an issue).
@@ -179,7 +180,8 @@ static void CORONA_init()
       rx_tx_addr[2] |= 0x01;
     }
     rx_tx_addr[1] = 0xFE;       // Always FE in the dumps of V1 and V2
-  #endif
+//TODO  #endif
+}
 }
 
 u16 convert_channel_ppm(u8 chan) {
