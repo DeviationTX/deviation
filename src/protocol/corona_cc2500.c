@@ -65,7 +65,7 @@ ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 #define CORONA_BIND_CHANNEL_V2    0xB8
 #define CORONA_CHANNEL_TIMING     1500
 #define FDV3_BIND_PERIOD          5000
-#define FDV3_CHANNEL_PERIOD       3000
+#define FDV3_CHANNEL_PERIOD       4000
 
 static u8  rx_tx_addr[CORONA_ADDRESS_LENGTH];
 static u8  hopping_frequency[CORONA_RF_NUM_CHANNELS+1];
@@ -261,7 +261,7 @@ static u16 CORONA_build_packet(void) {
       for(u8 i = 0; i < CORONA_RF_NUM_CHANNELS; i++)
         packet[i+1+CORONA_ADDRESS_LENGTH] = hopping_frequency[i];
       packet[8] = 0;
-      return 7800;  // extra delay after id packet according to captures
+      return 2*FDV3_CHANNEL_PERIOD;  // extra delay after id packet according to captures
   }
 
 
@@ -375,7 +375,7 @@ static void initialize(u8 bind)
   CORONA_init();
   CORONA_rf_init();
 
-  CLOCK_StartTimer(500, corona_cb);
+  CLOCK_StartTimer(10, corona_cb);
 }
 
 const void *Corona_Cmds(enum ProtoCmds cmd)
