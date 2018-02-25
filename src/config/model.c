@@ -223,7 +223,7 @@ static u8 get_source(const char *section, const char *value)
     char cmp[10];
     for (i = 0; i <= NUM_SOURCES; i++) {
         if(mapstrcasecmp(INPUT_SourceNameReal(cmp, i), ptr) == 0) {
-            #if defined(_DEVO7E_256_TARGET_H_) || defined(_T8SG_TARGET_H_)
+            #if defined(HAS_SWITCHES_NOSTOCK) && HAS_SWITCHES_NOSTOCK
             #define SWITCH_NOSTOCK ((1 << INP_HOLD0) | (1 << INP_HOLD1) | \
                                     (1 << INP_FMOD0) | (1 << INP_FMOD1))
             if ((Transmitter.ignore_src & SWITCH_NOSTOCK) == SWITCH_NOSTOCK) {
@@ -233,7 +233,7 @@ static u8 get_source(const char *section, const char *value)
                    mapstrcasecmp("HOLD1", ptr) == 0)
                     break;
             }
-            #endif
+            #endif //HAS_SWITCHES_NOSTOCK
             return ((ptr == value) ? 0 : 0x80) | i;
         }
     }
