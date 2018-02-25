@@ -79,6 +79,14 @@ struct disp_metrics {
     u8 line_space;
 };
 
+#if (LCD_WIDTH == 480) || (LCD_WIDTH == 320)
+struct disp_background {
+    u16 drawn_background;
+    u16 bg_color;
+    u16 hd_color;
+};
+#endif
+
 enum DispFlags {
     BAR_TRANSPARENT   = 0x01,
     TRIM_TRANSPARENT  = 0x02,
@@ -92,6 +100,9 @@ struct display_settings {
     struct disp_listbox listbox;
     struct disp_scrollbar scrollbar;
     struct disp_metrics metrics;
+#if (LCD_WIDTH == 480) || (LCD_WIDTH == 320)
+    struct disp_background background;
+#endif
     struct disp_bargraph bargraph;
     struct disp_xygraph xygraph;
     struct disp_bargraph trim;
