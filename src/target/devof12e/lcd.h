@@ -5,7 +5,6 @@
 #ifndef LCD_H
 #define LCD_H
 
-u32 I2C1_WriteBufferDMA(u16 deviceId, u8 *dmaAddr, s16 periphMemAddr, int len);
 
 void TW8816_Init();
 void TW8816_Reset();
