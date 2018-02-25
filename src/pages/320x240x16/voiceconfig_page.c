@@ -46,14 +46,14 @@ void PAGE_VoiceconfigInit(int page)
     (void)page;
     int init_y = 40;
     PAGE_SetModal(0);
+    PAGE_ShowHeader(PAGE_GetName(PAGEID_VOICECFG));
 
     if ( !AUDIO_VoiceAvailable() ) {
         GUI_CreateLabelBox(&gui->msg, 20, 80, 280, 100, &NARROW_FONT, NULL, NULL,
             _tr("External voice\ncurrently not\navailable"));
         return;
     }
-    PAGE_ShowHeader(PAGE_GetName(PAGEID_VOICECFG));
-
+    
     GUI_CreateScrollable(&gui->scrollable, 0, init_y, LCD_WIDTH, LCD_HEIGHT-init_y,
                      VOICEROWSPACER, MODEL_CUSTOM_ALARMS, row_cb, NULL, NULL, NULL);
     PAGE_SetScrollable(&gui->scrollable, &current_selected);
