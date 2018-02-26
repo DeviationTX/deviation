@@ -141,7 +141,7 @@ static void initialize_rx_tx_addr()
 // Generate id and hopping freq
 static void CORONA_init()
 {
-//TODO  #ifdef CORONA_FORCE_ID
+//TODO #ifdef CORONA_FORCE_ID
 if (!Model.fixed_id) {
     // Example of ID and channels taken from dumps
     switch (Model.proto_opts[PROTO_OPTS_FORMAT]) {
@@ -158,7 +158,7 @@ if (!Model.fixed_id) {
       memcpy((void *)hopping_frequency,(void *)"\x71\xb9\x30",CORONA_RF_NUM_CHANNELS);
       break;
     }
-//TODO  #else
+//TODO #else
 } else {
     // From dumps channels are anything between 0x00 and 0xC5 on V1.
     // But 0x00 and 0xB8 should be avoided on V2 since they are used for bind.
@@ -170,6 +170,7 @@ if (!Model.fixed_id) {
 
     if (Model.proto_opts[PROTO_OPTS_FORMAT] == FORMAT_FDV3 && rx_tx_addr[3] > 0xa0)
         rx_tx_addr[3] &= 0x7f;   // Flydream sends identifier using rx_tx_addr[3] as channel number
+rx_tx_addr[3] = 0x38;  //TODO
 
     // ID looks random but on the 15 V1 dumps they all show the same odd/even rule
     if (rx_tx_addr[3] & 0x01) { // If [3] is odd then [0] is odd and [2] is even 
@@ -179,8 +180,9 @@ if (!Model.fixed_id) {
       rx_tx_addr[0] &= 0xFE;
       rx_tx_addr[2] |= 0x01;
     }
-    rx_tx_addr[1] = 0xFE;       // Always FE in the dumps of V1 and V2
-//TODO  #endif
+    if (Model.proto_opts[PROTO_OPTS_FORMAT] != FORMAT_FDV3)
+        rx_tx_addr[1] = 0xFE;       // Always FE in the dumps of V1 and V2
+//TODO #endif
 }
 }
 
@@ -358,16 +360,18 @@ static void initialize(u8 bind)
   if (bind) {
       switch (Model.proto_opts[PROTO_OPTS_FORMAT]) {
       case FORMAT_V1:
+        PROTOCOL_SetBindState(5000);
         bind_counter = 1400;    // Stay in bind mode for 5s
         break;
       case FORMAT_V2:
+        PROTOCOL_SetBindState(5000);
         bind_counter = 187;     // Stay in bind mode for 5s
         break;
       case FORMAT_FDV3:
-        bind_counter = 1000;    // Stay in bind mode for 5s
+        PROTOCOL_SetBindState(15000);
+        bind_counter = 3000;    // Stay in bind mode for 15s
         break;
       }
-      PROTOCOL_SetBindState(5500);
   } else {
       bind_counter = 0;
   }
