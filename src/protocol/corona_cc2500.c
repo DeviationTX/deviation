@@ -170,18 +170,21 @@ if (!Model.fixed_id) {
 
     if (Model.proto_opts[PROTO_OPTS_FORMAT] == FORMAT_FDV3 && rx_tx_addr[3] > 0xa0)
         rx_tx_addr[3] &= 0x7f;   // Flydream sends identifier using rx_tx_addr[3] as channel number
+// that comment is not correct, still trying to figure it out
+rx_tx_addr[2] = 0x38;  //TODO
 rx_tx_addr[3] = 0x38;  //TODO
 
-    // ID looks random but on the 15 V1 dumps they all show the same odd/even rule
-    if (rx_tx_addr[3] & 0x01) { // If [3] is odd then [0] is odd and [2] is even 
-      rx_tx_addr[0] |= 0x01;
-      rx_tx_addr[2] &= 0xFE;
-    } else {                    // If [3] is even then [0] is even and [2] is odd 
-      rx_tx_addr[0] &= 0xFE;
-      rx_tx_addr[2] |= 0x01;
-    }
-    if (Model.proto_opts[PROTO_OPTS_FORMAT] != FORMAT_FDV3)
+    if (Model.proto_opts[PROTO_OPTS_FORMAT] != FORMAT_FDV3) {
+        // ID looks random but on the 15 V1 dumps they all show the same odd/even rule
+        if (rx_tx_addr[3] & 0x01) { // If [3] is odd then [0] is odd and [2] is even 
+            rx_tx_addr[0] |= 0x01;
+            rx_tx_addr[2] &= 0xFE;
+        } else {                    // If [3] is even then [0] is even and [2] is odd 
+            rx_tx_addr[0] &= 0xFE;
+            rx_tx_addr[2] |= 0x01;
+        }
         rx_tx_addr[1] = 0xFE;       // Always FE in the dumps of V1 and V2
+    }
 //TODO #endif
 }
 }
@@ -328,7 +331,7 @@ static u16 CORONA_build_packet(void) {
 
 MODULE_CALLTYPE
 static u16 corona_cb() {
-u16 packet_period = 0;
+  u16 packet_period = 0;
 
   if (bind_counter) {
     bind_counter--;
