@@ -86,7 +86,6 @@ static u8 packet[PACKET_SIZE];
 static u8 channel;
 static u8 state;
 static u8 packet_count;
-static u8 bind_count;
 static s16 freq_offset;
 
 enum {
@@ -266,6 +265,7 @@ static void build_packet(u8 bind)
 //    packet[20] = 0;
 //    packet[21] = 0;
 
+//TODO
 #if 0
 printf("packet ");
 for (int i=0; i < PACKET_SIZE; i++) {
@@ -273,6 +273,7 @@ for (int i=0; i < PACKET_SIZE; i++) {
 }
 printf("\n");
 #endif
+//TODO
 
 }
 
@@ -294,18 +295,21 @@ static int get_tx_id()
 
 MODULE_CALLTYPE
 static u16 bugs3_cb() {
+    u16 packet_period = 0;
+
     // keep frequency tuning updated
     if (freq_offset != Model.proto_opts[PROTOOPTS_FREQTUNE]) {
         freq_offset = Model.proto_opts[PROTOOPTS_FREQTUNE];
         A7105_AdjustLOBaseFreq(freq_offset);
     }
 
+//TODO
 #if 0
-printf("state %d, channel %02x\n", state, channel);
+printf("state %d, channel %02x, radio_data.channels[channel] %02x\n", state, channel, radio_data.channels[channel]);
 #endif
+//TODO
     switch(state) {
     case BIND_1:
-        bind_count++;
         build_packet(1);
         A7105_Strobe(A7105_STANDBY);
         A7105_WriteData(packet, PACKET_SIZE, radio_data.channels[channel]);
@@ -313,7 +317,8 @@ printf("state %d, channel %02x\n", state, channel);
         channel += packet_count & 1;
         channel %= NUM_RFCHAN;
         state = BIND_2;
-        return 1200;
+        packet_period = 1200;
+        break;
 
     case BIND_2:
         A7105_Strobe(A7105_STANDBY);
@@ -321,20 +326,23 @@ printf("state %d, channel %02x\n", state, channel);
         A7105_WriteReg(A7105_0F_PLL_I, radio_data.channels[channel] - 2);
         A7105_Strobe(A7105_RX);
         state = BIND_3;
-        return 4000;
+        packet_period = 4000;
+        break;
 
     case BIND_3:
         A7105_SetTxRxMode(TX_EN);
         if (A7105_ReadReg(A7105_00_MODE) & 0x01) {
             state = BIND_1;
-            return 1500;         // No received data so restart binding procedure.
+            packet_period = 1500;         // No received data so restart binding procedure.
+            break;
         }
         A7105_ReadData(packet, 16);
         A7105_WriteID(radio_data.radio_id);
         A7105_Strobe(A7105_STANDBY);
         PROTOCOL_SetBindState(0);
         state = DATA_1;
-        return 500;
+        packet_period = 500;
+        break;
 
     case DATA_1:
         A7105_SetPower( Model.tx_power);
@@ -345,7 +353,8 @@ printf("state %d, channel %02x\n", state, channel);
         channel += packet_count & 1;
         channel %= NUM_RFCHAN;
         state = DATA_2;
-        return 1200;
+        packet_period = 1200;
+        break;
 
     case DATA_2:
         A7105_Strobe(A7105_STANDBY);
@@ -353,7 +362,8 @@ printf("state %d, channel %02x\n", state, channel);
         A7105_WriteReg(A7105_0F_PLL_I, radio_data.channels[channel] - 2);
         A7105_Strobe(A7105_RX);
         state = DATA_3;
-        return 4000;
+        packet_period = 4000;
+        break;
 
     case DATA_3:
         A7105_SetTxRxMode(TX_EN);
@@ -361,13 +371,18 @@ printf("state %d, channel %02x\n", state, channel);
             A7105_ReadData(packet, 16);
         }
         state = DATA_1;
-        return 4000;
+        packet_period = 4000;
+        break;
     }
-    return 0;
+#ifndef EMULATOR
+    return packet_period;
+#else
+    return packet_period / 200;
+#endif
 }
 
 
-static void initialize() {
+static void initialize(u8 bind) {
 radio_data_t fixed_radio_data[] = {
             {0xac59a453, {0x1d, 0x3b, 0x4d, 0x29, 0x11, 0x2d, 0x63}},
             {0x56926d94, {0x25, 0x0a, 0x57, 0x27, 0x4b, 0x1c, 0x63}}, };
@@ -385,25 +400,27 @@ radio_data_t fixed_radio_data[] = {
             break;
     }
     
-    state = BIND_1;
+    if (bind) {
+        state = BIND_1;
+        PROTOCOL_SetBindState(0xFFFFFFFF);
+    } else {
+        state = DATA_1;
+    }
     channel = 0;
     packet_count = 0;
-    bind_count = 0;
-    PROTOCOL_SetBindState(0xFFFFFFFF);
 
-    CLOCK_StartTimer(10000, bugs3_cb);
+    CLOCK_StartTimer(100, bugs3_cb);
 }
 
 const void *BUGS3_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
-        case PROTOCMD_INIT: initialize(); return 0;
+        case PROTOCMD_INIT: initialize(0); return 0;
         case PROTOCMD_DEINIT:
         case PROTOCMD_RESET:
             CLOCK_StopTimer();
             return (void *)(A7105_Reset() ? 1L : -1L);
-        case PROTOCMD_CHECK_AUTOBIND: return (void *)1L;
-        case PROTOCMD_BIND:  initialize(); return 0;
+        case PROTOCMD_BIND:  initialize(1); return 0;
         case PROTOCMD_NUMCHAN: return (void *)8L; // A, E, T, R, Leds, Flips(or alt-hold), Snapshot, Video Recording, Headless, RTH, GPS Hold
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)4L;
         case PROTOCMD_CURRENT_ID: return 0;
