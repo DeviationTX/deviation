@@ -53,10 +53,12 @@ enum {
     CHANNEL11,    //
 };
 
-#define CHANNEL_LED         CHANNEL5
-#define CHANNEL_PICTURE     CHANNEL6
+#define CHANNEL_ARM         CHANNEL5
+#define CHANNEL_LED         CHANNEL6
+#define CHANNEL_PICTURE     CHANNEL7
 
 // flags
+#define FLAG_ARM     0x40    // arm (turn on motors)
 #define FLAG_PICTURE 0x01    // take picture
 #define FLAG_LED     0x80    // enable LEDs
 
@@ -74,14 +76,17 @@ ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 #define PACKET_SIZE   22
 #define NUM_RFCHAN     7
-#define BIND_ID       0xac59a453
 
 typedef struct {
   u32 radio_id;
   u8 channels[NUM_RFCHAN];
 } radio_data_t;
 
-static radio_data_t radio_data;
+static radio_data_t fixed_radio_data[] = {
+            {0xac59a453, {0x1d, 0x3b, 0x4d, 0x29, 0x11, 0x2d, 0x63}},     // bind phase
+            {0x56926d94, {0x27, 0x4b, 0x1c, 0x63, 0x25, 0x0a, 0x57}}, };  // data phase if rx responds 1d 5b 2c 7f 00 00 00 00 00 00 ff 87 00 00 00 00
+
+static radio_data_t *radio_data;
 static u8 packet[PACKET_SIZE];
 static u8 channel;
 static u8 state;
@@ -97,8 +102,7 @@ enum {
     DATA_3,
 };
 
-static int bugs3_init()
-{
+static int bugs3_init() {
     u8 if_calibration1;
     u8 vco_calibration0;
     u8 vco_calibration1;
@@ -213,13 +217,12 @@ static int bugs3_init()
     freq_offset = Model.proto_opts[PROTOOPTS_FREQTUNE];
     A7105_AdjustLOBaseFreq(freq_offset);
 
-    A7105_WriteID(BIND_ID);
+    A7105_WriteID(radio_data->radio_id);
     A7105_Strobe(A7105_STANDBY);
     return 1;
 }
 
-static s16 get_channel(u8 ch, s32 scale, s32 center, s32 range)
-{
+static s16 get_channel(u8 ch, s32 scale, s32 center, s32 range) {
     s32 value = (s32)Channels[ch] * scale / CHAN_MAX_VALUE + center;
     if (value < center - range)
         value = center - range;
@@ -230,8 +233,7 @@ static s16 get_channel(u8 ch, s32 scale, s32 center, s32 range)
 
 #define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
 
-static void build_packet(u8 bind)
-{
+static void build_packet(u8 bind) {
     memset(packet, 0, sizeof(packet));
     packet[0] = 0x34 + ((packet_count & 0x1) << 6) + (bind ? 0x80 : 0);
     packet[1] = 0x24;
@@ -241,9 +243,9 @@ static void build_packet(u8 bind)
     if (bind)
       packet[5] = 0x40;
     else
-      packet[5] = 0x20     // always armed, 0x60 is disarmed
+      packet[5] = (0x60 & ~GET_FLAG(CHANNEL_ARM, FLAG_ARM))     // 0x20 armed, 0x60 is disarmed
               + GET_FLAG(CHANNEL_PICTURE, FLAG_PICTURE)
-              + GET_FLAG(CHANNEL_LED, FLAG_LED);
+              + GET_FLAG(CHANNEL_LED,     FLAG_LED);
     packet[6] = get_channel(CHANNEL1, 100, 100, 100);
     packet[7] = get_channel(CHANNEL2, 100, 100, 100);
     packet[8] = get_channel(CHANNEL3, 100, 100, 100);
@@ -303,33 +305,43 @@ static u16 bugs3_cb() {
         A7105_AdjustLOBaseFreq(freq_offset);
     }
 
-//TODO
-#if 0
-printf("state %d, channel %02x, radio_data.channels[channel] %02x\n", state, channel, radio_data.channels[channel]);
-#endif
-//TODO
     switch(state) {
     case BIND_1:
+//TODO
+#if 0
+printf("state %d, channel %02x, radio_data->channels[channel] %02x\n", state, channel, radio_data->channels[channel]);
+#endif
+//TODO
         build_packet(1);
         A7105_Strobe(A7105_STANDBY);
-        A7105_WriteData(packet, PACKET_SIZE, radio_data.channels[channel]);
-        packet_count += 1;
-        channel += packet_count & 1;
-        channel %= NUM_RFCHAN;
+        A7105_WriteData(packet, PACKET_SIZE, radio_data->channels[channel]);
         state = BIND_2;
         packet_period = 1200;
         break;
 
     case BIND_2:
+//TODO
+#if 0
+printf("state %d, channel %02x, radio_data->channels[channel] %02x\n", state, channel, radio_data->channels[channel]-2);
+#endif
+//TODO
         A7105_Strobe(A7105_STANDBY);
         A7105_SetTxRxMode(RX_EN);
-        A7105_WriteReg(A7105_0F_PLL_I, radio_data.channels[channel] - 2);
+        A7105_WriteReg(A7105_0F_PLL_I, radio_data->channels[channel] - 2);
         A7105_Strobe(A7105_RX);
+        packet_count += 1;
+        channel += packet_count & 1;
+        channel %= NUM_RFCHAN;
         state = BIND_3;
         packet_period = 4000;
         break;
 
     case BIND_3:
+//TODO
+#if 0
+printf("state %d, radio_id %04lx\n", state, radio_data->radio_id);
+#endif
+//TODO
         A7105_SetTxRxMode(TX_EN);
         if (A7105_ReadReg(A7105_00_MODE) & 0x01) {
             state = BIND_1;
@@ -337,7 +349,8 @@ printf("state %d, channel %02x, radio_data.channels[channel] %02x\n", state, cha
             break;
         }
         A7105_ReadData(packet, 16);
-        A7105_WriteID(radio_data.radio_id);
+        radio_data = &fixed_radio_data[1];
+        A7105_WriteID(radio_data->radio_id);
         A7105_Strobe(A7105_STANDBY);
         PROTOCOL_SetBindState(0);
         state = DATA_1;
@@ -345,27 +358,42 @@ printf("state %d, channel %02x, radio_data.channels[channel] %02x\n", state, cha
         break;
 
     case DATA_1:
+//TODO
+#if 0
+printf("state %d, channel %02x, radio_data->channels[channel] %02x\n", state, channel, radio_data->channels[channel]);
+#endif
+//TODO
         A7105_SetPower( Model.tx_power);
         build_packet(0);
         A7105_Strobe(A7105_STANDBY);
-        A7105_WriteData(packet, PACKET_SIZE, radio_data.channels[channel]);
-        packet_count += 1;
-        channel += packet_count & 1;
-        channel %= NUM_RFCHAN;
+        A7105_WriteData(packet, PACKET_SIZE, radio_data->channels[channel]);
         state = DATA_2;
         packet_period = 1200;
         break;
 
     case DATA_2:
+//TODO
+#if 0
+printf("state %d, channel %02x, radio_data->channels[channel] %02x\n", state, channel, radio_data->channels[channel]-2);
+#endif
+//TODO
         A7105_Strobe(A7105_STANDBY);
         A7105_SetTxRxMode(RX_EN);
-        A7105_WriteReg(A7105_0F_PLL_I, radio_data.channels[channel] - 2);
+        A7105_WriteReg(A7105_0F_PLL_I, radio_data->channels[channel] - 2);
         A7105_Strobe(A7105_RX);
+        packet_count += 1;
+        channel += packet_count & 1;
+        channel %= NUM_RFCHAN;
         state = DATA_3;
         packet_period = 4000;
         break;
 
     case DATA_3:
+//TODO
+#if 0
+printf("state %d, radio_id %04lx\n", state, radio_data->radio_id);
+#endif
+//TODO
         A7105_SetTxRxMode(TX_EN);
         if (!(A7105_ReadReg(A7105_00_MODE) & 0x01)) {
             A7105_ReadData(packet, 16);
@@ -383,15 +411,11 @@ printf("state %d, channel %02x, radio_data.channels[channel] %02x\n", state, cha
 
 
 static void initialize(u8 bind) {
-radio_data_t fixed_radio_data[] = {
-            {0xac59a453, {0x1d, 0x3b, 0x4d, 0x29, 0x11, 0x2d, 0x63}},
-            {0x56926d94, {0x25, 0x0a, 0x57, 0x27, 0x4b, 0x1c, 0x63}}, };
-
     CLOCK_StopTimer();
 
     // use fixed ids and radio channels from captures until
     // algorithm decoded.
-    memcpy(&radio_data, &fixed_radio_data[get_tx_id() & 1], sizeof radio_data);
+    radio_data = &fixed_radio_data[0];
 
     while(1) {
         A7105_Reset();
@@ -421,8 +445,8 @@ const void *BUGS3_Cmds(enum ProtoCmds cmd)
             CLOCK_StopTimer();
             return (void *)(A7105_Reset() ? 1L : -1L);
         case PROTOCMD_BIND:  initialize(1); return 0;
-        case PROTOCMD_NUMCHAN: return (void *)8L; // A, E, T, R, Leds, Flips(or alt-hold), Snapshot, Video Recording, Headless, RTH, GPS Hold
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)4L;
+        case PROTOCMD_NUMCHAN: return (void *)7L; // A, E, T, R, Arm, Pic, Led
+        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)7L;
         case PROTOCMD_CURRENT_ID: return 0;
         case PROTOCMD_GETOPTIONS:
             return bugs3_opts;
