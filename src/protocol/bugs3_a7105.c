@@ -59,8 +59,8 @@ enum {
 
 // flags
 #define FLAG_ARM     0x40    // arm (turn on motors)
-#define FLAG_PICTURE 0x01    // take picture
 #define FLAG_LED     0x80    // enable LEDs
+#define FLAG_PICTURE 0x01    // take picture
 
 static const char * const bugs3_opts[] = {
     _tr_noop("Freq Tune"), "-300", "300", "655361", NULL, // big step 10, little step 1
