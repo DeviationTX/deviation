@@ -82,11 +82,7 @@ typedef struct {
   u8 channels[NUM_RFCHAN];
 } radio_data_t;
 
-static radio_data_t fixed_radio_data[] = {
-            {0xac59a453, {0x1d, 0x3b, 0x4d, 0x29, 0x11, 0x2d, 0x63}},     // bind phase
-            {0x56926d94, {0x27, 0x4b, 0x1c, 0x63, 0x25, 0x0a, 0x57}}, };  // data phase if rx responds 1d 5b 2c 7f 00 00 00 00 00 00 ff 87 00 00 00 00
-
-static radio_data_t *radio_data;
+static radio_data_t radio_data;
 static u8 packet[PACKET_SIZE];
 static u8 channel;
 static u8 state;
@@ -217,7 +213,7 @@ static int bugs3_init() {
     freq_offset = Model.proto_opts[PROTOOPTS_FREQTUNE];
     A7105_AdjustLOBaseFreq(freq_offset);
 
-    A7105_WriteID(radio_data->radio_id);
+    A7105_WriteID(radio_data.radio_id);
     A7105_Strobe(A7105_STANDBY);
     return 1;
 }
@@ -279,6 +275,7 @@ printf("\n");
 
 }
 
+#if 0
 // Generate internal id from TX id and manufacturer id (STM32 unique id)
 static int get_tx_id()
 {
@@ -292,6 +289,14 @@ static int get_tx_id()
     for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
         rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
     return rand32_r(&lfsr, 0);
+}
+#endif
+
+static void set_radio_data(u8 index) {
+    radio_data_t fixed_radio_data[] = {
+            {0xac59a453, {0x1d, 0x3b, 0x4d, 0x29, 0x11, 0x2d, 0x63}},     // bind phase
+            {0x56926d94, {0x27, 0x4b, 0x1c, 0x63, 0x25, 0x0a, 0x57}}, };  // data phase if rx responds 1d 5b 2c 7f 00 00 00 00 00 00 ff 87 00 00 00 00
+    memcpy(&radio_data, &fixed_radio_data[index], sizeof(radio_data_t));
 }
 
 
@@ -309,12 +314,12 @@ static u16 bugs3_cb() {
     case BIND_1:
 //TODO
 #if 0
-printf("state %d, channel %02x, radio_data->channels[channel] %02x\n", state, channel, radio_data->channels[channel]);
+printf("state %d, channel %02x, radio_data.channels[channel] %02x\n", state, channel, radio_data.channels[channel]);
 #endif
 //TODO
         build_packet(1);
         A7105_Strobe(A7105_STANDBY);
-        A7105_WriteData(packet, PACKET_SIZE, radio_data->channels[channel]);
+        A7105_WriteData(packet, PACKET_SIZE, radio_data.channels[channel]);
         state = BIND_2;
         packet_period = 1200;
         break;
@@ -322,12 +327,12 @@ printf("state %d, channel %02x, radio_data->channels[channel] %02x\n", state, ch
     case BIND_2:
 //TODO
 #if 0
-printf("state %d, channel %02x, radio_data->channels[channel] %02x\n", state, channel, radio_data->channels[channel]-2);
+printf("state %d, channel %02x, radio_data.channels[channel] %02x\n", state, channel, radio_data.channels[channel]-2);
 #endif
 //TODO
         A7105_Strobe(A7105_STANDBY);
         A7105_SetTxRxMode(RX_EN);
-        A7105_WriteReg(A7105_0F_PLL_I, radio_data->channels[channel] - 2);
+        A7105_WriteReg(A7105_0F_PLL_I, radio_data.channels[channel] - 2);
         A7105_Strobe(A7105_RX);
         packet_count += 1;
         channel += packet_count & 1;
@@ -339,7 +344,7 @@ printf("state %d, channel %02x, radio_data->channels[channel] %02x\n", state, ch
     case BIND_3:
 //TODO
 #if 0
-printf("state %d, radio_id %04lx\n", state, radio_data->radio_id);
+printf("state %d, radio_id %04lx\n", state, radio_data.radio_id);
 #endif
 //TODO
         A7105_SetTxRxMode(TX_EN);
@@ -349,24 +354,25 @@ printf("state %d, radio_id %04lx\n", state, radio_data->radio_id);
             break;
         }
         A7105_ReadData(packet, 16);
-        radio_data = &fixed_radio_data[1];
-        A7105_WriteID(radio_data->radio_id);
+        set_radio_data(1);
+        A7105_WriteID(radio_data.radio_id);
         A7105_Strobe(A7105_STANDBY);
         PROTOCOL_SetBindState(0);
         state = DATA_1;
+        channel = 0;
         packet_period = 500;
         break;
 
     case DATA_1:
 //TODO
 #if 0
-printf("state %d, channel %02x, radio_data->channels[channel] %02x\n", state, channel, radio_data->channels[channel]);
+printf("state %d, channel %02x, radio_data.channels[channel] %02x\n", state, channel, radio_data.channels[channel]);
 #endif
 //TODO
         A7105_SetPower( Model.tx_power);
         build_packet(0);
         A7105_Strobe(A7105_STANDBY);
-        A7105_WriteData(packet, PACKET_SIZE, radio_data->channels[channel]);
+        A7105_WriteData(packet, PACKET_SIZE, radio_data.channels[channel]);
         state = DATA_2;
         packet_period = 1200;
         break;
@@ -374,12 +380,12 @@ printf("state %d, channel %02x, radio_data->channels[channel] %02x\n", state, ch
     case DATA_2:
 //TODO
 #if 0
-printf("state %d, channel %02x, radio_data->channels[channel] %02x\n", state, channel, radio_data->channels[channel]-2);
+printf("state %d, channel %02x, radio_data.channels[channel] %02x\n", state, channel, radio_data.channels[channel]-2);
 #endif
 //TODO
         A7105_Strobe(A7105_STANDBY);
         A7105_SetTxRxMode(RX_EN);
-        A7105_WriteReg(A7105_0F_PLL_I, radio_data->channels[channel] - 2);
+        A7105_WriteReg(A7105_0F_PLL_I, radio_data.channels[channel] - 2);
         A7105_Strobe(A7105_RX);
         packet_count += 1;
         channel += packet_count & 1;
@@ -391,7 +397,7 @@ printf("state %d, channel %02x, radio_data->channels[channel] %02x\n", state, ch
     case DATA_3:
 //TODO
 #if 0
-printf("state %d, radio_id %04lx\n", state, radio_data->radio_id);
+printf("state %d, radio_id %04lx\n", state, radio_data.radio_id);
 #endif
 //TODO
         A7105_SetTxRxMode(TX_EN);
@@ -415,7 +421,7 @@ static void initialize(u8 bind) {
 
     // use fixed ids and radio channels from captures until
     // algorithm decoded.
-    radio_data = &fixed_radio_data[0];
+    set_radio_data(0);
 
     while(1) {
         A7105_Reset();
