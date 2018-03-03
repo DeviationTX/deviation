@@ -276,7 +276,7 @@ printf("\n");
 
 }
 
-#if 0
+#ifdef REAL
 // Generate internal id from TX id and manufacturer id (STM32 unique id)
 static int get_tx_id()
 {
@@ -304,6 +304,7 @@ static void set_radio_data(u8 index) {
 MODULE_CALLTYPE
 static u16 bugs3_cb() {
     u16 packet_period = 0;
+    u8 mode;
 
     // keep frequency tuning updated
     if (freq_offset != Model.proto_opts[PROTOOPTS_FREQTUNE]) {
@@ -315,7 +316,7 @@ static u16 bugs3_cb() {
     case BIND_1:
 //TODO
 #if 0
-printf("state %d, channel %02x, radio_data.channels[channel] %02x\n", state, channel, radio_data.channels[channel]);
+printf("state %d, channel %02x\n", state, radio_data.channels[channel]);
 #endif
 //TODO
         build_packet(1);
@@ -328,7 +329,7 @@ printf("state %d, channel %02x, radio_data.channels[channel] %02x\n", state, cha
     case BIND_2:
 //TODO
 #if 0
-printf("state %d, channel %02x, radio_data.channels[channel] %02x\n", state, channel, radio_data.channels[channel]-2);
+printf("state %d, channel %02x\n", state, radio_data.channels[channel]-2);
 #endif
 //TODO
         A7105_Strobe(A7105_STANDBY);
@@ -343,19 +344,34 @@ printf("state %d, channel %02x, radio_data.channels[channel] %02x\n", state, cha
         break;
 
     case BIND_3:
-//TODO
-#if 0
-printf("state %d, radio_id %04lx\n", state, radio_data.radio_id);
-#endif
-//TODO
         A7105_Strobe(A7105_STANDBY);
         A7105_SetTxRxMode(TX_EN);
-        if (A7105_ReadReg(A7105_00_MODE) & 0x01) {
+        mode = A7105_ReadReg(A7105_00_MODE);
+//TODO
+#if 0
+printf("state %d, radio_id %04lx, mode %02x\n", state, radio_data.radio_id, mode);
+#endif
+//TODO
+        if (mode & 0x01) {
             state = BIND_1;
             packet_period = 20;         // No received data so restart binding procedure.
             break;
         }
         A7105_ReadData(packet, 16);
+//TODO
+#if 0
+printf("received ");
+for (int i=0; i < 16; i++) {
+  printf("%02x ", packet[i]);
+}
+printf("\n");
+#endif
+//TODO
+if ((packet[0] + packet[1] + packet[2] + packet[3]) == 0) {
+    state = BIND_1;
+    packet_period = 20;         // No received data so restart binding procedure.
+    break;
+}
         set_radio_data(1);
         A7105_WriteID(radio_data.radio_id);
         PROTOCOL_SetBindState(0);
@@ -367,7 +383,7 @@ printf("state %d, radio_id %04lx\n", state, radio_data.radio_id);
     case DATA_1:
 //TODO
 #if 0
-printf("state %d, channel %02x, radio_data.channels[channel] %02x\n", state, channel, radio_data.channels[channel]);
+printf("state %d, channel %02x\n", state, radio_data.channels[channel]);
 #endif
 //TODO
         A7105_SetPower(Model.tx_power);
@@ -381,7 +397,7 @@ printf("state %d, channel %02x, radio_data.channels[channel] %02x\n", state, cha
     case DATA_2:
 //TODO
 #if 0
-printf("state %d, channel %02x, radio_data.channels[channel] %02x\n", state, channel, radio_data.channels[channel]-2);
+printf("state %d, channel %02x\n", state, radio_data.channels[channel]-2);
 #endif
 //TODO
         A7105_Strobe(A7105_STANDBY);
@@ -396,15 +412,25 @@ printf("state %d, channel %02x, radio_data.channels[channel] %02x\n", state, cha
         break;
 
     case DATA_3:
-//TODO
-#if 0
-printf("state %d, radio_id %04lx\n", state, radio_data.radio_id);
-#endif
-//TODO
         A7105_Strobe(A7105_STANDBY);
         A7105_SetTxRxMode(TX_EN);
-        if (!(A7105_ReadReg(A7105_00_MODE) & 0x01)) {
+        mode = A7105_ReadReg(A7105_00_MODE);
+//TODO
+#if 0
+printf("state %d, radio_id %04lx, mode %02x\n", state, radio_data.radio_id, mode);
+#endif
+//TODO
+        if (!(mode & 0x01)) {
             A7105_ReadData(packet, 16);
+//TODO
+#if 0
+printf("received ");
+for (int i=0; i < 16; i++) {
+  printf("%02x ", packet[i]);
+}
+printf("\n");
+#endif
+//TODO
         }
         state = DATA_1;
         packet_period = 20;
@@ -421,9 +447,14 @@ printf("state %d, radio_id %04lx\n", state, radio_data.radio_id);
 static void initialize(u8 bind) {
     CLOCK_StopTimer();
 
-    // use fixed ids and radio channels from captures until
-    // algorithm decoded.
-    set_radio_data(0);
+    if (bind) {
+        set_radio_data(0);
+        state = BIND_1;
+        PROTOCOL_SetBindState(0xFFFFFFFF);
+    } else {
+        set_radio_data(1);
+        state = DATA_1;
+    }
 
     while(1) {
         A7105_Reset();
@@ -432,15 +463,8 @@ static void initialize(u8 bind) {
             break;
     }
     
-    if (bind) {
-        state = BIND_1;
-        PROTOCOL_SetBindState(0xFFFFFFFF);
-    } else {
-        state = DATA_1;
-    }
     channel = 0;
     packet_count = 0;
-
     CLOCK_StartTimer(100, bugs3_cb);
 }
 
