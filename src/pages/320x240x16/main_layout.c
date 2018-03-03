@@ -41,7 +41,6 @@ static void dlgbut_cb(struct guiObject *obj, const void *data);
 
 struct buttonAction action;
 u8 cfg_elem_type;
-u8 show_config_menu = 0;
 static const int HEADER_Y = 32;
 
 #include "../common/_main_layout.c"
@@ -111,22 +110,21 @@ void PAGE_MainLayoutInit(int page)
 
     GUI_SelectionNotify(notify_cb);
     draw_elements();
-    if (show_config_menu) {
-        lp->selected_for_move = show_config_menu;
-        show_config();
-        show_config_menu = 0;
-    }
 }
+
 void PAGE_MainLayoutEvent()
 {
 }
+
 void PAGE_MainLayoutExit()
 {
     BUTTON_UnregisterCallback(&action);
 }
+
 void PAGE_MainLayoutRestoreDialog(int idx)
 {
-    show_config_menu = idx;
+    lp->selected_for_move = idx;
+    select_for_move(&gui->elem[lp->selected_for_move]);
 }
 
 void set_selected_for_move(int idx)
@@ -139,6 +137,7 @@ void set_selected_for_move(int idx)
     GUI_TextSelectEnable(&gui->y, state);
     GUI_SetSelectable((guiObject_t *)&gui->y, state);
 }
+
 const char *xpos_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
@@ -153,6 +152,7 @@ const char *xpos_cb(guiObject_t *obj, int dir, void *data)
     sprintf(tempstring, "%d", lp->selected_x);
     return tempstring;
 }
+
 const char *ypos_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
