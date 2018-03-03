@@ -111,6 +111,7 @@ static int bugs3_init() {
     A7105_WriteReg(A7105_07_RC_OSC_I, 0x00);
     A7105_WriteReg(A7105_08_RC_OSC_II, 0x00);
     A7105_WriteReg(A7105_09_RC_OSC_III, 0x00);
+    A7105_WriteReg(A7105_0A_CK0_PIN, 0x00);
     A7105_WriteReg(A7105_0D_CLOCK, 0x05);
     A7105_WriteReg(A7105_0E_DATA_RATE, 0x01);
     A7105_WriteReg(A7105_0F_PLL_I, 0x50);
@@ -239,7 +240,7 @@ static void build_packet(u8 bind) {
     if (bind)
       packet[5] = 0x40;
     else
-      packet[5] = (0x60 & ~GET_FLAG(CHANNEL_ARM, FLAG_ARM))     // 0x20 armed, 0x60 is disarmed
+      packet[5] = (FLAG_ARM & ~GET_FLAG(CHANNEL_ARM, FLAG_ARM))     // 0x00 armed, 0x40 is disarmed
               + GET_FLAG(CHANNEL_PICTURE, FLAG_PICTURE)
               + GET_FLAG(CHANNEL_LED,     FLAG_LED);
     packet[6] = get_channel(CHANNEL1, 100, 100, 100);
@@ -321,7 +322,7 @@ printf("state %d, channel %02x, radio_data.channels[channel] %02x\n", state, cha
         A7105_Strobe(A7105_STANDBY);
         A7105_WriteData(packet, PACKET_SIZE, radio_data.channels[channel]);
         state = BIND_2;
-        packet_period = 1200;
+        packet_period = 1168;
         break;
 
     case BIND_2:
@@ -338,7 +339,7 @@ printf("state %d, channel %02x, radio_data.channels[channel] %02x\n", state, cha
         channel += packet_count & 1;
         channel %= NUM_RFCHAN;
         state = BIND_3;
-        packet_period = 4000;
+        packet_period = 3850;
         break;
 
     case BIND_3:
@@ -347,16 +348,16 @@ printf("state %d, channel %02x, radio_data.channels[channel] %02x\n", state, cha
 printf("state %d, radio_id %04lx\n", state, radio_data.radio_id);
 #endif
 //TODO
+        A7105_Strobe(A7105_STANDBY);
         A7105_SetTxRxMode(TX_EN);
         if (A7105_ReadReg(A7105_00_MODE) & 0x01) {
             state = BIND_1;
-            packet_period = 1500;         // No received data so restart binding procedure.
+            packet_period = 20;         // No received data so restart binding procedure.
             break;
         }
         A7105_ReadData(packet, 16);
         set_radio_data(1);
         A7105_WriteID(radio_data.radio_id);
-        A7105_Strobe(A7105_STANDBY);
         PROTOCOL_SetBindState(0);
         state = DATA_1;
         channel = 0;
@@ -369,12 +370,12 @@ printf("state %d, radio_id %04lx\n", state, radio_data.radio_id);
 printf("state %d, channel %02x, radio_data.channels[channel] %02x\n", state, channel, radio_data.channels[channel]);
 #endif
 //TODO
-        A7105_SetPower( Model.tx_power);
+        A7105_SetPower(Model.tx_power);
         build_packet(0);
         A7105_Strobe(A7105_STANDBY);
         A7105_WriteData(packet, PACKET_SIZE, radio_data.channels[channel]);
         state = DATA_2;
-        packet_period = 1200;
+        packet_period = 1168;
         break;
 
     case DATA_2:
@@ -391,7 +392,7 @@ printf("state %d, channel %02x, radio_data.channels[channel] %02x\n", state, cha
         channel += packet_count & 1;
         channel %= NUM_RFCHAN;
         state = DATA_3;
-        packet_period = 4000;
+        packet_period = 3850;
         break;
 
     case DATA_3:
@@ -400,12 +401,13 @@ printf("state %d, channel %02x, radio_data.channels[channel] %02x\n", state, cha
 printf("state %d, radio_id %04lx\n", state, radio_data.radio_id);
 #endif
 //TODO
+        A7105_Strobe(A7105_STANDBY);
         A7105_SetTxRxMode(TX_EN);
         if (!(A7105_ReadReg(A7105_00_MODE) & 0x01)) {
             A7105_ReadData(packet, 16);
         }
         state = DATA_1;
-        packet_period = 4000;
+        packet_period = 20;
         break;
     }
 #ifndef EMULATOR
