@@ -97,6 +97,10 @@ int main() {
     audio_queue_time = CLOCK_getms() + 1500;
     num_audio=1;
     next_audio=1;
+#if (LCD_WIDTH == 480) || (LCD_WIDTH == 320)
+    if(Display.background.drawn_background)
+        while(CLOCK_getms() < audio_queue_time - 1200);
+#endif
     AUDIO_SetVolume(); // Initial setting of voice volume
 #endif
 
