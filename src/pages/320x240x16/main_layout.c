@@ -126,7 +126,10 @@ void PAGE_MainLayoutExit()
 }
 void PAGE_MainLayoutRestoreDialog(int idx)
 {
-    show_config_menu = idx;
+    //temporary fix for reset toggle icon position after toggle icon selection
+    //show_config_menu = idx;
+    lp->selected_for_move = idx;
+    select_for_move(&gui->elem[lp->selected_for_move]);
 }
 
 void set_selected_for_move(int idx)
