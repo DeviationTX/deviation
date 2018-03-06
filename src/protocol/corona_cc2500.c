@@ -91,6 +91,8 @@ static void CORONA_rf_init() {
   CC2500_Strobe(CC2500_SIDLE);
 
   for (u8 i = 0; i <= 0x2E; ++i) CC2500_WriteReg(i, CORONA_init_values[i]);
+  CC2500_Strobe(CC2500_SCAL);           // just duplicating stock tx
+  CC2500_ReadReg(CC2500_25_FSCAL1);     // just duplicating stock tx
 
   if (Model.proto_opts[PROTO_OPTS_FORMAT] == FORMAT_V2) {
     CC2500_WriteReg(CC2500_0A_CHANNR, CORONA_BIND_CHANNEL_V2);
@@ -169,7 +171,7 @@ if (!Model.fixed_id) {
         hopping_frequency[i^order] = 2+rx_tx_addr[3-i]%39+(i<<5)+(i<<3);
 
     if (Model.proto_opts[PROTO_OPTS_FORMAT] == FORMAT_FDV3 && rx_tx_addr[3] > 0xa0)
-        rx_tx_addr[3] &= 0x7f;   // Flydream sends identifier using rx_tx_addr[3] as channel number
+        rx_tx_addr[3] &= 0x7f;
 // that comment is not correct, still trying to figure it out
 rx_tx_addr[2] = 0x38;  //TODO
 rx_tx_addr[3] = 0x38;  //TODO
