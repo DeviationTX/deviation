@@ -165,7 +165,8 @@ if (!Model.fixed_id) {
     // From dumps channels are anything between 0x00 and 0xC5 on V1.
     // But 0x00 and 0xB8 should be avoided on V2 since they are used for bind.
     // Below code make sure channels are between 0x02 and 0xA0, spaced with a minimum of 2 and not ordered (RX only use the 1st channel unless there is an issue).
-    memcpy((void *)rx_tx_addr, (void *)Model.fixed_id, CORONA_ADDRESS_LENGTH);
+    memcpy((void *)rx_tx_addr, (void *)Model.fixed_id, CORONA_ADDRESS_LENGTH);  //TODO Flydream testing
+    rx_tx_addr[1] = 0xFA;       // Try fixed value as used in corona protocols  //TODO Flydream testing
 #if 0 //TODO
     initialize_rx_tx_addr();
     u8 order = rx_tx_addr[3] & 0x03;
