@@ -108,10 +108,10 @@ static void CORONA_rf_init() {
   CC2500_WriteReg(CC2500_0C_FSCTRL0, Model.proto_opts[PROTO_OPTS_FREQFINE]);
 
   //not sure what they are doing to the PATABLE since basically only the first byte is used and it's only 8 bytes long. So I think they end up filling the PATABLE fully with 0xFF
-  CC2500_WriteRegisterMulti(CC2500_3E_PATABLE,(const u8 *)"\x08\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF", 13);
+//TODO  CC2500_WriteRegisterMulti(CC2500_3E_PATABLE,(const u8 *)"\x08\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF", 13);
 
   CC2500_SetTxRxMode(TX_EN);
-  CC2500_SetPower(Model.tx_power);
+  CC2500_SetPower(0);   // min power for binding, set in build_packet for normal operation
 }
 
 // Generate address to use from TX id and manufacturer id (STM32 unique id)
@@ -343,6 +343,7 @@ static u16 corona_cb() {
       packet_period = CORONA_build_bind_pkt();
   else
       packet_period = CORONA_build_packet();
+
 //TODO printf("period: %d, packet: ", packet_period);
 //TODO for (u8 i=0; i <= packet[0]+1; i++) printf("%02x ", packet[i]);
 //TODO printf("\n");
