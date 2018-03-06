@@ -165,16 +165,15 @@ if (!Model.fixed_id) {
     // From dumps channels are anything between 0x00 and 0xC5 on V1.
     // But 0x00 and 0xB8 should be avoided on V2 since they are used for bind.
     // Below code make sure channels are between 0x02 and 0xA0, spaced with a minimum of 2 and not ordered (RX only use the 1st channel unless there is an issue).
+    memcpy((void *)rx_tx_addr, (void *)Model.fixed_id, CORONA_ADDRESS_LENGTH);
+#if 0 //TODO
     initialize_rx_tx_addr();
     u8 order = rx_tx_addr[3] & 0x03;
     for (u8 i=0; i < CORONA_RF_NUM_CHANNELS+1; i++)
         hopping_frequency[i^order] = 2+rx_tx_addr[3-i]%39+(i<<5)+(i<<3);
 
     if (Model.proto_opts[PROTO_OPTS_FORMAT] == FORMAT_FDV3 && rx_tx_addr[3] > 0xa0)
-        rx_tx_addr[3] &= 0x7f;
-// that comment is not correct, still trying to figure it out
-rx_tx_addr[2] = 0x38;  //TODO
-rx_tx_addr[3] = 0x38;  //TODO
+        rx_tx_addr[3] &= 0x7f; // TODO thought this was id/freq channel but may not be
 
     if (Model.proto_opts[PROTO_OPTS_FORMAT] != FORMAT_FDV3) {
         // ID looks random but on the 15 V1 dumps they all show the same odd/even rule
@@ -187,7 +186,7 @@ rx_tx_addr[3] = 0x38;  //TODO
         }
         rx_tx_addr[1] = 0xFE;       // Always FE in the dumps of V1 and V2
     }
-//TODO #endif
+#endif
 }
 }
 
@@ -257,7 +256,7 @@ static u16 CORONA_build_packet(void) {
 
 
   // Flydream every fourth packet is identifier packet and is on channel number
-  // same as last byte of rx_tx_addr
+  // TODO that is determined in some unknown manner
   if (Model.proto_opts[PROTO_OPTS_FORMAT] == FORMAT_FDV3 && fdv3_id_send) {
       fdv3_id_send = 0;
       CC2500_WriteReg(CC2500_0A_CHANNR, rx_tx_addr[CORONA_ADDRESS_LENGTH-1]);
