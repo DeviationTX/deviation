@@ -112,8 +112,10 @@ void PAGE_MainLayoutInit(int page)
     //GUI_CreateTextSelect(&gui->newelem, 36, 12, TEXTSELECT_96, newelem_press_cb, newelem_cb, NULL);
     GUI_CreateLabel(&gui->xlbl, 80+18, 9, NULL, TITLE_FONT, "X");
     GUI_CreateTextSelect(&gui->x, 88+18, 8, TEXTSELECT_64, NULL, xpos_cb, NULL);
+    GUI_SetSelectable((guiObject_t *)&gui->x, 0);
     GUI_CreateLabel(&gui->ylbl, 164+16, 9, NULL, TITLE_FONT, "Y");
     GUI_CreateTextSelect(&gui->y, 172+16, 8, TEXTSELECT_64, NULL, ypos_cb, NULL);
+    GUI_SetSelectable((guiObject_t *)&gui->y, 0);
 
     GUI_SelectionNotify(notify_cb);
     draw_elements();
@@ -140,9 +142,7 @@ void set_selected_for_move(int idx)
     int state = idx >= 0 ? 1 : 0;
     GUI_SetHidden((guiObject_t *)&gui->editelem, !state);
     GUI_TextSelectEnable(&gui->x, state);
-    GUI_SetSelectable((guiObject_t *)&gui->x, state);
     GUI_TextSelectEnable(&gui->y, state);
-    GUI_SetSelectable((guiObject_t *)&gui->y, state);
 }
 const char *xpos_cb(guiObject_t *obj, int dir, void *data)
 {
@@ -313,7 +313,7 @@ void show_config()
     int row_idx = 0;
     long type;
     if (OBJ_IS_USED(&gui->dialog))
-        GUI_RemoveHierObjects((guiObject_t *)&gui->dialog);
+        GUI_RemoveObj((guiObject_t *)&gui->dialog);
     if(lp->selected_for_move >= 0) {
         type = ELEM_TYPE(pc->elem[lp->selected_for_move]);
         row_idx = elem_abs_to_rel(lp->selected_for_move);
