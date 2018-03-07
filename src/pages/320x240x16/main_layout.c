@@ -68,6 +68,7 @@ enum {
     LAYDLG_X = (LCD_WIDTH - LAYDLG_MIN_WIDTH) / 2,
     LAYDLG_Y = (32 + LAYDLG_Y_SPACE),
 };
+
 void PAGE_MainLayoutInit(int page)
 {
      (void)page;
@@ -106,8 +107,10 @@ void PAGE_MainLayoutInit(int page)
     //GUI_CreateTextSelect(&gui->newelem, 36, 12, TEXTSELECT_96, newelem_press_cb, newelem_cb, NULL);
     GUI_CreateLabel(&gui->xlbl, 80+18, 9, NULL, TITLE_FONT, "X");
     GUI_CreateTextSelect(&gui->x, 88+18, 8, TEXTSELECT_64, NULL, xpos_cb, NULL);
+    GUI_SetSelectable((guiObject_t *)&gui->x, 0);
     GUI_CreateLabel(&gui->ylbl, 164+16, 9, NULL, TITLE_FONT, "Y");
     GUI_CreateTextSelect(&gui->y, 172+16, 8, TEXTSELECT_64, NULL, ypos_cb, NULL);
+    GUI_SetSelectable((guiObject_t *)&gui->y, 0);
 
     GUI_SelectionNotify(notify_cb);
     draw_elements();
@@ -117,13 +120,16 @@ void PAGE_MainLayoutInit(int page)
         show_config_menu = 0;
     }
 }
+
 void PAGE_MainLayoutEvent()
 {
 }
+
 void PAGE_MainLayoutExit()
 {
     BUTTON_UnregisterCallback(&action);
 }
+
 void PAGE_MainLayoutRestoreDialog(int idx)
 {
     show_config_menu = idx;
@@ -135,10 +141,9 @@ void set_selected_for_move(int idx)
     int state = idx >= 0 ? 1 : 0;
     GUI_SetHidden((guiObject_t *)&gui->editelem, !state);
     GUI_TextSelectEnable(&gui->x, state);
-    GUI_SetSelectable((guiObject_t *)&gui->x, state);
     GUI_TextSelectEnable(&gui->y, state);
-    GUI_SetSelectable((guiObject_t *)&gui->y, state);
 }
+
 const char *xpos_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
@@ -153,6 +158,7 @@ const char *xpos_cb(guiObject_t *obj, int dir, void *data)
     sprintf(tempstring, "%d", lp->selected_x);
     return tempstring;
 }
+
 const char *ypos_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
@@ -211,7 +217,7 @@ static void add_dlgbut_cb(struct guiObject *obj, const void *data)
     (void)obj;
     if(!data) {
         if (OBJ_IS_USED(&gui->dialog))
-            GUI_RemoveHierObjects((guiObject_t *)&gui->dialog);
+            GUI_RemoveObj((guiObject_t *)&gui->dialog);
         PAGE_PushByID(PAGEID_LOADSAVE, LOAD_LAYOUT);
     }
 }
@@ -267,7 +273,7 @@ const char *dlgbut_str_cb(guiObject_t *obj, const void *data)
 static void toggle_press_cb(guiObject_t *obj, const void *data)
 {
     if (OBJ_IS_USED(&gui->dialog))
-        GUI_RemoveHierObjects((guiObject_t *)&gui->dialog);
+        GUI_RemoveObj((guiObject_t *)&gui->dialog);
     TGLICO_Select(obj, data);
 }
 
@@ -307,7 +313,7 @@ void show_config()
     int row_idx = 0;
     long type;
     if (OBJ_IS_USED(&gui->dialog))
-        GUI_RemoveHierObjects((guiObject_t *)&gui->dialog);
+        GUI_RemoveObj((guiObject_t *)&gui->dialog);
     if(lp->selected_for_move >= 0) {
         type = ELEM_TYPE(pc->elem[lp->selected_for_move]);
         row_idx = elem_abs_to_rel(lp->selected_for_move);
@@ -326,12 +332,12 @@ void show_config()
 
     GUI_CreateScrollable(&gui->scrollable,
          x + LAYDLG_SCROLLABLE_X, LAYDLG_Y + LAYDLG_SCROLLABLE_Y,
-         width - 2 * LAYDLG_SCROLLABLE_X + 1, 
+         width - 2 * LAYDLG_SCROLLABLE_X + 1,
          LAYDLG_SCROLLABLE_HEIGHT,
          LAYDLG_TEXT_HEIGHT, count, row_cb, NULL, NULL, (void *)type);
     GUI_SetSelected(GUI_ShowScrollableRowCol(&gui->scrollable, row_idx, 0));
 }
-    
+
 static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
