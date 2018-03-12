@@ -107,8 +107,12 @@ static void CORONA_rf_init() {
   
   CC2500_WriteReg(CC2500_0C_FSCTRL0, Model.proto_opts[PROTO_OPTS_FREQFINE]);
 
-  //not sure what they are doing to the PATABLE since basically only the first byte is used and it's only 8 bytes long. So I think they end up filling the PATABLE fully with 0xFF
-//TODO  CC2500_WriteRegisterMulti(CC2500_3E_PATABLE,(const u8 *)"\x08\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF", 13);
+//TODO remove
+  if (Model.fixed_id & 1)
+    CC2500_WriteReg(CC2500_15_DEVIATN, 0x50);
+  else
+    CC2500_WriteReg(CC2500_15_DEVIATN, 0x47);
+//TODO remove
 
   CC2500_SetTxRxMode(TX_EN);
   CC2500_SetPower(0);   // min power for binding, set in build_packet for normal operation
@@ -143,8 +147,7 @@ static void initialize_rx_tx_addr()
 // Generate id and hopping freq
 static void CORONA_init()
 {
-//TODO #ifdef CORONA_FORCE_ID
-if (!Model.fixed_id) {
+#ifdef CORONA_FORCE_ID
     // Example of ID and channels taken from dumps
     switch (Model.proto_opts[PROTO_OPTS_FORMAT]) {
     case FORMAT_V1:
@@ -160,8 +163,7 @@ if (!Model.fixed_id) {
       memcpy((void *)hopping_frequency,(void *)"\x71\xb9\x30",CORONA_RF_NUM_CHANNELS);
       break;
     }
-//TODO #else
-} else {
+#else
     // From dumps channels are anything between 0x00 and 0xC5 on V1.
     // But 0x00 and 0xB8 should be avoided on V2 since they are used for bind.
     // Below code make sure channels are between 0x02 and 0xA0, spaced with
@@ -170,6 +172,8 @@ if (!Model.fixed_id) {
     u8 order = rx_tx_addr[3] & 0x03;
     for (u8 i=0; i < CORONA_RF_NUM_CHANNELS+1; i++)
         hopping_frequency[i^order] = 2+rx_tx_addr[3-i]%39+(i<<5)+(i<<3);
+//TODO printf("hopping: %02x, %02x, %02x, %02x\n", hopping_frequency[0], hopping_frequency[1],
+//TODO                                             hopping_frequency[2], hopping_frequency[3]);
 
     if (Model.proto_opts[PROTO_OPTS_FORMAT] != FORMAT_FDV3) {
         // ID looks random but on the 15 V1 dumps they all show the same odd/even rule
@@ -183,9 +187,9 @@ if (!Model.fixed_id) {
         rx_tx_addr[1] = 0xFE;       // Always FE in the dumps of V1 and V2
     } else {
         rx_tx_addr[1] = 0xFA;       // Always FA for Flydream V3
-        if (rx_tx_addr[3] > 0xa0) rx_tx_addr[3] &= 0x7f; // TODO thought this was id/freq channel but may not be
+        rx_tx_addr[3] = hopping_frequency[CORONA_RF_NUM_CHANNELS]; // channel used for id/freq packets
     }
-}
+#endif
 }
 
 u16 convert_channel_ppm(u8 chan) {
@@ -193,13 +197,6 @@ u16 convert_channel_ppm(u8 chan) {
 }
 
 static u16 CORONA_build_bind_pkt(void) {
-  // Tune frequency if it has been changed
-  if (fine != (s8)Model.proto_opts[PROTO_OPTS_FREQFINE]) {
-      fine = (s8)Model.proto_opts[PROTO_OPTS_FREQFINE];
-      CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);
-  }
-
-    // Build bind packets
     if (Model.proto_opts[PROTO_OPTS_FORMAT] == FORMAT_V1) {
       if (bind_counter&1) { // Send TX ID
         packet[0] = 0x04;    // 5 bytes to follow
@@ -227,14 +224,9 @@ static u16 CORONA_build_bind_pkt(void) {
 }
 
 static u16 CORONA_build_packet(void) {
-    u16 packet_period;
-  // Tune frequency if it has been changed
-  if (fine != (s8)Model.proto_opts[PROTO_OPTS_FREQFINE]) {
-      fine = (s8)Model.proto_opts[PROTO_OPTS_FREQFINE];
-      CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);
-  }
-  // Update RF power
-  CC2500_SetPower(Model.tx_power);
+  u16 packet_period;
+
+  CC2500_SetPower(Model.tx_power);   // Update RF power
 
   if (state && (Model.proto_opts[PROTO_OPTS_FORMAT] == FORMAT_V2)) {
     // Send identifier packet for 2.65sec. This is how the RX learns the hopping table after a bind. Why it's not part of the bind like V1 is a mistery...
@@ -254,8 +246,8 @@ static u16 CORONA_build_packet(void) {
 
 
   // Flydream every fourth packet is identifier packet and is on channel number
-  // TODO that is determined in some unknown manner
-  if (Model.proto_opts[PROTO_OPTS_FORMAT] == FORMAT_FDV3 && fdv3_id_send) {
+  // that is last byte of rx_tx_addr
+  if (fdv3_id_send) {
       fdv3_id_send = 0;
       CC2500_WriteReg(CC2500_0A_CHANNR, rx_tx_addr[CORONA_ADDRESS_LENGTH-1]);
 //TODO printf("chan: 0x%02x\n", rx_tx_addr[CORONA_ADDRESS_LENGTH-1]);
@@ -315,6 +307,7 @@ static u16 CORONA_build_packet(void) {
       }
   }
   hopping_frequency_no++;
+
   if (Model.proto_opts[PROTO_OPTS_FORMAT] == FORMAT_FDV3) {
       if (hopping_frequency_no == CORONA_RF_NUM_CHANNELS) {
           fdv3_id_send = 1;
@@ -323,8 +316,8 @@ static u16 CORONA_build_packet(void) {
           packet_period = FDV3_CHANNEL_PERIOD;
       }
   }
-  hopping_frequency_no %= CORONA_RF_NUM_CHANNELS;
 
+  hopping_frequency_no %= CORONA_RF_NUM_CHANNELS;
   return packet_period;
 }
 
@@ -332,14 +325,18 @@ MODULE_CALLTYPE
 static u16 corona_cb() {
   u16 packet_period = 0;
 
-  if (bind_counter) {
-    bind_counter--;
-    if (bind_counter == 0) PROTOCOL_SetBindState(0);
+  // Tune frequency if it has been changed
+  if (fine != (s8)Model.proto_opts[PROTO_OPTS_FREQFINE]) {
+      fine = (s8)Model.proto_opts[PROTO_OPTS_FREQFINE];
+      CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);
   }
-  if (bind_counter)
+
+  if (bind_counter) {
+      if (bind_counter-- == 0) PROTOCOL_SetBindState(0);
       packet_period = CORONA_build_bind_pkt();
-  else
+  } else {
       packet_period = CORONA_build_packet();
+  }
 
 //TODO printf("period: %d, packet: ", packet_period);
 //TODO for (u8 i=0; i <= packet[0]+1; i++) printf("%02x ", packet[i]);
@@ -371,8 +368,8 @@ static void initialize(u8 bind)
         bind_counter = 187;     // Stay in bind mode for 5s
         break;
       case FORMAT_FDV3:
-        PROTOCOL_SetBindState(15000);
-        bind_counter = 3000;    // Stay in bind mode for 15s
+        PROTOCOL_SetBindState(10000);
+        bind_counter = 2000;    // Stay in bind mode for 10s
         break;
       }
   } else {
@@ -380,6 +377,7 @@ static void initialize(u8 bind)
   }
   state = 400;            // Used by V2 to send RF channels + ID for 2.65s at startup
   hopping_frequency_no = 0;
+  fdv3_id_send = 0;
   packet[0] = 0;
   CORONA_init();
   CORONA_rf_init();
@@ -398,7 +396,7 @@ const void *Corona_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_BIND:  initialize(1); return 0;
         case PROTOCMD_NUMCHAN: return (void *)8L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
-        case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
+        case PROTOCMD_CURRENT_ID: return (void *)((long)Model.fixed_id);
         case PROTOCMD_GETOPTIONS: return corona_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
         default: break;
