@@ -323,7 +323,7 @@ static u16 CORONA_build_packet(void) {
 
 MODULE_CALLTYPE
 static u16 corona_cb() {
-  u16 packet_period = 0;
+  u16 packet_period;
 
   // Tune frequency if it has been changed
   if (fine != (s8)Model.proto_opts[PROTO_OPTS_FREQFINE]) {
@@ -346,11 +346,10 @@ static u16 corona_cb() {
   CC2500_WriteData(packet, packet[0]+2);
   packet[0]=0;
 
-#ifndef EMULATOR
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
   return packet_period;
-#else
-  return packet_period / 1000;
-#endif
+#pragma GCC diagnostic pop
 }
 
 static void initialize(u8 bind)
