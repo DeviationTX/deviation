@@ -28,7 +28,7 @@
 #define HAS_TOUCH           0
 #define HAS_RTC             0
 #define HAS_VIBRATINGMOTOR  1
-#define HAS_DATALOG         1
+#define HAS_DATALOG         0
 #define HAS_SCANNER         0
 #define HAS_LAYOUT_EDITOR   0
 #define HAS_EXTRA_SWITCHES  OPTIONAL

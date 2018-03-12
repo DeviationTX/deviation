@@ -17,4 +17,9 @@ SRC_C   += $(SDIR)/target/devof7/backlight.c \
            $(SDIR)/target/devof7/lcd.c \
            $(SDIR)/target/devof7/tx_buttons.c
 
+else
+
+$(TARGET).fs_wrapper: $(LAST_MODEL)
+	rm filesystem/$(FILESYSTEM)/datalog.bin
+
 endif
