@@ -20,12 +20,16 @@
 #include <stdio.h>
 
 #if HAS_DATALOG
-#define DATALOG_VERSION 0x02
+
+// version check by utils/datalog2csv.py
+#define DATALOG_VERSION 0x03
+// version 3: add channels 13-16
 
 //This is pretty crude.  need a more robust check
 #if TXID == 10
 //ctassert((DLOG_LAST == 67), dlog_api_changed); // DATALOG_VERSION = 0x01
 //ctassert((DLOG_LAST == 116), dlog_api_changed); // DATALOG_VERSION = 0x02
+ctassert((DLOG_LAST == 120), dlog_api_changed); // DATALOG_VERSION = 0x03
 #endif
 
 #define UPDATE_DELAY 4000 //wiat 4 seconds after changing enable before sample start

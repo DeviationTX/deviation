@@ -48,7 +48,8 @@ class Capture(object):
         inp    = []
         outch  = ["Channel1", "Channel2", "Channel3", "Channel4",
                   "Channel5", "Channel6", "Channel7", "Channel8",
-                  "Channel9", "Channel10", "Channel11", "Channel12"]
+                  "Channel9", "Channel10", "Channel11", "Channel12",
+                  "Channel13", "Channel14", "Channel15", "Channel16"]
         virtch = ["Virt1", "Virt2", "Virt3", "Virt4", "Virt5",
                   "Virt6", "Virt7", "Virt8", "Virt9", "Virt10"]
         ppm    = ["PPM1", "PPM2", "PPM3", "PPM4", "PPM5", "PPM6", "PPM7", "PPM8"]
@@ -281,7 +282,7 @@ def parse_file(bin):
             info[-1].add_elem(data[idx+1:])
             idx += info[-1].capture_size+1
             continue
-        if data[idx] != 0x02:
+        if data[idx] != 0x03:
             printf("Cannot handle API version 0x%02x\n", data[idx])
             return info
         info.append(Capture(data[idx:]))
