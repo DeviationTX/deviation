@@ -311,7 +311,7 @@ static void file_press_cb(guiObject_t *obj, void *data)
     if (mp->file_state == 3) {
         CONFIG_ResetModel();
         CONFIG_SaveModelIfNeeded();
-        GUI_RedrawAllObjects();
+        FullRedraw = REDRAW_EVERYTHING;
     } else {
         MODELPage_ShowLoadSave(mp->file_state, PAGE_ModelInit);
     }

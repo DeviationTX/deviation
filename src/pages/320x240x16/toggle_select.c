@@ -88,6 +88,8 @@ static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
         }
     }
     GUI_RemoveHierObjects((guiObject_t *)&gui->symbolicon[0]);
+    FullRedraw = REDRAW_ONLY_DIRTY;
+    GUI_DrawBackground(0, 79, LCD_WIDTH - 16, LCD_HEIGHT - 79);
     show_icons((long)data, idx);
     return page;
 }

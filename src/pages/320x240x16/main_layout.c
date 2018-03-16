@@ -120,19 +120,23 @@ void PAGE_MainLayoutInit(int page)
     GUI_SelectionNotify(notify_cb);
     draw_elements();
 }
+
 void PAGE_MainLayoutEvent()
 {
 }
+
 void PAGE_MainLayoutExit()
 {
     GUI_SelectionNotify(NULL);
     BUTTON_UnregisterCallback(&action);
 }
+
 void PAGE_MainLayoutRestoreDialog(int idx)
 {
     GUI_RemoveAllObjects();
     PAGE_MainLayoutInit(0);
-    lp->selected_for_move = idx;
+    lp->selected_for_move = - 1;
+    select_for_move(&gui->elem[idx]);
     show_config();
 }
 
@@ -144,6 +148,7 @@ void set_selected_for_move(int idx)
     GUI_TextSelectEnable(&gui->x, state);
     GUI_TextSelectEnable(&gui->y, state);
 }
+
 const char *xpos_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
@@ -158,6 +163,7 @@ const char *xpos_cb(guiObject_t *obj, int dir, void *data)
     sprintf(tempstring, "%d", lp->selected_x);
     return tempstring;
 }
+
 const char *ypos_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
@@ -312,8 +318,11 @@ void show_config()
     int count = 0;
     int row_idx = 0;
     long type;
-    if (OBJ_IS_USED(&gui->dialog))
+    if (OBJ_IS_USED(&gui->dialog)) {
+        u8 draw_mode = FullRedraw;
         GUI_RemoveObj((guiObject_t *)&gui->dialog);
+        FullRedraw = draw_mode;
+    }
     if(lp->selected_for_move >= 0) {
         type = ELEM_TYPE(pc->elem[lp->selected_for_move]);
         row_idx = elem_abs_to_rel(lp->selected_for_move);

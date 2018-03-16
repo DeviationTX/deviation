@@ -31,8 +31,11 @@ void draw_elements()
     u16 x, y, w, h;
     set_selected_for_move(-1);
     guiObject_t *obj = gui->y.header.next;
-    if (obj)
+    if (obj) {
+        u8 redraw_mode = FullRedraw;
         GUI_RemoveHierObjects(obj);
+        FullRedraw = redraw_mode;
+    }
     for(u32 i = 0; i < NUM_ELEMS; i++) {
         if (! GetWidgetLoc(&pc->elem[i], &x, &y, &w, &h))
             break;
@@ -133,10 +136,27 @@ int guielem_idx(guiObject_t *obj)
 
 void move_elem()
 {
+    u16 x, y, w, h;
     guiObject_t *obj = GUI_GetSelected();
     if ((guiLabel_t *)obj < gui->elem)
         return;
     int idx = guielem_idx(obj);
+    GetWidgetLoc(&pc->elem[idx], &x, &y, &w, &h);
+    if (x > 0) {
+        x -= 1;
+        w += 2;
+    }
+    if (y > 0) {
+        y -= 1;
+        h += 2;
+    }
+    if(x + w > LCD_WIDTH) {
+        w = LCD_WIDTH - x;
+    }
+    if(y + h > LCD_HEIGHT) {
+        h = LCD_HEIGHT - y;
+    }
+    GUI_DrawBackground(x, y, w, h);
     ELEM_SET_X(pc->elem[idx], lp->selected_x);
     ELEM_SET_Y(pc->elem[idx], lp->selected_y);
     draw_elements();
@@ -153,6 +173,8 @@ void notify_cb(guiObject_t *obj)
     GetElementSize(ELEM_TYPE(pc->elem[idx]), &lp->selected_w, &lp->selected_h);
     if (ELEM_TYPE(pc->elem[idx]) == ELEM_MODELICO)
         AdjustIconSize(&lp->selected_x, &lp->selected_y, &lp->selected_h, &lp->selected_w);
+    GUI_Redraw((guiObject_t *)&gui->xlbl);
     GUI_Redraw((guiObject_t *)&gui->x);
+    GUI_Redraw((guiObject_t *)&gui->ylbl);
     GUI_Redraw((guiObject_t *)&gui->y);
 }

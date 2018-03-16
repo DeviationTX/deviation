@@ -195,7 +195,13 @@ static int create_scrollable_objs(guiScrollable_t *scrollable, int row, int offs
     scrollable->cur_row = row;
     int rel_row = 0;
     int selectable, num_selectable = 0;
+#if (LCD_WIDTH != 66) && (LCD_WIDTH != 24)
+    u8 redraw_mode = FullRedraw;
     GUI_RemoveScrollableObjs((guiObject_t *)scrollable);
+    FullRedraw = redraw_mode;
+#else
+    GUI_RemoveScrollableObjs((guiObject_t *)scrollable);
+#endif
     guiObject_t *head = objHEAD;
     objHEAD = NULL;
     for(int y = scrollable->header.box.y, bottom = y + scrollable->header.box.height;
@@ -236,6 +242,9 @@ static int create_scrollable_objs(guiScrollable_t *scrollable, int row, int offs
     GUI_SetHidden((guiObject_t *)&scrollable->scrollbar, hidden);
     if (! hidden)
         GUI_SetScrollbar(&scrollable->scrollbar, scroll_pos);
+#if (LCD_WIDTH != 66) && (LCD_WIDTH != 24)
+    OBJ_SET_DIRTY((guiObject_t *)scrollable, 1);
+#endif
     //return new index of selected item
     if (idx >= 0 && idx < num_selectable)
         return idx;

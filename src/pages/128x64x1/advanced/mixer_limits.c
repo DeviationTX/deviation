@@ -130,7 +130,7 @@ void revert_cb(guiObject_t *obj, const void *data)
     (void)obj;
     memcpy(&mp->limit, (const void *)&origin_limit, sizeof(origin_limit));
     MIXER_SetLimit(mp->channel, &mp->limit);  // save
-    GUI_DrawScreen();
+    FullRedraw = REDRAW_EVERYTHING;
 }
 
 static unsigned action_cb(u32 button, unsigned flags, void *data)

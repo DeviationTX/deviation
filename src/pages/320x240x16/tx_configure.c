@@ -109,7 +109,9 @@ static void _show_page()
 {
     if (firstObj) {
         GUI_RemoveHierObjects(firstObj);
+        FullRedraw = REDRAW_ONLY_DIRTY;
         firstObj = NULL;
+        GUI_DrawBackground(0, 32, LCD_WIDTH - 16, LCD_HEIGHT - 32);
     }
     guiObject_t *obj;
     u8 space = 19;
