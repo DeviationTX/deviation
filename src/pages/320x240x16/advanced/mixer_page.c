@@ -43,7 +43,7 @@ static void _show_page()
     // Note for future maintenance: DO NOT use logical view to draw all the channel items at a time for this page:  I just
     // gave it a try, it spent very long time to construct all the 30 items and could trigger watch-dog to reboot !!!
     static const int XOFFSET = ((LCD_WIDTH - 320) / 2);
-    int init_y = LCD_HEIGHT == 240 ? 44 : 36;
+    int init_y = LCD_HEIGHT == 240 ? 44 : 48;
     int i;
     if (mp->firstObj) {
         GUI_RemoveHierObjects(mp->firstObj);
