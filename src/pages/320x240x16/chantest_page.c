@@ -37,6 +37,8 @@ static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
         newpos = endpos;
     if (newpos != cur_row) {
         GUI_RemoveHierObjects((guiObject_t *)&gui->chan[0]);
+        FullRedraw = REDRAW_ONLY_DIRTY;
+        GUI_DrawBackground(0, 32, LCD_WIDTH - 16, LCD_HEIGHT - 32);
         _show_bar_page(newpos);
     }
     return cur_row;
@@ -96,7 +98,6 @@ static void _show_bar_page(int row)
         GUI_CreateScrollbar(&gui->scrollbar, LCD_WIDTH-16, 32, LCD_HEIGHT-32, num_rows-1, NULL, scroll_cb, NULL);
         GUI_SetScrollbar(&gui->scrollbar, cur_row);
     }
-        
 }
 
 void PAGE_ChantestInit(int page)

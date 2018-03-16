@@ -83,7 +83,7 @@ void show_layout()
     GUI_CreateLabel(&gui->xlbl, 0,  1, NULL, micro, "X:");
     GUI_CreateLabelBox(&gui->x, 8, 1, 13, 6, &micro, pos_cb, NULL, (void *) 0L);
     GUI_CreateLabel(&gui->ylbl, 22, 1, NULL, micro, "Y:");
-    GUI_CreateLabelBox(&gui->y, 30, 1, 9, 6, &micro, pos_cb, NULL, (void *) 1L);
+    GUI_CreateLabelBox(&gui->y, 30, 1, 10, 6, &micro, pos_cb, NULL, (void *) 1L);
     //gui->y must be the last element!
     GUI_SelectionNotify(notify_cb);
 
@@ -91,6 +91,7 @@ void show_layout()
     if(OBJ_IS_USED(&gui->elem[0]))
         GUI_SetSelected((guiObject_t *)&gui->elem[0]);
 }
+
 void layout_exit()
 {
     GUI_SelectionNotify(NULL);

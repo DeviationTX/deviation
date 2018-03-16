@@ -80,7 +80,9 @@ static void _show_page(int page)
 static void _draw_body() {
     if (firstObj) {
         GUI_RemoveHierObjects(firstObj);
+        FullRedraw = REDRAW_ONLY_DIRTY;
         firstObj = NULL;
+        GUI_DrawBackground(0, 32, LCD_WIDTH - 16, LCD_HEIGHT - 32);
     }
     int COL1 = 30;
     int COL2 = 103;

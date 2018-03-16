@@ -17,6 +17,7 @@
 #include "../pages.h"
 #include "config/model.h"
 #include "../icons.h"
+#include "gui/gui.h"
 
 #include "../../common/advanced/_mixer_page.c"
 
@@ -47,7 +48,9 @@ static void _show_page()
     int i;
     if (mp->firstObj) {
         GUI_RemoveHierObjects(mp->firstObj);
+        FullRedraw = REDRAW_ONLY_DIRTY;
         mp->firstObj = NULL;
+        GUI_DrawBackground(0, 32, LCD_WIDTH - 16, LCD_HEIGHT - 32);
     }
     struct Mixer *mix = MIXER_GetAllMixers();
     for (i = 0; i < ENTRIES_PER_PAGE; i++) {
