@@ -103,17 +103,12 @@ static void CORONA_rf_init() {
     CC2500_WriteReg(CC2500_1B_AGCCTRL2, 0x67);
     CC2500_WriteReg(CC2500_1C_AGCCTRL1, 0xFB);
     CC2500_WriteReg(CC2500_1D_AGCCTRL0, 0xDC);
+  } else if (Model.proto_opts[PROTO_OPTS_FORMAT] == FORMAT_FDV3) {
+    // Flydream receiver captures have deviation 50, tx captures show 47
+    CC2500_WriteReg(CC2500_15_DEVIATN, 0x50);
   }
   
   CC2500_WriteReg(CC2500_0C_FSCTRL0, Model.proto_opts[PROTO_OPTS_FREQFINE]);
-
-//TODO remove
-  if (Model.fixed_id & 1)
-    CC2500_WriteReg(CC2500_15_DEVIATN, 0x50);
-  else
-    CC2500_WriteReg(CC2500_15_DEVIATN, 0x47);
-//TODO remove
-
   CC2500_SetTxRxMode(TX_EN);
   CC2500_SetPower(0);   // min power for binding, set in build_packet for normal operation
 }
@@ -168,12 +163,11 @@ static void CORONA_init()
     // But 0x00 and 0xB8 should be avoided on V2 since they are used for bind.
     // Below code make sure channels are between 0x02 and 0xA0, spaced with
     // a minimum of 2 and not ordered (RX only use the 1st channel unless there is an issue).
+    // Extra hopping frequency used for Flydream V3 id packets
     initialize_rx_tx_addr();
     u8 order = rx_tx_addr[3] & 0x03;
     for (u8 i=0; i < CORONA_RF_NUM_CHANNELS+1; i++)
         hopping_frequency[i^order] = 2+rx_tx_addr[3-i]%39+(i<<5)+(i<<3);
-//TODO printf("hopping: %02x, %02x, %02x, %02x\n", hopping_frequency[0], hopping_frequency[1],
-//TODO                                             hopping_frequency[2], hopping_frequency[3]);
 
     if (Model.proto_opts[PROTO_OPTS_FORMAT] != FORMAT_FDV3) {
         // ID looks random but on the 15 V1 dumps they all show the same odd/even rule
@@ -250,7 +244,6 @@ static u16 CORONA_build_packet(void) {
   if (fdv3_id_send) {
       fdv3_id_send = 0;
       CC2500_WriteReg(CC2500_0A_CHANNR, rx_tx_addr[CORONA_ADDRESS_LENGTH-1]);
-//TODO printf("chan: 0x%02x\n", rx_tx_addr[CORONA_ADDRESS_LENGTH-1]);
       packet[0] = 0x07;   // 8 bytes to follow
       // Send TX ID
       for(u8 i = 0; i < CORONA_ADDRESS_LENGTH; i++)
@@ -265,7 +258,6 @@ static u16 CORONA_build_packet(void) {
 
   // Set RF channel
   CC2500_WriteReg(CC2500_0A_CHANNR, hopping_frequency[hopping_frequency_no]);
-//TODO printf("chan: 0x%02x\n", hopping_frequency[hopping_frequency_no]);
 
   // Build packet
   packet[0] = 0x10;   // 17 bytes to follow
@@ -337,10 +329,6 @@ static u16 corona_cb() {
   } else {
       packet_period = CORONA_build_packet();
   }
-
-//TODO printf("period: %d, packet: ", packet_period);
-//TODO for (u8 i=0; i <= packet[0]+1; i++) printf("%02x ", packet[i]);
-//TODO printf("\n");
 
   // Send packet
   CC2500_WriteData(packet, packet[0]+2);
