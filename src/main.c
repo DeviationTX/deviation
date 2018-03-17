@@ -84,12 +84,12 @@ int main() {
     CLOCK_SetMsecCallback(MEDIUM_PRIORITY, MEDIUM_PRIORITY_MSEC);
 
     // We need to wait until we've actually measured the ADC before proceeding
-    while(! (priority_ready & (1 << LOW_PRIORITY)));
-
-    GUI_DrawScreen();
+    while(! (priority_ready & (1 << LOW_PRIORITY)))
+        ;
 
     //Only do this after we've initialized all channel data so the saftey works
     PROTOCOL_InitModules();
+    GUI_DrawScreen();
 
 #ifdef HAS_EVENT_LOOP
     start_event_loop();

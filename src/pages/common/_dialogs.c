@@ -15,6 +15,7 @@
 
 
 static guiObject_t *dialog = NULL;
+static char dlg_string[LCD_DEPTH == 1 ? 64 : 256];
 
 /******************/
 /*  Safety Dialog */

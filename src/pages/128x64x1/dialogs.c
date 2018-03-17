@@ -121,10 +121,9 @@ void PAGE_ShowWarning(const char *title, const char *str)
     (void)title;
     if (dialog)
         return;
-    if (str != tempstring)
-        tempstring_cpy(str);
+    snprintf(dlg_string, sizeof(dlg_string), "%s", str);
     dialog = GUI_CreateDialog(&gui->dialog, DIALOG3_X, DIALOG3_Y,
-                 DIALOG3_WIDTH, DIALOG3_HEIGHT, NULL, NULL, lowbatt_ok_cb, dtOk, tempstring);
+                 DIALOG3_WIDTH, DIALOG3_HEIGHT, NULL, NULL, lowbatt_ok_cb, dtOk, dlg_string);
 }
 
 
