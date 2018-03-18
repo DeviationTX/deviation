@@ -273,6 +273,37 @@ static void build_data_packet(u8 upper)
        packet[i*2 + 2] = (value >> 8) & 0xff;
        packet[i*2 + 3] = (value >> 0) & 0xff;
     }
+// The following code supports the XPLUS module to enable up to 20 channels. Implemented in an old
+// version of deviation by vlad_vy but was never merged. Included here for documentation. To enable
+// set num_channels to 13, ignoring the Model setting.  Report up to 20 channels as MAXNUMCHAN (more
+// than 16 requires modifying NUM_OUT_CHANNELS and more).
+// See https://www.deviationtx.com/forum/protocol-development/2088-18-channels-for-dsm2-dsmx for history.
+//  if ((num_channels > 12) && (bits == 11)) {
+//      u16 max = 1 << 9;
+//      u16 pct_100 = (u32)max * 100 / 150;
+//      if ((13 + upper + xchannel) <= num_channels) {
+//          value = (s32)Channels[12 + upper + xchannel] * (pct_100 / 2) / CHAN_MAX_VALUE + (max / 2);
+//          if (value >= max)
+//              value = max - 1;
+//          else if (value < 0)
+//              value = 0;
+//          value = 0 | (12 << 11) | ((xchannel >> 1) << 9) | value;
+//          packet[14] = (value >> 8) & 0xff;
+//          packet[15] = (value >> 0) & 0xff;
+//      } else {
+//          packet[14] = 0xff;
+//          packet[15] = 0xff;
+//      }
+//      if (upper == 1) {
+//          if ((upper + xchannel) < (num_channels - 13)) {
+//              xchannel = xchannel + 2;
+//              if (xchannel >= 8)
+//                  xchannel = 0;
+//          } else {
+//              xchannel = 0;
+//          }
+//      }
+//  }
 }
 
 static const u8 init_vals[][2] = {
