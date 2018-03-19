@@ -37,6 +37,6 @@ enum {
     SAVE_W         = 8*ITEM_SPACE,
     SAVE_Y_OFFS    = 0,
     LIST_X         = X_OFFSET + 14*ITEM_SPACE,
-    LIST_W         = LCD_WIDTH - LIST_X,
+    LIST_W         = LCD_WIDTH - LIST_X - ITEM_SPACE,
 };
 #include "../128x64x1/reorder_list.c"
