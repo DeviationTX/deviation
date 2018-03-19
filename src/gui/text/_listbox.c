@@ -17,24 +17,23 @@
 
 void _DrawListbox(struct guiObject *obj, u8 redraw_all)
 {
+    (void)redraw_all;
     struct guiListbox *listbox = (struct guiListbox *)obj;
+    u16 txt_w, txt_h;
     u16 obj_x, cx, cy;
-
-    if (redraw_all)
-        GUI_DrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
 
     LCD_GetCharDimensions(LCD_SELECT_CHAR, &cx, &cy);
 
     for(s32 i = 0; i < listbox->entries_per_page; i++) {
         const char *str = listbox->string_cb(i + listbox->cur_pos, listbox->cb_data);
+        LCD_GetStringDimensions((const u8 *)str, &txt_w, &txt_h);
         obj_x = obj->box.x;
         if (i + listbox->cur_pos == listbox->selected) {
             LCD_PrintCharXY(obj_x, obj->box.y + listbox->text_height * i, LCD_SELECT_CHAR);
             obj_x += cx;
         }
-        else {
-            GUI_DrawBackground(obj_x, obj->box.y + listbox->text_height * i, obj->box.width, listbox->text_height);
-        }
         LCD_PrintStringXY(obj_x, obj->box.y + listbox->text_height * i, str);
+        GUI_DrawBackground(obj_x + txt_w, obj->box.y + listbox->text_height * i, 
+                           obj->box.width - (obj_x - obj->box.x) - txt_w, listbox->text_height);
     }
 }
