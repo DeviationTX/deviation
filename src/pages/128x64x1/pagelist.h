@@ -39,11 +39,14 @@ PAGEDEF(PAGEID_TXCFG,    PAGE_TxConfigureInit, PAGE_TxConfigureEvent, PAGE_TxCon
 PAGEDEF(PAGEID_TELEMMON, PAGE_TelemtestInit,   PAGE_TelemtestEvent,   NULL,             _tr_noop("Telemetry monitor"))
 #endif
 PAGEDEF(PAGEID_CHANMON,  PAGE_ChantestInit,    PAGE_ChantestEvent,    PAGE_ChantestExit,_tr_noop("Channel monitor"))
-PAGEDEF(PAGEID_RANGE,    PAGE_RangeInit,       NULL,	              PAGE_RangeExit,   _tr_noop("Range Test"))
+PAGEDEF(PAGEID_RANGE,    PAGE_RangeInit,       NULL,                  PAGE_RangeExit,   _tr_noop("Range Test"))
 PAGEDEF(PAGEID_ABOUT,    PAGE_AboutInit,       NULL,                  NULL,             _tr_noop("About Deviation"))
 PAGEDEF(PAGEID_USB,      PAGE_USBInit,         PAGE_USBEvent,         PAGE_USBExit,     _tr_noop("USB"))
 #if DEBUG_WINDOW_SIZE
 PAGEDEF(PAGEID_DEBUGLOG, PAGE_DebuglogInit,    PAGE_DebuglogEvent,    NULL,             _tr_noop("Debuglog"))
+#endif
+#if HAS_VIDEO
+PAGEDEF(PAGEID_EXTOSD,   PAGE_ExternalOSDInit, NULL,                  NULL,             _tr_noop("External OSD"))
 #endif
 PAGEDEF(PAGEID_SPLASH,   PAGE_SplashInit,      PAGE_SplashEvent,      PAGE_SplashExit,  _tr_noop("Welcome"))
 #endif
