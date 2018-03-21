@@ -339,18 +339,18 @@ void SPI_FlashBlockWriteEnable(unsigned enable)
         if(enable) {
             CS_LO();
             //Global Block Protection unlock
-            spi_xfer(SPI1, 0x98);
+            spi_xfer(SPIx, 0x98);
             CS_HI();
         } else {
             CS_LO();
             //Write Block-Protection Register
-            spi_xfer(SPI1, 0x42);
+            spi_xfer(SPIx, 0x42);
             //write-protected BPR[79:0] = 5555 FFFFFFFF FFFFFFFF
             //data input must be most significant bit(s) first
-            spi_xfer(SPI1, 0x55);
-            spi_xfer(SPI1, 0x55);
+            spi_xfer(SPIx, 0x55);
+            spi_xfer(SPIx, 0x55);
             for (int i = 0; i < 8; i++) {
-                spi_xfer(SPI1, 0xFF);
+                spi_xfer(SPIx, 0xFF);
             }
             CS_HI();
             WaitForWriteComplete();
