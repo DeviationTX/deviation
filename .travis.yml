@@ -92,7 +92,11 @@ before_script:
   - echo $HOME
   - arm-none-eabi-gcc --version
 
-script: cd src && make $MAKETARGET
+script: 
+  - cd src;
+  - if [[ "$TRAVIS_EVENT_TYPE" == "cron" && "$MAKETARGET" == "zip_devo8" ]]; then
+        export MAKETARGET="zips winzips";
+  - make $MAKETARGET;
 
 after_success:
   - if [ "$TRAVIS_EVENT_TYPE" == "api" ]; then
