@@ -95,7 +95,7 @@ before_script:
 script: cd src && make $MAKETARGET
 
 after_success:
-  - if [[ "$TRAVIS_EVENT_TYPE" == "api" || "$TRAVIS_EVENT_TYPE" == "cron" ]]; then
+  - if [ "$TRAVIS_EVENT_TYPE" == "api" ]; then
         export NIGHTLY_DATE=$(echo $TRAVIS_COMMIT_MSG | egrep -o '[[:digit:]]{4}-[[:digit:]]{2}-[[:digit:]]{2}');
         if [[ "$TRAVIS_COMMIT_MSG" == "Nightly Build "* ]] && [ "$NIGHTLY_DATE" != "" ]; then
             echo "Uploading Nightly - $NIGHTLY_DATE";
@@ -108,6 +108,14 @@ after_success:
                 ../utils/upload_test_build.pl -skip -release "$RELEASE_VERSION" -delete;
                 ../utils/upload_test_build.pl -skip -release "$RELEASE_VERSION" *.zip;
             fi;
+        fi;
+    fi;
+  - if [ "$TRAVIS_EVENT_TYPE" == "cron" ]; then
+          export NIGHTLY_DATE=$(date "+%Y-%m-%d");
+        if [ "$NIGHTLY_DATE" != "" ]; then
+            echo "Uploading Nightly - $NIGHTLY_DATE";
+            ../utils/upload_test_build.pl -skip -nightly "$NIGHTLY_DATE" -delete;
+            ../utils/upload_test_build.pl -skip -nightly "$NIGHTLY_DATE" *.zip;
         fi;
     fi;
        
