@@ -96,6 +96,7 @@ script:
   - cd src;
   - if [[ "$TRAVIS_EVENT_TYPE" == "cron" && "$MAKETARGET" == "zip_devo8" ]]; then
         export MAKETARGET="zips winzips";
+    fi;
   - make $MAKETARGET;
 
 after_success:
