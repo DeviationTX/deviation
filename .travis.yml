@@ -96,6 +96,9 @@ script:
   - cd src;
   - if [[ "$TRAVIS_EVENT_TYPE" == "cron" && "$MAKETARGET" == "zip_devo8" ]]; then
         export MAKETARGET="zips winzips";
+        export FLTK_DIR=$HOME/fltk-1.3.0-w32;
+        export PORTAUDIO_DIR=$HOME/portaudio-w32;
+        export MPG123_DIR=$HOME/mpg123-w32;
     fi;
   - make $MAKETARGET;
 
@@ -115,7 +118,7 @@ after_success:
             fi;
         fi;
     fi;
-  - if [ "$TRAVIS_EVENT_TYPE" == "cron" ]; then
+  - if [[ "$TRAVIS_EVENT_TYPE" == "cron" && "$MAKETARGET" == "zips winzips" ]]; then
           export NIGHTLY_DATE=$(date "+%Y-%m-%d");
         if [ "$NIGHTLY_DATE" != "" ]; then
             echo "Uploading Nightly - $NIGHTLY_DATE";
