@@ -16,7 +16,7 @@
 
 #ifdef MODULAR
   //Allows the linker to properly relocate
-  #define CORONA_Cmds PROTO_Cmds
+  #define Corona_Cmds PROTO_Cmds
   #pragma long_calls
 #endif
 #include "common.h"
