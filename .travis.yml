@@ -95,7 +95,7 @@ before_script:
 script: cd src && make $MAKETARGET
 
 after_success:
-  - if [ "$TRAVIS_EVENT_TYPE" == "api" ]; then
+  - if [ "$TRAVIS_EVENT_TYPE" == "api" || "$TRAVIS_EVENT_TYPE" == "cron" ]; then
         export NIGHTLY_DATE=$(echo $TRAVIS_COMMIT_MSG | egrep -o '[[:digit:]]{4}-[[:digit:]]{2}-[[:digit:]]{2}');
         if [[ "$TRAVIS_COMMIT_MSG" == "Nightly Build "* ]] && [ "$NIGHTLY_DATE" != "" ]; then
             echo "Uploading Nightly - $NIGHTLY_DATE";
