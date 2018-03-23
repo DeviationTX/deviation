@@ -30,7 +30,7 @@ enum Music {
 
 #if HAS_EXTENDED_AUDIO
 #define MAX_VOICEMAP_ENTRIES 400 // arbitraty chosen
-#ifdef _DEVO12_TARGET_H_ // Check for Devo12 screen
+#if defined(_DEVO12_TARGET_H_) || defined(_DEVO12_XMS_TARGET_H_)  // Check for Devo12 screen
 #define MAX_VOICE_LABEL 35 // limit label length due to limited screen width
 #else
 #define MAX_VOICE_LABEL 26
