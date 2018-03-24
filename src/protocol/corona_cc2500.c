@@ -203,7 +203,7 @@ static u16 CORONA_build_bind_pkt(void) {
         packet[0] = 0x03;    // 4 bytes to follow
         for(u8 i = 0; i < CORONA_RF_NUM_CHANNELS+1; i++)
           packet[i+1] = hopping_frequency[i];
-        // Not sure what the last byte (+1) is for now since only the first 3 channels are used...
+        // Only the first 3 channels of hopping_frequency used for data
         return 3438;
       }
     } else { // V2 and FDV3
