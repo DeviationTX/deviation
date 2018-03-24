@@ -75,6 +75,7 @@ static u8  packet[40];
 static u16 state;
 static s8  fine;
 static u8  fdv3_id_send;
+static u16 packet_period;
 
 // V1 radio init also same for Flydream V3
 const u8 CORONA_init_values[] = {
@@ -190,22 +191,20 @@ u16 convert_channel_ppm(u8 chan) {
     return (u16)((s32)Channels[chan] * 500 / CHAN_MAX_VALUE + 1500);
 }
 
-static u16 CORONA_send_bind_pkt(void) {
-    u16 packet_period;
-
+static u16 CORONA_build_bind_pkt(void) {
     if (Model.proto_opts[PROTO_OPTS_FORMAT] == FORMAT_V1) {
       if (bind_counter&1) { // Send TX ID
         packet[0] = 0x04;    // 5 bytes to follow
         for(u8 i = 0; i < CORONA_ADDRESS_LENGTH; i++)
           packet[i+1] = rx_tx_addr[i];
         packet[5] = 0xCD;    // Unknown but seems to be always the same value for V1
-        packet_period = 3689;
+        return 3689;
       } else {             // Send hopping freq
         packet[0] = 0x03;    // 4 bytes to follow
         for(u8 i = 0; i < CORONA_RF_NUM_CHANNELS+1; i++)
           packet[i+1] = hopping_frequency[i];
         // Not sure what the last byte (+1) is for now since only the first 3 channels are used...
-        packet_period = 3438;
+        return 3438;
       }
     } else { // V2 and FDV3
       packet[0] = 0x04;   // 5 bytes to follow
@@ -213,20 +212,13 @@ static u16 CORONA_send_bind_pkt(void) {
         packet[i+1] = rx_tx_addr[i];
       packet[5] = 0x00;   // Unknown but seems to be always the same value for V2 and FDV3
       if (Model.proto_opts[PROTO_OPTS_FORMAT] == FORMAT_FDV3)
-          packet_period = FDV3_BIND_PERIOD;
+          return FDV3_BIND_PERIOD;
       else
-          packet_period = 26791;
+          return 26791;
     }
-
-    // Send packet
-    CC2500_WriteData(packet, packet[0]+2);
-    packet[0]=0;
-    return packet_period;
 }
 
-static u16 CORONA_send_packet(void) {
-  u16 packet_period;
-
+static u16 CORONA_build_packet(void) {
   CC2500_SetPower(Model.tx_power);   // Update RF power
 
   if (state && (Model.proto_opts[PROTO_OPTS_FORMAT] == FORMAT_V2)) {
@@ -317,10 +309,6 @@ static u16 CORONA_send_packet(void) {
   }
 
   hopping_frequency_no %= CORONA_RF_NUM_CHANNELS;
-
-  // Send packet
-  CC2500_WriteData(packet, packet[0]+2);
-  packet[0]=0;
   return packet_period;
 }
 
@@ -334,10 +322,14 @@ static u16 corona_cb() {
 
   if (bind_counter) {
       if (bind_counter-- == 0) PROTOCOL_SetBindState(0);
-      return CORONA_send_bind_pkt();
+      packet_period = CORONA_build_bind_pkt();
   } else {
-      return CORONA_send_packet();
+      packet_period = CORONA_build_packet();
   }
+
+  // Send packet
+  CC2500_WriteData(packet, packet[0]+2);
+  return packet_period;
 }
 
 static void initialize(u8 bind)
@@ -365,7 +357,7 @@ static void initialize(u8 bind)
   state = 400;            // Used by V2 to send RF channels + ID for 2.65s at startup
   hopping_frequency_no = 0;
   fdv3_id_send = 0;
-  packet[0] = 0;
+
   CORONA_init();
   CORONA_rf_init();
 
