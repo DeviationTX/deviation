@@ -41,7 +41,7 @@ void AUDIO_Init() {
     }
 #endif
 
-#ifndef _DEVO12_TARGET_H_
+#if !defined(_DEVO12_TARGET_H_) && !defined(_DEVO12_XMS_TARGET_H_)
     if ( PPMin_Mode() || Model.protocol == PROTOCOL_PPM ) {
         printf("Voice: Cannot initialize UART for extended-audio, PPM in use\n");
         UART_SetDataRate(0);
@@ -50,7 +50,7 @@ void AUDIO_Init() {
 #endif // _DEVO12_TARGET_H_
         printf("Voice: Setting up UART for extended-audio\n");
         UART_SetDataRate(9600);
-#ifndef _DEVO12_TARGET_H_
+#if !defined(_DEVO12_TARGET_H_) && !defined(_DEVO12_XMS_TARGET_H_)
     }
 #endif // _DEVO12_TARGET_H_
     AUDIO_SetVolume();
@@ -139,7 +139,7 @@ int AUDIO_Play(u16 music) {
 }
 
 void AUDIO_SetVolume() {
-#ifndef _DEVO12_TARGET_H_
+#if !defined(_DEVO12_TARGET_H_) && !defined(_DEVO12_XMS_TARGET_H_)
 #if HAS_AUDIO_UART5
     if ( !Transmitter.audio_uart5 && (PPMin_Mode() || Model.protocol == PROTOCOL_PPM) ) { // don't send volume command when using PPM port
 #else
@@ -187,7 +187,7 @@ void AUDIO_CheckQueue() {
 }
 
 int AUDIO_VoiceAvailable() {
-#ifndef _DEVO12_TARGET_H_
+#if !defined(_DEVO12_TARGET_H_) && !defined(_DEVO12_XMS_TARGET_H_)
 #if HAS_AUDIO_UART5
     if ( !Transmitter.audio_uart5 && (PPMin_Mode() || Model.protocol == PROTOCOL_PPM) ) { // don't send play command when using PPM port
 #else
