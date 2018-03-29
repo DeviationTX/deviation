@@ -27,6 +27,9 @@
 
 #ifdef EMULATOR
 #define USE_FIXED_MFGID
+#define PRINTDEBUG 1
+#else
+#define PRINTDEBUG 0
 #endif
 
 #ifdef MODULAR
@@ -279,7 +282,7 @@ static void build_packet(u8 bind) {
 //    packet[21] = 0;
 
 //TODO
-#if 0
+#if PRINTDEBUG
 printf("packet ");
 for (int i=0; i < PACKET_SIZE; i++) {
   printf("%02x ", packet[i]);
@@ -337,7 +340,7 @@ static u16 bugs3_cb() {
     switch(state) {
     case BIND_1:
 //TODO
-#if 0
+#if PRINTDEBUG
 printf("state %d, channel %02x\n", state, radio_data.channels[channel]);
 #endif
 //TODO
@@ -350,7 +353,7 @@ printf("state %d, channel %02x\n", state, radio_data.channels[channel]);
 
     case BIND_2:
 //TODO
-#if 0
+#if PRINTDEBUG
 printf("state %d, channel %02x\n", state, radio_data.channels[channel]-2);
 #endif
 //TODO
@@ -370,7 +373,7 @@ printf("state %d, channel %02x\n", state, radio_data.channels[channel]-2);
         A7105_SetTxRxMode(TX_EN);
         mode = A7105_ReadReg(A7105_00_MODE);
 //TODO
-#if 0
+#if PRINTDEBUG
 printf("state %d, radio_id %04lx, mode %02x\n", state, radio_data.radio_id, mode);
 #endif
 //TODO
@@ -381,7 +384,7 @@ printf("state %d, radio_id %04lx, mode %02x\n", state, radio_data.radio_id, mode
         }
         A7105_ReadData(packet, 16);
 //TODO
-#if 0
+#if PRINTDEBUG
 printf("received ");
 for (int i=0; i < 16; i++) {
   printf("%02x ", packet[i]);
@@ -404,7 +407,7 @@ if ((packet[0] + packet[1] + packet[2] + packet[3]) == 0) {
 
     case DATA_1:
 //TODO
-#if 0
+#if PRINTDEBUG
 printf("state %d, channel %02x\n", state, radio_data.channels[channel]);
 #endif
 //TODO
@@ -418,7 +421,7 @@ printf("state %d, channel %02x\n", state, radio_data.channels[channel]);
 
     case DATA_2:
 //TODO
-#if 0
+#if PRINTDEBUG
 printf("state %d, channel %02x\n", state, radio_data.channels[channel]-2);
 #endif
 //TODO
@@ -438,14 +441,14 @@ printf("state %d, channel %02x\n", state, radio_data.channels[channel]-2);
         A7105_SetTxRxMode(TX_EN);
         mode = A7105_ReadReg(A7105_00_MODE);
 //TODO
-#if 0
+#if PRINTDEBUG
 printf("state %d, radio_id %04lx, mode %02x\n", state, radio_data.radio_id, mode);
 #endif
 //TODO
         if (!(mode & 0x01)) {
             A7105_ReadData(packet, 16);
 //TODO
-#if 0
+#if PRINTDEBUG
 printf("received ");
 for (int i=0; i < 16; i++) {
   printf("%02x ", packet[i]);
