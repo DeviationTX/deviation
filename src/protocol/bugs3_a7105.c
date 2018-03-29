@@ -98,11 +98,79 @@ enum {
     DATA_3,
 };
 
-static int bugs3_init() {
+static u8 a7105_wait_cal() {
+    u32 ms = CLOCK_getms();
+    CLOCK_ResetWatchdog();
+    while (CLOCK_getms() - ms < 500)
+        if (!A7105_ReadReg(0x02)) return 1;
+    return 0;
+}
+
+static void a7105_SetVCOBand(u8 vb1, u8 vb2) {
+    u8 diff1, diff2;
+
+    if (vb1 >= 4)
+        diff1 = vb1 - 4;
+    else
+        diff1 = 4 - vb1;
+
+    if (vb2 >= 4)
+        diff2 = vb2 - 4;
+    else
+        diff2 = 4 - vb2;
+
+    if (diff1 == diff2 || diff1 > diff2)
+        A7105_WriteReg(A7105_25_VCO_SBCAL_I, vb1 | 0x08);
+    else
+        A7105_WriteReg(A7105_25_VCO_SBCAL_I, vb2 | 0x08);
+}
+
+// A7105 calibration code ported from reference code application note
+static u8 a7105_calibrate() {
     u8 if_calibration1;
     u8 vco_calibration0;
     u8 vco_calibration1;
-    
+
+    // IF Filter Bank Calibration
+    A7105_WriteReg(0x02, 1);
+    if (!a7105_wait_cal()) return 0;
+    if_calibration1 = A7105_ReadReg(A7105_22_IF_CALIB_I);
+    if(if_calibration1 & A7105_MASK_FBCF) {
+        return 0;
+    }
+
+    // Manual setting for VCO current
+    A7105_WriteReg(A7105_24_VCO_CURCAL, 0x13);
+
+    // VCO Band Calibration
+    A7105_WriteReg(A7105_26_VCO_SBCAL_II, 0x3b); // same as default value, but write is in reference code
+    // First at 2400 MHz
+    A7105_WriteReg(A7105_0F_CHANNEL, 0);
+    A7105_WriteReg(0x02, 2);
+    if (!a7105_wait_cal()) return 0;
+    vco_calibration0 = A7105_ReadReg(A7105_25_VCO_SBCAL_I);
+    if (vco_calibration0 & A7105_MASK_VBCF) {
+        return 0;
+    }
+
+    // Then 2480 MHz
+    A7105_WriteReg(A7105_0F_CHANNEL, 0xa0);
+    //VCO Calibration
+    A7105_WriteReg(A7105_02_CALC, 2);
+    if (!a7105_wait_cal()) return 0;
+    vco_calibration1 = A7105_ReadReg(A7105_25_VCO_SBCAL_I);
+    if (vco_calibration1 & A7105_MASK_VBCF) {
+        return 0;
+    }
+
+    // Then set calibration band value to best match
+    a7105_SetVCOBand(vco_calibration0 & 0x07, vco_calibration1 & 0x07);
+
+    return 1;
+}
+
+
+static int bugs3_init() {
     A7105_WriteReg(A7105_00_MODE, 0x00);
     A7105_WriteReg(A7105_01_MODE_CONTROL, 0x42);
     A7105_WriteReg(A7105_02_CALC, 0x00);
@@ -138,6 +206,7 @@ static int bugs3_init() {
     A7105_WriteReg(A7105_25_VCO_SBCAL_I, 0x00);
     A7105_WriteReg(A7105_26_VCO_SBCAL_II, 0x3b);
     A7105_WriteReg(A7105_27_BATTERY_DET, 0x00);
+    A7105_WriteReg(A7105_28_TX_TEST, 0x0b);
     A7105_WriteReg(A7105_29_RX_DEM_TEST_I, 0x47);
     A7105_WriteReg(A7105_2A_RX_DEM_TEST_II, 0x80);
     A7105_WriteReg(A7105_2B_CPC, 0x03);
@@ -150,67 +219,10 @@ static int bugs3_init() {
 
     A7105_Strobe(A7105_STANDBY);
 
-    //IF Filter Bank Calibration
-    A7105_WriteReg(0x02, 1);
-    A7105_ReadReg(0x02);
-    u32 ms = CLOCK_getms();
-    CLOCK_ResetWatchdog();
-    while (CLOCK_getms() - ms < 500) {
-        if (!A7105_ReadReg(0x02))
-            break;
-    }
-    if (CLOCK_getms() - ms >= 500)
-        return 0;
-    if_calibration1 = A7105_ReadReg(A7105_22_IF_CALIB_I);
-    if(if_calibration1 & A7105_MASK_FBCF) {
-        //Calibration failed...what do we do?
-        return 0;
-    }
-
-    A7105_WriteReg(A7105_24_VCO_CURCAL, 0x13);
-    A7105_WriteReg(A7105_26_VCO_SBCAL_II, 0x3b);
-
-    //VCO Calibration
-    A7105_WriteReg(A7105_0F_CHANNEL, 0);
-    A7105_WriteReg(0x02, 2);
-    ms = CLOCK_getms();
-    CLOCK_ResetWatchdog();
-    while(CLOCK_getms()  - ms < 500) {
-        if(! A7105_ReadReg(0x02))
-            break;
-    }
-    if (CLOCK_getms() - ms >= 500)
-        return 0;
-    vco_calibration0 = A7105_ReadReg(A7105_25_VCO_SBCAL_I);
-    if (vco_calibration0 & A7105_MASK_VBCF) {
-        //Calibration failed...what do we do?
-        return 0;
-    }
-
-    //Set Channel
-    A7105_WriteReg(A7105_0F_CHANNEL, 0xa0);
-    //VCO Calibration
-    A7105_WriteReg(A7105_02_CALC, 2);
-    ms = CLOCK_getms();
-    CLOCK_ResetWatchdog();
-    while (CLOCK_getms()  - ms < 500) {
-        if ( !A7105_ReadReg(A7105_02_CALC))
-            break;
-    }
-    if (CLOCK_getms() - ms >= 500)
-        return 0;
-    vco_calibration1 = A7105_ReadReg(A7105_25_VCO_SBCAL_I);
-    if (vco_calibration1 & A7105_MASK_VBCF) {
-        //Calibration failed...what do we do?
-    }
-
-    //Reset VCO Band calibration
-    A7105_WriteReg(A7105_25_VCO_SBCAL_I, 0x0e);
+    if (!a7105_calibrate()) return 0;
 
     A7105_SetTxRxMode(TX_EN);
 
-    A7105_SetPower(0x0b);   // bind in low-power (from spi capture)
-    
     freq_offset = Model.proto_opts[PROTOOPTS_FREQTUNE];
     A7105_AdjustLOBaseFreq(freq_offset);
 
@@ -456,11 +468,13 @@ static void initialize(u8 bind) {
         state = DATA_1;
     }
 
-    while(1) {
+    A7105_Reset();
+    CLOCK_ResetWatchdog();
+    while(!bugs3_init()) {
+        MUSIC_Play(MUSIC_ALARM1);
         A7105_Reset();
         CLOCK_ResetWatchdog();
-        if (bugs3_init())
-            break;
+        break;
     }
     
     channel = 0;
