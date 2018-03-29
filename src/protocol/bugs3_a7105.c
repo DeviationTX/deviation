@@ -75,7 +75,7 @@ ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 
 #define PACKET_SIZE   22
-#define NUM_RFCHAN     7
+#define NUM_RFCHAN    16
 
 typedef struct {
   u32 radio_id;
@@ -144,7 +144,7 @@ static u8 a7105_calibrate() {
 
     // VCO Band Calibration
     A7105_WriteReg(A7105_26_VCO_SBCAL_II, 0x3b); // same as default value, but write is in reference code
-    // First at 2400 MHz
+    // First get calibration value at 2400 MHz
     A7105_WriteReg(A7105_0F_CHANNEL, 0);
     A7105_WriteReg(0x02, 2);
     if (!a7105_wait_cal()) return 0;
@@ -244,17 +244,19 @@ static s16 get_channel(u8 ch, s32 scale, s32 center, s32 range) {
 
 static void build_packet(u8 bind) {
     memset(packet, 0, sizeof(packet));
-    packet[0] = 0x34 + ((packet_count & 0x1) << 6) + (bind ? 0x80 : 0);
-    packet[1] = 0x24;
-    packet[2] = 0x29;
-    packet[3] = 0x74;
-    packet[4] = 0x04 + ((packet_count & 0x1) << 6) + (bind ? 0x80 : 0);
-    if (bind)
-      packet[5] = 0x40;
-    else
-      packet[5] = (FLAG_ARM & ~GET_FLAG(CHANNEL_ARM, FLAG_ARM))     // 0x00 armed, 0x40 is disarmed
-              + GET_FLAG(CHANNEL_PICTURE, FLAG_PICTURE)
-              + GET_FLAG(CHANNEL_LED,     FLAG_LED);
+    packet[0] = 0x3c + ((packet_count & 0x1) << 6) + (bind ? 0 : 0x80);
+    packet[1] = 0x76;
+    packet[2] = 0x71;
+    packet[3] = 0x94;
+    packet[4] = 0x00 + ((packet_count & 0x1) << 6) + (bind ? 0x80 : 0);
+    if (bind) {
+      packet[5] = 0x26;
+    } else {
+      packet[5] = 0x26
+                + GET_FLAG(CHANNEL_ARM,     FLAG_ARM)         // 0x40 set when armed
+                + GET_FLAG(CHANNEL_PICTURE, FLAG_PICTURE)
+                + GET_FLAG(CHANNEL_LED,     FLAG_LED);
+    }
     packet[6] = get_channel(CHANNEL1, 100, 100, 100);
     packet[7] = get_channel(CHANNEL2, 100, 100, 100);
     packet[8] = get_channel(CHANNEL3, 100, 100, 100);
@@ -306,9 +308,17 @@ static int get_tx_id()
 #endif
 
 static void set_radio_data(u8 index) {
+    // captured radio data for bugs rx/tx version A2
     radio_data_t fixed_radio_data[] = {
-            {0xac59a453, {0x1d, 0x3b, 0x4d, 0x29, 0x11, 0x2d, 0x63}},     // bind phase
-            {0x56926d94, {0x27, 0x4b, 0x1c, 0x63, 0x25, 0x0a, 0x57}}, };  // data phase if rx responds 1d 5b 2c 7f 00 00 00 00 00 00 ff 87 00 00 00 00
+            // bind phase
+            {0xac59a453, {0x1d, 0x3b, 0x4d, 0x29, 0x11, 0x2d, 0x0b, 0x3d,
+                          0x59, 0x48, 0x17, 0x41, 0x23, 0x4e, 0x2a, 0x63}},
+            // data phase if rx responds 1d 5b 2c 7f 00 00 00 00 00 00 ff 87 00 00 00 00,
+            {0x57358d96, {0x4b, 0x19, 0x35, 0x1e, 0x63, 0x0f, 0x45, 0x21,
+                          0x51, 0x3a, 0x5d, 0x25, 0x0a, 0x44, 0x61, 0x27}}
+            // data phase if rx responds 1d 5b 2c 7f 00 00 00 00 00 00 ff 87 00 00 00 00,
+// A1 version capture            {0x56926d94, {0x27, 0x4b, 0x1c, 0x63, 0x25, 0x0a, 0x57}},
+    };
     memcpy(&radio_data, &fixed_radio_data[index], sizeof(radio_data_t));
 }
 
