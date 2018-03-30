@@ -21,6 +21,7 @@
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
+#include "music.h"
 #include "config/model.h"
 #include <string.h>
 #include <stdlib.h>
@@ -174,7 +175,6 @@ static u8 a7105_calibrate() {
 
 
 static int bugs3_init() {
-    A7105_WriteReg(A7105_00_MODE, 0x00);
     A7105_WriteReg(A7105_01_MODE_CONTROL, 0x42);
     A7105_WriteReg(A7105_02_CALC, 0x00);
     A7105_WriteReg(A7105_03_FIFOI, 0x15);
@@ -377,11 +377,13 @@ printf("state %d, channel %02x\n", state, radio_data.channels[channel]-2);
 printf("state %d, radio_id %04lx, mode %02x\n", state, radio_data.radio_id, mode);
 #endif
 //TODO
+#if 0 //TODO
         if (mode & 0x01) {
             state = BIND_1;
             packet_period = 20;         // No received data so restart binding procedure.
             break;
         }
+#endif
         A7105_ReadData(packet, 16);
 //TODO
 #if PRINTDEBUG
@@ -487,7 +489,6 @@ static void initialize(u8 bind) {
         MUSIC_Play(MUSIC_ALARM1);
         A7105_Reset();
         CLOCK_ResetWatchdog();
-        break;
     }
     
     channel = 0;
