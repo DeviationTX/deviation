@@ -88,7 +88,7 @@ typedef struct {
 
 static radio_data_t radio_data;
 static u8 packet[PACKET_SIZE];
-static u8 channel;
+static u8 channel_idx;
 static u8 state;
 static u8 packet_count;
 static s16 freq_offset;
@@ -325,7 +325,10 @@ static void set_radio_data(u8 index) {
     memcpy(&radio_data, &fixed_radio_data[index], sizeof(radio_data_t));
 }
 
-
+#define DELAY_POST_TX  1300
+#define DELAY_WAIT_TX   500
+#define DELAY_WAIT_RX  3500
+#define DELAY_POST_RX   700
 MODULE_CALLTYPE
 static u16 bugs3_cb() {
     u16 packet_period = 0;
@@ -341,40 +344,46 @@ static u16 bugs3_cb() {
     case BIND_1:
 //TODO
 #if PRINTDEBUG
-printf("state %d, channel %02x\n", state, radio_data.channels[channel]-1);
+printf("%09d: state %d, channel %02x\n", CLOCK_getms(), state, radio_data.channels[channel_idx]);
 #endif
 //TODO
         build_packet(1);
         A7105_Strobe(A7105_STANDBY);
-        A7105_WriteData(packet, PACKET_SIZE, radio_data.channels[channel]-1);
+        A7105_WriteData(packet, PACKET_SIZE, radio_data.channels[channel_idx]);
         state = BIND_2;
-        packet_period = 1168;
+        packet_period = DELAY_POST_TX;
         break;
 
     case BIND_2:
-//TODO
-#if PRINTDEBUG
-printf("state %d, channel %02x\n", state, radio_data.channels[channel]-1);
-#endif
-//TODO
-        A7105_Strobe(A7105_STANDBY);
-        A7105_SetTxRxMode(RX_EN);
-        A7105_WriteReg(A7105_0F_PLL_I, radio_data.channels[channel] - 1);
-        A7105_Strobe(A7105_RX);
-        packet_count += 1;
-        channel += packet_count & 1;
-        channel %= NUM_RFCHAN;
-        state = BIND_3;
-        packet_period = 3850;
-        break;
-
-    case BIND_3:
-        A7105_Strobe(A7105_STANDBY);
-        A7105_SetTxRxMode(TX_EN);
         mode = A7105_ReadReg(A7105_00_MODE);
 //TODO
 #if PRINTDEBUG
-printf("state %d, radio_id %04lx, mode %02x\n", state, radio_data.radio_id, mode);
+printf("%09d: state %d, channel %02x, mode %02x\n", CLOCK_getms(), state, radio_data.channels[channel_idx]-2, mode);
+#endif
+//TODO
+        mode = A7105_ReadReg(A7105_00_MODE);
+        if (mode & 0x01) {
+            packet_period = DELAY_WAIT_TX;  // don't proceed until transmission complete
+            break;
+        }
+        A7105_Strobe(A7105_STANDBY);
+        A7105_SetTxRxMode(RX_EN);
+        A7105_WriteReg(A7105_0F_PLL_I, radio_data.channels[channel_idx] - 2);
+        A7105_Strobe(A7105_RX);
+        packet_count += 1;
+        channel_idx += packet_count & 1;
+        channel_idx %= NUM_RFCHAN;
+        state = BIND_3;
+        packet_period = DELAY_WAIT_RX;
+        break;
+
+    case BIND_3:
+        mode = A7105_ReadReg(A7105_00_MODE);
+        A7105_Strobe(A7105_STANDBY);
+        A7105_SetTxRxMode(TX_EN);
+//TODO
+#if PRINTDEBUG
+printf("%09d: state %d, radio_id %04lx, mode %02x\n", CLOCK_getms(), state, radio_data.radio_id, mode);
 #endif
 //TODO
 #if 0 //TODO
@@ -396,55 +405,65 @@ printf("\n");
 //TODO
 if ((packet[0] + packet[1] + packet[2] + packet[3]) == 0) {
     state = BIND_1;
-    packet_period = 20;         // No received data so restart binding procedure.
+    packet_period = DELAY_POST_RX;         // No received data so restart binding procedure.
     break;
 }
         set_radio_data(1);
         A7105_WriteID(radio_data.radio_id);
         PROTOCOL_SetBindState(0);
         state = DATA_1;
-        channel = 0;
-        packet_period = 500;
+        channel_idx = 0;
+        packet_period = DELAY_POST_RX;
         break;
 
     case DATA_1:
-//TODO
-#if PRINTDEBUG
-printf("state %d, channel %02x\n", state, radio_data.channels[channel]);
-#endif
-//TODO
         A7105_SetPower(Model.tx_power);
         build_packet(0);
         A7105_Strobe(A7105_STANDBY);
-        A7105_WriteData(packet, PACKET_SIZE, radio_data.channels[channel]-1);
+        A7105_WriteData(packet, PACKET_SIZE, radio_data.channels[channel_idx]);
+//TODO
+#if PRINTDEBUG
+mode = A7105_ReadReg(A7105_00_MODE); //TODO
+while (mode & 1) {
+printf("%09ld: state %d, channel %02x, mode %02x\n", CLOCK_getms(), state, radio_data.channels[channel_idx], mode);
+mode = A7105_ReadReg(A7105_00_MODE); //TODO
+} 
+printf("%09ld: state %d, channel %02x, mode %02x\n", CLOCK_getms(), state, radio_data.channels[channel_idx], mode);
+#endif
+//TODO
         state = DATA_2;
-        packet_period = 1168;
+        packet_period = DELAY_POST_TX;
         break;
 
     case DATA_2:
-//TODO
-#if PRINTDEBUG
-printf("state %d, channel %02x\n", state, radio_data.channels[channel]-1);
-#endif
-//TODO
-        A7105_Strobe(A7105_STANDBY);
-        A7105_SetTxRxMode(RX_EN);
-        A7105_WriteReg(A7105_0F_PLL_I, radio_data.channels[channel] - 1);
-        A7105_Strobe(A7105_RX);
-        packet_count += 1;
-        channel += packet_count & 1;
-        channel %= NUM_RFCHAN;
-        state = DATA_3;
-        packet_period = 3850;
-        break;
-
-    case DATA_3:
-        A7105_Strobe(A7105_STANDBY);
-        A7105_SetTxRxMode(TX_EN);
         mode = A7105_ReadReg(A7105_00_MODE);
 //TODO
 #if PRINTDEBUG
-printf("state %d, radio_id %04lx, mode %02x\n", state, radio_data.radio_id, mode);
+printf("%09ld: state %d, channel %02x, mode %02x\n", CLOCK_getms(), state, radio_data.channels[channel_idx]-2, mode);
+#endif
+//TODO
+        if (mode & 0x01) {
+            packet_period = DELAY_WAIT_TX;  // don't proceed until transmission complete
+            break;
+        }
+        A7105_Strobe(A7105_STANDBY);
+        A7105_SetTxRxMode(RX_EN);
+        A7105_WriteReg(A7105_0F_PLL_I, radio_data.channels[channel_idx] - 2);
+        A7105_Strobe(A7105_RX);
+        packet_count += 1;
+        channel_idx += packet_count & 1;
+        channel_idx %= NUM_RFCHAN;
+        state = DATA_3;
+        packet_period = DELAY_WAIT_RX;
+        break;
+
+    case DATA_3:
+        mode = A7105_ReadReg(A7105_00_MODE);
+        A7105_Strobe(A7105_STANDBY);
+        A7105_SetTxRxMode(TX_EN);
+//TODO
+#if PRINTDEBUG
+printf("%09ld: state %d, radio_id %04lx, mode %02x\n", CLOCK_getms(), state, radio_data.radio_id, mode);
 #endif
 //TODO
         if (!(mode & 0x01)) {
@@ -460,7 +479,7 @@ printf("\n");
 //TODO
         }
         state = DATA_1;
-        packet_period = 20;
+        packet_period = DELAY_POST_RX;
         break;
     }
 #ifndef EMULATOR
@@ -491,7 +510,7 @@ static void initialize(u8 bind) {
         CLOCK_ResetWatchdog();
     }
     
-    channel = 0;
+    channel_idx = 0;
     packet_count = 0;
     CLOCK_StartTimer(100, bugs3_cb);
 }
