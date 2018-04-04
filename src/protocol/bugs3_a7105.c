@@ -341,12 +341,12 @@ static u16 bugs3_cb() {
     case BIND_1:
 //TODO
 #if PRINTDEBUG
-printf("state %d, channel %02x\n", state, radio_data.channels[channel]);
+printf("state %d, channel %02x\n", state, radio_data.channels[channel]-1);
 #endif
 //TODO
         build_packet(1);
         A7105_Strobe(A7105_STANDBY);
-        A7105_WriteData(packet, PACKET_SIZE, radio_data.channels[channel]);
+        A7105_WriteData(packet, PACKET_SIZE, radio_data.channels[channel]-1);
         state = BIND_2;
         packet_period = 1168;
         break;
@@ -354,12 +354,12 @@ printf("state %d, channel %02x\n", state, radio_data.channels[channel]);
     case BIND_2:
 //TODO
 #if PRINTDEBUG
-printf("state %d, channel %02x\n", state, radio_data.channels[channel]-2);
+printf("state %d, channel %02x\n", state, radio_data.channels[channel]-1);
 #endif
 //TODO
         A7105_Strobe(A7105_STANDBY);
         A7105_SetTxRxMode(RX_EN);
-        A7105_WriteReg(A7105_0F_PLL_I, radio_data.channels[channel] - 2);
+        A7105_WriteReg(A7105_0F_PLL_I, radio_data.channels[channel] - 1);
         A7105_Strobe(A7105_RX);
         packet_count += 1;
         channel += packet_count & 1;
@@ -416,7 +416,7 @@ printf("state %d, channel %02x\n", state, radio_data.channels[channel]);
         A7105_SetPower(Model.tx_power);
         build_packet(0);
         A7105_Strobe(A7105_STANDBY);
-        A7105_WriteData(packet, PACKET_SIZE, radio_data.channels[channel]);
+        A7105_WriteData(packet, PACKET_SIZE, radio_data.channels[channel]-1);
         state = DATA_2;
         packet_period = 1168;
         break;
@@ -424,12 +424,12 @@ printf("state %d, channel %02x\n", state, radio_data.channels[channel]);
     case DATA_2:
 //TODO
 #if PRINTDEBUG
-printf("state %d, channel %02x\n", state, radio_data.channels[channel]-2);
+printf("state %d, channel %02x\n", state, radio_data.channels[channel]-1);
 #endif
 //TODO
         A7105_Strobe(A7105_STANDBY);
         A7105_SetTxRxMode(RX_EN);
-        A7105_WriteReg(A7105_0F_PLL_I, radio_data.channels[channel] - 2);
+        A7105_WriteReg(A7105_0F_PLL_I, radio_data.channels[channel] - 1);
         A7105_Strobe(A7105_RX);
         packet_count += 1;
         channel += packet_count & 1;
