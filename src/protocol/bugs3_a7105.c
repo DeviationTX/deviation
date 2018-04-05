@@ -48,9 +48,9 @@ enum {
     CHANNEL2,     // Elevator
     CHANNEL3,     // Throttle
     CHANNEL4,     // Rudder
-    CHANNEL5,     // Leds
-    CHANNEL6,     // Still camera 
-    CHANNEL7,     //
+    CHANNEL5,     // Arm
+    CHANNEL6,     // LEDs
+    CHANNEL7,     // Picture
     CHANNEL8,     //
     CHANNEL9,     //
     CHANNEL10,    //
@@ -330,8 +330,8 @@ static void set_radio_data(u8 index) {
 
 #define DELAY_POST_TX  1300
 #define DELAY_WAIT_TX   500
-#define DELAY_WAIT_RX  3500
-#define DELAY_POST_RX   700
+#define DELAY_WAIT_RX  2000
+#define DELAY_POST_RX  2000
 MODULE_CALLTYPE
 static u16 bugs3_cb() {
     u16 packet_period = 0;
@@ -389,13 +389,12 @@ printf("%09d: state %d, channel %02x, mode %02x\n", CLOCK_getms(), state, radio_
 printf("%09d: state %d, radio_id %04lx, mode %02x\n", CLOCK_getms(), state, radio_data.radio_id, mode);
 #endif
 //TODO
-#if 0 //TODO
-        if (mode & 0x01) {
+        if ((Model.fixed_id & 1) && (mode & 0x01)) {
+//TODO        if (mode & 0x01) {
             state = BIND_1;
             packet_period = 20;         // No received data so restart binding procedure.
             break;
         }
-#endif
         A7105_ReadData(packet, 16);
 //TODO
 #if PRINTDEBUG
