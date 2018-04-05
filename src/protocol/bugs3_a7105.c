@@ -87,11 +87,12 @@ typedef struct {
 } radio_data_t;
 
 static radio_data_t radio_data;
+static s16 freq_offset;
 static u8 packet[PACKET_SIZE];
 static u8 channel_idx;
 static u8 state;
 static u8 packet_count;
-static s16 freq_offset;
+static u8 armed;
 
 enum {
     BIND_1,
@@ -236,16 +237,16 @@ static int bugs3_init() {
 
 static s16 get_channel(u8 ch, s32 scale, s32 center, s32 range) {
     s32 value = (s32)Channels[ch] * scale / CHAN_MAX_VALUE + center;
-    if (value < center - range)
-        value = center - range;
-    if (value >= center + range)
-        value = center + range -1;
+    if (value < center - range) value = center - range;
+    if (value >= center + range) value = center + range;
     return value;
 }
 
 #define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
 
 static void build_packet(u8 bind) {
+    u8 force_values = bind | !armed;
+
     memset(packet, 0, sizeof(packet));
     packet[0] = 0x3c + ((packet_count & 0x1) << 6) + (bind ? 0 : 0x80);
     packet[1] = 0x76;
@@ -260,10 +261,10 @@ static void build_packet(u8 bind) {
                 + GET_FLAG(CHANNEL_PICTURE, FLAG_PICTURE)
                 + GET_FLAG(CHANNEL_LED,     FLAG_LED);
     }
-    packet[6] = bind ? 100 : get_channel(CHANNEL1, 100, 100, 100);
-    packet[7] = bind ? 100 : get_channel(CHANNEL2, 100, 100, 100);
-    packet[8] = bind ?   0 : get_channel(CHANNEL3, 100, 100, 100);
-    packet[9] = bind ? 100 : get_channel(CHANNEL4, 100, 100, 100);
+    packet[6] = force_values ? 100 : get_channel(CHANNEL1, 101, 100, 100);
+    packet[7] = force_values ? 100 : get_channel(CHANNEL2, 101, 100, 100);
+    packet[8] = force_values ?   0 : get_channel(CHANNEL3, 101, 100, 100);
+    packet[9] = force_values ? 100 : get_channel(CHANNEL4, 101, 100, 100);
     packet[10] = 100;
     packet[11] = 100;
     packet[12] = 100;
@@ -273,13 +274,15 @@ static void build_packet(u8 bind) {
 //    packet[15] = 0;
 
     // try driven trims
-    packet[16] = bind ? 64 : packet[6] / 2 + 15;
-    packet[17] = bind ? 64 : packet[7] / 2 + 15;
+    packet[16] = force_values ? 64 : packet[6] / 2 + 15;
+    packet[17] = force_values ? 64 : packet[7] / 2 + 15;
     packet[18] = 64;
-    packet[19] = bind ? 64 : packet[9] / 2 + 15;
+    packet[19] = force_values ? 64 : packet[9] / 2 + 15;
 
 //    packet[20] = 0;
 //    packet[21] = 0;
+
+armed = GET_FLAG(CHANNEL_ARM, FLAG_ARM) ? 1 : 0; //TODO should be set when quad acknowledges
 
 //TODO
 #if PRINTDEBUG
@@ -512,6 +515,7 @@ static void initialize(u8 bind) {
     
     channel_idx = 0;
     packet_count = 0;
+    armed = 0;
     CLOCK_StartTimer(100, bugs3_cb);
 }
 
