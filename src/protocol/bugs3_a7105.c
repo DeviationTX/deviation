@@ -260,10 +260,10 @@ static void build_packet(u8 bind) {
                 + GET_FLAG(CHANNEL_PICTURE, FLAG_PICTURE)
                 + GET_FLAG(CHANNEL_LED,     FLAG_LED);
     }
-    packet[6] = get_channel(CHANNEL1, 100, 100, 100);
-    packet[7] = get_channel(CHANNEL2, 100, 100, 100);
-    packet[8] = get_channel(CHANNEL3, 100, 100, 100);
-    packet[9] = get_channel(CHANNEL4, 100, 100, 100);
+    packet[6] = bind ? 100 : get_channel(CHANNEL1, 100, 100, 100);
+    packet[7] = bind ? 100 : get_channel(CHANNEL2, 100, 100, 100);
+    packet[8] = bind ?   0 : get_channel(CHANNEL3, 100, 100, 100);
+    packet[9] = bind ? 100 : get_channel(CHANNEL4, 100, 100, 100);
     packet[10] = 100;
     packet[11] = 100;
     packet[12] = 100;
@@ -273,10 +273,10 @@ static void build_packet(u8 bind) {
 //    packet[15] = 0;
 
     // try driven trims
-    packet[16] = packet[6] / 2 + 15;
-    packet[17] = packet[7] / 2 + 15;
+    packet[16] = bind ? 64 : packet[6] / 2 + 15;
+    packet[17] = bind ? 64 : packet[7] / 2 + 15;
     packet[18] = 64;
-    packet[19] = packet[9] / 2 + 15;
+    packet[19] = bind ? 64 : packet[9] / 2 + 15;
 
 //    packet[20] = 0;
 //    packet[21] = 0;
