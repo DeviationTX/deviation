@@ -246,20 +246,21 @@ static s16 get_channel(u8 ch, s32 scale, s32 center, s32 range) {
 
 static void build_packet(u8 bind) {
     u8 force_values = bind | !armed;
+    u8 change_channel = ((packet_count & 0x1) << 6);
 
     memset(packet, 0, sizeof(packet));
-    packet[0] = 0x3c + ((packet_count & 0x1) << 6) + (bind ? 0 : 0x80);
+    packet[0] = 0x3c | change_channel | (bind ? 0 : 0x80);
     packet[1] = 0x76;
     packet[2] = 0x71;
     packet[3] = 0x94;
-    packet[4] = 0x00 + ((packet_count & 0x1) << 6) + (bind ? 0x80 : 0);
+    packet[4] = 0x00 | change_channel | (bind ? 0x80 : 0);
     if (bind) {
       packet[5] = 0x26;
     } else {
       packet[5] = 0x26
-                + GET_FLAG(CHANNEL_ARM,     FLAG_ARM)         // 0x40 set when armed
-                + GET_FLAG(CHANNEL_PICTURE, FLAG_PICTURE)
-                + GET_FLAG(CHANNEL_LED,     FLAG_LED);
+                | GET_FLAG(CHANNEL_ARM,     FLAG_ARM)         // 0x40 set when armed
+                | GET_FLAG(CHANNEL_PICTURE, FLAG_PICTURE)
+                | GET_FLAG(CHANNEL_LED,     FLAG_LED);
     }
     packet[6] = force_values ? 100 : get_channel(CHANNEL1, 101, 100, 100);
     packet[7] = force_values ? 100 : get_channel(CHANNEL2, 101, 100, 100);
@@ -328,13 +329,24 @@ static void set_radio_data(u8 index) {
     memcpy(&radio_data, &fixed_radio_data[index], sizeof(radio_data_t));
 }
 
-#define DELAY_POST_TX  1100
-#define DELAY_WAIT_TX   500
-#define DELAY_WAIT_RX  2000
-#define DELAY_POST_RX  2000
+static void increment_counts() {
+    // this logic works with the use of packet_count in build_packet
+    // to properly indicate channel changes to rx
+    packet_count += 1;
+    if ((packet_count & 1) == 0) {
+        channel_idx += 1;
+        channel_idx %= NUM_RFCHAN;
+    }
+}
+
+#define DELAY_POST_TX   1100
+#define DELAY_WAIT_TX    500
+#define DELAY_WAIT_RX   2000
+#define DELAY_POST_RX   2000
+#define DELAY_BIND_RST   200
 // FIFO config is one less than desired value
-#define FIFO_SIZE_RX     15
-#define FIFO_SIZE_TX     21
+#define FIFO_SIZE_RX      15
+#define FIFO_SIZE_TX      21
 MODULE_CALLTYPE
 static u16 bugs3_cb() {
     u16 packet_period = 0;
@@ -366,14 +378,7 @@ printf("%09d: state %d, channel %02x\n", CLOCK_getms(), state, radio_data.channe
         // wait here a bit for tx complete because
         // need to start rx immediately to catch return packet
         count = 20;
-        mode = A7105_ReadReg(A7105_00_MODE);
-        while (mode & 0x01) {
-            mode = A7105_ReadReg(A7105_00_MODE);
-//TODO
-#if PRINTDEBUG
-printf("%09d: state %d, channel %02x, mode %02x\n", CLOCK_getms(), state, radio_data.channels[channel_idx]-2, mode);
-#endif
-//TODO
+        while (A7105_ReadReg(A7105_00_MODE) & 0x01) {
             if (count-- == 0) {
                 packet_period = DELAY_WAIT_TX;  // don't proceed until transmission complete
                 break;
@@ -384,9 +389,7 @@ printf("%09d: state %d, channel %02x, mode %02x\n", CLOCK_getms(), state, radio_
         A7105_WriteReg(A7105_03_FIFOI, FIFO_SIZE_RX);
         A7105_Strobe(A7105_RX);
 
-        packet_count += 1;
-        channel_idx += packet_count & 1;
-        channel_idx %= NUM_RFCHAN;
+        increment_counts();
         state = BIND_3;
         packet_period = DELAY_WAIT_RX;
         break;
@@ -400,10 +403,9 @@ printf("%09d: state %d, channel %02x, mode %02x\n", CLOCK_getms(), state, radio_
 printf("%09d: state %d, radio_id %04lx, mode %02x\n", CLOCK_getms(), state, radio_data.radio_id, mode);
 #endif
 //TODO
-        if ((Model.fixed_id & 1) && (mode & 0x01)) {
-//TODO        if (mode & 0x01) {
+        if (mode & 0x01) {
             state = BIND_1;
-            packet_period = 200;         // No received data so restart binding procedure.
+            packet_period = DELAY_BIND_RST;         // No received data so restart binding procedure.
             break;
         }
         A7105_ReadData(packet, 16);
@@ -416,15 +418,16 @@ for (int i=0; i < 16; i++) {
 printf("\n");
 #endif
 //TODO
-if ((packet[0] + packet[1] + packet[2] + packet[3]) == 0) {
-    state = BIND_1;
-    packet_period = DELAY_POST_RX;         // No received data so restart binding procedure.
-    break;
-}
+        if ((packet[0] + packet[1] + packet[2] + packet[3]) == 0) {
+            state = BIND_1;
+            packet_period = DELAY_BIND_RST;         // No received data so restart binding procedure.
+            break;
+        }
         set_radio_data(1);
         A7105_WriteID(radio_data.radio_id);
         PROTOCOL_SetBindState(0);
         state = DATA_1;
+        packet_count = 0;
         channel_idx = 0;
         packet_period = DELAY_POST_RX;
         break;
@@ -450,17 +453,10 @@ printf("%09ld: state %d, channel %02x, mode %02x\n", CLOCK_getms(), state, radio
         break;
 
     case DATA_2:
-        mode = A7105_ReadReg(A7105_00_MODE);
-//TODO
-#if PRINTDEBUG
-printf("%09ld: state %d, channel %02x, mode %02x\n", CLOCK_getms(), state, radio_data.channels[channel_idx]-2, mode);
-#endif
-//TODO
         // wait here a bit for tx complete because
         // need to start rx immediately to catch return packet
         count = 20;
-        while (mode & 0x01) {
-            mode = A7105_ReadReg(A7105_00_MODE);
+        while (A7105_ReadReg(A7105_00_MODE) & 0x01) {
             if (count-- == 0) {
                 packet_period = DELAY_WAIT_TX;  // don't proceed until transmission complete
                 break;
@@ -471,9 +467,7 @@ printf("%09ld: state %d, channel %02x, mode %02x\n", CLOCK_getms(), state, radio
         A7105_WriteReg(A7105_03_FIFOI, FIFO_SIZE_RX);
         A7105_Strobe(A7105_RX);
 
-        packet_count += 1;
-        channel_idx += packet_count & 1;
-        channel_idx %= NUM_RFCHAN;
+        increment_counts();
         state = DATA_3;
         packet_period = DELAY_WAIT_RX;
         break;
