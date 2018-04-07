@@ -283,7 +283,7 @@ static void build_packet(u8 bind) {
 //    packet[20] = 0;
 //    packet[21] = 0;
 
-armed = GET_FLAG(CHANNEL_ARM, FLAG_ARM) ? 1 : 0; //TODO should be set when quad acknowledges
+    armed = GET_FLAG(CHANNEL_ARM, FLAG_ARM) ? 1 : 0;
 
 //TODO
 #if PRINTDEBUG
@@ -361,11 +361,6 @@ static u16 bugs3_cb() {
 
     switch(state) {
     case BIND_1:
-//TODO
-#if PRINTDEBUG
-printf("%09d: state %d, channel %02x\n", CLOCK_getms(), state, radio_data.channels[channel_idx]);
-#endif
-//TODO
         build_packet(1);
         A7105_Strobe(A7105_STANDBY);
         A7105_WriteReg(A7105_03_FIFOI, FIFO_SIZE_TX);
@@ -398,31 +393,20 @@ printf("%09d: state %d, channel %02x\n", CLOCK_getms(), state, radio_data.channe
         mode = A7105_ReadReg(A7105_00_MODE);
         A7105_Strobe(A7105_STANDBY);
         A7105_SetTxRxMode(TX_EN);
-//TODO
-#if PRINTDEBUG
-printf("%09d: state %d, radio_id %04lx, mode %02x\n", CLOCK_getms(), state, radio_data.radio_id, mode);
-#endif
-//TODO
+
         if (mode & 0x01) {
             state = BIND_1;
             packet_period = DELAY_BIND_RST;         // No received data so restart binding procedure.
             break;
         }
         A7105_ReadData(packet, 16);
-//TODO
-#if PRINTDEBUG
-printf("received ");
-for (int i=0; i < 16; i++) {
-  printf("%02x ", packet[i]);
-}
-printf("\n");
-#endif
-//TODO
         if ((packet[0] + packet[1] + packet[2] + packet[3]) == 0) {
             state = BIND_1;
             packet_period = DELAY_BIND_RST;         // No received data so restart binding procedure.
             break;
         }
+
+        A7105_Strobe(A7105_STANDBY);
         set_radio_data(1);
         A7105_WriteID(radio_data.radio_id);
         PROTOCOL_SetBindState(0);
@@ -435,19 +419,8 @@ printf("\n");
     case DATA_1:
         A7105_SetPower(Model.tx_power);
         build_packet(0);
-        A7105_Strobe(A7105_STANDBY);
         A7105_WriteReg(A7105_03_FIFOI, FIFO_SIZE_TX);
         A7105_WriteData(packet, PACKET_SIZE, radio_data.channels[channel_idx]);
-//TODO
-#if PRINTDEBUG
-mode = A7105_ReadReg(A7105_00_MODE); //TODO
-while (mode & 1) {
-printf("%09ld: state %d, channel %02x, mode %02x\n", CLOCK_getms(), state, radio_data.channels[channel_idx], mode);
-mode = A7105_ReadReg(A7105_00_MODE); //TODO
-} 
-printf("%09ld: state %d, channel %02x, mode %02x\n", CLOCK_getms(), state, radio_data.channels[channel_idx], mode);
-#endif
-//TODO
         state = DATA_2;
         packet_period = DELAY_POST_TX;
         break;
@@ -476,11 +449,7 @@ printf("%09ld: state %d, channel %02x, mode %02x\n", CLOCK_getms(), state, radio
         mode = A7105_ReadReg(A7105_00_MODE);
         A7105_Strobe(A7105_STANDBY);
         A7105_SetTxRxMode(TX_EN);
-//TODO
-#if PRINTDEBUG
-printf("%09ld: state %d, radio_id %04lx, mode %02x\n", CLOCK_getms(), state, radio_data.radio_id, mode);
-#endif
-//TODO
+
         if (!(mode & 0x01)) {
             A7105_ReadData(packet, 16);
 //TODO
