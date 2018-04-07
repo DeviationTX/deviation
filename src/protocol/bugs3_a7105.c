@@ -235,7 +235,7 @@ static int bugs3_init() {
     return 1;
 }
 
-static s16 get_channel(u8 ch, s32 scale, s32 center, s32 range) {
+static u16 get_channel(u8 ch, s32 scale, s32 center, s32 range) {
     s32 value = (s32)Channels[ch] * scale / CHAN_MAX_VALUE + center;
     if (value < center - range) value = center - range;
     if (value >= center + range) value = center + range;
@@ -247,6 +247,10 @@ static s16 get_channel(u8 ch, s32 scale, s32 center, s32 range) {
 static void build_packet(u8 bind) {
     u8 force_values = bind | !armed;
     u8 change_channel = ((packet_count & 0x1) << 6);
+    u16 aileron  = get_channel(CHANNEL1, 400, 400, 400);
+    u16 elevator = get_channel(CHANNEL2, 400, 400, 400);
+    u16 throttle = get_channel(CHANNEL3, 400, 400, 400);
+    u16 rudder   = get_channel(CHANNEL4, 400, 400, 400);
 
     memset(packet, 0, sizeof(packet));
     packet[0] = 0x3c | change_channel | (bind ? 0 : 0x80);
@@ -262,23 +266,27 @@ static void build_packet(u8 bind) {
                 | GET_FLAG(CHANNEL_PICTURE, FLAG_PICTURE)
                 | GET_FLAG(CHANNEL_LED,     FLAG_LED);
     }
-    packet[6] = force_values ? 100 : get_channel(CHANNEL1, 101, 100, 100);
-    packet[7] = force_values ? 100 : get_channel(CHANNEL2, 101, 100, 100);
-    packet[8] = force_values ?   0 : get_channel(CHANNEL3, 101, 100, 100);
-    packet[9] = force_values ? 100 : get_channel(CHANNEL4, 101, 100, 100);
+    packet[6] = force_values ? 100 : (aileron  >> 2);
+    packet[7] = force_values ? 100 : (elevator >> 2);
+    packet[8] = force_values ?   0 : (throttle >> 2);
+    packet[9] = force_values ? 100 : (rudder   >> 2);
     packet[10] = 100;
     packet[11] = 100;
     packet[12] = 100;
     packet[13] = 100;
 
-//    packet[14] = 0;
+    packet[14] = ((aileron  << 6) & 0xc0)
+               | ((elevator << 4) & 0x30)
+               | ((throttle << 2) & 0x0c)
+               | ((rudder       ) & 0x03);
+
 //    packet[15] = 0;
 
     // try driven trims
-    packet[16] = force_values ? 64 : packet[6] / 2 + 15;
-    packet[17] = force_values ? 64 : packet[7] / 2 + 15;
+    packet[16] = 64; //TODO force_values ? 64 : packet[6] / 2 + 15;
+    packet[17] = 64; //TODO force_values ? 64 : packet[7] / 2 + 15;
     packet[18] = 64;
-    packet[19] = force_values ? 64 : packet[9] / 2 + 15;
+    packet[19] = 64; //TODO force_values ? 64 : packet[9] / 2 + 15;
 
 //    packet[20] = 0;
 //    packet[21] = 0;
@@ -373,12 +381,14 @@ static u16 bugs3_cb() {
         // wait here a bit for tx complete because
         // need to start rx immediately to catch return packet
         count = 20;
+#ifndef EMULATOR
         while (A7105_ReadReg(A7105_00_MODE) & 0x01) {
             if (count-- == 0) {
                 packet_period = DELAY_WAIT_TX;  // don't proceed until transmission complete
                 break;
             }
         }
+#endif
         A7105_SetTxRxMode(RX_EN);
         A7105_WriteReg(A7105_0F_PLL_I, radio_data.channels[channel_idx] - 2);
         A7105_WriteReg(A7105_03_FIFOI, FIFO_SIZE_RX);
@@ -394,6 +404,7 @@ static u16 bugs3_cb() {
         A7105_Strobe(A7105_STANDBY);
         A7105_SetTxRxMode(TX_EN);
 
+#ifndef EMULATOR
         if (mode & 0x01) {
             state = BIND_1;
             packet_period = DELAY_BIND_RST;         // No received data so restart binding procedure.
@@ -405,6 +416,7 @@ static u16 bugs3_cb() {
             packet_period = DELAY_BIND_RST;         // No received data so restart binding procedure.
             break;
         }
+#endif
 
         A7105_Strobe(A7105_STANDBY);
         set_radio_data(1);
@@ -453,7 +465,7 @@ static u16 bugs3_cb() {
         if (!(mode & 0x01)) {
             A7105_ReadData(packet, 16);
 //TODO
-#if PRINTDEBUG
+#if 0
 printf("received ");
 for (int i=0; i < 16; i++) {
   printf("%02x ", packet[i]);
