@@ -242,6 +242,16 @@ static u16 get_channel(u8 ch, s32 scale, s32 center, s32 range) {
     return value;
 }
 
+static u8 get_checkbyte() {
+    u8 check = 0x6d;
+    u8 i;
+
+    for (i=1; i < PACKET_SIZE; i++)
+        check ^= packet[i];
+
+    return check;
+}
+
 #define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
 
 static void build_packet(u8 bind) {
@@ -253,7 +263,6 @@ static void build_packet(u8 bind) {
     u16 rudder   = get_channel(CHANNEL4, 400, 400, 400);
 
     memset(packet, 0, sizeof(packet));
-    packet[0] = 0x3c | change_channel | (bind ? 0 : 0x80);
     packet[1] = 0x76;
     packet[2] = 0x71;
     packet[3] = 0x94;
@@ -291,6 +300,7 @@ static void build_packet(u8 bind) {
 //    packet[20] = 0;
 //    packet[21] = 0;
 
+    packet[0] = get_checkbyte();
     armed = GET_FLAG(CHANNEL_ARM, FLAG_ARM) ? 1 : 0;
 
 //TODO
