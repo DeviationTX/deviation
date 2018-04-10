@@ -62,7 +62,8 @@ enum {
 #define CHANNEL_PICTURE     CHANNEL7
 
 // flags
-#define FLAG_ARM     0x40    // arm (turn on motors)
+#define FLAG_ARM     0x40    // arm (toggle to turn on motors)
+#define FLAG_DISARM  0x20    // disarm (toggle to turn off motors)
 #define FLAG_LED     0x80    // enable LEDs
 #define FLAG_PICTURE 0x01    // take picture
 
@@ -87,12 +88,13 @@ typedef struct {
 } radio_data_t;
 
 static radio_data_t radio_data;
-static s16 freq_offset;
 static u8 packet[PACKET_SIZE];
 static u8 channel_idx;
 static u8 state;
 static u8 packet_count;
-static u8 armed;
+static u8 armed, arm_flags;
+static u8 arm_channel_previous;
+static s16 freq_offset;
 
 enum {
     BIND_1,
@@ -252,6 +254,21 @@ static u8 get_checkbyte() {
     return check;
 }
 
+static void check_arming(s32 channel_value) {
+    u8 arm_channel = channel_value > 0;
+
+    if (arm_channel != arm_channel_previous) {
+        arm_channel_previous = arm_channel;
+        if (arm_channel) {
+            armed = 1;
+            arm_flags ^= FLAG_ARM;
+        } else {
+            armed = 0;
+            arm_flags ^= FLAG_DISARM;
+        }
+    }
+}
+
 #define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
 
 static void build_packet(u8 bind) {
@@ -267,11 +284,11 @@ static void build_packet(u8 bind) {
     packet[2] = 0x71;
     packet[3] = 0x94;
     packet[4] = 0x00 | change_channel | (bind ? 0x80 : 0);
+    check_arming(Channels[CHANNEL_ARM]);
     if (bind) {
-      packet[5] = 0x26;
+      packet[5] = 0x06 | arm_flags;
     } else {
-      packet[5] = 0x26
-                | GET_FLAG(CHANNEL_ARM,     FLAG_ARM)         // 0x40 set when armed
+      packet[5] = 0x06 | arm_flags
                 | GET_FLAG(CHANNEL_PICTURE, FLAG_PICTURE)
                 | GET_FLAG(CHANNEL_LED,     FLAG_LED);
     }
@@ -301,7 +318,6 @@ static void build_packet(u8 bind) {
 //    packet[21] = 0;
 
     packet[0] = get_checkbyte();
-    armed = GET_FLAG(CHANNEL_ARM, FLAG_ARM) ? 1 : 0;
 
 //TODO
 #if PRINTDEBUG
@@ -519,6 +535,8 @@ static void initialize(u8 bind) {
     channel_idx = 0;
     packet_count = 0;
     armed = 0;
+    arm_flags = FLAG_DISARM;    // initial value from captures
+    arm_channel_previous = Channels[CHANNEL_ARM] > 0;
     CLOCK_StartTimer(100, bugs3_cb);
 }
 
