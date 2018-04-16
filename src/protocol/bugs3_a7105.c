@@ -59,13 +59,18 @@ enum {
 
 #define CHANNEL_ARM         CHANNEL5
 #define CHANNEL_LED         CHANNEL6
-#define CHANNEL_PICTURE     CHANNEL7
+#define CHANNEL_FLIP        CHANNEL7
+#define CHANNEL_PICTURE     CHANNEL8
 
-// flags
+// flags packet byte 4
+#define FLAG_FLIP    0x08    // automatic flip
+                  // 0x04 is low/high speed select
+
+// flags packet byte 5
+#define FLAG_LED     0x80    // enable LEDs
 #define FLAG_ARM     0x40    // arm (toggle to turn on motors)
 #define FLAG_DISARM  0x20    // disarm (toggle to turn off motors)
-#define FLAG_LED     0x80    // enable LEDs
-#define FLAG_PICTURE 0x01    // take picture
+
 
 static const char * const bugs3_opts[] = {
     _tr_noop("Freq Tune"), "-300", "300", "655361", NULL, // big step 10, little step 1
@@ -283,15 +288,18 @@ static void build_packet(u8 bind) {
     packet[1] = 0x76;
     packet[2] = 0x71;
     packet[3] = 0x94;
-    packet[4] = 0x00 | change_channel | (bind ? 0x80 : 0);
-    check_arming(Channels[CHANNEL_ARM]);
+
+    check_arming(Channels[CHANNEL_ARM]);  // sets globals arm_flags and armed
     if (bind) {
+      packet[4] = change_channel | 0x80;
       packet[5] = 0x06 | arm_flags;
     } else {
+      packet[4] = change_channel
+                | GET_FLAG(CHANNEL_FLIP, FLAG_FLIP);
       packet[5] = 0x06 | arm_flags
-                | GET_FLAG(CHANNEL_PICTURE, FLAG_PICTURE)
                 | GET_FLAG(CHANNEL_LED,     FLAG_LED);
     }
+
     packet[6] = force_values ? 100 : (aileron  >> 2);
     packet[7] = force_values ? 100 : (elevator >> 2);
     packet[8] = force_values ?   0 : (throttle >> 2);
