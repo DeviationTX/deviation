@@ -50,7 +50,7 @@ enum {
     CHANNEL4,     // Rudder
     CHANNEL5,     // Arm
     CHANNEL6,     // LEDs
-    CHANNEL7,     // Picture
+    CHANNEL7,     // Flip
     CHANNEL8,     //
     CHANNEL9,     //
     CHANNEL10,    //
@@ -60,7 +60,7 @@ enum {
 #define CHANNEL_ARM         CHANNEL5
 #define CHANNEL_LED         CHANNEL6
 #define CHANNEL_FLIP        CHANNEL7
-#define CHANNEL_PICTURE     CHANNEL8
+//#define CHANNEL_PICTURE     CHANNEL8
 
 // flags packet byte 4
 #define FLAG_FLIP    0x08    // automatic flip
@@ -297,7 +297,7 @@ static void build_packet(u8 bind) {
       packet[4] = change_channel
                 | GET_FLAG(CHANNEL_FLIP, FLAG_FLIP);
       packet[5] = 0x06 | arm_flags
-                | GET_FLAG(CHANNEL_LED,     FLAG_LED);
+                | GET_FLAG(CHANNEL_LED, FLAG_LED);
     }
 
     packet[6] = force_values ? 100 : (aileron  >> 2);
