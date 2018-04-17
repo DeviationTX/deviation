@@ -64,7 +64,7 @@ enum {
 
 // flags packet byte 4
 #define FLAG_FLIP    0x08    // automatic flip
-                  // 0x04 is low/high speed select
+                  // 0x04 is low/high speed select (set is low speed)
 
 // flags packet byte 5
 #define FLAG_LED     0x80    // enable LEDs
