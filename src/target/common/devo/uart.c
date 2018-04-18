@@ -84,16 +84,39 @@ void UART_Stop()
 
 void UART_SetDataRate(u32 bps)
 {
-    switch (bps) {
-    case   9600:
-    case  57600:
-    case 115200:
-      break;
-    default:
-      bps = 115200;
-    }
+    if (bps > 2000000) bps = 2000000;
 
     usart_set_baudrate(_USART, bps);
+}
+
+void UART_SetFormat(int bits, uart_parity parity, uart_stopbits stopbits)
+{
+    // STM counts parity bit as part of databits length
+    // so bits and parity settings are interdependent.
+    if (bits == 8) {
+        if (parity == UART_PARITY_NONE) {
+            usart_set_databits(_USART, 8);
+            usart_set_parity(_USART, USART_PARITY_NONE);
+        } else {
+            usart_set_databits(_USART, 9);
+            if (parity == UART_PARITY_EVEN)
+                usart_set_parity(_USART, USART_PARITY_EVEN);
+            else
+                usart_set_parity(_USART, USART_PARITY_ODD);
+        }
+    } else if (bits == 7 && parity != UART_PARITY_NONE) {
+        usart_set_databits(_USART, 8);
+        if (parity == UART_PARITY_EVEN)
+            usart_set_parity(_USART, USART_PARITY_EVEN);
+        else
+            usart_set_parity(_USART, USART_PARITY_ODD);
+    }
+
+    switch (stopbits) {
+    case UART_STOPBITS_1:   usart_set_stopbits(_USART, USART_STOPBITS_1); break;
+    case UART_STOPBITS_1_5: usart_set_stopbits(_USART, USART_STOPBITS_1_5); break;
+    case UART_STOPBITS_2:   usart_set_stopbits(_USART, USART_STOPBITS_2); break;
+    }
 }
 
 static volatile u8 busy;

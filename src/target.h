@@ -178,10 +178,21 @@ void VIBRATINGMOTOR_Start();
 void VIBRATINGMOTOR_Stop();
 
 /* UART & Debug */
+typedef enum {
+    UART_STOPBITS_1,
+    UART_STOPBITS_1_5,
+    UART_STOPBITS_2,
+} uart_stopbits;
+typedef enum {
+    UART_PARITY_EVEN,
+    UART_PARITY_ODD,
+    UART_PARITY_NONE,
+} uart_parity;
 void UART_Initialize();
 void UART_Stop();
 u8 UART_Send(u8 *data, u16 len);
 void UART_SetDataRate(u32 bps);
+void UART_SetFormat(int bits, uart_parity parity, uart_stopbits stopbits);
 
 /* USB*/
 void USB_Enable(unsigned type, unsigned use_interrupt);
