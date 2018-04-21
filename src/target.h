@@ -188,11 +188,17 @@ typedef enum {
     UART_PARITY_ODD,
     UART_PARITY_NONE,
 } uart_parity;
+typedef enum {
+    UART_DUPLEX_FULL,
+    UART_DUPLEX_HALF,
+} uart_duplex;
 void UART_Initialize();
 void UART_Stop();
 u8 UART_Send(u8 *data, u16 len);
 void UART_SetDataRate(u32 bps);
 void UART_SetFormat(int bits, uart_parity parity, uart_stopbits stopbits);
+typedef void usart_callback_t(u8 ch, u8 status);
+void UART_SetReceive(usart_callback_t isr_callback);
 
 /* USB*/
 void USB_Enable(unsigned type, unsigned use_interrupt);

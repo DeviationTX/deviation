@@ -110,6 +110,8 @@ static const struct mcu_pin PROTO_MOSI_PIN  = _SPI_PROTO_MOSI_PIN;
     #define _USART_RCC_APB_ENR_USART_EN   RCC_APB2ENR_USART1EN
     #define _USART_GPIO                   GPIOA
     #define _USART_GPIO_USART_TX          GPIO_USART1_TX
+    #define _USART_GPIO_USART_RX          GPIO_USART1_RX
+    #define _USART_ISR                    usart1_isr
 #endif
 
 #ifndef SYSCLK_TIM // System-clock timer

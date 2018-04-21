@@ -32,20 +32,17 @@ void UART_Initialize()
     /* Enable DMA clock */
     rcc_peripheral_enable_clock(&RCC_AHBENR, _RCC_AHBENR_DMAEN);
 
-    /* Setup GPIO pin GPIO_USARTX_TX on USART GPIO port for transmit. */
+    /* Setup GPIO pin GPIO_USARTX_TX on USART GPIO port for transmit.
+       Set normal function to input as this is mode reverted to in half-duplex receive */
+    gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, _USART_GPIO_USART_TX);
     gpio_set_mode(_USART_GPIO, GPIO_MODE_OUTPUT_50_MHZ,
                     GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, _USART_GPIO_USART_TX);
-    //gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT,
-                  //GPIO_USART1_RX);
 
     /* Setup UART parameters. */
-    usart_set_baudrate(_USART, 115200);
-    usart_set_databits(_USART, 8);
-    usart_set_stopbits(_USART, USART_STOPBITS_1);
-    usart_set_parity(_USART, USART_PARITY_NONE);
+    UART_SetDataRate(115200);
+    UART_SetFormat(8, UART_PARITY_NONE, UART_STOPBITS_1);
     usart_set_flow_control(_USART, USART_FLOWCONTROL_NONE);
-    usart_set_mode(_USART, USART_MODE_TX);
-    //usart_set_mode(USART1, USART_MODE_TX_RX);
+    usart_set_mode(_USART, USART_MODE_TX_RX);
 
     /* Finally enable the USART. */
     usart_enable(_USART);
@@ -151,4 +148,38 @@ void _USART_DMA_ISR(void)
     dma_disable_channel(_USART_DMA, _USART_DMA_CHANNEL);
 
     busy = 0;
+}
+
+static usart_callback_t *rx_callback;
+void _USART_ISR(void)
+{
+	u8 status = USART_SR(_USART) & (USART_SR_RXNE | USART_SR_PE | USART_SR_FE | USART_SR_NE | USART_SR_ORE) ;
+    u8 data = usart_recv(_USART);       // read unconditionally to reset interrupt and error flags
+
+    if (rx_callback) rx_callback(data, status);
+
+    // interrupt cleared by reading data register
+}
+
+/* Enable serial data reception by providing a callback function
+   to accept received character and status. Disable by calling with argument NULL.
+   Callback executes in interrupt context and must be short.
+*/
+void UART_SetReceive(usart_callback_t *isr_callback)
+{
+    rx_callback = isr_callback;
+
+    if (isr_callback)
+        usart_enable_rx_interrupt(_USART);
+    else
+        usart_disable_rx_interrupt(_USART);
+}
+
+
+void UART_SetDuplex(uart_duplex duplex)
+{
+    if (duplex == UART_DUPLEX_FULL)
+        USART_CR3(_USART) &= ~USART_CR3_HDSEL;
+    else
+        USART_CR3(_USART) |= USART_CR3_HDSEL;
 }
