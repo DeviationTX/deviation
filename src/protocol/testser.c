@@ -144,7 +144,7 @@ static void initialize()
 #endif
 
     check_options(1);
-    UART_SetReceive(isr_callback);
+    UART_StartReceive(isr_callback);
     CLOCK_StartTimer(10000, serial_cb);
 }
 

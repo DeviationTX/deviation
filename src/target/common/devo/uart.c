@@ -74,7 +74,7 @@ void UART_Initialize()
 
 void UART_Stop()
 {
-    UART_SetReceive(NULL);
+    UART_StopReceive();
     nvic_disable_irq(_USART_NVIC_DMA_CHANNEL_IRQ);
     usart_set_mode(_USART, 0);
     usart_disable(_USART);
@@ -167,7 +167,7 @@ void _USART_ISR(void)
    to accept received character and status. Disable by calling with argument NULL.
    Callback executes in interrupt context and must be short.
 */
-void UART_SetReceive(usart_callback_t *isr_callback)
+void UART_StartReceive(usart_callback_t *isr_callback)
 {
     rx_callback = isr_callback;
 
@@ -180,6 +180,10 @@ void UART_SetReceive(usart_callback_t *isr_callback)
     }
 }
 
+void UART_StopReceive()
+{
+    UART_StartReceive(NULL);
+}
 
 void UART_SetDuplex(uart_duplex duplex)
 {

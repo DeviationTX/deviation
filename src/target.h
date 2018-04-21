@@ -200,7 +200,8 @@ u8 UART_Send(u8 *data, u16 len);
 void UART_SetDataRate(u32 bps);
 void UART_SetFormat(int bits, uart_parity parity, uart_stopbits stopbits);
 typedef void usart_callback_t(u8 ch, u8 status);
-void UART_SetReceive(usart_callback_t isr_callback);
+void UART_StartReceive(usart_callback_t isr_callback);
+void UART_StopReceive();
 void UART_SetDuplex(uart_duplex duplex);
 
 /* USB*/
