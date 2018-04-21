@@ -192,6 +192,8 @@ typedef enum {
     UART_DUPLEX_FULL,
     UART_DUPLEX_HALF,
 } uart_duplex;
+#define UART_RX_RXNE (1 << 5)  //USART_SR_RXNE
+//#define     USART_SR_RXNE   (1 << 5)
 void UART_Initialize();
 void UART_Stop();
 u8 UART_Send(u8 *data, u16 len);

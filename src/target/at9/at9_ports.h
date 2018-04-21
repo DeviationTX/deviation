@@ -31,6 +31,7 @@
     #define _USART_GPIO_USART_TX          GPIO_USART1_TX
     #define _USART_GPIO_USART_RX          GPIO_USART1_RX
     #define _USART_ISR                    usart1_isr
+    #define _USART_NVIC_USART_IRQ         NVIC_USART1_IRQ
 #endif
 
 #define ADC_OVERSAMPLE_WINDOW_COUNT 1

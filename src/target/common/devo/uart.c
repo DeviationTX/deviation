@@ -34,6 +34,7 @@ void UART_Initialize()
 
     /* Setup GPIO pin GPIO_USARTX_TX on USART GPIO port for transmit.
        Set normal function to input as this is mode reverted to in half-duplex receive */
+    gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, _USART_GPIO_USART_RX);
     gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, _USART_GPIO_USART_TX);
     gpio_set_mode(_USART_GPIO, GPIO_MODE_OUTPUT_50_MHZ,
                     GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, _USART_GPIO_USART_TX);
@@ -73,6 +74,7 @@ void UART_Initialize()
 
 void UART_Stop()
 {
+    UART_SetReceive(NULL);
     nvic_disable_irq(_USART_NVIC_DMA_CHANNEL_IRQ);
     usart_set_mode(_USART, 0);
     usart_disable(_USART);
@@ -169,10 +171,13 @@ void UART_SetReceive(usart_callback_t *isr_callback)
 {
     rx_callback = isr_callback;
 
-    if (isr_callback)
+    if (isr_callback) {
+        nvic_enable_irq(_USART_NVIC_USART_IRQ);
         usart_enable_rx_interrupt(_USART);
-    else
+    } else {
         usart_disable_rx_interrupt(_USART);
+        nvic_disable_irq(_USART_NVIC_USART_IRQ);
+    }
 }
 
 
