@@ -82,7 +82,6 @@ u8 UART_Send(u8 *data, u16 len) { (void)data; (void)len; return 0;}
 void UART_Stop() {}
 void UART_SetDataRate(u32 bps) { (void)bps;}
 void UART_SetFormat(int bits, uart_parity parity, uart_stopbits stopbits) {(void) bits; (void) parity; (void) stopbits;};
-// typedef void usart_callback_t(u8 ch, u8 status);
 void UART_SetReceive(usart_callback_t isr_callback) {(void) isr_callback;};
 void UART_SetDuplex(uart_duplex duplex) {(void) duplex;};
 
