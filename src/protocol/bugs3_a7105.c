@@ -317,10 +317,10 @@ static void build_packet(u8 bind) {
 //    packet[15] = 0;
 
     // try driven trims
-    packet[16] = 64; //TODO force_values ? 64 : packet[6] / 2 + 15;
-    packet[17] = 64; //TODO force_values ? 64 : packet[7] / 2 + 15;
+    packet[16] = force_values ? 64 : packet[6] / 13 + 0x22;
+    packet[17] = force_values ? 64 : packet[7] / 13 + 0x22;
     packet[18] = 64;
-    packet[19] = 64; //TODO force_values ? 64 : packet[9] / 2 + 15;
+    packet[19] = force_values ? 64 : packet[9] / 13 + 0x22;
 
 //    packet[20] = 0;
 //    packet[21] = 0;
