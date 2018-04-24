@@ -358,14 +358,20 @@ static int get_tx_id()
 
 static void set_radio_data(u8 index) {
     // captured radio data for bugs rx/tx version A2
+    // it appears that the hopping frequencies are determined by the txid
+    // and the data phase radio id is determined by the first 2 or 3 bytes of the
+    // rx bind packet
     radio_data_t fixed_radio_data[] = {
             // bind phase
             {0xac59a453, {0x1d, 0x3b, 0x4d, 0x29, 0x11, 0x2d, 0x0b, 0x3d,
                           0x59, 0x48, 0x17, 0x41, 0x23, 0x4e, 0x2a, 0x63}},
-            // data phase if rx responds 1d 5b 2c 7f 00 00 00 00 00 00 ff 87 00 00 00 00,
+            // data phase for txid 767194 if rx responds C6 BB 57 7F 00 00 00 00 00 00 FF 87 40 00 00 00
+            {0xA4C56AB4, {0x4b, 0x19, 0x35, 0x1e, 0x63, 0x0f, 0x45, 0x21,
+                          0x51, 0x3a, 0x5d, 0x25, 0x0a, 0x44, 0x61, 0x27}},
+            // data phase for txid 767194 if rx responds A3 1E D7 7f 00 00 00 00 00 00 ff 87 00 00 00 00
             {0x57358d96, {0x4b, 0x19, 0x35, 0x1e, 0x63, 0x0f, 0x45, 0x21,
-                          0x51, 0x3a, 0x5d, 0x25, 0x0a, 0x44, 0x61, 0x27}}
-            // data phase if rx responds 1d 5b 2c 7f 00 00 00 00 00 00 ff 87 00 00 00 00,
+                          0x51, 0x3a, 0x5d, 0x25, 0x0a, 0x44, 0x61, 0x27}},
+            // data phase if rx responds 1d 5b 2c 7f 00 00 00 00 00 00 ff 87 00 00 00 00
 // A1 version capture            {0x56926d94, {0x27, 0x4b, 0x1c, 0x63, 0x25, 0x0a, 0x57}},
     };
     memcpy(&radio_data, &fixed_radio_data[index], sizeof(radio_data_t));
