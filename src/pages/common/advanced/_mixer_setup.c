@@ -327,6 +327,7 @@ const char *set_mux_cb(guiObject_t *obj, int dir, void *data)
         case MUX_MAX:      return _tr("max");
         case MUX_MIN:      return _tr("min");
         case MUX_DELAY:    return _tr("delay");
+        case MUX_BEEP:     return _tr("beep");
         case MUX_LAST: break;
     }
     return "";
