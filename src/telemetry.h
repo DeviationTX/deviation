@@ -10,6 +10,7 @@
 
 
 enum {
+    TELEM_CRSF,
     TELEM_FRSKY,
     TELEM_DEVO,
     TELEM_DSM,
@@ -95,6 +96,7 @@ enum {
     TELEM_DSM_LAST,
 };
 
+
 // FrSky telemetry stream state machine
 typedef enum {
   TS_IDLE = 0,  // waiting for 0x5e frame marker
@@ -137,13 +139,43 @@ typedef enum {
     TELEM_FRSKY_LAST
 } frsky_telem_t;
 
-#define TELEM_VALS        (((int)TELEM_DSM_LAST > (int)TELEM_DEVO_LAST)            \
-                               ? (((int)TELEM_DSM_LAST > (int)TELEM_FRSKY_LAST)    \
-                                   ? (int)TELEM_DSM_LAST : (int)TELEM_FRSKY_LAST)  \
-                               : (((int)TELEM_DEVO_LAST > (int)TELEM_FRSKY_LAST)   \
-                                   ? (int)TELEM_DEVO_LAST : (int)TELEM_FRSKY_LAST) \
-                          )
+
+
+/*******************************
+  Crossfire
+********************************/
+typedef enum {
+    TELEM_CRSF_RX_RSSI1 = 1,
+    TELEM_CRSF_RX_RSSI2,
+    TELEM_CRSF_RX_QUALITY,
+    TELEM_CRSF_RX_SNR,
+    TELEM_CRSF_RX_ANTENNA,
+    TELEM_CRSF_RF_MODE,
+    TELEM_CRSF_TX_POWER,
+    TELEM_CRSF_TX_RSSI,
+    TELEM_CRSF_TX_QUALITY,
+    TELEM_CRSF_TX_SNR,
+    TELEM_CRSF_BATT_VOLTAGE,
+    TELEM_CRSF_BATT_CURRENT,
+    TELEM_CRSF_BATT_CAPACITY,
+    TELEM_CRSF_GPS_LATITUDE,
+    TELEM_CRSF_GPS_LONGITUDE,
+    TELEM_CRSF_GPS_GROUND_SPEED,
+    TELEM_CRSF_GPS_HEADING,
+    TELEM_CRSF_GPS_ALTITUDE,
+    TELEM_CRSF_GPS_SATELLITES,
+    TELEM_CRSF_ATTITUDE_PITCH,
+    TELEM_CRSF_ATTITUDE_ROLL,
+    TELEM_CRSF_ATTITUDE_YAW,
+    TELEM_CRSF_FLIGHT_MODE,
+    TELEM_CRSF_LAST
+} crossfire_telem_t;
+
+
+#define MAX4(A,B,C,D) (((A)>(B))?((A)>(C))?((A)>(D))?(A):(D):((C)>(D))?(C):(D):((B)>(C))?((B)>(D))?(B):(D):((C)>(D))?(C):(D))
+#define TELEM_VALS   MAX4(((int)TELEM_DSM_LAST), ((int)TELEM_DEVO_LAST), ((int)TELEM_FRSKY_LAST), ((int)TELEM_CRSF_LAST))
 #define NUM_TELEM   TELEM_VALS - 1
+
 enum {
     TELEM_GPS_LAT = TELEM_VALS,
     TELEM_GPS_LONG,

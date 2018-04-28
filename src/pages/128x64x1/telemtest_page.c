@@ -102,6 +102,8 @@ enum {
     DSM_LABEL,
     CELLS_LABEL,
     MISC_LABEL,
+    RX_LABEL,
+    TX_LABEL,
     ARROW_LABEL = 0xff,
 };
 
@@ -255,6 +257,49 @@ const struct telem_layout frsky_layout_basic[] = {
     {0, 0, 0, 0},
 };
 
+
+#if HAS_EXTENDED_TELEMETRY
+const struct telem_layout crsf_header_basic[] = {
+    {TYPE_HEADER, ITEM1_X, ITEM1_WIDTH, RX_LABEL},
+    {TYPE_HEADER, ITEM2_X, ITEM1_WIDTH, TX_LABEL},
+    {TYPE_HEADER, ITEM3_X, ITEM1_WIDTH, BATT_LABEL},
+    {TYPE_HEADER, ARROW_X, ARROW_W,     ARROW_LABEL},
+    {0, 0, 0, 0},
+};
+
+const struct telem_layout crsf_layout_basic[] = {
+    {TYPE_INDEX | 0, LBL1_X, LBL1_WIDTH,  1},
+    {TYPE_VALUE | 0, FRSKY1_X, FRSKY1_WIDTH, TELEM_CRSF_RX_RSSI1},
+    {TYPE_VALUE | 0, FRSKY2_X, FRSKY1_WIDTH, TELEM_CRSF_TX_RSSI},
+    {TYPE_VALUE | 0, FRSKY3_X, FRSKY1_WIDTH, TELEM_CRSF_BATT_VOLTAGE},
+
+    {TYPE_INDEX | 1, LBL1_X, LBL1_WIDTH,  2},
+    {TYPE_VALUE | 1, FRSKY1_X, FRSKY1_WIDTH, TELEM_CRSF_RX_RSSI2},
+    {TYPE_VALUE | 1, FRSKY2_X, FRSKY1_WIDTH, TELEM_CRSF_TX_POWER},
+    {TYPE_VALUE | 1, FRSKY3_X, FRSKY1_WIDTH, TELEM_CRSF_BATT_CURRENT},
+
+    {TYPE_INDEX | 2, LBL1_X, LBL1_WIDTH,  3},
+    {TYPE_VALUE | 2, FRSKY1_X, FRSKY1_WIDTH, TELEM_CRSF_RX_SNR},
+    {TYPE_VALUE | 2, FRSKY2_X, FRSKY1_WIDTH, TELEM_CRSF_TX_SNR},
+    {TYPE_VALUE | 2, FRSKY3_X, FRSKY1_WIDTH, TELEM_CRSF_BATT_CAPACITY},
+
+    {TYPE_INDEX | 3, LBL1_X, LBL1_WIDTH, 4},
+    {TYPE_VALUE | 3, FRSKY1_X, FRSKY1_WIDTH, TELEM_CRSF_RX_QUALITY},
+    {TYPE_VALUE | 3, FRSKY2_X, FRSKY1_WIDTH, TELEM_CRSF_TX_QUALITY},
+    {TYPE_VALUE | 3, FRSKY3_X, FRSKY1_WIDTH, TELEM_CRSF_FLIGHT_MODE},
+
+    {TYPE_INDEX | 4, LBL1_X, LBL1_WIDTH, 5},
+    {TYPE_VALUE | 4, FRSKY1_X, FRSKY1_WIDTH, TELEM_CRSF_ATTITUDE_PITCH},
+    {TYPE_VALUE | 4, FRSKY2_X, FRSKY1_WIDTH, TELEM_CRSF_ATTITUDE_ROLL},
+    {TYPE_VALUE | 4, FRSKY3_X, FRSKY1_WIDTH, TELEM_CRSF_ATTITUDE_YAW},
+
+    {TYPE_INDEX | 5, LBL1_X, LBL1_WIDTH, 6},
+    {TYPE_VALUE | 5, FRSKY1_X, FRSKY1_WIDTH, TELEM_CRSF_RF_MODE},
+
+    {0, 0, 0, 0},
+};
+#endif //HAS_EXTENDED_TELEMETRY
+
 const struct telem_layout2 devo_page[] = {
     {devo_header_basic, devo_layout_basic, 4, 1},
     {devo_header_gps, devo_layout_gps, 3, 4},
@@ -271,6 +316,13 @@ const struct telem_layout2 frsky_page[] = {
 #endif
     {devo_header_gps, devo_layout_gps, 3, 4},
 };
+#if HAS_EXTENDED_TELEMETRY
+const struct telem_layout2 crsf_page[] = {
+    {crsf_header_basic, crsf_layout_basic, 6, 1},
+    {devo_header_gps, devo_layout_gps, 3, 4},
+};
+#endif //HAS_EXTENDED_TELEMETRY
+
 static const char *header_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
@@ -288,6 +340,8 @@ static const char *header_cb(guiObject_t *obj, const void *data)
         case H_LABEL: return "H";
         case RXV_LABEL: return "RxV";
         case BATT_LABEL: return "Bat";
+        case RX_LABEL: return _tr("RX");
+        case TX_LABEL: return _tr("TX");
         case DSM_LABEL: return "DSM";
 #if HAS_EXTENDED_TELEMETRY
         case CELLS_LABEL:return "Cells";
@@ -333,12 +387,14 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 static const struct telem_layout2 *_get_telem_layout2()
 {
     const struct telem_layout2 *page;
-    if (TELEMETRY_Type() == TELEM_DEVO)
-        page = &devo_page[current_page];
-    else if (TELEMETRY_Type() == TELEM_DSM)
-        page = &dsm_page[current_page];
-    else
-        page = &frsky_page[current_page];
+    switch (TELEMETRY_Type()) {
+    case TELEM_DEVO:   page = &devo_page[current_page]; break;
+    case TELEM_DSM:    page = &dsm_page[current_page]; break;
+    case TELEM_FRSKY:  page = &frsky_page[current_page]; break;
+#if HAS_EXTENDED_TELEMETRY
+    case TELEM_CRSF:   page = &crsf_page[current_page]; break;
+#endif //HAS_EXTENDED_TELEMETRY
+    }
     return page;
 }
 
@@ -346,9 +402,7 @@ static void _show_page()
 {
     const struct telem_layout2 *page = _get_telem_layout2();
     PAGE_RemoveAllObjects();
-    PAGE_ShowHeader((page->header==devo_header_basic
-                     || page->header==frsky_header_basic)
-                    ? "" : _tr("Telemetry monitor"));
+    PAGE_ShowHeader(page->header == dsm_header_basic ? _tr("Telemetry monitor") : "");
     tp->font = TINY_FONT;
     tp->font.style = LABEL_SQUAREBOX;
     long i = 0;

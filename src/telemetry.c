@@ -24,10 +24,12 @@ static void _get_altitude_str(char *str, s32 value, u8 decimals, char units);
 #include "telemetry/telem_devo.c"
 #include "telemetry/telem_dsm.c"
 #include "telemetry/telem_frsky.c"
+#include "telemetry/telem_crsf.c"
 
 #define CAP_DSM   1
 #define CAP_FRSKY 2
-#define CAP_TYPEMASK 0x03
+#define CAP_CRSF  4
+#define CAP_TYPEMASK 0x07
 
 struct Telemetry Telemetry;
 static u8 k = 0; // telem_idx
@@ -128,11 +130,13 @@ s32 _TELEMETRY_GetValue(struct Telemetry *t, int idx)
     case TELEM_GPS_SATCOUNT:
         return t->gps.satcount;
     }
-    if (TELEMETRY_Type() == TELEM_DEVO)
-        return _devo_value(t, idx);
-    if (TELEMETRY_Type() == TELEM_DSM)
-        return _dsm_value(t, idx);
-    return _frsky_value(t, idx);
+    switch (TELEMETRY_Type()) {
+    case TELEM_DEVO: return _devo_value(t, idx);
+    case TELEM_DSM: return _dsm_value(t, idx);
+    case TELEM_FRSKY: return _frsky_value(t, idx);
+    case TELEM_CRSF: return _crsf_value(t, idx);
+    }
+    return 0;
 }
 
 const char * TELEMETRY_GetValueStrByValue(char *str, int idx, s32 value)
@@ -202,11 +206,12 @@ const char * TELEMETRY_GetValueStrByValue(char *str, int idx, s32 value)
         case TELEM_GPS_SATCOUNT:    _get_value_str(str, value, 0, '\0'); break;
         case TELEM_GPS_HEADING:     _get_value_str(str, value, 1, '\0'); break;
         default:
-            if (TELEMETRY_Type() == TELEM_DEVO)
-                return _devo_str_by_value(str, idx, value);
-            if (TELEMETRY_Type() == TELEM_DSM)
-                return _dsm_str_by_value(str, idx, value);
-            return _frsky_str_by_value(str, idx, value);
+            switch (TELEMETRY_Type()) {
+            case TELEM_DEVO:  return _devo_str_by_value(str, idx, value);
+            case TELEM_DSM:   return _dsm_str_by_value(str, idx, value);
+            case TELEM_FRSKY: return _frsky_str_by_value(str, idx, value);
+            case TELEM_CRSF:  return _crsf_str_by_value(str, idx, value);
+            }
     }
     return str;
 }
@@ -219,11 +224,13 @@ const char * TELEMETRY_GetValueStr(char *str, int idx)
 
 const char * TELEMETRY_Name(char *str, int idx)
 {
-    if (TELEMETRY_Type() == TELEM_DEVO)
-        return _devo_name(str, idx);
-    if (TELEMETRY_Type() == TELEM_DSM)
-        return _dsm_name(str, idx);
-    return _frsky_name(str, idx);
+    switch (TELEMETRY_Type()) {
+    case TELEM_DEVO:  return _devo_name(str, idx);
+    case TELEM_DSM:   return _dsm_name(str, idx);
+    case TELEM_FRSKY: return _frsky_name(str, idx);
+    case TELEM_CRSF:  return _crsf_name(str, idx);
+    }
+    return NULL;
 }
 
 const char * TELEMETRY_ShortName(char *str, int idx)
@@ -237,29 +244,34 @@ const char * TELEMETRY_ShortName(char *str, int idx)
         case TELEM_GPS_SATCOUNT:strcpy(str, _tr("SatCount")); break;
         case TELEM_GPS_HEADING: strcpy(str, _tr("Heading")); break;
         default:
-            if (TELEMETRY_Type() == TELEM_DEVO)
-                return _devo_short_name(str, idx);
-            if (TELEMETRY_Type() == TELEM_DSM)
-                return _dsm_short_name(str, idx);
-            return _frsky_short_name(str, idx);
+            switch (TELEMETRY_Type()) {
+            case TELEM_DEVO:  return _devo_short_name(str, idx);
+            case TELEM_DSM:   return _dsm_short_name(str, idx);
+            case TELEM_FRSKY: return _frsky_short_name(str, idx);
+            case TELEM_CRSF:  return _crsf_short_name(str, idx);
+            }
     }
     return str;
 }
 s32 TELEMETRY_GetMaxValue(int idx)
 {
-    if (TELEMETRY_Type() == TELEM_DEVO)
-        return _devo_get_max_value(idx);
-    if (TELEMETRY_Type() == TELEM_DSM)
-        return _dsm_get_max_value(idx);
-    return _frsky_get_max_value(idx);
+    switch (TELEMETRY_Type()) {
+    case TELEM_DEVO:  return _devo_get_max_value(idx);
+    case TELEM_DSM:   return _dsm_get_max_value(idx);
+    case TELEM_FRSKY: return _frsky_get_max_value(idx);
+    case TELEM_CRSF:  return _crsf_get_max_value(idx);
+    }
+    return 0;
 }
 s32 TELEMETRY_GetMinValue(int idx)
 {
-    if (TELEMETRY_Type() == TELEM_DEVO)
-        return _devo_get_min_value(idx);
-    if (TELEMETRY_Type() == TELEM_DSM)
-        return _dsm_get_min_value(idx);
-    return _frsky_get_min_value(idx);
+    switch (TELEMETRY_Type()) {
+    case TELEM_DEVO:  return _devo_get_min_value(idx);
+    case TELEM_DSM:   return _dsm_get_min_value(idx);
+    case TELEM_FRSKY: return _frsky_get_min_value(idx);
+    case TELEM_CRSF:  return _crsf_get_min_value(idx);
+    }
+    return 0;
 }
 
 void TELEMETRY_SetUpdated(int idx)
@@ -273,6 +285,8 @@ int TELEMETRY_Type()
         return TELEM_DSM;
     if (Telemetry.capabilities & CAP_FRSKY)
         return TELEM_FRSKY;
+    if (Telemetry.capabilities & CAP_CRSF)
+        return TELEM_CRSF;
     return TELEM_DEVO;
 }
 
@@ -282,6 +296,8 @@ int TELEMETRY_GetNumTelemSrc()
         return TELEM_DEVO_LAST-1;
     if (TELEMETRY_Type() == TELEM_DSM)
         return TELEM_DSM_LAST-1;
+    if (TELEMETRY_Type() == TELEM_CRSF)
+        return TELEM_CRSF_LAST-1;
     return TELEM_FRSKY_LAST-1;
 }
 
@@ -292,6 +308,8 @@ void TELEMETRY_SetType(int type)
         cap |= CAP_DSM;
     if (type == TELEM_FRSKY)
         cap |= CAP_FRSKY;
+    if (type == TELEM_CRSF)
+        cap |= CAP_CRSF;
     Telemetry.capabilities = cap;
 }
 
@@ -434,6 +452,19 @@ void TELEMETRY_Alarm()
                 default: MUSIC_PlayValue(MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + k), TELEMETRY_GetValue(Model.telem_alarm[k]),VOICE_UNIT_NONE,0);
             }
         }
+
+#if HAS_EXTENDED_TELEMETRY
+        if (TELEMETRY_Type() == TELEM_CRSF) {
+            switch(Model.telem_alarm[k]) {
+                case TELEM_CRSF_BATT_VOLTAGE:
+                    MUSIC_PlayValue(MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + k), TELEMETRY_GetValue(Model.telem_alarm[k]),VOICE_UNIT_VOLT,2); break;
+                case TELEM_CRSF_BATT_CURRENT: MUSIC_PlayValue(MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + k), TELEMETRY_GetValue(Model.telem_alarm[k]),VOICE_UNIT_AMPS,2); break;
+                case TELEM_CRSF_GPS_ALTITUDE: MUSIC_PlayValue(MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + k), TELEMETRY_GetValue(Model.telem_alarm[k]),VOICE_UNIT_ALTITUDE,2); break;
+                default: MUSIC_PlayValue(MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + k), TELEMETRY_GetValue(Model.telem_alarm[k]),VOICE_UNIT_NONE,0);
+            }
+        }
+#endif //HAS_EXTENDED_TELEMETRY
+
 #else
         MUSIC_Play(MUSIC_TELEMALARM1 + k);
 #endif //HAS_EXTENDED_AUDIO

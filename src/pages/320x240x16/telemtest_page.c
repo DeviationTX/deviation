@@ -87,6 +87,34 @@ const struct telem_layout frsky_layout[] = {
           {{0, 220, 55, 18}, {60, 220, 140, 18}, TELEM_GPS_TIME},
           {{0, 0, 0, 0}, {0, 0, 0, 0}, 0},
 };
+const struct telem_layout crsf_layout[] = {
+          {{15, 40, 40, 18}, {60, 40, 40, 18}, TELEM_CRSF_RX_RSSI1},
+          {{15, 60, 40, 18}, {60, 60, 40, 18}, TELEM_CRSF_RX_RSSI2},
+          {{15, 80, 40, 18}, {60, 80, 40, 18}, TELEM_CRSF_RX_SNR},
+          {{15, 100, 40, 18}, {60, 100, 40, 18}, TELEM_CRSF_RX_QUALITY},
+          {{15, 120, 40, 18}, {60, 120, 40, 18}, TELEM_CRSF_ATTITUDE_PITCH},
+
+          {{115, 40, 40, 18}, {160, 40, 40, 18}, TELEM_CRSF_TX_RSSI},
+          {{115, 60, 40, 18}, {160, 60, 40, 18}, TELEM_CRSF_TX_POWER},
+          {{115, 80, 40, 18}, {160, 80, 40, 18}, TELEM_CRSF_TX_SNR},
+          {{115, 100, 40, 18}, {160, 100, 40, 18}, TELEM_CRSF_TX_QUALITY},
+          {{115, 120, 40, 18}, {160, 120, 40, 18}, TELEM_CRSF_ATTITUDE_ROLL},
+
+          {{210, 40, 40, 18}, {253, 40, 40, 18}, TELEM_CRSF_BATT_VOLTAGE},
+          {{210, 60, 40, 18}, {253, 60, 40, 18}, TELEM_CRSF_BATT_CURRENT},
+          {{210, 80, 40, 18}, {253, 80, 40, 18}, TELEM_CRSF_BATT_CAPACITY},
+          {{210, 100, 40, 18}, {253, 100, 40, 18}, TELEM_CRSF_FLIGHT_MODE},
+          {{210, 120, 40, 18}, {253, 120, 40, 18}, TELEM_CRSF_ATTITUDE_YAW},
+          {{210, 140, 40, 18}, {253, 140, 40, 18}, TELEM_CRSF_RF_MODE},
+
+          {{0, 140, 55, 18}, {60, 140, 140, 18}, TELEM_GPS_LAT},
+          {{0, 160, 55, 18}, {60, 160, 140, 18}, TELEM_GPS_LONG},
+          {{0, 180, 55, 18}, {60, 180, 140, 18}, TELEM_GPS_ALT},
+          {{0, 200, 55, 18}, {60, 200, 140, 18}, TELEM_GPS_SPEED},
+          {{0, 220, 55, 18}, {60, 220, 140, 18}, TELEM_GPS_TIME},
+          {{210, 180, 55, 18}, {258, 180, 30, 18}, TELEM_GPS_SATCOUNT},
+          {{0, 0, 0, 0}, {0, 0, 0, 0}, 0},
+};
 const struct telem_layout dsm_layout[] = {
           {{15, 40, 40, 18}, {60, 40, 40, 18}, TELEM_DSM_FLOG_FADESA},
           {{15, 60, 40, 18}, {60, 60, 40, 18}, TELEM_DSM_FLOG_FADESB},
@@ -107,14 +135,13 @@ const struct telem_layout dsm_layout[] = {
 };
 static const struct telem_layout *_get_layout()
 {
-    const struct telem_layout *layout;
-    if (TELEMETRY_Type() == TELEM_DEVO)
-        layout = devo8_layout;
-    else if (TELEMETRY_Type() == TELEM_FRSKY)
-        layout = frsky_layout;
-    else
-        layout = dsm_layout;
-    return layout;
+    switch (TELEMETRY_Type()) {
+    case TELEM_DEVO:  return devo8_layout;
+    case TELEM_DSM:   return dsm_layout;
+    case TELEM_FRSKY: return frsky_layout;
+    case TELEM_CRSF:  return crsf_layout;
+    }
+    return NULL;
 }
 
 static void show_page()

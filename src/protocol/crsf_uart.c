@@ -32,12 +32,36 @@
   const unsigned long protocol_type = (unsigned long)&_data_loadaddr;
 #endif
 
-#define CRSF_CHANNELS 16
-#define CRSF_PACKET_SIZE 26
-#define CRSF_SYNC_BYTE 0xc8
-#define CRSF_TYPE_RCDATA 0x16
+#define CRSF_DATARATE             400000
+#define CRSF_FRAME_PERIOD         4000   // 4ms
+#define CRSF_CHANNELS             16
+#define CRSF_PACKET_SIZE          26
+#define CRSF_SYNC_BYTE            0xc8
+#define CRSF_TYPE_RCDATA          0x16
 
-static u8 packet[CRSF_PACKET_SIZE];
+// Device addresses
+#define BROADCAST_ADDRESS              0x00
+#define RADIO_ADDRESS                  0xEA
+#define MODULE_ADDRESS                 0xEE
+
+// Received Frame id
+#define GPS_ID                         0x02
+#define BATTERY_ID                     0x08
+#define LINK_ID                        0x14
+#define CHANNELS_ID                    0x16
+#define ATTITUDE_ID                    0x1E
+#define FLIGHT_MODE_ID                 0x21
+#define PING_DEVICES_ID                0x28
+#define DEVICE_INFO_ID                 0x29
+#define REQUEST_SETTINGS_ID            0x2A
+
+#define TELEMETRY_RX_PACKET_SIZE       128
+
+static u8 telemetryRxBuffer[TELEMETRY_RX_PACKET_SIZE];
+static u8 telemetryRxBufferCount;
+
+static void processCrossfireTelemetryData(u8 data, u8 status);  // ISR callback
+static void processCrossfireTelemetryFrame();
 
 
 // crc implementation from CRSF protocol document rev7
@@ -67,6 +91,138 @@ static u8 crc8(const u8 *ptr, u8 len)
     }
     return crc;
 }
+
+static u8 checkCrossfireTelemetryFrameCRC()
+{
+  u8 len = telemetryRxBuffer[1];
+  u8 crc = crc8(&telemetryRxBuffer[2], len-1);
+  return (crc == telemetryRxBuffer[len+1]);
+}
+
+static u8 getCrossfireTelemetryValue(u8 index, s32 *value, u8 len) {
+  u8 result = 0;
+  u8 *byte = &telemetryRxBuffer[index];
+  *value = (*byte & 0x80) ? -1 : 0;
+  for (u8 i=0; i < len; i++) {
+    *value <<= 8;
+    if (*byte != 0xff) result = 1;
+    *value += *byte++;
+  }
+  return result;
+}
+
+static void set_telemetry(crossfire_telem_t offset, s32 value) {
+    Telemetry.value[offset] = value;
+    TELEMETRY_SetUpdated(offset);
+}
+
+static void processCrossfireTelemetryFrame()
+{
+  if (!checkCrossfireTelemetryFrameCRC())
+    return;
+
+  s32 value;
+  u8 i;
+  u8 id = telemetryRxBuffer[2];
+
+  switch(id) {
+    case GPS_ID:
+      if (getCrossfireTelemetryValue(3, &value, 4)) {
+        Telemetry.gps.latitude = value / 10;
+        if (value & (1 << 30))
+            Telemetry.gps.latitude = -Telemetry.gps.latitude;   // south negative
+        TELEMETRY_SetUpdated(TELEM_GPS_LAT);
+      }
+      if (getCrossfireTelemetryValue(7, &value, 4)) {
+        Telemetry.gps.longitude = value / 10;
+        if (value & (1 << 30))
+            Telemetry.gps.longitude = -Telemetry.gps.longitude;   // west negative
+        TELEMETRY_SetUpdated(TELEM_GPS_LONG);
+      }
+      if (getCrossfireTelemetryValue(11, &value, 2)) {
+        Telemetry.gps.velocity = value;
+        TELEMETRY_SetUpdated(TELEM_GPS_SPEED);
+      }
+      if (getCrossfireTelemetryValue(13, &value, 2)) {
+        Telemetry.gps.heading = value;
+        TELEMETRY_SetUpdated(TELEM_GPS_HEADING);
+      }
+      if (getCrossfireTelemetryValue(15, &value, 2)) {
+        Telemetry.gps.altitude = value - 1000;
+        TELEMETRY_SetUpdated(TELEM_GPS_ALT);
+      }
+      if (getCrossfireTelemetryValue(17, &value, 1)) {
+        Telemetry.gps.satcount = value;
+        TELEMETRY_SetUpdated(TELEM_GPS_SATCOUNT);
+      }
+      break;
+
+    case LINK_ID:
+      for (i=0; i <= TELEM_CRSF_TX_SNR; i++) {
+        if (getCrossfireTelemetryValue(3+i, &value, 1)) {
+          if (i == TELEM_CRSF_TX_POWER) {
+            static const s32 power_values[] = { 0, 10, 25, 100, 500, 1000, 2000 };
+            value = power_values[value];
+          }
+          set_telemetry(i, value);
+        }
+      }
+      break;
+
+    case BATTERY_ID:
+      if (getCrossfireTelemetryValue(3, &value, 2))
+        set_telemetry(TELEM_CRSF_BATT_VOLTAGE, value);
+      if (getCrossfireTelemetryValue(5, &value, 2))
+        set_telemetry(TELEM_CRSF_BATT_CURRENT, value);
+      if (getCrossfireTelemetryValue(7, &value, 3))
+        set_telemetry(TELEM_CRSF_BATT_CAPACITY, value);
+      break;
+
+    case ATTITUDE_ID:
+      if (getCrossfireTelemetryValue(3, &value, 2))
+        set_telemetry(TELEM_CRSF_ATTITUDE_PITCH, value/10);
+      if (getCrossfireTelemetryValue(5, &value, 2))
+        set_telemetry(TELEM_CRSF_ATTITUDE_ROLL, value/10);
+      if (getCrossfireTelemetryValue(7, &value, 2))
+        set_telemetry(TELEM_CRSF_ATTITUDE_YAW, value/10);
+      break;
+
+    case FLIGHT_MODE_ID: // string - save first four bytes for now
+      getCrossfireTelemetryValue(3, &value, 4);
+      set_telemetry(TELEM_CRSF_FLIGHT_MODE, value);
+      break;
+  }
+}
+
+// serial data receive ISR callback
+static void processCrossfireTelemetryData(u8 data, u8 status) {
+  if (status != UART_RX_RXNE || (telemetryRxBufferCount == 0 && data != RADIO_ADDRESS)) {
+    return;
+  }
+  
+  if (telemetryRxBufferCount == 1 && (data < 2 || data > TELEMETRY_RX_PACKET_SIZE-2)) {
+    telemetryRxBufferCount = 0;
+    return;
+  }
+  
+  if (telemetryRxBufferCount < TELEMETRY_RX_PACKET_SIZE) {
+    telemetryRxBuffer[telemetryRxBufferCount++] = data;
+  } else {
+    telemetryRxBufferCount = 0;
+  }
+  
+  if (telemetryRxBufferCount > 4) {
+    u8 length = telemetryRxBuffer[1];
+    if (length + 2 == telemetryRxBufferCount) {
+      processCrossfireTelemetryFrame();
+      telemetryRxBufferCount = 0;
+    }
+  }
+}
+//TODO #endif  HAS_EXTENDED_TELEMETRY 
+
+static u8 packet[CRSF_PACKET_SIZE];
+
 
 
 /* from CRSF document
@@ -118,12 +274,14 @@ static void build_rcdata_pkt()
     packet[25] = crc8(&packet[2], CRSF_PACKET_SIZE-3);
 }
 
+// static u8 testrxframe[] = { 0x00, 0x0C, 0x14, 0x00, 0x00, 0x00, 0x00, 0xFF, 0x01, 0x03, 0x00, 0x00, 0x00, 0xF4 };
+
 static u16 serial_cb()
 {
     build_rcdata_pkt();
     UART_Send(packet, sizeof packet);
 
-    return 4000;
+    return CRSF_FRAME_PERIOD;
 }
 
 static void initialize()
@@ -139,9 +297,12 @@ static void initialize()
 #endif
     Transmitter.audio_player = AUDIO_DISABLED; // disable voice commands on serial port
 #endif
-    UART_SetDataRate(400000);
+    UART_SetDataRate(CRSF_DATARATE);
     UART_SetFormat(8, UART_PARITY_NONE, UART_STOPBITS_1);
     UART_SetDuplex(UART_DUPLEX_HALF);
+#if HAS_EXTENDED_TELEMETRY
+    UART_StartReceive(processCrossfireTelemetryData);
+#endif
 
     CLOCK_StartTimer(1000, serial_cb);
 }
@@ -155,7 +316,9 @@ const void * CRSF_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_BIND:  initialize(); return 0;
         case PROTOCMD_NUMCHAN: return (void *)16L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
-        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
+        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_ON;
+        case PROTOCMD_TELEMETRYTYPE:
+            return (void *)(long) TELEM_CRSF;
         default: break;
     }
     return 0;
