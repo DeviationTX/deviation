@@ -107,6 +107,7 @@ enum MuxType {
     MUX_MAX,
     MUX_MIN,
     MUX_DELAY,
+    MUX_BEEP,
     MUX_LAST,
 };
 
