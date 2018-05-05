@@ -297,8 +297,8 @@ static void initialize()
 #endif
     Transmitter.audio_player = AUDIO_DISABLED; // disable voice commands on serial port
 #endif
+    UART_Initialize();
     UART_SetDataRate(CRSF_DATARATE);
-    UART_SetFormat(8, UART_PARITY_NONE, UART_STOPBITS_1);
     UART_SetDuplex(UART_DUPLEX_HALF);
 #if HAS_EXTENDED_TELEMETRY
     UART_StartReceive(processCrossfireTelemetryData);
