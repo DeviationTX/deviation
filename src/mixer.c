@@ -336,11 +336,14 @@ void MIXER_ApplyMixer(struct Mixer *mixer, volatile s32 *raw, s32 *orig_value)
         break;
     case MUX_BEEP:
         if (orig_value) {
-            s32 new = value / (CHAN_MULTIPLIER / 10);
-            if (new != *orig_value / (CHAN_MULTIPLIER / 10)
-            && new == raw[mixer->dest + NUM_INPUTS + 1] / (CHAN_MULTIPLIER / 10)) {
-                SOUND_SetFrequency(3951, Transmitter.volume * 10);
-                SOUND_StartWithoutVibrating(100, NULL);
+            s32 new_value = raw[mixer->dest + NUM_INPUTS + 1];
+            if (abs(value - *orig_value) >= 10) {
+                if ((value > *orig_value && value < new_value) ||
+                    (value < *orig_value && value > new_value) ||
+                    (abs(value - new_value) <= 10)) {
+                    SOUND_SetFrequency(3951, Transmitter.volume * 10);
+                    SOUND_StartWithoutVibrating(100, NULL);
+                }
             }
         }
         value = raw[mixer->dest + NUM_INPUTS + 1];	// Use input value
