@@ -337,10 +337,13 @@ void MIXER_ApplyMixer(struct Mixer *mixer, volatile s32 *raw, s32 *orig_value)
     case MUX_BEEP:
         if (orig_value) {
             s32 new_value = raw[mixer->dest + NUM_INPUTS + 1];
-            if (abs(value - *orig_value) >= 10) {
+            if (abs(value - new_value) > 100)
+                mixer->beep_lock = 0;
+            if (mixer->beep_lock == 0) {
                 if ((value > *orig_value && value < new_value) ||
                     (value < *orig_value && value > new_value) ||
                     (abs(value - new_value) <= 10)) {
+                    mixer->beep_lock = 1;
                     SOUND_SetFrequency(3951, Transmitter.volume * 10);
                     SOUND_StartWithoutVibrating(100, NULL);
                 }
