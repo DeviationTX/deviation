@@ -353,11 +353,18 @@ void MIXER_ApplyMixer(struct Mixer *mixer, volatile s32 *raw, s32 *orig_value)
 #if HAS_EXTENDED_AUDIO
     case MUX_BEEP:
         if (orig_value) {
-            s32 new = value / (CHAN_MULTIPLIER / 10);
-            if (new != *orig_value / (CHAN_MULTIPLIER / 10)
-            && new == raw[mixer->dest + NUM_INPUTS + 1] / (CHAN_MULTIPLIER / 10))
-                MUSIC_Play(MUSIC_SAVING);
-          }
+            s32 new_value = raw[mixer->dest + NUM_INPUTS + 1];
+            if (abs(value - new_value) > 100)
+                mixer->beep_lock = 0;
+            if (mixer->beep_lock == 0) {
+                if ((value > *orig_value && value < new_value) ||
+                    (value < *orig_value && value > new_value) ||
+                    (abs(value - new_value) <= 10)) {
+                    mixer->beep_lock = 1;
+                    MUSIC_Play(MUSIC_SAVING);
+                }
+            }
+        }
         value = raw[mixer->dest + NUM_INPUTS + 1];	// Use input value
         break;
     case MUX_VOICE:
