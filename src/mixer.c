@@ -369,12 +369,19 @@ void MIXER_ApplyMixer(struct Mixer *mixer, volatile s32 *raw, s32 *orig_value)
         break;
     case MUX_VOICE:
         if (orig_value) {
-            s32 new = value / (CHAN_MULTIPLIER / 10);
-            if (new != *orig_value / (CHAN_MULTIPLIER / 10)
-            && new == raw[mixer->dest + NUM_INPUTS + 1] / (CHAN_MULTIPLIER / 10))
-                if (Model.voice.mixer[mixer->dest].music)
-                    MUSIC_Play(Model.voice.mixer[mixer->dest].music);
-          }
+            s32 new_value = raw[mixer->dest + NUM_INPUTS + 1];
+            if (abs(value - new_value) > 100)
+                mixer->voice_lock = 0;
+            if (mixer->voice_lock == 0) {
+                if ((value > *orig_value && value < new_value) ||
+                    (value < *orig_value && value > new_value) ||
+                    (abs(value - new_value) <= 10)) {
+                    mixer->voice_lock = 1;
+                    if (Model.voice.mixer[mixer->dest].music)
+                        MUSIC_Play(Model.voice.mixer[mixer->dest].music);
+                }
+            }
+        }
         value = raw[mixer->dest + NUM_INPUTS + 1];	// Use input value
         break;
 #endif

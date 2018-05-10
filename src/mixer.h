@@ -136,6 +136,7 @@ struct Mixer {
     s8 offset;
     u8 flags;
     u8 beep_lock;
+    u8 voice_lock;
     //apply_trim;
     //enum MuxType mux;
 };
