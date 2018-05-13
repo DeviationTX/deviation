@@ -11,7 +11,7 @@ enum loadSaveType {
 
 struct model_page {
     char iconstr[24];
-    char fixed_id[7];
+    char fixed_id[11];
     u8 file_state;
     u8 last_mixermode;
     u8 last_txpower;
