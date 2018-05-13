@@ -28,9 +28,7 @@
 
 #ifdef EMULATOR
 #define USE_FIXED_MFGID
-#define PRINTDEBUG 1
 #else
-#define PRINTDEBUG 0
 #endif
 
 #ifdef MODULAR
@@ -71,7 +69,7 @@ enum {
 #define FLAG_ARM     0x40    // arm (toggle to turn on motors)
 #define FLAG_DISARM  0x20    // disarm (toggle to turn off motors)
 
-
+#define RXID_MAX  65535
 static const char * const bugs3_opts[] = {
     _tr_noop("Freq Tune"), "-300", "300", "655361", NULL, // big step 10, little step 1
     NULL 
@@ -328,7 +326,7 @@ static void build_packet(u8 bind) {
     packet[0] = get_checkbyte();
 
 //TODO
-#if PRINTDEBUG
+#if 0
 printf("packet ");
 for (int i=0; i < PACKET_SIZE; i++) {
   printf("%02x ", packet[i]);
@@ -359,7 +357,7 @@ static int get_tx_id()
 static void set_radio_data(u8 index) {
     // captured radio data for bugs rx/tx version A2
     // it appears that the hopping frequencies are determined by the txid
-    // and the data phase radio id is determined by the first 2 or 3 bytes of the
+    // and the data phase radio id is determined by the first 2 bytes of the
     // rx bind packet
     radio_data_t fixed_radio_data[] = {
             // bind phase
@@ -459,8 +457,17 @@ static u16 bugs3_cb() {
 #endif
 
         A7105_Strobe(A7105_STANDBY);
-        set_radio_data(1);
-        A7105_WriteID(radio_data.radio_id);
+
+        // if fixed_id not set, put rxid there
+        // then user must look up radio id and store in fixed id
+        if (Model.fixed_id > RXID_MAX) {
+            set_radio_data(1);
+            A7105_WriteID(Model.fixed_id);
+        } else {
+            Model.fixed_id = (packet[1] << 8) + packet[2];
+            break;
+        }
+
         PROTOCOL_SetBindState(0);
         state = DATA_1;
         packet_count = 0;
