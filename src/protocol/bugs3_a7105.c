@@ -542,6 +542,7 @@ static void initialize(u8 bind) {
         PROTOCOL_SetBindState(0xFFFFFFFF);
     } else {
         set_radio_data(1);
+        if (Model.fixed_id > RXID_MAX) A7105_WriteID(Model.fixed_id);
         state = DATA_1;
     }
 
