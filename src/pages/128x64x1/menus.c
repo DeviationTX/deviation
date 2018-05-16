@@ -25,7 +25,7 @@ enum {
     NUM_X             = 0,
     NUM_WIDTH         = 16,
     MENU_X            = 17,
-    MENU_WIDTH        = (LCD_WIDTH - MENU_X * 2),
+    MENU_WIDTH        = (LCD_WIDTH - MENU_X - 2*ARROW_WIDTH),
 };
 #endif //OVERRIDE_PLACEMENT
 
