@@ -28,7 +28,9 @@ enum {
     ITEM_BATT,
     ITEM_ALARM_INTV,
     ITEM_PWRDN_ALARM,
+#ifndef HAS_OLED_DISPLAY
     ITEM_BACKLIGHT,
+#endif
     ITEM_CONTRAST,
     ITEM_DIMTIME,
     ITEM_DIMVAL,
@@ -174,6 +176,7 @@ static const char *modeselect_cb(guiObject_t *obj, int dir, void *data)
     return tempstring;
 }
 
+#ifndef HAS_OLED_DISPLAY
 static const char *backlight_select_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)data;
@@ -188,6 +191,7 @@ static const char *backlight_select_cb(guiObject_t *obj, int dir, void *data)
     sprintf(tempstring, "%d", Transmitter.backlight);
     return tempstring;
 }
+#endif
 
 static const char *common_select_cb(guiObject_t *obj, int dir, void *data)
 {
