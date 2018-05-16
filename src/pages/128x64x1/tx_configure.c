@@ -55,7 +55,11 @@ static int size_cb(int absrow, void *data)
         case ITEM_MODE:
 #endif
         case ITEM_BUZZ:
+#ifndef HAS_OLED_DISPLAY
         case ITEM_BACKLIGHT:
+#else
+        case ITEM_CONTRAST:
+#endif
         case ITEM_PREALERT:
         case ITEM_TELEMTEMP:
             return 2;
@@ -124,12 +128,17 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             label = _tr_noop("PwrDn alert");
             value = _music_shutdown_cb;
             break;
+#ifndef HAS_OLED_DISPLAY
         case ITEM_BACKLIGHT:
             title = _tr_noop("LCD settings");
             label = _tr_noop("Backlight");
             value = backlight_select_cb;
             break;
+#endif
         case ITEM_CONTRAST:
+#ifdef HAS_OLED_DISPLAY
+            title = _tr_noop("LCD settings");
+#endif
             label = _tr_noop("Contrast");
             value = _contrast_select_cb;
             break;
@@ -208,6 +217,9 @@ static const char *_contrast_select_cb(guiObject_t *obj, int dir, void *data)
                                   0, 10, dir, 1, 1, &changed);
     if (changed) {
         LCD_Contrast(Transmitter.contrast);
+#ifdef HAS_OLED_DISPLAY
+        Transmitter.backlight = Transmitter.contrast;
+#endif
     }
     if (Transmitter.contrast == 0)
         return _tr("Off");
