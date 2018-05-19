@@ -100,10 +100,9 @@ void PAGE_ShowWarning(const char *title, const char *str)
 {   
     if (dialog)
         return;
-    if(str != tempstring)
-        sprintf(tempstring, "%s", str);
+    snprintf(dlg_string, sizeof(dlg_string), "%s", str);
     dialogcrc = 0;
-    dialog = GUI_CreateDialog(&gui->dialog, 10 + DLG_XOFFSET, 42 + DLG_YOFFSET, 300, 188, title, NULL, lowbatt_ok_cb, dtOk, tempstring);
+    dialog = GUI_CreateDialog(&gui->dialog, 10 + DLG_XOFFSET, 42 + DLG_YOFFSET, 300, 188, title, NULL, lowbatt_ok_cb, dtOk, dlg_string);
 }
 
 void PAGE_ShowLowBattDialog()
