@@ -36,7 +36,9 @@ static void show_page(int page)
     struct mixer_page * mp = &pagemem.u.mixer_page;
     if (mp->firstObj) {
         GUI_RemoveHierObjects(mp->firstObj);
-        mp->firstObj = NULL;       
+        FullRedraw = REDRAW_ONLY_DIRTY;
+        mp->firstObj = NULL;
+        GUI_DrawBackground(0, 32, LCD_WIDTH - 16, LCD_HEIGHT - 32);
     }
     for (long i = 0; i < ENTRIES_PER_PAGE; i++) {
         int row = ROW1 + ROW_HEIGHT * i;
@@ -50,6 +52,7 @@ static void show_page(int page)
         GUI_CreateTextSelect(&gui->value[i], COL2, row, TEXTSELECT_128, toggle_failsafe_cb, set_failsafe_cb, (void *)ch);
     }
 }
+
 void PAGE_FailSafeInit(int page)
 {
     (void)page;

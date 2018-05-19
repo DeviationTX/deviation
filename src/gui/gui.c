@@ -28,15 +28,10 @@ static void (*select_notify)(guiObject_t *obj) = NULL;
 
 static struct guiObject *objACTIVE = NULL;
 
-enum FULL_REDRAW {
-    REDRAW_ONLY_DIRTY   = 0x00,
-    REDRAW_IF_NOT_MODAL = 0x01,
-    REDRAW_EVERYTHING   = 0x02,
-};
-
 static buttonAction_t button_action;
 static buttonAction_t button_modalaction;
-static u8 FullRedraw;
+u8 FullRedraw;
+
 #if HAS_TOUCH
 static u8 change_selection_on_touch = 1;
 static u8 in_touch = 0;
@@ -184,7 +179,11 @@ void GUI_RemoveObj(struct guiObject *obj)
             prev = prev->next;
         }
     }
-    FullRedraw = objHEAD ? REDRAW_IF_NOT_MODAL : REDRAW_EVERYTHING;
+    if(obj->Type == Dialog) {
+        FullRedraw = REDRAW_ONLY_DIRTY;
+    } else {
+        FullRedraw = objHEAD ? REDRAW_IF_NOT_MODAL : REDRAW_EVERYTHING;
+    }
 }
 
 void GUI_RemoveHierObjects(struct guiObject *obj)
@@ -226,24 +225,6 @@ void GUI_DrawBackground(u16 x, u16 y, u16 w, u16 h)
         _gui_draw_background(x, y, w, h);
 }
 
-void GUI_DrawScreen(void)
-{
-#ifdef DEBUG_DRAW
-    printf("DrawScreen\n");
-#endif
-    /*
-     * First we need to draw the main background
-     *  */
-    GUI_DrawBackground(0, 0, LCD_WIDTH, LCD_HEIGHT);
-    /*
-     * Then we need to draw any supporting GUI
-     */
-    FullRedraw = REDRAW_IF_NOT_MODAL;
-    GUI_DrawObjects();
-    FullRedraw = REDRAW_ONLY_DIRTY;
-    LCD_ForceUpdate();
-}
-
 struct guiObject *GUI_IsModal(void)
 {
     struct guiObject *obj = objHEAD;
@@ -264,7 +245,44 @@ void _GUI_Redraw(struct guiObject *obj)
 
 void GUI_RedrawAllObjects()
 {
-    FullRedraw = REDRAW_EVERYTHING;
+    struct guiObject *obj = objHEAD;
+    while(obj) {
+        if(! OBJ_IS_HIDDEN(obj)) {
+            if (obj->Type == Scrollable && ((guiScrollable_t *)obj)->head) {
+                //Redraw scrollable contents
+                guiObject_t *head = objHEAD;
+                objHEAD = ((guiScrollable_t *)obj)->head;
+                GUI_RedrawAllObjects();
+                objHEAD = head;
+            }
+            OBJ_SET_DIRTY(obj, 1);
+        } else {
+            OBJ_SET_DIRTY(obj, 0);
+        }
+        obj = obj->next;
+    }
+}
+
+void _GUI_RedrawUnderlyingObjects(u16 x, u16 y, u16 w, u16 h)
+{
+    struct guiObject *obj = objHEAD;
+    while(obj) {
+        if(! OBJ_IS_HIDDEN(obj) &&
+          (! ((obj->box.x + obj->box.width < x) ||
+              (obj->box.x > x + w) ||
+              (obj->box.y + obj->box.height < y) ||
+              (obj->box.y > y + h)) || obj->Type == Label)) {
+            if (obj->Type == Scrollable && ((guiScrollable_t *)obj)->head) {
+                //Redraw scrollable contents
+                guiObject_t *head = objHEAD;
+                objHEAD = ((guiScrollable_t *)obj)->head;
+                GUI_RedrawAllObjects();
+                objHEAD = head;
+            }
+            OBJ_SET_DIRTY(obj, 1);
+        }
+        obj = obj->next;
+    }
 }
 
 void GUI_HideObjects(struct guiObject *headObj, struct guiObject *modalObj)
@@ -283,9 +301,11 @@ void GUI_HideObjects(struct guiObject *headObj, struct guiObject *modalObj)
 
 void _GUI_RefreshScreen(struct guiObject *headObj)
 {
+    static u8 dlg_active = 0;
+    static u16 x, y, w, h;
     struct guiObject *modalObj = GUI_IsModal();
-
     struct guiObject *obj;
+
     if (FullRedraw) {
 #ifdef DEBUG_DRAW
         printf("Full Redraw requested: %d\n", FullRedraw);
@@ -294,9 +314,36 @@ void _GUI_RefreshScreen(struct guiObject *headObj)
             //Handle Dialog redraw as an incremental
             FullRedraw = REDRAW_ONLY_DIRTY;
         } else {
-            GUI_DrawScreen();
+            dlg_active = 0;
+            //First we need to draw the main background
+            GUI_DrawBackground(0, 0, LCD_WIDTH, LCD_HEIGHT);
+            //Then we need to draw any supporting GUI
+            FullRedraw = REDRAW_IF_NOT_MODAL;
+            struct guiObject *obj = objHEAD;
+            while(obj) {
+                if(! OBJ_IS_HIDDEN(obj)) {
+                    if(obj->Type == Dialog) {
+                        dlg_active = 1;
+                        x = obj->box.x;
+                        y = obj->box.y;
+                        w = obj->box.width;
+                        h = obj->box.height;
+                    }
+                    GUI_DrawObject(obj);
+                } else {
+                    OBJ_SET_DIRTY(obj, 0);
+                }
+                obj = obj->next;
+            }
+            FullRedraw = REDRAW_ONLY_DIRTY;
             return;
         }
+    }
+    if(dlg_active && (objDIALOG == NULL)) {
+        dlg_active = 0;
+        GUI_DrawBackground(x, y, w, h);
+        //GUI_RedrawAllObjects();
+        _GUI_RedrawUnderlyingObjects(x, y, w, h);
     }
     GUI_HideObjects(headObj, modalObj);
     //Only start drawing from headObj(scrollable) or 1st modal if either is set
@@ -304,11 +351,31 @@ void _GUI_RefreshScreen(struct guiObject *headObj)
     while(obj) {
         if(! OBJ_IS_HIDDEN(obj)) {
             if (obj->Type == Scrollable && ((guiScrollable_t *)obj)->head) {
+                #if (LCD_WIDTH != 66) && (LCD_WIDTH != 24)
+                //If scrollable changed first we need to draw the scrollable background
+                if(OBJ_IS_DIRTY(obj)) {
+                    #if (LCD_DEPTH == 16)
+                    if(! ((((guiObject_t *)((guiScrollable_t *)obj)->head)->Type == Label) &&
+                          (((guiLabel_t *)((guiScrollable_t *)obj)->head)->desc.style == LABEL_LISTBOX))) {
+                        GUI_DrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
+                    }
+                    #else
+                        GUI_DrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
+                    #endif
+                    OBJ_SET_DIRTY(obj, 0);
+                }
+                #endif
                 //Redraw scrollable contents
                 _GUI_RefreshScreen(((guiScrollable_t *)obj)->head);
             } else if(OBJ_IS_DIRTY(obj)) {
                 if(OBJ_IS_TRANSPARENT(obj) || OBJ_IS_HIDDEN(obj)) {
                     GUI_DrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
+                } else if(obj->Type == Dialog) {
+                    dlg_active = 1;
+                    x = obj->box.x;
+                    y = obj->box.y;
+                    w = obj->box.width;
+                    h = obj->box.height;
                 }
                 GUI_DrawObject(obj);
             }
@@ -318,6 +385,16 @@ void _GUI_RefreshScreen(struct guiObject *headObj)
 }
 
 void GUI_RefreshScreen() {
+    _GUI_RefreshScreen(NULL);
+    LCD_ForceUpdate();
+}
+
+void GUI_DrawScreen(void)
+{
+#ifdef DEBUG_DRAW
+    printf("DrawScreen\n");
+#endif
+    FullRedraw = REDRAW_EVERYTHING;
     _GUI_RefreshScreen(NULL);
     LCD_ForceUpdate();
 }

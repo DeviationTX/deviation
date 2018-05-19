@@ -95,7 +95,7 @@ static void _refresh_page() {
     GUI_SetHidden((guiObject_t *)&gui->exp[2], hide3);
     GUI_SetHidden((guiObject_t *)&gui->graph[2], hide3);
 
-    GUI_RedrawAllObjects();
+    FullRedraw = REDRAW_EVERYTHING;
 }
 
 void PAGE_DrExpCurvesEvent()

@@ -186,6 +186,32 @@ static void dlgbut_cb(struct guiObject *obj, const void *data)
     (void)obj;
     int idx = (long)data;
     int i;
+#if (LCD_WIDTH == 320) || (LCD_WIDTH == 480)
+    u16 x, y, w, h;
+    //Close the dialog
+    if (OBJ_IS_USED(&gui->dialog)) {
+        u8 draw_mode = FullRedraw;
+        GUI_RemoveObj((guiObject_t *)&gui->dialog);
+        FullRedraw = draw_mode;
+    }
+    //Erase object
+    GetWidgetLoc(&pc->elem[idx], &x, &y, &w, &h);
+    if (x > 0) {
+        x -= 1;
+        w += 2;
+    }
+    if (y > 0) {
+        y -= 1;
+        h += 2;
+    }
+    if(x + w > LCD_WIDTH) {
+        w = LCD_WIDTH - x;
+    }
+    if(y + h > LCD_HEIGHT) {
+        h = LCD_HEIGHT - y;
+    }
+    GUI_DrawBackground(x, y, w, h);
+#endif
     //Remove object
     int type = ELEM_TYPE(pc->elem[idx]);
     for(i = idx+1; i < NUM_ELEMS; i++) {
