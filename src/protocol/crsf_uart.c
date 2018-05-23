@@ -36,15 +36,13 @@
 #define CRSF_FRAME_PERIOD         4000   // 4ms
 #define CRSF_CHANNELS             16
 #define CRSF_PACKET_SIZE          26
-#define CRSF_SYNC_BYTE            0xc8
-#define CRSF_TYPE_RCDATA          0x16
 
 // Device addresses
 #define BROADCAST_ADDRESS              0x00
 #define RADIO_ADDRESS                  0xEA
 #define MODULE_ADDRESS                 0xEE
 
-// Received Frame id
+// Frame Type
 #define GPS_ID                         0x02
 #define BATTERY_ID                     0x08
 #define LINK_ID                        0x14
@@ -244,32 +242,32 @@ static void build_rcdata_pkt()
             channels[i] = 992;  // midpoint
     }
 
-    packet[0] = CRSF_SYNC_BYTE; 
+    packet[0] = MODULE_ADDRESS; 
     packet[1] = 24;   // length of type + payload + crc
-    packet[2] = CRSF_TYPE_RCDATA; 
+    packet[2] = CHANNELS_ID; 
 
-  	packet[3]  = (u8) ((channels[0] & 0x07FF));
-  	packet[4]  = (u8) ((channels[0] & 0x07FF)>>8   | (channels[1] & 0x07FF)<<3);
-  	packet[5]  = (u8) ((channels[1] & 0x07FF)>>5   | (channels[2] & 0x07FF)<<6);
-  	packet[6]  = (u8) ((channels[2] & 0x07FF)>>2);
-  	packet[7]  = (u8) ((channels[2] & 0x07FF)>>10  | (channels[3] & 0x07FF)<<1);
-  	packet[8]  = (u8) ((channels[3] & 0x07FF)>>7   | (channels[4] & 0x07FF)<<4);
-  	packet[9]  = (u8) ((channels[4] & 0x07FF)>>4   | (channels[5] & 0x07FF)<<7);
-  	packet[10] = (u8) ((channels[5] & 0x07FF)>>1);
-  	packet[11] = (u8) ((channels[5] & 0x07FF)>>9   | (channels[6] & 0x07FF)<<2);
-  	packet[12] = (u8) ((channels[6] & 0x07FF)>>6   | (channels[7] & 0x07FF)<<5);
-  	packet[13] = (u8) ((channels[7] & 0x07FF)>>3);
-  	packet[14] = (u8) ((channels[8] & 0x07FF));
-  	packet[15] = (u8) ((channels[8] & 0x07FF)>>8   | (channels[9] & 0x07FF)<<3);
-  	packet[16] = (u8) ((channels[9] & 0x07FF)>>5   | (channels[10] & 0x07FF)<<6);  
-  	packet[17] = (u8) ((channels[10] & 0x07FF)>>2);
-  	packet[18] = (u8) ((channels[10] & 0x07FF)>>10 | (channels[11] & 0x07FF)<<1);
-  	packet[19] = (u8) ((channels[11] & 0x07FF)>>7  | (channels[12] & 0x07FF)<<4);
-  	packet[20] = (u8) ((channels[12] & 0x07FF)>>4  | (channels[13] & 0x07FF)<<7);
-  	packet[21] = (u8) ((channels[13] & 0x07FF)>>1);
-  	packet[22] = (u8) ((channels[13] & 0x07FF)>>9  | (channels[14] & 0x07FF)<<2);
-  	packet[23] = (u8) ((channels[14] & 0x07FF)>>6  | (channels[15] & 0x07FF)<<5);
-	packet[24] = (u8) ((channels[15] & 0x07FF)>>3);
+    packet[3]  = (u8) ((channels[0] & 0x07FF));
+    packet[4]  = (u8) ((channels[0] & 0x07FF)>>8   | (channels[1] & 0x07FF)<<3);
+    packet[5]  = (u8) ((channels[1] & 0x07FF)>>5   | (channels[2] & 0x07FF)<<6);
+    packet[6]  = (u8) ((channels[2] & 0x07FF)>>2);
+    packet[7]  = (u8) ((channels[2] & 0x07FF)>>10  | (channels[3] & 0x07FF)<<1);
+    packet[8]  = (u8) ((channels[3] & 0x07FF)>>7   | (channels[4] & 0x07FF)<<4);
+    packet[9]  = (u8) ((channels[4] & 0x07FF)>>4   | (channels[5] & 0x07FF)<<7);
+    packet[10] = (u8) ((channels[5] & 0x07FF)>>1);
+    packet[11] = (u8) ((channels[5] & 0x07FF)>>9   | (channels[6] & 0x07FF)<<2);
+    packet[12] = (u8) ((channels[6] & 0x07FF)>>6   | (channels[7] & 0x07FF)<<5);
+    packet[13] = (u8) ((channels[7] & 0x07FF)>>3);
+    packet[14] = (u8) ((channels[8] & 0x07FF));
+    packet[15] = (u8) ((channels[8] & 0x07FF)>>8   | (channels[9] & 0x07FF)<<3);
+    packet[16] = (u8) ((channels[9] & 0x07FF)>>5   | (channels[10] & 0x07FF)<<6);  
+    packet[17] = (u8) ((channels[10] & 0x07FF)>>2);
+    packet[18] = (u8) ((channels[10] & 0x07FF)>>10 | (channels[11] & 0x07FF)<<1);
+    packet[19] = (u8) ((channels[11] & 0x07FF)>>7  | (channels[12] & 0x07FF)<<4);
+    packet[20] = (u8) ((channels[12] & 0x07FF)>>4  | (channels[13] & 0x07FF)<<7);
+    packet[21] = (u8) ((channels[13] & 0x07FF)>>1);
+    packet[22] = (u8) ((channels[13] & 0x07FF)>>9  | (channels[14] & 0x07FF)<<2);
+    packet[23] = (u8) ((channels[14] & 0x07FF)>>6  | (channels[15] & 0x07FF)<<5);
+    packet[24] = (u8) ((channels[15] & 0x07FF)>>3);
 
     packet[25] = crc8(&packet[2], CRSF_PACKET_SIZE-3);
 }
