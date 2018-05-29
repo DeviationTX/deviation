@@ -50,5 +50,5 @@ void LCD_DrawPixel(unsigned int color)
 
 void LCD_Clear(unsigned int color) {
 	(void)color;
-	memset(gui.image, 0xaa, sizeof(gui.image));
+	memset(gui.image, 0x00, sizeof(gui.image));
 }
