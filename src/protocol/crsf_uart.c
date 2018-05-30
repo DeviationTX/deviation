@@ -55,12 +55,6 @@
 
 #define TELEMETRY_RX_PACKET_SIZE       128
 
-static u8 telemetryRxBuffer[TELEMETRY_RX_PACKET_SIZE];
-static u8 telemetryRxBufferCount;
-
-static void processCrossfireTelemetryData(u8 data, u8 status);  // ISR callback
-static void processCrossfireTelemetryFrame();
-
 
 // crc implementation from CRSF protocol document rev7
 static u8 crc8tab[256] = {
@@ -89,6 +83,10 @@ static u8 crc8(const u8 *ptr, u8 len)
     }
     return crc;
 }
+
+#if HAS_EXTENDED_TELEMETRY
+static u8 telemetryRxBuffer[TELEMETRY_RX_PACKET_SIZE];
+static u8 telemetryRxBufferCount;
 
 static u8 checkCrossfireTelemetryFrameCRC()
 {
@@ -217,7 +215,7 @@ static void processCrossfireTelemetryData(u8 data, u8 status) {
     }
   }
 }
-//TODO #endif  HAS_EXTENDED_TELEMETRY 
+#endif  // HAS_EXTENDED_TELEMETRY
 
 static u8 packet[CRSF_PACKET_SIZE];
 

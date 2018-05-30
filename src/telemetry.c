@@ -24,7 +24,9 @@ static void _get_altitude_str(char *str, s32 value, u8 decimals, char units);
 #include "telemetry/telem_devo.c"
 #include "telemetry/telem_dsm.c"
 #include "telemetry/telem_frsky.c"
+#if HAS_EXTENDED_TELEMETRY
 #include "telemetry/telem_crsf.c"
+#endif  // HAS_EXTENDED_TELEMETRY
 
 #define CAP_DSM   1
 #define CAP_FRSKY 2
@@ -134,7 +136,9 @@ s32 _TELEMETRY_GetValue(struct Telemetry *t, int idx)
     case TELEM_DEVO: return _devo_value(t, idx);
     case TELEM_DSM: return _dsm_value(t, idx);
     case TELEM_FRSKY: return _frsky_value(t, idx);
+#if HAS_EXTENDED_TELEMETRY
     case TELEM_CRSF: return _crsf_value(t, idx);
+#endif  // HAS_EXTENDED_TELEMETRY
     }
     return 0;
 }
@@ -210,7 +214,9 @@ const char * TELEMETRY_GetValueStrByValue(char *str, int idx, s32 value)
             case TELEM_DEVO:  return _devo_str_by_value(str, idx, value);
             case TELEM_DSM:   return _dsm_str_by_value(str, idx, value);
             case TELEM_FRSKY: return _frsky_str_by_value(str, idx, value);
+#if HAS_EXTENDED_TELEMETRY
             case TELEM_CRSF:  return _crsf_str_by_value(str, idx, value);
+#endif  // HAS_EXTENDED_TELEMETRY
             }
     }
     return str;
@@ -228,7 +234,9 @@ const char * TELEMETRY_Name(char *str, int idx)
     case TELEM_DEVO:  return _devo_name(str, idx);
     case TELEM_DSM:   return _dsm_name(str, idx);
     case TELEM_FRSKY: return _frsky_name(str, idx);
+#if HAS_EXTENDED_TELEMETRY
     case TELEM_CRSF:  return _crsf_name(str, idx);
+#endif  // HAS_EXTENDED_TELEMETRY
     }
     return NULL;
 }
@@ -248,7 +256,9 @@ const char * TELEMETRY_ShortName(char *str, int idx)
             case TELEM_DEVO:  return _devo_short_name(str, idx);
             case TELEM_DSM:   return _dsm_short_name(str, idx);
             case TELEM_FRSKY: return _frsky_short_name(str, idx);
+#if HAS_EXTENDED_TELEMETRY
             case TELEM_CRSF:  return _crsf_short_name(str, idx);
+#endif  // HAS_EXTENDED_TELEMETRY
             }
     }
     return str;
@@ -259,7 +269,9 @@ s32 TELEMETRY_GetMaxValue(int idx)
     case TELEM_DEVO:  return _devo_get_max_value(idx);
     case TELEM_DSM:   return _dsm_get_max_value(idx);
     case TELEM_FRSKY: return _frsky_get_max_value(idx);
+#if HAS_EXTENDED_TELEMETRY
     case TELEM_CRSF:  return _crsf_get_max_value(idx);
+#endif  // HAS_EXTENDED_TELEMETRY
     }
     return 0;
 }
@@ -269,7 +281,9 @@ s32 TELEMETRY_GetMinValue(int idx)
     case TELEM_DEVO:  return _devo_get_min_value(idx);
     case TELEM_DSM:   return _dsm_get_min_value(idx);
     case TELEM_FRSKY: return _frsky_get_min_value(idx);
+#if HAS_EXTENDED_TELEMETRY
     case TELEM_CRSF:  return _crsf_get_min_value(idx);
+#endif  // HAS_EXTENDED_TELEMETRY
     }
     return 0;
 }
