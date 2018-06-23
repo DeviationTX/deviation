@@ -457,6 +457,9 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
     if (flags & BUTTON_PRESS && (CHAN_ButtonIsPressed(button, BUT_ENTER) || CHAN_ButtonIsPressed(button, BUT_EXIT))) {
         TELEMETRY_MuteAlarm();
     }
+    if (flags & BUTTON_LONGPRESS && CHAN_ButtonIsPressed(button, BUT_DOWN)) {
+        TELEMETRY_ResetValues();
+    }
     return default_button_action_cb(button, flags, data);
 }
 #endif //HAS_TELEMETRY

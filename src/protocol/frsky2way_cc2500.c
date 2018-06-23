@@ -493,6 +493,9 @@ const void *FRSKY2WAY_Cmds(enum ProtoCmds cmd)
             return (void *)(CC2500_Reset() ? 1L : -1L);
         case PROTOCMD_TELEMETRYTYPE: 
             return (void *)(long) TELEM_FRSKY;
+        case PROTOCMD_TELEMETRYRESET:
+            ground_level = 0;
+            return (void *)1L;
         default: break;
     }
     return 0;

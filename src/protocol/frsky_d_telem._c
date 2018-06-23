@@ -2,9 +2,9 @@
  telemetry processing that's common for Frsky and FrskyX
 ***************************************************************/
 
-static s32 ground_level;
 static u32 discharge_time;
 static u32 discharge_dAms;   // deciAmp-milliseconds
+static s32 ground_level;
 
 
 static void set_telemetry(frsky_telem_t offset, s32 value) {

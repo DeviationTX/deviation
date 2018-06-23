@@ -312,4 +312,5 @@ void TELEMETRY_SetUpdated(int telem);
 int TELEMETRY_Type();
 void TELEMETRY_SetType(int type);
 int TELEMETRY_GetNumTelemSrc();
+void TELEMETRY_ResetValues();
 #endif

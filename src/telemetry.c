@@ -447,6 +447,13 @@ void TELEMETRY_ResetAlarm(int i)
     mute_value[i] = 0;
 }
 
+void TELEMETRY_ResetValues(void)
+{
+    // Reset cumulative values, altitude ground level, etc.
+    // Exact values are protocol depenedent
+    PROTOCOL_ResetTelemetry();
+}
+
 void TELEMETRY_MuteAlarm()
 {
     for(int i = 0; i < TELEM_NUM_ALARMS; i++) {
