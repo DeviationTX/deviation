@@ -63,6 +63,9 @@ static const char RADIO_NUM_CHANNELS[] = "num_channels";
 static const char RADIO_FIXED_ID[] = "fixed_id";
 
 static const char RADIO_TX_POWER[] = "tx_power";
+#if HAS_EXTENDED_TELEMETRY
+static const char RADIO_GROUND_LEVEL[] = "ground_level";
+#endif  // HAS_EXTENDED_TELEMETRY
 
 static const char SECTION_PROTO_OPTS[] = "protocol_opts";
 /* Section: Mixer */
@@ -533,6 +536,9 @@ static const struct struct_map _secradio[] = {
     {RADIO_VIDEOCH,      OFFSET(Model, videoch), 0},
     {RADIO_VIDEOCONTRAST,OFFSET(Model, video_contrast), 0},
     {RADIO_VIDEOBRIGHTNESS,OFFSET(Model, video_brightness), 0},
+#endif
+#if HAS_EXTENDED_TELEMETRY
+    {RADIO_GROUND_LEVEL,     OFFSET(Model, ground_level), 0},
 #endif
 };
 static const struct struct_map _secmixer[] = {

@@ -71,6 +71,9 @@ struct Model {
 #if HAS_EXTENDED_AUDIO
     struct Voice voice;
 #endif // HAS_EXTENDED_AUDIO
+#if HAS_EXTENDED_TELEMETRY
+    s32 ground_level;
+#endif
 };
 extern struct Model Model;
 extern const char * const RADIO_TX_POWER_VAL[TXPOWER_LAST];

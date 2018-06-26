@@ -455,8 +455,8 @@ static void processSportPacket(u8 *packet) {
     s32 data = SPORT_DATA_S32(packet);
     switch (id & 0xfff0) {
     case ALT_FIRST_ID & 0xfff0:
-        if (ground_level == 0) ground_level = data;
-        set_telemetry(TELEM_FRSKY_ALTITUDE, data - ground_level);
+        if (Model.ground_level == 0) Model.ground_level = data;
+        set_telemetry(TELEM_FRSKY_ALTITUDE, data - Model.ground_level);
         break;
     case VARIO_FIRST_ID & 0xfff0:
         set_telemetry(TELEM_FRSKY_VARIO, data);
@@ -897,7 +897,6 @@ static void initialize(int bind)
     seq_rx_expected = 0;
     seq_tx_send = 8;
 #if HAS_EXTENDED_TELEMETRY
-    Telemetry.value[TELEM_FRSKY_MIN_CELL] = TELEMETRY_GetMaxValue(TELEM_FRSKY_MIN_CELL);
     telem_save_seq = -1;
     setup_serial_port();
 #endif
@@ -946,7 +945,9 @@ const void *FRSKYX_Cmds(enum ProtoCmds cmd)
             return (void *)(long) TELEM_FRSKY;
         case PROTOCMD_TELEMETRYRESET:
 #if HAS_EXTENDED_TELEMETRY
-            ground_level = 0;
+            Model.ground_level = 0;
+            discharge_dAms = 0;
+            Telemetry.value[TELEM_FRSKY_MIN_CELL] = TELEMETRY_GetMaxValue(TELEM_FRSKY_MIN_CELL);
 #endif
             return 0;
         case PROTOCMD_RESET:

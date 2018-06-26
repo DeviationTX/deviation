@@ -4,7 +4,6 @@
 
 static u32 discharge_time;
 static u32 discharge_dAms;   // deciAmp-milliseconds
-static s32 ground_level;
 
 
 static void set_telemetry(frsky_telem_t offset, s32 value) {
@@ -108,8 +107,8 @@ static void processHubPacket(u8 id, u16 value) {
         }
         s32 altitude = (s16)last_value * 100 + (((s16)last_value < 0) ? -value : value);
 
-        if (ground_level == 0) ground_level = altitude;
-        set_telemetry(TELEM_FRSKY_ALTITUDE, altitude - ground_level);
+        if (Model.ground_level == 0) Model.ground_level = altitude;
+        set_telemetry(TELEM_FRSKY_ALTITUDE, altitude - Model.ground_level);
         break;
     case 0x11: //GPS Speed (whole number and sign) in Knots
         fr_gps.velocity_bp = value;
