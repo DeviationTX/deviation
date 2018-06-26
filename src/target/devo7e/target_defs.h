@@ -26,10 +26,10 @@
 #define HAS_SCANNER         0
 #define HAS_LAYOUT_EDITOR   0
 #define HAS_EXTRA_SWITCHES  OPTIONAL
-#define HAS_EXTRA_BUTTONS  0
+#define HAS_EXTRA_BUTTONS   0
 #define HAS_MULTIMOD_SUPPORT 1
 #define HAS_VIDEO           0
-#define HAS_4IN1_FLASH      1
+#define HAS_4IN1_FLASH      0
 #define HAS_EXTENDED_AUDIO  0
 #define HAS_AUDIO_UART5     0
 #define HAS_MUSIC_CONFIG    0

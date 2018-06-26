@@ -109,7 +109,6 @@ static int get_selectable_idx(guiScrollable_t *scrollable, guiObject_t *obj)
     return -1;
 }
 
-
 static guiObject_t *get_selectable_obj(guiScrollable_t *scrollable, int row, int col)
 {
     guiObject_t *head = scrollable->head;
@@ -199,7 +198,6 @@ static guiObject_t *set_selected_abs_row_col(guiScrollable_t *scrollable, int ro
     create_scrollable_objs(scrollable, row);
     return get_selectable_obj(scrollable, row, col);
 }
-
 
 static guiObject_t * set_selectable_idx(guiScrollable_t *scrollable, int idx)
 {
@@ -298,8 +296,13 @@ static void create_scrollable_objs(guiScrollable_t *scrollable, int row)
     scrollable->cur_row = row;
     int rel_row = 0;
     int selectable_rows = 0;
+#if (LCD_WIDTH != 66) && (LCD_WIDTH != 24)
+    u8 redraw_mode = FullRedraw;
     GUI_RemoveScrollableObjs((guiObject_t *)scrollable);
-
+    FullRedraw = redraw_mode;
+#else
+    GUI_RemoveScrollableObjs((guiObject_t *)scrollable);
+#endif
     guiObject_t *head = objHEAD;
     objHEAD = NULL;
     for(int y = scrollable->header.box.y, bottom = y + scrollable->header.box.height;
@@ -333,6 +336,9 @@ static void create_scrollable_objs(guiScrollable_t *scrollable, int row)
     GUI_SetHidden((guiObject_t *)&scrollable->scrollbar, hidden);
     if (! hidden)
         GUI_SetScrollbar(&scrollable->scrollbar, scroll_pos);
+#if (LCD_WIDTH != 66) && (LCD_WIDTH != 24)
+    OBJ_SET_DIRTY((guiObject_t *)scrollable, 1);
+#endif
 }
 
 #if HAS_TOUCH
@@ -426,6 +432,7 @@ guiObject_t *GUI_GetScrollableObj(guiScrollable_t *scrollable, int row, int col)
         return NULL;
     return scrollable->getobj_cb(relrow, col, scrollable->cb_data);
 }
+
 guiObject_t *GUI_ShowScrollableRowCol(guiScrollable_t *scrollable, int absrow, int col)
 {
     return set_selected_abs_row_col(scrollable, absrow, col);
@@ -440,6 +447,7 @@ guiObject_t *GUI_ShowScrollableRowOffset(guiScrollable_t *scrollable, int row_id
     int idx = row_idx & 0xff;
     return set_selectable_idx(scrollable, idx);
 }
+
 int GUI_ScrollableGetObjRowOffset(guiScrollable_t *scrollable, guiObject_t *obj)
 {
     int idx = get_selectable_idx(scrollable, obj);
@@ -449,10 +457,12 @@ int GUI_ScrollableGetObjRowOffset(guiScrollable_t *scrollable, guiObject_t *obj)
     //printf("Saving position:%04x\n", idx);
     return idx;
 }
+
 int GUI_ScrollableCurrentRow(guiScrollable_t *scrollable)
 {
     return scrollable->cur_row;
 }
+
 int GUI_ScrollableVisibleRows(guiScrollable_t *scrollable)
 {
     return scrollable->visible_rows;

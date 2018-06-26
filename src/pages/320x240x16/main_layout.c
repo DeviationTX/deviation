@@ -115,7 +115,8 @@ void PAGE_MainLayoutInit(int page)
     GUI_SelectionNotify(notify_cb);
     draw_elements();
     if (show_config_menu) {
-        lp->selected_for_move = show_config_menu;
+        lp->selected_for_move = -1;
+        select_for_move(&gui->elem[show_config_menu]);
         show_config();
         show_config_menu = 0;
     }
@@ -312,8 +313,11 @@ void show_config()
     int count = 0;
     int row_idx = 0;
     long type;
-    if (OBJ_IS_USED(&gui->dialog))
+    if (OBJ_IS_USED(&gui->dialog)) {
+        u8 draw_mode = FullRedraw;
         GUI_RemoveObj((guiObject_t *)&gui->dialog);
+        FullRedraw = draw_mode;
+    }
     if(lp->selected_for_move >= 0) {
         type = ELEM_TYPE(pc->elem[lp->selected_for_move]);
         row_idx = elem_abs_to_rel(lp->selected_for_move);

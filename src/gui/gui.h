@@ -12,6 +12,15 @@
 #include "_gui.h"
 
 #define RGB888_to_RGB565(r, g, b) (((r & 0xf8) << 8) | ((g & 0xfc) << 3) | ((b & 0xf8) >>3))
+
+enum FULL_REDRAW {
+    REDRAW_ONLY_DIRTY   = 0x00,
+    REDRAW_IF_NOT_MODAL = 0x01,
+    REDRAW_EVERYTHING   = 0x02,
+};
+
+extern u8 FullRedraw;
+
 enum DialogType {
     dtOk, dtCancel, dtOkCancel, dtNone,
 };
@@ -23,6 +32,7 @@ enum BarGraphDirection {
     TRIM_INVHORIZONTAL,
     TRIM_VERTICAL,
 };
+
 enum TextSelectType {
     TEXTSELECT_224,
     TEXTSELECT_128,

@@ -225,6 +225,6 @@ static void revert_cb(guiObject_t *obj, const void *data)
     (void)data;
     (void)obj;
     memcpy(mp->limit, (const void *)&origin_limit, sizeof(origin_limit));
-    GUI_RedrawAllObjects();
+    FullRedraw = REDRAW_EVERYTHING;
 }
 
