@@ -314,11 +314,11 @@ static void build_packet(u8 bind) {
 
 //    packet[15] = 0;
 
-                      // try driven trims
-    packet[16] = 64;  //force_values ? 64 : packet[6] / 13 + 0x22;
-    packet[17] = 64;  //force_values ? 64 : packet[7] / 13 + 0x22;
+    // driven trims
+    packet[16] = aileron / 8 + 14;
+    packet[17] = elevator / 8 + 14;
     packet[18] = 64;
-    packet[19] = 64;  //force_values ? 64 : packet[9] / 13 + 0x22;
+    packet[19] = rudder / 8 + 14;
 
 //    packet[20] = 0;
 //    packet[21] = 0;
