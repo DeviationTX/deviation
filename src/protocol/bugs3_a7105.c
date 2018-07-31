@@ -23,6 +23,7 @@
 #include "mixer.h"
 #include "music.h"
 #include "config/model.h"
+#include "telemetry.h"
 #include <string.h>
 #include <stdlib.h>
 
@@ -238,6 +239,13 @@ static int bugs3_init() {
     A7105_WriteID(radio_data.radio_id);
     A7105_Strobe(A7105_STANDBY);
     return 1;
+}
+
+static void update_telemetry(u8 *data) {
+  Telemetry.value[TELEM_FRSKY_RSSI] = data[3];
+  TELEMETRY_SetUpdated(TELEM_FRSKY_RSSI);
+  Telemetry.value[TELEM_FRSKY_VOLT1] = data[10] == 0xff ? 840 : 600;
+  TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT1);
 }
 
 static u16 get_channel(u8 ch, s32 scale, s32 center, s32 range) {
@@ -511,6 +519,7 @@ static u16 bugs3_cb() {
 
         if (!(mode & 0x01)) {
             A7105_ReadData(packet, 16);
+            update_telemetry(packet);
 //TODO
 #if 0
 printf("received ");
@@ -576,7 +585,10 @@ const void *BUGS3_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_CURRENT_ID: return 0;
         case PROTOCMD_GETOPTIONS:
             return bugs3_opts;
-        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
+        case PROTOCMD_TELEMETRYSTATE:
+            return (void *)(long)(PROTO_TELEM_ON);
+        case PROTOCMD_TELEMETRYTYPE: 
+            return (void *)(long) TELEM_FRSKY;
         default: break;
     }
     return 0;
