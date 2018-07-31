@@ -63,7 +63,6 @@ ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 #define CORONA_ADDRESS_LENGTH     4
 #define CORONA_BIND_CHANNEL_V1    0xD1  // also Flydream V3
 #define CORONA_BIND_CHANNEL_V2    0xB8
-#define CORONA_CHANNEL_TIMING     1500
 #define FDV3_BIND_PERIOD          5000
 #define FDV3_CHANNEL_PERIOD       4000
 
@@ -234,7 +233,7 @@ static u16 CORONA_build_packet(void) {
     for(u8 i=0; i<CORONA_ADDRESS_LENGTH; i++)
       packet[i+4]=rx_tx_addr[i];
     packet[8]=0;
-    return 6647-CORONA_CHANNEL_TIMING;
+    return 6647;
   }
 
 
@@ -280,18 +279,18 @@ static u16 CORONA_build_packet(void) {
       switch (hopping_frequency_no) {
         case 0:
           packet_period = Model.proto_opts[PROTO_OPTS_FORMAT] == FORMAT_V1
-                        ? 4991-CORONA_CHANNEL_TIMING
-                        : 4248-CORONA_CHANNEL_TIMING;
+                        ? 4991
+                        : 4248;
           break;
         case 1: 
           packet_period = Model.proto_opts[PROTO_OPTS_FORMAT] == FORMAT_V1
-                        ? 4991-CORONA_CHANNEL_TIMING
-                        : 4345-CORONA_CHANNEL_TIMING;
+                        ? 4991
+                        : 4345;
           break;
         case 2: 
           packet_period = Model.proto_opts[PROTO_OPTS_FORMAT] == FORMAT_V1
-                        ? 12520-CORONA_CHANNEL_TIMING
-                        : 13468-CORONA_CHANNEL_TIMING;
+                        ? 12520
+                        : 13468;
           if (Model.proto_opts[PROTO_OPTS_FORMAT] == FORMAT_V2)
               packet[17] = 0x03;
           break;
