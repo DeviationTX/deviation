@@ -285,10 +285,10 @@ static void check_arming(s32 channel_value) {
 static void build_packet(u8 bind) {
     u8 force_values = bind | !armed;
     u8 change_channel = ((packet_count & 0x1) << 6);
-    u16 aileron  = get_channel(CHANNEL1,  400, 400, 400);
+    u16 aileron  = get_channel(CHANNEL1, -400, 400, 400);
     u16 elevator = get_channel(CHANNEL2, -400, 400, 400);
     u16 throttle = get_channel(CHANNEL3,  400, 400, 400);
-    u16 rudder   = get_channel(CHANNEL4,  400, 400, 400);
+    u16 rudder   = get_channel(CHANNEL4, -400, 400, 400);
 
     memset(packet, 0, sizeof(packet));
     packet[1] = 0x76;
