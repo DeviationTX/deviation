@@ -63,7 +63,7 @@ enum {
 
 // flags packet byte 4
 #define FLAG_FLIP    0x08    // automatic flip
-                  // 0x04 is low/high speed select (set is low speed)
+#define FLAG_MODE    0x04    // low/high speed select (set is high speed)
 
 // flags packet byte 5
 #define FLAG_LED     0x80    // enable LEDs
@@ -300,7 +300,7 @@ static void build_packet(u8 bind) {
       packet[4] = change_channel | 0x80;
       packet[5] = 0x06 | arm_flags;
     } else {
-      packet[4] = change_channel
+      packet[4] = change_channel | FLAG_MODE
                 | GET_FLAG(CHANNEL_FLIP, FLAG_FLIP);
       packet[5] = 0x06 | arm_flags
                 | GET_FLAG(CHANNEL_LED, FLAG_LED);
