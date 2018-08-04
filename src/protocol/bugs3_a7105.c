@@ -26,6 +26,171 @@
 #include "telemetry.h"
 #include <string.h>
 #include <stdlib.h>
+#include <stdint.h>
+#include <stdbool.h>
+
+//////////// rxid -> radioid algorithm //////////////////////////////
+// Hex digit 1 is periodic with length 2, and hex digit 2 is periodic
+// with length 16. However, storing the byte of those 2 digits
+// instead of manipulating bits results simpler code and smaller binary.
+static u8 most_popular_01_cycle[16];
+static void load_most_popular_01_cycle() {
+  u8 data[] = { 0x52, 0xac, 0x59, 0xa4, 0x53, 0xab, 0x57, 0xa9,
+                0x56, 0xa5, 0x5b, 0xa7, 0x5d, 0xa6, 0x58, 0xad};
+  memcpy(most_popular_01_cycle, data, sizeof data);
+};
+
+static u8 most_popular_01(u8 i) {
+  return most_popular_01_cycle[i % 16];
+}
+
+static u8 most_popular_67_cycle[37];
+static void load_most_popular_67_cycle() {
+    u8 data[] = { 0x34, 0xc5,
+                  0x6a, 0xb4,
+                  0x29, 0xd5,
+                  0x2c, 0xd3,
+                  0x91, 0xb3,
+                  0x6c, 0x49,
+                  0x52, 0x9c,
+                  0x4d, 0x65,
+                  0xc3, 0x4a,
+                  0x5b, 0xd6,
+                  0x92, 0x6d,
+                  0x94, 0xa6,
+                  0x55, 0xcd,
+                  0x2b, 0x9a,
+                  0x36, 0x95,
+                  0x4b, 0xd4,
+                  0x35, 0x8d,
+                  0x96, 0xb2,
+                  0xa3
+    };
+    memcpy(most_popular_67_cycle, data, sizeof data);
+};
+
+static u8 most_popular_67(u8 i) {
+  if (i == 0) {
+    return 0xd2;
+  } else if (i == 1) {
+    return 0xda;
+  } else if (i % 16 < 2) {
+    u8 ii = 2 * (i / 16) + i % 16 - 2;
+    if (ii % 2 == 0) {
+      return most_popular_67_cycle[ii + 7];
+    } else {
+      return most_popular_67_cycle[ii];
+    }
+  } else {
+    return most_popular_67_cycle[2 * (i / 16) + (i % 16 - 2) % 7];
+  }
+}
+
+static u8 most_popular_45(u8 i) {
+  if (i == 0) {
+    return 0xa3;
+  } else if (i == 1) {
+    return 0x86;
+  } else {
+    u8 ii = i;
+    if (i % 8 == 1) {
+      ii -= 8;
+    } else {
+      ii -= 1;
+    }
+    return most_popular_67(ii);
+  }
+}
+
+static u8 most_popular_23(u8 i) {
+  if (i == 0) {
+    return 0xb2;
+  } else if (i == 1) {
+    return 0xcb;
+  } else {
+    u8 ii = i;
+    if (i % 8 == 1) {
+      ii -= 8;
+    } else {
+      ii -= 1;
+    }
+    return most_popular_45(ii);
+  }
+}
+
+static u32 most_popular(u8 i) {
+  u32 ii = i + !(i <= 127);
+  return (u32) most_popular_01(ii) << 24 |
+    (u32) most_popular_23(ii) << 16 |
+    (u32) most_popular_45(ii) << 8 |
+    most_popular_67(ii);
+}
+
+static u32 second_most_popular(u8 i) {
+  if (i < 127) {
+    return most_popular(i + 1);
+  } else if (i > 128) {
+    return most_popular(i - 1);
+  } else {
+    return 0x52d6926d;
+  }
+}
+
+// The 22 irregular values do not match the above periodicities. They might be
+// errors from the readout, but let us try them here as long as it is not
+// proven.
+static u16 irregular_keys[22];
+static void load_irregular_keys() {
+    u16 data[] = { 1131, 1287, 2842, 4668, 5311, 11594, 13122, 13813,
+                  20655, 22975, 25007, 25068, 28252, 33309, 35364, 35765,
+                  37731, 40296, 43668, 46540, 49868, 65535
+    };
+    memcpy(irregular_keys, data, sizeof data);
+};
+
+static u32 irregular_values[22];
+static void load_irregular_values() {
+    u32 data[] = { 0x52d6926d, 0xa586da34, 0x5329d52c, 0xa66c4952,
+                  0x536c4952, 0x524a5bd6, 0x534d65c3, 0xa9d391b3,
+                  0x5249529c, 0xa555cd2b, 0xac9a3695, 0x58d391b3,
+                  0xa791b36c, 0x53926d94, 0xa7926d94, 0xa72cd391,
+                  0xa9b429d5, 0x5629d52c, 0xad2b9a36, 0xa74d65c3,
+                  0x526d94a6, 0xad96b2a3
+    };
+    memcpy(irregular_values, data, sizeof data);
+};
+
+static u32 is_irregular(u32 i) {
+  for (u8 j = 0; j < sizeof(irregular_keys) / sizeof(irregular_keys[0]); ++j) {
+    if (irregular_keys[j] == i) {
+      return irregular_values[j];
+    }
+  }
+  return 0;
+}
+
+static u32 rxid_to_radioid(u16 rxid) {
+  u8 block = rxid / 256;
+  u8 second_seq_size;
+  bool use_most_popular;
+  if (rxid < 32768) {
+    second_seq_size = 128 - block;
+    use_most_popular = rxid % 256 >= second_seq_size;
+  } else {
+    second_seq_size = block - 127;
+    use_most_popular = 255 - rxid % 256 >= second_seq_size;
+  }
+  u32 v = is_irregular(rxid);
+  if (!v) {
+    if (use_most_popular) {
+      v = most_popular(rxid % 255);
+    } else {
+      v = second_most_popular(rxid % 255);
+    }
+  }
+  return v;
+}
+//////////// rxid -> radioid algorithm //////////////////////////////
 
 #ifdef EMULATOR
 #define USE_FIXED_MFGID
@@ -472,7 +637,9 @@ static u16 bugs3_cb() {
             set_radio_data(1);
             A7105_WriteID(Model.fixed_id);
         } else {
-            Model.fixed_id = (packet[1] << 8) + packet[2];
+            u16 rxid = (packet[1] << 8) + packet[2];
+            u32 radioid = rxid_to_radioid(rxid);
+            Model.fixed_id = radioid;
             break;
         }
 
@@ -544,6 +711,12 @@ printf("\n");
 
 static void initialize(u8 bind) {
     CLOCK_StopTimer();
+
+    // support for auto rxid -> radioid
+    load_most_popular_01_cycle();
+    load_most_popular_67_cycle();
+    load_irregular_keys();
+    load_irregular_values();
 
     if (bind) {
         set_radio_data(0);
