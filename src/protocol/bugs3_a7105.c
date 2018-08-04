@@ -151,11 +151,11 @@ static void load_irregular_keys() {
 static u32 irregular_values[22];
 static void load_irregular_values() {
     u32 data[] = { 0x52d6926d, 0xa586da34, 0x5329d52c, 0xa66c4952,
-                  0x536c4952, 0x524a5bd6, 0x534d65c3, 0xa9d391b3,
-                  0x5249529c, 0xa555cd2b, 0xac9a3695, 0x58d391b3,
-                  0xa791b36c, 0x53926d94, 0xa7926d94, 0xa72cd391,
-                  0xa9b429d5, 0x5629d52c, 0xad2b9a36, 0xa74d65c3,
-                  0x526d94a6, 0xad96b2a3
+                   0x536c4952, 0x524a5bd6, 0x534d65c3, 0xa9d391b3,
+                   0x5249529c, 0xa555cd2b, 0xac9a3695, 0x58d391b3,
+                   0xa791b36c, 0x53926d94, 0xa7926d94, 0xa72cd391,
+                   0xa9b429d5, 0x5629d52c, 0xad2b9a36, 0xa74d65c3,
+                   0x526d94a6, 0xad96b2a3
     };
     memcpy(irregular_values, data, sizeof data);
 };
