@@ -346,7 +346,7 @@ static u8 a7105_calibrate() {
 }
 
 
-static int bugs3_init() {
+static int bugs3_init(u8 bind) {
     A7105_WriteReg(A7105_01_MODE_CONTROL, 0x42);
     A7105_WriteReg(A7105_02_CALC, 0x00);
     A7105_WriteReg(A7105_03_FIFOI, 0x15);
@@ -400,8 +400,12 @@ static int bugs3_init() {
 
     freq_offset = Model.proto_opts[PROTOOPTS_FREQTUNE];
     A7105_AdjustLOBaseFreq(freq_offset);
+  
+    if (bind)
+        A7105_WriteID(radio_data.radio_id);
+    else
+        A7105_WriteID(Model.fixed_id);
 
-    A7105_WriteID(radio_data.radio_id);
     A7105_Strobe(A7105_STANDBY);
     return 1;
 }
@@ -724,13 +728,12 @@ static void initialize(u8 bind) {
         PROTOCOL_SetBindState(0xFFFFFFFF);
     } else {
         set_radio_data(1);
-        if (Model.fixed_id > RXID_MAX) A7105_WriteID(Model.fixed_id);
         state = DATA_1;
     }
 
     A7105_Reset();
     CLOCK_ResetWatchdog();
-    while(!bugs3_init()) {
+    while(!bugs3_init(bind)) {
         MUSIC_Play(MUSIC_ALARM1);
         A7105_Reset();
         CLOCK_ResetWatchdog();
