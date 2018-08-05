@@ -460,7 +460,7 @@ static void build_packet(u8 bind) {
     u16 rudder   = get_channel(CHANNEL4, -400, 400, 400);
 
     memset(packet, 0, sizeof(packet));
-    packet[1] = 0x76;
+    packet[1] = 0x76;   // txid (rx uses to know hopping frequencies)
     packet[2] = 0x71;
     packet[3] = 0x94;
 
