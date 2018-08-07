@@ -47,6 +47,7 @@ PROTO_MODULES += $(ODIR)/protocol/dm002.mod
 PROTO_MODULES += $(ODIR)/protocol/corona.mod
 PROTO_MODULES += $(ODIR)/protocol/bugs3.mod
 PROTO_MODULES += $(ODIR)/protocol/crsf.mod
+PROTO_MODULES += $(ODIR)/protocol/hitec.mod
 
 ALL += $(PROTO_MODULES)
 else #BUILD_TARGET
@@ -236,6 +237,10 @@ $(ODIR)/protocol/bugs3.mod : $(ODIR)/bugs3_a7105.bin
     
 $(ODIR)/protocol/crsf.mod : $(ODIR)/crsf_uart.bin
 	@echo Building 'crsf' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
+    
+$(ODIR)/protocol/hitec.mod : $(ODIR)/hitec_cc2500.bin
+	@echo Building 'hitec' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
     
 endif #BUILD_TARGET
