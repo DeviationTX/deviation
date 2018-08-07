@@ -24,6 +24,7 @@
 #include "mixer.h"
 #include "config/model.h"
 #include "config/tx.h"
+#include "telemetry.h"
 
 #ifdef MODULAR
   //Some versions of gcc applythis to definitions, others to calls
@@ -83,7 +84,7 @@ static u8  phase;
 static u8  bind_in_progress;
 static u8  bind_phase;
 static u8  hopping_frequency[50];
-static u8  hopping_frequency_no=0;
+static u8  hopping_frequency_no;
 static u8  packet[40];
 static u8 calData[48];
 static u8  rf_ch_num;
@@ -268,6 +269,15 @@ static void HITEC_send_packet()
         packet[23] >>= 1;   // packet number
 }
 
+static void update_telemetry(u8 *pkt, u8 len) {
+  Telemetry.value[TELEM_FRSKY_RSSI] = pkt[len-2] ^ 0x80;
+  TELEMETRY_SetUpdated(TELEM_FRSKY_RSSI);
+  Telemetry.value[TELEM_FRSKY_LQI] = pkt[len-1] & 0x7F;
+  TELEMETRY_SetUpdated(TELEM_FRSKY_LQI);
+  Telemetry.value[TELEM_FRSKY_VOLT1] = ((pkt[len-3]<<8) + pkt[len-4])*1000/28;    // calculation in decimal is volt=(pkt[len-3]<<8+pkt[len-4])/28
+  TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT1);
+}
+
 static u16 ReadHitec()
 {
     u8 len;
@@ -370,21 +380,7 @@ static u16 ReadHitec()
                         { // telem packet: 0C, 00, 6A, 03, 00, 00, 00, 00, 00, 00, 00, 8E, 00, 5E, 94 
                           //Not fully handled since the RX I have only send 1 frame where from what I've been reading on Hitec telemetry should have at least 4 frames...
                             //debug(",telem");
-                            #if defined(HITEC_HUB_TELEMETRY)
-                                TX_RSSI = pkt[len-2];
-                                if(TX_RSSI >=128)
-                                    TX_RSSI -= 128;
-                                else
-                                    TX_RSSI += 128;
-                                TX_LQI = pkt[len-1]&0x7F;
-                                //TODO: where is the frame number...
-								v_lipo1 = (pkt[len-3])<<5 | (pkt[len-4])>>3;    // calculation in decimal is volt=(pkt[len-3]<<8+pkt[len-4])/28
-                                telemetry_link=1;
-                            #elif defined(HITEC_FW_TELEMETRY)
-								for(u8 i=4;i < len; i++)
-									pkt[i-4]=pkt[i];		// remove header, 11 bytes of data
-								telemetry_link=2;
-                            #endif
+                            update_telemetry(pkt, len);
                         }
                     //debugln("");
                 }
@@ -450,7 +446,10 @@ const void *Hitec_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
         case PROTOCMD_CURRENT_ID: return (void *)((long)Model.fixed_id);
         case PROTOCMD_GETOPTIONS: return hitec_opts;
-        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
+        case PROTOCMD_TELEMETRYSTATE:
+            return (void *)(long)(PROTO_TELEM_ON);
+        case PROTOCMD_TELEMETRYTYPE: 
+            return (void *)(long) TELEM_FRSKY;
         default: break;
     }
     return 0;
