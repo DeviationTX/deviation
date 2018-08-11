@@ -59,13 +59,13 @@ enum {
 };
 
 static const char *const hitec_opts[] = {
-    _tr_noop("Format"), "HITEC", "MINIMA", NULL,
+    _tr_noop("Format"), "OPTIMA", "MINIMA", NULL,
     _tr_noop("Freq-Fine"),  "-127", "127", NULL,
     NULL
 };
 
 enum {
-    FORMAT_HITEC,
+    FORMAT_OPTIMA,
     FORMAT_MINIMA,
 };
 
