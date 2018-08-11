@@ -59,14 +59,14 @@ enum {
 };
 
 static const char *const hitec_opts[] = {
-    _tr_noop("Format"), "HITEC", "OPTIMA", NULL,
+    _tr_noop("Format"), "HITEC", "MINIMA", NULL,
     _tr_noop("Freq-Fine"),  "-127", "127", NULL,
     NULL
 };
 
 enum {
     FORMAT_HITEC,
-    FORMAT_OPTIMA,
+    FORMAT_MINIMA,
 };
 
 enum {
@@ -212,13 +212,11 @@ static void HITEC_build_packet()
                 packet[5]=hopping_frequency[13]>>1; // if not there the Optima link is jerky...
                 break;
         }
-        if (Model.proto_opts[PROTO_OPTS_FORMAT] == FORMAT_OPTIMA) {
-            packet[4] = bind_phase; // increments based on RX answer
-        } else {
-            packet[4] = bind_phase+0x10;
-            bind_phase^=0x01;       // switch between 0x82=first part of the hopping table and 0x83=second part
-        }
-        packet[19] = 0x08;  // packet number
+        if (Model.proto_opts[PROTO_OPTS_FORMAT] == FORMAT_MINIMA)
+            packet[4] = bind_phase + 0x10;
+        else
+            packet[4] = bind_phase; // Optima: increments based on RX answer
+        packet[19] = 0x08;  // packet sequence
         offset=20;          // packet[20] and [21]
     }
     else
@@ -230,29 +228,29 @@ static void HITEC_build_packet()
             packet[4+2*i] = ch >> 8;
             packet[5+2*i] = ch & 0xFF;
         }
-        packet[23] = 0x80;  // packet number
+        packet[23] = 0x80;  // packet sequence
         offset=24;          // packet[24] and [25]
         packet[26] = 0x00;  // unknown always 0 and the RX doesn't seem to care about the value?
     }
 
-	if(F5_frame)
-	{// No idea what it is but Minima RXs are expecting these frames to work to work
-		packet[offset] = 0xF5;
-		packet[offset+1] = 0xDF;
-		if((F5_counter%9)==0)
-			packet[offset+1] -= 0x04;	// every 8 packets send 0xDB
-		F5_counter++;
-		F5_counter%=59;					// every 6 0xDB packets wait only 4 to resend instead of 8
-		F5_frame=0;					// alternate
-		if(bind_in_progress)
-			packet[offset+1]++;			// when binding the values are 0xE0 and 0xDC
-	}
-	else
-	{
-		packet[offset] = 0x00;
-		packet[offset+1] = 0x00;
-		F5_frame=1;					// alternate
-	}
+    if(F5_frame)
+    {// No idea what it is but Minima RXs are expecting these frames to work to work
+        packet[offset] = 0xF5;
+        packet[offset+1] = 0xDF;
+        if((F5_counter%9)==0)
+            packet[offset+1] -= 0x04;   // every 8 packets send 0xDB
+        F5_counter++;
+        F5_counter%=59;                 // every 6 0xDB packets wait only 4 to resend instead of 8
+        F5_frame=0;                 // alternate
+        if(bind_in_progress)
+            packet[offset+1]++;         // when binding the values are 0xE0 and 0xDC
+    }
+    else
+    {
+        packet[offset] = 0x00;
+        packet[offset+1] = 0x00;
+        F5_frame=1;                 // alternate
+    }
 /*  debug("P:");
     for(u8 i=0;i<packet[0]+1;i++)
         debug("%02X,",packet[i]);
@@ -260,22 +258,53 @@ static void HITEC_build_packet()
 */
 }
 
-static void HITEC_send_packet()
-{
+static void HITEC_send_packet() {
+    u8 i;
+
     CC2500_WriteData(packet, packet[0]+1);
-    if(bind_in_progress)
-        packet[19] >>= 1;   // packet number
-    else
-        packet[23] >>= 1;   // packet number
+    if(bind_in_progress) {
+        packet[19] >>= 1;   // packet sequence
+        if ((packet[4] & 0xfe) == 0x82) {
+            // Minima
+            packet[4] ^= 1;     // alternate 0x82 and 0x83
+            if (packet[4] & 0x01 )
+                for (i=0; i < 7; i++)       // 0x83
+                    packet[5+i] = hopping_frequency[i+14] >> 1;
+            else
+                for (i=0; i < 14; i++)      // 0x82
+                    packet[5+i] = hopping_frequency[i] >> 1;
+        }
+    } else {
+        packet[23] >>= 1;   // packet sequence
+    }
 }
 
 static void update_telemetry(u8 *pkt, u8 len) {
-  Telemetry.value[TELEM_FRSKY_RSSI] = pkt[len-2] ^ 0x80;
-  TELEMETRY_SetUpdated(TELEM_FRSKY_RSSI);
-  Telemetry.value[TELEM_FRSKY_LQI] = pkt[len-1] & 0x7F;
-  TELEMETRY_SetUpdated(TELEM_FRSKY_LQI);
-  Telemetry.value[TELEM_FRSKY_VOLT1] = ((pkt[len-3]<<8) + pkt[len-4])*1000/28;    // calculation in decimal is volt=(pkt[len-3]<<8+pkt[len-4])/28
-  TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT1);
+    (void) len;
+
+    switch (pkt[5]) { // telemetry frame number
+    case 0x00:
+        Telemetry.value[TELEM_FRSKY_VOLT1] = (pkt[10])<<5 | (pkt[11])>>3;   // calculation in float is volt=(pkt[10]<<8+pkt[11])/28
+        TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT1);
+        break;
+    case 0x11:
+        Telemetry.value[TELEM_FRSKY_VOLT1] = (pkt[9])<<5 | (pkt[10])>>3;    // calculation in float is volt=(pkt[9]<<8+pkt[10])/28
+        TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT1);
+        break;
+    case 0x18:
+        Telemetry.value[TELEM_FRSKY_VOLT1] = (pkt[6])<<5 | (pkt[7])>>3;     // calculation in float is volt=(pkt[6]<<8+pkt[7])/10
+        TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT2);
+        break;
+    }
+
+    if (pkt[13] >= 128)
+        Telemetry.value[TELEM_FRSKY_RSSI] = pkt[13] - 128;
+    else
+        Telemetry.value[TELEM_FRSKY_RSSI] = pkt[13] + 128;
+    TELEMETRY_SetUpdated(TELEM_FRSKY_RSSI);
+
+    Telemetry.value[TELEM_FRSKY_LQI] = pkt[14] & 0x7F;
+    TELEMETRY_SetUpdated(TELEM_FRSKY_LQI);
 }
 
 static u16 ReadHitec()
@@ -376,9 +405,19 @@ static u16 ReadHitec()
                         }
                     }
                     else
-                        if(len==15) // Telemetry packets have a length of 15
-                        { // telem packet: 0C, 00, 6A, 03, 00, 00, 00, 00, 00, 00, 00, 8E, 00, 5E, 94 
-                          //Not fully handled since the RX I have only send 1 frame where from what I've been reading on Hitec telemetry should have at least 4 frames...
+                        if (len == 15 && pkt[4] == 0 && pkt[12] == 0)
+                        {   // Valid telemetry packets
+                            // no station:
+                            //      0C,1C,A1,2B,00,00,00,00,00,00,00,8D,00,64,8E    -> 00 8D=>RX battery voltage 0x008D/28=5.03V
+                            // with HTS-SS:
+                            //      0C,1C,A1,2B,00,11,AF,00,2D,00,8D,11,00,4D,96    -> 00 8D=>RX battery voltage 0x008D/28=5.03V
+                            //      0C,1C,A1,2B,00,12,00,00,00,00,00,12,00,52,93
+                            //      0C,1C,A1,2B,00,13,00,00,00,00,46,13,00,52,8B    -> 46=>temperature2 0x46-0x28=30°C
+                            //      0C,1C,A1,2B,00,14,00,00,00,00,41,14,00,2C,93    -> 41=>temperature1 0x41-0x28=25°C
+                            //      0C,1C,A1,2B,00,15,00,2A,00,0E,00,15,00,44,96    -> 2A 00=>rpm1=420, 0E 00=>rpm2=140 
+                            //      0C,1C,A1,2B,00,16,00,00,00,00,00,16,00,2C,8E
+                            //      0C,1C,A1,2B,00,17,00,00,00,42,44,17,00,48,8D    -> 42=>temperature3 0x42-0x28=26°C,44=>temperature4 0x44-0x28=28°C
+                            //      0C,1C,A1,2B,00,18,00,00,00,00,00,18,00,50,92
                             //debug(",telem");
                             update_telemetry(pkt, len);
                         }
@@ -406,8 +445,8 @@ static u16 initHITEC()
     HITEC_RF_channels();
     #ifdef HITEC_FORCE_ID
     // ID and channels taken from dump
-		rx_tx_addr[1]=0x00;
-		rx_tx_addr[2]=0x03;
+        rx_tx_addr[1]=0x00;
+        rx_tx_addr[2]=0x03;
         rx_tx_addr[3]=0x6A;
         memcpy((void *)hopping_frequency,
                (void *)"\x00\x3A\x4A\x32\x0C\x58\x2A\x10\x26\x20\x08\x60\x68\x70\x78\x80\x88\x56\x5E\x66\x6E",
@@ -454,4 +493,68 @@ const void *Hitec_Cmds(enum ProtoCmds cmd)
     }
     return 0;
 }
+
+
+/* Full telemetry documentation
+packet[0] = TX RSSI value
+packet[1] = TX LQI value
+packet[2] = frame number
+packet[3-7] telemetry data
+
+The frame number takes the following values: 0x00, 0x11, 0x12, ..., 0x18. The frames can be present or not, they also do not have to follow each others.
+Here is a description of the telemetry data for each frame number:
+- frame 0x00
+data byte 0 -> 0x00             unknown
+data byte 1 -> 0x00             unknown
+data byte 2 -> 0x00             unknown
+data byte 3 -> RX Batt Volt_H
+data byte 4 -> RX Batt Volt_L => RX Batt=(Volt_H*256+Volt_L)/28
+- frame 0x11
+data byte 0 -> 0xAF             start of frame
+data byte 1 -> 0x00             unknown
+data byte 2 -> 0x2D             frame type but constant here
+data byte 3 -> Volt1_H
+data byte 4 -> Volt1_L          RX Batt=(Volt1_H*256+Volt1_L)/28 V
+- frame 0x12
+data byte 0 -> Lat_sec_H        GPS : latitude second
+data byte 1 -> Lat_sec_L        signed int : 1/100 of second
+data byte 2 -> Lat_deg_min_H    GPS : latitude degree.minute
+data byte 3 -> Lat_deg_min_L    signed int : +=North, - = south
+data byte 4 -> Time_second      GPS Time
+- frame 0x13
+data byte 0 ->                  GPS Longitude second
+data byte 1 ->                  signed int : 1/100 of second
+data byte 2 ->                  GPS Longitude degree.minute
+data byte 3 ->                  signed int : +=Est, - = west
+data byte 4 -> Temp2            Temperature2=Temp2-40°C
+- frame 0x14
+data byte 0 -> Speed_H
+data byte 1 -> Speed_L          Speed=Speed_H*256+Speed_L km/h
+data byte 2 -> Alti_sea_H
+data byte 3 -> Alti_sea_L       Altitude sea=Alti_sea_H*256+Alti_sea_L m
+data byte 4 -> Temp1            Temperature1=Temp1-40°C
+- frame 0x15
+data byte 0 -> FUEL
+data byte 1 -> RPM1_L
+data byte 2 -> RPM1_H           RPM1=RPM1_H*256+RPM1_L
+data byte 3 -> RPM2_L
+data byte 4 -> RPM2_H           RPM2=RPM2_H*256+RPM2_L
+- frame 0x16
+data byte 0 -> Date_year        GPS Date
+data byte 1 -> Date_month
+data byte 2 -> Date_day
+data byte 3 -> Time_hour        GPS Time
+data byte 4 -> Time_min
+- frame 0x17
+data byte 0 -> 0x00 COURSEH
+data byte 1 -> 0x00 COURSEL     GPS Course = COURSEH*256+COURSEL
+data byte 2 -> 0x00             GPS count
+data byte 3 -> Temp3            Temperature3=Temp2-40°C
+data byte 4 -> Temp4            Temperature4=Temp3-40°C
+- frame 0x18
+data byte 1 -> Volt2_H
+data byte 2 -> Volt2_L          Volt2=(Volt2_H*256+Volt2_L)/10 V
+data byte 3 -> AMP1_L
+data byte 4 -> AMP1_H           Amp=(AMP1_H*256+AMP1_L -180)/14 in signed A
+*/
 #endif
