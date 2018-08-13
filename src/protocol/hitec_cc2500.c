@@ -389,18 +389,24 @@ static void update_telemetry(u8 *pkt, u8 len) {
         Telemetry.gps.longitude = deg_min * 1000 + seconds ;
         TELEMETRY_SetUpdated(TELEM_GPS_LONG);
 
+#if HAS_EXTENDED_TELEMETRY
         set_telemetry(TELEM_FRSKY_TEMP2, pkt[10]-40);
+#endif
         break;
     case 0x14:
         Telemetry.gps.altitude = (s32)((pkt[8]<<8) + pkt[9]) * 10;
         TELEMETRY_SetUpdated(TELEM_GPS_ALT);
         Telemetry.gps.velocity = (s32)((pkt[6]<<8) + pkt[7]);
         TELEMETRY_SetUpdated(TELEM_GPS_SPEED);
+#if HAS_EXTENDED_TELEMETRY
         set_telemetry(TELEM_FRSKY_TEMP1, pkt[10]-40);
+#endif
         break;
     case 0x15:
+#if HAS_EXTENDED_TELEMETRY
         set_telemetry(TELEM_FRSKY_FUEL, pkt[6]);
         set_telemetry(TELEM_FRSKY_RPM, (pkt[8] << 8) + pkt[7]);
+#endif
         break;
     case 0x16:
         Telemetry.gps.time = ( (u32)pkt[6])  << 26  // year
@@ -419,7 +425,9 @@ static void update_telemetry(u8 *pkt, u8 len) {
     case 0x18:
 //TODO offsets may not be correct
         set_telemetry(TELEM_FRSKY_VOLT2, data_to_volt(pkt[6], pkt[7]));
+#if HAS_EXTENDED_TELEMETRY
         set_telemetry(TELEM_FRSKY_CURRENT, (s32)((pkt[9] << 8) + pkt[8] - 180) / 14 * 10);
+#endif
         break;
     }
 
