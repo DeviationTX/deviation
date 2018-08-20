@@ -114,12 +114,37 @@ static void HITEC_CC2500_init() {
     CC2500_SetPower(Model.tx_power);
 }
 
+static int get_tx_id()
+{
+    u32 lfsr = 0x7649eca9ul;
+
+    u8 var[12];
+    MCU_SerialNumber(var, 12);
+    for (int i = 0; i < 12; ++i) {
+        rand32_r(&lfsr, var[i]);
+    }
+    for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
+        rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
+    return rand32_r(&lfsr, 0);
+}
+
+// Convert 32b id to rx_tx_addr
+static void set_rx_tx_addr(u32 id)
+{
+  rx_tx_addr[0] = (id >> 24) & 0xFF;
+  rx_tx_addr[1] = (id >> 16) & 0xFF;
+  rx_tx_addr[2] = (id >>  8) & 0xFF;
+  rx_tx_addr[3] = (id >>  0) & 0xFF;
+  rx_tx_addr[4] = (rx_tx_addr[2]&0xF0)|(rx_tx_addr[3]&0x0F);
+}
+
 // Generate RF channels
 static void HITEC_RF_channels()
 {
     //Normal hopping
     u8 idx = 0;
-    u32 rnd = CLOCK_getms();
+    u32 rnd = get_tx_id();
+	set_rx_tx_addr(rnd);
 
     while (idx < HITEC_NUM_FREQUENCE)
     {
@@ -174,7 +199,8 @@ static void HITEC_change_chan_fast()
 #define CHANNEL_MIN_100 204     //  100%
 u16 convert_channel_16b_nolimit(uint8_t num, int16_t min, int16_t max)
 {
-    s32 val = Channels[num] * 1024 / CHAN_MAX_VALUE + 1024;    // 0<->2047
+//    s32 val = Channels[num] * 1024 / CHAN_MAX_VALUE + 1024;    // 0<->2047
+    s32 val = Channels[num];
     val=(val-CHANNEL_MIN_100)*(max-min)/(CHANNEL_MAX_100-CHANNEL_MIN_100)+min;
     return (u16)val;
 }
