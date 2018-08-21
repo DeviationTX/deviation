@@ -224,11 +224,14 @@ enum {
 #define CHANNEL_ARM         CHANNEL5
 #define CHANNEL_LED         CHANNEL6
 #define CHANNEL_FLIP        CHANNEL7
-//#define CHANNEL_PICTURE     CHANNEL8
+#define CHANNEL_PICTURE     CHANNEL8
+#define CHANNEL_VIDEO       CHANNEL9
 
 // flags packet byte 4
 #define FLAG_FLIP    0x08    // automatic flip
 #define FLAG_MODE    0x04    // low/high speed select (set is high speed)
+#define FLAG_VIDEO   0x02    // toggle video
+#define FLAG_PICTURE 0x01    // toggle picture
 
 // flags packet byte 5
 #define FLAG_LED     0x80    // enable LEDs
@@ -470,7 +473,9 @@ static void build_packet(u8 bind) {
       packet[5] = 0x06 | arm_flags;
     } else {
       packet[4] = change_channel | FLAG_MODE
-                | GET_FLAG(CHANNEL_FLIP, FLAG_FLIP);
+                | GET_FLAG(CHANNEL_FLIP, FLAG_FLIP)
+                | GET_FLAG(CHANNEL_PICTURE, FLAG_PICTURE)
+                | GET_FLAG(CHANNEL_VIDEO, FLAG_VIDEO);
       packet[5] = 0x06 | arm_flags
                 | GET_FLAG(CHANNEL_LED, FLAG_LED);
     }
@@ -756,8 +761,8 @@ const void *BUGS3_Cmds(enum ProtoCmds cmd)
             CLOCK_StopTimer();
             return (void *)(A7105_Reset() ? 1L : -1L);
         case PROTOCMD_BIND:  initialize(1); return 0;
-        case PROTOCMD_NUMCHAN: return (void *)7L; // A, E, T, R, Arm, Pic, Led
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)7L;
+        case PROTOCMD_NUMCHAN: return (void *)9L;
+        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)9L;
         case PROTOCMD_CURRENT_ID: return 0;
         case PROTOCMD_GETOPTIONS:
             return bugs3_opts;
