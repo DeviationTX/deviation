@@ -612,17 +612,12 @@ static u16 bugs3_cb() {
 
         A7105_Strobe(A7105_STANDBY);
 
-        // if fixed_id not set, put rxid there
-        // then user must look up radio id and store in fixed id
-        if (Model.fixed_id > RXID_MAX) {
-            set_radio_data(1);
-            A7105_WriteID(Model.fixed_id);
-        } else {
-            u16 rxid = (packet[1] << 8) + packet[2];
-            u32 radioid = rxid_to_radioid(rxid);
-            Model.fixed_id = radioid;
-            break;
-        }
+        // set fixed_id to radio_id
+        u16 rxid = (packet[1] << 8) + packet[2];
+        u32 radioid = rxid_to_radioid(rxid);
+        Model.fixed_id = radioid;
+        set_radio_data(1);
+        A7105_WriteID(radioid);
 
         PROTOCOL_SetBindState(0);
         state = DATA_1;
