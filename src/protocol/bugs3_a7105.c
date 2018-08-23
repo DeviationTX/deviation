@@ -506,35 +506,7 @@ static void build_packet(u8 bind) {
 //    packet[21] = 0;
 
     packet[0] = get_checkbyte();
-
-//TODO
-#if 0
-printf("packet ");
-for (int i=0; i < PACKET_SIZE; i++) {
-  printf("%02x ", packet[i]);
 }
-printf("\n");
-#endif
-//TODO
-
-}
-
-#ifdef REAL
-// Generate internal id from TX id and manufacturer id (STM32 unique id)
-static int get_tx_id()
-{
-    u32 lfsr = 0x7649eca9ul;
-
-    u8 var[12];
-    MCU_SerialNumber(var, 12);
-    for (int i = 0; i < 12; ++i) {
-        rand32_r(&lfsr, var[i]);
-    }
-    for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
-        rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
-    return rand32_r(&lfsr, 0);
-}
-#endif
 
 static void set_radio_data(u8 index) {
     // captured radio data for bugs rx/tx version A2
@@ -696,15 +668,6 @@ static u16 bugs3_cb() {
         if (!(mode & 0x01)) {
             A7105_ReadData(packet, 16);
             update_telemetry(packet);
-//TODO
-#if 0
-printf("received ");
-for (int i=0; i < 16; i++) {
-  printf("%02x ", packet[i]);
-}
-printf("\n");
-#endif
-//TODO
         }
         state = DATA_1;
         packet_period = DELAY_POST_RX;
