@@ -386,7 +386,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 
 static const struct telem_layout2 *_get_telem_layout2()
 {
-    const struct telem_layout2 *page;
+    const struct telem_layout2 *page = NULL;
     switch (TELEMETRY_Type()) {
     case TELEM_DEVO:   page = &devo_page[current_page]; break;
     case TELEM_DSM:    page = &dsm_page[current_page]; break;
