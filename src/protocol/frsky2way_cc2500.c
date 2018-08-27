@@ -493,6 +493,13 @@ const void *FRSKY2WAY_Cmds(enum ProtoCmds cmd)
             return (void *)(CC2500_Reset() ? 1L : -1L);
         case PROTOCMD_TELEMETRYTYPE: 
             return (void *)(long) TELEM_FRSKY;
+        case PROTOCMD_TELEMETRYRESET:
+#if HAS_EXTENDED_TELEMETRY
+            Model.ground_level = 0;
+            discharge_dAms = 0;
+            Telemetry.value[TELEM_FRSKY_MIN_CELL] = TELEMETRY_GetMaxValue(TELEM_FRSKY_MIN_CELL);
+#endif
+            return 0;
         default: break;
     }
     return 0;

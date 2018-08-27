@@ -176,6 +176,7 @@ int PROTOCOL_HasPowerAmp(int idx);
 int PROTOCOL_SetSwitch(int module);
 int PROTOCOL_SticksMoved(int init);
 void PROTOCOL_InitModules();
+void PROTOCOL_ResetTelemetry();
 
 
 /* Input */

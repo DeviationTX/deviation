@@ -338,6 +338,12 @@ int PROTOCOL_GetTelemetryType()
     return telem_type;
 }
 
+void PROTOCOL_ResetTelemetry()
+{
+    if(Model.protocol != PROTOCOL_NONE && PROTOCOL_LOADED)
+        PROTO_Cmds(PROTOCMD_TELEMETRYRESET);
+}
+
 void PROTOCOL_CheckDialogs()
 {
     if (proto_state & PROTO_MODULEDLG) {
