@@ -40,8 +40,9 @@ void UART_Initialize()
                     GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, _USART_GPIO_USART_TX);
 
     /* Setup UART parameters. */
-    UART_SetDataRate(115200);
+    UART_SetDataRate(0);
     UART_SetFormat(8, UART_PARITY_NONE, UART_STOPBITS_1);
+    UART_SetDuplex(UART_DUPLEX_FULL);
     usart_set_flow_control(_USART, USART_FLOWCONTROL_NONE);
     usart_set_mode(_USART, USART_MODE_TX_RX);
 
@@ -79,6 +80,7 @@ void UART_Stop()
     usart_set_mode(_USART, 0);
     usart_disable(_USART);
     rcc_peripheral_disable_clock(&_USART_RCC_APB_ENR_USART, _USART_RCC_APB_ENR_USART_EN);
+    gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, _USART_GPIO_USART_TX);
 }
 
 void UART_SetDataRate(u32 bps)
@@ -188,6 +190,7 @@ void UART_StopReceive()
 
 void UART_SetDuplex(uart_duplex duplex)
 {
+    // no libopencm3 function for duplex
     if (duplex == UART_DUPLEX_FULL)
         USART_CR3(_USART) &= ~USART_CR3_HDSEL;
     else
