@@ -233,9 +233,12 @@ $(ODIR)/protocol/corona.mod : $(ODIR)/corona_cc2500.bin
 $(ODIR)/protocol/bugs3.mod : $(ODIR)/bugs3_a7105.bin
 	@echo Building 'bugs3' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
+<<<<<<< HEAD
     
 $(ODIR)/protocol/crsf.mod : $(ODIR)/crsf_uart.bin
 	@echo Building 'crsf' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
+=======
+>>>>>>> 303079aef2f29fb628bd5734de68858f6c9a6b54
     
 endif #BUILD_TARGET
