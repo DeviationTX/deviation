@@ -241,7 +241,7 @@ enum {
 #define RXID_MAX  65535
 static const char * const bugs3_opts[] = {
     _tr_noop("Freq Tune"), "-300", "300", "655361", NULL, // big step 10, little step 1
-    NULL 
+    NULL
 };
 
 enum {
@@ -403,7 +403,7 @@ static int bugs3_init(u8 bind) {
 
     freq_offset = Model.proto_opts[PROTOOPTS_FREQTUNE];
     A7105_AdjustLOBaseFreq(freq_offset);
-  
+
     if (bind)
         A7105_WriteID(radio_data.radio_id);
     else
@@ -701,7 +701,7 @@ static void initialize(u8 bind) {
         A7105_Reset();
         CLOCK_ResetWatchdog();
     }
-    
+
     channel_idx = 0;
     packet_count = 0;
     armed = 0;
@@ -726,7 +726,7 @@ const void *BUGS3_Cmds(enum ProtoCmds cmd)
             return bugs3_opts;
         case PROTOCMD_TELEMETRYSTATE:
             return (void *)(long)(PROTO_TELEM_ON);
-        case PROTOCMD_TELEMETRYTYPE: 
+        case PROTOCMD_TELEMETRYTYPE:
             return (void *)(long) TELEM_FRSKY;
         default: break;
     }
