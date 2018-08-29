@@ -52,6 +52,9 @@ enum {
     CHANNEL9,     // Headless
     CHANNEL10,    // RTH
     CHANNEL11,    // GPS HOLD
+    CHANNEL12,    // Mode (sport1, sport2, acro)
+    CHANNEL13,    // OSD
+    CHANNEL14,    // Flip (H122D/H123D)
 };
 
 #define CHANNEL_LED         CHANNEL5
@@ -63,6 +66,9 @@ enum {
 #define CHANNEL_HEADLESS    CHANNEL9
 #define CHANNEL_RTH         CHANNEL10
 #define CHANNEL_GPS_HOLD    CHANNEL11
+#define CHANNEL_MODE        CHANNEL12
+#define CHANNEL_OSD         CHANNEL13
+#define CHANNEL_FLIP2       CHANNEL14
 
 enum{
     // flags going to packet[9] (H107)
@@ -94,9 +100,22 @@ enum{
     // flags going to packet[9] (H501S)
     FLAG_H501_VIDEO     = 0x01,
     FLAG_H501_LED       = 0x04,
+    FLAG_H122D_FLIP     = 0x08,	//H122D
     FLAG_H501_RTH       = 0x20,
     FLAG_H501_HEADLESS1 = 0x40,
     FLAG_H501_GPS_HOLD  = 0x80,
+};
+
+enum{
+    // flags going to packet[11] (H123D)
+    FLAG_H123D_MODE_SPORT1  = 0x01,
+    FLAG_H123D_MODE_SPORT2  = 0x02,
+    FLAG_H123D_MODE_ACRO    = 0x03
+};
+
+enum{
+    // flags going to packet[11] (H122D)
+    FLAG_H122D_OSD      = 0x20
 };
 
 enum{
@@ -376,12 +395,27 @@ static void hubsan_build_packet()
             packet[9] = 0x02
                       | GET_FLAG(CHANNEL_LED, FLAG_H501_LED)
                       | GET_FLAG(CHANNEL_VIDEO, FLAG_H501_VIDEO)
+                      | GET_FLAG(CHANNEL_FLIP2, FLAG_H122D_FLIP)
                       | GET_FLAG(CHANNEL_RTH, FLAG_H501_RTH)
                       | GET_FLAG(CHANNEL_GPS_HOLD, FLAG_H501_GPS_HOLD)
                       | GET_FLAG(CHANNEL_HEADLESS, FLAG_H501_HEADLESS1);
+            
             packet[13] = GET_FLAG(CHANNEL_HEADLESS, FLAG_H501_HEADLESS2)
                        | GET_FLAG(CHANNEL_ALT_HOLD, FLAG_H501_ALT_HOLD)
                        | GET_FLAG(CHANNEL_SNAPSHOT, FLAG_H501_SNAPSHOT);
+                       
+            //H123D specific -> Flight modes => Does this needs to be a sub_protocol to work?
+            packet[11] = 0x40;
+            if(Channels[CHANNEL_MODE] < 0)
+                packet[11] |= 0x01;  // Sport mode 1
+            else if(Channels[CHANNEL_MODE] > 0)
+                packet[11] |= 0x03;  // acro
+            else
+                packet[11] |= 0x02; // Sport mode 2
+            
+            //H122D specifics -> OSD => Does this needs to be a sub_protocol to work?
+            packet[11] |= 0x80
+                       |  GET_FLAG(CHANNEL_OSD, FLAG_H122D_OSD);
         }
         else { // H107P/C+/D+
             packet[9] = 0x06
@@ -639,8 +673,8 @@ const void *HUBSAN_Cmds(enum ProtoCmds cmd)
             return (void *)(A7105_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H107 ? (void*)1L : 0;
         case PROTOCMD_BIND:  initialize(1); return 0;
-        case PROTOCMD_NUMCHAN: return (void *)11L; // A, E, T, R, Leds, Flips(or alt-hold), Snapshot, Video Recording, Headless, RTH, GPS Hold
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)11L;
+        case PROTOCMD_NUMCHAN: return (void *)14L; // A, E, T, R, Leds, Flips(or alt-hold), Snapshot, Video Recording, Headless, RTH, GPS Hold, Mode, osd, flip
+        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)14L;
         case PROTOCMD_CURRENT_ID: return 0;
         case PROTOCMD_GETOPTIONS:
             if( Model.proto_opts[PROTOOPTS_VTX_FREQ] == 0)
