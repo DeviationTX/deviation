@@ -156,8 +156,8 @@ static void processCrossfireTelemetryFrame()
       break;
 
     case LINK_ID:
-      for (i=0; i <= TELEM_CRSF_TX_SNR; i++) {
-        if (getCrossfireTelemetryValue(3+i, &value, 1)) {
+      for (i=1; i <= TELEM_CRSF_TX_SNR; i++) {
+        if (getCrossfireTelemetryValue(2+i, &value, 1)) {   // payload starts at third byte of rx packet
           if (i == TELEM_CRSF_TX_POWER) {
             static const s32 power_values[] = { 0, 10, 25, 100, 500, 1000, 2000 };
             value = power_values[value];
@@ -186,7 +186,7 @@ static void processCrossfireTelemetryFrame()
       break;
 
     case FLIGHT_MODE_ID: // string - save first four bytes for now
-      getCrossfireTelemetryValue(3, &value, 4);
+      memcpy(&value, &telemetryRxBuffer[3], 4);
       set_telemetry(TELEM_CRSF_FLIGHT_MODE, value);
       break;
   }
