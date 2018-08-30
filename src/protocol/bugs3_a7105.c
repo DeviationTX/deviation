@@ -226,6 +226,7 @@ enum {
 #define CHANNEL_FLIP        CHANNEL7
 #define CHANNEL_PICTURE     CHANNEL8
 #define CHANNEL_VIDEO       CHANNEL9
+#define CHANNEL_ANGLE       CHANNEL10
 
 // flags packet byte 4
 #define FLAG_FLIP    0x08    // automatic flip
@@ -237,6 +238,7 @@ enum {
 #define FLAG_LED     0x80    // enable LEDs
 #define FLAG_ARM     0x40    // arm (toggle to turn on motors)
 #define FLAG_DISARM  0x20    // disarm (toggle to turn off motors)
+#define FLAG_ANGLE   0x04    // angle/acro mode (set is angle mode)
 
 #define RXID_MAX  65535
 static const char * const bugs3_opts[] = {
@@ -470,14 +472,15 @@ static void build_packet(u8 bind) {
     check_arming(Channels[CHANNEL_ARM]);  // sets globals arm_flags and armed
     if (bind) {
       packet[4] = change_channel | 0x80;
-      packet[5] = 0x06 | arm_flags;
+      packet[5] = 0x02 | arm_flags;
     } else {
       packet[4] = change_channel | FLAG_MODE
                 | GET_FLAG(CHANNEL_FLIP, FLAG_FLIP)
                 | GET_FLAG(CHANNEL_PICTURE, FLAG_PICTURE)
                 | GET_FLAG(CHANNEL_VIDEO, FLAG_VIDEO);
-      packet[5] = 0x06 | arm_flags
-                | GET_FLAG(CHANNEL_LED, FLAG_LED);
+      packet[5] = 0x02 | arm_flags
+                | GET_FLAG(CHANNEL_LED, FLAG_LED)
+                | GET_FLAG(CHANNEL_ANGLE, FLAG_ANGLE);
     }
 
     packet[6] = force_values ? 100 : (aileron  >> 2);
@@ -719,8 +722,8 @@ const void *BUGS3_Cmds(enum ProtoCmds cmd)
             CLOCK_StopTimer();
             return (void *)(A7105_Reset() ? 1L : -1L);
         case PROTOCMD_BIND:  initialize(1); return 0;
-        case PROTOCMD_NUMCHAN: return (void *)9L;
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)9L;
+        case PROTOCMD_NUMCHAN: return (void *)10L;
+        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)10L;
         case PROTOCMD_CURRENT_ID: return 0;
         case PROTOCMD_GETOPTIONS:
             return bugs3_opts;
