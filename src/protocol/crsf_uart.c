@@ -282,6 +282,7 @@ static u16 serial_cb()
     UART_Send(packet, sizeof packet);
 
 #ifdef EMULATOR
+#if HAS_EXTENDED_TELEMETRY
     static u8 i;
     u8 j, len;
 
@@ -296,6 +297,7 @@ static u16 serial_cb()
     if (rxframes[i][0] == 0) i = 0;
 
     return CRSF_FRAME_PERIOD / 100;
+#endif //HAS_EXTENDED_TELEMETRY
 #endif //EMULATOR
 
     return CRSF_FRAME_PERIOD;
