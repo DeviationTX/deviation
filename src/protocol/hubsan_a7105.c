@@ -53,8 +53,7 @@ enum {
     CHANNEL10,    // RTH
     CHANNEL11,    // GPS HOLD
     CHANNEL12,    // Mode (sport1, sport2, acro)
-    CHANNEL13,    // OSD
-    CHANNEL14,    // Flip (H122D/H123D)
+    CHANNEL13,    // Flip (H122D/H123D)
 };
 
 #define CHANNEL_LED         CHANNEL5
@@ -67,8 +66,7 @@ enum {
 #define CHANNEL_RTH         CHANNEL10
 #define CHANNEL_GPS_HOLD    CHANNEL11
 #define CHANNEL_MODE        CHANNEL12
-#define CHANNEL_OSD         CHANNEL13
-#define CHANNEL_FLIP2       CHANNEL14
+#define CHANNEL_FLIP2       CHANNEL13
 
 enum{
     // flags going to packet[9] (H107)
@@ -111,11 +109,6 @@ enum{
     FLAG_H123D_MODE_SPORT1  = 0x01,
     FLAG_H123D_MODE_SPORT2  = 0x02,
     FLAG_H123D_MODE_ACRO    = 0x03
-};
-
-enum{
-    // flags going to packet[11] (H122D)
-    FLAG_H122D_OSD      = 0x20
 };
 
 enum{
@@ -407,15 +400,11 @@ static void hubsan_build_packet()
             //H123D specific -> Flight modes => Does this needs to be a sub_protocol to work?
             packet[11] = 0x40;
             if(Channels[CHANNEL_MODE] < 0)
-                packet[11] |= 0x01;  // Sport mode 1
+                packet[11] |= FLAG_H123D_MODE_SPORT1;
             else if(Channels[CHANNEL_MODE] > 0)
-                packet[11] |= 0x03;  // acro
+                packet[11] |= FLAG_H123D_MODE_ACRO;
             else
-                packet[11] |= 0x02; // Sport mode 2
-            
-            //H122D specifics -> OSD => Does this needs to be a sub_protocol to work?
-            packet[11] |= 0x80
-                       |  GET_FLAG(CHANNEL_OSD, FLAG_H122D_OSD);
+                packet[11] |= FLAG_H123D_MODE_SPORT2;
         }
         else { // H107P/C+/D+
             packet[9] = 0x06
@@ -673,8 +662,8 @@ const void *HUBSAN_Cmds(enum ProtoCmds cmd)
             return (void *)(A7105_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H107 ? (void*)1L : 0;
         case PROTOCMD_BIND:  initialize(1); return 0;
-        case PROTOCMD_NUMCHAN: return (void *)14L; // A, E, T, R, Leds, Flips(or alt-hold), Snapshot, Video Recording, Headless, RTH, GPS Hold, Mode, osd, flip
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)14L;
+        case PROTOCMD_NUMCHAN: return (void *)13L; // A, E, T, R, Leds, Flips(or alt-hold), Snapshot, Video Recording, Headless, RTH, GPS Hold, Mode, flip
+        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)13L;
         case PROTOCMD_CURRENT_ID: return 0;
         case PROTOCMD_GETOPTIONS:
             if( Model.proto_opts[PROTOOPTS_VTX_FREQ] == 0)
