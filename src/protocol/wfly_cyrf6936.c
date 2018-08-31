@@ -315,6 +315,8 @@ void initWFLY(u8 bind)
     hopping_frequency[2]=ch+0x2D;
     hopping_frequency[3]=rf_ch_num;         // RF channel used to send the current hopping table
     
+    CYRF_Reset();
+    
     if(bind)
     {
         bind_counter=WFLY_BIND_COUNT;
