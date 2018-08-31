@@ -448,7 +448,6 @@ static void update_telemetry(u8 *pkt, u8 len) {
         TELEMETRY_SetUpdated(TELEM_GPS_HEADING);
         break;
     case 0x18:
-//TODO offsets may not be correct
         set_telemetry(TELEM_FRSKY_VOLT2, data_to_volt(pkt[6], pkt[7]));
 #if HAS_EXTENDED_TELEMETRY
         set_telemetry(TELEM_FRSKY_CURRENT, (s32)((pkt[9] << 8) + pkt[8] - 180) / 14 * 10);
