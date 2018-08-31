@@ -298,7 +298,7 @@ void initWFLY(u8 bind)
     }
     
     //Random start channel
-    u8 ch=0x0A+lfsr%0x0E;
+    u8 ch=0x0A+rand32()%0x0E;
     if(ch%3==0)
         ch++;                               // remove these channels as they seem to not be working...
     rf_ch_num=0x0C+(rx_tx_addr[1]%4)*3;     // use the start channels which do not seem to work to send the hopping table instead
