@@ -106,7 +106,7 @@ static void WFLY_cyrf_data_config()
     CYRF_ConfigSOPCode(WFLY_sop_data);
     
     tx_power = Model.tx_power;
-    CYRF_WriteRegister(CYRF_03_TX_CFG, 0x08 | tx_power); // 8DR Mode, 32 chip codes
+    CYRF_SetPower(tx_power); 
     
     CYRF_SetTxRxMode(TX_EN);
 }
@@ -170,11 +170,11 @@ static u16 WFLY_send_data_packet()
     //Keep transmit power in sync
     if(tx_power != Model.tx_power) {
         tx_power = Model.tx_power;
-        CYRF_WriteRegister(CYRF_03_TX_CFG, 0x08 | tx_power); // 8DR Mode, 32 chip codes
+        CYRF_SetPower(tx_power);
     }
     
     CYRF_ConfigRFChannel(hopping_frequency[(packet_count)%4]);
-    CYRF_SetPower(0x08);
+    
     CYRF_WriteDataPacketLen(packet, len+1);
 
     switch(packet_count%4)
