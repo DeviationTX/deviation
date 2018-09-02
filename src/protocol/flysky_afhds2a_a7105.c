@@ -76,7 +76,7 @@ enum{
 static const char * const afhds2a_opts[] = {
     _tr_noop("Outputs"), "PWM/IBUS", "PPM/IBUS", "PWM/SBUS", "PPM/SBUS", NULL,
     _tr_noop("Servo Hz"), "50", "400", "5", NULL,
-    _tr_noop("LQI output"), "None", "Ch5", "Ch6", "Ch7", "Ch8", "Ch9", "Ch10", "Ch11", "Ch12", NULL,
+    _tr_noop("LQI output"), "None", "Ch5", "Ch6", "Ch7", "Ch8", "Ch9", "Ch10", "Ch11", "Ch12", "Ch13", "Ch14", NULL,
     _tr_noop("Freq Tune"), "-300", "300", "655361", NULL, // big step 10, little step 1
     "RX ID", "-32768", "32767", "1", NULL, // todo: store that elsewhere
     "RX ID2","-32768", "32767", "1", NULL, // ^^^^^^^^^^^^^^^^^^^^^^^^^^
