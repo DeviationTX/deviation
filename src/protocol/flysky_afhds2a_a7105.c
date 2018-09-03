@@ -76,7 +76,7 @@ enum{
 static const char * const afhds2a_opts[] = {
     _tr_noop("Outputs"), "PWM/IBUS", "PPM/IBUS", "PWM/SBUS", "PPM/SBUS", NULL,
     _tr_noop("Servo Hz"), "50", "400", "5", NULL,
-    _tr_noop("LQI output"), "None", "Ch5", "Ch6", "Ch7", "Ch8", "Ch9", "Ch10", "Ch11", "Ch12", NULL,
+    _tr_noop("LQI output"), "None", "Ch5", "Ch6", "Ch7", "Ch8", "Ch9", "Ch10", "Ch11", "Ch12", "Ch13", "Ch14", NULL,
     _tr_noop("Freq Tune"), "-300", "300", "655361", NULL, // big step 10, little step 1
     "RX ID", "-32768", "32767", "1", NULL, // todo: store that elsewhere
     "RX ID2","-32768", "32767", "1", NULL, // ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -304,6 +304,7 @@ static void update_telemetry()
 #if HAS_EXTENDED_TELEMETRY
     u8 cell_index = 0;
     u16 cell_total = 0;
+    u8 temp_index;
 #endif
 
     for(u8 sensor=0; sensor<7; sensor++) {
@@ -331,8 +332,15 @@ static void update_telemetry()
                 break;
 #if HAS_EXTENDED_TELEMETRY
             case SENSOR_TEMPERATURE:
-                Telemetry.value[TELEM_FRSKY_TEMP1] = ((packet[index+3]<<8 | packet[index+2]) - 400)/10;
-                TELEMETRY_SetUpdated(TELEM_FRSKY_TEMP1);
+                temp_index = packet[index+1];
+                if(temp_index == 0) {
+                    Telemetry.value[TELEM_FRSKY_TEMP1] = ((packet[index+3]<<8 | packet[index+2]) - 400)/10;
+                    TELEMETRY_SetUpdated(TELEM_FRSKY_TEMP1);
+                }
+                else if(temp_index == 1) {
+                    Telemetry.value[TELEM_FRSKY_TEMP2] = ((packet[index+3]<<8 | packet[index+2]) - 400)/10;
+                    TELEMETRY_SetUpdated(TELEM_FRSKY_TEMP2);
+                }
                 break;
             case SENSOR_CELL_VOLTAGE:
                 if(cell_index < 6) {
