@@ -246,6 +246,15 @@ void MUSIC_PlayValue(u16 music, s32 value, u8 unit, u8 prec)
     char thousands = 0;
     u8 digit_count = 0;
 
+    //quick fix for enabling device=buzzer on playValue
+    if (music < MUSIC_TOTAL) {
+        MUSIC_GetSound(music);
+        if ( (playback_device == AUDDEV_BUZZER) || (playback_device == AUDDEV_ALL) ) {
+            MUSIC_Play(music);
+            return;
+        }
+    }
+
     if ( !AUDIO_VoiceAvailable() || !AUDIO_AddQueue(music)) {
         if (music < MUSIC_TOTAL)
             MUSIC_Play(music);
