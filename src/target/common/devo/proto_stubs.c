@@ -34,6 +34,7 @@ extern void USB_Disable();
 extern void PROTO_CS_HI();
 extern void PROTO_CS_LO();
 extern void MUSIC_Beep();
+extern void rand32();
 
 void PROTO_Stubs(int idx)
 {
@@ -56,4 +57,5 @@ void PROTO_Stubs(int idx)
     PROTO_CS_HI();
     PROTO_CS_LO();
     MUSIC_Beep();
+    rand32();
 }
