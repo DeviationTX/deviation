@@ -41,6 +41,7 @@ static const char * const frsky_opts[] = {
   _tr_noop("Freq-Fine"),  "-127", "127", NULL,
   _tr_noop("Freq-Coarse"),  "-127", "127", NULL,
   _tr_noop("AD2GAIN"),  "1", "255", NULL,
+  _tr_noop("RSSIChan"),  "None", "LastChan", NULL,
   NULL
 };
 enum {
@@ -48,6 +49,7 @@ enum {
     PROTO_OPTS_FREQFINE = 1,
     PROTO_OPTS_FREQCOURSE = 2,
     PROTO_OPTS_AD2GAIN = 3,
+    PROTO_OPTS_RSSICHAN = 4,
     LAST_PROTO_OPT,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
@@ -188,24 +190,29 @@ static void frsky2way_build_data_packet()
     packet[11] = 0;
     packet[16] = 0;
     packet[17] = 0;
-    for(int i = 0; i < 8; i++) {
+    for(int chan = 0; chan < 8; chan++) {
         s32 value;
-        if(i >= Model.num_channels) {
+        if(chan >= Model.num_channels) {
             value = 0x8ca;
         } else {
-            value = (s32)Channels[i] * 600 / CHAN_MAX_VALUE + 0x8ca; // 0-2047, 0 = 817, 1024 = 1500, 2047 = 2182
+            if (Model.proto_opts[PROTO_OPTS_RSSICHAN] && (chan == Model.num_channels - 1)) {      
+                value = 1650 + Telemetry.value[TELEM_FRSKY_RSSI] * 11; // Max RSSI value seems to be around 106, scale it to around 2000µs
+            }
+            else {
+                value = (s32)Channels[chan] * 600 / CHAN_MAX_VALUE + 0x8ca; // 0-2047, 0 = 817, 1024 = 1500, 2047 = 2182
+            }
         }                                                            // H (0)7-4, L (0)3-0, H (1)3-0, L (0)11-8, H (1)11-8, L (1)7-4 etc
-        if(i < 4) {
-            packet[6+i] = value & 0xff;
-            packet[10+(i>>1)] |= ((value >> 8) & 0x0f) << (4 *(i & 0x01));
+        if(chan < 4) {
+            packet[6+chan] = value & 0xff;
+            packet[10+(chan>>1)] |= ((value >> 8) & 0x0f) << (4 *(chan & 0x01));
         } else {
-            packet[8+i] = value & 0xff;
-            packet[16+((i-4)>>1)] |= ((value >> 8) & 0x0f) << (4 * ((i-4) & 0x01));
+            packet[8+chan] = value & 0xff;
+            packet[16+((chan-4)>>1)] |= ((value >> 8) & 0x0f) << (4 * ((chan-4) & 0x01));
         }
     }
     //if(counter == 0) {
-    //    for(int i = 0; i < 18; i++)
-    //        printf("%02x ", packet[i]);
+    //    for(int chan = 0; chan < 18; chan++)
+    //        printf("%02x ", packet[chan]);
     //    printf("\n");
     //}
 }
