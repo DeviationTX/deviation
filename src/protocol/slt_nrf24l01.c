@@ -91,21 +91,21 @@ enum {
 };
 
 enum{
-	// flags going to packet[6] (Q200)
-	FLAG_Q200_FMODE	= 0x20,
-	FLAG_Q200_VIDON	= 0x10,
-	FLAG_Q200_FLIP	= 0x08,
-	FLAG_Q200_VIDOFF= 0x04,
+    // flags going to packet[6] (Q200)
+    FLAG_Q200_FMODE = 0x20,
+    FLAG_Q200_VIDON = 0x10,
+    FLAG_Q200_FLIP  = 0x08,
+    FLAG_Q200_VIDOFF= 0x04,
 };
 
 //
 static u8 phase;
 enum {
     SLT_BUILD=0,
-	SLT_DATA1,
-	SLT_DATA2,
-	SLT_DATA3,
-	SLT_BIND1,
+    SLT_DATA1,
+    SLT_DATA2,
+    SLT_DATA3,
+    SLT_BIND1,
     SLT_BIND2
 };
 
@@ -134,9 +134,9 @@ static void SLT_init()
     NRF24L01_SetBitrate(NRF24L01_BR_250K);           // 256kbps
     NRF24L01_SetPower(Model.tx_power);
     if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_V1)
-        NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, (uint8_t*)"\xC3\xC3\xAA\x55", SLT_TXID_SIZE);
+        NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, (u8*)"\xC3\xC3\xAA\x55", SLT_TXID_SIZE);
     else // V2, Q200
-        NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, (uint8_t*)"\x7E\xB8\x63\xA9", SLT_TXID_SIZE);
+        NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, (u8*)"\x7E\xB8\x63\xA9", SLT_TXID_SIZE);
     NRF24L01_FlushRx();
 
 
@@ -207,11 +207,11 @@ static void set_tx_id(u32 id)
     }
 
     if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q200) { //Q200: Force high part of the ID otherwise it won't bind
-		tx_id[0]=0x01;
-		tx_id[1]=0x02;
-		#ifdef SLT_Q200_FORCE_ID	// ID taken from TX dumps
-			tx_id[0]=0x01;tx_id[1]=0x02;tx_id[2]=0x6A;tx_id[3]=0x31;
-		/*	tx_id[0]=0x01;tx_id[1]=0x02;tx_id[2]=0x0B;tx_id[3]=0x57;*/
+        tx_id[0]=0x01;
+        tx_id[1]=0x02;
+        #ifdef SLT_Q200_FORCE_ID    // ID taken from TX dumps
+            tx_id[0]=0x01;tx_id[1]=0x02;tx_id[2]=0x6A;tx_id[3]=0x31;
+        /*  tx_id[0]=0x01;tx_id[1]=0x02;tx_id[2]=0x0B;tx_id[3]=0x57;*/
         #endif  
     }
     
@@ -228,26 +228,26 @@ static void set_tx_id(u32 id)
     }
 
     // unique
-    uint8_t max_freq=0x50;	//V1 sure, V2?
-	if(Model.proto_opts[PROTOOPTS_FORMAT]==FORMAT_Q200)
-		max_freq=45;
-	for (uint8_t i = 0; i < SLT_NFREQCHANNELS; ++i)
-	{
-		if(Model.proto_opts[PROTOOPTS_FORMAT]==FORMAT_Q200 && rf_channels[i] >= max_freq)
-			rf_channels[i] = rf_channels[i] - max_freq + 0x03;
-		uint8_t done = 0;
-		while (!done)
-		{
-			done = 1;
-			for (uint8_t j = 0; j < i; ++j)
-				if (rf_channels[i] == rf_channels[j])
-				{
-					done = 0;
-					rf_channels[i] += 7;
-					if (rf_channels[i] >= max_freq)
-						rf_channels[i] = rf_channels[i] - max_freq + 0x03;
-				}
-		}
+    u8 max_freq=0x50;  //V1 sure, V2?
+    if(Model.proto_opts[PROTOOPTS_FORMAT]==FORMAT_Q200)
+        max_freq=45;
+    for (u8 i = 0; i < SLT_NFREQCHANNELS; ++i)
+    {
+        if(Model.proto_opts[PROTOOPTS_FORMAT]==FORMAT_Q200 && rf_channels[i] >= max_freq)
+            rf_channels[i] = rf_channels[i] - max_freq + 0x03;
+        u8 done = 0;
+        while (!done)
+        {
+            done = 1;
+            for (u8 j = 0; j < i; ++j)
+                if (rf_channels[i] == rf_channels[j])
+                {
+                    done = 0;
+                    rf_channels[i] += 7;
+                    if (rf_channels[i] >= max_freq)
+                        rf_channels[i] = rf_channels[i] - max_freq + 0x03;
+                }
+        }
     }
     printf("Using id:%02X%02X%02X%02X fh: ", tx_id[0], tx_id[1], tx_id[2], tx_id[3]);
     for (int i = 0; i < NFREQCHANNELS; ++i) {
@@ -335,11 +335,11 @@ static void build_packet()
         if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q200) 
             packet[6] = GET_FLAG(CHANNEL9 , FLAG_Q200_FMODE)
                       | GET_FLAG(CHANNEL10, FLAG_Q200_FLIP)
-					  | GET_FLAG(CHANNEL11, FLAG_Q200_VIDON)
+                      | GET_FLAG(CHANNEL11, FLAG_Q200_VIDON)
                       | GET_FLAG(CHANNEL12, FLAG_Q200_VIDOFF);
         packet[7]=(long) controls[6] * 255 / 20000L + 128;
-		packet[8]=(long) controls[7] * 255 / 20000L + 128;
-		packet[9]=0xAA;		//unknown
+        packet[8]=(long) controls[7] * 255 / 20000L + 128;
+        packet[9]=0xAA;     //unknown
         packet[10]=0x00; //unknown
     }
     // Set radio channel - once per packet batch
@@ -366,9 +366,9 @@ static void send_bind_packet()
 
     NRF24L01_WriteReg(NRF24L01_05_RF_CH, 0x50);
     memcpy((void*)packet,(void*)tx_id,SLT_TXID_SIZE);
-	if(phase==SLT_BIND2)
-		send_packet(SLT_TXID_SIZE);
-	else // SLT_BIND1
+    if(phase==SLT_BIND2)
+        send_packet(SLT_TXID_SIZE);
+    else // SLT_BIND1
         send_packet(SLT_PAYLOADSIZE_V2);
 
     // NB: we should wait until the packet's sent before changing TX address!
@@ -393,74 +393,74 @@ void checkTxPower()
     }
 }
 
-#define SLT_TIMING_BUILD		1000
-#define SLT_V1_TIMING_PACKET	1000
-#define SLT_V2_TIMING_PACKET	2042
-#define SLT_V1_TIMING_BIND2		1000
-#define SLT_V2_TIMING_BIND1		6507
-#define SLT_V2_TIMING_BIND2	    2112
+#define SLT_TIMING_BUILD        1000
+#define SLT_V1_TIMING_PACKET    1000
+#define SLT_V2_TIMING_PACKET    2042
+#define SLT_V1_TIMING_BIND2     1000
+#define SLT_V2_TIMING_BIND1     6507
+#define SLT_V2_TIMING_BIND2     2112
 MODULE_CALLTYPE
 static u16 SLT_callback()
 {
     switch (phase)
-	{
-		case SLT_BUILD:
-			build_packet();
-			phase++;
-			return SLT_TIMING_BUILD;
-		case SLT_DATA1:
-		case SLT_DATA2:
-			phase++;
-			if(Model.proto_opts[PROTOOPTS_FORMAT]==FORMAT_V1)
-			{
-				send_packet(SLT_PAYLOADSIZE_V1);
-				return SLT_V1_TIMING_PACKET;
-			}
-			else //V2
-			{
-				send_packet(SLT_PAYLOADSIZE_V2);
-				return SLT_V2_TIMING_PACKET;
-			}
-		case SLT_DATA3:
-			if(Model.proto_opts[PROTOOPTS_FORMAT]==FORMAT_V1)
-				send_packet(SLT_PAYLOADSIZE_V1);
-			else //V2
-				send_packet(SLT_PAYLOADSIZE_V2);
-			if (++packet_count >= 100)
-			{// Send bind packet
-				packet_count = 0;
-				if(Model.proto_opts[PROTOOPTS_FORMAT]==FORMAT_V1)
-				{
-					phase=SLT_BIND2;
-					return SLT_V1_TIMING_BIND2;
-				}
-				else //V2
-				{
-					phase=SLT_BIND1;
-					return SLT_V2_TIMING_BIND1;
-				}
-			}
-			else
-			{// Continue to send normal packets
-				checkTxPower();	// Set tx_power
-				phase = SLT_BUILD;
-				if(Model.proto_opts[PROTOOPTS_FORMAT]==FORMAT_V1)
-					return 20000-SLT_TIMING_BUILD;
-				else //V2
-					return 13730-SLT_TIMING_BUILD;
-			}
-		case SLT_BIND1:
-			send_bind_packet();
-			phase++;
-			return SLT_V2_TIMING_BIND2;
-		case SLT_BIND2:
-			send_bind_packet();
-			phase = SLT_BUILD;
-			if(Model.proto_opts[PROTOOPTS_FORMAT]==FORMAT_V1)
-				return 20000-SLT_TIMING_BUILD-SLT_V1_TIMING_BIND2;
-			else //V2
-				return 13730-SLT_TIMING_BUILD-SLT_V2_TIMING_BIND1-SLT_V2_TIMING_BIND2;
-	}
+    {
+        case SLT_BUILD:
+            build_packet();
+            phase++;
+            return SLT_TIMING_BUILD;
+        case SLT_DATA1:
+        case SLT_DATA2:
+            phase++;
+            if(Model.proto_opts[PROTOOPTS_FORMAT]==FORMAT_V1)
+            {
+                send_packet(SLT_PAYLOADSIZE_V1);
+                return SLT_V1_TIMING_PACKET;
+            }
+            else //V2
+            {
+                send_packet(SLT_PAYLOADSIZE_V2);
+                return SLT_V2_TIMING_PACKET;
+            }
+        case SLT_DATA3:
+            if(Model.proto_opts[PROTOOPTS_FORMAT]==FORMAT_V1)
+                send_packet(SLT_PAYLOADSIZE_V1);
+            else //V2
+                send_packet(SLT_PAYLOADSIZE_V2);
+            if (++packet_count >= 100)
+            {// Send bind packet
+                packet_count = 0;
+                if(Model.proto_opts[PROTOOPTS_FORMAT]==FORMAT_V1)
+                {
+                    phase=SLT_BIND2;
+                    return SLT_V1_TIMING_BIND2;
+                }
+                else //V2
+                {
+                    phase=SLT_BIND1;
+                    return SLT_V2_TIMING_BIND1;
+                }
+            }
+            else
+            {// Continue to send normal packets
+                checkTxPower(); // Set tx_power
+                phase = SLT_BUILD;
+                if(Model.proto_opts[PROTOOPTS_FORMAT]==FORMAT_V1)
+                    return 20000-SLT_TIMING_BUILD;
+                else //V2
+                    return 13730-SLT_TIMING_BUILD;
+            }
+        case SLT_BIND1:
+            send_bind_packet();
+            phase++;
+            return SLT_V2_TIMING_BIND2;
+        case SLT_BIND2:
+            send_bind_packet();
+            phase = SLT_BUILD;
+            if(Model.proto_opts[PROTOOPTS_FORMAT]==FORMAT_V1)
+                return 20000-SLT_TIMING_BUILD-SLT_V1_TIMING_BIND2;
+            else //V2
+                return 13730-SLT_TIMING_BUILD-SLT_V2_TIMING_BIND1-SLT_V2_TIMING_BIND2;
+    }
     return 19000;
 }
 
