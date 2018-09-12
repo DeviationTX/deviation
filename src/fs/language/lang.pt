@@ -133,8 +133,8 @@ PASSO Mix
 Cíclico
 :Calibrate
 Calibrar
-:Calibration done.
-Calibração OK
+<:Calibration done.
+<Calibração OK
 >:Calibration done.\n \nPress ENT.
 :Cancel
 Cancelar
@@ -154,8 +154,8 @@ Alterar
 >:Channel
 :Channel monitor
 Monitor canais
-:Channel output
-Canais saída
+<:Channel output
+<Canais saída
 >:Clock
 :Complex
 Complexo
