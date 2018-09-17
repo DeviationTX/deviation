@@ -763,7 +763,6 @@ static u16 frskyx_cb() {
       return 26; //TODO 31;
 #endif
     case FRSKY_DATA4:
-#if 1       //TODO
       CLOCK_RunMixer();
       state++;
 #ifndef EMULATOR
@@ -772,7 +771,6 @@ static u16 frskyx_cb() {
       return 5;
 #endif
     case FRSKY_DATA5:
-#endif
       len = CC2500_ReadReg(CC2500_3B_RXBYTES | CC2500_READ_BURST) & 0x7F;
 #ifndef EMULATOR
       if (len && len < MAX_PACKET_SIZE) {
