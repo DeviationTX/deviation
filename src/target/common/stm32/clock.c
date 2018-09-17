@@ -219,13 +219,30 @@ void CLOCK_ClearMsecCallback(int cb)
     msec_callbacks &= ~(1 << cb);
 }
 
+void CLOCK_RunMixer() {
+    nvic_set_pending_irq(NVIC_EXTI1_IRQ);
+}
+
+void CLOCK_StartMixer() {
+    CLOCK_SetMsecCallback(MEDIUM_PRIORITY, MEDIUM_PRIORITY_MSEC);
+}
+
+void CLOCK_StopMixer() {
+    CLOCK_ClearMsecCallback(MEDIUM_PRIORITY);
+}
+
+void CLOCK_UpdateMixers() {
+    ADC_Filter();
+    MIXER_CalcChannels();
+}
 
 void exti1_isr()
 {
     //ADC_StartCapture();
     //ADC completion will trigger update
-    ADC_Filter();
-    medium_priority_cb();
+//    ADC_Filter();
+//    medium_priority_cb();
+    CLOCK_UpdateMixers();
 }
 
 void sys_tick_handler(void)

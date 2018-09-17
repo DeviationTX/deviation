@@ -20,6 +20,8 @@
   Important that the actual functions never execute
 */
 extern void CLOCK_StartTimer();
+extern void CLOCK_RunMixer();
+extern void CLOCK_StopMixer();
 extern void spi_disable();
 extern void spi_set_bidirectional_receive_only_mode();
 extern void spi_read();
@@ -39,7 +41,9 @@ void PROTO_Stubs(int idx)
     if (! idx)
         return;
     CLOCK_StartTimer();
-
+    CLOCK_RunMixer();
+    CLOCK_StopMixer();
+  
     spi_disable();
     spi_set_bidirectional_receive_only_mode();
     spi_read();

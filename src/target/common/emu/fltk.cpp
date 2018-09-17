@@ -638,6 +638,9 @@ void CLOCK_ClearMsecCallback(int cb)
 {
     timer_enable &= ~(1 << cb);
 }
+void CLOCK_RunMixer() {}
+void CLOCK_StartMixer() {}
+void CLOCK_StopMixer() {}
 
 u32 CLOCK_getms()
 {
