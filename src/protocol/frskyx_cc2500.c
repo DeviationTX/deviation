@@ -725,6 +725,7 @@ static u16 frskyx_cb() {
       channr = 0;
       state++;
       break;
+
     case FRSKY_DATA1:
       if (fine != (s8)Model.proto_opts[PROTO_OPTS_FREQFINE]) {
           fine = (s8)Model.proto_opts[PROTO_OPTS_FREQFINE];
@@ -757,11 +758,21 @@ static u16 frskyx_cb() {
       CC2500_Strobe(CC2500_SRX);
       state++;
 #ifndef EMULATOR
-      return 3100;
+      return 2600; //TODO 3100;
 #else
-      return 31;
+      return 26; //TODO 31;
 #endif
     case FRSKY_DATA4:
+#if 1       //TODO
+      CLOCK_RunMixer();
+      state++;
+#ifndef EMULATOR
+      return 500;
+#else
+      return 5;
+#endif
+    case FRSKY_DATA5:
+#endif
       len = CC2500_ReadReg(CC2500_3B_RXBYTES | CC2500_READ_BURST) & 0x7F;
 #ifndef EMULATOR
       if (len && len < MAX_PACKET_SIZE) {
@@ -883,6 +894,7 @@ static int get_tx_id()
 static void initialize(int bind)
 {
     CLOCK_StopTimer();
+    CLOCK_StopMixer();   // protocol schedules mixer updates
 
     // initialize statics since 7e modules don't initialize
     fine = Model.proto_opts[PROTO_OPTS_FREQFINE];

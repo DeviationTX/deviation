@@ -297,14 +297,15 @@ static u16 SFHSS_cb()
         send_packet();
         calc_next_chan();
         state = SFHSS_TUNE;
-        return 2020;
+        return 4020;  //TODO 2020;
     case SFHSS_TUNE:
 #ifdef USE_TUNE_FREQ
         tune_freq();
 #endif
         tune_power();
         state = SFHSS_DATA1;
-        return 3150;
+        CLOCK_RunMixer();
+        return 1150;  //TODO 3150;
 /*
     case SFHSS_DATA1:
         build_data_packet();
@@ -371,6 +372,7 @@ static void get_tx_id()
 static void initialize()
 {
     CLOCK_StopTimer();
+    CLOCK_StopMixer();
 #ifdef USE_TUNE_FREQ
     /* Initialize to neutral values so tune_freq will work */
     coarse = 0;
