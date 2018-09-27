@@ -110,7 +110,7 @@ void BUTTON_Handler()
     u32 buttons_released=(~buttons) &   last_buttons;
 
     if (buttons != last_buttons)
-        last_button_time = ms;
+        last_button_time = ms + DEBOUNCE_WAIT_MS;
 
     if(buttons_pressed && !longpress_release) {
         //printf("pressed: %08d\n", buttons_pressed);
