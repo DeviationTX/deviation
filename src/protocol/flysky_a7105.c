@@ -358,6 +358,7 @@ static u16 flysky_cb()
         }
     }
     hopping_frequency_no++;
+    CLOCK_RunMixer();
     return packet_period;
 }
 
@@ -367,6 +368,7 @@ static void initialize(u8 bind) {
     uint8_t temp;
 
     CLOCK_StopTimer();
+    CLOCK_StopMixer();
     if(Model.proto_opts[PROTOOPTS_WLTOYS] == WLTOYS_EXT_CX20) {
         packet_period = PACKET_PERIOD_CX20;
     } else {
