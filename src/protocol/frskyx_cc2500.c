@@ -89,8 +89,8 @@ static enum {
   FRSKY_DATA2,
   FRSKY_DATA3,
   FRSKY_DATA4,
-  FRSKY_DATA5
-} state;
+  FRSKY_DATAM
+} state, datam_state;
 
 static u16 fixed_id;
 static u8 packet[MAX_PACKET_SIZE];
@@ -759,21 +759,31 @@ static u16 frskyx_cb() {
 #endif
     case FRSKY_DATA3:
       CC2500_Strobe(CC2500_SRX);
-      state++;
 #ifndef EMULATOR
-      return 2600; //TODO 3100;
+      if (mixer_runtime <= 500) {
+          state = FRSKY_DATA4;
+          return 3100;
+      } else {
+          state = FRSKY_DATAM;
+          datam_state = FRSKY_DATA4;
+          return 3100 - mixer_runtime;
+      }
+      return 3100;
 #else
-      return 26; //TODO 31;
+      state = FRSKY_DATA4;
+      return 31;
 #endif
-    case FRSKY_DATA4:
-      if (mixer_runtime > 500) CLOCK_RunMixer(&mixer_sync);  // at least 1ms to finish
-      state++;
+
+    case FRSKY_DATAM:
+      state = datam_state;
 #ifndef EMULATOR
-      return 500;
+      CLOCK_RunMixer(&mixer_sync);
+      return mixer_runtime;
 #else
       return 5;
 #endif
-    case FRSKY_DATA5:
+
+    case FRSKY_DATA4:
       len = CC2500_ReadReg(CC2500_3B_RXBYTES | CC2500_READ_BURST) & 0x7F;
 #ifndef EMULATOR
       if (len && len < MAX_PACKET_SIZE) {
@@ -791,7 +801,7 @@ static u16 frskyx_cb() {
       if (seq_tx_send != 8) seq_tx_send = (seq_tx_send + 1) % 4;
       state = FRSKY_DATA1;
 #ifndef EMULATOR
-      if (mixer_runtime <= 500) CLOCK_RunMixer(&mixer_sync);  // at least 500us to finish
+      if (mixer_runtime <= 500) CLOCK_RunMixer(&mixer_sync);
       return 500;
 #else
       return 5;
