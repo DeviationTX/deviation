@@ -219,7 +219,10 @@ void CLOCK_ClearMsecCallback(int cb)
     msec_callbacks &= ~(1 << cb);
 }
 
-void CLOCK_RunMixer() {
+static volatile int *mixer_sync;
+void CLOCK_RunMixer(volatile int *sync) {
+    mixer_sync = sync;
+    if (mixer_sync) *mixer_sync = 0; // set in exti1_isr()
     nvic_set_pending_irq(NVIC_EXTI1_IRQ);
 }
 
@@ -243,6 +246,7 @@ void exti1_isr()
 //    ADC_Filter();
 //    medium_priority_cb();
     CLOCK_UpdateMixers();
+    if (mixer_sync) *mixer_sync = 1;
 }
 
 void sys_tick_handler(void)

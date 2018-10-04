@@ -84,12 +84,29 @@ static void build_rcdata_pkt()
 
 // static u8 testrxframe[] = { 0x00, 0x0C, 0x14, 0x00, 0x00, 0x00, 0x00, 0xFF, 0x01, 0x03, 0x00, 0x00, 0x00, 0xF4 };
 
+static enum {
+    ST_DATA1,
+    ST_DATA2,
+} state;
+
+static volatile int mixer_sync;
+static u16 mixer_runtime;
 static u16 serial_cb()
 {
-    build_rcdata_pkt();
-    UART_Send(packet, sizeof packet);
+    switch (state) {
+    case ST_DATA1:
+        CLOCK_RunMixer(&mixer_sync);    // clears mixer_sync, which is then set when mixer update complete
+        state = ST_DATA2;
+        return mixer_runtime;
 
-    return SBUS_FRAME_PERIOD;
+    case ST_DATA2:
+        if (!mixer_sync && mixer_runtime < 2000) mixer_runtime += 50;
+        build_rcdata_pkt();
+        UART_Send(packet, sizeof packet);
+        state = ST_DATA1;
+        return SBUS_FRAME_PERIOD - mixer_runtime;
+    }
+    return SBUS_FRAME_PERIOD;   // avoid compiler warning
 }
 
 static void initialize()
@@ -108,6 +125,9 @@ static void initialize()
     UART_Initialize();
     UART_SetDataRate(SBUS_DATARATE);
 	UART_SetFormat(8, UART_PARITY_EVEN, UART_STOPBITS_2);
+    state = ST_DATA1;
+    mixer_runtime = 50;
+    CLOCK_StopMixer();   // protocol schedules mixer updates
 
     CLOCK_StartTimer(1000, serial_cb);
 }

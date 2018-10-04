@@ -358,7 +358,7 @@ static u16 flysky_cb()
         }
     }
     hopping_frequency_no++;
-    CLOCK_RunMixer();
+    CLOCK_RunMixer(NULL);
     return packet_period;
 }
 

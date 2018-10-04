@@ -134,7 +134,7 @@ void CLOCK_SetMsecCallback(int cb, u32 msec);
 void CLOCK_ClearMsecCallback(int cb);
 void CLOCK_StartWatchdog();
 void CLOCK_ResetWatchdog();
-void CLOCK_RunMixer();
+void CLOCK_RunMixer(volatile int *sync);
 void CLOCK_StartMixer();
 void CLOCK_StopMixer();
 

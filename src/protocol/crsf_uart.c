@@ -276,31 +276,52 @@ static void build_rcdata_pkt()
 static const u8 rxframes[][26];
 #endif //EMULATOR
 
+static enum {
+    ST_DATA1,
+    ST_DATA2,
+} state;
+
+static volatile int mixer_sync;
+static u16 mixer_runtime;
 static u16 serial_cb()
 {
-    build_rcdata_pkt();
-    UART_Send(packet, sizeof packet);
+    switch (state) {
+    case ST_DATA1:
+        CLOCK_RunMixer(&mixer_sync);    // clears mixer_sync, which is then set when mixer update complete
+        state = ST_DATA2;
+        return mixer_runtime;
+
+    case ST_DATA2:
+        if (!mixer_sync && mixer_runtime < 2000) mixer_runtime += 50;
+        build_rcdata_pkt();
+        UART_Send(packet, sizeof packet);
+        state = ST_DATA1;
 
 #ifdef EMULATOR
 #if HAS_EXTENDED_TELEMETRY
-    static u8 i;
-    u8 j, len;
+        {
+        static u8 i;
+        u8 j, len;
 
-    len = rxframes[i][1] + 2;
-//    printf("%d: ", i);
-    for (j=0; j < len; j++) {
-//        printf("%02x", rxframes[i][j]);
-        processCrossfireTelemetryData(rxframes[i][j], UART_RX_RXNE);
-    }
-//    printf("\n");
-    i += 1;
-    if (rxframes[i][0] == 0) i = 0;
+        len = rxframes[i][1] + 2;
+    //    printf("%d: ", i);
+        for (j=0; j < len; j++) {
+    //        printf("%02x", rxframes[i][j]);
+            processCrossfireTelemetryData(rxframes[i][j], UART_RX_RXNE);
+        }
+    //    printf("\n");
+        i += 1;
+        if (rxframes[i][0] == 0) i = 0;
+        }
 
-    return CRSF_FRAME_PERIOD / 100;
+        return CRSF_FRAME_PERIOD / 100;
 #endif //HAS_EXTENDED_TELEMETRY
 #endif //EMULATOR
 
-    return CRSF_FRAME_PERIOD;
+        return CRSF_FRAME_PERIOD - mixer_runtime;
+    }
+
+    return CRSF_FRAME_PERIOD;   // avoid compiler warning
 }
 
 static void initialize()
@@ -322,6 +343,9 @@ static void initialize()
 #if HAS_EXTENDED_TELEMETRY
     UART_StartReceive(processCrossfireTelemetryData);
 #endif
+    state = ST_DATA1;
+    mixer_runtime = 50;
+    CLOCK_StopMixer();   // protocol schedules mixer updates
 
     CLOCK_StartTimer(1000, serial_cb);
 }

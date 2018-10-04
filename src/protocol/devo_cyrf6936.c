@@ -450,7 +450,7 @@ static u16 devo_telemetry_cb()
         DEVO_BuildPacket();
         CYRF_WriteDataPacket(packet);
         txState = 1;
-        CLOCK_RunMixer();
+        CLOCK_RunMixer(NULL);
         return 900;
     }
     if (txState == 1) {
@@ -542,7 +542,7 @@ static u16 devo_cb()
         radio_ch_ptr = radio_ch_ptr == &radio_ch[2] ? radio_ch : radio_ch_ptr + 1;
         CYRF_ConfigRFChannel(*radio_ch_ptr);
     }
-    CLOCK_RunMixer();
+    CLOCK_RunMixer(NULL);
     return 1200;
 }
 

@@ -304,7 +304,7 @@ static u16 SFHSS_cb()
 #endif
         tune_power();
         state = SFHSS_DATA1;
-        CLOCK_RunMixer();
+        CLOCK_RunMixer(NULL);
         return 1150;  //TODO 3150;
 /*
     case SFHSS_DATA1:
