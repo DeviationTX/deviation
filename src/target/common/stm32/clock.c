@@ -135,7 +135,7 @@ void CLOCK_Init()
 
     timer_enable_counter(TIMx);
 
-    /* Enable EXTI1 interrupt. */
+    /* Enable EXTI1 interrupt for medium priority callback. */
     /* We are enabling only the interrupt
      * We'll manually trigger this via set_pending_interrupt
      */
@@ -144,6 +144,13 @@ void CLOCK_Init()
     /* Enable DMA Channel1 with same priority as EXTI1 */
     nvic_enable_irq(_NVIC_DMA_CHANNEL_IRQ);
     nvic_set_priority(_NVIC_DMA_CHANNEL_IRQ, 65); //Medium priority
+
+    /* Enable EXTI3 interrupt for triggering mixer calculations from protocol. */
+    /* We are enabling only the interrupt
+     * We'll manually trigger this via set_pending_interrupt
+     */
+    nvic_enable_irq(NVIC_EXTI3_IRQ);
+    nvic_set_priority(NVIC_EXTI3_IRQ, 32); // priority lower than protocol callback, higher than medium priority
 
     /* wait for system to start up and stabilize */
     while(msecs < 100)
@@ -219,67 +226,74 @@ void CLOCK_ClearMsecCallback(int cb)
     msec_callbacks &= ~(1 << cb);
 }
 
+static enum {
+    MIXCLK_TIMER = 0,
+    MIXCLK_PROTO,
+} clock_mixer;
+// Run Mixer one time.  Used by protocols that trigger mixer calc in protocol code
 static volatile int *mixer_sync;
 void CLOCK_RunMixer(volatile int *sync) {
     mixer_sync = sync;
-    if (mixer_sync) *mixer_sync = 0; // set in exti1_isr()
-    nvic_set_pending_irq(NVIC_EXTI1_IRQ);
+    if (mixer_sync) *mixer_sync = 0; // set in CLOCK_UpdateMixers()
+    nvic_set_pending_irq(NVIC_EXTI3_IRQ);
 }
 
+// Run Mixer on medium priority interval.  Default behavior - no protocol code required.
 void CLOCK_StartMixer() {
-    CLOCK_SetMsecCallback(MEDIUM_PRIORITY, MEDIUM_PRIORITY_MSEC);
+    clock_mixer = MIXCLK_TIMER;
 }
 
 void CLOCK_StopMixer() {
-    CLOCK_ClearMsecCallback(MEDIUM_PRIORITY);
+    clock_mixer = MIXCLK_PROTO;
 }
 
 void CLOCK_UpdateMixers() {
     ADC_Filter();
     MIXER_CalcChannels();
+    if (mixer_sync) *mixer_sync = 1;
+}
+
+void exti3_isr() {
+    CLOCK_UpdateMixers();
 }
 
 void exti1_isr()
 {
-    //ADC_StartCapture();
-    //ADC completion will trigger update
-//    ADC_Filter();
-//    medium_priority_cb();
-    CLOCK_UpdateMixers();
-    if (mixer_sync) *mixer_sync = 1;
+    // medium_priority_cb();
+    if (clock_mixer == MIXCLK_TIMER) CLOCK_UpdateMixers();
 }
 
 void sys_tick_handler(void)
 {
 	msecs++;
-        if(msecs - wdg_time > 2000) {
-            nvic_set_pending_irq(NVIC_EXTI2_IRQ);
-            return;
+    if(msecs - wdg_time > 2000) {
+        nvic_set_pending_irq(NVIC_EXTI2_IRQ);
+        return;
+    }
+    if(msec_callbacks & (1 << MEDIUM_PRIORITY)) {
+        if (msecs == msec_cbtime[MEDIUM_PRIORITY]) {
+            //medium priority tasks execute in interrupt and main loop context
+            nvic_set_pending_irq(NVIC_EXTI1_IRQ);
+            priority_ready |= 1 << MEDIUM_PRIORITY;
+            msec_cbtime[MEDIUM_PRIORITY] = msecs + MEDIUM_PRIORITY_MSEC;
         }
-        if(msec_callbacks & (1 << MEDIUM_PRIORITY)) {
-            if (msecs == msec_cbtime[MEDIUM_PRIORITY]) {
-                //medium priority tasks execute in interrupt and main loop context
-                nvic_set_pending_irq(NVIC_EXTI1_IRQ);
-                priority_ready |= 1 << MEDIUM_PRIORITY;
-                msec_cbtime[MEDIUM_PRIORITY] = msecs + MEDIUM_PRIORITY_MSEC;
-            }
+    }
+    if(msec_callbacks & (1 << LOW_PRIORITY)) {
+        if (msecs == msec_cbtime[LOW_PRIORITY]) {
+            //Low priority tasks execute in the main loop
+            priority_ready |= 1 << LOW_PRIORITY;
+            msec_cbtime[LOW_PRIORITY] = msecs + LOW_PRIORITY_MSEC;
         }
-        if(msec_callbacks & (1 << LOW_PRIORITY)) {
-            if (msecs == msec_cbtime[LOW_PRIORITY]) {
-                //Low priority tasks execute in the main loop
-                priority_ready |= 1 << LOW_PRIORITY;
-                msec_cbtime[LOW_PRIORITY] = msecs + LOW_PRIORITY_MSEC;
-            }
+    }
+    if(msec_callbacks & (1 << TIMER_SOUND)) {
+        if (msecs == msec_cbtime[TIMER_SOUND]) {
+            unsigned ms = SOUND_Callback();
+            if(! ms)
+                msec_callbacks &= ~(1 << TIMER_SOUND);
+            else
+                msec_cbtime[TIMER_SOUND] = msecs + ms;
         }
-        if(msec_callbacks & (1 << TIMER_SOUND)) {
-            if (msecs == msec_cbtime[TIMER_SOUND]) {
-                unsigned ms = SOUND_Callback();
-                if(! ms)
-                    msec_callbacks &= ~(1 << TIMER_SOUND);
-                else
-                    msec_cbtime[TIMER_SOUND] = msecs + ms;
-            }
-        }
+    }
 }
 
 // initialize RTC
