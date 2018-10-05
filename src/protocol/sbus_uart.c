@@ -32,8 +32,18 @@
   const unsigned long protocol_type = (unsigned long)&_data_loadaddr;
 #endif
 
+static const char * const sbus_opts[] = {
+  _tr_noop("Period (ms)"),  "6", "14", NULL,
+  NULL
+};
+enum {
+    PROTO_OPTS_PERIOD,
+    LAST_PROTO_OPT,
+};
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
+
 #define SBUS_DATARATE             100000
-#define SBUS_FRAME_PERIOD         14000   // 14ms
+#define SBUS_FRAME_PERIOD_MAX     14000   // 14ms
 #define SBUS_CHANNELS             16
 #define SBUS_PACKET_SIZE          25
 
@@ -91,8 +101,12 @@ static enum {
 
 static volatile int mixer_sync;
 static u16 mixer_runtime;
+static u16 sbus_period;
 static u16 serial_cb()
 {
+    if (sbus_period != Model.proto_opts[PROTO_OPTS_PERIOD] * 1000)
+        sbus_period = Model.proto_opts[PROTO_OPTS_PERIOD] * 1000;
+
     switch (state) {
     case ST_DATA1:
         CLOCK_RunMixer(&mixer_sync);    // clears mixer_sync, which is then set when mixer update complete
@@ -104,9 +118,9 @@ static u16 serial_cb()
         build_rcdata_pkt();
         UART_Send(packet, sizeof packet);
         state = ST_DATA1;
-        return SBUS_FRAME_PERIOD - mixer_runtime;
+        return sbus_period - mixer_runtime;
     }
-    return SBUS_FRAME_PERIOD;   // avoid compiler warning
+    return sbus_period;   // avoid compiler warning
 }
 
 static void initialize()
@@ -128,6 +142,7 @@ static void initialize()
     state = ST_DATA1;
     mixer_runtime = 50;
     CLOCK_StopMixer();   // protocol schedules mixer updates
+    sbus_period = Model.proto_opts[PROTO_OPTS_PERIOD] ? (Model.proto_opts[PROTO_OPTS_PERIOD] * 1000) : SBUS_FRAME_PERIOD_MAX;
 
     CLOCK_StartTimer(1000, serial_cb);
 }
@@ -143,6 +158,10 @@ const void * SBUS_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
 	case PROTOCMD_CHANNELMAP: return UNCHG;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
+        case PROTOCMD_GETOPTIONS:
+            if (!Model.proto_opts[PROTO_OPTS_PERIOD])
+                Model.proto_opts[PROTO_OPTS_PERIOD] = SBUS_FRAME_PERIOD_MAX;
+            return sbus_opts;
         default: break;
     }
     return 0;
