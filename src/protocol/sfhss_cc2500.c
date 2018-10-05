@@ -57,7 +57,6 @@ ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 #define TX_ID_LEN   2
 
 static u8 packet[PACKET_LEN];
-static u32 state;
 static u8 rf_chan;
 static u8 fhss_code; // 0-27
 static u8 tx_id[TX_ID_LEN];
@@ -72,13 +71,14 @@ static s8 fine;
 #endif
 
 
-enum {
+static enum {
     SFHSS_START = 0x101,
     SFHSS_CAL   = 0x102,
     SFHSS_TUNE  = 0x103,
     SFHSS_DATA1 = 0x02,
-    SFHSS_DATA2 = 0x0b
-};
+    SFHSS_DATA2 = 0x0b,
+    SFHSS_MIX,
+} state;
 
 #define FREQ0_VAL 0xC4
 
@@ -267,6 +267,8 @@ static void send_packet()
 }
 
 
+static volatile int mixer_sync;
+static u16 mixer_runtime;
 static u16 SFHSS_cb()
 {
     switch(state) {
@@ -288,6 +290,7 @@ static u16 SFHSS_cb()
 
     /* Work cycle, 6.8ms, second packet 1.65ms after first */
     case SFHSS_DATA1:
+        if (!mixer_sync && mixer_runtime < 2000) mixer_runtime += 50;
         build_data_packet();
         send_packet();
         state = SFHSS_DATA2;
@@ -297,15 +300,19 @@ static u16 SFHSS_cb()
         send_packet();
         calc_next_chan();
         state = SFHSS_TUNE;
-        return 4020;  //TODO 2020;
+        return 2020;
     case SFHSS_TUNE:
 #ifdef USE_TUNE_FREQ
         tune_freq();
 #endif
         tune_power();
+        state = SFHSS_MIX;
+        return 3150 - mixer_runtime;
+
+    case SFHSS_MIX:
         state = SFHSS_DATA1;
-        CLOCK_RunMixer(NULL);
-        return 1150;  //TODO 3150;
+        CLOCK_RunMixer(&mixer_sync);
+        return mixer_runtime;
 /*
     case SFHSS_DATA1:
         build_data_packet();
