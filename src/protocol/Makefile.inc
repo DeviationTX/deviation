@@ -49,6 +49,7 @@ PROTO_MODULES += $(ODIR)/protocol/bugs3.mod
 PROTO_MODULES += $(ODIR)/protocol/crsf.mod
 PROTO_MODULES += $(ODIR)/protocol/hitec.mod
 PROTO_MODULES += $(ODIR)/protocol/wfly.mod
+PROTO_MODULES += $(ODIR)/protocol/bug3mini.mod
 
 ALL += $(PROTO_MODULES)
 else #BUILD_TARGET
@@ -246,6 +247,10 @@ $(ODIR)/protocol/hitec.mod : $(ODIR)/hitec_cc2500.bin
 
 $(ODIR)/protocol/wfly.mod : $(ODIR)/wfly_cyrf6936.bin
 	@echo Building 'wfly' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
+    
+$(ODIR)/protocol/bug3mini.mod : $(ODIR)/bugs3mini_nrf24l01.bin
+	@echo Building 'bug3mini' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
     
 endif #BUILD_TARGET
