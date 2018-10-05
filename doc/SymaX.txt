@@ -30,7 +30,7 @@ Each channel is 8 bits in sign plus magnitude format.
 
 Trim values are sent in three separate bytes.  Trim values are 6 bits
 sign plus magnitude.  The SymaX implementation drives the trim values in
-parallel with the channel data to acheive additional control range.
+parallel with the channel data to achieve additional control range.
 
 Features are enabled by setting various bits in the data packet. When auto-flip
 is enabled, full cyclic in any direction causes a flip to be executed in that

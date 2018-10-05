@@ -29,7 +29,7 @@ Rx: 04 32 44 a7 0d 0f 00 00 00 00 00 00 00 00 00 c3
     aa bb cc dd ee ff gg hh ii jj kk ll mm nn oo pp
 aa : current bind state
 bb : chosen frequency
-ccddeeff : ID to use for this session 
+ccddeeff : ID to use for this session
 gg : always Tx 08
 hh-kk : ??
 llmmnnoo: Transmiter ID(?)
@@ -91,7 +91,7 @@ bb : chosen frequency (Tx), count (Rx)
 ccddeeff: chosen ID for this session
 gg : always Tx 08
 hh-kk : ??
-llmmnnoo: Transmiter ID(?)
+llmmnnoo: Transmitter ID(?)
 pp : checksum
 Binding is complete once the Received data has 'bb' == '09'
 
@@ -109,7 +109,7 @@ ee : rudder    observed range: 0x34 - 0xcc (smaller is right)
 gg : elevator  observed range: 0x3e - 0xbc (smaller is up)
 ii : aileron   observed range: 0x45 - 0xc3 (smaller is right)
 jj : bit 0x02 is always set, on the H107-L setting bit 0x04 switch lights on, setting bit 0x08 enable flips
-llmmnnoo: Transmiter ID(?)
+llmmnnoo: Transmitter ID(?)
 pp : checksum
 Checksums:
 The checksum is calculated as 256 - ((sum of the 1st 15 bytes) modulo 256)

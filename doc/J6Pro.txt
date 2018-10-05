@@ -36,7 +36,7 @@ After binding, The transmitter scans channels (looking for free channels?) It ap
 a group of 4 via the sequence a b c a  a b c a ...
 There is no evidence that the Tx communicates the channel sequence to the Rx.  It appears that b = a + 5 and c = b + 5
 Data packets are sent every 3.4 - 3.75 msec within the sequence.  the pause between sequences is 13.3msec
-It appears that the data packet is in no way associated with the Rx.  Despite the binidng handshake.  Once bound, a given model
+It appears that the data packet is in no way associated with the Rx.  Despite the binding handshake.  Once bound, a given model
 will immediately bind to a given Tx, even if that Tx has subsequently been bound with a different model.
 
 Each channel consists of 10-bits.  The upper 2 bits are packed 4-channels to a byte in bytes 13-15.  The protocol supports
@@ -59,8 +59,8 @@ PN codes:
 The SOP code table is 19 entries long.
 The index into the SOP table, and the CRC are calculated from the MfgID as:
 sop_idx = (0xff & (MfgID[0] + MfgID[1] + MfgID[2] + MfgID[3] - MfgID[5])) % 19
-crc = ((MfgId[1] - MfgId[4] + MfgId[5]) & 0xFF) + 
-      ((0xFF & (MfgId[2] + MfgId[3] - MfgId[4] + MfgId[5]) ) << 8) 
+crc = ((MfgId[1] - MfgId[4] + MfgId[5]) & 0xFF) +
+      ((0xFF & (MfgId[2] + MfgId[3] - MfgId[4] + MfgId[5]) ) << 8)
 The CRC is 0x0000 during binding.
 
 The PN codes for the SOP are transformations of the recommended codes:
