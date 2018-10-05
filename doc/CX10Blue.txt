@@ -131,7 +131,7 @@ XOR with a fixed whitening sequence:
 Packets are GFSK modulated at a rate of 1 Mbit/second and a frequency deviation
 of approximately +/- 340 kHz.  Zero bits are represented by the lower frequency
 deviation while one bits are represented by the higher deviation.  Each packet
-has a duration of 245 microseconds and is preceded by an modulated carrier
+has a duration of 245 microseconds and is preceded by an not modulated carrier
 for an additional 245 microseconds.
 
 6. Frequency Hopping
