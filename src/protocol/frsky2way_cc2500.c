@@ -76,6 +76,9 @@ enum {
     FRSKY_DATA3,
     FRSKY_DATA4,
     FRSKY_DATA5,
+    FRSKY_DATA6,
+    FRSKY_DATA7,
+    FRSKY_DATA8,
 };
 
 static void frsky2way_init(int bind)
@@ -357,6 +360,8 @@ static u8 testdata[] = {
  0x00 };
 #endif
 
+static volatile int mixer_sync;  // unused but needed for mixer trigger by protocol
+static u16 mixer_runtime;
 static u16 frsky2way_cb()
 {
     unsigned len = 0;
@@ -382,15 +387,23 @@ static u16 frsky2way_cb()
         counter = 1;
         break;
 
-    case FRSKY_DATA5:
-        CC2500_Strobe(CC2500_SRX);
+    case FRSKY_DATA8:
         state = FRSKY_DATA1;
+    case FRSKY_DATA2:
+    case FRSKY_DATA4:
+        CLOCK_RunMixer(&mixer_sync);    // clears mixer_sync, which is then set when mixer update complete
+        if (state != FRSKY_DATA1) state++;
+        return mixer_runtime;
+
+    case FRSKY_DATA7:
+        CC2500_Strobe(CC2500_SRX);
+        state++;
 #ifdef EMULATOR
         return 92;
 #else
-        return 9200;
+        return 9200 - mixer_runtime;
 #endif
-    case FRSKY_DATA4:
+    case FRSKY_DATA6:
         counter = (counter + 1) % 188;
         //telemetry receive
         CC2500_SetTxRxMode(RX_EN);
@@ -422,8 +435,8 @@ static u8 *data = testdata;
 #endif //EMULATOR
         // no break - fall through
 
-    case FRSKY_DATA2:
     case FRSKY_DATA3:
+    case FRSKY_DATA5:
         counter = (counter + 1) % 188;
         CC2500_SetTxRxMode(TX_EN);
         CC2500_SetPower(Model.tx_power);
@@ -439,83 +452,16 @@ static u8 *data = testdata;
         CC2500_WriteReg(CC2500_23_FSCAL3, 0x89);
         //CC2500_WriteReg(CC2500_3E_PATABLE, 0xfe);
         CC2500_Strobe(CC2500_SFRX);
+        if (!mixer_sync && mixer_runtime < 2000) mixer_runtime += 50;
         frsky2way_build_data_packet();
         CC2500_WriteData(packet, packet[0]+1);
         state++;
     }
 
-
-#if 0   //TODO
-    if (state == FRSKY_BIND_DONE) {
-        state = FRSKY_DATA2;
-        PROTOCOL_SetBindState(0);
-        frsky2way_init(0);
-        counter = 0;
-    } else if (state == FRSKY_DATA5) {
-        CC2500_Strobe(CC2500_SRX);
-        state = FRSKY_DATA1;
 #ifdef EMULATOR
-        return 92;
+    return state == FRSKY_DATA6 ? 75 : 90;
 #else
-        return 9200;
-#endif
-    }
-    counter = (counter + 1) % 188;
-    if (state == FRSKY_DATA4) {
-        //telemetry receive
-        CC2500_SetTxRxMode(RX_EN);
-        CC2500_Strobe(CC2500_SIDLE);
-        CC2500_WriteReg(CC2500_0A_CHANNR, get_chan_num(counter % 47));
-        CC2500_WriteReg(CC2500_23_FSCAL3, 0x89);
-        state++;
-#ifdef EMULATOR
-        return 13;
-#else
-        return 1300;
-#endif
-    } else {
-        if (state == FRSKY_DATA1) {
-            unsigned len = CC2500_ReadReg(CC2500_3B_RXBYTES | CC2500_READ_BURST);
-            if (len && len < sizeof(packet)) {
-                CC2500_ReadData(packet, len);
-                frsky2way_parse_telem(packet, len);
-            }
-#ifdef EMULATOR
-static u8 *data = testdata;
-
-            if (!*data) data = testdata;
-            len = *data + 3;
-            memcpy(packet, data, len);
-            data[1] = fixed_id & 0xff;
-            data[2] = fixed_id >> 8;
-            data += len;
-            frsky2way_parse_telem(packet, len);
-#endif //EMULATOR
-
-            CC2500_SetTxRxMode(TX_EN);
-            CC2500_SetPower(Model.tx_power);
-        }
-        CC2500_Strobe(CC2500_SIDLE);
-        if (fine != (s8)Model.proto_opts[PROTO_OPTS_FREQFINE] || course != (s8)Model.proto_opts[PROTO_OPTS_FREQCOURSE]) {
-            course = Model.proto_opts[PROTO_OPTS_FREQCOURSE];
-            fine   = Model.proto_opts[PROTO_OPTS_FREQFINE];
-            CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);
-            CC2500_WriteReg(CC2500_0F_FREQ0, 0x27 + course);
-        }
-        CC2500_WriteReg(CC2500_0A_CHANNR, get_chan_num(counter % 47));
-        CC2500_WriteReg(CC2500_23_FSCAL3, 0x89);
-        //CC2500_WriteReg(CC2500_3E_PATABLE, 0xfe);
-        CC2500_Strobe(CC2500_SFRX);
-        frsky2way_build_data_packet();
-        CC2500_WriteData(packet, packet[0]+1);
-        state++;
-    }
-#endif
-
-#ifdef EMULATOR
-    return state == FRSKY_DATA4 ? 75 : 90;
-#else
-    return state == FRSKY_DATA4 ? 7500 : 9000;
+    return state == FRSKY_DATA6 ? 7500 : (9000 - mixer_runtime);
 #endif
 }
 
@@ -537,6 +483,7 @@ static int get_tx_id()
 static void initialize(int bind)
 {
     CLOCK_StopTimer();
+    mixer_runtime = 50;
     course = (int)Model.proto_opts[PROTO_OPTS_FREQCOURSE];
     fine = Model.proto_opts[PROTO_OPTS_FREQFINE];
     //fixed_id = 0x3e19;
