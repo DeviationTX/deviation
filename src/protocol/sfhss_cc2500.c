@@ -379,7 +379,6 @@ static void get_tx_id()
 static void initialize()
 {
     CLOCK_StopTimer();
-    CLOCK_StopMixer();
 #ifdef USE_TUNE_FREQ
     /* Initialize to neutral values so tune_freq will work */
     coarse = 0;

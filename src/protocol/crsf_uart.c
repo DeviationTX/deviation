@@ -345,7 +345,6 @@ static void initialize()
 #endif
     state = ST_DATA1;
     mixer_runtime = 50;
-    CLOCK_StopMixer();   // protocol schedules mixer updates
 
     CLOCK_StartTimer(1000, serial_cb);
 }

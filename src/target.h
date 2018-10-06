@@ -136,7 +136,6 @@ void CLOCK_StartWatchdog();
 void CLOCK_ResetWatchdog();
 void CLOCK_RunMixer(volatile int *sync);
 void CLOCK_StartMixer();
-void CLOCK_StopMixer();
 
 /*PWM/PPM functions */
 void PWM_Initialize();

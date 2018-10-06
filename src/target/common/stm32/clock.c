@@ -145,11 +145,6 @@ void CLOCK_Init()
     nvic_enable_irq(_NVIC_DMA_CHANNEL_IRQ);
     nvic_set_priority(_NVIC_DMA_CHANNEL_IRQ, 65); //Medium priority
 
-    // Enable EXTI3 interrupt for triggering mixer calculations from protocol.
-    // Manually triggered via set_pending_interrupt
-    nvic_enable_irq(NVIC_EXTI3_IRQ);
-    nvic_set_priority(NVIC_EXTI3_IRQ, 32); // priority lower than protocol callback, higher than medium priority
-
     /* wait for system to start up and stabilize */
     while(msecs < 100)
         ;
@@ -224,41 +219,26 @@ void CLOCK_ClearMsecCallback(int cb)
     msec_callbacks &= ~(1 << cb);
 }
 
-static enum {
-    MIXCLK_TIMER = 0,
-    MIXCLK_PROTO,
-} clock_mixer;
 // Run Mixer one time.  Used by protocols that trigger mixer calc in protocol code
 static volatile int *mixer_sync;
 void CLOCK_RunMixer(volatile int *sync) {
     mixer_sync = sync;
-    if (mixer_sync) *mixer_sync = 0; // set in CLOCK_UpdateMixers()
-    nvic_set_pending_irq(NVIC_EXTI3_IRQ);
+    if (mixer_sync) *mixer_sync = 0; // set after mixers updated
+    nvic_set_pending_irq(NVIC_EXTI1_IRQ);
 }
 
 // Run Mixer on medium priority interval.  Default behavior - no protocol code required.
 void CLOCK_StartMixer() {
-    clock_mixer = MIXCLK_TIMER;
-}
-
-void CLOCK_StopMixer() {
-    clock_mixer = MIXCLK_PROTO;
-}
-
-void CLOCK_UpdateMixers() {
-    ADC_Filter();
-    MIXER_CalcChannels();
-    if (mixer_sync) *mixer_sync = 1;
-}
-
-void exti3_isr() {
-    CLOCK_UpdateMixers();
+    mixer_sync = NULL;
 }
 
 void exti1_isr()
 {
-    // medium_priority_cb();
-    CLOCK_UpdateMixers();
+    // medium_priority_cb();  Currently not used. If needed, 
+    // use exti3 for mixer updates.
+    ADC_Filter();
+    MIXER_CalcChannels();
+    if (mixer_sync) *mixer_sync = 1;
 }
 
 void sys_tick_handler(void)
@@ -275,8 +255,8 @@ void sys_tick_handler(void)
             // so only schedule interrupt if using periodic mixer calc (not per-protocol mixer calc)
             // If any other code added in medium priority interrupt handler, move the following line to
             // exti1_isr before the CLOCK_UpdateMixers() line.
-            if (clock_mixer == MIXCLK_TIMER)
-                nvic_set_pending_irq(NVIC_EXTI1_IRQ);
+            // overload mixer_sync to fit in 7e build - 0 indicates mixer run by timer
+            if (mixer_sync) nvic_set_pending_irq(NVIC_EXTI1_IRQ);
             priority_ready |= 1 << MEDIUM_PRIORITY;
             msec_cbtime[MEDIUM_PRIORITY] = msecs + MEDIUM_PRIORITY_MSEC;
         }

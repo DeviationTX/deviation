@@ -441,6 +441,7 @@ void DEVO_BuildPacket()
         pkt_num = 0;
 }
 
+static volatile int mixer_sync;  // unused but needed for mixer trigger by protocol
 MODULE_CALLTYPE
 static u16 devo_telemetry_cb()
 {
@@ -450,7 +451,7 @@ static u16 devo_telemetry_cb()
         DEVO_BuildPacket();
         CYRF_WriteDataPacket(packet);
         txState = 1;
-        CLOCK_RunMixer(NULL);
+        CLOCK_RunMixer(&mixer_sync);
         return 900;
     }
     if (txState == 1) {
@@ -542,7 +543,7 @@ static u16 devo_cb()
         radio_ch_ptr = radio_ch_ptr == &radio_ch[2] ? radio_ch : radio_ch_ptr + 1;
         CYRF_ConfigRFChannel(*radio_ch_ptr);
     }
-    CLOCK_RunMixer(NULL);
+    CLOCK_RunMixer(&mixer_sync);
     return 1200;
 }
 
@@ -557,7 +558,6 @@ static void devo_bind()
 static void initialize()
 {
     CLOCK_StopTimer();
-    CLOCK_StopMixer();   // protocol schedules mixer updates
     CYRF_Reset();
     cyrf_init();
     CYRF_GetMfgData(cyrfmfg_id);

@@ -141,7 +141,6 @@ static void initialize()
 	UART_SetFormat(8, UART_PARITY_EVEN, UART_STOPBITS_2);
     state = ST_DATA1;
     mixer_runtime = 50;
-    CLOCK_StopMixer();   // protocol schedules mixer updates
     sbus_period = Model.proto_opts[PROTO_OPTS_PERIOD] ? (Model.proto_opts[PROTO_OPTS_PERIOD] * 1000) : SBUS_FRAME_PERIOD_MAX;
 
     CLOCK_StartTimer(1000, serial_cb);

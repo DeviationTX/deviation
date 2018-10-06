@@ -334,6 +334,7 @@ static void flysky_build_packet(u8 init)
     flysky_apply_extension_flags();
 }
 
+static volatile int mixer_sync;  // unused but needed for mixer trigger by protocol
 MODULE_CALLTYPE
 static u16 flysky_cb()
 {
@@ -358,7 +359,7 @@ static u16 flysky_cb()
         }
     }
     hopping_frequency_no++;
-    CLOCK_RunMixer(NULL);
+    CLOCK_RunMixer(&mixer_sync);
     return packet_period;
 }
 
@@ -368,7 +369,6 @@ static void initialize(u8 bind) {
     uint8_t temp;
 
     CLOCK_StopTimer();
-    CLOCK_StopMixer();
     if(Model.proto_opts[PROTOOPTS_WLTOYS] == WLTOYS_EXT_CX20) {
         packet_period = PACKET_PERIOD_CX20;
     } else {

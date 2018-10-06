@@ -640,7 +640,6 @@ void CLOCK_ClearMsecCallback(int cb)
 }
 void CLOCK_RunMixer(volatile int *) {}
 void CLOCK_StartMixer() {}
-void CLOCK_StopMixer() {}
 
 u32 CLOCK_getms()
 {

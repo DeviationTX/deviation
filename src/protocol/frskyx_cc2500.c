@@ -907,7 +907,6 @@ static void initialize(int bind)
 {
     CLOCK_StopTimer();
     mixer_runtime = 50;
-    CLOCK_StopMixer();   // protocol schedules mixer updates
 
     // initialize statics since 7e modules don't initialize
     fine = Model.proto_opts[PROTO_OPTS_FREQFINE];
