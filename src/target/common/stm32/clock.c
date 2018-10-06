@@ -145,10 +145,8 @@ void CLOCK_Init()
     nvic_enable_irq(_NVIC_DMA_CHANNEL_IRQ);
     nvic_set_priority(_NVIC_DMA_CHANNEL_IRQ, 65); //Medium priority
 
-    /* Enable EXTI3 interrupt for triggering mixer calculations from protocol. */
-    /* We are enabling only the interrupt
-     * We'll manually trigger this via set_pending_interrupt
-     */
+    // Enable EXTI3 interrupt for triggering mixer calculations from protocol.
+    // Manually triggered via set_pending_interrupt
     nvic_enable_irq(NVIC_EXTI3_IRQ);
     nvic_set_priority(NVIC_EXTI3_IRQ, 32); // priority lower than protocol callback, higher than medium priority
 
@@ -260,7 +258,7 @@ void exti3_isr() {
 void exti1_isr()
 {
     // medium_priority_cb();
-    if (clock_mixer == MIXCLK_TIMER) CLOCK_UpdateMixers();
+    CLOCK_UpdateMixers();
 }
 
 void sys_tick_handler(void)
@@ -271,9 +269,14 @@ void sys_tick_handler(void)
         return;
     }
     if(msec_callbacks & (1 << MEDIUM_PRIORITY)) {
+        //medium priority tasks execute in interrupt and main loop context
         if (msecs == msec_cbtime[MEDIUM_PRIORITY]) {
-            //medium priority tasks execute in interrupt and main loop context
-            nvic_set_pending_irq(NVIC_EXTI1_IRQ);
+            // currently the mixer calculations is the only code that runs under medium interrupt priority,
+            // so only schedule interrupt if using periodic mixer calc (not per-protocol mixer calc)
+            // If any other code added in medium priority interrupt handler, move the following line to
+            // exti1_isr before the CLOCK_UpdateMixers() line.
+            if (clock_mixer == MIXCLK_TIMER)
+                nvic_set_pending_irq(NVIC_EXTI1_IRQ);
             priority_ready |= 1 << MEDIUM_PRIORITY;
             msec_cbtime[MEDIUM_PRIORITY] = msecs + MEDIUM_PRIORITY_MSEC;
         }
