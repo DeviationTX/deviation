@@ -199,7 +199,7 @@ static void frsky2way_build_data_packet()
             value = 0x8ca;
         } else {
             if (Model.proto_opts[PROTO_OPTS_RSSICHAN] && (chan == Model.num_channels - 1)) {      
-                value = 1650 + Telemetry.value[TELEM_FRSKY_RSSI] * 11; // Max RSSI value seems to be around 106, scale it to around 2000µs
+                value = 1650 + Telemetry.value[TELEM_FRSKY_RSSI] * 11; // Max RSSI value seems to be around 106, scale it to around 2000Âµs
             }
             else {
                 value = (s32)Channels[chan] * 600 / CHAN_MAX_VALUE + 0x8ca; // 0-2047, 0 = 817, 1024 = 1500, 2047 = 2182
