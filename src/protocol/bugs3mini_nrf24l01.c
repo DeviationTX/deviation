@@ -53,20 +53,37 @@
 
 u8 packet[TX_PAYLOAD_SIZE];
 u8 current_chan;
-u8 packet_counter;
 u8 tx_rx_addr[ADDRESS_SIZE];
-u8 txid[3];
 u8 rxid[2];
 u8 phase;
 u8 tx_power;
 
-// #3 data chans 0x12,0x20,0x2f,0x1a,0x28,0x38,0x14,0x23,0x32,0x1c,0x2c,0x3b,0x17,0x26,0x34
-// #3 data addr  0x83,0x3d,0x1d,0x3d,0x5a
-
-const u8 bind_addr[ADDRESS_SIZE] = {0x6D,0x6A,0x78,0x52,0x43};
 const u8 bind_chans[NUM_RF_CHANNELS] = {0x1A,0x23,0x2C,0x35,0x3E,0x17,0x20,0x29,0x32,0x3B,0x14,0x1D,0x26,0x2F,0x38}; // bugs 3 mini
 //const u8 bind_chans[NUM_RF_CHANNELS] = {0x1A,0x23,0x2C,0x35,0x17,0x20,0x29,0x32,0x3B,0x14,0x1D,0x26,0x2F,0x38,0x11}; // bugs 3 H
+
+// dumped from tx #1 (C0ckpitvue 777)
+//const u8 rf_chans[NUM_RF_CHANNELS] = {0x22,0x2f,0x3a,0x14,0x20,0x2d,0x38,0x18,0x26,0x32,0x11,0x1d,0x29,0x35,0x17};
+//const u8 txid[3] = {0xA8,0xE6,0x32};
+//const u8 data_addr[3] = {0x6c,0x3d,0x5a};
+// const u8 tx_hash = 0x6c;
+
+// dumped from tx #2 (DPyro)
+//const u8 rf_chans[NUM_RF_CHANNELS] = {0x3d,0x34,0x2b,0x22,0x19,0x40,0x37,0x2e,0x25,0x1c,0x3a,0x31,0x28,0x1f,0x16};
+//const u8 txid[3] = {0xdd,0xab,0xfd};
+//const u8 data_addr[3] = {0x9e,0x6b,0x3d};
+// const u8 tx_hash = 0x9e;
+
+// dumped from tx #3 (goebish)
 const u8 rf_chans[NUM_RF_CHANNELS] = {0x12,0x20,0x2f,0x1a,0x28,0x38,0x14,0x23,0x32,0x1c,0x2c,0x3b,0x17,0x26,0x34};
+const u8 txid[3] = {0x90,0x9e,0x4a};
+//const u8 data_addr[3] = {0x3d,0x3d,0x5a};
+const u8 tx_hash = 0x3d;
+
+// dumped from Bugs 3H (aszasza)
+//const u8 rf_chans[NUM_RF_CHANNELS] = {0x13,0x25,0x37,0x1F,0x31,0x17,0x28,0x3A,0x1C,0x2E,0x22,0x33,0x19,0x2B,0x3D};
+//const u8 txid[3] = {0x20,0x28,0xBA};
+//const u8 data_addr[3] = {0xb3,0x3e,0x73};
+// const u8 tx_hash = 0xb3;
 
 enum {
     BIND1,
@@ -84,12 +101,14 @@ enum {
     CHANNEL6,       // Flip
     CHANNEL7,       // Snapshot
     CHANNEL8,       // Arm
+    CHANNEL9,       // Mode (Stabilized/Acro)
 };
 
 #define CHANNEL_LED         CHANNEL5
-//#define CHANNEL_FLIP        CHANNEL6
+#define CHANNEL_FLIP        CHANNEL6
 #define CHANNEL_SNAPSHOT    CHANNEL7
 #define CHANNEL_ARM         CHANNEL8
+#define CHANNEL_MODE        CHANNEL9
 
 // flags going to packet[12]
 enum {
@@ -106,11 +125,13 @@ enum {
 
 static const char *const bugs3mini_opts[] = {
     _tr_noop("RX Id"), "-32768", "32767", "1", NULL,
+    _tr_noop("Address"), "-32768", "32767", "655361", NULL,
     NULL
 };
 
 enum {
     PROTOOPTS_RXID = 0,
+    PROTOOPTS_ADDR,
     LAST_PROTO_OPT
 };
 
@@ -121,10 +142,10 @@ ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 static u8 checksum()
 {
-    u8 checksum = packet[1];
-    for(u8 i=2; i < TX_PAYLOAD_SIZE; i++)
+    u8 checksum = 0x6d;
+    for(u8 i=1; i < TX_PAYLOAD_SIZE; i++)
         checksum ^= packet[i];
-    return checksum ^ 0x6d;
+    return checksum;
 }
 
 static void bugs3mini_init()
@@ -191,11 +212,6 @@ static u8 scale_channel(u8 ch, u8 destMin, u8 destMax)
 #define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
 static void send_packet(u8 bind)
 {
-    // tx #3 {0x90,0x9E,0x4A};
-    txid[0] = 0x90;
-    txid[1] = 0x9e;
-    txid[2] = 0x4a;
-    
     u8 aileron = scale_channel(CHANNEL1, 0, 255);
     u8 elevator = scale_channel(CHANNEL2, 0, 255);
     u8 throttle = scale_channel(CHANNEL3, 0, 255);
@@ -213,7 +229,7 @@ static void send_packet(u8 bind)
         packet[9] = 0x20;
         packet[10]= 0x20;
         packet[11]= 0x40;
-        packet[12]= packet[12] & 0x40 ? 0 : 0x40; // next chan flag
+        packet[12]^= 0x40; // alternating freq hopping flag
         packet[13]= 0x60; // disarmed | 0x40 = bind ?
         packet[14]= 0x00;
         packet[15]= 0x00;
@@ -228,13 +244,13 @@ static void send_packet(u8 bind)
         packet[10]= 0x20 | (rudder << 7);
         packet[11]= 0x4e | (throttle << 7);
         packet[12]= 0x80 | (packet[12] & 0x40 ? 0 : 0x40); // bugs 3 H doesn't have 0x80 ?
-        packet[13] = 0x20 // (disarmed)
+        packet[13] = FLAG_DISARMED //GET_FLAG(CHANNEL_ARM, 1) ? FLAG_ARMED : FLAG_DISARMED
                    | GET_FLAG(CHANNEL_LED, FLAG_LED);
         
         packet[14] = 0;
         packet[15] = 0; // 0x53 on bugs 3 H ?
     }
-    memset(&packet[16], (u8)0, 8);
+    //memset(&packet[16], (u8)0, 8); // already done during init
     packet[0] = checksum();
     
     if(!(packet[12]&0x40)) {
@@ -266,15 +282,18 @@ static u16 bugs3mini_callback()
                 XN297_ReadPayload(packet, RX_PAYLOAD_SIZE);
                 rxid[0] = packet[1];
                 rxid[1] = packet[2];
-                Model.proto_opts[PROTOOPTS_RXID] = (u16)rxid[0]<<8 | rxid[1];
+                Model.proto_opts[PROTOOPTS_RXID] = (u16)rxid[0]<<8 | rxid[1]; // store rxid into protocol options
                 NRF24L01_SetTxRxMode(TXRX_OFF);
                 NRF24L01_SetTxRxMode(TX_EN);
                 
                 tx_rx_addr[0] = rxid[0];
-                tx_rx_addr[1] = 0x3d; // tx #3
+                //tx_rx_addr[1] = data_addr[0];
+                tx_rx_addr[1] = tx_hash;
                 tx_rx_addr[2] = rxid[1];
-                tx_rx_addr[3] = 0x3d; // tx #3
-                tx_rx_addr[4] = 0x5a; // tx #3
+                //tx_rx_addr[3] = data_addr[1];
+                //tx_rx_addr[4] = data_addr[2];
+                tx_rx_addr[3] = Model.proto_opts[PROTOOPTS_ADDR] >> 8;
+                tx_rx_addr[4] = Model.proto_opts[PROTOOPTS_ADDR] & 0xff;
                 
                 XN297_SetTXAddr(tx_rx_addr, 5);
                 XN297_SetRXAddr(tx_rx_addr, 5);
@@ -291,8 +310,8 @@ static u16 bugs3mini_callback()
         case BIND2:
             // switch to RX mode
             NRF24L01_SetTxRxMode(TXRX_OFF);
-            NRF24L01_FlushRx();
             NRF24L01_SetTxRxMode(RX_EN);
+            NRF24L01_FlushRx();
             XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) 
                           | BV(NRF24L01_00_PWR_UP) | BV(NRF24L01_00_PRIM_RX));
             phase = BIND1;
@@ -306,21 +325,29 @@ static u16 bugs3mini_callback()
 
 static void initialize(u8 bind)
 {
+    memset(packet, (u8)0, sizeof(packet));
+    bugs3mini_init();
     if(bind) {
         phase = BIND1;
-        XN297_SetTXAddr(bind_addr, 5);
-        XN297_SetRXAddr(bind_addr, 5);
+        XN297_SetTXAddr((const u8*)"mjxRC", 5);
+        XN297_SetRXAddr((const u8*)"mjxRC", 5);
         PROTOCOL_SetBindState(0xFFFFFFFF);
     }
     else {
         rxid[0] = Model.proto_opts[PROTOOPTS_RXID] >> 8;
         rxid[1] = Model.proto_opts[PROTOOPTS_RXID] & 0xff;
         
-        tx_rx_addr[0] = rxid[0];
-        tx_rx_addr[1] = 0x3d; // tx #3
+        /*tx_rx_addr[0] = rxid[0];
+        tx_rx_addr[1] = data_addr[0];
         tx_rx_addr[2] = rxid[1];
-        tx_rx_addr[3] = 0x3d; // tx #3
-        tx_rx_addr[4] = 0x5a; // tx #3
+        tx_rx_addr[3] = data_addr[1];
+        tx_rx_addr[4] = data_addr[2];*/
+        
+        tx_rx_addr[0] = rxid[0];
+        tx_rx_addr[1] = tx_hash;
+        tx_rx_addr[2] = rxid[1];
+        tx_rx_addr[3] = Model.proto_opts[PROTOOPTS_ADDR] >> 8;
+        tx_rx_addr[4] = Model.proto_opts[PROTOOPTS_ADDR] & 0xff;
                 
         XN297_SetTXAddr(tx_rx_addr, 5);
         XN297_SetRXAddr(tx_rx_addr, 5);
@@ -328,7 +355,6 @@ static void initialize(u8 bind)
         phase = DATA;
     }
     
-    bugs3mini_init();
     CLOCK_StartTimer(INITIAL_WAIT, bugs3mini_callback);
 }
 
