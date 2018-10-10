@@ -122,7 +122,6 @@ enum {
 #define FLAG_DISARM  0x20    // disarm (toggle to turn off motors)
 #define FLAG_ANGLE   0x04    // angle/acro mode (set is angle mode)
 
-
 static const char *const bugs3mini_opts[] = {
     _tr_noop("RX Id"), "-32768", "32767", "1", NULL,
     _tr_noop("Address"), "-32768", "32767", "655361", NULL,
@@ -227,10 +226,10 @@ static void check_arming(s32 channel_value) {
 #define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
 static void send_packet(u8 bind)
 {
-    u8 aileron = scale_channel(CHANNEL1, 0, 250);
-    u8 elevator = scale_channel(CHANNEL2, 0, 250);
-    u8 throttle = scale_channel(CHANNEL3, 0, 250);
-    u8 rudder = scale_channel(CHANNEL4, 0, 250);
+    u8 aileron = scale_channel(CHANNEL1, 0, 500);
+    u8 elevator = scale_channel(CHANNEL2, 0, 500);
+    u8 throttle = scale_channel(CHANNEL3, 0, 500);
+    u8 rudder = scale_channel(CHANNEL4, 0, 500);
     
     check_arming(Channels[CHANNEL_ARM]);  // sets globals arm_flags and armed
     
