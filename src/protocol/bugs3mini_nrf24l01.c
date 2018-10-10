@@ -325,6 +325,7 @@ static u16 bugs3mini_callback()
 
 static void initialize(u8 bind)
 {
+    CLOCK_StopTimer();
     memset(packet, (u8)0, sizeof(packet));
     bugs3mini_init();
     if(bind) {
