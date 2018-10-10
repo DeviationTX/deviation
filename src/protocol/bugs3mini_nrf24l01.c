@@ -51,39 +51,37 @@
 #define NUM_RF_CHANNELS 15
 #define ADDRESS_SIZE    5
 
-u8 packet[TX_PAYLOAD_SIZE];
-u8 current_chan;
-u8 tx_rx_addr[ADDRESS_SIZE];
-u8 rxid[2];
-u8 phase;
-u8 tx_power;
+static u8 packet[TX_PAYLOAD_SIZE];
+static u8 current_chan;
+static u8 tx_rx_addr[ADDRESS_SIZE];
+static u8 rxid[2];
+static u8 phase;
+static u8 tx_power;
+static u8 armed, arm_flags;
+static u8 arm_channel_previous;
 
-const u8 bind_chans[NUM_RF_CHANNELS] = {0x1A,0x23,0x2C,0x35,0x3E,0x17,0x20,0x29,0x32,0x3B,0x14,0x1D,0x26,0x2F,0x38}; // bugs 3 mini
+static const u8 bind_chans[NUM_RF_CHANNELS] = {0x1A,0x23,0x2C,0x35,0x3E,0x17,0x20,0x29,0x32,0x3B,0x14,0x1D,0x26,0x2F,0x38}; // bugs 3 mini
 //const u8 bind_chans[NUM_RF_CHANNELS] = {0x1A,0x23,0x2C,0x35,0x17,0x20,0x29,0x32,0x3B,0x14,0x1D,0x26,0x2F,0x38,0x11}; // bugs 3 H
 
 // dumped from tx #1 (C0ckpitvue 777)
 //const u8 rf_chans[NUM_RF_CHANNELS] = {0x22,0x2f,0x3a,0x14,0x20,0x2d,0x38,0x18,0x26,0x32,0x11,0x1d,0x29,0x35,0x17};
 //const u8 txid[3] = {0xA8,0xE6,0x32};
-//const u8 data_addr[3] = {0x6c,0x3d,0x5a};
-// const u8 tx_hash = 0x6c;
+//const u8 tx_hash = 0x6c;
 
 // dumped from tx #2 (DPyro)
 //const u8 rf_chans[NUM_RF_CHANNELS] = {0x3d,0x34,0x2b,0x22,0x19,0x40,0x37,0x2e,0x25,0x1c,0x3a,0x31,0x28,0x1f,0x16};
 //const u8 txid[3] = {0xdd,0xab,0xfd};
-//const u8 data_addr[3] = {0x9e,0x6b,0x3d};
-// const u8 tx_hash = 0x9e;
+//const u8 tx_hash = 0x9e;
 
 // dumped from tx #3 (goebish)
-const u8 rf_chans[NUM_RF_CHANNELS] = {0x12,0x20,0x2f,0x1a,0x28,0x38,0x14,0x23,0x32,0x1c,0x2c,0x3b,0x17,0x26,0x34};
-const u8 txid[3] = {0x90,0x9e,0x4a};
-//const u8 data_addr[3] = {0x3d,0x3d,0x5a};
-const u8 tx_hash = 0x3d;
+static const u8 rf_chans[NUM_RF_CHANNELS] = {0x12,0x20,0x2f,0x1a,0x28,0x38,0x14,0x23,0x32,0x1c,0x2c,0x3b,0x17,0x26,0x34};
+static const u8 txid[3] = {0x90,0x9e,0x4a};
+static const u8 tx_hash = 0x3d;
 
 // dumped from Bugs 3H (aszasza)
 //const u8 rf_chans[NUM_RF_CHANNELS] = {0x13,0x25,0x37,0x1F,0x31,0x17,0x28,0x3A,0x1C,0x2E,0x22,0x33,0x19,0x2B,0x3D};
 //const u8 txid[3] = {0x20,0x28,0xBA};
-//const u8 data_addr[3] = {0xb3,0x3e,0x73};
-// const u8 tx_hash = 0xb3;
+//const u8 tx_hash = 0xb3;
 
 enum {
     BIND1,
@@ -93,35 +91,37 @@ enum {
 
 // For code readability
 enum {
-    CHANNEL1 = 0,   // Aileron
-    CHANNEL2,       // Elevator
-    CHANNEL3,       // Throttle
-    CHANNEL4,       // Rudder
-    CHANNEL5,       // Led
-    CHANNEL6,       // Flip
-    CHANNEL7,       // Snapshot
-    CHANNEL8,       // Arm
-    CHANNEL9,       // Mode (Stabilized/Acro)
+    CHANNEL1 = 0,
+    CHANNEL2,
+    CHANNEL3,
+    CHANNEL4,
+    CHANNEL5,
+    CHANNEL6,
+    CHANNEL7,
+    CHANNEL8,
+    CHANNEL9,
+    CHANNEL10
 };
 
-#define CHANNEL_LED         CHANNEL5
-#define CHANNEL_FLIP        CHANNEL6
-#define CHANNEL_SNAPSHOT    CHANNEL7
-#define CHANNEL_ARM         CHANNEL8
-#define CHANNEL_MODE        CHANNEL9
+#define CHANNEL_ARM         CHANNEL5
+#define CHANNEL_LED         CHANNEL6
+#define CHANNEL_FLIP        CHANNEL7
+#define CHANNEL_PICTURE     CHANNEL8
+#define CHANNEL_VIDEO       CHANNEL9
+#define CHANNEL_ANGLE       CHANNEL10
 
-// flags going to packet[12]
-enum {
-    FLAG_SNAPSHOT = 0x01,
-    FLAG_HIGHRATE = 0x04,
-};
+// flags packet[12]
+#define FLAG_FLIP    0x08    // automatic flip
+#define FLAG_MODE    0x04    // low/high speed select (set is high speed)
+#define FLAG_VIDEO   0x02    // toggle video
+#define FLAG_PICTURE 0x01    // toggle picture
 
-// flags going to packet[13]
-enum {
-    FLAG_LED = 0x80,
-    FLAG_DISARMED = 0x20,
-    FLAG_ARMED = 0x40,
-};
+// flags packet[13]
+#define FLAG_LED     0x80    // enable LEDs
+#define FLAG_ARM     0x40    // arm (toggle to turn on motors)
+#define FLAG_DISARM  0x20    // disarm (toggle to turn off motors)
+#define FLAG_ANGLE   0x04    // angle/acro mode (set is angle mode)
+
 
 static const char *const bugs3mini_opts[] = {
     _tr_noop("RX Id"), "-32768", "32767", "1", NULL,
@@ -209,13 +209,30 @@ static u8 scale_channel(u8 ch, u8 destMin, u8 destMax)
     return (range * (chanval - CHAN_MIN_VALUE)) / CHAN_RANGE + destMin;
 }
 
+static void check_arming(s32 channel_value) {
+    u8 arm_channel = channel_value > 0;
+
+    if (arm_channel != arm_channel_previous) {
+        arm_channel_previous = arm_channel;
+        if (arm_channel) {
+            armed = 1;
+            arm_flags ^= FLAG_ARM;
+        } else {
+            armed = 0;
+            arm_flags ^= FLAG_DISARM;
+        }
+    }
+}
+
 #define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
 static void send_packet(u8 bind)
 {
-    u8 aileron = scale_channel(CHANNEL1, 0, 255);
-    u8 elevator = scale_channel(CHANNEL2, 0, 255);
-    u8 throttle = scale_channel(CHANNEL3, 0, 255);
-    u8 rudder = scale_channel(CHANNEL4, 0, 255);
+    u8 aileron = scale_channel(CHANNEL1, 0, 250);
+    u8 elevator = scale_channel(CHANNEL2, 0, 250);
+    u8 throttle = scale_channel(CHANNEL3, 0, 250);
+    u8 rudder = scale_channel(CHANNEL4, 0, 250);
+    
+    check_arming(Channels[CHANNEL_ARM]);  // sets globals arm_flags and armed
     
     packet[1] = txid[0];
     packet[2] = txid[1];
@@ -230,7 +247,7 @@ static void send_packet(u8 bind)
         packet[10]= 0x20;
         packet[11]= 0x40;
         packet[12]^= 0x40; // alternating freq hopping flag
-        packet[13]= 0x60; // disarmed | 0x40 = bind ?
+        packet[13]= 0x60;
         packet[14]= 0x00;
         packet[15]= 0x00;
     }
@@ -242,15 +259,19 @@ static void send_packet(u8 bind)
         packet[8] = 0x20 | (aileron << 7);
         packet[9] = 0x20 | (elevator << 7);
         packet[10]= 0x20 | (rudder << 7);
-        packet[11]= 0x4e | (throttle << 7);
-        packet[12]= 0x80 | (packet[12] & 0x40 ? 0 : 0x40); // bugs 3 H doesn't have 0x80 ?
-        packet[13] = FLAG_DISARMED //GET_FLAG(CHANNEL_ARM, 1) ? FLAG_ARMED : FLAG_DISARMED
-                   | GET_FLAG(CHANNEL_LED, FLAG_LED);
+        packet[11]= 0x40 | (throttle << 7); // 4e ?
+        packet[12]= 0x80 | (packet[12] & 0x40 ? 0 : 0x40) // bugs 3 H doesn't have 0x80 ?
+                  | FLAG_MODE
+                  | GET_FLAG(CHANNEL_FLIP, FLAG_FLIP)
+                  | GET_FLAG(CHANNEL_PICTURE, FLAG_PICTURE)
+                  | GET_FLAG(CHANNEL_VIDEO, FLAG_VIDEO);
+        packet[13] = arm_flags
+                   | GET_FLAG(CHANNEL_LED, FLAG_LED)
+                   | GET_FLAG(CHANNEL_ANGLE, FLAG_ANGLE);
         
         packet[14] = 0;
         packet[15] = 0; // 0x53 on bugs 3 H ?
     }
-    //memset(&packet[16], (u8)0, 8); // already done during init
     packet[0] = checksum();
     
     if(!(packet[12]&0x40)) {
@@ -287,11 +308,8 @@ static u16 bugs3mini_callback()
                 NRF24L01_SetTxRxMode(TX_EN);
                 
                 tx_rx_addr[0] = rxid[0];
-                //tx_rx_addr[1] = data_addr[0];
                 tx_rx_addr[1] = tx_hash;
                 tx_rx_addr[2] = rxid[1];
-                //tx_rx_addr[3] = data_addr[1];
-                //tx_rx_addr[4] = data_addr[2];
                 tx_rx_addr[3] = Model.proto_opts[PROTOOPTS_ADDR] >> 8;
                 tx_rx_addr[4] = Model.proto_opts[PROTOOPTS_ADDR] & 0xff;
                 
@@ -338,12 +356,6 @@ static void initialize(u8 bind)
         rxid[0] = Model.proto_opts[PROTOOPTS_RXID] >> 8;
         rxid[1] = Model.proto_opts[PROTOOPTS_RXID] & 0xff;
         
-        /*tx_rx_addr[0] = rxid[0];
-        tx_rx_addr[1] = data_addr[0];
-        tx_rx_addr[2] = rxid[1];
-        tx_rx_addr[3] = data_addr[1];
-        tx_rx_addr[4] = data_addr[2];*/
-        
         tx_rx_addr[0] = rxid[0];
         tx_rx_addr[1] = tx_hash;
         tx_rx_addr[2] = rxid[1];
@@ -355,7 +367,9 @@ static void initialize(u8 bind)
         
         phase = DATA;
     }
-    
+    armed = 0;
+    arm_flags = FLAG_DISARM;    // initial value from captures
+    arm_channel_previous = Channels[CHANNEL_ARM] > 0;
     CLOCK_StartTimer(INITIAL_WAIT, bugs3mini_callback);
 }
 
