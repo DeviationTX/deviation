@@ -293,7 +293,7 @@ static void send_packet(u8 bind)
     }
 }
 
-static make_address()
+static void make_address()
 {
     tx_rx_addr[0] = rxid[0];
     if(tx_rx_addr[0]==0 || tx_rx_addr[0]==0xff)
