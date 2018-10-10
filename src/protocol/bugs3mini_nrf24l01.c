@@ -293,6 +293,19 @@ static void send_packet(u8 bind)
     }
 }
 
+static make_address()
+{
+    tx_rx_addr[0] = rxid[0];
+    if(tx_rx_addr[0]==0 || tx_rx_addr[0]==0xff)
+        tx_rx_addr[0] = 0x52;
+    tx_rx_addr[1] = tx_hash;
+    tx_rx_addr[2] = rxid[1];
+    if(tx_rx_addr[2]==0 || tx_rx_addr[2]==0xff)
+        tx_rx_addr[2] = 0x66;
+    tx_rx_addr[3] = Model.proto_opts[PROTOOPTS_ADDR] >> 8;
+    tx_rx_addr[4] = Model.proto_opts[PROTOOPTS_ADDR] & 0xff;
+}
+
 MODULE_CALLTYPE
 static u16 bugs3mini_callback()
 {
@@ -305,16 +318,9 @@ static u16 bugs3mini_callback()
                 Model.proto_opts[PROTOOPTS_RXID] = (u16)rxid[0]<<8 | rxid[1]; // store rxid into protocol options
                 NRF24L01_SetTxRxMode(TXRX_OFF);
                 NRF24L01_SetTxRxMode(TX_EN);
-                
-                tx_rx_addr[0] = rxid[0];
-                tx_rx_addr[1] = tx_hash;
-                tx_rx_addr[2] = rxid[1];
-                tx_rx_addr[3] = Model.proto_opts[PROTOOPTS_ADDR] >> 8;
-                tx_rx_addr[4] = Model.proto_opts[PROTOOPTS_ADDR] & 0xff;
-                
+                make_address();
                 XN297_SetTXAddr(tx_rx_addr, 5);
                 XN297_SetRXAddr(tx_rx_addr, 5);
-                
                 phase = DATA;
                 PROTOCOL_SetBindState(0);
                 return PACKET_INTERVAL;
@@ -354,16 +360,9 @@ static void initialize(u8 bind)
     else {
         rxid[0] = Model.proto_opts[PROTOOPTS_RXID] >> 8;
         rxid[1] = Model.proto_opts[PROTOOPTS_RXID] & 0xff;
-        
-        tx_rx_addr[0] = rxid[0];
-        tx_rx_addr[1] = tx_hash;
-        tx_rx_addr[2] = rxid[1];
-        tx_rx_addr[3] = Model.proto_opts[PROTOOPTS_ADDR] >> 8;
-        tx_rx_addr[4] = Model.proto_opts[PROTOOPTS_ADDR] & 0xff;
-                
+        make_address();
         XN297_SetTXAddr(tx_rx_addr, 5);
         XN297_SetRXAddr(tx_rx_addr, 5);
-        
         phase = DATA;
     }
     armed = 0;
