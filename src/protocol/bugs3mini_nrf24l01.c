@@ -226,10 +226,10 @@ static void check_arming(s32 channel_value) {
 #define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
 static void send_packet(u8 bind)
 {
-    u16 aileron = scale_channel(CHANNEL1, 0, 500);
+    u16 aileron = scale_channel(CHANNEL1, 500, 0);
     u16 elevator = scale_channel(CHANNEL2, 0, 500);
     u16 throttle = scale_channel(CHANNEL3, 0, 500);
-    u16 rudder = scale_channel(CHANNEL4, 0, 500);
+    u16 rudder = scale_channel(CHANNEL4, 500, 0);
     
     check_arming(Channels[CHANNEL_ARM]);  // sets globals arm_flags and armed
     
@@ -259,7 +259,7 @@ static void send_packet(u8 bind)
         packet[9] = 0x20 | (elevator << 7);
         packet[10]= 0x20 | (rudder << 7);
         packet[11]= 0x40 | (throttle << 7); // 4e ?
-        packet[12]= 0x80 | (packet[12] & 0x40 ? 0 : 0x40) // bugs 3 H doesn't have 0x80 ?
+        packet[12]= 0x80 | (packet[12] ^ 0x40) // bugs 3 H doesn't have 0x80 ?
                   | FLAG_MODE
                   | GET_FLAG(CHANNEL_FLIP, FLAG_FLIP)
                   | GET_FLAG(CHANNEL_PICTURE, FLAG_PICTURE)
