@@ -384,7 +384,7 @@ static u16 frsky2way_cb()
         state = FRSKY_DATA2;
         PROTOCOL_SetBindState(0);
         frsky2way_init(0);
-        counter = 1;
+        counter = 0;
         break;
 
     case FRSKY_DATA8:
