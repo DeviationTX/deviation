@@ -255,8 +255,8 @@ void sys_tick_handler(void)
             // so only schedule interrupt if using periodic mixer calc (not per-protocol mixer calc)
             // If any other code added in medium priority interrupt handler, move the following line to
             // exti1_isr before the CLOCK_UpdateMixers() line.
-            // overload mixer_sync to fit in 7e build - 0 indicates mixer run by timer
-            if (mixer_sync) nvic_set_pending_irq(NVIC_EXTI1_IRQ);
+            // overload mixer_sync to fit in 7e build - NULL indicates mixer run by timer
+            if (mixer_sync == NULL) nvic_set_pending_irq(NVIC_EXTI1_IRQ);
             priority_ready |= 1 << MEDIUM_PRIORITY;
             msec_cbtime[MEDIUM_PRIORITY] = msecs + MEDIUM_PRIORITY_MSEC;
         }
