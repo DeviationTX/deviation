@@ -378,7 +378,7 @@ const void *BUGS3MINI_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_DEINIT:
         case PROTOCMD_RESET:
             CLOCK_StopTimer();
-            return (void *)(A7105_Reset() ? 1L : -1L);
+            return (void *)(NRF24L01_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return 0;
         case PROTOCMD_BIND:  initialize(1); return 0;
         case PROTOCMD_NUMCHAN: return (void *)10L;
