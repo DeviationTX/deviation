@@ -350,7 +350,6 @@ void MIXER_ApplyMixer(struct Mixer *mixer, volatile s32 *raw, s32 *orig_value)
                 value = *orig_value - rate;
         }
         break;
-#if HAS_EXTENDED_AUDIO
     case MUX_BEEP:
         if (orig_value) {
             s32 new_value = raw[mixer->dest + NUM_INPUTS + 1];
@@ -361,12 +360,14 @@ void MIXER_ApplyMixer(struct Mixer *mixer, volatile s32 *raw, s32 *orig_value)
                     (value < *orig_value && value > new_value) ||
                     (abs(value - new_value) <= 10)) {
                     mixer->beep_lock = 1;
-                    MUSIC_Play(MUSIC_SAVING);
+                    SOUND_SetFrequency(3951, Transmitter.volume * 10);
+                    SOUND_StartWithoutVibrating(100, NULL);
                 }
             }
         }
         value = raw[mixer->dest + NUM_INPUTS + 1];	// Use input value
         break;
+#if HAS_EXTENDED_AUDIO
     case MUX_VOICE:
         if (orig_value) {
             s32 new_value = raw[mixer->dest + NUM_INPUTS + 1];
