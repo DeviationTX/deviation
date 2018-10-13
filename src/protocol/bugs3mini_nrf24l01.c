@@ -78,7 +78,7 @@ static const u8 rf_chans[NUM_RF_CHANNELS] = {0x12,0x20,0x2f,0x1a,0x28,0x38,0x14,
 static const u8 txid[3] = {0x90,0x9e,0x4a};
 static const u8 tx_hash = 0x3d;
 
-// dumped from Bugs 3H (aszasza)
+// dumped from Bugs 3H tx (aszasza)
 //const u8 rf_chans[NUM_RF_CHANNELS] = {0x13,0x25,0x37,0x1F,0x31,0x17,0x28,0x3A,0x1C,0x2E,0x22,0x33,0x19,0x2B,0x3D};
 //const u8 txid[3] = {0x20,0x28,0xBA};
 //const u8 tx_hash = 0xb3;
@@ -120,7 +120,7 @@ enum {
 #define FLAG_LED     0x80    // enable LEDs
 #define FLAG_ARM     0x40    // arm (toggle to turn on motors)
 #define FLAG_DISARM  0x20    // disarm (toggle to turn off motors)
-#define FLAG_ANGLE   0x04    // angle/acro mode (set is angle mode)
+#define FLAG_ANGLE   0x02    // angle/acro mode (set is angle mode)
 
 static const char *const bugs3mini_opts[] = {
     _tr_noop("RX Id"), "-32768", "32767", "1", NULL,
