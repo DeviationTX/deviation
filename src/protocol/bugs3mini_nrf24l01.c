@@ -86,7 +86,8 @@ static const u8 tx_hash = 0x3d;
 enum {
     BIND1,
     BIND2,
-    DATA
+    DATA1,
+    DATA2
 };
 
 // For code readability
@@ -306,6 +307,24 @@ static void make_address()
     tx_rx_addr[4] = Model.proto_opts[PROTOOPTS_ADDR] & 0xff;
 }
 
+static void update_telemetry() {
+  u8 checksum = 0x6d;
+  for(u8 i=1; i<12; i++) {
+      checksum += packet[i];
+  }
+  if(packet[0] == checksum) {
+      Telemetry.value[TELEM_FRSKY_RSSI] = packet[3];
+      TELEMETRY_SetUpdated(TELEM_FRSKY_RSSI);
+      if(packet[11] & 0x80)
+          Telemetry.value[TELEM_FRSKY_VOLT1] = 840; // Ok
+      else if(packet[11] & 0x40)
+          Telemetry.value[TELEM_FRSKY_VOLT1] = 710; // Warning
+      else
+          Telemetry.value[TELEM_FRSKY_VOLT1] = 640; // Critical
+      TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT1);
+  }
+}
+
 MODULE_CALLTYPE
 static u16 bugs3mini_callback()
 {
@@ -321,7 +340,7 @@ static u16 bugs3mini_callback()
                 make_address();
                 XN297_SetTXAddr(tx_rx_addr, 5);
                 XN297_SetRXAddr(tx_rx_addr, 5);
-                phase = DATA;
+                phase = DATA1;
                 PROTOCOL_SetBindState(0);
                 return PACKET_INTERVAL;
             }
@@ -339,9 +358,26 @@ static u16 bugs3mini_callback()
                           | BV(NRF24L01_00_PWR_UP) | BV(NRF24L01_00_PRIM_RX));
             phase = BIND1;
             return PACKET_INTERVAL - 1000;
-        case DATA:
+        case DATA1:
+            if( NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR)) { // RX fifo data ready
+                // read only 12 bytes to not overwrite channel change flag
+                XN297_ReadPayload(packet, 12);
+                update_telemetry();
+            }
+            NRF24L01_SetTxRxMode(TXRX_OFF);
+            NRF24L01_SetTxRxMode(TX_EN);
             send_packet(0);
-            break;
+            phase = DATA2;
+            return 1000;
+        case DATA2:
+            // switch to RX mode
+            NRF24L01_SetTxRxMode(TXRX_OFF);
+            NRF24L01_SetTxRxMode(RX_EN);
+            NRF24L01_FlushRx();
+            XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) 
+                          | BV(NRF24L01_00_PWR_UP) | BV(NRF24L01_00_PRIM_RX));
+            phase = DATA1;
+            return PACKET_INTERVAL - 1000;
     }
     return PACKET_INTERVAL;
 }
@@ -363,7 +399,7 @@ static void initialize(u8 bind)
         make_address();
         XN297_SetTXAddr(tx_rx_addr, 5);
         XN297_SetRXAddr(tx_rx_addr, 5);
-        phase = DATA;
+        phase = DATA1;
     }
     armed = 0;
     arm_flags = FLAG_DISARM;    // initial value from captures
