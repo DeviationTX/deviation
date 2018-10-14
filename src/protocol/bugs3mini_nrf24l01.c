@@ -88,6 +88,7 @@ static const struct {
       0xb3,
      {0x13,0x25,0x37,0x1F,0x31,0x17,0x28,0x3A,0x1C,0x2E,0x22,0x33,0x19,0x2B,0x3D}}
 };
+#define NUM_TX_RF_MAPS (sizeof(tx_rf_map)/(sizeof(tx_rf_map)/sizeof(tx_rf_map[0])))
 
 enum {
     BIND1,
@@ -233,12 +234,12 @@ static void check_arming(s32 channel_value) {
 #define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
 static void send_packet(u8 bind)
 {
+    check_arming(Channels[CHANNEL_ARM]);  // sets globals arm_flags and armed
+    
     u16 aileron = scale_channel(CHANNEL1, 500, 0);
     u16 elevator = scale_channel(CHANNEL2, 0, 500);
-    u16 throttle = scale_channel(CHANNEL3, 0, 500);
+    u16 throttle = armed ? scale_channel(CHANNEL3, 0, 500) : 0;
     u16 rudder = scale_channel(CHANNEL4, 500, 0);
-    
-    check_arming(Channels[CHANNEL_ARM]);  // sets globals arm_flags and armed
     
     packet[1] = txid[0];
     packet[2] = txid[1];
@@ -258,17 +259,17 @@ static void send_packet(u8 bind)
         packet[15]= 0x00;
     }
     else {
-        packet[4] = armed ? (throttle >> 1) : 0;
+        packet[4] = throttle >> 1;
         packet[5] = rudder >> 1;
         packet[6] = elevator >> 1;
         packet[7] = aileron >> 1;
         packet[8] = 0x20 | (aileron << 7);
         packet[9] = 0x20 | (elevator << 7);
         packet[10]= 0x20 | (rudder << 7);
-        packet[11]= 0x40 | (armed ? (throttle << 7) : 0);
+        packet[11]= 0x40 | (throttle << 7);
         packet[12]= 0x80 | (packet[12] ^ 0x40) // bugs 3 H doesn't have 0x80 ?
                   | FLAG_MODE
-                  | GET_FLAG(CHANNEL_FLIP, FLAG_FLIP)
+                  | (armed ? GET_FLAG(CHANNEL_FLIP, FLAG_FLIP) : 0)
                   | GET_FLAG(CHANNEL_PICTURE, FLAG_PICTURE)
                   | GET_FLAG(CHANNEL_VIDEO, FLAG_VIDEO);
         packet[13] = arm_flags
@@ -398,9 +399,9 @@ static void initialize_txid()
     // Pump zero bytes for LFSR to diverge more
     for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
     
-    memcpy(txid, tx_rf_map[lfsr % (sizeof(tx_rf_map)/sizeof(tx_rf_map[0]))].txid, sizeof(txid));
-    memcpy(rf_chans, tx_rf_map[lfsr % (sizeof(tx_rf_map)/sizeof(tx_rf_map[0]))].rf_chans, sizeof(rf_chans));
-    tx_hash = tx_rf_map[lfsr % (sizeof(tx_rf_map)/sizeof(tx_rf_map[0]))].tx_hash;
+    memcpy(txid, tx_rf_map[lfsr % NUM_TX_RF_MAPS].txid, sizeof(txid));
+    memcpy(rf_chans, tx_rf_map[lfsr % NUM_TX_RF_MAPS].rf_chans, sizeof(rf_chans));
+    tx_hash = tx_rf_map[lfsr % NUM_TX_RF_MAPS].tx_hash;
 }
 
 static void initialize(u8 bind)
