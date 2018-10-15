@@ -46,6 +46,7 @@
 
 #define INITIAL_WAIT    500
 #define PACKET_INTERVAL 6840
+#define WRITE_WAIT      2000
 #define TX_PAYLOAD_SIZE 24
 #define RX_PAYLOAD_SIZE 16
 #define NUM_RF_CHANNELS 15
@@ -355,7 +356,7 @@ static u16 bugs3mini_callback()
             NRF24L01_SetTxRxMode(TX_EN);
             send_packet(1);
             phase = BIND2;
-            return 1000;
+            return WRITE_WAIT;
         case BIND2:
             // switch to RX mode
             NRF24L01_SetTxRxMode(TXRX_OFF);
@@ -364,7 +365,7 @@ static u16 bugs3mini_callback()
             XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) 
                           | BV(NRF24L01_00_PWR_UP) | BV(NRF24L01_00_PRIM_RX));
             phase = BIND1;
-            return PACKET_INTERVAL - 1000;
+            return PACKET_INTERVAL - WRITE_WAIT;
         case DATA1:
             if( NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR)) { // RX fifo data ready
                 // read only 12 bytes to not overwrite channel change flag
@@ -375,7 +376,7 @@ static u16 bugs3mini_callback()
             NRF24L01_SetTxRxMode(TX_EN);
             send_packet(0);
             phase = DATA2;
-            return 1000;
+            return WRITE_WAIT;
         case DATA2:
             // switch to RX mode
             NRF24L01_SetTxRxMode(TXRX_OFF);
@@ -384,7 +385,7 @@ static u16 bugs3mini_callback()
             XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) 
                           | BV(NRF24L01_00_PWR_UP) | BV(NRF24L01_00_PRIM_RX));
             phase = DATA1;
-            return PACKET_INTERVAL - 1000;
+            return PACKET_INTERVAL - WRITE_WAIT;
     }
     return PACKET_INTERVAL;
 }
