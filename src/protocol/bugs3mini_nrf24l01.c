@@ -54,8 +54,7 @@
 
 static u8 packet[TX_PAYLOAD_SIZE];
 static u8 current_chan;
-static u8 tx_rx_addr[ADDRESS_SIZE];
-static u8 rxid[2];
+static u8 rx_tx_addr[ADDRESS_SIZE];
 static u8 phase;
 static u8 tx_power;
 static u8 armed, arm_flags;
@@ -133,13 +132,11 @@ enum {
 
 static const char *const bugs3mini_opts[] = {
     _tr_noop("RX Id"), "-32768", "32767", "1", NULL,
-    _tr_noop("Address"), "-32768", "32767", "655361", NULL,
     NULL
 };
 
 enum {
     PROTOOPTS_RXID = 0,
-    PROTOOPTS_ADDR,
     LAST_PROTO_OPT
 };
 
@@ -303,35 +300,79 @@ static void send_packet(u8 bind)
     }
 }
 
+// compute final address for the rxid received during bind
+// thanks to Pascal for the function!
 static void make_address()
 {
-    tx_rx_addr[0] = rxid[0];
-    if(tx_rx_addr[0]==0 || tx_rx_addr[0]==0xff)
-        tx_rx_addr[0] = 0x52;
-    tx_rx_addr[1] = tx_hash;
-    tx_rx_addr[2] = rxid[1];
-    if(tx_rx_addr[2]==0 || tx_rx_addr[2]==0xff)
-        tx_rx_addr[2] = 0x66;
-    tx_rx_addr[3] = Model.proto_opts[PROTOOPTS_ADDR] >> 8;
-    tx_rx_addr[4] = Model.proto_opts[PROTOOPTS_ADDR] & 0xff;
+    u8 start, length, index;
+    u8 rxid_high = Model.proto_opts[PROTOOPTS_RXID] >> 8;
+    u8 rxid_low  = Model.proto_opts[PROTOOPTS_RXID] & 0xff;
+    
+    static const u16 end[]={
+        0x2d9e, 0x95a4, 0x9c5c, 0xb4a6, 0xa9ce, 0x562b, 0x3e73, 0xb895, 0x6a82, 0x9437, 0x3d5a,
+        0x4bb2, 0x6949, 0xc224, 0x6b3d, 0x23c6, 0x9ea3, 0xa498, 0x5c9e, 0xa652, 0xce76, 0x2b4b, 0x733a };
+    
+    if(rxid_high==0x00 || rxid_high==0xFF)
+        rx_tx_addr[0]=0x52;
+    else
+        rx_tx_addr[0]=rxid_high;
+    
+    rx_tx_addr[1]=tx_hash;
+    
+    if(rxid_low==0x00 || rxid_low==0xFF)
+        rx_tx_addr[2]=0x66;
+    else
+        rx_tx_addr[2]=rxid_low;
+    
+    for(u8 end_idx=0;end_idx<23;end_idx++)
+    {
+        //calculate sequence start
+        if(end_idx<=7)
+            start=end_idx;
+        else
+            start=(end_idx-7)*16+7;
+        //calculate sequence length
+        if(end_idx>6)
+        {
+            if(end_idx>15)
+                length=(23-end_idx)<<1;
+            else
+                length=16;
+        }
+        else
+            length=(end_idx+1)<<1;
+        //scan for a possible solution using the current end
+        for(u8 i=0;i<length;i++)
+        {
+            index=(i>>1)*7+(((i+1)>>1)<<3);
+            index=start+index-rxid_high;
+            if(index==rxid_low)
+            {
+                rx_tx_addr[3]=end[end_idx]>>8;
+                rx_tx_addr[4]=end[end_idx];
+                return;
+            }
+        }
+    }
+    // Something wrong happened if we arrive here....
 }
 
 static void update_telemetry() {
-  u8 checksum = 0x6d;
-  for(u8 i=1; i<12; i++) {
-      checksum += packet[i];
-  }
-  if(packet[0] == checksum) {
-      Telemetry.value[TELEM_FRSKY_RSSI] = packet[3];
-      TELEMETRY_SetUpdated(TELEM_FRSKY_RSSI);
-      if(packet[11] & 0x80)
-          Telemetry.value[TELEM_FRSKY_VOLT1] = 840; // Ok
-      else if(packet[11] & 0x40)
-          Telemetry.value[TELEM_FRSKY_VOLT1] = 710; // Warning
-      else
-          Telemetry.value[TELEM_FRSKY_VOLT1] = 640; // Critical
-      TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT1);
-  }
+    u8 checksum = 0x6d;
+    for(u8 i=1; i<12; i++) {
+        checksum += packet[i];
+    }
+    if(packet[0] == checksum) {
+        Telemetry.value[TELEM_FRSKY_RSSI] = packet[3];
+        TELEMETRY_SetUpdated(TELEM_FRSKY_RSSI);
+        if(packet[11] & 0x80)
+            Telemetry.value[TELEM_FRSKY_VOLT1] = 840; // Ok
+        else if(packet[11] & 0x40)
+            Telemetry.value[TELEM_FRSKY_VOLT1] = 710; // Warning
+        else
+            Telemetry.value[TELEM_FRSKY_VOLT1] = 640; // Critical
+        TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT1);
+    }
 }
 
 MODULE_CALLTYPE
@@ -341,14 +382,12 @@ static u16 bugs3mini_callback()
         case BIND1:
             if( NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR)) { // RX fifo data ready
                 XN297_ReadPayload(packet, RX_PAYLOAD_SIZE);
-                rxid[0] = packet[1];
-                rxid[1] = packet[2];
-                Model.proto_opts[PROTOOPTS_RXID] = (u16)rxid[0]<<8 | rxid[1]; // store rxid into protocol options
+                Model.proto_opts[PROTOOPTS_RXID] = (u16)packet[1]<<8 | packet[2]; // store rxid into protocol options
                 NRF24L01_SetTxRxMode(TXRX_OFF);
                 NRF24L01_SetTxRxMode(TX_EN);
                 make_address();
-                XN297_SetTXAddr(tx_rx_addr, 5);
-                XN297_SetRXAddr(tx_rx_addr, 5);
+                XN297_SetTXAddr(rx_tx_addr, 5);
+                XN297_SetRXAddr(rx_tx_addr, 5);
                 phase = DATA1;
                 PROTOCOL_SetBindState(0);
                 return PACKET_INTERVAL;
@@ -419,11 +458,9 @@ static void initialize(u8 bind)
         PROTOCOL_SetBindState(0xFFFFFFFF);
     }
     else {
-        rxid[0] = Model.proto_opts[PROTOOPTS_RXID] >> 8;
-        rxid[1] = Model.proto_opts[PROTOOPTS_RXID] & 0xff;
         make_address();
-        XN297_SetTXAddr(tx_rx_addr, 5);
-        XN297_SetRXAddr(tx_rx_addr, 5);
+        XN297_SetTXAddr(rx_tx_addr, 5);
+        XN297_SetRXAddr(rx_tx_addr, 5);
         phase = DATA1;
     }
     armed = 0;
