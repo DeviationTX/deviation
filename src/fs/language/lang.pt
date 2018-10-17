@@ -1,0 +1,754 @@
+﻿Português BR
+: is %d%%, safe value = %d%%\n
+ = %d%%, valor seguro  = %d%%\n
+: is %d%%,\nsafe value = %d%%
+ = %d%%, \nvalor seguro  = %d%%
+:# Channels
+# Canais
+>:%d bytes left
+>:1 sec
+:1-to-1
+1 a 1
+>:10 sec
+:11 Point
+11 Pontos
+:13 Point
+13 Pontos
+>:1Mbps
+>:250kbps
+:3 Point
+3 Pontos
+>:3 Pos
+>:30 sec
+:4Ch w/ Dual-Rates
+4Ch c/Dual-Rate
+:5 Point
+5 Pontos
+>:5 sec
+:5+1
+5+1
+:6+1
+6+1
+>:60 sec
+:6Ch Airplane
+Aeroplano 6Ch
+:6Ch Helicopter
+Helicóptero 6Ch
+:7 Point
+7 Pontos
+:9 Point
+9 Pontos
+:ABSVAL
+ABSVAL
+>:ACKPKT
+>:AD2GAIN
+:AIL
+AIL
+:AIL DR
+ALAB DR
+:AIL Inv
+ALAB Inv
+:AIL Mix
+ALAB Mix
+>:AUX2
+>:AUX3
+:AUX4
+AUX4
+:AUX5
+AUX5
+>:AUX6
+>:AUX7
+:About Deviation
+Sobre o Deviation
+>:Add
+>:Advanced
+>:AirSpd
+:Airplane
+Aeroplano
+:Alarm
+Alarme
+>:Alarm interval
+>:Alarm intvl
+>:Alert interval
+>:Alert intvl
+>:All
+>:AllCell
+>:Alt
+>:Alt.
+>:Alt.max
+:Altitude
+Altitude
+>:Amp
+>:Amps
+>:Att.: -20dB
+>:Att.: 0dB
+>:Audio settings
+>:Volume audio
+>:Auto
+>:Average
+:Backlight
+Backlight
+>:Bad/missing\nprotocol modules!
+>:Bar
+>:Bargraph
+>:Bat
+:Batt alarm
+Alarme bat
+>:Battery
+:Battery alarm
+Alarme Bateria
+:Battery too low,\ncan't save!
+Bateria baixa, não\nserá possivel gravar!
+>:Big-box
+:Bind
+Bind
+:Binding
+Bindando
+:Binding %s...\nPress ENT to stop
+Bindando %s\nTecle ENT p/parar
+:Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
+Bind sendo executado...\nConfirme que o receptor está ligado\n\nPressionar OK NÃO ira cancelar o Bind\nmas dara o controle total do Rádio
+>:Blink
+>:Blue-A
+>:Box
+>:Brightness
+:Button monitor
+Botão do display
+>:Buzz settings
+:Buzz volume
+Volume buzzer
+>:Buzzer settings
+:COL
+PASSO
+:COL Inv
+PASSO Inv
+:COL Limit
+PASSO limite	
+:COL Mix
+PASSO Mix
+>:CPPM
+>:CRTP Mode
+>:CRTPLOG
+:CYC
+Cíclico
+:Calibrate
+Calibrar
+<:Calibration done.
+<Calibração OK
+>:Calibration done.\n \nPress ENT.
+:Cancel
+Cancelar
+:Celsius
+Celsius
+:Center PW
+Centralizar PW
+:Center all \nsticks and knobs\nthen press ENT
+Centralizar todos\nsticks e knobs\nsó então teclar ENT
+:Ch
+Ch
+>:Ch%d
+:Chan mode
+Modo canal
+:Change
+Alterar
+>:Channel
+:Channel monitor
+Monitor canais
+<:Channel output
+<Canais saída
+>:Clock
+:Complex
+Complexo
+:Configure
+Configurar
+:Contrast
+Contraste
+>:Control
+:Copy To
+Copiar para
+:Copy To...
+Copiar...
+:Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
+Nivel crítico das baterias.\nAs modificações devem ser gravadas.\nQualquer alteração\nNÃO será gravada.\n\nTroque as baterias imediatamente!
+:Curve
+Curva
+:Cyclic1
+Ciclico1
+:Cyclic2
+Ciclico2
+:Cyclic3
+Ciclico3
+>:D/R & Exp
+>:D/R&Exp -AIL
+>:D/R&Exp -ELE
+>:D/R&Exp -RUD
+>:DIS
+:DR
+DR
+>:Datalog
+>:Date
+>:Date / Time
+>:Date format
+>:Day
+:Deadband
+ZonaMorta
+>:Debuglog
+:Default
+Default
+>:Delete
+:Delta PW
+Delta PW
+>:Deviation
+:Deviation FW version:
+Versão FW Deviation:
+>:Deviation\n   USB
+:Dimmer target
+Limite Dimmer
+:Dimmer time
+Tempo dimmer
+>:Disabled
+:Dn
+Aba
+>:Do you really want\nto reset the\n permanent timer %d?
+:Down
+Desce
+>:DynTrim
+:ELE
+ELE
+:ELE DR
+ELE DR
+:ELE Inv
+ELE Inv
+:ELE Mix
+ELE Mix
+:EXPO %d
+Expo. %d
+>:Edit
+>:Enable
+>:Enabled
+:Enter
+Entrar
+:Exit
+Sair
+>:Expert
+:Expo&DR
+Expo&DR
+>:Extend
+>:External OSD
+>:External voice\ncurrently not\navailable
+>:F.Log filter
+>:FMODE
+>:Fades
+:Fahren
+Fahren
+:Fail-safe
+Fail-safe
+>:Failsafe
+:File
+Arquivo
+:Fixed
+Fixo
+:Fixed ID
+ID Fixo
+>:Fly mode
+:Foot
+Pé
+>:Format
+:Frame Size
+Taman. frame
+>:Freq Tune
+>:Freq-Coarse
+>:Freq-Fine
+>:Fuel
+:GEAR
+GEAR
+:GPS
+GPS
+>:GPS Alt.
+>:GPS Coords
+>:GPS Speed
+>:GPS Time
+:Generic settings
+Configs. gerais
+>:Green
+>:Gyro sense
+>:H
+>:H-trim
+>:HOLD
+>:Heading
+:Heli
+Heli
+>:Heli/Standard GUI
+:Helicopter
+Helicóptero
+:High-Rate
+Valor Max.
+>:HighSpeed
+>:Hold position
+>:Holds
+>:Hour
+:Icon
+Icone
+>:Idle Up 1
+>:Idle Up 2
+:Input
+Entrada
+:Input monitor
+Monitor entrada
+:Insert
+Inserir
+:Inverted
+Invertido
+>:L
+:LCD settings
+Config. LCD
+:LEFT_H
+ESQUERDA_H
+:LEFT_V
+ESQUERDA_V
+>:LIN
+>:LQI
+>:LQI output
+>:LRSSI
+:Language
+Lingua
+:Latitude
+Latitude
+>:Layout: Long-Press ENT
+:Left
+Esquerda
+:Length
+Longitude
+:Linked
+Lincado
+:Load
+Ler...
+>:Load Layout
+>:Load Model
+>:Load Model Template
+:Load...
+Ler...
+:Longitude
+Longitude
+>:Loss
+:Low Battery
+Bateria baixa
+:Low-Rate
+Taxa baixa
+>:M
+>:MIX
+:Main menu
+Menu principal
+:Main page
+Menu principal
+:Main page config
+Personaliza menu
+>:Manual
+:Max Limit
+Límite max
+:Menu
+Menu
+:Meter
+Metro
+:Mid-Rate
+Valor Médio
+:Min Limit
+Limite Min
+:Min/Max
+Min/Max
+>:MinCell
+>:Minute
+>:Missing Modules:\n
+:Mixer
+Mixer
+>:Mixer    Reorder:Hold R+
+>:Mixer GUI
+>:Mixer output
+:Mixers
+Mixers
+>:Mode
+:Modo %d
+Modo %d
+>:Model
+:Model menu
+Menu do modelo
+:Model name
+Nome modelo
+>:Model needs reset\nfor standard mixer
+>:Model needs to be reset\nin order to switch to the standard mixer
+:Model setup
+Configura modelo
+:Model type
+Tipo modelo
+>:Module Error
+>:Momentary
+>:Month
+:Move Down
+Descer
+:Move Up
+Subir
+:Move sticks and knobs\nto max & min positions\nthen press ENT
+Mova sticks e knobs\npara as posições max e min\ne tecle ENT
+>:Multi
+>:Multirotor
+:Mux
+Mux
+:Neg
+Neg
+:New
+Novo
+>:No
+:No Trim
+Sem Trim
+>:No range test possible.
+:None
+Nenhum
+:Normal
+Normal
+:Notch PW
+Notch PW
+>:Num Channels
+:Off
+Desl
+:Offset
+Offset
+:Ok
+Ok
+:On
+Lig
+>:On/Off
+>:OrangeRx
+>:Outputs
+>:PIT
+>:PIT Mix
+>:PPM
+>:PPM In
+>:PPM%d
+>:PPMIn Cfg (Extend)
+:Page
+Página
+>:Page Config
+>:Peak
+>:Pitch curves
+:Plane
+Aeroplano
+:Point
+Ponto
+:Pos
+Pos
+>:Pos 0
+>:Pos 1
+>:Pos 2
+:Pos/Neg
+Pos/Neg
+>:Position %d
+>:Power On alarm
+>:Power reduced to
+>:Power-down alert
+:Prealert interval
+Interv. inicial
+:Prealert intvl
+Interv. inicial
+:Prealert time
+Tempo inicial
+:Press 'Ent' to turn USB Filesystem
+Tecle 'Ent' p/arquivos via USB
+:Press ENT to change
+Tecle ENT para alterar
+:Press ENT to copy to
+Tecle ENT para copiar para
+:Press ENT to load
+Tecle ENT para ler
+>:Press ENT to start test.
+>:Press ENT to stop test.
+:Press ENT to turn \nUSB drive
+Tecle ENT p/ativar USB
+:Protocol
+Protocolo
+>:PwrDn alert
+>:PwrOn alarm
+:RIGHT_H
+DIREITA_H
+:RIGHT_V
+DIREITA_V
+:RPM
+RPM
+>:RPYT
+>:RSSI
+>:RSSIChan
+>:RTC Time
+:RUD
+RUD
+:RUD DR
+RUD DR
+>:Range Test
+>:Rate
+:Re-Init
+Reconecta
+>:Re-bind
+>:Real Time Clock
+:Remove
+Remover
+:Reset
+Reset
+>:Reset Permanent Timer?
+>:Reset sw
+:Reverse
+Inverter
+:Reversed
+Invertido
+:Revert
+Reverter
+:Right
+Direita
+>:RxV
+>:S.PORT Out
+>:SW A
+>:SW B
+>:SW C
+>:SW D
+>:SW E
+>:SW F
+>:SW G
+>:SW H
+:Safe Val
+Valor Seguro
+:Safety
+Seguro
+>:Sample Rate
+>:SatCount
+:Save
+Save
+>:Save Model as...
+>:Scale
+:Scale%s
+Escala%s
+:Scanner
+Scanner
+>:Second
+>:Select
+>:Select Icon
+>:Select Language
+>:Servo
+>:Servo Hz
+>:Set
+>:Set date
+>:Set permanent timer
+>:Set time
+>:Set to
+>:Setup
+:Simple
+Simples
+:Simple 4 Channel
+4Ch. Simples
+>:Small-box
+>:Smooth
+:Speed
+Velocidade
+:Src
+Origem
+>:Standard
+>:Standard Mixer
+:Start
+Inicio
+>:Start test
+:Step
+Passo
+>:Stick
+:Stick input
+Posição dos sticks
+:Stick mode
+Modo de voo
+:Sticks
+Sticks
+>:Stop test
+:Subtrim
+Subtrim
+>:Swash
+:SwashType
+Tipo de Swash
+:Switch
+Chave
+>:Switch assignment
+:Switch1
+Chave1
+:Switch2
+Chave2
+:Symmetric
+Simétrico
+:THR
+THR
+:TRIMLH+
+TRIMSO+
+:TRIMLH-
+TRIMSO-
+:TRIMLV+
+TRIMSV+
+:TRIMLV-
+TRIMSV-
+:TRIMRH+
+TRIMDO+
+:TRIMRH-
+TRIMDO-
+:TRIMRV+
+TRIMDV+
+:TRIMRV-
+TRIMDV-
+:TRIM_L+
+TRIM_S+
+:TRIM_L-
+TRIM_S-
+:TRIM_R+
+TRIM_D+
+:TRIM_R-
+TRIM_D-
+>:TRN
+>:Telem %d
+:TelemRPM
+TelemRPM
+>:TelemRSSI
+:TelemT
+TelemT
+:TelemV
+TelemV
+:Telemetry
+Telemetria
+:Telemetry config
+Conf. telemetria
+:Telemetry monitor
+Monitor telemetria
+:Telemetry settings
+Ajustes telemetria
+:Temp
+Temp
+:Temperature
+Temperatura
+>:Template
+:Template..
+Template..
+>:Thr hold
+>:Throttle curves
+>:Throttle hold
+:Time
+Hora
+>:Time format
+:Timer
+Timer
+>:Timer %d
+:Timer settings
+Config. Timer
+:Timer%d
+Timer%d
+:Timers
+Temporizadores
+:Timeup interval
+Intervalo
+:Timeup intvl
+Duração
+>:Toggle
+:Touch Calibrate
+Calibração do Touch
+:Touch Test
+Teste do Touch
+:Touch screen
+Tela Touch
+:Touch target %d
+Tocar %d
+:Touch to Lock
+Tocar para bloquear
+:Touch to Unlock
+Tocar para desbloquear
+>:Trainer Cfg (Channel)
+>:Trainer Cfg (Stick)
+>:Trainer Sw
+:Transmitter config
+Config. do rádio
+:Transmitter menu
+Menu do rádio
+>:Travel adjust
+:Trim
+Trim
+:Trim +
+Trim +
+:Trim -
+Trim -
+:Trim Step
+Passo Trim
+>:Trimbar
+:Trims
+Trims
+:Turn Off
+Desligar
+:Turn On
+Ligar
+:Tx power
+Potência
+>:TxPower
+>:Type
+:USB
+USB
+>:USB Filesystem is currently 
+>:USE A.ACK
+:Unknown
+Desconhecido
+:Up
+Para Cima
+>:V-trim
+>:VSI
+:Value
+Valor
+:Vibration
+Vibrar
+>:Vibration settings
+>:Vibration:
+>:Video
+>:Video Channel
+>:Video Enable
+>:Video setup
+:Virt
+Virt
+>:Voice config
+:Volt
+Volt
+>:Welcome
+>:Year
+>:Yes
+:Zero/Max
+Zero/Max
+:\n%d seconds left
+\n%d segs restantes
+:\n\nBinding will end in %d seconds...
+\n\nBind termina em %d segundos...
+>:actual value
+:add
+adiciona
+>:beep
+>:cntdn-prop
+:countdown
+regressivo
+>:delay
+>:down
+>:from
+:is not supported
+não é suportado
+:is turned off
+desligado
+:max
+max
+:min
+min
+:mult
+mult
+>:permanent
+>:regular
+:replace
+substituir
+>:resulting value
+>:stop-prop
+:stopwatch
+cronometro
+>:up
+>:vTX MHz
+>:value to add or set
+>:value to set
+>:voice
