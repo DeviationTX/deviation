@@ -144,7 +144,12 @@ typedef enum {
 extern volatile mixsync_t mixer_sync;
 
 /*PWM/PPM functions */
-void PWM_Initialize();
+typedef enum {
+    PWM_PPM,
+    PWM_PXX,
+} pwm_type_t;
+
+void PWM_Initialize(pwm_type_t type);
 void PWM_Stop();
 void PWM_Set(int);
 void PPM_Enable(unsigned low_time, volatile u16 *pulses);
