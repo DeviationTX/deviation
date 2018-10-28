@@ -39,6 +39,8 @@ typedef enum {
 } pwm_type_t;
 
 static pwm_type_t pwm_type;
+static u8 pxx_bit;
+static u8 pxx_ones_count;
 void PWM_Initialize(pwm_type_t type)
 {
     pwm_type = type;
@@ -53,8 +55,19 @@ void PWM_Initialize(pwm_type_t type)
                                | RCC_APB2ENR_AFIOEN);
     timer_reset(TIM1);
 
-    // Timer global mode: No divider, Alignment edge, Direction up, auto-preload buffered
-    timer_set_mode(TIM1, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
+    if (type == PWM_PPM)
+        // Timer global mode: No divider, Alignment edge, Direction up, auto-preload buffered
+        timer_set_mode(TIM1, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
+    else if (type == PWM_PXX)
+        pxx_bit = 1 << 7;
+        pxx_ones_count = 0;
+        // Timer global mode: No divider, Alignment edge, Direction down, auto-preload buffered
+        timer_set_mode(TIM1, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_DOWN);
+    else {
+      PWM_Stop();
+      return;
+    }
+
     timer_enable_preload(TIM1);
 
     /* timer updates each microsecond */
@@ -65,12 +78,15 @@ void PWM_Initialize(pwm_type_t type)
     timer_enable_oc_preload(TIM1, _PWM_TIM_OC);         // must use preload for PWM mode
     timer_set_oc_value(TIM1, _PWM_TIM_OC, 0);           // hold output inactive
     if (type == PWM_PPM) {
-        timer_set_oc_polarity_low(TIM1, _PWM_TIM_OC);       // notch time is low
-        timer_set_period(TIM1, 22500);                      // sane default
+        timer_set_oc_polarity_low(TIM1, _PWM_TIM_OC);   // notch time is low
+        timer_set_period(TIM1, 22500);                  // sane default
     } else if (type == PWM_PXX) {
-        timer_set_oc_polarity_high(TIM1, _PWM_TIM_OC);      // fixed time is high
-        timer_set_period(TIM1, 24);                         // 24us period is 1
-    } else return;
+        timer_set_oc_polarity_high(TIM1, _PWM_TIM_OC);  // fixed time is high
+        timer_set_period(TIM1, 24);                     // 24us period is 1
+    } else {
+      PWM_Stop();
+      return;
+    }
     timer_generate_event(TIM1, TIM_EGR_UG);             // load shadow registers
     timer_enable_counter(TIM1);
 
@@ -115,11 +131,39 @@ void PPM_Enable(unsigned low_time, volatile u16 *pulses)
     }
 }
 
-void PXX_Enable(unsigned high_time, volatile u16 *pulses)
+extern volatile u8 *pxx;  // defined in pwm_rom.c
+void PXX_Enable(unsigned high_time, volatile u8 *packet)
 {
-    pwm = pulses;
-    if (*pwm) {
-        timer_set_period(TIM1, *pwm++ - 1);
+    u16 width;
+
+    pxx = packet;
+    if (*pxx) {
+        if (*pxx & pxx_bit) {
+            // bit to send is 1
+            if (pxx_ones_count++ == 5) {
+                // stuff 0 bit after 5 ones
+                width = 16;
+                pxx_ones_count = 0;
+            } else {
+                width = 24;
+                pxx_ones_count += 1;
+                pxx_bit >>= 1;
+                if (pxx_bit == 0) {
+                    pxx_bit = 1 << 7;
+                    pxx += 1;
+                }
+            }
+        } else {
+            // bit to send is 0
+            width = 16;
+            pxx_ones_count = 0;
+            pxx_bit >>= 1;
+            if (pxx_bit == 0) {
+                pxx_bit = 1 << 7;
+                pxx += 1;
+            }
+        }
+        timer_set_period(TIM1, width - 1);
         timer_set_oc_value(TIM1, _PWM_TIM_OC, high_time);
         timer_generate_event(TIM1, TIM_EGR_UG); // Force-load shadow registers
 
