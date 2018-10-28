@@ -188,16 +188,13 @@ static void build_data_pkt()
     packet[PXX_PKT_BYTES-3] = lcrc;
     packet[PXX_PKT_BYTES-2] = lcrc >> 8;
     packet[PXX_PKT_BYTES-1] = START_STOP;
-
-    pulses[num_channels] = 1; // extra period so last preload cycle is run
-    pulses[num_channels+1] = 0;
 }
 
 MODULE_CALLTYPE
 static u16 pxxout_cb()
 {
     build_data_pkt();
-    PXX_Enable(PW_HIGH, pulses);
+    PXX_Enable(packet);
 #ifdef EMULATOR
     return 3000;
 #else
@@ -211,7 +208,7 @@ static void initialize()
     if (PPMin_Mode())
         return;
 
-    PWM_Initialize();
+    PWM_Initialize(PWM_PXX);
     num_channels = Model.num_channels;
     failsafe_count = 0;
     chan_offset = 0;

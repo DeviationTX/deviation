@@ -32,8 +32,6 @@ volatile u8  *pxx;
 
 void tim1_up_isr()
 {
-    u8 stuffed = 0;
-
     timer_clear_flag(TIM1, TIM_SR_UIF);
 
     if (pwm_type == PWM_PPM) {
@@ -45,6 +43,9 @@ void tim1_up_isr()
     }
 
     // type is PWM_PXX
+    u8 width;
+    u8 stuffed = 0;
+
     if (pxx) {
         if (*pxx & pxx_bit) {
             // bit to send is 1
@@ -63,7 +64,7 @@ void tim1_up_isr()
             pxx_ones_count = 0;
         }
 
-        if (!stuffed) {
+        if (!stuffed) {   // advance to next bit
             pxx_bit >>= 1;
             if (pxx_bit == 0) {
                 pxx_bit = 1 << 7;
@@ -73,13 +74,7 @@ void tim1_up_isr()
 
         timer_set_period(TIM1, width - 1);
         timer_set_oc_value(TIM1, _PWM_TIM_OC, width - 8);
-        timer_generate_event(TIM1, TIM_EGR_UG); // Force-load shadow registers
-
-        //Create an interrupt on ARR reload
-        timer_clear_flag(TIM1, TIM_SR_UIF);
-        timer_enable_irq(TIM1, TIM_DIER_UIE);
     }
-
 }
 
 #endif
