@@ -148,6 +148,7 @@ void PWM_Initialize();
 void PWM_Stop();
 void PWM_Set(int);
 void PPM_Enable(unsigned low_time, volatile u16 *pulses);
+void PXX_Enable(unsigned high_time, volatile u16 *pulses);
 
 /* PPM-In functions */
 #define MAX_PPM_IN_CHANNELS 8

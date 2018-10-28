@@ -33,9 +33,16 @@
 #include <string.h>
 #include <errno.h>
 
+typedef enum {
+    PWM_PPM,
+    PWM_PXX,
+} pwm_type_t;
 
-void PWM_Initialize()
+static pwm_type_t pwm_type;
+void PWM_Initialize(pwm_type_t type)
 {
+    pwm_type = type;
+
 #if _PWM_PIN == GPIO_USART1_TX
     UART_Stop();
 #endif
@@ -56,9 +63,14 @@ void PWM_Initialize()
     /* compare output setup. compare register must match i/o pin */
     timer_set_oc_mode(TIM1, _PWM_TIM_OC, TIM_OCM_PWM1); // output active while counter below compare
     timer_enable_oc_preload(TIM1, _PWM_TIM_OC);         // must use preload for PWM mode
-    timer_set_oc_polarity_low(TIM1, _PWM_TIM_OC);       // notch time is low
     timer_set_oc_value(TIM1, _PWM_TIM_OC, 0);           // hold output inactive
-    timer_set_period(TIM1, 22500);                      // sane default
+    if (type == PWM_PPM) {
+        timer_set_oc_polarity_low(TIM1, _PWM_TIM_OC);       // notch time is low
+        timer_set_period(TIM1, 22500);                      // sane default
+    } else if (type == PWM_PXX) {
+        timer_set_oc_polarity_high(TIM1, _PWM_TIM_OC);      // fixed time is high
+        timer_set_period(TIM1, 24);                         // 24us period is 1
+    } else return;
     timer_generate_event(TIM1, TIM_EGR_UG);             // load shadow registers
     timer_enable_counter(TIM1);
 
@@ -95,6 +107,20 @@ void PPM_Enable(unsigned low_time, volatile u16 *pulses)
     if (*pwm) {
         timer_set_period(TIM1, *pwm++ - 1);
         timer_set_oc_value(TIM1, _PWM_TIM_OC, low_time);
+        timer_generate_event(TIM1, TIM_EGR_UG); // Force-load shadow registers
+
+        //Create an interrupt on ARR reload
+        timer_clear_flag(TIM1, TIM_SR_UIF);
+        timer_enable_irq(TIM1, TIM_DIER_UIE);
+    }
+}
+
+void PXX_Enable(unsigned high_time, volatile u16 *pulses)
+{
+    pwm = pulses;
+    if (*pwm) {
+        timer_set_period(TIM1, *pwm++ - 1);
+        timer_set_oc_value(TIM1, _PWM_TIM_OC, high_time);
         timer_generate_event(TIM1, TIM_EGR_UG); // Force-load shadow registers
 
         //Create an interrupt on ARR reload

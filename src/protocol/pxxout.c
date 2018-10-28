@@ -35,8 +35,24 @@
 #define STUFF_MASK    0x20
 #define PXX_PKT_BYTES 19
 #define PXX_PKT_BITS  (2 * PXX_PKT_BYTES * 8)  // 2* allows every byte to be escaped
+#define PW_HIGH        8    //  8 microcseconds high, rest of pulse low
 #define PW_ZERO       16    // 16 microsecond pulse is zero
 #define PW_ONE        24    // 24 microsecond pulse is one
+
+static const char * const frskyx_opts[] = {
+  _tr_noop("Failsafe"), "Hold", "NoPulse", "RX", NULL,
+  NULL
+};
+enum {
+    PROTO_OPTS_FAILSAFE,
+    LAST_PROTO_OPT,
+};
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
+
+#define FAILSAFE_HOLD    0
+#define FAILSAFE_NOPULSE 1
+#define FAILSAFE_RX      2
+
 
 static u8 packet[PXX_PKT_BYTES];
 static volatile u16 pulses[PXX_PKT_BITS+2];
@@ -133,17 +149,16 @@ static void build_data_pkt()
     u16 chan_1;
     static u8 failsafe_chan;
     u8 startChan = 0;
-    packet[0] = START_STOP;
 
-    packet[1] = 0;  // RX number
+    packet[0] = START_STOP;
+    packet[1] = 0;  // RX number (looking at opentx it's used for module number)
     packet[2] = 0;  // Byte 3: FLAG1,
-                    // b0: set Rx number -> if this bit is set, every rx listening should change it's rx number to the
-                    // one described in byte 2
-                    // b1...b3: set failsafe position -> if set the following positions should be used as "Failsafe"
-                    // positions.
+                    // b0: set Rx number -> if this bit is set, every rx listening
+                    // should change it's rx number to the one described in byte 2
+                    // b1...b3: set failsafe position -> if set the following positions
+                    // should be used as "Failsafe" positions.
                     // b4..b7:reserved for future use, must be “0” in this version
     packet[3] = 0;  // Byte 4: FLAG2, Reserved for future use, must be “0” in this version.
-
 
     for(u8 i = 0; i < 12 ; i += 3) {    // 12 bytes of channel data
         if (FS_flag & 0x10 && (((failsafe_chan & 0x7) | chan_offset) == startChan)) {
@@ -167,12 +182,14 @@ static void build_data_pkt()
         packet[4+i+2] = chan_1 >> 4;
     }
 
-    u16 lcrc = crc(&packet[3], packet_size-5);
+    // TODO opentx puts "extra_flags" byte here
+
+    u16 lcrc = crc(&packet[3], PXX_PKT_BYTES-5);
     packet[PXX_PKT_BYTES-3] = lcrc;
     packet[PXX_PKT_BYTES-2] = lcrc >> 8;
     packet[PXX_PKT_BYTES-1] = START_STOP;
 
-    pulses[num_channels] = Model.proto_opts[PERIOD_PW]; // extra period so last preload cycle is run
+    pulses[num_channels] = 1; // extra period so last preload cycle is run
     pulses[num_channels+1] = 0;
 }
 
@@ -180,11 +197,11 @@ MODULE_CALLTYPE
 static u16 pxxout_cb()
 {
     build_data_pkt();
-    PXX_Enable(Model.proto_opts[NOTCH_PW], pulses);
+    PXX_Enable(PW_HIGH, pulses);
 #ifdef EMULATOR
     return 3000;
 #else
-    return Model.proto_opts[PERIOD_PW];
+    return 8000;
 #endif
 }
 
