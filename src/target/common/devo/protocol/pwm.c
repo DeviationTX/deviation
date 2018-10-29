@@ -34,13 +34,17 @@
 #include <errno.h>
 
 extern pwm_type_t pwm_type;
+#ifndef MODULAR
 extern volatile u8 pxx_bit;
 extern volatile u8 pxx_ones_count;
+#endif
 void PWM_Initialize(pwm_type_t type)
 {
     pwm_type = type;
+#ifndef MODULAR
     pxx_bit = 1 << 7;
     pxx_ones_count = 0;
+#endif
 
 #if _PWM_PIN == GPIO_USART1_TX
     UART_Stop();
@@ -109,6 +113,7 @@ void PPM_Enable(unsigned low_time, volatile u16 *pulses)
     }
 }
 
+#ifndef MODULAR
 extern volatile u8 *pxx;  // defined in pwm_rom.c
 void PXX_Enable(volatile u8 *packet)
 {
@@ -147,6 +152,7 @@ void PXX_Enable(volatile u8 *packet)
         timer_enable_irq(TIM1, TIM_DIER_UIE);
     }
 }
+#endif  //MODULAR
 
 #endif //DISABLE_PWM
 #pragma long_calls_off

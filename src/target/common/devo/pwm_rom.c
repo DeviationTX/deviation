@@ -25,10 +25,12 @@
 
 
 pwm_type_t pwm_type;
+volatile u16 *pwm;
+#ifndef MODULAR
 volatile u8 pxx_bit;
 volatile u8 pxx_ones_count;
-volatile u16 *pwm;
 volatile u8  *pxx;
+#endif
 
 void tim1_up_isr()
 {
@@ -42,6 +44,7 @@ void tim1_up_isr()
         return;
     }
 
+#ifndef MODULAR
     // type is PWM_PXX
     u8 width;
     u8 stuffed = 0;
@@ -75,6 +78,7 @@ void tim1_up_isr()
         timer_set_period(TIM1, width - 1);
         timer_set_oc_value(TIM1, _PWM_TIM_OC, width - 8);
     }
+#endif
 }
 
 #endif
