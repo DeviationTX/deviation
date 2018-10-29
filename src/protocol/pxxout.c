@@ -55,7 +55,6 @@ ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 
 static u8 packet[PXX_PKT_BYTES];
-static volatile u16 pulses[PXX_PKT_BITS+2];
 u8 num_channels;
 
 static u16 failsafe_count;
@@ -188,13 +187,14 @@ static void build_data_pkt()
     packet[PXX_PKT_BYTES-3] = lcrc;
     packet[PXX_PKT_BYTES-2] = lcrc >> 8;
     packet[PXX_PKT_BYTES-1] = START_STOP;
+
 }
 
 MODULE_CALLTYPE
 static u16 pxxout_cb()
 {
     build_data_pkt();
-    PXX_Enable(packet);
+    PXX_Enable(packet);   // send PXX bitstream using timer1
 #ifdef EMULATOR
     return 3000;
 #else

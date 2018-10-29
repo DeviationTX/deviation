@@ -29,7 +29,8 @@ volatile u16 *pwm;
 #ifndef MODULAR
 volatile u8 pxx_bit;
 volatile u8 pxx_ones_count;
-volatile u8  *pxx;
+volatile u8 *pxx;
+volatile u8 bytes;
 #endif
 
 void tim1_up_isr()
@@ -70,13 +71,17 @@ void tim1_up_isr()
         if (!stuffed) {   // advance to next bit
             pxx_bit >>= 1;
             if (pxx_bit == 0) {
+                if (bytes-- == 0) { // all bits sent
+                    pxx = NULL;
+                    timer_set_oc_value(TIM1, _PWM_TIM_OC, 0); // hold output inactive
+                    return;
+                }
                 pxx_bit = 1 << 7;
                 pxx += 1;
             }
         }
 
         timer_set_period(TIM1, width - 1);
-        timer_set_oc_value(TIM1, _PWM_TIM_OC, width - 8);
     }
 #endif
 }
