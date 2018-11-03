@@ -43,7 +43,7 @@
     #define BIND_COUNT 4
     #define dbgprintf printf
 #else
-    #define BIND_COUNT 150
+    #define BIND_COUNT 300
     //printf inside an interrupt handler is really dangerous
     //this shouldn't be enabled even in debug builds without explicitly
     //turning it on

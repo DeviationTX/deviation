@@ -212,8 +212,7 @@ static void initialize_txid()
     // rf channels
     rand32_r(&lfsr, 0);
     for(i=0; i<NUM_RF_CHANNELS; i++) {
-        rf_chans[i] = 0x30 + (((lfsr >> (i*8)) & 0xff) % 0x21); 
-        //rf_chans[i] = lfsr % 0x51; // hack
+        rf_chans[i] = 0x10 + (((lfsr >> (i*8)) & 0xff) % 0x32); 
     }
 }
 
