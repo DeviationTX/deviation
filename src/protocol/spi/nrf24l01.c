@@ -273,8 +273,9 @@ int NRF24L01_Reset()
     return (status1 == status2 && (status1 & 0x0f) == 0x0e);
 }
 
+//
 // XN297 emulation layer
-
+//////////////////////////
 static u8  xn297_scramble_enabled;
 static int xn297_addr_len;
 static u8  xn297_tx_addr[5];
@@ -538,7 +539,113 @@ u8 XN297_ReadEnhancedPayload(u8* msg, int len)
     }
     return pcf_size;
 }
-
+//
 // End of XN297 emulation
+///////////////////////////
+
+//
+// HS6200 emulation layer
+///////////////////////////
+static u8 hs6200_crc;
+static u16 hs6200_crc_init;
+static u8 hs6200_tx_addr[5];
+static u8 hs6200_address_length;
+
+static const u8 hs6200_scramble[] = {
+    0x80,0xf5,0x3b,0x0d,0x6d,0x2a,0xf9,0xbc,
+    0x51,0x8e,0x4c,0xfd,0xc1,0x65,0xd0}; // todo: find all 32 bytes ...
+
+void HS6200_SetTXAddr(const u8* addr, u8 len)
+{
+    if(len < 4)
+        len = 4;
+    else if(len > 5)
+        len = 5;
+    
+    // use nrf24 address field as a longer preamble
+    if(addr[len-1] & 0x80)
+        NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, (u8*)"\x55\x55\x55\x55\x55", 5);
+    else
+        NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, (u8*)"\xaa\xaa\xaa\xaa\xaa", 5);
+    
+    // precompute address crc
+    hs6200_crc_init = 0xffff;
+    for(int i=0; i<len; i++)
+        hs6200_crc_init = crc16_update(hs6200_crc_init, addr[len-1-i], 8);
+    memcpy(hs6200_tx_addr, addr, len);
+    hs6200_address_length = len;
+}
+
+static u16 hs6200_calc_crc(u8* msg, u8 len)
+{
+    u8 pos;
+    u16 crc = hs6200_crc_init;
+    
+    // pcf + payload
+    for(pos=0; pos < len-1; pos++) { 
+        crc = crc16_update(crc, msg[pos], 8);
+    }
+    // last byte (1 bit only)
+    if(len > 0) {
+        crc = crc16_update(crc, msg[pos+1], 1);
+    }
+    
+    return crc;
+}
+
+void HS6200_Configure(u8 flags)
+{
+    hs6200_crc = !!(flags & BV(NRF24L01_00_EN_CRC));
+    flags &= ~(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO));
+    NRF24L01_WriteReg(NRF24L01_00_CONFIG, flags & 0xff);      
+}
+
+u8 HS6200_WritePayload(u8* msg, u8 len)
+{
+    u8 payload[32];
+    const u8 no_ack = 1; // never ask for an ack
+    static u8 pid;
+    u8 pos = 0;
+    
+    if(len > sizeof(hs6200_scramble))
+        len = sizeof(hs6200_scramble);
+    
+    // address
+    for(int i=hs6200_address_length-1; i>=0; i--) {
+        payload[pos++] = hs6200_tx_addr[i];
+    }
+    
+    // guard bytes
+    payload[pos++] = hs6200_tx_addr[0];
+    payload[pos++] = hs6200_tx_addr[0];
+    
+    // packet control field
+    payload[pos++] = ((len & 0x3f) << 2) | (pid & 0x03);
+    payload[pos] = (no_ack & 0x01) << 7;
+    pid++;
+    
+    // scrambled payload
+    if(len > 0) {
+        payload[pos++] |= (msg[0] ^ hs6200_scramble[0]) >> 1; 
+        for(u8 i=1; i<len; i++)
+            payload[pos++] = ((msg[i-1] ^ hs6200_scramble[i-1]) << 7) | ((msg[i] ^ hs6200_scramble[i]) >> 1);
+        payload[pos] = (msg[len-1] ^ hs6200_scramble[len-1]) << 7; 
+    }
+    
+    // crc
+    if(hs6200_crc) {
+        u16 crc = hs6200_calc_crc(&payload[hs6200_address_length+2], len+2);
+        uint8_t hcrc = crc >> 8;
+        uint8_t lcrc = crc & 0xff;
+        payload[pos++] |= (hcrc >> 1);
+        payload[pos++] = (hcrc << 7) | (lcrc >> 1);
+        payload[pos++] = lcrc << 7;
+    }
+    
+    return NRF24L01_WritePayload(payload, pos);
+}
+//
+// End of HS6200 emulation
+////////////////////////////
 
 #endif // defined(PROTO_HAS_NRF24L01)
