@@ -126,6 +126,7 @@ u8 NRF24L01_FlushTx();
 u8 NRF24L01_FlushRx();
 u8 NRF24L01_Activate(u8 code);
 
+void BK2421_init();
 
 // Bitrate 0 - 1Mbps, 1 - 2Mbps, 3 - 250K (for nRF24L01+)
 u8 NRF24L01_SetBitrate(u8 bitrate);

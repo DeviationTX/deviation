@@ -66,17 +66,6 @@ static u16 bind_counter;
 static u8 tx_power;
 static u8 current_chan;
 
-static const char* const e012_opts[] = {
-    _tr_noop("Frequency"), "2400", "2527", "1", NULL,
-    NULL
-};
-
-enum {
-    PROTOOPTS_FREQ = 0,
-    LAST_PROTO_OPT,
-};
-ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
-
 enum {
     BIND,
     DATA
@@ -147,12 +136,15 @@ static void send_packet(u8 bind)
     
     // Power on, TX mode, CRC enabled
     HS6200_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
-    NRF24L01_WriteReg(NRF24L01_05_RF_CH, bind ? RF_BIND_CHANNEL : Model.proto_opts[PROTOOPTS_FREQ] - 2400 /*rf_chans[current_chan++]*/);
+    NRF24L01_WriteReg(NRF24L01_05_RF_CH, bind ? RF_BIND_CHANNEL : rf_chans[current_chan++]);
     current_chan %= NUM_RF_CHANNELS;
     
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
     NRF24L01_FlushTx();
     
+    // transmit packet twice in a row without waiting for
+    // the first one to complete, seems to help the hs6200
+    // demodulator to start decoding.
     HS6200_WritePayload(packet, PACKET_SIZE);
     HS6200_WritePayload(packet, PACKET_SIZE);
     
@@ -185,33 +177,7 @@ static void e012_init()
     NRF24L01_Activate(0x73);
     
     // Check for Beken BK2421/BK2423 chip
-    // It is done by using Beken specific activate code, 0x53
-    // and checking that status register changed appropriately
-    // There is no harm to run it on nRF24L01 because following
-    // closing activate command changes state back even if it
-    // does something on nRF24L01
-    NRF24L01_Activate(0x53); // magic for BK2421 bank switch
-    dbgprintf("Trying to switch banks\n");
-    if (NRF24L01_ReadReg(NRF24L01_07_STATUS) & 0x80) {
-        dbgprintf("BK2421 detected\n");
-        // Beken registers don't have such nice names, so we just mention
-        // them by their numbers
-        // It's all magic, eavesdropped from real transfer and not even from the
-        // data sheet - it has slightly different values
-        NRF24L01_WriteRegisterMulti(0x00, (u8 *) "\x40\x4B\x01\xE2", 4);
-        NRF24L01_WriteRegisterMulti(0x01, (u8 *) "\xC0\x4B\x00\x00", 4);
-        NRF24L01_WriteRegisterMulti(0x02, (u8 *) "\xD0\xFC\x8C\x02", 4);
-        NRF24L01_WriteRegisterMulti(0x03, (u8 *) "\x99\x00\x39\x21", 4);
-        NRF24L01_WriteRegisterMulti(0x04, (u8 *) "\xD9\x96\x82\x1B", 4);
-        NRF24L01_WriteRegisterMulti(0x05, (u8 *) "\x24\x06\x7F\xA6", 4);
-        NRF24L01_WriteRegisterMulti(0x0C, (u8 *) "\x00\x12\x73\x00", 4);
-        NRF24L01_WriteRegisterMulti(0x0D, (u8 *) "\x46\xB4\x80\x00", 4);
-        NRF24L01_WriteRegisterMulti(0x04, (u8 *) "\xDF\x96\x82\x1B", 4);
-        NRF24L01_WriteRegisterMulti(0x04, (u8 *) "\xD9\x96\x82\x1B", 4);
-    } else {
-        dbgprintf("nRF24L01 detected\n");
-    }
-    NRF24L01_Activate(0x53); // switch bank back
+    BK2421_init();
 }
 
 static void initialize_txid()
@@ -243,14 +209,11 @@ static void initialize_txid()
     rand32_r(&lfsr, 0);
     tx_addr[4] = lfsr & 0xff;
     
-    // rf channels 
-    // hack: use only 1 out of 4 channels as it seems the hs6200
-    // has a hard time decoding packets sent by the nrf24l01
+    // rf channels
     rand32_r(&lfsr, 0);
     for(i=0; i<NUM_RF_CHANNELS; i++) {
-        //rf_chans[i] = 0x30 + (((lfsr >> (i*8)) & 0xff) % 0x21); 
+        rf_chans[i] = 0x30 + (((lfsr >> (i*8)) & 0xff) % 0x21); 
         //rf_chans[i] = lfsr % 0x51; // hack
-        rf_chans[i] = Model.proto_opts[PROTOOPTS_FREQ] - 2400;
     }
 }
 
@@ -301,7 +264,7 @@ const void *E012_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_NUMCHAN: return (void *) 10L; // A, E, T, R, n/a , flip, n/a, n/a, headless, RTH
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)10L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
-        case PROTOCMD_GETOPTIONS: return e012_opts; //(void *)0L;
+        case PROTOCMD_GETOPTIONS: return (void *)0L;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
         default: break;
     }
