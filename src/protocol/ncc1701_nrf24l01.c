@@ -92,7 +92,7 @@ enum {
     CHANNEL5
 };
 
-#define CHANNEL_WARP 5
+#define CHANNEL_WARP CHANNEL5
 
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
