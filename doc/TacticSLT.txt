@@ -47,7 +47,7 @@ Binding packets are transmitted every 2 sec on channel 0x50, address 7E B8 63 A9
 Transmitter does it in the same batch where regular packets go, 1ms after last packet in the batch (of 3) and after it makes pause for 19ms, keeping 22ms overall cycle.
 The binding packet is just 4-byte transmitter id.
 
-After successful binding the reciever tries packet sizes 4 to 9 on the first channel in frequency hopping sequence, and after sussessful attempt keeps this packet size.
+After successful binding the receiver tries packet sizes 4 to 9 on the first channel in frequency hopping sequence, and after successful attempt keeps this packet size.
 I only witnessed packet size 7 described before.
 
 491 W_REGISTER(RX_PW_P0) 04
@@ -120,7 +120,7 @@ For address 7C 95 C1 70
 For address 84 03 35 DE
 07 24 3B 11 06 03 13 17 45 1D 33 48 2E 47 2B
 
-Frequency hopping generation algoritm in Python:
+Frequency hopping generation algorithm in Python:
 
 def gen_fq_hop(id):
   fq_hop = 15 * [0]
