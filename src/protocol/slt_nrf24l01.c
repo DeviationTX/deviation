@@ -52,29 +52,38 @@ enum {
     CHANNEL9,
     CHANNEL10,
     CHANNEL11,
-    CHANNEL12
+    CHANNEL12,
+    CHANNEL13,
 };
+
+#define CHANNEL_FMODE       CHANNEL9
+#define CHANNEL_FLIP        CHANNEL10
+#define CHANNEL_VIDEON      CHANNEL11
+#define CHANNEL_VIDEOOFF    CHANNEL12 // Q200
+#define CHANNEL_PICTURE     CHANNEL12 // Q100 & MR100
+#define CHANNEL_CALIBRATE   CHANNEL13 // Q100 & Q200
 
 //#define SLT_Q200_FORCE_ID
 #define SLT_PAYLOADSIZE_V1 7
 #define SLT_PAYLOADSIZE_V2 11
 #define SLT_NFREQCHANNELS 15
 #define SLT_TXID_SIZE 4
-#define NFREQCHANNELS 15
 
 #ifdef EMULATOR
 #define USE_FIXED_MFGID
 #endif
 
 static u8 packet[SLT_PAYLOADSIZE_V2];
+static u8 rf_channels[SLT_NFREQCHANNELS];
 static u8 packet_sent;
 static u8 tx_id[SLT_TXID_SIZE];
 static u8 rf_ch_num;
 static u32 packet_count;
 static u8 tx_power;
+static u8 phase;
 
 static const char * const slt_opts[] = {
-    _tr_noop("Format"), "V1", "V2", "Q200", NULL,
+    _tr_noop("Format"), "V1", "V2", "Q100", "Q200", "MR100", NULL,
     NULL
 };
 
@@ -87,7 +96,9 @@ ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 enum {
     FORMAT_V1,
     FORMAT_V2,
+    FORMAT_Q100,
     FORMAT_Q200,
+    FORMAT_MR100
 };
 
 enum{
@@ -98,8 +109,14 @@ enum{
     FLAG_Q200_VIDOFF= 0x04,
 };
 
-//
-static u8 phase;
+enum{
+    // flags going to packet[6] (MR100 & Q100)
+    FLAG_MR100_FMODE    = 0x20,
+    FLAG_MR100_FLIP     = 0x04,
+    FLAG_MR100_VIDEO    = 0x02,
+    FLAG_MR100_PICTURE  = 0x01,
+};
+
 enum {
     SLT_BUILD=0,
     SLT_DATA1,
@@ -108,9 +125,6 @@ enum {
     SLT_BIND1,
     SLT_BIND2
 };
-
-
-static u8 rf_channels[NFREQCHANNELS];
 
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
@@ -223,7 +237,7 @@ static void set_tx_id(u32 id)
         rf_channels[i*4 + 0]  = (tx_id[i] & 0x3f) + base;
         rf_channels[i*4 + 1]  = (tx_id[i] >> 2) + base;
         rf_channels[i*4 + 2]  = (tx_id[i] >> 4) + (tx_id[next_i] & 0x03)*0x10 + base;
-        if (i*4 + 3 < NFREQCHANNELS) // guard for 16 channel
+        if (i*4 + 3 < SLT_NFREQCHANNELS) // guard for 16 channel
             rf_channels[i*4 + 3]  = (tx_id[i] >> 6) + (tx_id[next_i] & 0x0f)*0x04 + base;
     }
 
@@ -250,7 +264,7 @@ static void set_tx_id(u32 id)
         }
     }
     printf("Using id:%02X%02X%02X%02X fh: ", tx_id[0], tx_id[1], tx_id[2], tx_id[3]);
-    for (int i = 0; i < NFREQCHANNELS; ++i) {
+    for (int i = 0; i < SLT_NFREQCHANNELS; ++i) {
         printf("%02X ", rf_channels[i]);
     }
     printf("\n");
@@ -317,6 +331,7 @@ void send_data(u8 *data, u8 len)
 
 static void build_packet()
 {
+    static uint8_t calib_counter = 0;
     // Raw controls, limited by -10000..10000
     s16 controls[8]; // aileron, elevator, throttle, rudder, gear, pitch
     read_controls(controls);
@@ -333,19 +348,35 @@ static void build_packet()
     packet[6] = (long) controls[5] * 255 / 20000L + 128;
     if(Model.proto_opts[PROTOOPTS_FORMAT] != FORMAT_V1) {
         if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q200) 
-            packet[6] = GET_FLAG(CHANNEL9 , FLAG_Q200_FMODE)
-                      | GET_FLAG(CHANNEL10, FLAG_Q200_FLIP)
-                      | GET_FLAG(CHANNEL11, FLAG_Q200_VIDON)
-                      | GET_FLAG(CHANNEL12, FLAG_Q200_VIDOFF);
+            packet[6] = GET_FLAG(CHANNEL_FMODE , FLAG_Q200_FMODE)
+                      | GET_FLAG(CHANNEL_FLIP, FLAG_Q200_FLIP)
+                      | GET_FLAG(CHANNEL_VIDEON, FLAG_Q200_VIDON)
+                      | GET_FLAG(CHANNEL_VIDEOOFF, FLAG_Q200_VIDOFF);
+        else if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_MR100 || Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q100)
+            packet[6] =  GET_FLAG(CHANNEL_FMODE , FLAG_MR100_FMODE)
+                        |GET_FLAG(CHANNEL_FLIP, FLAG_MR100_FLIP)
+                        |GET_FLAG(CHANNEL_VIDEON, FLAG_MR100_VIDEO)  // Does not exist on the Q100 but...
+                        |GET_FLAG(CHANNEL_PICTURE, FLAG_MR100_PICTURE); // Does not exist on the Q100 but...
         packet[7]=(long) controls[6] * 255 / 20000L + 128;
         packet[8]=(long) controls[7] * 255 / 20000L + 128;
         packet[9]=0xAA;     //unknown
-        packet[10]=0x00; //unknown
+        packet[10]=0x00;    //unknown
+        
+        if((Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q100 || Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q200) && GET_FLAG(CHANNEL_CALIBRATE, 1))
+        {//Calibrate
+            packet[9]=0x77;         //enter calibration
+            if(calib_counter>=20 && calib_counter<=25)  // 7 packets for Q100 / 3 packets for Q200
+                packet[10]=0x20;    //launch calibration
+            calib_counter++;
+            if(calib_counter>250) calib_counter=250;
+        }
+        else
+            calib_counter=0;
     }
     // Set radio channel - once per packet batch
     u8 rf_ch = rf_channels[rf_ch_num];
     NRF24L01_WriteReg(NRF24L01_05_RF_CH, rf_ch);
-    if (++rf_ch_num >= NFREQCHANNELS) rf_ch_num = 0;
+    if (++rf_ch_num >= SLT_NFREQCHANNELS) rf_ch_num = 0;
     //  Serial.print(rf_ch); Serial.write("\n");
 }
 
@@ -513,8 +544,8 @@ const void *SLT_Cmds(enum ProtoCmds cmd)
             return (void *)(NRF24L01_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // Always Autobind
         case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 12L; // A, E, T, R, G, P, 7, 8, (Q200) Mode, Flip, VidOn, VidOff
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)12L;
+        case PROTOCMD_NUMCHAN: return (void *) 13L; // A, E, T, R, G, P, 7, 8, (Q200) Mode, Flip, VidOn, VidOff/Picture, Calibrate
+        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)13L;
         // TODO: return id correctly
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_GETOPTIONS: return slt_opts;
