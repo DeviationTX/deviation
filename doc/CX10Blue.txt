@@ -45,7 +45,7 @@ CRC      19       2        cyclic redundancy check
 +---+---------------+---------------+-------+-------+-------+-----+-+-------+-------+
 
 2.1 Phase Field
-    
+
     0xaa: binding phase
     0x55: flying phase
 
@@ -95,7 +95,7 @@ CRC      19       2        cyclic redundancy check
 
 2.10 CRC Field
 
-    The 16-bit CRC is computed over all data fields, starting with the adress
+    The 16-bit CRC is computed over all data fields, starting with the address
     and ending with the mode field.  See src/protocol/spi/nrf24l01.c for
     details.
 

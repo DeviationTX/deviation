@@ -10,7 +10,7 @@ More specific info on DeviationTx support for the Crazyflie can be found on
 the wiki here: http://wiki.bitcraze.io/misc:hacks:deviation
 
 # Binding #
-Binding is done automatically via a fixed three digit model ID. 
+Binding is done automatically via a fixed three digit model ID.
 The first digit specifies the data rate:
 0 = 250kbps
 1 = 1Mbps
@@ -25,7 +25,7 @@ Example: 000 = 250kbps, channel 0.
 Data packets conform to the CRTP protocol outlined in the wiki
 http://wiki.bitcraze.io/projects:crazyflie:crtp
 
-This deviation protocol supports two types of commander packets, selectible in
+This deviation protocol supports two types of commander packets, selectable in
 the protocol options menu.
 - RPYT = ordinary RPYT packets sent to CRTP port 3
   (http://wiki.bitcraze.io/projects:crazyflie:crtp:commander)
@@ -63,7 +63,7 @@ Bat (VOLT2): Voltage of the CFlie internal battery
 CRTPLOG: Telemtry mode that utilizes the more complicated/extensible CRTP logging
 framework (https://wiki.bitcraze.io/doc:crazyflie:crtp:log). Takes several
 seconds at startup to initialize and start logging, but offers much more
-flexibility to log any number of variables. Telemtry UI mapping is as follows:
+flexibility to log any number of variables. Telemetry UI mapping is as follows:
 A (FADESA): RSSI (dB)
 F (FRAMELOSS): Count of dropped packets
 Bat (VOLT2): Voltage of the CFlie internal battery

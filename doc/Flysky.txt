@@ -52,14 +52,14 @@ word 9:               (ch6)
 word 10:              (ch7)
 word 11:              (ch8)
 
-Word 1 is 0xaa05 until 3 seconds have elapsed and the throttle has been broughtto its minimum value.  It then changes to 0x5505 at the same time that the Tx starts cycling between channels
+Word 1 is 0xaa05 until 3 seconds have elapsed and the throttle has been brought to its minimum value.  It then changes to 0x5505 at the same time that the Tx starts cycling between channels
 
 Word 2 and 3 are the Transmitter's Unique ID (thanks zeza from RCGroups)
 
 WLToys implemented some enhancements to the protocol for the v9x9 quads:
 Setting bit 14 of the throttle channel will toggle the accessory (video camera)
 Setting bit 15 of the throttle channel will toggle the accessory (still camera)
-Setting bit 13 of the rudder channel will toggle the lights 
+Setting bit 13 of the rudder channel will toggle the lights
 
 zeza has confirmed channels 5-8 on a Turnigy 9x (Thanks!)
 

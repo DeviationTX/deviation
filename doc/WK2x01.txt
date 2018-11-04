@@ -18,7 +18,7 @@ and Binding packets are sent.  The radio sends ~3000 binding packets, which
 contain the chosen ID, and the chosen 3 frequencies.  If the radio is 8 channel,
 and a FixedID is selected, the radio skips the binding stage.
 
-After binding, data packets are sent.  A single data packet contains upto 8
+After binding, data packets are sent.  A single data packet contains up to 8
 channels of data in 10bit/channel.  The 4, 6, and 8 channel radios, all have
 slightly different data packet syntax, but all contain the chosen ID and the proper
 sequence number.
@@ -61,7 +61,7 @@ aa bb cc dd ee ff gg hh ii jj kk ll mm nn oo pp
 14 oo: xor 0x25 with bytes 0-13
 15 pp: checksum (0x25 + sum(bytes 0-13)) modulo 0x100
 
-A value of 0x000 is servo center. The largest value is 0x190 (whch corresponds to 100% servo throw)
+A value of 0x000 is servo center. The largest value is 0x190 (which corresponds to 100% servo throw)
 Positive/negative servo direction is controlled by byte 13
 Channel   byte9    byte4   lower8byte
 01 Thr   ........ xx......    00
@@ -157,7 +157,7 @@ aa bb cc dd ee ff gg hh ii jj kk ll mm nn oo pp
 #########################
 # 4-channel Data Packet #
 #########################
-Each channel is 10-bits.  The radio sends the trim values as seperate 10bit
+Each channel is 10-bits.  The radio sends the trim values as separate 10bit
 values (resulting in a syntax similar to the 8-channel radio
 The upper 2 bits are packed, 4 to a byte in bytes 4 and 9.
 70 00 02 00 2a 0e 00 fc 00 a6 e0 bd d4 f0 75 ad
@@ -183,7 +183,7 @@ aa bb cc dd ee ff gg hh ii jj kk ll mm nn oo pp
 #########################
 # 4/6/8 Channel Binding #
 #########################
-The CYRFID does not seem to be used in the protocol. A single SOP code is usedi
+The CYRFID does not seem to be used in the protocol. A single SOP code is used
 for all 4/6/8 channel radios.
 SOP: DF B1 C0 49 62 DF C1 49
 

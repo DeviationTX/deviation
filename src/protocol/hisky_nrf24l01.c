@@ -201,43 +201,7 @@ static void hisky_init()
 
 
     // Check for Beken BK2421/BK2423 chip
-    // It is done by using Beken specific activate code, 0x53
-    // and checking that status register changed appropriately
-    // There is no harm to run it on nRF24L01 because following
-    // closing activate command changes state back even if it
-    // does something on nRF24L01
-    // For detailed description of what's happening here see 
-    //   http://www.inhaos.com/uploadfile/otherpic/AN0008-BK2423%20Communication%20In%20250Kbps%20Air%20Rate.pdf
-    NRF24L01_Activate(0x53); // magic for BK2421 bank switch
-    dbgprintf("Trying to switch banks\n");
-    if (NRF24L01_ReadReg(NRF24L01_07_STATUS) & 0x80) {
-        dbgprintf("BK2421 detected\n");
-        long nul = 0;
-        // Beken registers don't have such nice names, so we just mention
-        // them by their numbers
-        // It's all magic, eavesdropped from real transfer and not even from the
-        // data sheet - it has slightly different values
-        NRF24L01_WriteRegisterMulti(0x00, (u8 *) "\x40\x4B\x01\xE2", 4);
-        NRF24L01_WriteRegisterMulti(0x01, (u8 *) "\xC0\x4B\x00\x00", 4);
-        NRF24L01_WriteRegisterMulti(0x02, (u8 *) "\xD0\xFC\x8C\x02", 4);
-        NRF24L01_WriteRegisterMulti(0x03, (u8 *) "\xF9\x00\x39\x21", 4);
-        NRF24L01_WriteRegisterMulti(0x04, (u8 *) "\xC1\x96\x9A\x1B", 4);
-        NRF24L01_WriteRegisterMulti(0x05, (u8 *) "\x24\x06\x7F\xA6", 4);
-        NRF24L01_WriteRegisterMulti(0x06, (u8 *) &nul, 4);
-        NRF24L01_WriteRegisterMulti(0x07, (u8 *) &nul, 4);
-        NRF24L01_WriteRegisterMulti(0x08, (u8 *) &nul, 4);
-        NRF24L01_WriteRegisterMulti(0x09, (u8 *) &nul, 4);
-        NRF24L01_WriteRegisterMulti(0x0A, (u8 *) &nul, 4);
-        NRF24L01_WriteRegisterMulti(0x0B, (u8 *) &nul, 4);
-        NRF24L01_WriteRegisterMulti(0x0C, (u8 *) "\x00\x12\x73\x00", 4);
-        NRF24L01_WriteRegisterMulti(0x0D, (u8 *) "\x46\xB4\x80\x00", 4);
-        NRF24L01_WriteRegisterMulti(0x0E, (u8 *) "\x41\x10\x04\x82\x20\x08\x08\xF2\x7D\xEF\xFF", 11);
-        NRF24L01_WriteRegisterMulti(0x04, (u8 *) "\xC7\x96\x9A\x1B", 4);
-        NRF24L01_WriteRegisterMulti(0x04, (u8 *) "\xC1\x96\x9A\x1B", 4);
-    } else {
-        dbgprintf("nRF24L01 detected\n");
-    }
-    NRF24L01_Activate(0x53); // switch bank back
+    BK2421_init();
 }
 
 // HiSky channel sequence: AILE  ELEV  THRO  RUDD  GEAR  PITH, channel data value is from 0 to 1000

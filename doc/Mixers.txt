@@ -35,7 +35,7 @@ achieve the above goal.
 Because building mixer rules can be complicated, several predefined templates are
 available.  Each of these has a customized configuration screen exposing the
 relevant options.  A template can configure multiple mixers via a single screen,
-hiding the complexity of connetcing them together properly.
+hiding the complexity of connecting them together properly.
 
 Note that if a mixer template is used, and the template is changed, all the
 mixers associated with that template will be lost
