@@ -126,6 +126,7 @@ u8 NRF24L01_FlushTx();
 u8 NRF24L01_FlushRx();
 u8 NRF24L01_Activate(u8 code);
 
+void BK2421_init();
 
 // Bitrate 0 - 1Mbps, 1 - 2Mbps, 3 - 250K (for nRF24L01+)
 u8 NRF24L01_SetBitrate(u8 bitrate);
@@ -151,5 +152,10 @@ u8 XN297_WritePayload(u8* msg, int len);
 u8 XN297_WriteEnhancedPayload(u8* msg, int len, int noack, u16 crc_xorout);
 u8 XN297_ReadPayload(u8* msg, int len);
 u8 XN297_ReadEnhancedPayload(u8* msg, int len);
+
+// HS6200 emulation layer
+void HS6200_SetTXAddr(const u8* addr, u8 len);
+void HS6200_Configure(u8 flags);
+u8 HS6200_WritePayload(u8* msg, u8 len);
 
 #endif
