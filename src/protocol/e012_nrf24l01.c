@@ -13,10 +13,9 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifdef MODULAR
   //Allows the linker to properly relocate
-  #define GW008_Cmds PROTO_Cmds
+  #define E012_Cmds PROTO_Cmds
   #pragma long_calls
 #endif
 #include "common.h"
@@ -41,30 +40,34 @@
 
 #ifdef EMULATOR
     #define USE_FIXED_MFGID
+    #define BIND_COUNT 4
     #define dbgprintf printf
 #else
+    #define BIND_COUNT 500
     //printf inside an interrupt handler is really dangerous
     //this shouldn't be enabled even in debug builds without explicitly
     //turning it on
     #define dbgprintf if(0) printf
 #endif
 
-#define INITIAL_WAIT    500
-#define PACKET_PERIOD   2400
-#define RF_BIND_CHANNEL 2
-#define PAYLOAD_SIZE    15
+#define PACKET_PERIOD       4525
+#define INITIAL_WAIT        500
+#define RF_BIND_CHANNEL     0x3c
+#define ADDRESS_LENGTH      5
+#define NUM_RF_CHANNELS     4
+#define PACKET_SIZE         15
 
-static u8 packet[PAYLOAD_SIZE];
-static u8 rf_chans[4];
-static u8 current_chan;
+static const u8 bind_address[ADDRESS_LENGTH] = {0x55,0x42,0x9C,0x8F,0xC9};
+static u8 tx_addr[ADDRESS_LENGTH];
+static u8 rf_chans[NUM_RF_CHANNELS];
+static u8 packet[PACKET_SIZE];
 static u8 phase;
+static u16 bind_counter;
 static u8 tx_power;
-static u8 rxid;
-static u8 txid[2];
+static u8 current_chan;
 
 enum {
-    BIND1,
-    BIND2,
+    BIND,
     DATA
 };
 
@@ -76,15 +79,20 @@ enum {
     CHANNEL4,       // Rudder
     CHANNEL5,       // 
     CHANNEL6,       // Flip
+    CHANNEL7,       //
+    CHANNEL8,       //
+    CHANNEL9,       // Headless
+    CHANNEL10,      // RTH
 };
 
-#define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
+#define CHANNEL_FLIP     CHANNEL6
+#define CHANNEL_HEADLESS CHANNEL9
+#define CHANNEL_RTH      CHANNEL10
 
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
 
 #define CHAN_RANGE (CHAN_MAX_VALUE - CHAN_MIN_VALUE)
-
 static u16 scale_channel(u8 ch, u16 destMin, u16 destMax)
 {
     s32 chanval = Channels[ch];
@@ -97,70 +105,75 @@ static u16 scale_channel(u8 ch, u16 destMin, u16 destMax)
     return (range * (chanval - CHAN_MIN_VALUE)) / CHAN_RANGE + destMin;
 }
 
+#define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
 static void send_packet(u8 bind)
 {
-    packet[0] = txid[0];
+    packet[0] = tx_addr[1];
     if(bind) {
-        packet[1] = 0x55;
-        packet[2] = rf_chans[0];
-        packet[3] = rf_chans[1];
-        packet[4] = rf_chans[2];
-        packet[5] = rf_chans[3];
-        memset(&packet[6], 0, 7);
-        packet[13] = 0xaa;
+        packet[1] = 0xaa;
+        memcpy(&packet[2], rf_chans, NUM_RF_CHANNELS);
+        memcpy(&packet[6], tx_addr, ADDRESS_LENGTH);
     }
     else {
-        packet[1] = 0x01 | GET_FLAG(CHANNEL6, 0x40); // flip
-        packet[2] = scale_channel(CHANNEL1, 200, 0); // aileron
-        packet[3] = scale_channel(CHANNEL2, 0, 200); // elevator
-        packet[4] = scale_channel(CHANNEL4, 200, 0); // rudder
-        packet[5] = scale_channel(CHANNEL3, 0, 200); // throttle
+        packet[1] = 0x01
+                  | GET_FLAG(CHANNEL_RTH, 0x04)
+                  | GET_FLAG(CHANNEL_HEADLESS, 0x10)
+                  | GET_FLAG(CHANNEL_FLIP, 0x40);
+        packet[2] = scale_channel(CHANNEL1, 0xc8, 0x00); // aileron
+        packet[3] = scale_channel(CHANNEL2, 0x00, 0xc8); // elevator
+        packet[4] = scale_channel(CHANNEL4, 0xc8, 0x00); // rudder
+        packet[5] = scale_channel(CHANNEL3, 0x00, 0xc8); // throttle
         packet[6] = 0xaa;
-        packet[7] = 0x02; // max rate
+        packet[7] = 0x02; // rate (0-2)
         packet[8] = 0x00;
         packet[9] = 0x00;
         packet[10]= 0x00;
-        packet[11]= 0x00;
-        packet[12]= 0x00;
-        packet[13]= rxid;
     }
-    packet[14] = txid[1];
+    packet[11] = 0x00;
+    packet[12] = 0x00;
+    packet[13] = 0x56; 
+    packet[14] = tx_addr[2];
     
     // Power on, TX mode, CRC enabled
-    XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
-    NRF24L01_WriteReg(NRF24L01_05_RF_CH, bind ? RF_BIND_CHANNEL : rf_chans[(current_chan++)/2]);
-    current_chan %= 8;
-
+    HS6200_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
+    NRF24L01_WriteReg(NRF24L01_05_RF_CH, bind ? RF_BIND_CHANNEL : rf_chans[current_chan++]);
+    current_chan %= NUM_RF_CHANNELS;
+    
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
     NRF24L01_FlushTx();
-    XN297_WriteEnhancedPayload(packet, PAYLOAD_SIZE, 0, 0x3c7d);
     
+    // transmit packet twice in a row without waiting for
+    // the first one to complete, seems to help the hs6200
+    // demodulator to start decoding.
+    HS6200_WritePayload(packet, PACKET_SIZE);
+    HS6200_WritePayload(packet, PACKET_SIZE);
+    
+    // Check and adjust transmission power. We do this after
+    // transmission to not bother with timeout after power
+    // settings change -  we have plenty of time until next
+    // packet.
     if (tx_power != Model.tx_power) {
-        //Keep transmit power updated
         tx_power = Model.tx_power;
         NRF24L01_SetPower(tx_power);
     }
 }
 
-static void gw008_init()
+static void e012_init()
 {
     NRF24L01_Initialize();
     NRF24L01_SetTxRxMode(TX_EN);
-    XN297_SetTXAddr((u8*)"\xcc\xcc\xcc\xcc\xcc", 5);
-    XN297_SetRXAddr((u8*)"\xcc\xcc\xcc\xcc\xcc", 5);
+    HS6200_SetTXAddr(bind_address, ADDRESS_LENGTH);
     NRF24L01_FlushTx();
     NRF24L01_FlushRx();
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);     // Clear data ready, data sent, and retransmit
     NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);      // No Auto Acknowldgement on all data pipes
-    NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x01);
-    NRF24L01_WriteReg(NRF24L01_11_RX_PW_P0, PAYLOAD_SIZE+2); // payload + 2 bytes for pcf
     NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x03);
     NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0x00); // no retransmits
-    NRF24L01_SetBitrate(NRF24L01_BR_1M);
-    NRF24L01_SetPower(Model.tx_power);
-    NRF24L01_Activate(0x73);                         // Activate feature register
-    NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 0x00);      // Disable dynamic payload length on all pipes
-    NRF24L01_WriteReg(NRF24L01_1D_FEATURE, 0x01);    // Set feature bits on
+    NRF24L01_SetBitrate(NRF24L01_BR_1M);             // 1 Mbps
+    NRF24L01_SetPower(tx_power);
+    NRF24L01_Activate(0x73);                          // Activate feature register
+    NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 0x00);       // Disable dynamic payload length on all pipes
+    NRF24L01_WriteReg(NRF24L01_1D_FEATURE, 0x01);     // Set feature bits on
     NRF24L01_Activate(0x73);
     
     // Check for Beken BK2421/BK2423 chip
@@ -176,58 +189,46 @@ static void initialize_txid()
     u8 var[12];
     MCU_SerialNumber(var, 12);
     dbgprintf("Manufacturer id: ");
-    for(i = 0; i < 12; ++i) {
+    for (i = 0; i < 12; ++i) {
         dbgprintf("%02X", var[i]);
         rand32_r(&lfsr, var[i]);
     }
     dbgprintf("\r\n");
 #endif
 
-    if(Model.fixed_id) {
+    if (Model.fixed_id) {
        for (i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
            rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
     }
     // Pump zero bytes for LFSR to diverge more
-    for(i=0; i<sizeof(lfsr); ++i) 
-        rand32_r(&lfsr, 0);
+    for (i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
 
+    // tx address
     for(i=0; i<4; i++)
-        rf_chans[i] = 0x10 + ((lfsr >> (i*8)) % 0x37);
+        tx_addr[i] = (lfsr >> (i*8)) & 0xff;
+    rand32_r(&lfsr, 0);
+    tx_addr[4] = lfsr & 0xff;
     
-    txid[0] = lfsr & 0xff;
-    txid[1] = lfsr >> 8;
+    // rf channels
+    rand32_r(&lfsr, 0);
+    for(i=0; i<NUM_RF_CHANNELS; i++) {
+        rf_chans[i] = 0x10 + (((lfsr >> (i*8)) & 0xff) % 0x32); 
+    }
 }
 
 MODULE_CALLTYPE
-static u16 gw008_callback()
+static u16 e012_callback()
 {
-    switch(phase) {
-        case BIND1:
-            if((NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR)) &&   // RX fifo data ready
-                XN297_ReadEnhancedPayload(packet, PAYLOAD_SIZE) == PAYLOAD_SIZE && // check payload size
-                packet[0] == txid[0] && packet[14] == txid[1]) { // check tx id
-                NRF24L01_SetTxRxMode(TXRX_OFF);
-                NRF24L01_SetTxRxMode(TX_EN);
-                rxid = packet[13];
-                PROTOCOL_SetBindState(0);
+    switch (phase) {
+        case BIND:
+            if (bind_counter == 0) {
+                HS6200_SetTXAddr(tx_addr, 5);
                 phase = DATA;
+                PROTOCOL_SetBindState(0);
             } else {
-                NRF24L01_SetTxRxMode(TXRX_OFF);
-                NRF24L01_SetTxRxMode(TX_EN);
                 send_packet(1);
-                phase = BIND2;
-                return 300;
+                bind_counter--;
             }
-            break;
-        case BIND2:
-            // switch to RX mode
-            NRF24L01_SetTxRxMode(TXRX_OFF);
-            NRF24L01_FlushRx();
-            NRF24L01_SetTxRxMode(RX_EN);
-            XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) 
-                          | BV(NRF24L01_00_PWR_UP) | BV(NRF24L01_00_PRIM_RX)); 
-            phase = BIND1;
-            return 5000;
             break;
         case DATA:
             send_packet(0);
@@ -239,16 +240,17 @@ static u16 gw008_callback()
 static void initialize()
 {
     CLOCK_StopTimer();
-    initialize_txid();
     tx_power = Model.tx_power;
-    phase = BIND1;
-    gw008_init();
+    initialize_txid();
+    e012_init();
+    bind_counter = BIND_COUNT;
     current_chan = 0;
-    PROTOCOL_SetBindState(0xffffffff);
-    CLOCK_StartTimer(INITIAL_WAIT, gw008_callback);
+    PROTOCOL_SetBindState(BIND_COUNT * PACKET_PERIOD / 1000);
+    phase = BIND;
+    CLOCK_StartTimer(INITIAL_WAIT, e012_callback);
 }
 
-const void *GW008_Cmds(enum ProtoCmds cmd)
+const void *E012_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(); return 0;
@@ -258,13 +260,14 @@ const void *GW008_Cmds(enum ProtoCmds cmd)
             return (void *)(NRF24L01_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // always Autobind
         case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 6L; // A, E, T, R, N/A, flip
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)6L;
+        case PROTOCMD_NUMCHAN: return (void *) 10L; // A, E, T, R, n/a , flip, n/a, n/a, headless, RTH
+        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)10L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
-        case PROTOCMD_GETOPTIONS: return (void*)0L;
+        case PROTOCMD_GETOPTIONS: return (void *)0L;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
         default: break;
     }
     return 0;
 }
+
 #endif
