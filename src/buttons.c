@@ -18,7 +18,7 @@
 
 static buttonAction_t *buttonHEAD = NULL;
 static buttonAction_t *buttonPressed = NULL;
-#define DEBOUNCE_WAIT_MS 20
+#define DEBOUNCE_WAIT_MS 80
 
 void exec_callbacks(u32, enum ButtonFlags);
 
