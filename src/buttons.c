@@ -18,11 +18,11 @@
 
 static buttonAction_t *buttonHEAD = NULL;
 static buttonAction_t *buttonPressed = NULL;
-#define DEBOUNCE_WAIT_MS 20
+#define DEBOUNCE_WAIT_MS 80
 
 void exec_callbacks(u32, enum ButtonFlags);
 
-unsigned BUTTON_RegisterCallback(buttonAction_t *action, u32 button, unsigned flags,
+void BUTTON_RegisterCallback(buttonAction_t *action, u32 button, unsigned flags,
                  unsigned (*callback)(u32 button, unsigned flags, void *data), void *data)
 {
     buttonAction_t *ptr;
@@ -43,7 +43,6 @@ unsigned BUTTON_RegisterCallback(buttonAction_t *action, u32 button, unsigned fl
             if((ptr->button & button) && (ptr->flags & flags) && ! (ptr->flags & BUTTON_PRIORITY)) {
                 printf("WARNING: Button %08x with flags %d is already assigned\n", (unsigned int)button, flags);
                 //memset(action, 0, sizeof(buttonAction_t));
-                //return 0;
             }
             if (! ptr->next)
                 break;
@@ -62,7 +61,6 @@ unsigned BUTTON_RegisterCallback(buttonAction_t *action, u32 button, unsigned fl
     action->flags = flags;
     action->callback = callback;
     action->data = data;
-    return 1;
 }
 
 void BUTTON_UnregisterCallback(buttonAction_t *action)
@@ -110,7 +108,7 @@ void BUTTON_Handler()
     u32 buttons_released=(~buttons) &   last_buttons;
 
     if (buttons != last_buttons)
-        last_button_time = ms;
+        last_button_time = ms + DEBOUNCE_WAIT_MS;
 
     if(buttons_pressed && !longpress_release) {
         //printf("pressed: %08d\n", buttons_pressed);

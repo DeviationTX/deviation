@@ -20,7 +20,7 @@ enum ButtonFlags {
 
 typedef struct buttonAction buttonAction_t;
 
-unsigned BUTTON_RegisterCallback(buttonAction_t *action, u32 button, unsigned flags,
+void BUTTON_RegisterCallback(buttonAction_t *action, u32 button, unsigned flags,
                  unsigned (*callback)(u32 button, unsigned flags, void *data), void *data);
 void BUTTON_UnregisterCallback(buttonAction_t *action);
 void BUTTON_Handler();
