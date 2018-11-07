@@ -72,7 +72,7 @@ before_install:
          strip --strip-unneeded $HOME/mpg123-w32/bin/mpg123.exe;
          popd;
       fi;
-   - openssl aes-256-cbc -K $encrypted_39cc7b34336f_key -iv $encrypted_39cc7b34336f_iv -in install_nightlies.tar.enc -out install_nightlies.tar -d;
+   - openssl aes-256-cbc -K $encrypted_54cd4d6ff016_key -iv $encrypted_54cd4d6ff016_iv -in install_nightlies.tar.enc -out install_nightlies.tar -d;
          tar -xf install_nightlies.tar;
          rm -f install_nightlies.tar
 
