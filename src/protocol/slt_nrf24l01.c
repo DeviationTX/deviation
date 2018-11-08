@@ -50,38 +50,81 @@ enum {
     CHANNEL7,
     CHANNEL8,
     CHANNEL9,
-    CHANNEL10
+    CHANNEL10,
+    CHANNEL11,
+    CHANNEL12,
+    CHANNEL13,
 };
 
-#define PAYLOADSIZE 7
-#define NFREQCHANNELS 15
-#define TXID_SIZE 4
+#define CHANNEL_FMODE       CHANNEL9
+#define CHANNEL_FLIP        CHANNEL10
+#define CHANNEL_VIDEON      CHANNEL11
+#define CHANNEL_VIDEOOFF    CHANNEL12 // Q200
+#define CHANNEL_PICTURE     CHANNEL12 // Q100 & MR100
+#define CHANNEL_CALIBRATE   CHANNEL13 // Q100 & Q200
+
+//#define SLT_Q200_FORCE_ID
+#define SLT_PAYLOADSIZE_V1 7
+#define SLT_PAYLOADSIZE_V2 11
+#define SLT_NFREQCHANNELS 15
+#define SLT_TXID_SIZE 4
 
 #ifdef EMULATOR
 #define USE_FIXED_MFGID
 #endif
 
-static u8 packet[PAYLOADSIZE];
+static u8 packet[SLT_PAYLOADSIZE_V2];
+static u8 rf_channels[SLT_NFREQCHANNELS];
 static u8 packet_sent;
-static u8 tx_id[TXID_SIZE];
+static u8 tx_id[SLT_TXID_SIZE];
 static u8 rf_ch_num;
-static u16 counter;
-static u32 packet_counter;
+static u32 packet_count;
 static u8 tx_power;
-
-
-//
 static u8 phase;
-enum {
-    SLT_INIT2 = 0,
-    SLT_BIND,
-    SLT_DATA1,
-    SLT_DATA2,
-    SLT_DATA3
+
+static const char * const slt_opts[] = {
+    _tr_noop("Format"), "V1", "V2", "Q100", "Q200", "MR100", NULL,
+    NULL
 };
 
+enum {
+    PROTOOPTS_FORMAT,
+    LAST_PROTO_OPT,
+};
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
-static u8 rf_channels[NFREQCHANNELS];
+enum {
+    FORMAT_V1,
+    FORMAT_V2,
+    FORMAT_Q100,
+    FORMAT_Q200,
+    FORMAT_MR100
+};
+
+enum{
+    // flags going to packet[6] (Q200)
+    FLAG_Q200_FMODE = 0x20,
+    FLAG_Q200_VIDON = 0x10,
+    FLAG_Q200_FLIP  = 0x08,
+    FLAG_Q200_VIDOFF= 0x04,
+};
+
+enum{
+    // flags going to packet[6] (MR100 & Q100)
+    FLAG_MR100_FMODE    = 0x20,
+    FLAG_MR100_FLIP     = 0x04,
+    FLAG_MR100_VIDEO    = 0x02,
+    FLAG_MR100_PICTURE  = 0x01,
+};
+
+enum {
+    SLT_BUILD=0,
+    SLT_DATA1,
+    SLT_DATA2,
+    SLT_DATA3,
+    SLT_BIND1,
+    SLT_BIND2
+};
 
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
@@ -104,49 +147,15 @@ static void SLT_init()
         NRF24L01_WriteReg(init_vals[i][0], init_vals[i][1]);
     NRF24L01_SetBitrate(NRF24L01_BR_250K);           // 256kbps
     NRF24L01_SetPower(Model.tx_power);
-    u8 rx_tx_addr[] = {0xC3, 0xC3, 0xAA, 0x55};
-    NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, rx_tx_addr, 4);
+    if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_V1)
+        NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, (u8*)"\xC3\xC3\xAA\x55", SLT_TXID_SIZE);
+    else // V2, Q200
+        NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, (u8*)"\x7E\xB8\x63\xA9", SLT_TXID_SIZE);
     NRF24L01_FlushRx();
 
 
     // Check for Beken BK2421/BK2423 chip
-    // It is done by using Beken specific activate code, 0x53
-    // and checking that status register changed appropriately
-    // There is no harm to run it on nRF24L01 because following
-    // closing activate command changes state back even if it
-    // does something on nRF24L01
-    // For detailed description of what's happening here see 
-    //   http://www.inhaos.com/uploadfile/otherpic/AN0008-BK2423%20Communication%20In%20250Kbps%20Air%20Rate.pdf
-    NRF24L01_Activate(0x53); // magic for BK2421/BK2423 bank switch
-    printf("Trying to switch banks\n");
-    if (NRF24L01_ReadReg(NRF24L01_07_STATUS) & 0x80) {
-        printf("BK2421 detected\n");
-        long nul = 0;
-        // Beken registers don't have such nice names, so we just mention
-        // them by their numbers
-        // It's all magic, eavesdropped from real transfer and not even from the
-        // data sheet - it has slightly different values
-        NRF24L01_WriteRegisterMulti(0x00, (u8 *) "\x40\x4B\x01\xE2", 4);
-        NRF24L01_WriteRegisterMulti(0x01, (u8 *) "\xC0\x4B\x00\x00", 4);
-        NRF24L01_WriteRegisterMulti(0x02, (u8 *) "\xD0\xFC\x8C\x02", 4);
-        NRF24L01_WriteRegisterMulti(0x03, (u8 *) "\xF9\x00\x39\x21", 4);
-        NRF24L01_WriteRegisterMulti(0x04, (u8 *) "\xC1\x96\x9A\x1B", 4);
-        NRF24L01_WriteRegisterMulti(0x05, (u8 *) "\x24\x06\x7F\xA6", 4);
-        NRF24L01_WriteRegisterMulti(0x06, (u8 *) &nul, 4);
-        NRF24L01_WriteRegisterMulti(0x07, (u8 *) &nul, 4);
-        NRF24L01_WriteRegisterMulti(0x08, (u8 *) &nul, 4);
-        NRF24L01_WriteRegisterMulti(0x09, (u8 *) &nul, 4);
-        NRF24L01_WriteRegisterMulti(0x0A, (u8 *) &nul, 4);
-        NRF24L01_WriteRegisterMulti(0x0B, (u8 *) &nul, 4);
-        NRF24L01_WriteRegisterMulti(0x0C, (u8 *) "\x00\x12\x73\x00", 4);
-        NRF24L01_WriteRegisterMulti(0x0D, (u8 *) "\x46\xB4\x80\x00", 4);
-        NRF24L01_WriteRegisterMulti(0x0E, (u8 *) "\x41\x10\x04\x82\x20\x08\x08\xF2\x7D\xEF\xFF", 11);
-        NRF24L01_WriteRegisterMulti(0x04, (u8 *) "\xC7\x96\x9A\x1B", 4);
-        NRF24L01_WriteRegisterMulti(0x04, (u8 *) "\xC1\x96\x9A\x1B", 4);
-    } else {
-        printf("nRF24L01 detected\n");
-    }
-    NRF24L01_Activate(0x53); // switch bank back
+    BK2421_init();
 
     // Implicit delay in callback
     // delay(50);
@@ -170,11 +179,20 @@ static void SLT_init2()
 
 static void set_tx_id(u32 id)
 {
-    for (int i = TXID_SIZE-1; i >= 0; --i) {
+    for (int i = SLT_TXID_SIZE-1; i >= 0; --i) {
         tx_id[i] = id & 0xFF;
         id >>= 8;
     }
 
+    if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q200) { //Q200: Force high part of the ID otherwise it won't bind
+        tx_id[0]=0x01;
+        tx_id[1]=0x02;
+        #ifdef SLT_Q200_FORCE_ID    // ID taken from TX dumps
+            tx_id[0]=0x01;tx_id[1]=0x02;tx_id[2]=0x6A;tx_id[3]=0x31;
+        /*  tx_id[0]=0x01;tx_id[1]=0x02;tx_id[2]=0x0B;tx_id[3]=0x57;*/
+        #endif  
+    }
+    
     // Frequency hopping sequence generation
 
     for (int i = 0; i < 4; ++i) {
@@ -183,28 +201,34 @@ static void set_tx_id(u32 id)
         rf_channels[i*4 + 0]  = (tx_id[i] & 0x3f) + base;
         rf_channels[i*4 + 1]  = (tx_id[i] >> 2) + base;
         rf_channels[i*4 + 2]  = (tx_id[i] >> 4) + (tx_id[next_i] & 0x03)*0x10 + base;
-        if (i*4 + 3 < NFREQCHANNELS) // guard for 16 channel
+        if (i*4 + 3 < SLT_NFREQCHANNELS) // guard for 16 channel
             rf_channels[i*4 + 3]  = (tx_id[i] >> 6) + (tx_id[next_i] & 0x0f)*0x04 + base;
     }
 
     // unique
-    for (int i = 0; i < NFREQCHANNELS; ++i) {
+    u8 max_freq=0x50;  //V1 sure, V2?
+    if(Model.proto_opts[PROTOOPTS_FORMAT]==FORMAT_Q200)
+        max_freq=45;
+    for (u8 i = 0; i < SLT_NFREQCHANNELS; ++i)
+    {
+        if(Model.proto_opts[PROTOOPTS_FORMAT]==FORMAT_Q200 && rf_channels[i] >= max_freq)
+            rf_channels[i] = rf_channels[i] - max_freq + 0x03;
         u8 done = 0;
-        while (!done) {
+        while (!done)
+        {
             done = 1;
-            for (int j = 0; j < i; ++j) {
-                if (rf_channels[i] == rf_channels[j]) {
+            for (u8 j = 0; j < i; ++j)
+                if (rf_channels[i] == rf_channels[j])
+                {
                     done = 0;
                     rf_channels[i] += 7;
-                    if (rf_channels[i] >= 0x50) {
-                        rf_channels[i] = rf_channels[i] - 0x50 + 0x03;
-                    }
+                    if (rf_channels[i] >= max_freq)
+                        rf_channels[i] = rf_channels[i] - max_freq + 0x03;
                 }
-            }
         }
     }
     printf("Using id:%02X%02X%02X%02X fh: ", tx_id[0], tx_id[1], tx_id[2], tx_id[3]);
-    for (int i = 0; i < NFREQCHANNELS; ++i) {
+    for (int i = 0; i < SLT_NFREQCHANNELS; ++i) {
         printf("%02X ", rf_channels[i]);
     }
     printf("\n");
@@ -232,12 +256,13 @@ static void read_controls(s16 *controls)
     // throttle can be less than CHAN_MIN_VALUE or larger than
     // CHAN_MAX_VALUE. As we have no space here, we hard-limit
     // channels values by min..max range
-    for (int i = 0; i < 6; ++i)
-        controls[i] = convert_channel(i);
+    for (int i = 0; i < 8; ++i)
+        if(i < Model.num_channels)
+            controls[i] = convert_channel(i);
 
     // Print channels every second or so
 /*
-    if ((packet_counter & 0xFF) == 1) {
+    if ((packet_count & 0xFF) == 1) {
         printf("Raw channels: %d, %d, %d, %d, %d, %d\n",
                Channels[0], Channels[1], Channels[2], Channels[3], Channels[4], Channels[5]);
         printf("Aileron %d, elevator %d, throttle %d, rudder %d, gear %d, pitch %d\n",
@@ -266,11 +291,13 @@ void send_data(u8 *data, u8 len)
     packet_sent = 1;
 }
 
+#define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
 
 static void build_packet()
 {
+    static uint8_t calib_counter = 0;
     // Raw controls, limited by -10000..10000
-    s16 controls[6]; // aileron, elevator, throttle, rudder, gear, pitch
+    s16 controls[8]; // aileron, elevator, throttle, rudder, gear, pitch
     read_controls(controls);
     u8 e = 0; // byte where extension 2 bits for every 10-bit channel are packed
     for (int i = 0; i < 4; ++i) {
@@ -283,19 +310,44 @@ static void build_packet()
     // 8-bit channels
     packet[5] = (long) controls[4] * 255 / 20000L + 128;
     packet[6] = (long) controls[5] * 255 / 20000L + 128;
-
+    if(Model.proto_opts[PROTOOPTS_FORMAT] != FORMAT_V1) {
+        if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q200) 
+            packet[6] = GET_FLAG(CHANNEL_FMODE , FLAG_Q200_FMODE)
+                      | GET_FLAG(CHANNEL_FLIP, FLAG_Q200_FLIP)
+                      | GET_FLAG(CHANNEL_VIDEON, FLAG_Q200_VIDON)
+                      | GET_FLAG(CHANNEL_VIDEOOFF, FLAG_Q200_VIDOFF);
+        else if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_MR100 || Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q100)
+            packet[6] =  GET_FLAG(CHANNEL_FMODE , FLAG_MR100_FMODE)
+                        |GET_FLAG(CHANNEL_FLIP, FLAG_MR100_FLIP)
+                        |GET_FLAG(CHANNEL_VIDEON, FLAG_MR100_VIDEO)  // Does not exist on the Q100 but...
+                        |GET_FLAG(CHANNEL_PICTURE, FLAG_MR100_PICTURE); // Does not exist on the Q100 but...
+        packet[7]=(long) controls[6] * 255 / 20000L + 128;
+        packet[8]=(long) controls[7] * 255 / 20000L + 128;
+        packet[9]=0xAA;     //unknown
+        packet[10]=0x00;    //unknown
+        
+        if((Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q100 || Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q200) && GET_FLAG(CHANNEL_CALIBRATE, 1))
+        {//Calibrate
+            packet[9]=0x77;         //enter calibration
+            if(calib_counter>=20 && calib_counter<=25)  // 7 packets for Q100 / 3 packets for Q200
+                packet[10]=0x20;    //launch calibration
+            calib_counter++;
+            if(calib_counter>250) calib_counter=250;
+        }
+        else
+            calib_counter=0;
+    }
     // Set radio channel - once per packet batch
     u8 rf_ch = rf_channels[rf_ch_num];
     NRF24L01_WriteReg(NRF24L01_05_RF_CH, rf_ch);
-    if (++rf_ch_num >= NFREQCHANNELS) rf_ch_num = 0;
+    if (++rf_ch_num >= SLT_NFREQCHANNELS) rf_ch_num = 0;
     //  Serial.print(rf_ch); Serial.write("\n");
 }
 
 
-static void send_packet()
+static void send_packet(u8 len)
 {
-    send_data(packet, sizeof(packet));
-    ++packet_counter;
+    send_data(packet, len);
 }
 
 
@@ -308,7 +360,11 @@ static void send_bind_packet()
     NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, (u8 *)bind_addr, 4);
 
     NRF24L01_WriteReg(NRF24L01_05_RF_CH, 0x50);
-    send_data(tx_id, sizeof(tx_id));
+    memcpy((void*)packet,(void*)tx_id,SLT_TXID_SIZE);
+    if(phase==SLT_BIND2)
+        send_packet(SLT_TXID_SIZE);
+    else // SLT_BIND1
+        send_packet(SLT_PAYLOADSIZE_V2);
 
     // NB: we should wait until the packet's sent before changing TX address!
     wait_radio();
@@ -325,58 +381,82 @@ void checkTxPower()
     // transmission to not bother with timeout after power
     // settings change -  we have plenty of time until next
     // packet.
-    if (! rf_ch_num && tx_power != Model.tx_power) {
+    if (tx_power != Model.tx_power) {
         // Keep transmit power updated
         tx_power = Model.tx_power;
         NRF24L01_SetPower(tx_power);
     }
 }
 
-
+#define SLT_TIMING_BUILD        1000
+#define SLT_V1_TIMING_PACKET    1000
+#define SLT_V2_TIMING_PACKET    2042
+#define SLT_V1_TIMING_BIND2     1000
+#define SLT_V2_TIMING_BIND1     6507
+#define SLT_V2_TIMING_BIND2     2112
 MODULE_CALLTYPE
 static u16 SLT_callback()
 {
-    u16 delay_us = 20000; // 3 packets with 1ms intervals every 22ms
-    switch (phase) {
-    case SLT_INIT2:
-        SLT_init2();
-        // MUSIC_Play(MUSIC_TELEMALARM1);	// Shouldn't play telemetry alarm doing bind init
-        phase = SLT_BIND;
-        delay_us = 150;
-        break;
-
-    case SLT_BIND:
-        send_bind_packet();
-        phase = SLT_DATA1;
-        delay_us = 19000;
-        break;
-
-    case SLT_DATA1:
-        build_packet();
-        send_packet();
-        phase = SLT_DATA2;
-        delay_us = 1000;
-        break;
-
-    case SLT_DATA2:
-        send_packet();
-        phase = SLT_DATA3;
-        delay_us = 1000;
-        break;
-
-    case SLT_DATA3:
-        send_packet();
-        if (++counter >= 100) {
-            counter = 0;
-            phase = SLT_BIND;
-            delay_us = 1000;
-        } else {
-            checkTxPower();
-            phase = SLT_DATA1;
-        }
-        break;
+    switch (phase)
+    {
+        case SLT_BUILD:
+            build_packet();
+            phase++;
+            return SLT_TIMING_BUILD;
+        case SLT_DATA1:
+        case SLT_DATA2:
+            phase++;
+            if(Model.proto_opts[PROTOOPTS_FORMAT]==FORMAT_V1)
+            {
+                send_packet(SLT_PAYLOADSIZE_V1);
+                return SLT_V1_TIMING_PACKET;
+            }
+            else //V2
+            {
+                send_packet(SLT_PAYLOADSIZE_V2);
+                return SLT_V2_TIMING_PACKET;
+            }
+        case SLT_DATA3:
+            if(Model.proto_opts[PROTOOPTS_FORMAT]==FORMAT_V1)
+                send_packet(SLT_PAYLOADSIZE_V1);
+            else //V2
+                send_packet(SLT_PAYLOADSIZE_V2);
+            if (++packet_count >= 100)
+            {// Send bind packet
+                packet_count = 0;
+                if(Model.proto_opts[PROTOOPTS_FORMAT]==FORMAT_V1)
+                {
+                    phase=SLT_BIND2;
+                    return SLT_V1_TIMING_BIND2;
+                }
+                else //V2
+                {
+                    phase=SLT_BIND1;
+                    return SLT_V2_TIMING_BIND1;
+                }
+            }
+            else
+            {// Continue to send normal packets
+                checkTxPower(); // Set tx_power
+                phase = SLT_BUILD;
+                if(Model.proto_opts[PROTOOPTS_FORMAT]==FORMAT_V1)
+                    return 20000-SLT_TIMING_BUILD;
+                else //V2
+                    return 13730-SLT_TIMING_BUILD;
+            }
+        case SLT_BIND1:
+            send_bind_packet();
+            phase++;
+            return SLT_V2_TIMING_BIND2;
+        case SLT_BIND2:
+            send_bind_packet();
+            phase = SLT_BUILD;
+            if(Model.proto_opts[PROTOOPTS_FORMAT]==FORMAT_V1)
+                return 20000-SLT_TIMING_BUILD-SLT_V1_TIMING_BIND2;
+            else //V2
+                return 13730-SLT_TIMING_BUILD-SLT_V2_TIMING_BIND1-SLT_V2_TIMING_BIND2;
     }
-    return delay_us;
+    return 19000;
 }
 
 // Generate internal id from TX id and manufacturer id (STM32 unique id)
@@ -400,7 +480,7 @@ static void initialize_tx_id()
            rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
     }
     // Pump zero bytes for LFSR to diverge more
-    for (int i = 0; i < TXID_SIZE; ++i) rand32_r(&lfsr, 0);
+    for (int i = 0; i < SLT_TXID_SIZE; ++i) rand32_r(&lfsr, 0);
 
     set_tx_id(lfsr);
 }
@@ -409,13 +489,12 @@ static void initialize()
 {
     CLOCK_StopTimer();
     tx_power = Model.tx_power;
-    packet_counter = 0;
-    counter = 0;
+    packet_count = 0;
     SLT_init();
-    phase = SLT_INIT2;
-
+    phase = SLT_BIND1;
     initialize_tx_id();
-
+    SLT_init2();
+    
     CLOCK_StartTimer(50000, SLT_callback);
 }
 
@@ -429,10 +508,11 @@ const void *SLT_Cmds(enum ProtoCmds cmd)
             return (void *)(NRF24L01_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // Always Autobind
         case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 6L; // A, E, T, R, G, P
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)6L;
+        case PROTOCMD_NUMCHAN: return (void *) 13L; // A, E, T, R, G, P, 7, 8, (Q200) Mode, Flip, VidOn, VidOff/Picture, Calibrate
+        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)13L;
         // TODO: return id correctly
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
+        case PROTOCMD_GETOPTIONS: return slt_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
         default: break;
     }
