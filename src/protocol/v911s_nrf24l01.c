@@ -45,7 +45,7 @@
 #define V911S_BIND_PACKET_PERIOD 100
 #define dbgprintf printf
 #else
-#define BIND_COUNT 150
+#define V911S_BIND_COUNT      200
 #define V911S_PACKET_PERIOD   5000 // Timeout for callback in uSec
 #define V911S_BIND_PACKET_PERIOD    3300
 //printf inside an interrupt handler is really dangerous
