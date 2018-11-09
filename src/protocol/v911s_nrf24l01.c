@@ -45,7 +45,7 @@
 #define V911S_BIND_PACKET_PERIOD 100
 #define dbgprintf printf
 #else
-#define V911S_BIND_COUNT      200
+#define V911S_BIND_COUNT      1000
 #define V911S_PACKET_PERIOD   5000 // Timeout for callback in uSec
 #define V911S_BIND_PACKET_PERIOD    3300
 //printf inside an interrupt handler is really dangerous
@@ -256,7 +256,7 @@ static void initialize(u8 bind)
     CLOCK_StopTimer();
     V911S_initialize_txid();
     tx_power = Model.tx_power;
-    PROTOCOL_SetBindState(V911S_BIND_COUNT * V911S_BIND_PACKET_PERIOD / 500);
+    PROTOCOL_SetBindState((V911S_BIND_COUNT-100) * V911S_BIND_PACKET_PERIOD + V911S_BIND_PACKET_PERIOD*300 / 1000);
     
     #ifdef V911S_ORIGINAL_ID
         rx_tx_addr[0]=0xA5;
