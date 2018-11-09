@@ -52,6 +52,7 @@ PROTO_MODULES += $(ODIR)/protocol/wfly.mod
 PROTO_MODULES += $(ODIR)/protocol/bugs3min.mod
 PROTO_MODULES += $(ODIR)/protocol/e012.mod
 PROTO_MODULES += $(ODIR)/protocol/e015.mod
+PROTO_MODULES += $(ODIR)/protocol/v911s.mod
 
 ALL += $(PROTO_MODULES)
 else #BUILD_TARGET
@@ -261,6 +262,10 @@ $(ODIR)/protocol/e012.mod : $(ODIR)/e012_nrf24l01.bin
     
 $(ODIR)/protocol/e015.mod : $(ODIR)/e015_nrf24l01.bin
 	@echo Building 'e015' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
+    
+$(ODIR)/protocol/v911s.mod : $(ODIR)/v911s_nrf24l01.bin
+	@echo Building 'v911s' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
     
 endif #BUILD_TARGET
