@@ -256,7 +256,6 @@ static void initialize(u8 bind)
     CLOCK_StopTimer();
     V911S_initialize_txid();
     tx_power = Model.tx_power;
-    PROTOCOL_SetBindState((V911S_BIND_COUNT-100) * V911S_BIND_PACKET_PERIOD + V911S_BIND_PACKET_PERIOD*300 / 1000);
     
     #ifdef V911S_ORIGINAL_ID
         rx_tx_addr[0]=0xA5;
@@ -276,6 +275,7 @@ static void initialize(u8 bind)
     {
         bind_counter = V911S_BIND_COUNT;
         packet_period= V911S_BIND_PACKET_PERIOD;
+        PROTOCOL_SetBindState(((V911S_BIND_COUNT-100) * V911S_BIND_PACKET_PERIOD + V911S_BIND_PACKET_PERIOD*300) / 1000);
         phase = V911S_BIND;
     }
     else
