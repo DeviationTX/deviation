@@ -61,15 +61,15 @@
 #define V911S_RF_BIND_CHANNEL       35
 #define V911S_NUM_RF_CHANNELS       8
 
-u8 tx_power;
-u8 packet[V911S_PACKET_SIZE];
-u8 rf_ch_num;
-u8 hopping_frequency_no;
-u8 rx_tx_addr[5];
-u8 hopping_frequency[V911S_NUM_RF_CHANNELS];
-u16 bind_counter;
-u16 packet_period;
-u8 phase;
+static u8 tx_power;
+static u8 packet[V911S_PACKET_SIZE];
+static u8 rf_ch_num;
+static u8 hopping_frequency_no;
+static u8 rx_tx_addr[5];
+static u8 hopping_frequency[V911S_NUM_RF_CHANNELS];
+static u16 bind_counter;
+static u16 packet_period;
+static u8 phase;
 
 enum{
     V911S_BIND,
