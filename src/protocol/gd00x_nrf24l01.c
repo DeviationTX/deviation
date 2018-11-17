@@ -167,7 +167,7 @@ static void GD00X_initialize_txid()
         rx_tx_addr[2]=0x12;
         rx_tx_addr[3]=0x13;
         for(u8 i=0; i<4;i++)
-            hopping_frequency[0]=79-(i<<1);
+            hopping_frequency[i]=79-(i<<1);
     #endif
 }
 
