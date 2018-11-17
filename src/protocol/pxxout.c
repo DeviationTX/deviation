@@ -33,8 +33,7 @@
 #define START_STOP    0x7e
 #define BYTESTUFF     0x7d
 #define STUFF_MASK    0x20
-#define PXX_PKT_BYTES 19
-#define PXX_PKT_BITS  (2 * PXX_PKT_BYTES * 8)  // 2* allows every byte to be escaped
+#define PXX_PKT_BYTES 20
 #define PW_HIGH        8    //  8 microcseconds high, rest of pulse low
 #define PW_ZERO       16    // 16 microsecond pulse is zero
 #define PW_ONE        24    // 24 microsecond pulse is one
@@ -131,8 +130,8 @@ static u16 scaleForPXX(u8 chan, u8 failsafe)
     if (Model.proto_opts[PROTO_OPTS_RSSICHAN] && (chan == Model.num_channels - 1) && !failsafe)
         chan_val = Telemetry.value[TELEM_FRSKY_RSSI] * 21;      // Max RSSI value seems to be 99, scale it to around 2000
     else
-        chan_val = chan_val * STICK_SCALE / CHAN_MAX_VALUE + 1024;
 #endif
+        chan_val = chan_val * STICK_SCALE / CHAN_MAX_VALUE + 1024;
 
     if (chan_val > 2046)   chan_val = 2046;
     else if (chan_val < 1) chan_val = 1;
@@ -142,12 +141,32 @@ static u16 scaleForPXX(u8 chan, u8 failsafe)
     return chan_val;
 }
 
+#ifdef EMULATOR
+#define FAILSAFE_TIMEOUT 64
+#else
+#define FAILSAFE_TIMEOUT 1032
+#endif
+
 static void build_data_pkt()
 {
     u16 chan_0;
     u16 chan_1;
     static u8 failsafe_chan;
     u8 startChan = 0;
+
+    // data frames sent every 8ms; failsafe every 8 seconds
+    if (FS_flag == 0  &&  failsafe_count > FAILSAFE_TIMEOUT  &&  chan_offset == 0  &&  Model.proto_opts[PROTO_OPTS_FAILSAFE] != FAILSAFE_RX) {
+        FS_flag = 0x10;
+        failsafe_chan = 0;
+    } else if (FS_flag & 0x10 && failsafe_chan < (Model.num_channels-1)) {
+        FS_flag = 0x10 | ((FS_flag + 2) & 0x0f);
+        failsafe_chan += 1;
+    } else if (FS_flag & 0x10) {
+        FS_flag = 0;
+        failsafe_count = 0;
+    }
+    failsafe_count += 1;
+
 
     packet[0] = START_STOP;
     packet[1] = 0;  // RX number (looking at opentx it's used for module number)
@@ -161,7 +180,7 @@ static void build_data_pkt()
 
     for(u8 i = 0; i < 12 ; i += 3) {    // 12 bytes of channel data
         if (FS_flag & 0x10 && (((failsafe_chan & 0x7) | chan_offset) == startChan)) {
-            packet[7] = FS_flag;
+            packet[2] = FS_flag;
             chan_0 = scaleForPXX(failsafe_chan, 1);
         } else {
             chan_0 = scaleForPXX(startChan, 0);
@@ -169,7 +188,7 @@ static void build_data_pkt()
         startChan++;
 
         if (FS_flag & 0x10 && (((failsafe_chan & 0x7) | chan_offset) == startChan)) {
-            packet[7] = FS_flag;
+            packet[2] = FS_flag;
             chan_1 = scaleForPXX(failsafe_chan, 1);
         } else {
             chan_1 = scaleForPXX(startChan, 0);
@@ -181,9 +200,9 @@ static void build_data_pkt()
         packet[4+i+2] = chan_1 >> 4;
     }
 
-    // TODO opentx puts "extra_flags" byte here
+    packet[PXX_PKT_BYTES-4] = 0; // opentx puts "extra_flags" byte here
 
-    u16 lcrc = crc(&packet[3], PXX_PKT_BYTES-5);
+    u16 lcrc = crc(&packet[1], PXX_PKT_BYTES-4);
     packet[PXX_PKT_BYTES-3] = lcrc;
     packet[PXX_PKT_BYTES-2] = lcrc >> 8;
     packet[PXX_PKT_BYTES-1] = START_STOP;
