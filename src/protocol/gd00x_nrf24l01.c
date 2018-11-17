@@ -205,8 +205,8 @@ const void *GD00X_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_RESET:
             CLOCK_StopTimer();
             return (void *)(NRF24L01_Reset() ? 1L : -1L);
-        case PROTOCMD_CHECK_AUTOBIND: return (void *)0L;
-        case PROTOCMD_BIND:  initialize(); return (void*)1L;
+        case PROTOCMD_CHECK_AUTOBIND: return (void *)1L;
+        case PROTOCMD_BIND:  initialize(); return (void*)0L;
         case PROTOCMD_NUMCHAN: return (void *) 6L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)6L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
