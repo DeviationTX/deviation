@@ -18,7 +18,7 @@
 #include "display.h"
 #include <stdlib.h>
 #include <string.h>
-#define font_index(x) (&(x) - Display.font)
+#define font_index(x) (&(x) - &Display.font[0])
 static const char FONT[] = "font";
 static const char * const FONT_VAL[] = {
     [font_index(DEFAULT_FONT)]      = "default",
@@ -40,7 +40,7 @@ static const char * const FONT_VAL[] = {
     [font_index(NORMALBOX_FONT)]    = "normalbox",
     [font_index(NORMALBOXNEG_FONT)] = "normalboxneg",
     [font_index(SECTION_FONT)]      = "section",
-    [font_index(TEXTSEL_FONT)]      = "textsel", 
+    [font_index(TEXTSEL_FONT)]      = "textsel",
     [font_index(BUTTON_FONT)]       = "button",
     [font_index(MENU_FONT)]         = "menu",
     [font_index(LISTBOX_FONT)]      = "listbox"
