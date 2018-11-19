@@ -138,8 +138,56 @@ int CC2500_Reset() { return 1;}
 int CYRF_Reset() {return 1;}
 
 void SPI_AVRProgramInit() {}
-void PWM_Initialize() {}
+void PWM_Initialize(pwm_type_t type) {}
 void PWM_Stop() {}
+#define PXX_PKT_BITS  (20 * 8 + 32)  // every 5th bit might be escaped
+void PXX_Enable(u8 *packet) {
+    u8 pxx_bits[PXX_PKT_BITS];
+    int i;
+    printf("PXX: ");
+    for(i = 0; i < 20; i++)
+        printf("%02x ", packet[i]);
+    printf("\n");
+
+    u8 pxx_bit = 1 << 7;
+    u8 pxx_ones_count = 0;
+    u8 pxx_bytes = 20;
+
+    if (!packet) return;
+
+    u8 *pc = pxx_bits;
+    for (;;) {
+printf("*packet = %02x, pxx_bytes = %02x, pxx_bit = %02x\n", *packet, pxx_bytes, pxx_bit);
+        if (*packet & pxx_bit) {
+            // bit to send is 1
+            if (pxx_ones_count++ == 5) {
+                // stuff 0 bit after 5 ones
+                *pc++ = 15;
+                pxx_ones_count = 0;
+            } 
+            *pc++ = 23;
+            pxx_ones_count += 1;
+        } else {
+            // bit to send is 0
+            *pc++ = 15;
+            pxx_ones_count = 0;
+        }
+
+        pxx_bit >>= 1;
+        if (pxx_bit == 0) {
+            pxx_bytes -= 1;
+            if (pxx_bytes == 0) { // all bytes sent
+                break;
+            }
+            pxx_bit = 1 << 7;
+            packet++;
+        }
+    }
+    printf("Bits length: %d (%0lx, %0lx)\nBits: ", pc - pxx_bits, pxx_bits, pc);
+//    for (i=0; i < (pc-pxx_bits); i++) printf("%02x ", pxx_bits[i]);
+    for (i=0; i < 100; i++) printf("%02x ", pxx_bits[i]);
+    printf("\n");
+}
 void PPM_Enable(unsigned low_time, volatile u16 *pulses) {
     int i;
     printf("PPM: low=%d ", (int)low_time);
