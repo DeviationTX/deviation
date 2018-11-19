@@ -104,13 +104,12 @@ ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 static int afhds2a_init()
 {
-    int i;
     u8 if_calibration1;
     u8 vco_calibration0;
     u8 vco_calibration1;
 
     A7105_WriteID(0x5475c52a);
-    for (i = 0; i < 0x33; i++)
+    for (u8 i = 0; i < sizeof(AFHDS2A_regs); i++)
         if((s8)AFHDS2A_regs[i] != -1)
             A7105_WriteReg(i, AFHDS2A_regs[i]);
 
