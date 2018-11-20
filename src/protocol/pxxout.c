@@ -38,7 +38,7 @@
 #define PW_ZERO       16    // 16 microsecond pulse is zero
 #define PW_ONE        24    // 24 microsecond pulse is one
 
-static const char * const frskyx_opts[] = {
+static const char * const pxx_opts[] = {
   _tr_noop("Failsafe"), "Hold", "NoPulse", "RX", NULL,
   NULL
 };
@@ -245,7 +245,7 @@ const void * PXXOUT_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_BIND:  initialize(); return 0;
         case PROTOCMD_NUMCHAN: return (void *)16L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
-        case PROTOCMD_GETOPTIONS: return 0;
+        case PROTOCMD_GETOPTIONS: return pxx_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
         default: break;
     }
