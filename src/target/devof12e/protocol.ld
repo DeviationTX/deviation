@@ -1,6 +1,6 @@
 MEMORY
 {
-	ram (rwx) : ORIGIN = 0x20028000, LENGTH = 4K
+	ram (rwx) : ORIGIN = 0x20009800, LENGTH = 10K
 }
 SECTIONS
 {

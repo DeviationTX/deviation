@@ -3,7 +3,7 @@ FILESYSTEMS := common text text_gfx
 
 CRC_OFFSET       := 4096
 OPTIMIZE_DFU     := 1
-MODULAR          := 0x20028000
+MODULAR          := 0x20009800
 DFU_ARGS         := -c 12 -b 0x08004000
 
 DEFAULT_PROTOCOLS := 
