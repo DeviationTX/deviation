@@ -1,3 +1,9 @@
+#ifdef MODULAR
+  //Allows the linker to properly relocate
+  #define BUGS3_Cmds PROTO_Cmds
+  #pragma long_calls
+#endif
+
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/spi.h>
 
