@@ -35,9 +35,9 @@ extern struct FAT FontFAT; //defined in screen/lcd_string.c
 //Not static because we need it in mixer.c
 const u8 EATRG[PROTO_MAP_LEN] =
     { INP_ELEVATOR, INP_AILERON, INP_THROTTLE, INP_RUDDER, INP_GEAR1 };
-static const u8 TAERG[PROTO_MAP_LEN] = 
+static const u8 TAERG[PROTO_MAP_LEN] =
     { INP_THROTTLE, INP_AILERON, INP_ELEVATOR, INP_RUDDER, INP_GEAR1 };
-static const u8 AETRG[PROTO_MAP_LEN] = 
+static const u8 AETRG[PROTO_MAP_LEN] =
     { INP_AILERON, INP_ELEVATOR, INP_THROTTLE, INP_RUDDER, INP_GEAR1 };
 
 static u8 proto_state;
@@ -55,9 +55,9 @@ const u8 *ProtocolChannelMap[PROTOCOL_COUNT] = {
     #include "protocol.h"
 };
 #undef PROTODEF
-#ifdef MODULAR
-unsigned long * const loaded_protocol = (unsigned long *)MODULAR;
-void * (* const PROTO_Cmds)(enum ProtoCmds) = (void *)(MODULAR +sizeof(long)+1);
+#ifdef ENABLE_MODULAR
+unsigned long * const loaded_protocol = (unsigned long *)ENABLE_MODULAR;
+void * (* const PROTO_Cmds)(enum ProtoCmds) = (void *)(ENABLE_MODULAR +sizeof(long)+1);
 #define PROTOCOL_LOADED (*loaded_protocol == Model.protocol)
 #else
 const void * (*PROTO_Cmds)(enum ProtoCmds) = NULL;
@@ -103,7 +103,7 @@ extern unsigned _data_loadaddr;
 void PROTOCOL_Load(int no_dlg)
 {
     (void)no_dlg;
-#ifdef MODULAR
+#ifdef ENABLE_MODULAR
     if(! PROTOCOL_HasModule(Model.protocol)) {
         *loaded_protocol = 0;
         return;
@@ -185,7 +185,7 @@ void PROTOCOL_Load(int no_dlg)
         TELEMETRY_SetType(PROTOCOL_GetTelemetryType());
     }
 }
- 
+
 u8 PROTOCOL_WaitingForSafe()
 {
     return ((proto_state & (PROTO_INIT | PROTO_READY)) == PROTO_INIT) ? 1 : 0;
@@ -387,7 +387,7 @@ int PROTOCOL_HasModule(int idx)
     if (SPISwitch_Present()) {
         return 1;
     } else {
-#endif        
+#endif
     int m = get_module(idx);
     if(m == TX_MODULE_LAST || Transmitter.module_enable[m].port != 0)
         return 1;
@@ -403,7 +403,7 @@ int PROTOCOL_HasPowerAmp(int idx)
     if (SPISwitch_Present()) {
         return 1;
     } else {
-#endif        
+#endif
     int m = get_module(idx);
     if(m != TX_MODULE_LAST && Transmitter.module_poweramp & (1 << m))
         return 1;
@@ -484,7 +484,7 @@ void PROTOCOL_InitModules()
                     }
                     break;
                 }
-            } 
+            }
         }
     }
     //Put this last because the switch will not respond until after it has been initialized
@@ -510,7 +510,7 @@ void PROTO_CS_HI(int module)
     if (SPISwitch_Present()) {
         SPISwitch_CS_HI(module);
     } else {
-#endif        
+#endif
 #if HAS_MULTIMOD_SUPPORT
     if (MODULE_ENABLE[MULTIMOD].port) {
         //We need to set the multimodule CSN even if we don't use it

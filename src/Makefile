@@ -132,7 +132,7 @@ OBJS 	 = $(addprefix $(ODIR)/, $(notdir $(SRC_C:.c=.o) $(SRC_S:.s=.o) $(SRC_CXX:
 ifdef MODULAR
 PROTO_OBJS  := $(addprefix $(ODIR)/, $(notdir $(PROTO_SRC_C:.c=.o)))
 PROTO_LIBS  := $(addprefix $(ODIR)/, $(notdir $(PROTO_SRC_C:.c=.bin)))
-PROTO_EXTRA_OBJS := $(addprefix $(ODIR)/, $(notdir $(PROTO_EXTRA_C:.c=.o)))
+PROTO_EXTRA_OBJS := $(addprefix $(ODIR)/, $(notdir $(PROTO_EXTRA_C:.c=.o_)))
 SYMBOL_FILE := $(ODIR)/symbolfile
 endif
 
@@ -158,7 +158,8 @@ ifeq "$(TYPE)" "dev"
   CFLAGS   := $(CFLAGS) -g -DBUILDTYPE_DEV
 endif
 ifdef MODULAR
-CFLAGS   +=  -DMODULAR=$(MODULAR)
+EXTRA_CFLAGS   :=  -DMODULAR=$(MODULAR)
+CFLAGS   +=  -DENABLE_MODULAR=$(MODULAR)
 endif
 
 CFLAGS   := $(CFLAGS) -Wall -Wextra -Werror=undef -I. -D$(PROGMODE) -std=gnu99 -Itarget/$(TARGET) -Igui/$(SCREENSIZE) \
@@ -336,7 +337,7 @@ filesystem/$(FILESYSTEM)/media/04b03.fon: fonts/04b03.bdf
 ## http://mad-scientist.net/make/autodep.html
 -include $(OBJS:.o=.P)
 -include $(PROTO_OBJS:.o=.P)
--include $(PROTO_EXTRA_OBJS:.o=.P)
+-include $(PROTO_EXTRA_OBJS:.o_=.P)
 
 dollar = $$
 define define_compile_rules
@@ -359,7 +360,7 @@ $(ODIR)/%.o: $(1)%.cpp
 #For module building
 $(ODIR)/%.o_: $(1)%.c
 	@echo " + Compiling '$$<' as module"
-	$(CC) $$(CFLAGS) $$(MODULE_FLAGS) -MD -c -o $$@ $$<
+	$(CC) $$(CFLAGS) $$(EXTRA_CFLAGS) $$(MODULE_FLAGS) -MD -c -o $$@ $$<
 	@cp $(ODIR)/$$*.d $(ODIR)/$$*.P; \
             sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$(dollar)//' \
                 -e '/^$$(dollar)/ d' -e 's/$$(dollar)/ :/' < $(ODIR)/$$*.d >> $(ODIR)/$$*.P; \
