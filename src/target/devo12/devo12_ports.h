@@ -45,5 +45,11 @@
 #define _PWM_PIN                   GPIO8
 #define _PWM_EXTI                  EXTI8
 #define _PWM_TIM_OC                TIM_OC1
+#define _PWM_TIM_ARR               TIM1_ARR
+#define _PWM_TIM_DIER_DMAEN        TIM_DIER_CC1DE
+#define _PWM_DMA                   DMA1
+#define _PWM_DMA_CHANNEL           DMA_CHANNEL2
+#define _PWM_DMA_ISR               dma1_channel2_isr
+#define _PWM_NVIC_DMA_CHANNEL_IRQ  NVIC_DMA1_CHANNEL2_IRQ
 //End PWM Port
 #endif //_DEVO12_PORTS_H_
