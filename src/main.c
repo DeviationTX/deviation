@@ -40,7 +40,7 @@ void PAGE_Test();
 int main() {
 
     Init();
-#ifndef MODULAR
+#ifndef ENABLE_MODULAR
     //Banner();
 #endif
     if(PWR_CheckPowerSwitch()) PWR_Shutdown();
@@ -163,7 +163,7 @@ void Init() {
     SPI_FlashBlockWriteEnable(1); //Enable writing to all banks of SPIFlash
 
     PPMin_TIM_Init();
-#ifdef MODULAR
+#ifdef ENABLE_MODULAR
     //Force protocol to none to initialize RAM
     Model.protocol = PROTOCOL_NONE;
     PROTOCOL_Init(1);
