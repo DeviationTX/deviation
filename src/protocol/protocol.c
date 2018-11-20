@@ -38,7 +38,7 @@ const u8 EATRG[PROTO_MAP_LEN] =
 const u8 TAERG[PROTO_MAP_LEN] =
     { INP_THROTTLE, INP_AILERON, INP_ELEVATOR, INP_RUDDER, INP_GEAR1 };
 static const u8 AETRG0[PROTO_MAP_LEN] =
-    { INP_AILERON, INP_ELEVATOR, INP_THROTTLE, INP_RUDDER, INP_GEAR1 };
+    { INP_THROTTLE, INP_AILERON, INP_ELEVATOR, INP_RUDDER, INP_GEAR1 };
 const u8 * CurrentProtocolChannelMap;
 
 static u8 proto_state;
@@ -50,9 +50,9 @@ static u32 bind_time;
 #define PROTO_BINDDLG   0x08
 #define PROTO_MODULEDLG 0x10
 
-#ifdef MODULAR
-unsigned long * const loaded_protocol = (unsigned long *)MODULAR;
-void * (* const PROTO_Cmds)(enum ProtoCmds) = (void *)(MODULAR +sizeof(long)+1);
+#ifdef ENABLE_MODULAR
+unsigned long * const loaded_protocol = (unsigned long *)ENABLE_MODULAR;
+void * (* const PROTO_Cmds)(enum ProtoCmds) = (void *)(ENABLE_MODULAR +sizeof(long)+1);
 #define PROTOCOL_LOADED (*loaded_protocol == Model.protocol)
 #else
 const void * (*PROTO_Cmds)(enum ProtoCmds) = NULL;
@@ -145,7 +145,7 @@ extern unsigned _data_loadaddr;
 void PROTOCOL_Load(int no_dlg)
 {
     (void)no_dlg;
-#ifdef MODULAR
+#ifdef ENABLE_MODULAR
     if(! PROTOCOL_HasModule(Model.protocol)) {
         *loaded_protocol = 0;
         return;

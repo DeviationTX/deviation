@@ -61,7 +61,7 @@ void MSC_Init() {
     User_Standard_Requests = &MSC_User_Standard_Requests;
 }
 
-#ifdef MODULAR
+#ifdef ENABLE_MODULAR
 void (*_HID_Init)() = NULL;
 #else
 extern void HID_Init();
@@ -80,7 +80,7 @@ void USB_Enable(unsigned type, unsigned use_interrupt)
         //Mass Storage
         MSC_Init();
     } else if (type == 1) {
-#ifndef MODULAR
+#ifndef ENABLE_MODULAR
         HID_Init();
 #else
         if(_HID_Init)
@@ -92,7 +92,7 @@ void USB_Enable(unsigned type, unsigned use_interrupt)
         gpio_set(GPIOB, GPIO10);
     //rcc_set_usbpre(RCC_CFGR_USBPRE_PLL_CLK_DIV1_5);
     rcc_peripheral_enable_clock(&RCC_APB1ENR, RCC_APB1ENR_USBEN);
-    USB_Init();  
+    USB_Init();
     if(use_interrupt) {
         nvic_enable_irq(NVIC_USB_LP_CAN_RX0_IRQ);
     }
@@ -103,7 +103,7 @@ void USB_Disable()
     gpio_set(GPIOB, GPIO10);
     nvic_disable_irq(NVIC_USB_LP_CAN_RX0_IRQ);
 }
- 
+
 void USB_HandleISR()
 {
     USB_Istr();
