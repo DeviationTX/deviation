@@ -1,3 +1,7 @@
+#ifdef MODULAR
+  #pragma long_calls
+#endif
+
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/spi.h>
 
