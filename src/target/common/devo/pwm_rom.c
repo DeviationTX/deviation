@@ -24,20 +24,17 @@
 #include "../ports.h"
 
 
-pwm_type_t pwm_type;
 volatile u16 *pwm;
 
 void tim1_up_isr()
 {
     timer_clear_flag(TIM1, TIM_SR_UIF);
 
-    if (pwm_type == PWM_PPM) {
-        if (*pwm)
-            timer_set_period(TIM1, *pwm++ - 1);
-        else
-            timer_set_oc_value(TIM1, _PWM_TIM_OC, 0); // hold output inactive
-        return;
-    }
+    if (*pwm)
+        timer_set_period(TIM1, *pwm++ - 1);
+    else
+        timer_set_oc_value(TIM1, _PWM_TIM_OC, 0); // hold output inactive
+    return;
 }
 
 #endif

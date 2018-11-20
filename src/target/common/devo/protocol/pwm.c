@@ -34,11 +34,8 @@
 #include <string.h>
 #include <errno.h>
 
-extern pwm_type_t pwm_type;
-void PWM_Initialize(pwm_type_t type)
+void PWM_Initialize()
 {
-    pwm_type = type;
-
 #if _PWM_PIN == GPIO_USART1_TX
     UART_Stop();
 #endif
@@ -60,26 +57,18 @@ void PWM_Initialize(pwm_type_t type)
 
     /* compare output setup. compare register must match i/o pin */
     timer_set_oc_mode(TIM1, _PWM_TIM_OC, TIM_OCM_FORCE_HIGH); // output force high
-    if (type == PWM_PPM) {
-timer_enable_preload(TIM1);   // TODO necessary?
-timer_enable_oc_preload(TIM1, _PWM_TIM_OC);         // TODO must use preload for PWM mode
-        timer_set_oc_value(TIM1, _PWM_TIM_OC, 400);     // default notch time
-        timer_set_period(TIM1, 22500);                  // sane default
-        timer_set_oc_polarity_low(TIM1, _PWM_TIM_OC);   // notch time is low
-        // interrupt on overflow (reload)
-        nvic_enable_irq(NVIC_TIM1_UP_IRQ);
-        nvic_set_priority(NVIC_TIM1_UP_IRQ, 1);
-        timer_set_oc_mode(TIM1, _PWM_TIM_OC, TIM_OCM_PWM1); // output active while counter below compare
-        timer_enable_oc_output(TIM1, _PWM_TIM_OC);          // enable OCx to pin
-        timer_enable_break_main_output(TIM1);               // master output enable
-        timer_enable_counter(TIM1);
-    } else {
-        timer_set_oc_value(TIM1, _PWM_TIM_OC, 8);       // 8us high for PXX
-        timer_set_period(TIM1, 23);                     // default 1
-        timer_set_oc_mode(TIM1, _PWM_TIM_OC, TIM_OCM_PWM1); // output active while counter below compare
-        timer_enable_oc_output(TIM1, _PWM_TIM_OC);          // enable OCx to pin
-        timer_enable_break_main_output(TIM1);               // master output enable
-    }
+    timer_enable_preload(TIM1);
+    timer_enable_oc_preload(TIM1, _PWM_TIM_OC);
+    timer_set_oc_value(TIM1, _PWM_TIM_OC, 400);     // default notch time
+    timer_set_period(TIM1, 22500);                  // sane default
+    timer_set_oc_polarity_low(TIM1, _PWM_TIM_OC);   // notch time is low
+    // interrupt on overflow (reload)
+    nvic_enable_irq(NVIC_TIM1_UP_IRQ);
+    nvic_set_priority(NVIC_TIM1_UP_IRQ, 1);
+    timer_set_oc_mode(TIM1, _PWM_TIM_OC, TIM_OCM_PWM1); // output active while counter below compare
+    timer_enable_oc_output(TIM1, _PWM_TIM_OC);          // enable OCx to pin
+    timer_enable_break_main_output(TIM1);               // master output enable
+    timer_enable_counter(TIM1);
 }
 
 
@@ -151,6 +140,13 @@ void PXX_Enable(u8 *packet)
             packet++;
         }
     }
+
+    // Reconfigure timer for PXX
+    timer_set_oc_value(TIM1, _PWM_TIM_OC, 8);       // 8us high for PXX
+    timer_set_period(TIM1, 23);                     // default 1
+    timer_set_oc_mode(TIM1, _PWM_TIM_OC, TIM_OCM_PWM1); // output active while counter below compare
+    timer_enable_oc_output(TIM1, _PWM_TIM_OC);          // enable OCx to pin
+    timer_enable_break_main_output(TIM1);               // master output enable
 
     // Setup DMA and start
     dma_channel_reset(_PWM_DMA, _PWM_DMA_CHANNEL);

@@ -227,7 +227,7 @@ static void initialize()
     if (PPMin_Mode())
         return;
 
-    PWM_Initialize(PWM_PXX);
+    PWM_Initialize();
     num_channels = Model.num_channels;
     failsafe_count = 0;
     chan_offset = 0;

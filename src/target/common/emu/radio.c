@@ -138,7 +138,7 @@ int CC2500_Reset() { return 1;}
 int CYRF_Reset() {return 1;}
 
 void SPI_AVRProgramInit() {}
-void PWM_Initialize(pwm_type_t type) {}
+void PWM_Initialize() {}
 void PWM_Stop() {}
 #define PXX_PKT_BITS  (20 * 8 + 32)  // every 5th bit might be escaped
 void PXX_Enable(u8 *packet) {

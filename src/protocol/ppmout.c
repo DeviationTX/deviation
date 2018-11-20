@@ -82,7 +82,7 @@ static void initialize()
     if (PPMin_Mode())
         return;
 
-    PWM_Initialize(PWM_PPM);
+    PWM_Initialize();
     num_channels = Model.num_channels;
     if (Model.proto_opts[CENTER_PW] == 0) {
         Model.proto_opts[CENTER_PW] = 1100;
