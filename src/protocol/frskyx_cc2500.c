@@ -399,7 +399,10 @@ static u8 sport_crc(u8 *data) {
     return 0x00ff - crc;
 }
 
+static u8 outbuf[FRSKY_SPORT_PACKET_SIZE+2];
+
 static void setup_serial_port() {
+    outbuf[0] = 0x7e;
     if ( Model.proto_opts[PROTO_OPTS_SPORTOUT] ) {
         UART_SetDataRate(57600);    // set for s.port compatibility
 #if HAS_EXTENDED_AUDIO
@@ -412,7 +415,6 @@ static void setup_serial_port() {
 }
 
 static void serial_echo(u8 *packet) {
-  static u8 outbuf[FRSKY_SPORT_PACKET_SIZE+2] = {0x7e};
 
   memcpy(outbuf+1, packet, FRSKY_SPORT_PACKET_SIZE);
   outbuf[FRSKY_SPORT_PACKET_SIZE+1] = sport_crc(outbuf+2);
