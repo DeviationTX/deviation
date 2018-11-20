@@ -24,8 +24,6 @@
 #include <errno.h>
 
 #ifdef MODULAR
-  //Allows the linker to properly relocate
-  #define BUGS3_Cmds PROTO_Cmds
   #pragma long_calls
 #endif
 
