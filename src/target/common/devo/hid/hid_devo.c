@@ -41,7 +41,7 @@ void HID_Write(s8 *packet, u8 num_channels)
     PrevXferComplete = 0;
     //printf("sending\n");
     USB_SIL_Write(EP1_IN, (u8 *)packet, num_channels);
-    SetEPTxValid(ENDP1);
+    _SetEPTxValid(ENDP1);
 }
 
 void HID_Init() {
