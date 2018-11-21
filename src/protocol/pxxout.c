@@ -33,7 +33,7 @@
 #define START_STOP    0x7e
 #define BYTESTUFF     0x7d
 #define STUFF_MASK    0x20
-#define PXX_PKT_BYTES 20
+#define PXX_PKT_BYTES 18
 #define PW_HIGH        8    //  8 microcseconds high, rest of pulse low
 #define PW_ZERO       16    // 16 microsecond pulse is zero
 #define PW_ONE        24    // 24 microsecond pulse is one
@@ -168,19 +168,18 @@ static void build_data_pkt()
     failsafe_count += 1;
 
 
-    packet[0] = START_STOP;
-    packet[1] = 0;  // RX number (looking at opentx it's used for module number)
-    packet[2] = 0;  // Byte 3: FLAG1,
+    packet[0] = 0;  // RX number (looking at opentx it's used for module number)
+    packet[1] = 0;  // Byte 3: FLAG1,
                     // b0: set Rx number -> if this bit is set, every rx listening
                     // should change it's rx number to the one described in byte 2
                     // b1...b3: set failsafe position -> if set the following positions
                     // should be used as "Failsafe" positions.
                     // b4..b7:reserved for future use, must be “0” in this version
-    packet[3] = 0;  // Byte 4: FLAG2, Reserved for future use, must be “0” in this version.
+    packet[2] = 0;  // Byte 4: FLAG2, Reserved for future use, must be “0” in this version.
 
     for(u8 i = 0; i < 12 ; i += 3) {    // 12 bytes of channel data
         if (FS_flag & 0x10 && (((failsafe_chan & 0x7) | chan_offset) == startChan)) {
-            packet[2] = FS_flag;
+            packet[1] = FS_flag;
             chan_0 = scaleForPXX(failsafe_chan, 1);
         } else {
             chan_0 = scaleForPXX(startChan, 0);
@@ -188,25 +187,23 @@ static void build_data_pkt()
         startChan++;
 
         if (FS_flag & 0x10 && (((failsafe_chan & 0x7) | chan_offset) == startChan)) {
-            packet[2] = FS_flag;
+            packet[1] = FS_flag;
             chan_1 = scaleForPXX(failsafe_chan, 1);
         } else {
             chan_1 = scaleForPXX(startChan, 0);
         }
         startChan++;
 
-        packet[4+i]   = chan_0;
-        packet[4+i+1] = (((chan_0 >> 8) & 0x0F) | (chan_1 << 4));
-        packet[4+i+2] = chan_1 >> 4;
+        packet[3+i]   = chan_0;
+        packet[3+i+1] = (((chan_0 >> 8) & 0x0F) | (chan_1 << 4));
+        packet[3+i+2] = chan_1 >> 4;
     }
 
-    packet[PXX_PKT_BYTES-4] = 0; // opentx puts "extra_flags" byte here
+    packet[PXX_PKT_BYTES-3] = 0; // opentx puts "extra_flags" byte here
 
-    u16 lcrc = crc(&packet[1], PXX_PKT_BYTES-4);
-    packet[PXX_PKT_BYTES-3] = lcrc;
-    packet[PXX_PKT_BYTES-2] = lcrc >> 8;
-    packet[PXX_PKT_BYTES-1] = START_STOP;
-
+    u16 lcrc = crc(packet, PXX_PKT_BYTES-2);
+    packet[PXX_PKT_BYTES-2] = lcrc;
+    packet[PXX_PKT_BYTES-1] = lcrc >> 8;
 }
 
 MODULE_CALLTYPE

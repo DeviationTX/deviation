@@ -57,18 +57,8 @@ void PWM_Initialize()
 
     /* compare output setup. compare register must match i/o pin */
     timer_set_oc_mode(TIM1, _PWM_TIM_OC, TIM_OCM_FORCE_HIGH); // output force high
-    timer_enable_preload(TIM1);
-    timer_enable_oc_preload(TIM1, _PWM_TIM_OC);
-    timer_set_oc_value(TIM1, _PWM_TIM_OC, 400);     // default notch time
-    timer_set_period(TIM1, 22500);                  // sane default
-    timer_set_oc_polarity_low(TIM1, _PWM_TIM_OC);   // notch time is low
-    // interrupt on overflow (reload)
-    nvic_enable_irq(NVIC_TIM1_UP_IRQ);
-    nvic_set_priority(NVIC_TIM1_UP_IRQ, 1);
-    timer_set_oc_mode(TIM1, _PWM_TIM_OC, TIM_OCM_PWM1); // output active while counter below compare
-    timer_enable_oc_output(TIM1, _PWM_TIM_OC);          // enable OCx to pin
-    timer_enable_break_main_output(TIM1);               // master output enable
-    timer_enable_counter(TIM1);
+
+    // further specific initialization in PPM_Enable and PXX_Enable
 }
 
 
@@ -90,6 +80,19 @@ void PWM_Stop()
 extern volatile u16 *pwm;  // defined in pwm_rom.c
 void PPM_Enable(unsigned low_time, volatile u16 *pulses)
 {
+    timer_enable_preload(TIM1);
+    timer_enable_oc_preload(TIM1, _PWM_TIM_OC);
+    timer_set_oc_value(TIM1, _PWM_TIM_OC, 400);     // default notch time
+    timer_set_period(TIM1, 22500);                  // sane default
+    timer_set_oc_polarity_low(TIM1, _PWM_TIM_OC);   // notch time is low
+    // interrupt on overflow (reload)
+    nvic_enable_irq(NVIC_TIM1_UP_IRQ);
+    nvic_set_priority(NVIC_TIM1_UP_IRQ, 1);
+    timer_set_oc_mode(TIM1, _PWM_TIM_OC, TIM_OCM_PWM1); // output active while counter below compare
+    timer_enable_oc_output(TIM1, _PWM_TIM_OC);          // enable OCx to pin
+    timer_enable_break_main_output(TIM1);               // master output enable
+    timer_enable_counter(TIM1);
+
     pwm = pulses;
     if (*pwm) {
         timer_set_period(TIM1, *pwm++ - 1);
@@ -104,26 +107,30 @@ void PPM_Enable(unsigned low_time, volatile u16 *pulses)
 
 #ifndef MODULAR
 #define PXX_PKT_BITS  (20 * 8 + 32)  // every 5th bit might be escaped
+static const u8 pxx_flag[] = {15, 23, 23, 23, 23, 23, 23, 15};  // 7e
 static u8 pxx_bits[PXX_PKT_BITS];
 void PXX_Enable(u8 *packet)
 {
-    u8 pxx_bit = 1 << 7;
-    u8 pxx_ones_count = 0;
-    u8 pxx_bytes = 20;
-
     if (!packet) return;
 
+    u8 pxx_bit = 1 << 7;
+    u8 pxx_ones_count = 0;
+    u8 pxx_bytes = 18;
     u8 *pc = pxx_bits;
+
+    // flag bytes are not bit-stuffed
+    memcpy(pc, pxx_flag, 8);
+    pc += 8;
     for (;;) {
         if (*packet & pxx_bit) {
             // bit to send is 1
-            if (pxx_ones_count++ == 5) {
+            *pc++ = 23;
+            pxx_ones_count += 1;
+            if (pxx_ones_count == 5) {
                 // stuff 0 bit after 5 ones
                 *pc++ = 15;
                 pxx_ones_count = 0;
             } 
-            *pc++ = 23;
-            pxx_ones_count += 1;
         } else {
             // bit to send is 0
             *pc++ = 15;
@@ -140,19 +147,17 @@ void PXX_Enable(u8 *packet)
             packet++;
         }
     }
-
-    // Reconfigure timer for PXX
-    timer_set_oc_value(TIM1, _PWM_TIM_OC, 8);       // 8us high for PXX
-    timer_set_period(TIM1, 23);                     // default 1
-    timer_set_oc_mode(TIM1, _PWM_TIM_OC, TIM_OCM_PWM1); // output active while counter below compare
-    timer_enable_oc_output(TIM1, _PWM_TIM_OC);          // enable OCx to pin
-    timer_enable_break_main_output(TIM1);               // master output enable
+    memcpy(pc, pxx_flag, 8);
+    pc += 8;
+//TODO    while (pc % 8) {
+//TODO        *pc++ = 0x15;   // fill out byte boundary with 0
+//TODO    }
 
     // Setup DMA and start
     dma_channel_reset(_PWM_DMA, _PWM_DMA_CHANNEL);
     dma_set_peripheral_address(_PWM_DMA, _PWM_DMA_CHANNEL, (u32) &_PWM_TIM_ARR);  /* send data to the TIM1 period register */
     dma_set_memory_address(_PWM_DMA, _PWM_DMA_CHANNEL, (u32) pxx_bits);
-    dma_set_number_of_data(_PWM_DMA, _PWM_DMA_CHANNEL, pc - pxx_bits);
+    dma_set_number_of_data(_PWM_DMA, _PWM_DMA_CHANNEL, pc - pxx_bits + 1);
     dma_set_read_from_memory(_PWM_DMA, _PWM_DMA_CHANNEL);                     /* direction is from memory to timer */
     dma_enable_memory_increment_mode(_PWM_DMA, _PWM_DMA_CHANNEL);             /* memory pointer increments, peripheral no */
     dma_set_peripheral_size(_PWM_DMA, _PWM_DMA_CHANNEL, DMA_CCR_PSIZE_16BIT);  /* _PWM_TIM_ARR is 16 bit wide in this mode */
@@ -160,15 +165,21 @@ void PXX_Enable(u8 *packet)
     dma_set_priority(_PWM_DMA, _PWM_DMA_CHANNEL, DMA_CCR_PL_VERY_HIGH);
     dma_enable_transfer_complete_interrupt(_PWM_DMA, _PWM_DMA_CHANNEL);
     dma_enable_channel(_PWM_DMA, _PWM_DMA_CHANNEL);    // dma ready to go
+
+    // configure timer for PXX
+    timer_set_period(TIM1, 0);                          // hold timer stopped
+    timer_set_oc_value(TIM1, _PWM_TIM_OC, 8);           // 8 us high for PXX
+    timer_enable_oc_output(TIM1, _PWM_TIM_OC);          // enable OCx to pin
+    timer_enable_break_main_output(TIM1);               // master output enable
     timer_set_dma_on_update_event(TIM1);
-    timer_enable_irq(TIM1, _PWM_TIM_DIER_DMAEN);       // enable timer dma request
+    timer_enable_irq(TIM1, _PWM_TIM_DIER_DMAEN);        // enable timer dma request
     timer_set_oc_mode(TIM1, _PWM_TIM_OC, TIM_OCM_PWM1); // output active while counter below compare
 
-    nvic_set_priority(_PWM_NVIC_DMA_CHANNEL_IRQ, 3);
+    nvic_set_priority(_PWM_NVIC_DMA_CHANNEL_IRQ, 3);    // DMA interrupt on transfer complete
     nvic_enable_irq(_PWM_NVIC_DMA_CHANNEL_IRQ);
 
     timer_enable_counter(TIM1);
-    timer_generate_event(TIM1, TIM_EGR_UG);            // Force-load shadow registers
+    timer_generate_event(TIM1, TIM_EGR_UG);             // Generate event to start DMA
 }
 
 void _PWM_DMA_ISR(void)
