@@ -159,6 +159,8 @@ ifeq "$(TYPE)" "dev"
 endif
 ifdef MODULAR
 CFLAGS   +=  -DMODULAR=$(MODULAR)
+else
+CFLAGS   += -flto
 endif
 
 CFLAGS   := $(CFLAGS) -Wall -Wextra -Werror=undef -I. -D$(PROGMODE) -std=gnu99 -Itarget/$(TARGET) -Igui/$(SCREENSIZE) \
