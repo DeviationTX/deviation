@@ -95,7 +95,7 @@ void fault_printf(const char *str, unsigned int val)
 // hard fault handler in C,
 // with stack frame location as input parameter
 // called from HardFault_Handler in file xxx.s
-void fault_handler_c (unsigned int * hardfault_args, unsigned int fault_type)
+void __attribute__((used)) fault_handler_c (unsigned int * hardfault_args, unsigned int fault_type)
 {
   unsigned int stacked_r0;
   unsigned int stacked_r1;
