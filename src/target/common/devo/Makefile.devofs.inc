@@ -2,11 +2,11 @@
 ifndef BUILD_TARGET
 ALL += $(ODIR)/devo.fs
 
+else
+
 DEFAULT_PROTOCOLS = devo.mod dsm2.mod
 
 REQUIRED_PROTOCOLS = $(addprefix $(ODIR)/protocol/, $(DEFAULT_PROTOCOLS))
-
-else
 
 $(ODIR)/devo.fs: $(LAST_MODEL) $(TARGET).dfu $(PRE_FS) $(TARGET).fs_wrapper $(REQUIRED_PROTOCOLS)
 	rm -rf $(ODIR)/tmpfs | true
