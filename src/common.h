@@ -43,7 +43,7 @@ void PROTO_CS_HI(int module);
 void PROTO_CS_LO(int module);
 
 extern volatile s32 Channels[NUM_OUT_CHANNELS];
-extern const char DeviationVersion[33];
+extern const char DeviationVersion[34];
 
 /* Temproary definition until we have real translation */
 #define _tr_noop(x) x
