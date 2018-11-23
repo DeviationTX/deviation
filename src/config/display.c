@@ -15,6 +15,7 @@
 
 #include "common.h"
 #include "gui/gui.h"
+#include "gui/font.h"
 #include "display.h"
 #include <stdlib.h>
 #include <string.h>
@@ -88,7 +89,7 @@ static const char * const ALIGN_VAL[] = {
 #define MATCH_VALUE(s)   strcasecmp(value,   s) == 0
 #define NUM_STR_ELEMS(s) (sizeof(s) / sizeof(char *))
 #define SET_FLAG(var, value, flag) ((value) ? ((var) | (flag)) : ((var) & ~(flag)))
-extern u8 FONT_GetFromString(const char *);
+
 struct display_settings Display;
 
 u16 get_color(const char *value) {
@@ -103,7 +104,7 @@ u16 get_color(const char *value) {
 static int handle_label(struct LabelDesc *label, const char *name, const char *value)
 {
     if(MATCH_KEY(FONT)) {
-        label->font = FONT_GetFromString(value);
+        label->font = LCD_GetFontFromString(value);
         return 1;
     }
     if(MATCH_KEY(FONT_COLOR)) {
@@ -237,7 +238,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
                     case 3:
                         *((u32 *)((long)ptr + offset)) = value_int; break;
                     case 6:
-                        *((u8 *)((long)ptr + offset)) = FONT_GetFromString(value);
+                        *((u8 *)((long)ptr + offset)) = LCD_GetFontFromString(value);
                 }
                 return 1;
             }

@@ -50,7 +50,7 @@ u8 LCD_SetFont(unsigned int idx)
     return 1;
 }
 
-u8 FONT_GetFromString(const char *value)
+u8 LCD_GetFontFromString(const char *value)
 {
     (void)value;
     return 1;

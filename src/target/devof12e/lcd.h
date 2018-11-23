@@ -30,7 +30,7 @@ void TW8816_SetVideoStandard(u8 standard);
 
 extern struct FAT FontFAT;
 
-struct font_def 
+struct font_def
 {
         u8 idx;
         u8 zoom;          /* Character size relative to a 1x1 character */

@@ -384,7 +384,7 @@ void VIDEO_SetChannel(int ch)
 /**
  * Since this is a text based screen some of the LCD string functions are here
  **/
-u8 FONT_GetFromString(const char *value)
+u8 LCD_GetFontFromString(const char *value)
 {
     if (strcmp(value, "big") == 0) {
         return 2;
