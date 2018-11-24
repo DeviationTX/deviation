@@ -275,6 +275,7 @@ static s32 rf_ch_idx = 0;
         tx_state_ = STATE_BINDING;
         packet_sent = 0;
         //Do once, no break needed
+        FALLTHROUGH;
     case STATE_BINDING:
         if(packet_sent < bind_count)
         {
@@ -286,14 +287,16 @@ static s32 rf_ch_idx = 0;
             PROTOCOL_SetBindState(0);
             MUSIC_Play(MUSIC_DONE_BINDING);
             tx_state_ = STATE_PRE_SEND;
-           //Do once, no break needed
+            //Do once, no break needed
+            FALLTHROUGH;
         }
     case STATE_PRE_SEND:
             packet_sent = 0;
             kn_send_init(tx_addr_, packet_);
             rf_ch_idx = 0;
             tx_state_ = STATE_SENDING;
-           //Do once, no break needed
+            //Do once, no break needed
+            FALLTHROUGH;
     case STATE_SENDING:
         if(packet_sent >= packet_send_count)
         {

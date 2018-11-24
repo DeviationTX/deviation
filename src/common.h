@@ -10,6 +10,7 @@
 #define ctassert(COND,MSG) typedef char static_assertion_##MSG[(COND)?1:-1]
 #define _UNUSED   __attribute__ ((unused))
 #define NO_INLINE __attribute__ ((noinline))
+#define FALLTHROUGH __attribute__ ((fallthrough))
 
 #define TEMPSTRINGLENGTH 400 //This is the max dialog size (80 characters * 5 lines)
                              //We could reduce this to ~240 on the 128x64 screens
