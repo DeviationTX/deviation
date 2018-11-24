@@ -30,9 +30,11 @@
   const unsigned long protocol_type = (unsigned long)&_data_loadaddr;
 #endif
 
+#define PXX_SEND_BIND           0x01
+#define PXX_SEND_FAILSAFE       (1 << 4)
+#define PXX_SEND_RANGECHECK     (1 << 5)
+
 #define START_STOP    0x7e
-#define BYTESTUFF     0x7d
-#define STUFF_MASK    0x20
 #define PXX_PKT_BYTES 18
 #define PW_HIGH        8    //  8 microcseconds high, rest of pulse low
 #define PW_ZERO       16    // 16 microsecond pulse is zero
@@ -40,10 +42,12 @@
 
 static const char * const pxx_opts[] = {
   _tr_noop("Failsafe"), "Hold", "NoPulse", "RX", NULL,
+  _tr_noop("Country"), "US", "JP", "EU", NULL,
   NULL
 };
 enum {
     PROTO_OPTS_FAILSAFE,
+    PROTO_OPTS_COUNTRY,
     LAST_PROTO_OPT,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
@@ -102,6 +106,21 @@ static u16 crc(u8 *data, u8 len) {
   return crc;
 }
 
+// Generate internal id from TX id and manufacturer id (STM32 unique id)
+static int get_tx_id()
+{
+    u32 lfsr = 0x7649eca9ul;
+
+    u8 var[12];
+    MCU_SerialNumber(var, 12);
+    for (int i = 0; i < 12; ++i) {
+        rand32_r(&lfsr, var[i]);
+    }
+    for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
+        rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
+    return rand32_r(&lfsr, 0);
+}
+
 //#define STICK_SCALE    819  // full scale at +-125
 #define STICK_SCALE    751  // +/-100 gives 2000/1000 us pwm
 static u16 scaleForPXX(u8 chan, u8 failsafe)
@@ -147,7 +166,7 @@ static u16 scaleForPXX(u8 chan, u8 failsafe)
 #define FAILSAFE_TIMEOUT 1032
 #endif
 
-static void build_data_pkt()
+static void build_data_pkt(u8 bind)
 {
     u16 chan_0;
     u16 chan_1;
@@ -167,15 +186,22 @@ static void build_data_pkt()
     }
     failsafe_count += 1;
 
+    // only need packet contents here. Start and end flags added by pxx_enable
 
-    packet[0] = 0;  // RX number (looking at opentx it's used for module number)
-    packet[1] = 0;  // Byte 3: FLAG1,
-                    // b0: set Rx number -> if this bit is set, every rx listening
+    // packet[0] = set in initialize()  // RX number (looking at opentx it's used for module number)
+    if (bind) 
+                    // FLAG1,
+                    // b0: BIND / set Rx number -> if this bit is set, every rx listening
                     // should change it's rx number to the one described in byte 2
+                    // if b0, then b1..b2 = country code (us 0, japan 1, eu 2 ?)
+        packet[1] = PXX_SEND_BIND | (Model.proto_opts[PROTO_OPTS_COUNTRY] << 1);
+    else
                     // b1...b3: set failsafe position -> if set the following positions
                     // should be used as "Failsafe" positions.
                     // b4..b7:reserved for future use, must be “0” in this version
-    packet[2] = 0;  // Byte 4: FLAG2, Reserved for future use, must be “0” in this version.
+        packet[1] = 0;
+
+    packet[2] = 0;  // FLAG2, Reserved for future use, must be “0” in this version.
 
     for(u8 i = 0; i < 12 ; i += 3) {    // 12 bytes of channel data
         if (FS_flag & 0x10 && (((failsafe_chan & 0x7) | chan_offset) == startChan)) {
@@ -206,11 +232,39 @@ static void build_data_pkt()
     packet[PXX_PKT_BYTES-1] = lcrc >> 8;
 }
 
+static enum {
+  PXX_BIND,
+#ifndef EMULATOR
+  PXX_BIND_DONE = 650,
+#else
+  PXX_BIND_DONE = 50,
+#endif
+  PXX_DATA1,
+  PXX_DATA2,
+  PXX_DATA3,
+  PXX_DATA4,
+  PXX_DATA5
+} state;
+
 MODULE_CALLTYPE
 static u16 pxxout_cb()
 {
-    build_data_pkt();
+    switch (state) {
+    default: // binding
+        build_data_pkt(1);
+        state++;
+        break;
+    case PXX_BIND_DONE:
+        PROTOCOL_SetBindState(0);
+        state++;
+        // intentional fall-through
+    case PXX_DATA1:
+        build_data_pkt(0);
+        break;
+    }
+
     PXX_Enable(packet);   // send PXX bitstream using timer1
+
 #ifdef EMULATOR
     return 3000;
 #else
@@ -218,7 +272,7 @@ static u16 pxxout_cb()
 #endif
 }
 
-static void initialize()
+static void initialize(u8 bind)
 {
     CLOCK_StopTimer();
     if (PPMin_Mode())
@@ -229,6 +283,14 @@ static void initialize()
     failsafe_count = 0;
     chan_offset = 0;
     FS_flag = 0;
+    packet[0] = (u8) get_tx_id();
+
+    if (bind) {
+        state = PXX_BIND;
+        PROTOCOL_SetBindState(5000);
+    } else {
+        state = PXX_DATA1;
+    }
     CLOCK_StartTimer(1000, pxxout_cb);
 }
 
@@ -236,10 +298,10 @@ static void initialize()
 const void * PXXOUT_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
-        case PROTOCMD_INIT:  initialize(); return 0;
+        case PROTOCMD_INIT:  initialize(0); return 0;
         case PROTOCMD_DEINIT: PWM_Stop(); return 0;
-        case PROTOCMD_CHECK_AUTOBIND: return (void *)1L;
-        case PROTOCMD_BIND:  initialize(); return 0;
+        case PROTOCMD_CHECK_AUTOBIND: return 0;
+        case PROTOCMD_BIND:  initialize(1); return 0;
         case PROTOCMD_NUMCHAN: return (void *)16L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
         case PROTOCMD_GETOPTIONS: return pxx_opts;
