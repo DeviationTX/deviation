@@ -198,8 +198,9 @@ static void build_data_pkt(u8 bind)
     else
                     // b1...b3: set failsafe position -> if set the following positions
                     // should be used as "Failsafe" positions.
-                    // b4..b7:reserved for future use, must be “0” in this version
-        packet[1] = 0;
+                    // b4: if 1, b1..b3 indicate channel holding failsafe value.
+                    // b5..b7:reserved for future use, must be “0” in this version
+        packet[1] = FS_flag;
 
     packet[2] = 0;  // FLAG2, Reserved for future use, must be “0” in this version.
 
