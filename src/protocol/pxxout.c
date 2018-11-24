@@ -236,7 +236,7 @@ static void build_data_pkt(u8 bind)
 static enum {
   PXX_BIND,
 #ifndef EMULATOR
-  PXX_BIND_DONE = 650,
+  PXX_BIND_DONE = 600,
 #else
   PXX_BIND_DONE = 50,
 #endif
@@ -269,7 +269,7 @@ static u16 pxxout_cb()
 #ifdef EMULATOR
     return 3000;
 #else
-    return 8000;
+    return 9000;
 #endif
 }
 
