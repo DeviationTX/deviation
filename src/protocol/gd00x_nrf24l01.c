@@ -52,7 +52,7 @@
 #define dbgprintf if(0) printf
 #endif
 
-#define FORCE_GD00X_ORIGINAL_ID
+//#define FORCE_GD00X_ORIGINAL_ID
 
 #define GD00X_INITIAL_WAIT 500
 #define GD00X_RF_BIND_CHANNEL 2
@@ -161,6 +161,9 @@ static void GD00X_init()
 
 static void GD00X_initialize_txid()
 {
+    u8 start=76+(rx_tx_addr[0]&0x03);
+    for(u8 i=0; i<4;i++)
+        hopping_frequency[i]=start-(i<<1);
     #ifdef FORCE_GD00X_ORIGINAL_ID
         rx_tx_addr[0]=0x1F;
         rx_tx_addr[1]=0x39;
