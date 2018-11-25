@@ -161,15 +161,44 @@ static void GD00X_init()
 
 static void GD00X_initialize_txid()
 {
+    u32 lfsr = 0xb2c54a2ful;
+    u8 i,j;
+    
+#ifndef USE_FIXED_MFGID
+    u8 var[12];
+    MCU_SerialNumber(var, 12);
+    dbgprintf("Manufacturer id: ");
+    for (i = 0; i < 12; ++i) {
+        dbgprintf("%02X", var[i]);
+        rand32_r(&lfsr, var[i]);
+    }
+    dbgprintf("\r\n");
+#endif
+
+    if (Model.fixed_id) {
+       for (i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
+           rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
+    }
+    // Pump zero bytes for LFSR to diverge more
+    for (i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
+
+    // tx address
+    for(i=0; i<2; i++)
+        rx_tx_addr[i] = (lfsr >> (i*8)) & 0xff;
+    
+    rx_tx_addr[2]=0x12;
+    rx_tx_addr[3]=0x13;
+    
     u8 start=76+(rx_tx_addr[0]&0x03);
-    for(u8 i=0; i<4;i++)
+    for(i=0; i<4;i++)
         hopping_frequency[i]=start-(i<<1);
+    
     #ifdef FORCE_GD00X_ORIGINAL_ID
         rx_tx_addr[0]=0x1F;
         rx_tx_addr[1]=0x39;
         rx_tx_addr[2]=0x12;
         rx_tx_addr[3]=0x13;
-        for(u8 i=0; i<4;i++)
+        for(i=0; i<4;i++)
             hopping_frequency[i]=79-(i<<1);
     #endif
 }
