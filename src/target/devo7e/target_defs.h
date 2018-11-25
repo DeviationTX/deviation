@@ -12,7 +12,8 @@
 //No room for debug and standard gui
  #define HAS_STANDARD_GUI   0
 #else
- #define HAS_STANDARD_GUI   1
+//Nor for production build 
+ #define HAS_STANDARD_GUI   0
 #endif
 
 #define HAS_ADVANCED_GUI    1
