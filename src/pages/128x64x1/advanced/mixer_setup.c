@@ -417,7 +417,7 @@ void MIXPAGE_RedrawGraphs()
     switch(mp->cur_template) {
     case MIXERTEMPLATE_COMPLEX:
         GUI_Redraw(&gui->bar);
-        FALLTHROUGH;
+        /* FALLTHROUGH */
     case MIXERTEMPLATE_EXPO_DR:
     case MIXERTEMPLATE_SIMPLE:
         GUI_Redraw(&gui->graph);

@@ -263,7 +263,7 @@ u16 WFLY_callback()
             WFLY_cyrf_data_config();
             packet_count=0;
             phase++;
-            FALLTHROUGH;
+            /* FALLTHROUGH */
         case WFLY_DATA:
             wait_write = MAX_WAIT_WRITE;
             while (wait_write-- > 0) // Wait max 200µs for TX to finish
