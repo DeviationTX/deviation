@@ -7,13 +7,14 @@ my $update;
 my $lang;
 my $fs;
 my $target_list;
-my $objdir;
+my $elffile;
 my $count;
 # The following are legal alternatives to the default string
 my @targets = ("devo8", "devo10", "devo12");
 
 $ENV{CROSS} ||= "";
-GetOptions("update" => \$update, "language=s" => \$lang, "fs=s" => \$fs, "targets=s" => \$target_list, "count" => \$count, "objdir=s" => \$objdir);
+GetOptions("update" => \$update, "language=s" => \$lang, "fs=s" => \$fs,
+    "targets=s" => \$target_list, "count" => \$count, "elffile=s" => \$elffile);
 my @requested_targets = ();
 @requested_targets = split(/,/, $target_list) if($target_list);
 if($fs || @requested_targets) {
@@ -76,40 +77,38 @@ if($str) {
 #build string list
 my @out;
 #Filter out any strings that do not appear in any obj files
-if($objdir) {
+if($elffile) {
     my %allstr;
-    my @files = glob("$objdir/*.o");
-    foreach my $file (@files) {
-        #Parse all strings from the object files and add to the allstr hash
-        my @od = `$ENV{CROSS}objdump -s $file`;
-        my $str = "";
-        my $state = 0;
-        foreach(@od) {
-            my $orig = $_;
-            if(/section \.ro?data/) {
-                $str = "";
-                $state = 1;
-                next;
-            } elsif(/^Contents/ && ! /\.ro?data/) {
-                $str = "";
-                $state = 0;
-            } elsif($state) {
-                #Strip off everything but hex data
-                s/^\s+\S+\s//;
-                s/\s\s.*//;
-                s/ //g;
-                while(/(\S\S)/g) {
-                    #Iterate over each ascii character
-                    if($1 eq "00") {
-                        #NULL termination
-                        if($str) {
-                            $str =~ s/\n/\\n/g;  #Convert <CR> to \n
-                            $allstr{$str} = 1;
-                            $str = "";
-                        }
-                    } else {
-                        $str .= chr(hex($1));
+    my @files;
+    #Parse all strings from the object files and add to the allstr hash
+    my @od = `$ENV{CROSS}objdump -s $elffile`;
+    my $str = "";
+    my $state = 0;
+    foreach(@od) {
+        my $orig = $_;
+        if(/section \.ro?data/) {
+            $str = "";
+            $state = 1;
+            next;
+        } elsif(/^Contents/ && ! /\.ro?data/) {
+            $str = "";
+            $state = 0;
+        } elsif($state) {
+            #Strip off everything but hex data
+            s/^\s+\S+\s//;
+            s/\s\s.*//;
+            s/ //g;
+            while(/(\S\S)/g) {
+                #Iterate over each ascii character
+                if($1 eq "00") {
+                    #NULL termination
+                    if($str) {
+                        $str =~ s/\n/\\n/g;  #Convert <CR> to \n
+                        $allstr{$str} = 1;
+                        $str = "";
                     }
+                } else {
+                    $str .= chr(hex($1));
                 }
             }
         }

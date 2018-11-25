@@ -34,11 +34,13 @@ SECTIONS
 		*(.vectors)	/* Vector table */
 		INCLUDE objs/optimize.ld
 		. = _crc_offset;
-                KEEP(*(.crc))
+             KEEP(*(.crc))
 		*(.text*)	/* Program code */
+	} >rom
+
+	.rodata : {
 		. = ALIGN(4);
 		*(.rodata*)	/* Read-only data */
-		. = ALIGN(4);
 	} >rom
 
 	/* C++ Static constructors/destructors, also used for __attribute__
