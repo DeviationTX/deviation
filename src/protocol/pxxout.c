@@ -63,6 +63,20 @@ u8 num_channels;
 static u16 failsafe_count;
 static u8 chan_offset;
 static u8 FS_flag;
+ 
+enum XJTRFProtocols {
+  RF_PROTO_OFF = -1,
+  RF_PROTO_X16,
+  RF_PROTO_D8,
+  RF_PROTO_LR12,
+  RF_PROTO_LAST = RF_PROTO_LR12
+};
+
+enum R9MSubTypes
+{
+  MODULE_SUBTYPE_R9M_FCC,
+  MODULE_SUBTYPE_R9M_LBT,
+};
 
 static const u16 CRCTable[] = {
   0x0000,0x1189,0x2312,0x329b,0x4624,0x57ad,0x6536,0x74bf,
@@ -119,6 +133,11 @@ static int get_tx_id()
     for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
         rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
     return rand32_r(&lfsr, 0);
+}
+
+static u8 power_to_r9m() {
+    if (Model.tx_power > 3) return Model.tx_power - 4;
+    return 0;
 }
 
 //#define STICK_SCALE    819  // full scale at +-125
@@ -187,20 +206,25 @@ static void build_data_pkt(u8 bind)
     failsafe_count += 1;
 
     // only need packet contents here. Start and end flags added by pxx_enable
+//  packet[0] = set in initialize() to tx id
 
-    // packet[0] = set in initialize()  // RX number (looking at opentx it's used for module number)
-    if (bind) 
-                    // FLAG1,
-                    // b0: BIND / set Rx number -> if this bit is set, every rx listening
-                    // should change it's rx number to the one described in byte 2
-                    // if b0, then b1..b2 = country code (us 0, japan 1, eu 2 ?)
-        packet[1] = PXX_SEND_BIND | (Model.proto_opts[PROTO_OPTS_COUNTRY] << 1);
-    else
-                    // b1...b3: set failsafe position -> if set the following positions
-                    // should be used as "Failsafe" positions.
-                    // b4: if 1, b1..b3 indicate channel holding failsafe value.
-                    // b5..b7:reserved for future use, must be “0” in this version
-        packet[1] = FS_flag;
+    // FLAG1,
+    // b0: BIND / set Rx number -> if this bit is set, every rx listening
+    // should change it's rx number to the one described in byte 2
+    // b1...b3: set failsafe position -> if set the following positions
+    // should be used as "Failsafe" positions.
+    // b4: if 1, b1..b3 indicate channel holding failsafe value.
+    // b5: rangecheck if set
+    // b6..b7: rf protocol
+    packet[1] = RF_PROTO_X16 << 6;
+    if (bind) {
+        // if b0, then b1..b2 = country code (us 0, japan 1, eu 2 ?)
+        packet[1] |= PXX_SEND_BIND | (Model.proto_opts[PROTO_OPTS_COUNTRY] << 1);
+    } else if (Model.tx_power == 0) {
+        packet[1] |= PXX_SEND_RANGECHECK;
+    } else {
+        packet[1] |= FS_flag;
+    }
 
     packet[2] = 0;  // FLAG2, Reserved for future use, must be “0” in this version.
 
@@ -226,11 +250,17 @@ static void build_data_pkt(u8 bind)
         packet[3+i+2] = chan_1 >> 4;
     }
 
-    packet[PXX_PKT_BYTES-3] = 0; // opentx puts "extra_flags" byte here
+    // extra_flags byte definitions pulled from openTX
+    // b0: antenna selection on Horus and Xlite
+    // b1: turn off telemetry at receiver
+    // b2: set receiver PWM output to channels 9-16
+    // b3-4: RF power setting
+    // b5: set to disable R9M S.Port output
+    packet[15] = power_to_r9m() << 3;
 
     u16 lcrc = crc(packet, PXX_PKT_BYTES-2);
-    packet[PXX_PKT_BYTES-2] = lcrc;
-    packet[PXX_PKT_BYTES-1] = lcrc >> 8;
+    packet[16] = lcrc;
+    packet[17] = lcrc >> 8;
 }
 
 static enum {
