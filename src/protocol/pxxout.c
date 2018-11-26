@@ -120,21 +120,6 @@ static u16 crc(u8 *data, u8 len) {
   return crc;
 }
 
-// Generate internal id from TX id and manufacturer id (STM32 unique id)
-static int get_tx_id()
-{
-    u32 lfsr = 0x7649eca9ul;
-
-    u8 var[12];
-    MCU_SerialNumber(var, 12);
-    for (int i = 0; i < 12; ++i) {
-        rand32_r(&lfsr, var[i]);
-    }
-    for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
-        rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
-    return rand32_r(&lfsr, 0);
-}
-
 static u8 power_to_r9m() {
     if (Model.tx_power >= TXPOWER_10mW) return Model.tx_power - TXPOWER_10mW;
     return TXPOWER_100uW;
@@ -314,7 +299,7 @@ static void initialize(u8 bind)
     failsafe_count = 0;
     chan_offset = 0;
     FS_flag = 0;
-    packet[0] = (u8) get_tx_id();
+    packet[0] = (u8) Model.fixed_id;
 
     if (bind) {
         state = PXX_BIND;
