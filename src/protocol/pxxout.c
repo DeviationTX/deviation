@@ -136,8 +136,8 @@ static int get_tx_id()
 }
 
 static u8 power_to_r9m() {
-    if (Model.tx_power > 3) return Model.tx_power - 4;
-    return 0;
+    if (Model.tx_power >= TXPOWER_10mW) return Model.tx_power - TXPOWER_10mW;
+    return TXPOWER_100uW;
 }
 
 //#define STICK_SCALE    819  // full scale at +-125
@@ -220,7 +220,7 @@ static void build_data_pkt(u8 bind)
     if (bind) {
         // if b0, then b1..b2 = country code (us 0, japan 1, eu 2 ?)
         packet[1] |= PXX_SEND_BIND | (Model.proto_opts[PROTO_OPTS_COUNTRY] << 1);
-    } else if (Model.tx_power == 0) {
+    } else if (Model.tx_power == TXPOWER_100uW) {   // RANGE_test() sets power to 100uW
         packet[1] |= PXX_SEND_RANGECHECK;
     } else {
         packet[1] |= FS_flag;
