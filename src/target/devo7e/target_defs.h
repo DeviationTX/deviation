@@ -17,15 +17,15 @@
 #endif
 
 #define HAS_ADVANCED_GUI    1
-#define HAS_PERMANENT_TIMER 0
+#define HAS_PERMANENT_TIMER 1
 #define HAS_TELEMETRY       1
 #define HAS_EXTENDED_TELEMETRY 0
 #define HAS_TOUCH           0
 #define HAS_RTC             0
 #define HAS_VIBRATINGMOTOR  1
-#define HAS_DATALOG         0
+#define HAS_DATALOG         1
 #define HAS_SCANNER         0
-#define HAS_LAYOUT_EDITOR   0
+#define HAS_LAYOUT_EDITOR   1
 #define HAS_EXTRA_SWITCHES  OPTIONAL
 #define HAS_EXTRA_BUTTONS   0
 #define HAS_MULTIMOD_SUPPORT 1
