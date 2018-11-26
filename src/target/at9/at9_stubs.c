@@ -106,3 +106,4 @@ void PPM_Enable(unsigned low_time, volatile u16 *pulses) {
     (void)low_time;
     (void)pulses;
 }
+void PXX_Enable(u8 *packet) { (void)packet; }

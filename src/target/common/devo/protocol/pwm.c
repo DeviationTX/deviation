@@ -18,7 +18,6 @@
   #pragma long_calls
 #endif
 
-#ifndef DISABLE_PWM
 
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/timer.h>
@@ -33,6 +32,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+
+#ifndef DISABLE_PWM
 
 void PWM_Initialize()
 {
@@ -149,9 +150,6 @@ void PXX_Enable(u8 *packet)
     }
     memcpy(pc, pxx_flag, 8);
     pc += 8;
-//TODO    while (pc % 8) {
-//TODO        *pc++ = 0x15;   // fill out byte boundary with 0
-//TODO    }
 
     // Setup DMA and start
     dma_channel_reset(_PWM_DMA, _PWM_DMA_CHANNEL);
