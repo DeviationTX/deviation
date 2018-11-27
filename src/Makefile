@@ -31,33 +31,33 @@ everything: txs emus fss
 # Generate the targets for a transmitter.
 define make-target
 $1:
-	$(MAKE) TARGET=$1
+	+$(MAKE) TARGET=$1
 win_$1:
 ifeq ($(OS),Windows_NT)
 	# This builds Windows emulators on a Windows system
-	$(MAKE) TARGET=$1 WINDOWS=1
+	+$(MAKE) TARGET=$1 WINDOWS=1
 else
 	# This builds Windows emulators on a Linux system
-	$(MAKE) TARGET=$1 WINDOWS=1 CROSS=i586-mingw32msvc-
+	+$(MAKE) TARGET=$1 WINDOWS=1 CROSS=i586-mingw32msvc-
 endif
 fs_$1:
 ifneq "$(INCLUDE_FS)" "1"
-	$(MAKE) TARGET=$1 fs
+	+$(MAKE) TARGET=$1 fs
 endif
 both_$1: $1 emu_$1
 zip_$1:
-	$(MAKE) TARGET=$1 zip
+	+$(MAKE) TARGET=$1 zip
 zip_win_$1:
 ifeq ($(OS),Windows_NT)
 	# This builds Windows emulators on a Windows system
-	$(MAKE) TARGET=$1 WINDOWS=1 zip
+	+$(MAKE) TARGET=$1 WINDOWS=1 zip
 else
 	# This builds Windows emulators on a Linux system
-	$(MAKE) TARGET=$1 WINDOWS=1 CROSS=i586-mingw32msvc- zip
+	+$(MAKE) TARGET=$1 WINDOWS=1 CROSS=i586-mingw32msvc- zip
 endif
 release_$1: zip_$1 zip_win_emu_$1 fs_$1
 all_$1:
-	$(MAKE) TARGET=$1 all
+	+$(MAKE) TARGET=$1 all
 endef
 
 # Now generate all the convenience targets
@@ -340,7 +340,7 @@ filesystem/$(FILESYSTEM)/media/04b03.fon: fonts/04b03.bdf
 
 dollar = $$
 define define_compile_rules
-$(ODIR)/%.o: $(1)%.c
+$(ODIR)/%.o: $(1)%.c $(LIBOPENCM3)
 	@echo " + Compiling '$$<'"
 	$(CC) $$(CFLAGS) -MD -c -o $$@ $$<
 	@cp $(ODIR)/$$*.d $(ODIR)/$$*.P; \
@@ -348,7 +348,7 @@ $(ODIR)/%.o: $(1)%.c
                 -e '/^$$(dollar)/ d' -e 's/$$(dollar)/ :/' < $(ODIR)/$$*.d >> $(ODIR)/$$*.P; \
             rm -f $(ODIR)/$$*.d
 
-$(ODIR)/%.o: $(1)%.cpp
+$(ODIR)/%.o: $(1)%.cpp $(LIBOPENCM3)
 	@echo " + Compiling '$$<'"
 	$(CXX) $$(CXXFLAGS) -MD -c -o $$@ $$<
 	@cp $(ODIR)/$$*.d $(ODIR)/$$*.P; \
@@ -357,7 +357,7 @@ $(ODIR)/%.o: $(1)%.cpp
             rm -f $(ODIR)/$$*.d
 
 #For module building
-$(ODIR)/%.o_: $(1)%.c
+$(ODIR)/%.o_: $(1)%.c $(LIBOPENCM3)
 	@echo " + Compiling '$$<' as module"
 	$(CC) $$(CFLAGS) $$(MODULE_FLAGS) -MD -c -o $$@ $$<
 	@cp $(ODIR)/$$*.d $(ODIR)/$$*.P; \

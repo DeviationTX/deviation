@@ -100,7 +100,7 @@ script:
         export PORTAUDIO_DIR=$HOME/portaudio-w32;
         export MPG123_DIR=$HOME/mpg123-w32;
     fi;
-  - make $MAKETARGET;
+  - make -j2 $MAKETARGET;
 
 after_success:
   - if [ "$TRAVIS_EVENT_TYPE" == "api" ]; then
