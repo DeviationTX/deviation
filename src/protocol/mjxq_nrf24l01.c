@@ -212,7 +212,7 @@ static void send_packet(u8 bind)
     case FORMAT_H26D:
     case FORMAT_H26WH:
         packet[10] = pan_tilt_value();
-        // fall through on purpose - no break
+        /* FALLTHROUGH */
     case FORMAT_WLH08:
     case FORMAT_E010:
         packet[10] += GET_FLAG(CHANNEL_RTH, 0x02)

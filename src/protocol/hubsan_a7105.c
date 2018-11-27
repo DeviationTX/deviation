@@ -487,6 +487,7 @@ static u16 hubsan_cb()
             A7105_WriteID(id_data);    
             bind_count = 0;
         }
+        /* FALLTHROUGH */
     case BIND_3:
     case BIND_5:
     case BIND_7:

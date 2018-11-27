@@ -448,6 +448,7 @@ static void initialize()
         case FORMAT_Q282:
         case FORMAT_Q242:
             packet_size = Q282_PACKET_SIZE - CX10_PACKET_SIZE;  // difference in packet size
+            /* FALLTHROUGH */
         case FORMAT_CX10_GREEN:
         case FORMAT_DM007:
         case FORMAT_JC3015_1:

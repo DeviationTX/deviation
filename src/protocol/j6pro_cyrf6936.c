@@ -184,6 +184,7 @@ static u16 j6pro_cb()
         case J6PRO_BIND:
             cyrf_bindinit();
             state = J6PRO_BIND_01;
+            /* FALLTHROUGH */
             //no break because we want to send the 1st bind packet now
         case J6PRO_BIND_01:
             CYRF_ConfigRFChannel(0x52);
@@ -248,10 +249,12 @@ static u16 j6pro_cb()
             set_radio_channels();
             cyrf_datainit();
             state = J6PRO_CHAN_1;
+            /* FALLTHROUGH */
         case J6PRO_CHAN_1:
             //Keep transmit power updated
             CYRF_SetPower(Model.tx_power);
             build_data_packet();
+            /* FALLTHROUGH */
             //return 3400;
         case J6PRO_CHAN_2:
             //return 3500;

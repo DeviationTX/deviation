@@ -176,11 +176,13 @@ static const char TELEM_ABOVE[] =  "above";
 static const char TELEM_VALUE[] = "value";
 static const char TELEM_TH[] ="threshold";
 
+#if HAS_DATALOG
 /* Section: Datalog */
 static const char SECTION_DATALOG[] = "datalog";
 static const char DATALOG_RATE[] = "rate";
 #define DATALOG_SWITCH MIXER_SWITCH
 #define DATALOG_SOURCE TELEM_SRC
+#endif
 
 /* Section: Gui-QVGA */
 #define STRINGIFY(x) _STRINGIFY(x)
