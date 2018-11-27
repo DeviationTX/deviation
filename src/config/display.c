@@ -89,7 +89,7 @@ static const char * const ALIGN_VAL[] = {
 #define MATCH_VALUE(s)   strcasecmp(value,   s) == 0
 #define NUM_STR_ELEMS(s) (sizeof(s) / sizeof(char *))
 #define SET_FLAG(var, value, flag) ((value) ? ((var) | (flag)) : ((var) & ~(flag)))
-
+extern u8 LCD_GetFontFromString(const char *);
 struct display_settings Display;
 
 u16 get_color(const char *value) {

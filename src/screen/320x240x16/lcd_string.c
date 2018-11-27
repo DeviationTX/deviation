@@ -20,7 +20,7 @@
 #define CHAR_SPACING 1
 
 static struct {
-    unsigned int font_idx;
+    u8 font_idx;
     unsigned int x_start;
     unsigned int x;
     unsigned int y;
