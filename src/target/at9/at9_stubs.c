@@ -102,8 +102,9 @@ const char *MCU_GetPinName(char *str, struct mcu_pin *port) {
 
 void PWM_Initialize() {}
 void PWM_Stop() {}
-void PPM_Enable(unsigned low_time, volatile u16 *pulses) {
+void PPM_Enable(unsigned low_time, volatile u16 *pulses, u8 num_pulses) {
     (void)low_time;
     (void)pulses;
+    (void)num_pulses;
 }
 void PXX_Enable(u8 *packet) { (void)packet; }

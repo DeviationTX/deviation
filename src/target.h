@@ -147,7 +147,7 @@ extern volatile mixsync_t mixer_sync;
 void PWM_Initialize();
 void PWM_Stop();
 void PWM_Set(int);
-void PPM_Enable(unsigned low_time, volatile u16 *pulses);
+void PPM_Enable(unsigned low_time, volatile u16 *pulses, u8 num_pulses);
 void PXX_Enable(u8 *packet);
 
 /* PPM-In functions */

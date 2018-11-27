@@ -188,10 +188,10 @@ printf("*packet = %02x, pxx_bytes = %02x, pxx_bit = %02x\n", *packet, pxx_bytes,
     for (i=0; i < 100; i++) printf("%02x ", pxx_bits[i]);
     printf("\n");
 }
-void PPM_Enable(unsigned low_time, volatile u16 *pulses) {
+void PPM_Enable(unsigned low_time, volatile u16 *pulses, u8 num_pulses) {
     int i;
     printf("PPM: low=%d ", (int)low_time);
-    for(i = 0; pulses[i]; i++)
+    for(i = 0; i < num_pulses; i++)
         printf("%04d ", pulses[i]);
     printf("\n");
 }

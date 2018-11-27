@@ -17,24 +17,12 @@
 #ifndef DISABLE_PWM
 
 #include <libopencm3/stm32/rcc.h>
-#include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/timer.h>
+#include <libopencm3/stm32/gpio.h>
+#include <libopencm3/stm32/dma.h>
 #include <libopencm3/cm3/nvic.h>
 
 #include "../ports.h"
 
-
-volatile u16 *pwm;
-
-void tim1_up_isr()
-{
-    timer_clear_flag(TIM1, TIM_SR_UIF);
-
-    if (*pwm)
-        timer_set_period(TIM1, *pwm++ - 1);
-    else
-        timer_set_oc_value(TIM1, _PWM_TIM_OC, 0); // hold output inactive
-    return;
-}
 
 #endif
