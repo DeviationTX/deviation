@@ -87,7 +87,7 @@ void PPM_Enable(unsigned low_time, volatile u16 *pulses, u8 num_pulses)
     dma_channel_reset(_PWM_DMA, _PWM_DMA_CHANNEL);
     dma_set_peripheral_address(_PWM_DMA, _PWM_DMA_CHANNEL, (u32) &_PWM_TIM_ARR);  /* send data to the TIM1 period register */
     dma_set_memory_address(_PWM_DMA, _PWM_DMA_CHANNEL, (u32) pulses);
-    dma_set_number_of_data(_PWM_DMA, _PWM_DMA_CHANNEL, num_pulses + 1);
+    dma_set_number_of_data(_PWM_DMA, _PWM_DMA_CHANNEL, num_pulses);
     dma_set_read_from_memory(_PWM_DMA, _PWM_DMA_CHANNEL);                     /* direction is from memory to timer */
     dma_enable_memory_increment_mode(_PWM_DMA, _PWM_DMA_CHANNEL);             /* memory pointer increments, peripheral no */
     dma_set_peripheral_size(_PWM_DMA, _PWM_DMA_CHANNEL, DMA_CCR_PSIZE_16BIT);  /* _PWM_TIM_ARR is 16 bit wide in this mode */
