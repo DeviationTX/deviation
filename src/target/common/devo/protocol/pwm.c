@@ -182,16 +182,6 @@ void PXX_Enable(u8 *packet)
     timer_generate_event(TIM1, TIM_EGR_UG);             // Generate event to start DMA
 }
 
-void _PWM_DMA_ISR(void)
-{
-    timer_set_oc_mode(TIM1, _PWM_TIM_OC, TIM_OCM_FROZEN); // output force high
-    timer_disable_counter(TIM1);
-    nvic_disable_irq(_PWM_NVIC_DMA_CHANNEL_IRQ);
-    DMA_IFCR(_PWM_DMA) |= DMA_IFCR_CTCIF(_PWM_DMA_CHANNEL);
-    dma_disable_transfer_complete_interrupt(_PWM_DMA, _PWM_DMA_CHANNEL);
-    dma_disable_channel(_PWM_DMA, _PWM_DMA_CHANNEL);
-}
-
 #endif  //MODULAR
 
 #endif //DISABLE_PWM

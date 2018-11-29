@@ -25,4 +25,13 @@
 #include "../ports.h"
 
 
+void _PWM_DMA_ISR(void)
+{
+    timer_disable_counter(TIM1);
+    nvic_disable_irq(_PWM_NVIC_DMA_CHANNEL_IRQ);
+    DMA_IFCR(_PWM_DMA) |= DMA_IFCR_CTCIF(_PWM_DMA_CHANNEL);
+    dma_disable_transfer_complete_interrupt(_PWM_DMA, _PWM_DMA_CHANNEL);
+    dma_disable_channel(_PWM_DMA, _PWM_DMA_CHANNEL);
+}
+
 #endif
