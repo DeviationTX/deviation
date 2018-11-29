@@ -47,7 +47,7 @@ before_install:
          curl --retry 10 --retry-max-time 120 -L "http://fltk.org/pub/fltk/1.3.0/fltk-1.3.0-source.tar.gz" | tar xzf -;
          cd fltk-1.3.0;
          ./configure --prefix=$HOME/fltk-1.3.0-w32 --enable-localzlib --enable-localpng --disable-gl --host=i586-mingw32msvc &&
-         make DIRS="jpeg zlib png src fluid" &&
+         make -j2 DIRS="jpeg zlib png src fluid" &&
          make install DIRS="jpeg zlib png src fluid";
          popd;
       fi;
@@ -58,7 +58,7 @@ before_install:
          curl --retry 10 --retry-max-time 120 -L "http://www.portaudio.com/archives/pa_stable_v19_20140130.tgz" | tar xzf -;
          cd portaudio;
          ./configure --prefix=$HOME/portaudio-w32 --host=i586-mingw32msvc &&
-         make install;
+         make -j2 install;
          popd;
       fi;
    - if [ ! -d "$HOME/mpg123-w32/bin" ]; then
@@ -68,7 +68,7 @@ before_install:
          curl --retry 10 --retry-max-time 120 -L "http://www.mpg123.de/download/mpg123-1.23.8.tar.bz2" | tar xjf -;
          cd mpg123-1.23.8;
          ./configure --prefix=$HOME/mpg123-w32 --host=i586-mingw32msvc --disable-shared && make;
-         make install;
+         make -j2 install;
          strip --strip-unneeded $HOME/mpg123-w32/bin/mpg123.exe;
          popd;
       fi;
@@ -100,7 +100,7 @@ script:
         export PORTAUDIO_DIR=$HOME/portaudio-w32;
         export MPG123_DIR=$HOME/mpg123-w32;
     fi;
-  - make $MAKETARGET;
+  - make -j2 $MAKETARGET;
 
 after_success:
   - if [ "$TRAVIS_EVENT_TYPE" == "api" ]; then
