@@ -52,9 +52,6 @@
 
 static void serial_echo(u8 *packet);
 
-static s8 telem_save_seq;
-static u8 telem_save_data[FRSKY_SPORT_PACKET_SIZE+1];
-
 // FrSky PRIM IDs (1 byte)
 #define DATA_FRAME                0x10
 
@@ -64,22 +61,11 @@ static u8 telem_save_data[FRSKY_SPORT_PACKET_SIZE+1];
 #define HUB_DATA_U16(packet)    (*((uint16_t *)(packet+4)))
 
 
-static u8 sport_crc(u8 *data) {
-    u16 crc = 0;
-    for (int i=1; i < FRSKY_SPORT_PACKET_SIZE-1; ++i) {
-        crc += data[i];
-        crc += crc >> 8;
-        crc &= 0x00ff;
-    }
-    return 0x00ff - crc;
-}
-
 static void processSportPacket(u8 *packet) {
 //    u8  instance = (packet[0] & 0x1F) + 1;    // all instances of same sensor write to same telemetry value
     u8  prim = packet[1];
     u16 id = *((u16 *)(packet+2));
 
-    if (!PPMin_Mode() && Model.proto_opts[PROTO_OPTS_SPORTOUT])
         serial_echo(packet);   // echo to trainer port
 
     if (prim != DATA_FRAME)

@@ -23,6 +23,10 @@
 #include "interface.h"
 #include "mixer.h"
 #include "config/model.h"
+#include "config/tx.h"
+#if HAS_EXTENDED_TELEMETRY
+#include "telemetry.h"
+#endif
 
 #ifdef MODULAR
   #pragma long_calls_off
@@ -288,13 +292,37 @@ static u16 pxxout_cb()
 #endif
 }
 
+// Support S.Port telemetry on UART RX pin
+// couple defines to avoid errors from include file
+static void serial_echo(u8 *packet) {(void)packet;}
+#define PROTO_OPTS_AD2GAIN 0
+#include "frsky_d_telem._c"
+#include "frsky_s_telem._c"
+static void process_pxx_sport_data(u8 data, u8 status) {
+  if (status != UART_RX_RXNE) return;
+  frsky_parse_sport_stream(data);
+}
+
 static void initialize(u8 bind)
 {
     CLOCK_StopTimer();
     if (PPMin_Mode())
         return;
 
+#if HAS_EXTENDED_TELEMETRY
+#if HAS_EXTENDED_AUDIO
+#if HAS_AUDIO_UART5
+    if (!Transmitter.audio_uart5)
+#endif
+        Transmitter.audio_player = AUDIO_DISABLED; // disable voice commands on serial port
+#endif
+    UART_Initialize(); // Must be before PWM_Initialize so PWM can steal the TX pin back
+    UART_SetDataRate(57600);  // standard s.port
+    UART_StartReceive(process_pxx_sport_data);
+#endif // HAS_EXTENDED_TELEMETRY
+
     PWM_Initialize();
+
     num_channels = Model.num_channels;
     failsafe_count = 0;
     chan_offset = 0;
@@ -315,13 +343,21 @@ const void * PXXOUT_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(0); return 0;
-        case PROTOCMD_DEINIT: PWM_Stop(); return 0;
+        case PROTOCMD_DEINIT:
+          PWM_Stop();
+          UART_Stop();
+          return 0;
         case PROTOCMD_CHECK_AUTOBIND: return 0;
         case PROTOCMD_BIND:  initialize(1); return 0;
         case PROTOCMD_NUMCHAN: return (void *)16L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
         case PROTOCMD_GETOPTIONS: return pxx_opts;
-        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
+#if HAS_EXTENDED_TELEMETRY
+        case PROTOCMD_TELEMETRYSTATE:
+            return (void *)(long)PROTO_TELEM_ON;
+        case PROTOCMD_TELEMETRYTYPE:
+            return (void *)(long) TELEM_FRSKY;
+#endif
         default: break;
     }
     return 0;
