@@ -10,6 +10,8 @@
 #define ctassert(COND,MSG) typedef char static_assertion_##MSG[(COND)?1:-1]
 #define _UNUSED   __attribute__ ((unused))
 #define NO_INLINE __attribute__ ((noinline))
+#define VISIBLE   __attribute__ ((externally_visible))
+#define EXPORT    __attribute__ ((visibility ("default")))
 
 #define TEMPSTRINGLENGTH 400 //This is the max dialog size (80 characters * 5 lines)
                              //We could reduce this to ~240 on the 128x64 screens
@@ -34,8 +36,8 @@ typedef uint64_t u64;
 #define FLASHWORDTABLE static const u16
 #define pgm_read_word(x) (*(x))
 #define pgm_read_byte(x) (*(x))
-void PROTO_CS_HI(int module);
-void PROTO_CS_LO(int module);
+VISIBLE void PROTO_CS_HI(int module);
+VISIBLE void PROTO_CS_LO(int module);
 
 extern volatile s32 Channels[NUM_OUT_CHANNELS];
 extern const char DeviationVersion[33];
@@ -154,7 +156,7 @@ u64 PROTOCOL_CheckSafe();
 u32 PROTOCOL_Binding();
 u8 PROTOCOL_AutoBindEnabled();
 void PROTOCOL_Bind();
-void PROTOCOL_SetBindState(u32 msec);
+VISIBLE void PROTOCOL_SetBindState(u32 msec);
 int PROTOCOL_NumChannels();
 u8 PROTOCOL_GetTelemCapability();
 int PROTOCOL_DefaultNumChannels();

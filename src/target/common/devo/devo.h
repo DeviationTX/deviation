@@ -18,7 +18,6 @@ enum {
 void CLOCK_ClearMsecCallback(int MsecCallback);
 u32 SOUND_Callback();
 
-extern void PROTO_Stubs(int);
 // ADC defines
 #define NUM_ADC_CHANNELS (INP_HAS_CALIBRATION + 2) //Inputs + Temprature + Voltage
 extern const u8 adc_chan_sel[NUM_ADC_CHANNELS];

@@ -129,7 +129,7 @@ enum MsecCallback {
 
 void CLOCK_Init(void);
 u32 CLOCK_getms(void);
-void CLOCK_StartTimer(unsigned us, u16 (*cb)(void));
+VISIBLE void CLOCK_StartTimer(unsigned us, u16 (*cb)(void));
 void CLOCK_StopTimer();
 void CLOCK_SetMsecCallback(int cb, u32 msec);
 void CLOCK_ClearMsecCallback(int cb);
@@ -239,7 +239,7 @@ int FS_OpenDir(const char *path);
 int FS_ReadDir(char *path);
 void FS_CloseDir();
 
-void _usleep(u32 usec);
+VISIBLE void _usleep(u32 usec);
 void _msleep(u32 msec);
 #define usleep _usleep
 
@@ -256,7 +256,7 @@ u8 *BOOTLOADER_Read(int idx);
 //Ensure functions are loaded for protocol modules
 void SPI_ProtoInit();
 void SPI_AVRProgramInit();
-int SPI_ConfigSwitch(unsigned csn_high, unsigned csn_low);
+VISIBLE int SPI_ConfigSwitch(unsigned csn_high, unsigned csn_low);
 int SPI_ProtoGetPinConfig(int module, int state);
 u32 AVR_StartProgram();
 int AVR_Erase();
@@ -270,7 +270,7 @@ struct mcu_pin;
 void MCU_InitModules();
 int MCU_SetPin(struct mcu_pin *, const char *name);
 const char *MCU_GetPinName(char *str, struct mcu_pin *);
-void MCU_SerialNumber(u8 *var, int len);
+VISIBLE void MCU_SerialNumber(u8 *var, int len);
 
 #if defined HAS_4IN1_FLASH && HAS_4IN1_FLASH
 void SPISwitch_Init();
