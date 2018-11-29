@@ -292,6 +292,7 @@ static u16 pxxout_cb()
 #endif
 }
 
+#if HAS_EXTENDED_TELEMETRY
 // Support S.Port telemetry on UART RX pin
 // couple defines to avoid errors from include file
 static void serial_echo(u8 *packet) {(void)packet;}
@@ -302,6 +303,7 @@ static void process_pxx_sport_data(u8 data, u8 status) {
   if (status != UART_RX_RXNE) return;
   frsky_parse_sport_stream(data);
 }
+#endif // HAS_EXTENDED_TELEMETRY
 
 static void initialize(u8 bind)
 {
