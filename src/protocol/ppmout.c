@@ -58,9 +58,10 @@ static void build_data_pkt()
         s32 value = (s32)Channels[i] * Model.proto_opts[DELTA_PW] / CHAN_MAX_VALUE
                     + Model.proto_opts[CENTER_PW] + Model.proto_opts[NOTCH_PW];
                    //FIXME fix timing options, remove notch here, center to real center value (e.g. 1500)
-        pulses[i] = value;
+        pulses[i] = value - 1;  //TODO -1 due to timer hardware - should abstract this with function call
     }
-    pulses[Model.num_channels] = Model.proto_opts[PERIOD_PW];
+    // last width just needs to be long enough not to end before callback
+    pulses[Model.num_channels] = 50000;
 }
 
 MODULE_CALLTYPE
