@@ -85,26 +85,26 @@ void PPM_Enable(unsigned low_time, volatile u16 *pulses, u8 num_pulses)
 
     // Setup DMA
     dma_channel_reset(_PWM_DMA, _PWM_DMA_CHANNEL);
-    dma_set_peripheral_address(_PWM_DMA, _PWM_DMA_CHANNEL, (u32) &_PWM_TIM_ARR);  /* send data to the TIM1 period register */
+    dma_set_peripheral_address(_PWM_DMA, _PWM_DMA_CHANNEL, (u32) &_PWM_TIM_ARR);
     dma_set_memory_address(_PWM_DMA, _PWM_DMA_CHANNEL, (u32) pulses);
     dma_set_number_of_data(_PWM_DMA, _PWM_DMA_CHANNEL, num_pulses);
-    dma_set_read_from_memory(_PWM_DMA, _PWM_DMA_CHANNEL);                     /* direction is from memory to timer */
-    dma_enable_memory_increment_mode(_PWM_DMA, _PWM_DMA_CHANNEL);             /* memory pointer increments, peripheral no */
-    dma_set_peripheral_size(_PWM_DMA, _PWM_DMA_CHANNEL, DMA_CCR_PSIZE_16BIT);  /* _PWM_TIM_ARR is 16 bit wide in this mode */
-    dma_set_memory_size(_PWM_DMA, _PWM_DMA_CHANNEL, DMA_CCR_MSIZE_16BIT);      /* source memory is 16 bit wide */
+    dma_set_read_from_memory(_PWM_DMA, _PWM_DMA_CHANNEL);
+    dma_enable_memory_increment_mode(_PWM_DMA, _PWM_DMA_CHANNEL);
+    dma_set_peripheral_size(_PWM_DMA, _PWM_DMA_CHANNEL, DMA_CCR_PSIZE_16BIT);
+    dma_set_memory_size(_PWM_DMA, _PWM_DMA_CHANNEL, DMA_CCR_MSIZE_16BIT);
     dma_set_priority(_PWM_DMA, _PWM_DMA_CHANNEL, DMA_CCR_PL_VERY_HIGH);
     dma_enable_channel(_PWM_DMA, _PWM_DMA_CHANNEL);    // dma ready to go
 
     // Setup timer for PPM
     timer_set_oc_value(TIM1, _PWM_TIM_OC, low_time);
-    timer_set_period(TIM1, 22500);                  // sane default
+    timer_set_period(TIM1, 22500);
     timer_set_oc_polarity_low(TIM1, _PWM_TIM_OC);       // output active low
     timer_set_oc_mode(TIM1, _PWM_TIM_OC, TIM_OCM_PWM1); // output active when timer below compare
     timer_enable_oc_output(TIM1, _PWM_TIM_OC);          // enable OCx to pin
     timer_enable_break_main_output(TIM1);               // master output enable
     timer_set_dma_on_update_event(TIM1);
-    timer_enable_irq(TIM1, _PWM_TIM_DIER_DMAEN);        // enable timer dma request
-    timer_generate_event(TIM1, TIM_EGR_UG); // Generate update event to start DMA
+    timer_enable_irq(TIM1, _PWM_TIM_DIER_DMAEN); // enable timer dma request (despite function name)
+    timer_generate_event(TIM1, TIM_EGR_UG);      // Generate update event to start DMA
     timer_enable_counter(TIM1);
 }
 
@@ -155,13 +155,13 @@ void PXX_Enable(u8 *packet)
 
     // Setup DMA
     dma_channel_reset(_PWM_DMA, _PWM_DMA_CHANNEL);
-    dma_set_peripheral_address(_PWM_DMA, _PWM_DMA_CHANNEL, (u32) &_PWM_TIM_ARR);  /* send data to the TIM1 period register */
+    dma_set_peripheral_address(_PWM_DMA, _PWM_DMA_CHANNEL, (u32) &_PWM_TIM_ARR);
     dma_set_memory_address(_PWM_DMA, _PWM_DMA_CHANNEL, (u32) pxx_bits);
     dma_set_number_of_data(_PWM_DMA, _PWM_DMA_CHANNEL, pc - pxx_bits + 1);
-    dma_set_read_from_memory(_PWM_DMA, _PWM_DMA_CHANNEL);                     /* direction is from memory to timer */
-    dma_enable_memory_increment_mode(_PWM_DMA, _PWM_DMA_CHANNEL);             /* memory pointer increments, peripheral no */
-    dma_set_peripheral_size(_PWM_DMA, _PWM_DMA_CHANNEL, DMA_CCR_PSIZE_16BIT);  /* _PWM_TIM_ARR is 16 bit wide in this mode */
-    dma_set_memory_size(_PWM_DMA, _PWM_DMA_CHANNEL, DMA_CCR_MSIZE_8BIT);      /* source memory is 8 bit wide */
+    dma_set_read_from_memory(_PWM_DMA, _PWM_DMA_CHANNEL);
+    dma_enable_memory_increment_mode(_PWM_DMA, _PWM_DMA_CHANNEL);
+    dma_set_peripheral_size(_PWM_DMA, _PWM_DMA_CHANNEL, DMA_CCR_PSIZE_16BIT);
+    dma_set_memory_size(_PWM_DMA, _PWM_DMA_CHANNEL, DMA_CCR_MSIZE_8BIT);
     dma_set_priority(_PWM_DMA, _PWM_DMA_CHANNEL, DMA_CCR_PL_VERY_HIGH);
     dma_enable_transfer_complete_interrupt(_PWM_DMA, _PWM_DMA_CHANNEL);
     dma_enable_channel(_PWM_DMA, _PWM_DMA_CHANNEL);    // dma ready to go
