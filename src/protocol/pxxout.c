@@ -47,11 +47,15 @@
 static const char * const pxx_opts[] = {
   _tr_noop("Failsafe"), "Hold", "NoPulse", "RX", NULL,
   _tr_noop("Country"), "US", "JP", "EU", NULL,
+  _tr_noop("Rx PWM out"), "1-8", "9-16", NULL,
+  _tr_noop("Rx Telem"), "On", "Off", NULL,
   NULL
 };
 enum {
     PROTO_OPTS_FAILSAFE,
     PROTO_OPTS_COUNTRY,
+    PROTO_OPTS_RXPWM,
+    PROTO_OPTS_RXTELEM,
     LAST_PROTO_OPT,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
@@ -245,7 +249,9 @@ static void build_data_pkt(u8 bind)
     // b2: set receiver PWM output to channels 9-16
     // b3-4: RF power setting
     // b5: set to disable R9M S.Port output
-    packet[15] = power_to_r9m() << 3;
+    packet[15] = (power_to_r9m() << 3)
+               | (Model.proto_opts[PROTO_OPTS_RXTELEM] << 1)
+               | (Model.proto_opts[PROTO_OPTS_RXPWM] << 2);
 
     u16 lcrc = crc(packet, PXX_PKT_BYTES-2);
     packet[16] = lcrc;
