@@ -10,6 +10,7 @@ env:
       - MAKETARGET=zip_t8sg
       - TARGET=at9
       - MAKETARGET=zip_win_emu_devo8
+      - MAKETARGET=zip_emu_devo8
 #      - COMPILER=latest TARGET=devo8
 
 # use new docker environment
@@ -27,6 +28,7 @@ addons:
       - mingw32
       - mingw32-binutils
       - mingw32-runtime
+      - libfltk1.3-dev
 #      - gcc-arm-none-eabi
 
 #Do NOT set these.  They set 'CC' which breaks the build
