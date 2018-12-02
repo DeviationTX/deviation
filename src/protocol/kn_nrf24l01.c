@@ -216,6 +216,8 @@ const void *KN_Cmds(enum ProtoCmds cmd)
             return KN_PROTOCOL_OPTIONS;
         case PROTOCMD_TELEMETRYSTATE: 
             return (void *)PROTO_TELEM_UNSUPPORTED;
+        case PROTOCMD_CHANNELMAP:
+            return TAERG;
         default: break;
     }
     return 0;

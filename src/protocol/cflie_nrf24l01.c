@@ -950,6 +950,7 @@ const void *CFlie_Cmds(enum ProtoCmds cmd)
             return (void *)(long)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_OFF ? PROTO_TELEM_OFF : PROTO_TELEM_ON);
         case PROTOCMD_TELEMETRYTYPE: 
             return (void *)(long) TELEM_DSM;
+        case PROTOCMD_CHANNELMAP: return AETRG;
         default: break;
     }
     return 0;

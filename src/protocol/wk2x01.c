@@ -580,6 +580,8 @@ const void *WK2x01_Cmds(enum ProtoCmds cmd)
                 return wk2601_opts;
             break;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
+        case PROTOCMD_CHANNELMAP:
+            return EATRG;
         default: break;
     }
     return 0;

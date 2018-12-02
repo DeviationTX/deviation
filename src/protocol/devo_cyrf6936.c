@@ -616,6 +616,8 @@ const void *DEVO_Cmds(enum ProtoCmds cmd)
             return (void *)(long)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
         case PROTOCMD_TELEMETRYTYPE: 
             return (void *)(long) TELEM_DEVO;
+        case PROTOCMD_CHANNELMAP:
+            return EATRG;
         default: break;
     }
     return 0;

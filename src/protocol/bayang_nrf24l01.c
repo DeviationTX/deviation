@@ -543,6 +543,8 @@ const void *Bayang_Cmds(enum ProtoCmds cmd)
                                 PROTO_TELEM_OFF);
     case PROTOCMD_TELEMETRYTYPE:
         return (void *)(long) TELEM_DSM;
+    case PROTOCMD_CHANNELMAP:
+        return AETRG;
     default:
         break;
     }

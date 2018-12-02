@@ -129,7 +129,7 @@ enum Protocols {
     PROTOCOL_COUNT,
 };
 #undef PROTODEF
-extern const u8 *ProtocolChannelMap[PROTOCOL_COUNT];
+extern const u8 *CurrentProtocolChannelMap;
 #define PROTO_MAP_LEN 5
 
 enum ModelType {

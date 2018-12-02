@@ -29,9 +29,9 @@ const char *STDMIX_channelname_cb(guiObject_t *obj, const void *data)
     if ((Transmitter.ignore_src & SWITCH_NOSTOCK) == SWITCH_NOSTOCK)
         proto_map_length = PROTO_MAP_LEN - 1;
     #endif //HAS_SWITCHES_NOSTOCK
-    if (ch < proto_map_length && ProtocolChannelMap[Model.protocol]) {
+    if (ch < proto_map_length && CurrentProtocolChannelMap) {
         char tmp1[30];
-        INPUT_SourceNameAbbrevSwitch(tmp1, ProtocolChannelMap[Model.protocol][ch]);
+        INPUT_SourceNameAbbrevSwitch(tmp1, CurrentProtocolChannelMap[ch]);
         snprintf(tempstring, sizeof(tempstring), "%d-%s", ch + 1, tmp1);
     }
     else if (ch == 4)

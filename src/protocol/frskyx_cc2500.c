@@ -959,6 +959,7 @@ const void *FRSKYX_Cmds(enum ProtoCmds cmd)
 #endif
             CLOCK_StopTimer();
             return (void *)(CC2500_Reset() ? 1L : -1L);
+        case PROTOCMD_CHANNELMAP: return AETRG;
         default: break;
     }
     return 0;
