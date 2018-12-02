@@ -124,13 +124,12 @@ int PAGE_ModelDoneEditing();
 /* Protocol */
 #define PROTODEF(proto, module, map, init, name) proto,
 enum Protocols {
-    PROTOCOL_NONE,
+    PROTOCOL_NONE = 0,
     #include "protocol/protocol.h"
     PROTOCOL_COUNT,
 };
 #undef PROTODEF
 extern const u8 *ProtocolChannelMap[PROTOCOL_COUNT];
-extern const char * const ProtocolNames[PROTOCOL_COUNT];
 #define PROTO_MAP_LEN 5
 
 enum ModelType {
@@ -166,6 +165,8 @@ u8 PROTOCOL_GetTelemCapability();
 int PROTOCOL_DefaultNumChannels();
 void PROTOCOL_CheckDialogs();
 u32 PROTOCOL_CurrentID();
+const char * PROTOCOL_Name();
+const char * PROTOCOL_GetName(u16 idx);
 const char **PROTOCOL_GetOptions();
 void PROTOCOL_SetOptions();
 int PROTOCOL_GetTelemetryState();

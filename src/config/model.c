@@ -57,7 +57,7 @@ static const char RADIO_VIDEOCH[]  = "videoch";
 static const char RADIO_VIDEOCONTRAST[]  = "videocontrast";
 static const char RADIO_VIDEOBRIGHTNESS[]  = "videobrightness";
 
-#define RADIO_PROTOCOL_VAL ProtocolNames
+#define RADIO_PROTOCOL_VAL Protocols
 
 static const char RADIO_NUM_CHANNELS[] = "num_channels";
 static const char RADIO_FIXED_ID[] = "fixed_id";
@@ -653,8 +653,8 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
     }
     if (MATCH_SECTION(SECTION_RADIO)) {
         if (MATCH_KEY(RADIO_PROTOCOL)) {
-            for (i = 0; i < NUM_STR_ELEMS(RADIO_PROTOCOL_VAL); i++) {
-                if (MATCH_VALUE(RADIO_PROTOCOL_VAL[i])) {
+            for (i = 0; i < NUM_STR_ELEMS(PROTOCOL_COUNT); i++) {
+                if (MATCH_VALUE(PROTOCOL_GetName(i))) {
                     m->protocol = i;
                     PROTOCOL_Load(1);
                     return 1;
@@ -1200,7 +1200,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
     if(WRITE_FULL_MODEL || m->type != 0)
         fprintf(fh, "%s=%s\n", MODEL_TYPE, MODEL_TYPE_VAL[m->type]);
     fprintf(fh, "[%s]\n", SECTION_RADIO);
-    fprintf(fh, "%s=%s\n", RADIO_PROTOCOL, RADIO_PROTOCOL_VAL[m->protocol]);
+    fprintf(fh, "%s=%s\n", RADIO_PROTOCOL, PROTOCOL_GetName(m->protocol));
     write_int(fh, m, _secradio, MAPSIZE(_secradio));
     fprintf(fh, "%s=%s\n", RADIO_TX_POWER, RADIO_TX_POWER_VAL[m->tx_power]);
     fprintf(fh, "\n");

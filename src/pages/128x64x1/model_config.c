@@ -213,7 +213,7 @@ void PAGE_VideoSetupInit(int page)
 void PAGE_ModelProtoInit(int page)
 {
     (void) page;
-    show_titlerow(ProtocolNames[Model.protocol]);
+    show_titlerow(PROTOCOL_Name());
 
     proto_strs = PROTOCOL_GetOptions();
     int idx = 0;
