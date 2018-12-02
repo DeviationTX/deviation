@@ -115,9 +115,9 @@ static void GD00X_send_packet()
     channel=scale_channel(CHANNEL3, 1000, 2000); // throttle
     packet[7 ] = channel;
     packet[8 ] = channel>>8;
-    channel=scale_channel(CHANNEL6, 1000, 2000); // TRIM
-    packet[9 ] = channel;
-    packet[10] = channel>>8;
+    // dynamically driven aileron trim
+    packet[9 ] = packet[5];
+    packet[10] = packet[6];
     packet[11] = GD00X_FLAG_DR                      // Force high rate
                | GET_FLAG(CHANNEL5, GD00X_FLAG_LIGHT);
     packet[12] = 0x00;
