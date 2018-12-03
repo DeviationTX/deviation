@@ -653,7 +653,7 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
     }
     if (MATCH_SECTION(SECTION_RADIO)) {
         if (MATCH_KEY(RADIO_PROTOCOL)) {
-            for (i = 0; i < NUM_STR_ELEMS(PROTOCOL_COUNT); i++) {
+            for (i = 0; i < PROTOCOL_COUNT; i++) {
                 if (MATCH_VALUE(PROTOCOL_GetName(i))) {
                     m->protocol = i;
                     PROTOCOL_Load(1);
