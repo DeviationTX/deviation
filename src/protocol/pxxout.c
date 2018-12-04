@@ -266,10 +266,6 @@ static enum {
   PXX_BIND_DONE = 50,
 #endif
   PXX_DATA1,
-  PXX_DATA2,
-  PXX_DATA3,
-  PXX_DATA4,
-  PXX_DATA5
 } state;
 
 MODULE_CALLTYPE
