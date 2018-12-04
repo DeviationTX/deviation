@@ -57,8 +57,6 @@ static const char RADIO_VIDEOCH[]  = "videoch";
 static const char RADIO_VIDEOCONTRAST[]  = "videocontrast";
 static const char RADIO_VIDEOBRIGHTNESS[]  = "videobrightness";
 
-#define RADIO_PROTOCOL_VAL Protocols
-
 static const char RADIO_NUM_CHANNELS[] = "num_channels";
 static const char RADIO_FIXED_ID[] = "fixed_id";
 
