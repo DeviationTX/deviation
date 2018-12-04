@@ -115,7 +115,7 @@ static void GD00X_send_packet()
     packet[7 ] = channel;
     packet[8 ] = channel>>8;
     // dynamically driven aileron trim
-    u16 channel=scale_channel(CHANNEL1, 1000, 2000); // aileron
+    channel=scale_channel(CHANNEL1, 1000, 2000); // aileron
     packet[9 ] = channel;
     packet[10] = channel>>8;
     packet[11] = GD00X_FLAG_DR                      // Force high rate
