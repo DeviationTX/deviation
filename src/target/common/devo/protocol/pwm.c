@@ -109,6 +109,7 @@ void PPM_Enable(unsigned low_time, volatile u16 *pulses, u8 num_pulses)
 }
 
 #ifndef MODULAR
+#define PXX_PKT_BYTES 18
 #define PXX_PKT_BITS  (20 * 8 + 32)  // every 5th bit might be escaped
 static const u8 pxx_flag[] = {15, 23, 23, 23, 23, 23, 23, 15};  // 7e
 static u8 pxx_bits[PXX_PKT_BITS];
@@ -118,13 +119,13 @@ void PXX_Enable(u8 *packet)
 
     u8 pxx_bit = 1 << 7;
     u8 pxx_ones_count = 0;
-    u8 pxx_bytes = 18;
     u8 *pc = pxx_bits;
 
     // flag bytes are not bit-stuffed
     memcpy(pc, pxx_flag, 8);
     pc += 8;
-    for (;;) {
+    // set pulse length for each bit of payload bytes
+    for (int i=0; i < PXX_PKT_BYTES * 8; i++) {
         if (*packet & pxx_bit) {
             // bit to send is 1
             *pc++ = 23;
@@ -142,10 +143,6 @@ void PXX_Enable(u8 *packet)
 
         pxx_bit >>= 1;
         if (pxx_bit == 0) {
-            pxx_bytes -= 1;
-            if (pxx_bytes == 0) { // all bytes sent
-                break;
-            }
             pxx_bit = 1 << 7;
             packet++;
         }
