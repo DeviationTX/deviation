@@ -66,8 +66,6 @@ ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 
 static u8 packet[PXX_PKT_BYTES];
-u8 num_channels;
-
 static u16 failsafe_count;
 static u8 chan_offset;
 static u8 FS_flag;
@@ -327,7 +325,6 @@ static void initialize(u8 bind)
 
     PWM_Initialize();
 
-    num_channels = Model.num_channels;
     failsafe_count = 0;
     chan_offset = 0;
     FS_flag = 0;
