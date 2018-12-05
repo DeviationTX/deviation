@@ -330,7 +330,7 @@ void TELEMETRY_SetType(int type)
 //#define DEBUG_TELEMALARM
 void TELEMETRY_Alarm()
 {
-    if (! PROTOCOL_GetTelemetryState())
+    if (PROTOCOL_GetTelemetryState() == PROTO_TELEM_UNSUPPORTED)
         return;
 
     //Update 'updated' state every time we get here
