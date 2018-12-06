@@ -252,8 +252,8 @@ static void build_data_pkt(u8 bind)
                | (Model.proto_opts[PROTO_OPTS_RXPWM] << 2);
 
     u16 lcrc = crc(packet, PXX_PKT_BYTES-2);
-    packet[16] = lcrc;
-    packet[17] = lcrc >> 8;
+    packet[16] = lcrc >> 8;
+    packet[17] = lcrc;
 }
 
 static enum {
