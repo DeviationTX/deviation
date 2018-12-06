@@ -18,20 +18,19 @@
   #pragma long_calls
 #endif
 
+#include <stdio.h>
+#include <string.h>
+#include <errno.h>
 
+#include <libopencm3/cm3/nvic.h>
+#include <libopencm3/stm32/dma.h>
+#include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/timer.h>
-#include <libopencm3/stm32/gpio.h>
-#include <libopencm3/stm32/dma.h>
-#include <libopencm3/cm3/nvic.h>
 
 #include "common.h"
 #include "config/model.h"
 #include "../ports.h"
-
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
 
 #ifndef DISABLE_PWM
 
