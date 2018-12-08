@@ -474,7 +474,8 @@ NO_INLINE static void parse_telemetry_packet()
                                    TELEM_DSM_FLOG_FADESL, TELEM_DSM_FLOG_FADESR,
                                    TELEM_DSM_FLOG_FRAMELOSS, TELEM_DSM_FLOG_HOLDS,
                                    TELEM_DSM_FLOG_VOLT1, 0};
-    static const u8 update7e[] = { TELEM_DSM_FLOG_RPM1, TELEM_DSM_FLOG_VOLT2, TELEM_DSM_FLOG_TEMP1, 0};
+    static const u8 update7e[] = { TELEM_DSM_FLOG_RPM1, TELEM_DSM_FLOG_VOLT2, TELEM_DSM_FLOG_TEMP1,
+                                   TELEM_DSM_FLOG_RSSI_DBM, 0};
     static const u8 update03[] = { TELEM_DSM_AMPS1, 0};
     static const u8 update11[] = { TELEM_DSM_AIRSPEED, 0};
     static const u8 update12[] = { TELEM_DSM_ALTITUDE, TELEM_DSM_ALTITUDE_MAX, 0};
@@ -614,6 +615,7 @@ NO_INLINE static void parse_telemetry_packet()
             Telemetry.value[TELEM_DSM_FLOG_RPM1]  = (pktTelem[1] == 0xffff || pktTelem[1] < 200) ?  0 : (120000000 / 2 / pktTelem[1]);
             Telemetry.value[TELEM_DSM_FLOG_VOLT2] =  pktTelem[2];
             Telemetry.value[TELEM_DSM_FLOG_TEMP1] = (pktTelem[3] == 0x7fff) ? 0 : (pktTelem[3] - 32) * 5 / 9; //Convert to C
+            Telemetry.value[TELEM_DSM_FLOG_RSSI_DBM] = (pktTelem[4] == 0xffff) ? 0 : pktTelem[4] >> 8;
             break;
         case 0x16: //GPS sensor (always second GPS packet)
             update = update16;
