@@ -126,7 +126,6 @@ const char * _dsm_str_by_value(char *str, u8 telem, s32 value)
         case TELEM_DSM_FLOG_FADESR:
         case TELEM_DSM_FLOG_FRAMELOSS:
         case TELEM_DSM_FLOG_HOLDS:
-        case TELEM_DSM_FLOG_RSSI_DBM:
         case TELEM_DSM_FLOG_RPM1:       _get_value_str(str, value, 0, '\0'); break;
         case TELEM_DSM_FLOG_VOLT1:
         case TELEM_DSM_FLOG_VOLT2:      _get_value_str(str, value, 2, 'V'); break;
@@ -146,6 +145,7 @@ const char * _dsm_str_by_value(char *str, u8 telem, s32 value)
         case TELEM_DSM_PBOX_ALARMV2:
         case TELEM_DSM_PBOX_ALARMC1:
         case TELEM_DSM_PBOX_ALARMC2:    strcpy(str, _tr(value?"On":"Off")); break;
+        case TELEM_DSM_FLOG_RSSI_DBM:
         case TELEM_DSM_PBOX_CAPACITY1:
         case TELEM_DSM_PBOX_CAPACITY2:
         case TELEM_DSM_FPCAP_CAPACITY:
@@ -198,7 +198,6 @@ const char * _dsm_name(char *str, u8 telem)
         case TELEM_DSM_FLOG_FADESR:     sprintf(str, "%s%c", _tr("Fades"), 'R'); break;
         case TELEM_DSM_FLOG_FRAMELOSS:  strcpy(str, _tr("Loss")); break;
         case TELEM_DSM_FLOG_HOLDS:      strcpy(str, _tr("Holds")); break;
-        case TELEM_DSM_FLOG_RSSI_DBM:   strcpy(str, _tr("dBm")); break;
         case TELEM_DSM_AMPS1:           strcpy(str, _tr("Amps")); break;
         case TELEM_DSM_AIRSPEED:        strcpy(str, _tr("AirSpd")); break;
         case TELEM_DSM_ALTITUDE:        strcpy(str, _tr("Alt.")); break;
@@ -211,6 +210,7 @@ const char * _dsm_name(char *str, u8 telem)
         case TELEM_DSM_GFORCE_ZMAX:     strcpy(str, "g max Z"); break;
         case TELEM_DSM_GFORCE_ZMIN:     strcpy(str, "g min Z"); break;
 #if HAS_EXTENDED_TELEMETRY
+        case TELEM_DSM_FLOG_RSSI_DBM:   strcpy(str, _tr("dBm")); break;
         case TELEM_DSM_PBOX_VOLT1:
         case TELEM_DSM_PBOX_VOLT2:      sprintf(str, "%s%d", "Pbox.V", telem - TELEM_DSM_PBOX_VOLT1 + 1); break;
         case TELEM_DSM_PBOX_CAPACITY1:
@@ -274,7 +274,6 @@ s32 _dsm_get_max_value(u8 telem)
         case TELEM_DSM_FLOG_FADESL:
         case TELEM_DSM_FLOG_FADESR:
         case TELEM_DSM_FLOG_FRAMELOSS:
-        case TELEM_DSM_FLOG_RSSI_DBM:
         case TELEM_DSM_FLOG_HOLDS:      return 999;
         case TELEM_DSM_FLOG_TEMP1:      return 538;
         case TELEM_DSM_FLOG_VOLT1:      return 800;
@@ -310,6 +309,7 @@ s32 _dsm_get_max_value(u8 telem)
         case TELEM_DSM_RXPCAP_AMPS:     return 1800;
         case TELEM_DSM_FPCAP_AMPS:      return 1400;
         case TELEM_DSM_FPCAP_TEMP:      return 1500;
+        case TELEM_DSM_FLOG_RSSI_DBM:   return 255;
 #endif
         case TELEM_DSM_AIRSPEED:        return 999;
         case TELEM_DSM_ALTITUDE:
