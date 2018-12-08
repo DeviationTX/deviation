@@ -286,7 +286,7 @@ static u16 pxxout_cb()
     PXX_Enable(packet);   // send PXX bitstream using timer1
 
 #ifdef EMULATOR
-    return 3000;
+    return 300;
 #else
     return 9000;
 #endif
