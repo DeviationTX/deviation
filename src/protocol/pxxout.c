@@ -180,17 +180,12 @@ static void build_data_pkt(u8 bind)
 {
     u16 chan_0;
     u16 chan_1;
-    static u8 failsafe_chan;
-    u8 startChan = 0;
+    u8 startChan = chan_offset;
 
     // data frames sent every 8ms; failsafe every 8 seconds
-    if (FS_flag == 0  &&  failsafe_count > FAILSAFE_TIMEOUT  &&  chan_offset == 0  &&  Model.proto_opts[PROTO_OPTS_FAILSAFE] != FAILSAFE_RX) {
+    if (FS_flag == 0 && failsafe_count > FAILSAFE_TIMEOUT && chan_offset == 0 &&  Model.proto_opts[PROTO_OPTS_FAILSAFE] != FAILSAFE_RX) {
         FS_flag = 0x10;
-        failsafe_chan = 0;
-    } else if (FS_flag & 0x10 && failsafe_chan < (Model.num_channels-1)) {
-        FS_flag = 0x10 | ((FS_flag + 2) & 0x0f);
-        failsafe_chan += 1;
-    } else if (FS_flag & 0x10) {
+    } else if (FS_flag & 0x10 && chan_offset == 0) {
         FS_flag = 0;
         failsafe_count = 0;
     }
@@ -202,9 +197,7 @@ static void build_data_pkt(u8 bind)
     // FLAG1,
     // b0: BIND / set Rx number -> if this bit is set, every rx listening
     // should change it's rx number to the one described in byte 2
-    // b1...b3: set failsafe position -> if set the following positions
-    // should be used as "Failsafe" positions.
-    // b4: if 1, b1..b3 indicate channel holding failsafe value.
+    // b4: if 1, set failsafe positions for all channels
     // b5: rangecheck if set
     // b6..b7: rf protocol
     packet[1] = RF_PROTO_X16 << 6;
@@ -220,21 +213,8 @@ static void build_data_pkt(u8 bind)
     packet[2] = 0;  // FLAG2, Reserved for future use, must be “0” in this version.
 
     for(u8 i = 0; i < 12 ; i += 3) {    // 12 bytes of channel data
-        if (FS_flag & 0x10 && (((failsafe_chan & 0x7) | chan_offset) == startChan)) {
-            packet[1] = FS_flag;
-            chan_0 = scaleForPXX(failsafe_chan, 1);
-        } else {
-            chan_0 = scaleForPXX(startChan, 0);
-        }
-        startChan++;
-
-        if (FS_flag & 0x10 && (((failsafe_chan & 0x7) | chan_offset) == startChan)) {
-            packet[1] = FS_flag;
-            chan_1 = scaleForPXX(failsafe_chan, 1);
-        } else {
-            chan_1 = scaleForPXX(startChan, 0);
-        }
-        startChan++;
+        chan_0 = scaleForPXX(startChan++, FS_flag == 0x10 ? 1 : 0);
+        chan_1 = scaleForPXX(startChan++, FS_flag == 0x10 ? 1 : 0);
 
         packet[3+i]   = chan_0;
         packet[3+i+1] = (((chan_0 >> 8) & 0x0F) | (chan_1 << 4));
@@ -254,6 +234,8 @@ static void build_data_pkt(u8 bind)
     u16 lcrc = crc(packet, PXX_PKT_BYTES-2);
     packet[16] = lcrc >> 8;
     packet[17] = lcrc;
+
+    chan_offset ^= 0x08;
 }
 
 static enum {
