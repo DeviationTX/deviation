@@ -57,7 +57,7 @@ void PPMin_TIM_Init()
 
     /* Reset TIM1 peripheral. */
     timer_disable_counter(TIM1);
-    timer_reset(TIM1);
+    rcc_periph_reset_pulse(RST_TIM1);
 
     /* Timer global mode:
      * - No divider

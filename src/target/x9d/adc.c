@@ -30,7 +30,7 @@ void ADC_Init(void)
 {
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_ADC1EN);
     /* Make sure the ADC doesn't run during config. */
-    adc_off(ADC1);
+    adc_power_off(ADC1);
     adc_set_clk_prescale(ADC_CCR_ADCPRE_BY2);
     /* We configure to scan the entire group each time conversion is requested. */
     adc_enable_scan_mode(ADC1);
