@@ -90,6 +90,9 @@ static void processSportPacket(u8 *packet) {
     case BATT_ID:
         set_telemetry(TELEM_FRSKY_VOLTA, SPORT_DATA_U8(packet) * 132 / 100);
         break;
+    case RSSI_ID:
+        set_telemetry(TELEM_FRSKY_RSSI, SPORT_DATA_U8(packet));
+        break;
     }
 
     s32 data = SPORT_DATA_S32(packet);
