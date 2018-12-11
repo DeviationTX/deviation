@@ -78,18 +78,20 @@ extern u8 window;
 
 void LCD_CreateMappedWindow(unsigned val, unsigned x, unsigned y, unsigned w, unsigned h)
 {
+    val = val == 1 ? 0 : 1;
     TW8816_CreateMappedWindow(val, x, y, w, h);
 }
 
-void LCD_UnmapWindow(unsigned i)
+void LCD_UnmapWindow(unsigned val)
 {
-    TW8816_UnmapWindow(i);
+    val = val == 1 ? 0 : 1;
+    TW8816_UnmapWindow(val);
 }
 
 void LCD_SetMappedWindow(unsigned val)
 {
     if (val != 0) {
-        TW8816_SetWindow(1);
+        TW8816_SetWindow(0);
         memset(font_map, 0, sizeof(font_map));
     } else {
         if (window < 4) {
@@ -100,7 +102,7 @@ void LCD_SetMappedWindow(unsigned val)
         } else {
             TW8816_LoadFont(font_map, window - 4, 1);
         }
-        TW8816_SetWindow(0);
+        TW8816_SetWindow(1);
     }
     window = val;
 }

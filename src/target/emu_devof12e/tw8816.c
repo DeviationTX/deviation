@@ -195,14 +195,15 @@ void TW8816_DisplayCharacter(u16 pos, unsigned chr, unsigned attr)
     if (!Windows[window].Enabled)
         return;
 
+    int index = window;
     pos = pos * 2;
-    x = pos % Windows[window].H_size;
-    y = (pos - x ) / Windows[window].H_size;
+    x = pos % Windows[index].H_size;
+    y = (pos - x ) / Windows[index].H_size;
     y *= 2;
-    x += Windows[window].H_start;
-    y += Windows[window].V_start;
+    x += Windows[index].H_start;
+    y += Windows[index].V_start;
 
-    int font_size = Windows[window].H_zoom;
+    int font_size = Windows[index].H_zoom;
     const u8 *offset;
 
     if (chr >= 0x300)
@@ -282,6 +283,7 @@ void TW8816_SetWindow(unsigned i)
 
 void TW8816_CreateMappedWindow(unsigned val, unsigned x, unsigned y, unsigned w, unsigned h)
 {
+    val = 1 - val;
     Windows[val].H_start = x;
     Windows[val].V_start = y;
 
@@ -295,6 +297,7 @@ void TW8816_CreateMappedWindow(unsigned val, unsigned x, unsigned y, unsigned w,
 
 void TW8816_UnmapWindow(unsigned i)
 {
+    i = 1 - i;
     Windows[i].Enabled = 0;
 }
 

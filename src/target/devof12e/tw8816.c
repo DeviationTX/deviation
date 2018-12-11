@@ -417,7 +417,7 @@ void TW8816_Init()
 #endif
     }
     //Setup XY Graph
-    LCD_WriteReg(0x9e, 0x01);
+    LCD_WriteReg(0x9e, 0x00);
     LCD_WriteReg(0x9f, 0x01);
     LCD_WriteReg(0xa0, (564 >> 8));
     LCD_WriteReg(0xa1, 0xff & 564); //564
@@ -434,12 +434,9 @@ void TW8816_Init()
     LCD_WriteReg(0xAC,   0x08);
     LCD_WriteReg(0xAD,     0);
     LCD_WriteReg(0xAE,     0);
-    window = 1;
-    //for(int i = 0; i < 24; i++)
-    //    TW8816_DisplayCharacter(i, 'A' + i, 7);
 
     //Setup normal display
-    LCD_WriteReg(0x9e, 0x00);
+    LCD_WriteReg(0x9e, 0x01);
     LCD_WriteReg(0x9f, 0x01);
     LCD_WriteReg(0xa0, 0x00);
     LCD_WriteReg(0xa1, 0x00);
@@ -450,12 +447,11 @@ void TW8816_Init()
     LCD_WriteReg(0xa4, 13);
     LCD_WriteReg(0xAC, 0x08);
     LCD_WriteReg(0xA9,  0x50);
+
     window = 0;
-    //for(int i = 0; i < 24; i++)
-    //    TW8816_DisplayCharacter(i, 'A' + i, 7);
 
     //Hide XY Graph placeholder
-    TW8816_UnmapWindow(1);
+    TW8816_UnmapWindow(0);
 }
 
 void TW8816_LoadFont(u8 *data, unsigned offset, unsigned count)
@@ -483,7 +479,7 @@ void TW8816_SetVideoMode(unsigned enable)
 void TW8816_DisplayCharacter(u16 pos, unsigned chr, unsigned attr)
 {
     if (window == 1)
-        pos += 430;
+      pos += 430;
     LCD_WriteReg(0x94, ((chr & 0xFF00) >= 0x300) ? 0x80 : 0x00); // isRamFont
     LCD_WriteReg(0x95, pos >> 8);
     LCD_WriteReg(0x96, pos & 0xff);
@@ -502,8 +498,8 @@ void TW8816_CreateMappedWindow(unsigned val, unsigned x, unsigned y, unsigned w,
     (void)h;
     TW8816_SetWindow(val);
     LCD_WriteReg(0x9f, 0x01);
-    x *= 12;
-    y *= 18;
+    x *= CHAR_WIDTH;
+    y *= CHAR_HEIGHT;
     LCD_WriteReg(0xa0, (0x30 & (y >> 4)) | (0x07 & (x >> 8)));
     LCD_WriteReg(0xa1, 0xff & x);
     LCD_WriteReg(0xa2, 0xff & y);
