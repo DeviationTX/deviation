@@ -49,6 +49,9 @@ extern "C" {
 #include "config/tx.h"
 }
 
+#ifdef LCD_EMU_LOWLEVEL
+#define LCD_Init EMULCD_Init
+#endif
 
 static const u16 keymap[BUT_LAST] = BUTTON_MAP;
 
