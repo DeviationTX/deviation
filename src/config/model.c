@@ -52,10 +52,12 @@ const char *MODEL_MIXERMODE = "mixermode";
 static const char SECTION_RADIO[]   = "radio";
 
 static const char RADIO_PROTOCOL[] = "protocol";
+#if HAS_VIDEO
 static const char RADIO_VIDEOSRC[] = "videosrc";
 static const char RADIO_VIDEOCH[]  = "videoch";
 static const char RADIO_VIDEOCONTRAST[]  = "videocontrast";
 static const char RADIO_VIDEOBRIGHTNESS[]  = "videobrightness";
+#endif
 
 static const char RADIO_NUM_CHANNELS[] = "num_channels";
 static const char RADIO_FIXED_ID[] = "fixed_id";
