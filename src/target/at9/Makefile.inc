@@ -42,6 +42,7 @@ SRC_C   := $(wildcard $(SDIR)/target/$(TARGET)/*.c) \
            $(wildcard $(SDIR)/target/common/devo/hid/*.c) \
            $(wildcard $(SDIR)/target/common/devo/protocol/*.c) \
            $(wildcard $(SDIR)/target/common/devo/uart.c) \
+           $(wildcard $(SDIR)/target/common/devo/protospi.c) \
            $(SDIR)/target/devo8/ili9341.c
 
 ifneq "$(HAS_4IN1_FLASH)" "1"
