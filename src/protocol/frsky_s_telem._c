@@ -88,7 +88,8 @@ static void processSportPacket(u8 *packet) {
         set_telemetry(TELEM_FRSKY_VOLT2, ((s32)SPORT_DATA_U8(packet) * 132 * Model.proto_opts[PROTO_OPTS_AD2GAIN]) / 10000);
         break;
     case BATT_ID:   // receiver battery voltage from R9M/XJT
-        set_telemetry(TELEM_FRSKY_VOLT1, SPORT_DATA_U8(packet) * 132 / 100);
+//TODO        set_telemetry(TELEM_FRSKY_VOLT1, SPORT_DATA_U8(packet) * 132 / 100);
+        set_telemetry(TELEM_FRSKY_VOLT1, (1320 * SPORT_DATA_U8(packet) + 1220) / 255);
         break;
     case RSSI_ID:
         set_telemetry(TELEM_FRSKY_RSSI, SPORT_DATA_U8(packet));
