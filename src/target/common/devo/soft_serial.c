@@ -13,31 +13,28 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <libopencm3/stm32/rcc.h>
-#include <libopencm3/stm32/gpio.h>
 #include <libopencm3/cm3/nvic.h>
-#include <libopencm3/stm32/exti.h>
-
 #include <libopencm3/cm3/systick.h>
+#include <libopencm3/stm32/exti.h>
+#include <libopencm3/stm32/gpio.h>
+#include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/timer.h>
 #include <libopencm3/stm32/usart.h>
-#include <libopencm3/stm32/iwdg.h>
  
 #include "common.h"
 #include "devo.h"
-//#include "mixer.h"
-//#include "config/model.h"
 
 
-#ifndef MODULAR
 // soft serial receiver for s.port data
+// receive inverted data (high input volgate = 0, low is 1)
 // 57600 bps, no stop, 8 data bits, 1 stop bit
-// 1) Enable rising edge interrupt on RX line to search for start
+// 1) Enable rising edge interrupt on RX line to search for start bit
 // 2) On rising edge, set timer for half a bit time to get to bit center
 // 3) Verify start bit, set timer for interrupts at full bit time
 // 4) Collect 8 data bits, verify stop bit
 // 5) Process byte, then repeat
 
+#ifndef MODULAR
 
 static u8 in_byte;
 static u8 data_byte;
@@ -58,7 +55,7 @@ void SSER_Initialize()
     /* Set GPIO0 (in GPIO port A) to 'input float'. */
     gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, _USART_GPIO_USART_RX);
     
-    /* Configure the EXTI subsystem. */
+    // Interrupt on input rising edge to find start bit
     exti_select_source(EXTI10, GPIOA);
     exti_set_trigger(EXTI10, EXTI_TRIGGER_RISING);
     exti_enable_request(EXTI10);
