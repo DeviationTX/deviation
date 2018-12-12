@@ -218,6 +218,10 @@ typedef void usart_callback_t(u8 ch, u8 status);
 void UART_StartReceive(usart_callback_t isr_callback);
 void UART_StopReceive();
 void UART_SetDuplex(uart_duplex duplex);
+typedef void sser_callback_t(u8 data);
+void SSER_StartReceive(sser_callback_t isr_callback);
+void SSER_Initialize();
+void SSER_Stop();
 
 /* USB*/
 void USB_Enable(unsigned type, unsigned use_interrupt);

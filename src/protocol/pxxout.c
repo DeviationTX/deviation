@@ -275,16 +275,12 @@ static u16 pxxout_cb()
 }
 
 #if HAS_EXTENDED_TELEMETRY
-// Support S.Port telemetry on UART RX pin
+// Support S.Port telemetry on RX pin
 // couple defines to avoid errors from include file
 static void serial_echo(u8 *packet) {(void)packet;}
 #define PROTO_OPTS_AD2GAIN 0
 #include "frsky_d_telem._c"
 #include "frsky_s_telem._c"
-static void process_pxx_sport_data(u8 data, u8 status) {
-  if (status != UART_RX_RXNE) return;
-  frsky_parse_sport_stream(data);
-}
 #endif // HAS_EXTENDED_TELEMETRY
 
 static void initialize(u8 bind)
@@ -293,17 +289,14 @@ static void initialize(u8 bind)
     if (PPMin_Mode())
         return;
 
-#if HAS_EXTENDED_TELEMETRY
 #if HAS_EXTENDED_AUDIO
 #if HAS_AUDIO_UART5
     if (!Transmitter.audio_uart5)
 #endif
         Transmitter.audio_player = AUDIO_DISABLED; // disable voice commands on serial port
 #endif
-    UART_Initialize(); // Must be before PWM_Initialize so PWM can steal the TX pin back
-    UART_SetDataRate(57600);  // standard s.port
-    UART_StartReceive(process_pxx_sport_data);
-#endif // HAS_EXTENDED_TELEMETRY
+    SSER_Initialize(); // soft serial receiver
+    SSER_StartReceive(frsky_parse_sport_stream);
 
     PWM_Initialize();
 
@@ -328,7 +321,7 @@ const void * PXXOUT_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_INIT:  initialize(0); return 0;
         case PROTOCMD_DEINIT:
           PWM_Stop();
-          UART_Stop();
+          SSER_Stop();
           return 0;
         case PROTOCMD_CHECK_AUTOBIND: return 0;
         case PROTOCMD_BIND:  initialize(1); return 0;
