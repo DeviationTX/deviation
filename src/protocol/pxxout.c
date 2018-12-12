@@ -295,8 +295,10 @@ static void initialize(u8 bind)
 #endif
         Transmitter.audio_player = AUDIO_DISABLED; // disable voice commands on serial port
 #endif
+#if HAS_EXTENDED_TELEMETRY
     SSER_Initialize(); // soft serial receiver
     SSER_StartReceive(frsky_parse_sport_stream);
+#endif
 
     PWM_Initialize();
 

@@ -146,6 +146,10 @@ void PPMin_TIM_Init() {}
 volatile u8 ppmSync;
 volatile s32 ppmChannels[MAX_PPM_IN_CHANNELS];
 volatile u8 ppmin_num_channels;
+typedef void sser_callback_t(u8 data);
+void SSER_StartReceive(sser_callback_t isr_callback) { (void)isr_callback;}
+void SSER_Initialize() {}
+void SSER_Stop() {}
 
 void MCU_SerialNumber(u8 *var, int len)
 {
