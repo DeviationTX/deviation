@@ -210,7 +210,7 @@ const char * _dsm_name(char *str, u8 telem)
         case TELEM_DSM_GFORCE_ZMAX:     strcpy(str, "g max Z"); break;
         case TELEM_DSM_GFORCE_ZMIN:     strcpy(str, "g min Z"); break;
 #if HAS_EXTENDED_TELEMETRY
-        case TELEM_DSM_FLOG_RSSI_DBM:   strcpy(str, _tr("dBm")); break;
+        case TELEM_DSM_FLOG_RSSI_DBM:   strcpy(str, _tr("RSSI")); break;
         case TELEM_DSM_PBOX_VOLT1:
         case TELEM_DSM_PBOX_VOLT2:      sprintf(str, "%s%d", "Pbox.V", telem - TELEM_DSM_PBOX_VOLT1 + 1); break;
         case TELEM_DSM_PBOX_CAPACITY1:
