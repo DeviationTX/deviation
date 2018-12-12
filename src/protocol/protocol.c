@@ -70,7 +70,7 @@ const struct{
     int module;
     const char* name;
 }Protocols[PROTOCOL_COUNT] = {
-    { TX_MODULE_LAST, "None" },
+    { 0, "None" },
     #include "protocol.h"
 };
 #undef PROTODEF
