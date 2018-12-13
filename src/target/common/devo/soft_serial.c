@@ -52,7 +52,7 @@ void SSER_Initialize()
     /* Enable GPIOA clock. */
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPAEN);
 
-    /* Set GPIO0 (in GPIO port A) to 'input float'. */
+    // Set RX pin mode
     gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, _USART_GPIO_USART_RX);
     
     // Interrupt on input rising edge to find start bit
@@ -88,7 +88,8 @@ void SSER_Stop()
     exti_disable_request(EXTI10);
 }
 
-#define SSER_BIT_TIME       (1250)   // 17.36 us at 72MHz
+#define SSER_BIT_TIME       1250   // 17.36 us at 72MHz
+// rising edge ISR
 void exti15_10_isr(void)
 {
     exti_reset_request(EXTI10);
@@ -113,18 +114,18 @@ static void next_byte() {
     nvic_enable_irq(NVIC_EXTI15_10_IRQ);
 }
 
+// bit timer ISR
 void tim6_isr(void) {
     timer_clear_flag(TIM6, TIM_SR_UIF);
 
     u16 value = gpio_get(GPIOA, _USART_GPIO_USART_RX);
 
     if (in_byte == 1) {  // first interrupt after edge, check start bit
-        if(value) {
+        if (value) {
             in_byte = 2;
             timer_set_period(TIM6, SSER_BIT_TIME);
         } else {
-            // error in start bit, try again
-            next_byte();
+            next_byte(); // error in start bit, start looking again again
         }
         return;
     }
