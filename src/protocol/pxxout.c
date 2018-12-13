@@ -305,7 +305,7 @@ static void initialize(u8 bind)
     failsafe_count = 0;
     chan_offset = 0;
     FS_flag = 0;
-    packet[0] = (u8) Model.fixed_id;
+    packet[0] = (u8) Model.fixed_id & 0x3f;  // limit to valid range - 6 bits
 
     if (bind) {
         state = PXX_BIND;
