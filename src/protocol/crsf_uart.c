@@ -39,6 +39,11 @@
 #define CRSF_CHANNELS             16
 #define CRSF_PACKET_SIZE          26
 
+#define SBUS_DATARATE             100000
+#define SBUS_FRAME_PERIOD         14000   // 14ms
+#define SBUS_CHANNELS             16
+#define SBUS_PACKET_SIZE          25
+
 // Device addresses
 #define BROADCAST_ADDRESS              0x00
 #define RADIO_ADDRESS                  0xEA
@@ -220,8 +225,7 @@ static void processCrossfireTelemetryData(u8 data, u8 status) {
 #endif  // HAS_EXTENDED_TELEMETRY
 
 static u8 packet[CRSF_PACKET_SIZE];
-
-
+ctassert(CRSF_PACKET_SIZE > SBUS_PACKET_SIZE, packet_size_is_too_small);
 
 /* from CRSF document
 Center (1500us) = 992
@@ -230,7 +234,7 @@ US_TO_TICKS(x) ((x - 1500) * 8 / 5 + 992)
 */
 //#define STICK_SCALE    869  // full scale at +-125
 #define STICK_SCALE    800  // +/-100 gives 2000/1000 us
-static void build_rcdata_pkt()
+static void build_crsf_data_pkt()
 {
     int i;
 	u16 channels[CRSF_CHANNELS];
@@ -242,9 +246,9 @@ static void build_rcdata_pkt()
             channels[i] = 992;  // midpoint
     }
 
-    packet[0] = MODULE_ADDRESS; 
+    packet[0] = MODULE_ADDRESS;
     packet[1] = 24;   // length of type + payload + crc
-    packet[2] = CHANNELS_ID; 
+    packet[2] = CHANNELS_ID;
 
     packet[3]  = (u8) ((channels[0] & 0x07FF));
     packet[4]  = (u8) ((channels[0] & 0x07FF)>>8   | (channels[1] & 0x07FF)<<3);
@@ -259,7 +263,7 @@ static void build_rcdata_pkt()
     packet[13] = (u8) ((channels[7] & 0x07FF)>>3);
     packet[14] = (u8) ((channels[8] & 0x07FF));
     packet[15] = (u8) ((channels[8] & 0x07FF)>>8   | (channels[9] & 0x07FF)<<3);
-    packet[16] = (u8) ((channels[9] & 0x07FF)>>5   | (channels[10] & 0x07FF)<<6);  
+    packet[16] = (u8) ((channels[9] & 0x07FF)>>5   | (channels[10] & 0x07FF)<<6);
     packet[17] = (u8) ((channels[10] & 0x07FF)>>2);
     packet[18] = (u8) ((channels[10] & 0x07FF)>>10 | (channels[11] & 0x07FF)<<1);
     packet[19] = (u8) ((channels[11] & 0x07FF)>>7  | (channels[12] & 0x07FF)<<4);
@@ -272,14 +276,55 @@ static void build_rcdata_pkt()
     packet[25] = crc8(&packet[2], CRSF_PACKET_SIZE-3);
 }
 
+static void build_sbus_data_pkt()
+{
+    int i;
+  u16 channels[SBUS_CHANNELS];
+
+    for (i=0; i < SBUS_CHANNELS; i++) {
+        if (i < Model.num_channels)
+            channels[i] = (u16)(Channels[i] * STICK_SCALE / CHAN_MAX_VALUE + 992);
+        else
+            channels[i] = 992;  // midpoint
+    }
+
+  packet[0] = 0x0f;
+
+    packet[1] = (u8) ((channels[0] & 0x07FF));
+    packet[2] = (u8) ((channels[0] & 0x07FF)>>8 | (channels[1] & 0x07FF)<<3);
+    packet[3] = (u8) ((channels[1] & 0x07FF)>>5 | (channels[2] & 0x07FF)<<6);
+    packet[4] = (u8) ((channels[2] & 0x07FF)>>2);
+    packet[5] = (u8) ((channels[2] & 0x07FF)>>10 | (channels[3] & 0x07FF)<<1);
+    packet[6] = (u8) ((channels[3] & 0x07FF)>>7 | (channels[4] & 0x07FF)<<4);
+    packet[7] = (u8) ((channels[4] & 0x07FF)>>4 | (channels[5] & 0x07FF)<<7);
+    packet[8] = (u8) ((channels[5] & 0x07FF)>>1);
+    packet[9] = (u8) ((channels[5] & 0x07FF)>>9 | (channels[6] & 0x07FF)<<2);
+    packet[10] = (u8) ((channels[6] & 0x07FF)>>6 | (channels[7] & 0x07FF)<<5);
+    packet[11] = (u8) ((channels[7] & 0x07FF)>>3);
+    packet[12] = (u8) ((channels[8] & 0x07FF));
+    packet[13] = (u8) ((channels[8] & 0x07FF)>>8 | (channels[9] & 0x07FF)<<3);
+    packet[14] = (u8) ((channels[9] & 0x07FF)>>5 | (channels[10] & 0x07FF)<<6);
+    packet[15] = (u8) ((channels[10] & 0x07FF)>>2);
+    packet[16] = (u8) ((channels[10] & 0x07FF)>>10 | (channels[11] & 0x07FF)<<1);
+    packet[17] = (u8) ((channels[11] & 0x07FF)>>7 | (channels[12] & 0x07FF)<<4);
+    packet[18] = (u8) ((channels[12] & 0x07FF)>>4 | (channels[13] & 0x07FF)<<7);
+    packet[19] = (u8) ((channels[13] & 0x07FF)>>1);
+    packet[20] = (u8) ((channels[13] & 0x07FF)>>9 | (channels[14] & 0x07FF)<<2);
+    packet[21] = (u8) ((channels[14] & 0x07FF)>>6 | (channels[15] & 0x07FF)<<5);
+    packet[22] = (u8) ((channels[15] & 0x07FF)>>3);
+
+  packet[23] = 0x00; // flags
+  packet[24] = 0x00;
+}
+
 #ifdef EMULATOR
 static const u8 rxframes[][26];
 #endif //EMULATOR
 
-static u16 serial_cb()
+static u16 crsf_serial_cb()
 {
-    build_rcdata_pkt();
-    UART_Send(packet, sizeof packet);
+    build_crsf_data_pkt();
+    UART_Send(packet, CRSF_PACKET_SIZE);
 
 #ifdef EMULATOR
 #if HAS_EXTENDED_TELEMETRY
@@ -303,6 +348,14 @@ static u16 serial_cb()
     return CRSF_FRAME_PERIOD;
 }
 
+static u16 sbus_serial_cb()
+{
+    build_sbus_data_pkt();
+    UART_Send(packet, SBUS_PACKET_SIZE);
+
+    return SBUS_FRAME_PERIOD;
+}
+
 static void initialize()
 {
     CLOCK_StopTimer();
@@ -317,13 +370,25 @@ static void initialize()
     Transmitter.audio_player = AUDIO_DISABLED; // disable voice commands on serial port
 #endif
     UART_Initialize();
-    UART_SetDataRate(CRSF_DATARATE);
-    UART_SetDuplex(UART_DUPLEX_HALF);
+
+    if (Model.protocol == PROTOCOL_CRSF)
+    {
+        UART_SetDataRate(CRSF_DATARATE);
+        UART_SetFormat(8, UART_PARITY_NONE, UART_STOPBITS_1);
+        UART_SetDuplex(UART_DUPLEX_HALF);
+
 #if HAS_EXTENDED_TELEMETRY
-    UART_StartReceive(processCrossfireTelemetryData);
+        UART_StartReceive(processCrossfireTelemetryData);
 #endif
 
-    CLOCK_StartTimer(1000, serial_cb);
+        CLOCK_StartTimer(1000, crsf_serial_cb);
+    }
+    else
+    {
+        UART_SetDataRate(SBUS_DATARATE);
+        UART_SetFormat(8, UART_PARITY_EVEN, UART_STOPBITS_2);
+        CLOCK_StartTimer(1000, sbus_serial_cb);
+    }
 }
 
 const void * CRSF_Cmds(enum ProtoCmds cmd)
