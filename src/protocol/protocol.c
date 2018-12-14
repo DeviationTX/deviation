@@ -64,13 +64,43 @@ const void * (*PROTO_Cmds)(enum ProtoCmds) = NULL;
 #define PROTOCOL_LOADED PROTO_Cmds
 #endif
 
-#define PROTODEF(proto, module, map, cmd, name) name,
-const char * const ProtocolNames[PROTOCOL_COUNT] = {
-    "None",
+#ifdef MODULAR
+#define PROTODEF(proto, module, map, cmd, name) {module, name},
+const struct{
+    int module;
+    const char* name;
+}Protocols[PROTOCOL_COUNT] = {
+    { 0, "None" },
     #include "protocol.h"
 };
 #undef PROTODEF
-static int get_module(int idx);
+#else
+#define PROTODEF(proto, module, map, cmd, name) {module, cmd, name},
+const struct{
+    int module;
+    const void * (*cmd)(enum ProtoCmds);
+    const char* name;
+}Protocols[PROTOCOL_COUNT] = {
+    { 0, NULL, "None"},
+    #include "protocol.h"
+};
+#undef PROTODEF
+#endif
+
+static int get_module(u16 idx);
+
+const char * PROTOCOL_GetName(u16 idx)
+{
+    if (idx > PROTOCOL_COUNT)
+        return _tr("None");
+    else
+        return Protocols[idx].name;
+}
+
+const char * PROTOCOL_Name()
+{
+    return PROTOCOL_GetName(Model.protocol);
+}
 
 void PROTOCOL_Init(u8 force)
 {
@@ -112,12 +142,15 @@ void PROTOCOL_Load(int no_dlg)
         return;
     char file[25];
     strcpy(file, "protocol/");
-    #define PROTODEF(proto, module, map, cmd, name) case proto: strcat(file,name); break;
-    switch(Model.protocol) {
-        #include "protocol.h"
-        default: *loaded_protocol = 0; return;
+
+    if (Model.protocol > PROTOCOL_COUNT)
+    {
+        *loaded_protocol = 0; return;
     }
-    #undef PROTODEF
+    else
+    {
+        strcat(file, Protocols[Model.protocol].name);
+    }
     file[17] = '\0'; //truncate filename to 8 characters
     strcat(file, ".mod");
     FILE *fh;
@@ -172,12 +205,7 @@ void PROTOCOL_Load(int no_dlg)
         printf("Module is not defined!\n");
         return;
     }
-    #define PROTODEF(proto, module, map, cmd, name) case proto: PROTO_Cmds = cmd; break;
-    switch(Model.protocol) {
-        #include "protocol.h"
-        default: PROTO_Cmds = NULL;
-    }
-    #undef PROTODEF
+    PROTO_Cmds = Protocols[Model.protocol].cmd;
 #endif
     PROTOCOL_SetSwitch(get_module(Model.protocol));
     if (PROTOCOL_GetTelemetryState() != PROTO_TELEM_UNSUPPORTED) {
@@ -367,15 +395,13 @@ void PROTOCOL_CheckDialogs()
         }
     }
 }
-static int get_module(int idx)
+
+static int get_module(u16 idx)
 {
-    int m = TX_MODULE_LAST;
-    #define PROTODEF(proto, module, map, cmd, name) case proto: m = module; break;
-    switch(idx) {
-        #include "protocol.h"
-    }
-    #undef PROTODEF
-    return m;
+    if (idx >= PROTOCOL_COUNT)
+        return TX_MODULE_LAST;
+    else
+        return Protocols[idx].module;
 }
 
 int PROTOCOL_HasModule(int idx)

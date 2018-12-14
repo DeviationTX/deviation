@@ -269,11 +269,12 @@ static const char *protoselect_cb(guiObject_t *obj, int dir, void *data)
         configure_bind_button();
     }
     GUI_TextSelectEnablePress((guiTextSelect_t *)obj, PROTOCOL_GetOptions() ? 1 : 0);
+
     if (Model.protocol == 0)
         return _tr("None");
-    if(PROTOCOL_HasModule(Model.protocol))
-        return ProtocolNames[Model.protocol];
-    sprintf(tempstring, "*%s", ProtocolNames[Model.protocol]);
+    if (PROTOCOL_HasModule(Model.protocol))
+        return PROTOCOL_Name();
+    sprintf(tempstring, "*%s", PROTOCOL_Name());
     return tempstring;
 }
 void proto_press_cb(guiObject_t *obj, void *data)
