@@ -122,6 +122,7 @@ const struct telem_layout dsm_layout[] = {
           {{15,100, 40, 18}, {60,100, 40, 18}, TELEM_DSM_FLOG_FADESR},
           {{115, 40, 40, 18}, {160, 40, 40, 18}, TELEM_DSM_FLOG_FRAMELOSS},
           {{115, 60, 40, 18}, {160, 60, 40, 18}, TELEM_DSM_FLOG_HOLDS},
+          {{115, 80, 40, 18}, {160, 80, 40, 18}, TELEM_DSM_FLOG_RSSI_DBM},
           {{215, 40, 40, 18}, {260, 40, 40, 18}, TELEM_DSM_FLOG_VOLT1},
           {{215, 60, 40, 18}, {260, 60, 40, 18}, TELEM_DSM_FLOG_VOLT2},
           {{215, 80, 40, 18}, {260, 80, 40, 18}, TELEM_DSM_FLOG_RPM1},
