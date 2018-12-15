@@ -7,12 +7,9 @@
 
 
 void TW8816_Init();
-void TW8816_Reset();
-void TW8816_ResetLoop();
 void TW8816_LoadFont(u8 *data, unsigned offset, unsigned count);
 void TW8816_SetVideoMode(unsigned enable);
-void TW8816_ReinitPixelClock();
-void TW8816_DisplayCharacter(unsigned pos, unsigned chr, unsigned attr);
+void TW8816_DisplayCharacter(u16 pos, unsigned chr, unsigned attr);
 void TW8816_ClearDisplay();
 void TW8816_SetWindow(unsigned i);
 void TW8816_CreateMappedWindow(unsigned val, unsigned x, unsigned y, unsigned w, unsigned h);
@@ -22,18 +19,16 @@ void TW8816_Contrast(unsigned contrast);
 void TW8816_Brightness(int brightness);
 void TW8816_Sharpness(unsigned sharpness);
 void TW8816_Chroma(unsigned chromau, unsigned chromav);
+void TW8816_SetVideoChannel(int ch);
+void TW8816_EnableVideo(int on);
 u8 TW8816_GetVideoStandard();
 void TW8816_SetVideoStandard(u8 standard);
-
-void LCD_WriteReg(unsigned reg, u8 val);
-void LCD_WriteBuffer(u16 periphAddr, u8 *buffer, unsigned len);
-u32 LCD_ReadReg(unsigned reg);
 
 #define LCD_ALIGN_LEFT      0
 #define LCD_ALIGN_CENTER    1
 #define LCD_ALIGN_RIGHT     2
 
-struct FAT FontFAT;
+extern struct FAT FontFAT;
 
 struct font_def 
 {
