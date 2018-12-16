@@ -374,7 +374,6 @@ static void initialize()
     if (Model.protocol == PROTOCOL_CRSF)
     {
         UART_SetDataRate(CRSF_DATARATE);
-        UART_SetFormat(8, UART_PARITY_NONE, UART_STOPBITS_1);
         UART_SetDuplex(UART_DUPLEX_HALF);
 
 #if HAS_EXTENDED_TELEMETRY
