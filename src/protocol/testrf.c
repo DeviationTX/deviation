@@ -391,6 +391,8 @@ const void * TESTRF_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
         case PROTOCMD_GETOPTIONS:
             return testrf_opts;
+	case PROTOCMD_CHANNELMAP:
+	    return UNCHG;
         case PROTOCMD_SETOPTIONS:
             initialize();
             return 0;

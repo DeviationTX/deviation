@@ -46,7 +46,7 @@ static void map_inp(unsigned *chmap, u8 *val)
 void RemapChannelsForProtocol(const u8 *oldmap)
 {
     int i, j;
-    const u8 *map = ProtocolChannelMap[Model.protocol];
+    const u8 *map = CurrentProtocolChannelMap;
     unsigned chmap[PROTO_MAP_LEN];
 
     if(! oldmap || ! map || map == oldmap)

@@ -861,6 +861,8 @@ const void *DSM2_Cmds(enum ProtoCmds cmd)
             return (void *)(long)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
         case PROTOCMD_TELEMETRYTYPE: 
             return (void *)(long) TELEM_DSM;
+        case PROTOCMD_CHANNELMAP:
+            return TAERG;
         default: break;
     }
     return NULL;

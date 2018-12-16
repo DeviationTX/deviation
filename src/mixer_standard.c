@@ -45,7 +45,7 @@ void STDMIXER_Preset()
     mapped_std_channels.switches[SWITCHFUNC_DREXP_ELE] = INP_ELE_DR0;
     mapped_std_channels.switches[SWITCHFUNC_DREXP_RUD] = INP_FMOD0;
 
-    const u8 *ch_map = ProtocolChannelMap[Model.protocol];
+    const u8 *ch_map = CurrentProtocolChannelMap;
     if (! ch_map) {
         // for none protocol, assign any channel to thr is fine
         ch_map = EATRG;
@@ -64,7 +64,7 @@ void STDMIXER_Preset()
 
 void STDMIXER_SetChannelOrderByProtocol()
 {
-    const u8 *ch_map = ProtocolChannelMap[Model.protocol];
+    const u8 *ch_map = CurrentProtocolChannelMap;
     if (! ch_map) {
         // for none protocol, assign any channel to thr is fine
         ch_map = EATRG;

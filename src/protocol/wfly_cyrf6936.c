@@ -354,6 +354,7 @@ const void *WFLY_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_CURRENT_ID:  return (void *)((unsigned long)Model.fixed_id);
         case PROTOCMD_GETOPTIONS: return (void*)0L;
         case PROTOCMD_TELEMETRYSTATE: return (void *) PROTO_TELEM_UNSUPPORTED;
+        case PROTOCMD_CHANNELMAP: return AETRG;
         default: break;
     }
     return 0;

@@ -461,6 +461,7 @@ const void *BUGS3MINI_Cmds(enum ProtoCmds cmd)
             return (void *)(long) PROTO_TELEM_ON;
         case PROTOCMD_TELEMETRYTYPE:
             return (void *)(long) TELEM_FRSKY;
+        case PROTOCMD_CHANNELMAP: return AETRG;
         default: break;
     }
     return 0;

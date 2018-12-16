@@ -15,6 +15,7 @@ enum ProtoCmds {
     PROTOCMD_TELEMETRYTYPE,
     PROTOCMD_TELEMETRYRESET,
     PROTOCMD_RESET,
+    PROTOCMD_CHANNELMAP,
 };
 
 enum TXRX_State {
@@ -29,6 +30,12 @@ enum PinConfigState {
     DISABLED_PIN,
     RESET_PIN,
 };
+
+const u8 EATRG[PROTO_MAP_LEN];
+const u8 TAERG[PROTO_MAP_LEN];
+#define UNCHG ((void*)1)
+#define AETRG ((void*)0)
+
 #ifndef MODULAR
 #define PROTODEF(proto, module, map, cmd, name) extern const void * cmd(enum ProtoCmds);
 #include "protocol.h"
