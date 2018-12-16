@@ -293,11 +293,13 @@ void GetElementSize(unsigned type, u16 *w, u16 *h)
         [ELEM_BATTERY]  = BATTERY_H,
         [ELEM_TXPOWER]  = TXPOWER_H,
     };
+#ifndef _DEVO_F12E_TARGET_H_
     if (type == ELEM_MODELICO && Model.icon[0]) {
         if(LCD_ImageDimensions(CONFIG_GetCurrentIcon(), w, h))
             return;
         //We can't fix this during model-load because only 1 file can be open at a time
     }
+#endif
     *w = width[type];
     *h = height[type];
 }

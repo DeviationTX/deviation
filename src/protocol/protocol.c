@@ -35,10 +35,11 @@ extern struct FAT FontFAT; //defined in screen/lcd_string.c
 //Not static because we need it in mixer.c
 const u8 EATRG[PROTO_MAP_LEN] =
     { INP_ELEVATOR, INP_AILERON, INP_THROTTLE, INP_RUDDER, INP_GEAR1 };
-static const u8 TAERG[PROTO_MAP_LEN] = 
+const u8 TAERG[PROTO_MAP_LEN] =
     { INP_THROTTLE, INP_AILERON, INP_ELEVATOR, INP_RUDDER, INP_GEAR1 };
-static const u8 AETRG[PROTO_MAP_LEN] = 
+static const u8 AETRG0[PROTO_MAP_LEN] =
     { INP_AILERON, INP_ELEVATOR, INP_THROTTLE, INP_RUDDER, INP_GEAR1 };
+const u8 * CurrentProtocolChannelMap;
 
 static u8 proto_state;
 static u32 bind_time;
@@ -49,12 +50,6 @@ static u32 bind_time;
 #define PROTO_BINDDLG   0x08
 #define PROTO_MODULEDLG 0x10
 
-#define PROTODEF(proto, module, map, cmd, name) map,
-const u8 *ProtocolChannelMap[PROTOCOL_COUNT] = {
-    NULL,
-    #include "protocol.h"
-};
-#undef PROTODEF
 #ifdef MODULAR
 unsigned long * const loaded_protocol = (unsigned long *)MODULAR;
 void * (* const PROTO_Cmds)(enum ProtoCmds) = (void *)(MODULAR +sizeof(long)+1);
@@ -64,13 +59,43 @@ const void * (*PROTO_Cmds)(enum ProtoCmds) = NULL;
 #define PROTOCOL_LOADED PROTO_Cmds
 #endif
 
-#define PROTODEF(proto, module, map, cmd, name) name,
-const char * const ProtocolNames[PROTOCOL_COUNT] = {
-    "None",
+#ifdef MODULAR
+#define PROTODEF(proto, module, map, cmd, name) {module, name},
+const struct{
+    int module;
+    const char* name;
+}Protocols[PROTOCOL_COUNT] = {
+    { 0, "None" },
     #include "protocol.h"
 };
 #undef PROTODEF
-static int get_module(int idx);
+#else
+#define PROTODEF(proto, module, map, cmd, name) {module, cmd, name},
+const struct{
+    int module;
+    const void * (*cmd)(enum ProtoCmds);
+    const char* name;
+}Protocols[PROTOCOL_COUNT] = {
+    { 0, NULL, "None"},
+    #include "protocol.h"
+};
+#undef PROTODEF
+#endif
+
+static int get_module(u16 idx);
+
+const char * PROTOCOL_GetName(u16 idx)
+{
+    if (idx > PROTOCOL_COUNT)
+        return _tr("None");
+    else
+        return Protocols[idx].name;
+}
+
+const char * PROTOCOL_Name()
+{
+    return PROTOCOL_GetName(Model.protocol);
+}
 
 void PROTOCOL_Init(u8 force)
 {
@@ -84,10 +109,27 @@ void PROTOCOL_Init(u8 force)
     }
     proto_state |= PROTO_READY;
 
-    if(Model.protocol == PROTOCOL_NONE || ! PROTOCOL_LOADED)
+    if(Model.protocol == PROTOCOL_NONE || ! PROTOCOL_LOADED) {
         CLOCK_StopTimer();
-    else
+        CurrentProtocolChannelMap = NULL;
+    }
+    else {
         PROTO_Cmds(PROTOCMD_INIT);
+
+        CurrentProtocolChannelMap = (const u8*)PROTO_Cmds(PROTOCMD_CHANNELMAP);
+        if (CurrentProtocolChannelMap == AETRG)
+        {
+            CurrentProtocolChannelMap = AETRG0;
+        }
+        else if (CurrentProtocolChannelMap == UNCHG)
+        {
+            CurrentProtocolChannelMap = NULL;
+        }
+        else if (CurrentProtocolChannelMap != EATRG && CurrentProtocolChannelMap != TAERG)
+        {
+            printf("Unknown map: %x\n", CurrentProtocolChannelMap);
+        }
+    }
 }
 
 void PROTOCOL_DeInit()
@@ -112,12 +154,15 @@ void PROTOCOL_Load(int no_dlg)
         return;
     char file[25];
     strcpy(file, "protocol/");
-    #define PROTODEF(proto, module, map, cmd, name) case proto: strcat(file,name); break;
-    switch(Model.protocol) {
-        #include "protocol.h"
-        default: *loaded_protocol = 0; return;
+
+    if (Model.protocol > PROTOCOL_COUNT)
+    {
+        *loaded_protocol = 0; return;
     }
-    #undef PROTODEF
+    else
+    {
+        strcat(file, Protocols[Model.protocol].name);
+    }
     file[17] = '\0'; //truncate filename to 8 characters
     strcat(file, ".mod");
     FILE *fh;
@@ -172,12 +217,7 @@ void PROTOCOL_Load(int no_dlg)
         printf("Module is not defined!\n");
         return;
     }
-    #define PROTODEF(proto, module, map, cmd, name) case proto: PROTO_Cmds = cmd; break;
-    switch(Model.protocol) {
-        #include "protocol.h"
-        default: PROTO_Cmds = NULL;
-    }
-    #undef PROTODEF
+    PROTO_Cmds = Protocols[Model.protocol].cmd;
 #endif
     PROTOCOL_SetSwitch(get_module(Model.protocol));
     if (PROTOCOL_GetTelemetryState() != PROTO_TELEM_UNSUPPORTED) {
@@ -185,7 +225,7 @@ void PROTOCOL_Load(int no_dlg)
         TELEMETRY_SetType(PROTOCOL_GetTelemetryType());
     }
 }
- 
+
 u8 PROTOCOL_WaitingForSafe()
 {
     return ((proto_state & (PROTO_INIT | PROTO_READY)) == PROTO_INIT) ? 1 : 0;
@@ -220,9 +260,9 @@ void PROTOCOL_SetBindState(u32 msec)
 int PROTOCOL_MapChannel(int input, int default_ch)
 {
     int i;
-    if (ProtocolChannelMap[Model.protocol]) {
+    if (CurrentProtocolChannelMap) {
         for(i = 0; i < PROTO_MAP_LEN; i++) {
-            if (ProtocolChannelMap[Model.protocol][i] == input) {
+            if (CurrentProtocolChannelMap[i] == input) {
                 default_ch = NUM_INPUTS + i;
                 break;
             }
@@ -367,15 +407,13 @@ void PROTOCOL_CheckDialogs()
         }
     }
 }
-static int get_module(int idx)
+
+static int get_module(u16 idx)
 {
-    int m = TX_MODULE_LAST;
-    #define PROTODEF(proto, module, map, cmd, name) case proto: m = module; break;
-    switch(idx) {
-        #include "protocol.h"
-    }
-    #undef PROTODEF
-    return m;
+    if (idx >= PROTOCOL_COUNT)
+        return TX_MODULE_LAST;
+    else
+        return Protocols[idx].module;
 }
 
 int PROTOCOL_HasModule(int idx)
@@ -387,7 +425,7 @@ int PROTOCOL_HasModule(int idx)
     if (SPISwitch_Present()) {
         return 1;
     } else {
-#endif        
+#endif
     int m = get_module(idx);
     if(m == TX_MODULE_LAST || Transmitter.module_enable[m].port != 0)
         return 1;
@@ -403,7 +441,7 @@ int PROTOCOL_HasPowerAmp(int idx)
     if (SPISwitch_Present()) {
         return 1;
     } else {
-#endif        
+#endif
     int m = get_module(idx);
     if(m != TX_MODULE_LAST && Transmitter.module_poweramp & (1 << m))
         return 1;
@@ -484,7 +522,7 @@ void PROTOCOL_InitModules()
                     }
                     break;
                 }
-            } 
+            }
         }
     }
     //Put this last because the switch will not respond until after it has been initialized
@@ -510,7 +548,7 @@ void PROTO_CS_HI(int module)
     if (SPISwitch_Present()) {
         SPISwitch_CS_HI(module);
     } else {
-#endif        
+#endif
 #if HAS_MULTIMOD_SUPPORT
     if (MODULE_ENABLE[MULTIMOD].port) {
         //We need to set the multimodule CSN even if we don't use it

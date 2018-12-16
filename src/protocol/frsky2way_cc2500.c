@@ -507,6 +507,7 @@ const void *FRSKY2WAY_Cmds(enum ProtoCmds cmd)
             Telemetry.value[TELEM_FRSKY_MIN_CELL] = TELEMETRY_GetMaxValue(TELEM_FRSKY_MIN_CELL);
 #endif
             return 0;
+        case PROTOCMD_CHANNELMAP: return AETRG;
         default: break;
     }
     return 0;

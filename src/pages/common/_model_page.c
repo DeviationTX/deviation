@@ -244,7 +244,7 @@ static const char *protoselect_cb(guiObject_t *obj, int dir, void *data)
     enum Protocols new_protocol;
     new_protocol = GUI_TextSelectHelper(Model.protocol, PROTOCOL_NONE, PROTOCOL_COUNT-1, dir, 1, 1, &changed);
     if (changed) {
-        const u8 *oldmap = ProtocolChannelMap[Model.protocol];
+        const u8 *oldmap = CurrentProtocolChannelMap;
     	// DeInit() the old protocol (Model.protocol unchanged)
         PROTOCOL_DeInit();
         // Load() the new protocol
@@ -269,11 +269,12 @@ static const char *protoselect_cb(guiObject_t *obj, int dir, void *data)
         configure_bind_button();
     }
     GUI_TextSelectEnablePress((guiTextSelect_t *)obj, PROTOCOL_GetOptions() ? 1 : 0);
+
     if (Model.protocol == 0)
         return _tr("None");
-    if(PROTOCOL_HasModule(Model.protocol))
-        return ProtocolNames[Model.protocol];
-    sprintf(tempstring, "*%s", ProtocolNames[Model.protocol]);
+    if (PROTOCOL_HasModule(Model.protocol))
+        return PROTOCOL_Name();
+    sprintf(tempstring, "*%s", PROTOCOL_Name());
     return tempstring;
 }
 void proto_press_cb(guiObject_t *obj, void *data)

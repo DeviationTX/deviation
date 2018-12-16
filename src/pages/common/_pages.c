@@ -105,14 +105,14 @@ u8 PAGE_TelemStateCheck(char *str, int strlen)
 {
     (void)strlen;
     s8 state = PROTOCOL_GetTelemetryState();
-    if (state == -1) {
+    if (state == PROTO_TELEM_UNSUPPORTED) {
         sprintf(str, "%s%s%s",
             _tr("Telemetry"),
             LCD_DEPTH == 1?"\n":" ", // no translate for this string
             _tr("is not supported"));
         return 0;
     }
-    else if (state == 0) {
+    else if (state == PROTO_TELEM_OFF) {
         sprintf(str, "%s%s%s",
             _tr("Telemetry"),
             LCD_DEPTH == 1?"\n":" ",  // no translate for this string

@@ -487,6 +487,7 @@ static u16 hubsan_cb()
             A7105_WriteID(id_data);    
             bind_count = 0;
         }
+        /* FALLTHROUGH */
     case BIND_3:
     case BIND_5:
     case BIND_7:
@@ -673,6 +674,7 @@ const void *HUBSAN_Cmds(enum ProtoCmds cmd)
             return (void *)(long)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
         case PROTOCMD_TELEMETRYTYPE: 
             return (void *)(long) TELEM_DEVO;
+        case PROTOCMD_CHANNELMAP: return AETRG;
         default: break;
     }
     return 0;

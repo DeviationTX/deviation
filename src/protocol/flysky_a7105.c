@@ -446,6 +446,7 @@ const void *FLYSKY_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_GETOPTIONS:
             return flysky_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
+        case PROTOCMD_CHANNELMAP: return AETRG;
         default: break;
     }
     return 0;

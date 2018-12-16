@@ -120,6 +120,7 @@ const void * PPMOUT_Cmds(enum ProtoCmds cmd)
                 Model.proto_opts[PERIOD_PW] = 22500;
             }
             return ppm_opts;
+	case PROTOCMD_CHANNELMAP: return UNCHG;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
         default: break;
     }

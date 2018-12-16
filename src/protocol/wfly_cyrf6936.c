@@ -263,6 +263,7 @@ u16 WFLY_callback()
             WFLY_cyrf_data_config();
             packet_count=0;
             phase++;
+            /* FALLTHROUGH */
         case WFLY_DATA:
             wait_write = MAX_WAIT_WRITE;
             while (wait_write-- > 0) // Wait max 200µs for TX to finish
@@ -353,6 +354,7 @@ const void *WFLY_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_CURRENT_ID:  return (void *)((unsigned long)Model.fixed_id);
         case PROTOCMD_GETOPTIONS: return (void*)0L;
         case PROTOCMD_TELEMETRYSTATE: return (void *) PROTO_TELEM_UNSUPPORTED;
+        case PROTOCMD_CHANNELMAP: return AETRG;
         default: break;
     }
     return 0;
