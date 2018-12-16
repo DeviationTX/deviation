@@ -130,7 +130,7 @@ void UART_SetFormat(int bits, uart_parity parity, uart_stopbits stopbits)
    to accept received character and status. Disable by calling with argument NULL.
    Callback executes in interrupt context and must be short.
 */
-extern usart_callback_t *rx_callback;
+usart_callback_t *rx_callback;
 void UART_StartReceive(usart_callback_t *isr_callback)
 {
     rx_callback = isr_callback;

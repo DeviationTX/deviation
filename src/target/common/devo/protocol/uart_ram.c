@@ -19,7 +19,7 @@
 #include <libopencm3/cm3/nvic.h>
 #include "common.h"
 
-extern u8 busy;
+u8 busy;
 u8 UART_Send(u8 *data, u16 len) {
     if (busy) return 1;
     busy = 1;
