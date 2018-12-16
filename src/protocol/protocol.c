@@ -59,7 +59,7 @@ const void * (*PROTO_Cmds)(enum ProtoCmds) = NULL;
 #define PROTOCOL_LOADED PROTO_Cmds
 #endif
 
-#ifdef MODULAR
+#ifdef ENABLE_MODULAR
 #define PROTODEF(proto, module, map, cmd, name) {module, name},
 const struct{
     int module;
