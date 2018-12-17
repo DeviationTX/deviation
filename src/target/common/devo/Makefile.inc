@@ -25,7 +25,6 @@ ifdef MODULAR
 PROTO_EXTRA_C = $(wildcard $(SDIR)/target/common/devo/protocol/*.c) \
                 $(wildcard $(SDIR)/target/common/devo/hid/*.c) \
                 $(wildcard $(SDIR)/protocol/spi/*.c) \
-                $(SDIR)/target/common/devo/protospi.c \
                 $(SDIR)/target/common/devo/uart.c
 else
 SRC_C   += $(wildcard $(SDIR)/target/common/devo/protocol/*.c) \
