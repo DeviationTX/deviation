@@ -39,7 +39,7 @@ void _USART_DMA_ISR(void)
 usart_callback_t *rx_callback;
 void _USART_ISR(void)
 {
-	u8 status = USART_SR(_USART) & (USART_SR_RXNE | USART_SR_PE | USART_SR_FE | USART_SR_NE | USART_SR_ORE) ;
+    u8 status = USART_SR(_USART) & (USART_SR_RXNE | USART_SR_PE | USART_SR_FE | USART_SR_NE | USART_SR_ORE);
     u8 data = usart_recv(_USART);       // read unconditionally to reset interrupt and error flags
 
     if (rx_callback) rx_callback(data, status);
