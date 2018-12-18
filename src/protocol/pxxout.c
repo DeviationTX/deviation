@@ -336,6 +336,7 @@ const void * PXXOUT_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_TELEMETRYTYPE:
             return (void *)(long) TELEM_FRSKY;
 #endif
+        case PROTOCMD_CHANNELMAP: return UNCHG;
         default: break;
     }
     return 0;
