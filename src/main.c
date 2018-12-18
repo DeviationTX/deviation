@@ -211,7 +211,7 @@ void medium_priority_cb()
 void EventLoop()
 {
     CLOCK_ResetWatchdog();
-#if !HAS_EXTENDED_AUDIO
+#if !HAS_EXTENDED_AUDIO && (!defined(HAS_HARD_POWER_OFF) || !HAS_HARD_POWER_OFF)
     unsigned int time;
 #endif
 
