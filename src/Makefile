@@ -271,8 +271,8 @@ $(MODELDIR):
 ######################
 $(TARGET).$(EXEEXT): $(LINKFILE) $(OBJS) $(LIBOPENCM3)
 	@echo " + Building '$@'"
-ifdef LINKFILE #Create an empty 'obj/optimize.ld' just in case the linker script needs it
-	echo "" > objs/optimize.ld
+ifdef LINKFILE #Create an empty 'obj/$(TARGET)/optimize.ld' just in case the linker script needs it
+	echo "" > objs/$(TARGET)/optimize.ld
 endif
 ifeq ("$(SRC_CXX)", " ")
 	$(CC) -o $@ $(OBJS) $(LIBOPENCM3) $(LFLAGS) $(LFLAGS2) $(CFLAGS)
