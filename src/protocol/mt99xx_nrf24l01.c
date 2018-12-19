@@ -24,7 +24,6 @@
 #include "mixer.h"
 #include "config/model.h"
 #include "config/tx.h" // for Transmitter
-#include "music.h"
 #include "telemetry.h"
 
 #ifdef MODULAR
@@ -349,7 +348,6 @@ static u16 mt99xx_callback()
 {
     switch (state) {
     case MT99XX_INIT:
-        // MUSIC_Play(MUSIC_TELEMALARM1);	// Shouldn't play telemetry alarm doing bind init
         state = MT99XX_BIND;
         break;
 
@@ -368,7 +366,6 @@ static u16 mt99xx_callback()
             XN297_SetTXAddr(rx_tx_addr, 5);
             state = MT99XX_DATA;
             PROTOCOL_SetBindState(0);
-            MUSIC_Play(MUSIC_DONE_BINDING);
         } else {
             if(Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_LS) {
                 NRF24L01_WriteReg(NRF24L01_05_RF_CH, 0x2d);

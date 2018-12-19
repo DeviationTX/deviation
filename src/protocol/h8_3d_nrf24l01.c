@@ -394,7 +394,6 @@ static u16 h8_3d_callback()
 {
     switch (phase) {
     case H8_3D_INIT1:
-        // MUSIC_Play(MUSIC_TELEMALARM1);	// Shouldn't play telemetry alarm doing bind init
         phase = H8_3D_BIND2;
         break;
 
@@ -402,7 +401,6 @@ static u16 h8_3d_callback()
         if (counter == 0) {
             phase = H8_3D_DATA;
             PROTOCOL_SetBindState(0);
-            MUSIC_Play(MUSIC_DONE_BINDING);
         } else {
             send_packet(1);
             counter -= 1;

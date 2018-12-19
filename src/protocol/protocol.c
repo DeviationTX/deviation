@@ -402,7 +402,6 @@ void PROTOCOL_CheckDialogs()
             proto_state |= PROTO_BINDDLG;
         } else if (proto_state & PROTO_BINDDLG) {
             PAGE_CloseBindingDialog();
-            MUSIC_Play(MUSIC_DONE_BINDING);
             proto_state &= ~PROTO_BINDDLG;
         }
     }
