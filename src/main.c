@@ -211,9 +211,6 @@ void medium_priority_cb()
 void EventLoop()
 {
     CLOCK_ResetWatchdog();
-#if !HAS_EXTENDED_AUDIO
-    unsigned int time;
-#endif
 
 #ifdef HEAP_DEBUG
     static int heap = 0;
@@ -243,6 +240,7 @@ void EventLoop()
 #else
         {
             // We wait ~1sec for shutdown buzzer music finished
+            unsigned int time;
             MUSIC_Play(MUSIC_SHUTDOWN);
             time = CLOCK_getms()+700;
             while(CLOCK_getms()<time);
