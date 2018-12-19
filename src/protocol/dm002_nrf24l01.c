@@ -203,9 +203,6 @@ static void DM002_init()
     NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x01);  // Enable data pipe 0 only
     NRF24L01_SetBitrate(NRF24L01_BR_1M);             // 1Mbps
     NRF24L01_SetPower(Model.tx_power);
-    
-    // Check for Beken BK2421/BK2423 chip
-    BK2421_init();
 }
 
 MODULE_CALLTYPE

@@ -85,9 +85,6 @@ void init()
     NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x01);         // Enable data pipe 0 only
     NRF24L01_WriteReg(NRF24L01_11_RX_PW_P0, PACKET_SIZE);
     NRF24L01_SetPower(Model.tx_power);
-
-    // Check for Beken BK2421/BK2423 chip
-    BK2421_init();
 }
 
 void send_packet()

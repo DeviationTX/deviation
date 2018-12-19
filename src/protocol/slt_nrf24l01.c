@@ -152,13 +152,6 @@ static void SLT_init()
     else // V2, Q200
         NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, (u8*)"\x7E\xB8\x63\xA9", SLT_TXID_SIZE);
     NRF24L01_FlushRx();
-
-
-    // Check for Beken BK2421/BK2423 chip
-    BK2421_init();
-
-    // Implicit delay in callback
-    // delay(50);
 }
 
 
