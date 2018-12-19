@@ -3,7 +3,7 @@ The Deviation firmware project is hosted at http://www.deviationtx.com
 There you can find links to:
   * pre-built binaries: http://www.deviationtx.com/downloads-new/category/1-deviation-releases
   * the wiki: http://www.deviationtx.com/wiki
-  * the forums for asking questions: http://www.deviationtx.com/forums
+  * the forums for asking questions: http://www.deviationtx.com/forum
 
 Building Deviation requires setting up a cross-compiler.  On certain
 transmitters (like the devo7e), the firmware takes up nearly 100% of the
