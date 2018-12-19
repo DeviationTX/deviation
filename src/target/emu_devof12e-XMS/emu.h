@@ -8,5 +8,6 @@
 #define ZOOM_X          1 / 2
 #define ZOOM_Y          1 / 2
 #define EMU_STRING "DEVO-F12E-XMS-Emu"
-#define HAS_LCD_INIT    1
+
+#define LCD_EMU_LOWLEVEL 1
 #endif

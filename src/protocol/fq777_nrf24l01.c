@@ -108,18 +108,6 @@ static u8 packet[32];
 // Bit vector from bit position
 #define _BV(bit) (1 << bit)
 
-static const u16 polynomial = 0x1021;
-static u16 crc16_update(u16 crc, uint8_t a)
-{
-    crc ^= a << 8;
-    for (uint8_t i = 0; i < 8; ++i)
-        if (crc & 0x8000)
-            crc = (crc << 1) ^ polynomial;
-        else
-            crc = crc << 1;
-    return crc;
-}
-
 static void ssv_pack_dpl(u8 const addr[], u8 pid, u8* len, u8* payload, u8* packed_payload)
 {
     u8 i = 0;
@@ -146,9 +134,9 @@ static void ssv_pack_dpl(u8 const addr[], u8 pid, u8* len, u8* payload, u8* pack
 
     crc.val=0x3c18;
     for (i = 0; i < 7; ++i)
-        crc.val=crc16_update(crc.val,header[i]);
+        crc.val=crc16_update(crc.val,header[i],8);
     for (i = 0; i < *len; ++i)
-        crc.val=crc16_update(crc.val,payload[i]);
+        crc.val=crc16_update(crc.val,payload[i],8);
 
     // encode payload and crc
     // xor with this:
@@ -358,6 +346,7 @@ const void *FQ777_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_GETOPTIONS: return fq777_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
+        case PROTOCMD_CHANNELMAP: return AETRG;
         default: break;
     }
     return 0;

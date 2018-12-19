@@ -68,7 +68,7 @@ $(TARGET).bin: $(TARGET).elf
 	$(DUMP) -S $< > $(TARGET).list
 
 $(LIBOPENCM3):
-	$(MAKE) -C $(SDIR)/libopencm3 TARGETS=stm32/f1 lib
+	+$(MAKE) -C $(SDIR)/libopencm3 TARGETS=stm32/f1 lib
 
 $(TARGET).dfu: $(TARGET).bin
 	$(SDIR)/../utils/dfu.py --name "$(HGVERSION) Firmware" $(DFU_ARGS):$< $@

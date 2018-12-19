@@ -71,8 +71,8 @@ const char *MIXPAGE_ChanNameProtoCB(guiObject_t *obj, const void *data)
     if ((Transmitter.ignore_src & SWITCH_NOSTOCK) == SWITCH_NOSTOCK)
         proto_map_length = PROTO_MAP_LEN - 1;
     #endif //HAS_SWITCHES_NOSTOCK
-    if (ch < proto_map_length && ProtocolChannelMap[Model.protocol]) {
-        INPUT_SourceNameAbbrevSwitch(tmp1, ProtocolChannelMap[Model.protocol][ch]);
+    if (ch < proto_map_length && CurrentProtocolChannelMap) {
+        INPUT_SourceNameAbbrevSwitch(tmp1, CurrentProtocolChannelMap[ch]);
         sprintf(tempstring, "%s%d-%s",
             (Model.limits[ch].flags & CH_REVERSE) ? "!" : "",
             (int)(ch + 1), tmp1);

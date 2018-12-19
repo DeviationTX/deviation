@@ -41,6 +41,7 @@ enum {
     TELEM_DSM_FLOG_TEMP1,
     TELEM_DSM_AMPS1,
 #if HAS_EXTENDED_TELEMETRY
+    TELEM_DSM_FLOG_RSSI_DBM,
     TELEM_DSM_PBOX_VOLT1,
     TELEM_DSM_PBOX_VOLT2,
     TELEM_DSM_PBOX_CAPACITY1,
@@ -218,9 +219,9 @@ struct Telemetry {
 };
 
 enum {
-    PROTO_TELEM_UNSUPPORTED = -1,
-    PROTO_TELEM_OFF = 0,
-    PROTO_TELEM_ON  = 1,
+    PROTO_TELEM_UNSUPPORTED = 0,
+    PROTO_TELEM_OFF = 1,
+    PROTO_TELEM_ON  = 2,
 };
 
 
@@ -326,7 +327,7 @@ enum {
 
 /************************************************************************/
 
-extern struct Telemetry Telemetry; 
+extern struct Telemetry Telemetry;
 s32 TELEMETRY_GetValue(int idx);
 s32 _TELEMETRY_GetValue(struct Telemetry *t, int idx);
 const char * TELEMETRY_GetValueStr(char *str, int idx);

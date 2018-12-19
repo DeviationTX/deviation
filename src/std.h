@@ -2,6 +2,7 @@
 #define _STD_H_
 
 /* the following defines allow control over how stdio/stdlib functions are handles */
+#undef strncpy
 #define strncpy "BAD_FUNC"  //Do not allow any use of strncpy (use strlcpy instead)
 #ifndef USE_OWN_PRINTF
     #define USE_OWN_PRINTF 1
@@ -59,7 +60,9 @@
     void tfp_sprintf(char* s,const char *fmt, ...);
     void tfp_snprintf(char* s, int len, const char *fmt, ...);
     void tfp_fprintf(FILE *fh,const char *fmt, ...);
+    #undef sprintf
     #define sprintf tfp_sprintf
+    #undef snprintf
     #define snprintf tfp_snprintf
     #define fprintf tfp_fprintf
     #if ! defined BUILDTYPE_DEV  && ! DEBUG_WINDOW_SIZE

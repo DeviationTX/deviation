@@ -212,7 +212,7 @@ static void send_packet(u8 bind)
     case FORMAT_H26D:
     case FORMAT_H26WH:
         packet[10] = pan_tilt_value();
-        // fall through on purpose - no break
+        /* FALLTHROUGH */
     case FORMAT_WLH08:
     case FORMAT_E010:
         packet[10] += GET_FLAG(CHANNEL_RTH, 0x02)
@@ -473,6 +473,7 @@ const void *MJXq_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_GETOPTIONS: return mjxq_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
+        case PROTOCMD_CHANNELMAP: return AETRG;
         default: break;
     }
     return 0;

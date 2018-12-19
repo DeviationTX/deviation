@@ -98,7 +98,8 @@ const void * USBHID_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_BIND:  initialize(); return 0;
         case PROTOCMD_NUMCHAN: return (void *)((unsigned long)USBHID_MAX_CHANNELS);
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)6L;
-        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
+	case PROTOCMD_CHANNELMAP: return UNCHG;
+	case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
         default: break;
     }
     return 0;

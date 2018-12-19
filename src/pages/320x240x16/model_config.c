@@ -64,7 +64,7 @@ void PAGE_ModelConfigInit(int page)
 void PAGE_ModelProtoInit(int page)
 {
     (void)page;
-    PAGE_ShowHeader(ProtocolNames[Model.protocol]);
+    PAGE_ShowHeader(PROTOCOL_Name());
     proto_strs = PROTOCOL_GetOptions();
     int row = ROW1;
     int pos = 0;

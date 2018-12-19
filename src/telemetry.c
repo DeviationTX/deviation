@@ -330,7 +330,7 @@ void TELEMETRY_SetType(int type)
 //#define DEBUG_TELEMALARM
 void TELEMETRY_Alarm()
 {
-    if (! PROTOCOL_GetTelemetryState())
+    if (PROTOCOL_GetTelemetryState() != PROTO_TELEM_ON)
         return;
 
     //Update 'updated' state every time we get here
@@ -436,6 +436,9 @@ void TELEMETRY_Alarm()
                 case TELEM_DSM_GFORCE_YMAX:
                 case TELEM_DSM_GFORCE_ZMAX:
                 case TELEM_DSM_GFORCE_ZMIN: MUSIC_PlayValue(MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + k), TELEMETRY_GetValue(Model.telem_alarm[k]),VOICE_UNIT_GFORCE,2); break;
+#if HAS_EXTENDED_TELEMETRY
+                case TELEM_DSM_FLOG_RSSI_DBM: MUSIC_PlayValue(MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + k), TELEMETRY_GetValue(Model.telem_alarm[k]),VOICE_UNIT_DB,0); break;
+#endif
                 default: MUSIC_PlayValue(MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + k), TELEMETRY_GetValue(Model.telem_alarm[k]),VOICE_UNIT_NONE,0);
           }
         }
@@ -463,6 +466,8 @@ void TELEMETRY_Alarm()
                 case TELEM_FRSKY_CURRENT: MUSIC_PlayValue(MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + k), TELEMETRY_GetValue(Model.telem_alarm[k]),VOICE_UNIT_AMPS,2); break;
                 case TELEM_FRSKY_ALTITUDE: MUSIC_PlayValue(MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + k), TELEMETRY_GetValue(Model.telem_alarm[k]),VOICE_UNIT_ALTITUDE,2); break;
 #endif
+                case TELEM_FRSKY_LRSSI:
+                case TELEM_FRSKY_RSSI: MUSIC_PlayValue(MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + k), TELEMETRY_GetValue(Model.telem_alarm[k]),VOICE_UNIT_DB,0); break;
                 default: MUSIC_PlayValue(MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + k), TELEMETRY_GetValue(Model.telem_alarm[k]),VOICE_UNIT_NONE,0);
             }
         }
@@ -474,6 +479,11 @@ void TELEMETRY_Alarm()
                     MUSIC_PlayValue(MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + k), TELEMETRY_GetValue(Model.telem_alarm[k]),VOICE_UNIT_VOLT,2); break;
                 case TELEM_CRSF_BATT_CURRENT: MUSIC_PlayValue(MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + k), TELEMETRY_GetValue(Model.telem_alarm[k]),VOICE_UNIT_AMPS,2); break;
                 case TELEM_CRSF_GPS_ALTITUDE: MUSIC_PlayValue(MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + k), TELEMETRY_GetValue(Model.telem_alarm[k]),VOICE_UNIT_ALTITUDE,2); break;
+                case TELEM_CRSF_TX_SNR:
+                case TELEM_CRSF_TX_RSSI:
+                case TELEM_CRSF_RX_SNR:
+                case TELEM_CRSF_RX_RSSI1:
+                case TELEM_CRSF_RX_RSSI2: MUSIC_PlayValue(MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + k), TELEMETRY_GetValue(Model.telem_alarm[k]),VOICE_UNIT_DB,0); break;
                 default: MUSIC_PlayValue(MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + k), TELEMETRY_GetValue(Model.telem_alarm[k]),VOICE_UNIT_NONE,0);
             }
         }

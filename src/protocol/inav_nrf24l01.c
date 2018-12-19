@@ -829,6 +829,7 @@ const void *INAV_Cmds(enum ProtoCmds cmd)
 #else
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
 #endif
+        case PROTOCMD_CHANNELMAP: return AETRG;
         default: break;
     }
     return 0;
