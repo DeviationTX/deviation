@@ -43,7 +43,7 @@ endif
 MODULE_FLAGS = -fno-builtin
 
 #LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -nostdlib
-LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -lc -lnosys -L$(SDIR)
+LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -lc -lnosys -L$(SDIR) -Lobjs/$(TARGET)
 LFLAGS2  = -Wl,-T$(LINKFILE)
 LFLAGS2OPT  = -Wl,-T$(SDIR)/target/$(TARGET)/$(TARGET)_opt.ld
 
@@ -57,7 +57,7 @@ $(TARGET).bin: $(TARGET).elf
 ifdef OPTIMIZE_DFU
 	$(CP) $(TARGET).elf objs/$(TARGET)/$(TARGET).elf
 	@echo " + Optimizing placement and re-linking"
-	$(SDIR)/../utils/repack_ld.pl -mapfile $(TARGET).map -size $(CRC_OFFSET) > objs/optimize.ld
+	$(SDIR)/../utils/repack_ld.pl -mapfile $(TARGET).map -size $(CRC_OFFSET) > objs/$(TARGET)/optimize.ld
 	$(CC) -o $< $(OBJS) $(LIBOPENCM3) $(LFLAGS) $(LFLAGS2OPT) $(CFLAGS)
 endif
 ifdef MODULAR # the following builds a symbol file with thumb addresses (address+1 for functions, address+0 for variables)
@@ -67,7 +67,7 @@ endif
 	$(DUMP) -S $< > $(TARGET).list
 
 $(LIBOPENCM3):
-	+$(MAKE) -C $(SDIR)/libopencm3 TARGETS=stm32/f1 lib
+	+flock objs/.lock $(MAKE) -C $(SDIR)/libopencm3 TARGETS=stm32/f1 lib
 
 $(TARGET).dfu: $(TARGET).bin
 	$(SDIR)/../utils/dfu.py --name "$(HGVERSION) Firmware" $(DFU_ARGS):$< $@
