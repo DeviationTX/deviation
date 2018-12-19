@@ -57,7 +57,7 @@ CFLAGS  += -D"HAS_FLASH_DETECT=1"
 endif
 MODULE_FLAGS = -fno-builtin
 
-LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -lc -lnosys -L$(SDIR)
+LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -lc -lnosys -L$(SDIR) -Lobjs/$(TARGET)
 LFLAGS2  = -Wl,-T$(LINKFILE)
 
 
