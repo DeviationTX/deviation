@@ -239,7 +239,6 @@ void EventLoop()
         } else {
 #else
         {
-            unsigned int time;
             // We wait ~1sec for shutdown buzzer music finished
             unsigned int time;
             MUSIC_Play(MUSIC_SHUTDOWN);
