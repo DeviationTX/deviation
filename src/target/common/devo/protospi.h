@@ -11,7 +11,8 @@ u8 PROTOSPI_read3wire();
 #define PROTOSPI_xfer(byte) spi_xfer(SPI2, byte)
 #define _NOP()  asm volatile ("nop")
 
-extern const struct mcu_pin CYRF_RESET_PIN;
-extern const struct mcu_pin AVR_RESET_PIN;
+
+#define _SPI_CYRF_RESET_PIN {GPIOB, GPIO11}
+#define _SPI_AVR_RESET_PIN {GPIO_BANK_JTCK_SWCLK, GPIO_JTCK_SWCLK}
 
 #endif // _SPIPROTO_H_

@@ -7,9 +7,6 @@
 
 #include "common.h"
 
-static const struct mcu_pin CYRF_RESET_PIN ={GPIOB, GPIO11};
-static const struct mcu_pin AVR_RESET_PIN ={GPIO_BANK_JTCK_SWCLK, GPIO_JTCK_SWCLK};
-
 u8 PROTOSPI_read3wire(){
     u8 data;
     while(!(SPI_SR(SPI2) & SPI_SR_TXE))
