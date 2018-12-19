@@ -145,7 +145,7 @@ const char * _dsm_str_by_value(char *str, u8 telem, s32 value)
         case TELEM_DSM_PBOX_ALARMV2:
         case TELEM_DSM_PBOX_ALARMC1:
         case TELEM_DSM_PBOX_ALARMC2:    strcpy(str, _tr(value?"On":"Off")); break;
-        case TELEM_DSM_FLOG_RSSI_DBM:
+        case TELEM_DSM_FLOG_RSSI_DBM:   _get_value_str(str, value, 0, 'd'); break;
         case TELEM_DSM_PBOX_CAPACITY1:
         case TELEM_DSM_PBOX_CAPACITY2:
         case TELEM_DSM_FPCAP_CAPACITY:
