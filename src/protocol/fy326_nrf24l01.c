@@ -24,7 +24,6 @@
 #include "mixer.h"
 #include "config/model.h"
 #include "config/tx.h" // for Transmitter
-#include "music.h"
 
 #ifdef MODULAR
   //Some versions of gcc applythis to definitions, others to calls
@@ -231,7 +230,6 @@ static u16 fy326_callback()
     u8 i;
     switch (phase) {
     case FY319_INIT1:
-        // MUSIC_Play(MUSIC_TELEMALARM1);	// Shouldn't play telemetry alarm doing bind init
         NRF24L01_SetTxRxMode(TXRX_OFF);
         NRF24L01_FlushRx();
         NRF24L01_SetTxRxMode(RX_EN);
@@ -268,13 +266,11 @@ static u16 fy326_callback()
             packet[1] = 0x40;
         if(--bind_counter == 0) {
             PROTOCOL_SetBindState(0);
-            MUSIC_Play(MUSIC_DONE_BINDING);
             phase = FY326_DATA;
         }
         break;
     
     case FY326_INIT1:
-        // MUSIC_Play(MUSIC_TELEMALARM1);	// Shouldn't play telemetry alarm doing bind init
         bind_counter = BIND_COUNT;
         phase = FY326_BIND2;
         send_packet(1);
@@ -294,7 +290,6 @@ static u16 fy326_callback()
             NRF24L01_SetTxRxMode(TXRX_OFF);
             NRF24L01_SetTxRxMode(TX_EN);
             PROTOCOL_SetBindState(0);
-            MUSIC_Play(MUSIC_DONE_BINDING);
             phase = FY326_DATA;
         } else if (bind_counter-- == 0) {
             bind_counter = BIND_COUNT;
