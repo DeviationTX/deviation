@@ -23,6 +23,10 @@
 #include <string.h>
 #include <errno.h>
 
+#ifdef MODULAR
+  #pragma long_calls
+#endif
+
 void UART_Initialize()
 {
     /* Enable clocks for GPIO port containing _USART and USART */

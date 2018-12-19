@@ -24,13 +24,11 @@ extern void spi_disable();
 extern void spi_set_bidirectional_receive_only_mode();
 extern void spi_read();
 extern void spi_set_unidirectional_mode();
-extern void UART_Stop();
 extern void rcc_peripheral_disable_clock();
 extern void _usleep();
 extern void TELEMETRY_SetUpdated();
 extern void TELEMETRY_SetType();
 extern void MCU_SerialNumber();
-extern void USB_Disable();
 extern void PROTO_CS_HI();
 extern void PROTO_CS_LO();
 extern void MUSIC_Beep();
@@ -41,19 +39,16 @@ void PROTO_Stubs(int idx)
     if (! idx)
         return;
     CLOCK_StartTimer();
-  
+
     spi_disable();
     spi_set_bidirectional_receive_only_mode();
     spi_read();
     spi_set_unidirectional_mode();
-
     TELEMETRY_SetUpdated();
     TELEMETRY_SetType();
-    UART_Stop();
     rcc_peripheral_disable_clock();
     _usleep();
     MCU_SerialNumber();
-    USB_Disable();
     PROTO_CS_HI();
     PROTO_CS_LO();
     MUSIC_Beep();

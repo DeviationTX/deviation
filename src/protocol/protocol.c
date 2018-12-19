@@ -50,16 +50,16 @@ static u32 bind_time;
 #define PROTO_BINDDLG   0x08
 #define PROTO_MODULEDLG 0x10
 
-#ifdef MODULAR
-unsigned long * const loaded_protocol = (unsigned long *)MODULAR;
-void * (* const PROTO_Cmds)(enum ProtoCmds) = (void *)(MODULAR +sizeof(long)+1);
+#ifdef ENABLE_MODULAR
+unsigned long * const loaded_protocol = (unsigned long *)ENABLE_MODULAR;
+void * (* const PROTO_Cmds)(enum ProtoCmds) = (void *)(ENABLE_MODULAR +sizeof(long)+1);
 #define PROTOCOL_LOADED (*loaded_protocol == Model.protocol)
 #else
 const void * (*PROTO_Cmds)(enum ProtoCmds) = NULL;
 #define PROTOCOL_LOADED PROTO_Cmds
 #endif
 
-#ifdef MODULAR
+#ifdef ENABLE_MODULAR
 #define PROTODEF(proto, module, map, cmd, name) {module, name},
 const struct{
     int module;
@@ -145,7 +145,7 @@ extern unsigned _data_loadaddr;
 void PROTOCOL_Load(int no_dlg)
 {
     (void)no_dlg;
-#ifdef MODULAR
+#ifdef ENABLE_MODULAR
     if(! PROTOCOL_HasModule(Model.protocol)) {
         *loaded_protocol = 0;
         return;

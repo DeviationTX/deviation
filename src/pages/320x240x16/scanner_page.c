@@ -93,7 +93,7 @@ static const char *attstr_cb(guiObject_t *obj, const void *data)
 static void press_enable_cb(guiObject_t *obj, const void *data)
 {
     (void)data;
-#ifndef MODULAR
+#ifndef ENABLE_MODULAR
     sp->enable ^= 1;
     if (sp->enable) {
         PROTOCOL_DeInit();
@@ -112,7 +112,7 @@ static void press_enable_cb(guiObject_t *obj, const void *data)
 static void press_mode_cb(guiObject_t *obj, const void *data)
 {
     (void)data;
-#ifndef MODULAR
+#ifndef ENABLE_MODULAR
     sp->scan_mode ^= 1;
 #endif
     GUI_Redraw(obj);
@@ -121,7 +121,7 @@ static void press_mode_cb(guiObject_t *obj, const void *data)
 static void press_attenuator_cb(guiObject_t *obj, const void *data)
 {
     (void)data;
-#ifndef MODULAR
+#ifndef ENABLE_MODULAR
     sp->attenuator ^= 1;
 #endif
     GUI_Redraw(obj);
@@ -154,7 +154,7 @@ void PAGE_ScannerInit(int page)
 
 void PAGE_ScannerEvent()
 {
-#ifndef MODULAR
+#ifndef ENABLE_MODULAR
     if(! sp->enable)
         return;
     GUI_Redraw(&gui->bar[sp->channel]);
@@ -169,7 +169,7 @@ void PAGE_ScannerEvent()
 
 void PAGE_ScannerExit()
 {
-#ifndef MODULAR
+#ifndef ENABLE_MODULAR
     if(sp->enable)
         PROTOCOL_Init(0);
 #endif

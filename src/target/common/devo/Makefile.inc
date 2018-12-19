@@ -24,7 +24,8 @@ SRC_C    = $(wildcard $(SDIR)/target/$(TARGET)/*.c) \
 ifdef MODULAR
 PROTO_EXTRA_C = $(wildcard $(SDIR)/target/common/devo/protocol/*.c) \
                 $(wildcard $(SDIR)/target/common/devo/hid/*.c) \
-                $(wildcard $(SDIR)/protocol/spi/*.c)
+                $(wildcard $(SDIR)/protocol/spi/*.c) \
+                $(SDIR)/target/common/devo/uart.c
 else
 SRC_C   += $(wildcard $(SDIR)/target/common/devo/protocol/*.c) \
            $(wildcard $(SDIR)/target/common/devo/hid/*.c)
@@ -78,7 +79,7 @@ $(TARGET).dfu: $(TARGET).bin
 ###################################
 $(ODIR)/%.bin: $(ODIR)/%.o_ $(PROTO_LINKFILE) $(PROTO_EXTRA_OBJS) $(TARGET).bin
 	@echo " + Building '$@'"
-	$(LD) -o $(@:.bin=.elf) $< $(PROTO_EXTRA_OBJS) objs/devo7e/uart.o $(LIBOPENCM3) -gc-sections -Map=$(@:.bin=.map) \
+	$(LD) -o $(@:.bin=.elf) $< $(PROTO_EXTRA_OBJS) $(LIBOPENCM3) -gc-sections -Map=$(@:.bin=.map) \
 		--cref -T$(PROTO_LINKFILE) --just-symbols=$(SYMBOL_FILE)
 	$(DUMP) -t $(@:.bin=.elf) | grep -q _from_thumb; if [ $$? -eq 0 ]; then echo "ERROR: Bad address found"; false; else true; fi
 	$(CP) -O binary  $(@:.bin=.elf) $@
