@@ -228,7 +228,7 @@ static u32 I2C1_ReadBuffer(u16 deviceId, u8 *buffer, s16 periphMemAddr, int len)
 
 static u32 LCD_ReadReg(unsigned reg)
 {
-    u8 val;
+    u8 val = 0;
     for (int i = 0; i < 2; i++) {
         if (! I2C1_ReadBuffer(0x45, &val, reg, 1))
             break;
