@@ -556,9 +556,6 @@ static void init_nrf24l01(void)
     NRF24L01_WriteReg(NRF24L01_1D_FEATURE, BV(NRF24L01_1D_EN_ACK_PAY) | BV(NRF24L01_1D_EN_DPL));
 #endif
 
-    // Check for Beken BK2421/BK2423 chip
-    BK2421_init();
-
     NRF24L01_SetTxRxMode(TX_EN); // enter transmit mode, sets up NRF24L01_00_CONFIG register
 }
 

@@ -160,10 +160,6 @@ static void h377_init()
     NRF24L01_SetBitrate(0);                          // 1Mbps
     NRF24L01_SetPower(Model.tx_power);
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);     // Clear data ready, data sent, and retransmit
-
-
-    // Check for Beken BK2421/BK2423 chip
-    BK2421_init();
 }
 
 // H377 channel sequence: AILE  ELEV  THRO  RUDD  GEAR  PITH, channel data value is from 0 to 1000

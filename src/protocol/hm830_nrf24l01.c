@@ -162,9 +162,6 @@ static void HM830_init()
     NRF24L01_WriteReg(NRF24L01_1C_DYNPD,   0x3F);
     //NRF24L01_ReadReg(NRF24L01_07_STATUS) ==> 0x07
 
-    // Check for Beken BK2421/BK2423 chip
-    BK2421_init();
-
     NRF24L01_FlushTx();
     //NRF24L01_ReadReg(NRF24L01_07_STATUS) ==> 0x0e
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x0e);

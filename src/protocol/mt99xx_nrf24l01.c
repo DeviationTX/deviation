@@ -310,9 +310,6 @@ static void mt99xx_init()
     NRF24L01_ReadReg(NRF24L01_1D_FEATURE);
     NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 0x00);       // Disable dynamic payload length on all pipes
     NRF24L01_WriteReg(NRF24L01_1D_FEATURE, 0x00);     // Set feature bits on
-
-    // Check for Beken BK2421/BK2423 chip
-    BK2421_init();
     
     // Power on, TX mode, 2byte CRC    
     XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
