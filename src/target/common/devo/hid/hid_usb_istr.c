@@ -22,6 +22,7 @@
 #include "hid_usb_prop.h"
 #include "hid_usb_istr.h"
 #include "usb_pwr.h"
+#include "usb_regs.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
