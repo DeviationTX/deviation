@@ -109,27 +109,10 @@ void PROTOCOL_Init(u8 force)
     }
     proto_state |= PROTO_READY;
 
-    if(Model.protocol == PROTOCOL_NONE || ! PROTOCOL_LOADED) {
+    if(Model.protocol == PROTOCOL_NONE || ! PROTOCOL_LOADED)
         CLOCK_StopTimer();
-        CurrentProtocolChannelMap = NULL;
-    }
-    else {
+    else
         PROTO_Cmds(PROTOCMD_INIT);
-
-        CurrentProtocolChannelMap = (const u8*)PROTO_Cmds(PROTOCMD_CHANNELMAP);
-        if (CurrentProtocolChannelMap == AETRG)
-        {
-            CurrentProtocolChannelMap = AETRG0;
-        }
-        else if (CurrentProtocolChannelMap == UNCHG)
-        {
-            CurrentProtocolChannelMap = NULL;
-        }
-        else if (CurrentProtocolChannelMap != EATRG && CurrentProtocolChannelMap != TAERG)
-        {
-            printf("Unknown map: %x\n", CurrentProtocolChannelMap);
-        }
-    }
 }
 
 void PROTOCOL_DeInit()
@@ -224,6 +207,8 @@ void PROTOCOL_Load(int no_dlg)
         memset(&Telemetry, 0, sizeof(Telemetry));
         TELEMETRY_SetType(PROTOCOL_GetTelemetryType());
     }
+
+    CurrentProtocolChannelMap = PROTOCOL_GetChannelMap();
 }
 
 u8 PROTOCOL_WaitingForSafe()
@@ -360,6 +345,24 @@ void PROTOCOL_SetOptions()
 {
     if(Model.protocol != PROTOCOL_NONE && PROTOCOL_LOADED)
         PROTO_Cmds(PROTOCMD_SETOPTIONS);
+}
+
+const u8* PROTOCOL_GetChannelMap()
+{
+    const u8* channelmap = NULL;
+    if(Model.protocol != PROTOCOL_NONE && PROTOCOL_LOADED)
+    {
+        channelmap = PROTO_Cmds(PROTOCMD_CHANNELMAP);
+        if (channelmap == AETRG)
+        {
+            channelmap = AETRG0;
+        }
+        else if (channelmap == UNCHG)
+        {
+            channelmap = NULL;
+        }
+    }
+    return channelmap;
 }
 
 int PROTOCOL_GetTelemetryState()

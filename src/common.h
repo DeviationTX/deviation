@@ -168,6 +168,7 @@ u32 PROTOCOL_CurrentID();
 const char * PROTOCOL_Name();
 const char * PROTOCOL_GetName(u16 idx);
 const char **PROTOCOL_GetOptions();
+const u8* PROTOCOL_GetChannelMap();
 void PROTOCOL_SetOptions();
 int PROTOCOL_GetTelemetryState();
 int PROTOCOL_GetTelemetryType();
