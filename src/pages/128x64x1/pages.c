@@ -18,6 +18,7 @@ static unsigned action_cb(u32 button, unsigned flags, void *data);
 
 #include "../common/_pages.c"
 
+struct _gui_objs gui_objs;
 static u8 quick_page_enabled;
 static u16 *current_selected;
 static guiScrollable_t *page_scrollable;

@@ -593,7 +593,7 @@ struct stdtravel_obj {
     guiScrollbar_t scrollbar;
 };
 
-struct gui_objs {
+struct _gui_objs {
     struct page_obj page;
     struct dialog_obj dialog;
     union {
@@ -643,5 +643,7 @@ struct gui_objs {
         struct stdtravel_obj stdtravel;
         struct stdchan_obj stdchan;
     } u;
-} gui_objs;
+};
+
+extern struct _gui_objs gui_objs;
 #endif

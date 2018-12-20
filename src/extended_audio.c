@@ -25,6 +25,13 @@
 #endif // EMULATOR
 
 #if HAS_EXTENDED_AUDIO
+u16 voice_map_entries;
+struct VoiceMap voice_map[MAX_VOICEMAP_ENTRIES];
+
+u16 audio_queue[AUDIO_QUEUE_LENGTH];
+u8 next_audio;
+u8 num_audio;
+u32 audio_queue_time;
 
 // Initialize UART for extended-audio
 void AUDIO_Init() {

@@ -27,7 +27,7 @@
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-__IO uint16_t wIstr;  /* ISTR register last read value */
+extern __IO uint16_t wIstr;  /* ISTR register last read value */
 
 /* Extern variables ----------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
