@@ -64,12 +64,12 @@ enum {
     DATA5
 };
 
-u8 hopping_frequency[2];
-u8 hopping_frequency_no;
-u8 packet[32];
-u8 tx_power;
-u8 state;
-u32 packet_count;
+static u8 hopping_frequency[2];
+static u8 hopping_frequency_no;
+static u8 packet[32];
+static u8 tx_power;
+static u8 state;
+static u32 packet_count;
 
 void init()
 {
