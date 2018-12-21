@@ -59,6 +59,7 @@ void LCD_Init()
 
 void LCD_Clear(unsigned int color)
 {
+    last_color = 0;
     backcolor = LCD_GetColor(color);
     TW8816_ClearDisplay(backcolor);
 }
@@ -104,7 +105,6 @@ void LCD_SetFontStyle(u8 style)
 
 void LCD_SetFontColor(u16 color)
 {
-
     cur_str.color = LCD_GetColor(color);
 }
 
