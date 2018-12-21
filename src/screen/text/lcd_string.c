@@ -85,6 +85,7 @@ void LCD_GetStringDimensions(const u8 *str, u16 *width, u16 *height) {
     //printf("W: %d   H: %d\n",(int)*width,(int)*height);
 }
 
+#pragma weak LCD_SetFontColor
 void LCD_SetFontColor(u16 color) {
     cur_str.color = color;
 }

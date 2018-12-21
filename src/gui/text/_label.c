@@ -15,6 +15,7 @@
 
 #include "lcd_page_props.h"
 
+#ifdef HAS_MAPPED_GFX
 void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height,
         const char *str, const struct LabelDesc *desc, u8 is_selected) {
 
@@ -29,6 +30,37 @@ void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height,
         obj_width = txt_w;
     if (obj_height == 0)
         obj_height = txt_h;
+
+    // Caculate alignment
+    u8 style = 0;
+    if (desc && (desc->style == LABEL_INVERTED || (desc->style != LABEL_FILL && is_selected))) {
+        // switch the forecolor and backcolor
+        style |= FONT_INVERTED;
+    }
+    else if (desc && desc->style == LABEL_UNDERLINE)
+        style |= FONT_UNDERLINE;
+    LCD_SetFontStyle(style);
+    printf("|%s| [%dx%d] - 0x%x\n", str, txt_w, obj_width, style);
+    LCD_PrintStringXY(obj_x, obj_y, str);
+    if (style)
+        LCD_SetFontStyle(0);
+}
+#else
+void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height,
+        const char *str, const struct LabelDesc *desc, u8 is_selected) {
+
+    u16 txt_w, txt_h;
+    u16 cx, cy;
+
+    LCD_GetStringDimensions((const u8 *)str, &txt_w, &txt_h);
+    LCD_GetCharDimensions(LCD_SELECT_CHAR, &cx, &cy);
+
+    txt_w += cx;
+    if (obj_width == 0)
+        obj_width = txt_w;
+    if (obj_height == 0)
+        obj_height = txt_h;
+
     if (desc && (desc->style == LABEL_INVERTED || (desc->style != LABEL_FILL && is_selected))) {
         LCD_PrintCharXY(obj_x, obj_y, LCD_SELECT_CHAR);
         obj_x += cx;
@@ -39,3 +71,4 @@ void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height,
     //printf("%s, %d, %d\n", tempstring, txt_w, obj_width);
     LCD_PrintStringXY(obj_x, obj_y, str);
 }
+#endif

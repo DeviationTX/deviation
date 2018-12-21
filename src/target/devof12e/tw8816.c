@@ -476,19 +476,29 @@ void TW8816_SetVideoMode(unsigned enable)
     }
 }
 
-void TW8816_DisplayCharacter(u16 pos, unsigned chr, unsigned attr)
+void TW8816_DisplayCharacter(u16 pos, u8 chr, u16 attr)
 {
     if (window == 1)
-      pos += 430;
-    LCD_WriteReg(0x94, ((chr & 0xFF00) >= 0x300) ? 0x80 : 0x00); // isRamFont
+        pos += 430;
+    LCD_WriteReg(0x94, attr >> 8);
     LCD_WriteReg(0x95, pos >> 8);
     LCD_WriteReg(0x96, pos & 0xff);
     LCD_WriteReg(0x97, chr & 0xff);
     LCD_WriteReg(0x98, attr);
 }
 
-void TW8816_ClearDisplay()
+void TW8816_LoadColor(u8 index, u8 color)
 {
+    LCD_WriteReg(0x9c, index);
+    LCD_WriteReg(0x9d, color);
+}
+
+void TW8816_ClearDisplay(u8 index)
+{
+    u8 data = LCD_ReadReg(0x9F);
+    data &= 0x0F;
+    data |= index << 4;
+    LCD_WriteReg(0x9F, data);
     LCD_WriteReg(0x94, 2);
 }
 

@@ -30,14 +30,6 @@ extern u8 window;
 u8 window_mult;
 unsigned window_x, window_y;
 
-struct rgb {
-    u8 r;
-    u8 g;
-    u8 b;
-};
-static const struct rgb background = {0x00, 0x00, 0xff};
-static const struct rgb foreground = {0xff, 0xff, 0xff};
-
 #define RANGE_TABLE_SIZE 20
 
 struct font_def_rom
@@ -61,13 +53,9 @@ void LCD_DrawPixel(unsigned int color)
 {
     if (gui.x < IMAGE_X && gui.y < IMAGE_Y)
     {   // both are unsigned, can not be < 0
-        struct rgb c;
-        // for emulator of devo 10, 0x0 means white while others mean black
-        c = color ? foreground : background; // 0xaa is grey color(not dot)
-
-        gui.image[3*(IMAGE_X * gui.y + gui.x) + 0]     = c.r;
-        gui.image[3*(IMAGE_X * gui.y + gui.x) + 1]     = c.g;
-        gui.image[3*(IMAGE_X * gui.y + gui.x) + 2]     = c.b;
+        gui.image[3*(IMAGE_X * gui.y + gui.x) + 0]     = (color & 0xff0000) >> 16;
+        gui.image[3*(IMAGE_X * gui.y + gui.x) + 1]     = (color & 0xff00) >> 8;
+        gui.image[3*(IMAGE_X * gui.y + gui.x) + 2]     = (color & 0xff);
     }
     // this must be executed to continue drawing in the next row
     gui.x++;
@@ -184,7 +172,25 @@ void TW8816_SetVideoMode(unsigned enable)
     printf("Video is %s\n", enable?"Enabled":"Disabled");
 }
 
-void TW8816_DisplayCharacter(u16 pos, unsigned chr, unsigned attr)
+static u8 colors[16];
+void TW8816_LoadColor(u8 index, u8 color)
+{
+    colors[index] = color;
+}
+
+u32 RG[] = {0, 32, 64, 96, 128, 160, 192, 255};
+u32 B[] = {0, 64, 128, 255};
+
+static u32 TW8816_UnmapColor(u8 index)
+{
+    u8 color = colors[index];
+    u32 ret = B[color & 0x3] |
+              (RG[(color & 0x1c) >> 2] << 8) |
+              (RG[(color & 0xe0) >> 5] << 16);
+    return ret;
+}
+
+void TW8816_DisplayCharacter(u16 pos, u8 chr, u16 attr)
 {
     (void)attr;
 
@@ -203,12 +209,15 @@ void TW8816_DisplayCharacter(u16 pos, unsigned chr, unsigned attr)
     x += Windows[index].H_start;
     y += Windows[index].V_start;
 
+    u32 forecolor = TW8816_UnmapColor(attr & LCD_FORCOLOR_MASK);
+    u32 backcolor = TW8816_UnmapColor((attr & LCD_BACKCOLOR_MASK) >> LCD_BACKCOLOR_OFFSET);
+
     int font_size = Windows[index].H_zoom;
     const u8 *offset;
 
-    if (chr >= 0x300)
+    if (attr & LCD_FONT_RAM)
     {
-        offset = &font_ram[(chr - 0x300) * 27];
+        offset = &font_ram[chr * 27];
         width = CHAR_WIDTH;
 
         for (int dx = 0; dx < CHAR_WIDTH; dx++) {
@@ -216,7 +225,7 @@ void TW8816_DisplayCharacter(u16 pos, unsigned chr, unsigned attr)
                 int byte = dy / 2 * 3 + dx / 4;
                 int bit = 4 * (dy & 1) + 3 - (dx & 0x3);
 
-                int c = (offset[byte] & (1 << bit)) ? 1 : 0;
+                u32 c = (offset[byte] & (1 << bit)) ? forecolor : backcolor;
                 for (int my = 0; my < font_size; my++)
                     for (int mx = 0; mx < font_size; mx++)
                         LCD_DrawPixelXY((x * CHAR_WIDTH) + dx*font_size + mx,
@@ -240,7 +249,7 @@ void TW8816_DisplayCharacter(u16 pos, unsigned chr, unsigned attr)
         // First clean th area
         for(col = 0; col < font_size * CHAR_WIDTH; col++) {
             for(row = 0; row < font_size * CHAR_HEIGHT; row++) {
-                LCD_DrawPixelXY((x * CHAR_WIDTH) + col, (y * CHAR_HEIGHT) + row, 0);
+                LCD_DrawPixelXY((x * CHAR_WIDTH) + col, (y * CHAR_HEIGHT) + row, backcolor);
             }
         }
 
@@ -256,7 +265,7 @@ void TW8816_DisplayCharacter(u16 pos, unsigned chr, unsigned attr)
                     bit = 0;
                 }
                 if (*data & (1 << bit)) {
-                    LCD_DrawPixelXY((x * CHAR_WIDTH) + col, (y * CHAR_HEIGHT) + row, cur_str.color);
+                    LCD_DrawPixelXY((x * CHAR_WIDTH) + col, (y * CHAR_HEIGHT) + row, forecolor);
                 }
                 bit++;
             }
@@ -265,14 +274,15 @@ void TW8816_DisplayCharacter(u16 pos, unsigned chr, unsigned attr)
     }
 }
 
-void TW8816_ClearDisplay()
+void TW8816_ClearDisplay(u8 color)
 {
     memset(characters, 0, sizeof(characters));
 
+    u32 fullcolor = TW8816_UnmapColor(color);
     for (unsigned i = 0; i < sizeof(gui.image); i+= 3) {
-        gui.image[i] = background.r;
-        gui.image[i+1] = background.g;
-        gui.image[i+2] = background.b;
+        gui.image[i]   = (fullcolor & 0xff0000) >> 16;
+        gui.image[i+1] = (fullcolor & 0xff00) >> 8;
+        gui.image[i+2] = (fullcolor & 0xff);
     }
 }
 

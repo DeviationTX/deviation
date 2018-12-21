@@ -63,6 +63,14 @@ u8 CONFIG_SaveModelIfNeeded();
 void CONFIG_SaveTxIfNeeded();
 extern const char * const MODULE_NAME[TX_MODULE_LAST];
 
+enum
+{
+    FONT_INVERTED  = 0x01,
+    FONT_UNDERLINE = 0x02,
+    FONT_BLINK     = 0x04,
+    FONT_ITALIC    = 0x08
+};
+
 /* LCD primitive functions */
 void LCD_Clear(unsigned int color);
     /* Strings */
@@ -74,8 +82,10 @@ void LCD_SetXY(unsigned int x, unsigned int y);
 void LCD_GetStringDimensions(const u8 *str, u16 *width, u16 *height);
 void LCD_GetCharDimensions(u32 c, u16 *width, u16 *height);
 u8 LCD_SetFont(unsigned int idx);
-u8  LCD_GetFont();
+u8 LCD_GetFont();
 void LCD_SetFontColor(u16 color);
+void LCD_SetFontStyle(u8 style);
+
     /* Graphics */
 void LCD_DrawCircle(u16 x0, u16 y0, u16 r, u16 color);
 void LCD_FillCircle(u16 x0, u16 y0, u16 r, u16 color);
