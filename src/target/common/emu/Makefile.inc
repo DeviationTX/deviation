@@ -37,7 +37,6 @@ ifdef WINDOWS
     EXEEXT = exe
     ODIREXT = -w32
 else
-    CFLAGS += -I/usr/local/include
     LFLAGS := $(LFLAGS) `fltk-config --cxxflags --ldflags`
     ifndef SOUND
         CFLAGS += -DNO_SOUND
