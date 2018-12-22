@@ -484,7 +484,7 @@ void TW8816_DisplayCharacter(u16 pos, u8 chr, u16 attr)
     LCD_WriteReg(0x95, pos >> 8);
     LCD_WriteReg(0x96, pos & 0xff);
     LCD_WriteReg(0x97, chr & 0xff);
-    LCD_WriteReg(0x98, attr & 0ff);
+    LCD_WriteReg(0x98, attr & 0xff);
 }
 
 void TW8816_LoadColor(u8 index, u8 color)
