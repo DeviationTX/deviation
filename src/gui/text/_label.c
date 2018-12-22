@@ -15,7 +15,7 @@
 
 #include "lcd_page_props.h"
 
-#ifdef HAS_MAPPED_GFX
+#ifdef _DEVO_F12E_TARGET_H_
 void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height,
         const char *str, const struct LabelDesc *desc, u8 is_selected) {
 
