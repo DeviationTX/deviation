@@ -50,10 +50,7 @@ static const char *string_cb(guiObject_t *obj, const void *data)
                     && (u8)tempstring[1] == 0xbb
                     && (u8)tempstring[2] == 0xbf)
                 {
-                    //Remove BOM
-                    for(u32 i = 3; i < len; i++)
-                        tempstring[i-3] = tempstring[i];
-                    len -= 3;
+                    return tempstring + 3;
                 }
                 return tempstring;
             }

@@ -11,7 +11,7 @@ my $target_list;
 my $objdir;
 my $count;
 # The following are legal alternatives to the default string
-my @targets = ("devo8", "devo10", "devof12e");
+my @targets = ("devo8", "devo10", "devo12");
 
 sub fnv_16 {
     my ($input, $init_value) = @_;

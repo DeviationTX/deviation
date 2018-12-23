@@ -125,33 +125,32 @@ void CONFIG_ReadLang(u8 idx)
         printf("Couldn't open language file: %s\n", file);
         return;
     }
-    while (fgets(line, sizeof(line), fh) != NULL) {
-        u16 hash;
-        if(line[0] == ':') {
-            CLOCK_ResetWatchdog();
-            fix_crlf(line+1);
-            if (lookup - lookupmap == MAX_STRINGS - 1) {
-                printf("Only %d strings are supported aborting @ %s\n", MAX_STRINGS, line);
-                break;
-            }
-            hash = fnv_16_str(line + 1);
-            dbg_printf("%d: %s\n", hash, line);
-            if (fgets(line, sizeof(line), fh) == NULL) {
-                break;
-            }
-            line[MAX_LINE-1] = 0;
-            unsigned len = fix_crlf(line) + 1;
-            if (pos + len > sizeof(strings)) {
-                printf("Out of space processing %s\n", line);
-                break;
-            }
-            dbg_printf("\t: %s\n", line);
-            lookup->hash = hash;
-            lookup->pos = pos;
-            lookup++;
-            strlcpy(strings + pos, line, len);
-            pos += len;
+
+    // first line of langauge name, ignore it
+    fgets(line, sizeof(line), fh);
+
+    u16 hash;
+    while (fread(&hash, 2, 1, fh) == 1) {
+        CLOCK_ResetWatchdog();
+        if (lookup - lookupmap == MAX_STRINGS - 1) {
+            printf("Only %d strings are supported aborting @ %s\n", MAX_STRINGS, line);
+            break;
         }
+        if (fgets(line, sizeof(line), fh) == NULL) {
+            break;
+        }
+        line[MAX_LINE-1] = 0;
+        unsigned len = fix_crlf(line) + 1;
+        if (pos + len > sizeof(strings)) {
+            printf("Out of space processing %s\n", line);
+            break;
+        }
+        printf("\t: %s\n", line);
+        lookup->hash = hash;
+        lookup->pos = pos;
+        lookup++;
+        strlcpy(strings + pos, line, len);
+        pos += len;
     }
     lookup->pos = 0xFFFF;
     fclose(fh);
