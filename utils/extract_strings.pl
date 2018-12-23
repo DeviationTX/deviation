@@ -3,6 +3,7 @@ use strict;
 use warnings;
 
 use Getopt::Long;
+
 my $update;
 my $lang;
 my $fs;
@@ -10,7 +11,23 @@ my $target_list;
 my $objdir;
 my $count;
 # The following are legal alternatives to the default string
-my @targets = ("devo8", "devo10", "devo12");
+my @targets = ("devo8", "devo10", "devof12e");
+
+sub fnv_16 {
+    my ($input, $init_value) = @_;
+
+    $init_value = 0x811c9dc5 unless (defined $init_value);
+    my $fnv_32_prime = 0x01000193;
+
+    my $hval = $init_value;
+
+    foreach my $x (unpack ('C*', $input)) {
+        $hval = ($hval * $fnv_32_prime) & 0xffffffff;
+        $hval = ($hval ^ $x) & 0xffffffff;
+    }
+
+    return ($hval >> 16) ^ ($hval & 0xffff);
+}
 
 $ENV{CROSS} ||= "";
 GetOptions("update" => \$update, "language=s" => \$lang, "fs=s" => \$fs, "targets=s" => \$target_list, "count" => \$count, "objdir=s" => \$objdir);
@@ -193,7 +210,11 @@ foreach my $file (@files) {
         }
         foreach (sort keys %strings) {
             if(! $unused{$_} && defined($strings{$_})) {
-                print $fh ":$_\n$strings{$_}\n";
+                if ($_ ne $strings{$_}) {
+                    my $hash = fnv_16($_);
+                    print $fh pack("S<", $hash);
+                    print $fh "$strings{$_}\n";
+                }
             }
         }
         close $fh;
