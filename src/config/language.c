@@ -34,6 +34,7 @@ void CONFIG_EnableLanguage(int state) {(void)state;}
 #else
 u16 fnv_16_str(const char *str);
 static char strings[8192];
+static u16 table_size;
 #define MAX_STRINGS 450
 #define MAX_LINE 300
 
@@ -50,17 +51,25 @@ static struct str_map {
 
 const char *_tr(const char *str)
 {
-    int i;
-    if (lookupmap[0].pos == 0xffff) {
+    u16 min, max, i;
+
+    if (table_size == 0) {
         return str;
     }
     u16 hash = fnv_16_str(str);
     dbg_printf("%d: %s\n", hash, str);
-    for(i = 0; i < MAX_STRINGS; i++) {
-        if(lookupmap[i].pos == 0xffff)
-            return str;
-        if(lookupmap[i].hash == hash)
+
+    min = 0;
+    max = table_size;
+    while (min <= max)
+    {
+        i = (min + max) / 2;
+        if (hash == lookupmap[i].hash)
             return strings + lookupmap[i].pos;
+        else if (hash > lookupmap[i].hash)
+            min = i + 1;
+        else
+            max = i - 1;
     }
     return str;
 }
@@ -102,7 +111,7 @@ void CONFIG_ReadLang(u8 idx)
     int type;
     char line[MAX_LINE];
 
-    lookupmap[0].pos = 0xffff;
+    table_size = 0;
     Transmitter.language = 0;
     if (! idx)
         return;
@@ -145,14 +154,14 @@ void CONFIG_ReadLang(u8 idx)
             printf("Out of space processing %s\n", line);
             break;
         }
-        printf("\t: %s\n", line);
+        dbg_printf("%d\t: %s\n", hash, line);
         lookup->hash = hash;
         lookup->pos = pos;
         lookup++;
         strlcpy(strings + pos, line, len);
         pos += len;
     }
-    lookup->pos = 0xFFFF;
+    table_size = lookup - lookupmap;
     fclose(fh);
     Transmitter.language = idx;
 }

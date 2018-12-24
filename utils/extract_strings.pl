@@ -200,6 +200,7 @@ foreach my $file (@files) {
     if($fs) {
         #if target is specified, we want to return a filtered list of strings
         my $outf = $file;
+        my %hashvalues;
         $outf =~ s/fs/filesystem\/$fs/;
         open $fh, ">", $outf or die "ERROR: Can't write $outf\n";
         print $fh $name;
@@ -212,10 +213,21 @@ foreach my $file (@files) {
             if(! $unused{$_} && defined($strings{$_})) {
                 if ($_ ne $strings{$_}) {
                     my $hash = fnv_16($_);
-                    print $fh pack("S<", $hash);
-                    print $fh "$strings{$_}\n";
+                    my $value = $strings{$_};
+                    if (defined($hashvalues{$hash})) {
+                        printf("Warning: Conflict hash detected:\n%s\n%s\n",
+                            $hashvalues{$hash}, $value);
+                        exit 1;
+                    }
+                    $hashvalues{$hash} = $value;
                 }
             }
+        }
+
+        foreach(sort{$a <=> $b} keys %hashvalues)
+        {
+            print $fh pack("S<", $_);
+            print $fh "$hashvalues{$_}\n";
         }
         close $fh;
     } else {
