@@ -18,6 +18,10 @@
 #include "tx.h"
 #include "ini.h"
 
+#ifndef SUPPORT_LANG_V1
+#define SUPPORT_LANG_V1 1
+#endif
+
 /* String long enough to hold every used string in the code
    defined as extern char tempstring[TEMPSTRINGLENGTH] in common.h */
 char tempstring[TEMPSTRINGLENGTH];
@@ -101,13 +105,96 @@ unsigned fix_crlf(char *str)
     return len;
 }
 
+#if SUPPORT_LANG_V1
+static void CONFIG_ReadLangV1(FILE* fh)
+{
+    char line[MAX_LINE];
+    struct str_map *lookup = lookupmap;
+    unsigned pos = 0;
+
+    while (fgets(line, sizeof(line), fh) != NULL) {
+        u16 hash;
+        if(line[0] == ':') {
+            CLOCK_ResetWatchdog();
+            fix_crlf(line+1);
+            if (lookup - lookupmap == MAX_STRINGS - 1) {
+                printf("Only %d strings are supported aborting @ %s\n", MAX_STRINGS, line);
+                break;
+            }
+            hash = fnv_16_str(line + 1);
+            dbg_printf("%d: %s\n", hash, line);
+            if (fgets(line, sizeof(line), fh) == NULL) {
+                break;
+            }
+            line[MAX_LINE-1] = 0;
+            unsigned len = fix_crlf(line) + 1;
+            if (pos + len > sizeof(strings)) {
+                printf("Out of space processing %s\n", line);
+                break;
+            }
+            dbg_printf("\t: %s\n", line);
+
+            // sorted insert based on hash, assume no hash conflict
+            struct str_map *lookup0 = lookupmap;
+            while (lookup0 < lookup && lookup0->hash < hash) {
+                lookup0++;
+            }
+
+            // free up one slot to insert
+            if (lookup - lookup0 > 0) {
+                memmove(lookup0+1, lookup0, (lookup - lookup0)* sizeof(struct str_map));
+            }
+
+            // insert the current string
+            lookup0->hash = hash;
+            lookup0->pos = pos;
+
+            lookup++;
+            strlcpy(strings + pos, line, len);
+            pos += len;
+        }
+    }
+    table_size = lookup - lookupmap;
+}
+#endif
+
+static void CONFIG_ReadLangV2(FILE* fh)
+{
+    u16 hash;
+    unsigned pos = 0;
+    char line[MAX_LINE];
+    struct str_map *lookup = lookupmap;
+
+    while (fread(&hash, 2, 1, fh) == 1) {
+        CLOCK_ResetWatchdog();
+        if (lookup - lookupmap == MAX_STRINGS - 1) {
+            printf("Only %d strings are supported aborting @ %s\n", MAX_STRINGS, line);
+            break;
+        }
+        if (fgets(line, sizeof(line), fh) == NULL) {
+            break;
+        }
+        line[MAX_LINE-1] = 0;
+        unsigned len = fix_crlf(line) + 1;
+        if (pos + len > sizeof(strings)) {
+            printf("Out of space processing %s\n", line);
+            break;
+        }
+        dbg_printf("%d\t: %s\n", hash, line);
+        lookup->hash = hash;
+        lookup->pos = pos;
+        lookup++;
+        strlcpy(strings + pos, line, len);
+        pos += len;
+    }
+    table_size = lookup - lookupmap;
+}
+
 void CONFIG_ReadLang(u8 idx)
 {
     u8 cnt = 0;
     char file[30];
     char filename[13];
-    struct str_map *lookup = lookupmap;
-    unsigned pos = 0;
     int type;
     char line[MAX_LINE];
 
@@ -138,30 +225,22 @@ void CONFIG_ReadLang(u8 idx)
     // first line of langauge name, ignore it
     fgets(line, sizeof(line), fh);
 
-    u16 hash;
-    while (fread(&hash, 2, 1, fh) == 1) {
-        CLOCK_ResetWatchdog();
-        if (lookup - lookupmap == MAX_STRINGS - 1) {
-            printf("Only %d strings are supported aborting @ %s\n", MAX_STRINGS, line);
-            break;
-        }
-        if (fgets(line, sizeof(line), fh) == NULL) {
-            break;
-        }
-        line[MAX_LINE-1] = 0;
-        unsigned len = fix_crlf(line) + 1;
-        if (pos + len > sizeof(strings)) {
-            printf("Out of space processing %s\n", line);
-            break;
-        }
-        dbg_printf("%d\t: %s\n", hash, line);
-        lookup->hash = hash;
-        lookup->pos = pos;
-        lookup++;
-        strlcpy(strings + pos, line, len);
-        pos += len;
+#if SUPPORT_LANG_V1
+    // Try to detect the version
+    if (fread(line, 1, 1, fh) == 1)
+    {
+        // move file cursor 1 byte back
+        fseek(fh, -1, SEEK_SET);
+        // check the value of the next character to detect version
+        if (line[0] == ':')
+            CONFIG_ReadLangV1(fh);
+        else
+            CONFIG_ReadLangV2(fh);
     }
-    table_size = lookup - lookupmap;
+#else
+    CONFIG_ReadLangV2(fh);
+#endif
+
     fclose(fh);
     Transmitter.language = idx;
 }
