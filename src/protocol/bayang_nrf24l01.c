@@ -30,7 +30,6 @@
 #include "mixer.h"
 #include "config/model.h"
 #include "config/tx.h"          // for Transmitter
-#include "music.h"
 #include "telemetry.h"
 
 #ifdef MODULAR
@@ -388,7 +387,6 @@ MODULE_CALLTYPE static u16 bay_callback()
 {
     switch (phase) {
     case Bayang_INIT1:
-        // MUSIC_Play(MUSIC_TELEMALARM1);	// Shouldn't play telemetry alarm doing bind init
         phase = Bayang_BIND2;
         break;
 
@@ -398,7 +396,6 @@ MODULE_CALLTYPE static u16 bay_callback()
             XN297_SetRXAddr(rx_tx_addr, ADDRESS_LENGTH);
             phase = Bayang_DATA;
             PROTOCOL_SetBindState(0);
-            MUSIC_Play(MUSIC_DONE_BINDING);
         } else {
             if (bay_count == 0)
                 send_packet(1);

@@ -23,7 +23,6 @@
 #include "mixer.h"
 #include "config/model.h"
 #include "config/tx.h" // for Transmitter
-#include "music.h"
 #include "telemetry.h"
 
 #ifdef MODULAR
@@ -808,7 +807,6 @@ static u16 cflie_callback()
         case PKT_ACKED:
             phase = CFLIE_DATA;
             PROTOCOL_SetBindState(0);
-            MUSIC_Play(MUSIC_DONE_BINDING);
             break;
         case PKT_TIMEOUT:
             send_search_packet();
