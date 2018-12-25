@@ -71,7 +71,6 @@
 #include "mixer.h"
 #include "config/model.h"
 #include "config/tx.h" // for Transmitter
-#include "music.h"
 #include "telemetry.h"
 
 #ifdef MODULAR
@@ -758,7 +757,6 @@ static u16 inav_callback()
         if (bind_counter == 0) {
             set_data_phase();
             PROTOCOL_SetBindState(0);
-            MUSIC_Play(MUSIC_DONE_BINDING);
         } else {
             if (packet_ack() == PKT_ACKED) {
                 bind_acked = 1;

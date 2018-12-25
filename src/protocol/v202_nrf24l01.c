@@ -23,7 +23,6 @@
 #include "mixer.h"
 #include "config/model.h"
 #include "config/tx.h" // for Transmitter
-#include "music.h"
 #include "telemetry.h"
 
 #ifdef MODULAR
@@ -481,7 +480,6 @@ static u16 v202_callback()
     switch (phase) {
     case V202_INIT2:
         V202_init2();
-        // MUSIC_Play(MUSIC_TELEMALARM1);	// Shouldn't play telemetry alarm doing bind init
 //        phase = V202_BIND1;
         phase = V202_BIND2;
         return 150;
@@ -507,7 +505,6 @@ static u16 v202_callback()
             counter = led_blink_count;
             flags = 0;
             PROTOCOL_SetBindState(0);
-            MUSIC_Play(MUSIC_DONE_BINDING);
         }
         break;
     case V202_DATA:

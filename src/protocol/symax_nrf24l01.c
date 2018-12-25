@@ -28,7 +28,6 @@
 #include "mixer.h"
 #include "config/model.h"
 #include "config/tx.h" // for Transmitter
-#include "music.h"
 
 #ifdef MODULAR
   //Some versions of gcc applythis to definitions, others to calls
@@ -464,7 +463,6 @@ static u16 symax_callback()
             symax_init2();
             phase = SYMAX_DATA;
             PROTOCOL_SetBindState(0);
-            MUSIC_Play(MUSIC_DONE_BINDING);
         } else {
             send_packet(1);
             counter -= 1;
