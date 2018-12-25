@@ -276,6 +276,7 @@ u16 WFLY_callback()
 
 void initWFLY(u8 bind)
 { 
+    CLOCK_StopTimer();
     u32 lfsr = 0xb2c54a2ful;
 
 #ifndef USE_FIXED_MFGID
