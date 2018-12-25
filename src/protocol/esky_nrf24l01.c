@@ -142,12 +142,6 @@ static void esky_init(u8 bind)
     NRF24L01_WriteReg(NRF24L01_15_RX_PW_P4, PAYLOADSIZE);
     NRF24L01_WriteReg(NRF24L01_16_RX_PW_P5, PAYLOADSIZE);
     NRF24L01_WriteReg(NRF24L01_17_FIFO_STATUS, 0x00);      // Just in case, no real bits to write here
-
-    // Check for Beken BK2421/BK2423 chip
-    BK2421_init();
-
-    // Implicit delay in callback
-    // delay(50);
 }
 
 static void esky_init2()

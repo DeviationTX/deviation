@@ -162,9 +162,6 @@ static void gw008_init()
     NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 0x00);      // Disable dynamic payload length on all pipes
     NRF24L01_WriteReg(NRF24L01_1D_FEATURE, 0x01);    // Set feature bits on
     NRF24L01_Activate(0x73);
-    
-    // Check for Beken BK2421/BK2423 chip
-    BK2421_init();
 }
 
 static void initialize_txid()

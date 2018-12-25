@@ -312,9 +312,6 @@ static void ht_init()
         NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 0x3f);       // match other stock settings even though AA disabled...
         NRF24L01_WriteReg(NRF24L01_1D_FEATURE, 0x07);
     }
-
-    // Check for Beken BK2421/BK2423 chip
-    BK2421_init();
 }
 
 static void ht_init2()
