@@ -41,15 +41,15 @@
 #define WFLY_NUM_FREQUENCE 4
 #define WFLY_BIND_CHANNEL 0x09
 
-u8 packet[PACKET_LENGTH];
-u8 pkt[PACKET_LENGTH];
-u8 rx_tx_addr[5];
-u8 hopping_frequency[WFLY_NUM_FREQUENCE];
-u8 rf_ch_num;
-u32 bind_counter;
-u32 packet_count;
-u8 phase;
-u8 tx_power;
+static u8 packet[PACKET_LENGTH];
+static u8 pkt[PACKET_LENGTH];
+static u8 rx_tx_addr[5];
+static u8 hopping_frequency[WFLY_NUM_FREQUENCE];
+static u8 rf_ch_num;
+static u32 bind_counter;
+static u32 packet_count;
+static u8 phase;
+static u8 tx_power;
 
 enum {
     WFLY_BIND_TX=0,
@@ -190,7 +190,7 @@ static u16 WFLY_send_data_packet()
 }
 
 MODULE_CALLTYPE
-u16 WFLY_callback()
+static u16 WFLY_callback()
 {
     u8 status,len,sum=0,check=0;
     static u8 retry;
@@ -274,8 +274,9 @@ u16 WFLY_callback()
     return 1000;
 }
 
-void initWFLY(u8 bind)
+static void initWFLY(u8 bind)
 { 
+    CLOCK_StopTimer();
     u32 lfsr = 0xb2c54a2ful;
 
 #ifndef USE_FIXED_MFGID
