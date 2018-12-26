@@ -10,6 +10,7 @@ my $ascent = 0;
 my $descent = 0;
 my $maxsize = 0;
 my $minspace = 0;
+my $ascii = '';
 main();
 sub main {
     my $out = "bdf_font";
@@ -18,8 +19,20 @@ sub main {
                "debug=i" => \$debug,
                "mode=s" => \$mode,
                "minspace=i" => \$minspace, 
-               "maxsize=i" => \$maxsize);
+               "maxsize=i" => \$maxsize,
+               "ascii!" =>\$ascii);
     my $char = read_bdf(shift @ARGV);
+
+    if ($ascii){
+        my %newchar;
+        foreach my $c (%$char) {
+            if ($c < 255) {
+                my $v = $char->{$c};
+                $newchar{$c} = $v;
+            }
+        }
+        $char = \%newchar;
+    }
 
     $out =~ s/\.fon$//;
     if($mode =~ /analyze/) {
