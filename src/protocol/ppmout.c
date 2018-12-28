@@ -31,7 +31,7 @@
 #endif
 #define PPMOUT_MAX_CHANNELS NUM_OUT_CHANNELS
 static volatile u16 pulses[PPMOUT_MAX_CHANNELS+2];
-u8 num_channels;
+static u8 num_channels;
 
 #define STEP_SIZE "3276810"  // == 10small/50large == (50 << 16) | 10
 #define STEPSIZE2 "32768100" // == 100small / 500large == (500 << 16) | 100

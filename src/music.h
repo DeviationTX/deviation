@@ -106,7 +106,7 @@ struct  Voice {
 #endif
 };
 
-u16 voice_map_entries;
+extern u16 voice_map_entries;
 
 struct VoiceMap {
     u16 id;
@@ -116,7 +116,7 @@ struct VoiceMap {
 #endif
 };
 
-struct VoiceMap voice_map[MAX_VOICEMAP_ENTRIES];
+extern struct VoiceMap voice_map[MAX_VOICEMAP_ENTRIES];
 
 u16 MUSIC_GetTelemetryAlarm(enum Music music);
 u16 MUSIC_GetTimerAlarm(enum Music music);

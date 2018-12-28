@@ -22,12 +22,13 @@
 #include "hid_usb_prop.h"
 #include "hid_usb_istr.h"
 #include "usb_pwr.h"
+#include "usb_regs.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-__IO uint16_t wIstr;  /* ISTR register last read value */
+extern __IO uint16_t wIstr;  /* ISTR register last read value */
 
 /* Extern variables ----------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/

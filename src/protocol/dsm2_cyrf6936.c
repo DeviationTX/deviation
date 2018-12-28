@@ -88,18 +88,18 @@ ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 #endif
 
 enum {
-    DSM2_BIND = 0,
-    DSM2_CHANSEL     = BIND_COUNT + 0,
-    DSM2_CH1_WRITE_A = BIND_COUNT + 1,
-    DSM2_CH1_CHECK_A = BIND_COUNT + 2,
-    DSM2_CH2_WRITE_A = BIND_COUNT + 3,
-    DSM2_CH2_CHECK_A = BIND_COUNT + 4,
-    DSM2_CH2_READ_A  = BIND_COUNT + 5,
-    DSM2_CH1_WRITE_B = BIND_COUNT + 6,
-    DSM2_CH1_CHECK_B = BIND_COUNT + 7,
-    DSM2_CH2_WRITE_B = BIND_COUNT + 8,
-    DSM2_CH2_CHECK_B = BIND_COUNT + 9,
-    DSM2_CH2_READ_B  = BIND_COUNT + 10,
+    DSM2_CH1_WRITE_A = 1,
+    DSM2_CH1_CHECK_A = 2,
+    DSM2_CH2_WRITE_A = 3,
+    DSM2_CH2_CHECK_A = 4,
+    DSM2_CH2_READ_A  = 5,
+    DSM2_CH1_WRITE_B = 6,
+    DSM2_CH1_CHECK_B = 7,
+    DSM2_CH2_WRITE_B = 8,
+    DSM2_CH2_CHECK_B = 9,
+    DSM2_CH2_READ_B  = 10,
+    DSM2_BIND        = 11,
+    DSM2_CHANSEL     = BIND_COUNT + 11,
 };
    
 static const u8 pncodes[5][9][8] = {
@@ -175,14 +175,14 @@ static const u8 ch_map12[] = {1, 5, 2, 4, 6, 10, 0xff,    0, 7, 3, 8, 9, 11, 0xf
 static const u8 ch_map14[] = {1, 5, 2, 3, 4,  6,    8,    1, 5, 2, 3, 0,  7,    9};
 #endif
 
-u8 packet[16];
-u8 channels[23];
-u8 chidx;
-u8 sop_col;
-u8 data_col;
-u16 state;
-u8 crcidx;
-u8 binding;
+static u8 packet[16];
+static u8 channels[23];
+static u8 chidx;
+static u8 sop_col;
+static u8 data_col;
+static u16 state;
+static u8 crcidx;
+static u8 binding;
 
 #ifdef USE_FIXED_MFGID
     //static const u8 cyrfmfg_id[6] = {0x5e, 0x28, 0xa3, 0x1b, 0x00, 0x00}; //dx8
@@ -191,9 +191,9 @@ u8 binding;
     static u8 cyrfmfg_id[6];
 #endif
 
-u8 num_channels;
-u16 crc;
-u8 model;
+static u8 num_channels;
+static u16 crc;
+static u8 model;
 
 static void build_bind_packet()
 {
@@ -667,7 +667,7 @@ static u16 dsm2_cb()
 #define WRITE_DELAY   1550  // Time after write to verify write complete
 #define READ_DELAY     600  // Time before write to check read state, and switch channels.
                             // Telemetry read+processing =~200us and switch channels =~300us
-    if(state < DSM2_CHANSEL) {
+    if(state >= DSM2_BIND && state < DSM2_CHANSEL) {
         //Binding
         state += 1;
         if(state & 1) {
@@ -680,7 +680,7 @@ static u16 dsm2_cb()
             CYRF_ReadRegister(CYRF_04_TX_IRQ_STATUS);
             return 1500;
         }
-    } else if(state < DSM2_CH1_WRITE_A) {
+    } else if(state == DSM2_CHANSEL) {
         //Select channels and configure for writing data
         //CYRF_FindBestChannels(ch, 2, 10, 1, 79);
         cyrf_transfer_config();

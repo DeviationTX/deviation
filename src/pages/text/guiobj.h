@@ -351,7 +351,7 @@ struct stdtravel_obj {
     guiScrollable_t scrollable;
 };
 
-struct gui_objs {
+struct _gui_objs {
     struct dialog_obj dialog;
     union {
         struct about_obj about;
@@ -400,6 +400,8 @@ struct gui_objs {
         struct stdchan_obj stdchan;
         struct toggleselect_obj toggleselect;
     } u;
-} gui_objs;
+};
+
+extern struct _gui_objs gui_objs;
 
 #endif //_GUIOBJ_H_
