@@ -3,6 +3,7 @@ use strict;
 use warnings;
 
 use Getopt::Long;
+
 my $update;
 my $lang;
 my $fs;
@@ -11,6 +12,22 @@ my $objdir;
 my $count;
 # The following are legal alternatives to the default string
 my @targets = ("devo8", "devo10", "devo12");
+
+sub fnv_16 {
+    my ($input, $init_value) = @_;
+
+    $init_value = 0x811c9dc5 unless (defined $init_value);
+    my $fnv_32_prime = 0x01000193;
+
+    my $hval = $init_value;
+
+    foreach my $x (unpack ('C*', $input)) {
+        $hval = ($hval * $fnv_32_prime) & 0xffffffff;
+        $hval = ($hval ^ $x) & 0xffffffff;
+    }
+
+    return ($hval >> 16) ^ ($hval & 0xffff);
+}
 
 $ENV{CROSS} ||= "";
 GetOptions("update" => \$update, "language=s" => \$lang, "fs=s" => \$fs, "targets=s" => \$target_list, "count" => \$count, "objdir=s" => \$objdir);
@@ -183,6 +200,7 @@ foreach my $file (@files) {
     if($fs) {
         #if target is specified, we want to return a filtered list of strings
         my $outf = $file;
+        my %hashvalues;
         $outf =~ s/fs/filesystem\/$fs/;
         open $fh, ">", $outf or die "ERROR: Can't write $outf\n";
         print $fh $name;
@@ -193,8 +211,23 @@ foreach my $file (@files) {
         }
         foreach (sort keys %strings) {
             if(! $unused{$_} && defined($strings{$_})) {
-                print $fh ":$_\n$strings{$_}\n";
+                if ($_ ne $strings{$_}) {
+                    my $hash = fnv_16($_);
+                    my $value = $strings{$_};
+                    if (defined($hashvalues{$hash})) {
+                        printf("Warning: Conflict hash detected:\n%s\n%s\n",
+                            $hashvalues{$hash}, $value);
+                        exit 1;
+                    }
+                    $hashvalues{$hash} = $value;
+                }
             }
+        }
+
+        foreach(sort{$a <=> $b} keys %hashvalues)
+        {
+            print $fh pack("S<", $_);
+            print $fh "$hashvalues{$_}\n";
         }
         close $fh;
     } else {
