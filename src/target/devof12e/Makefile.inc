@@ -5,6 +5,7 @@ DFU_ARGS         := -c 12 -b 0x08004000
 
 DEFAULT_PROTOCOLS := 
 INCLUDE_FS := 0
+LANGUAGE := devof12e
 
 include $(SDIR)/target/common/devo/Makefile.inc
 include target/common/devo/Makefile.devofs.inc

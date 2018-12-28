@@ -11,6 +11,7 @@ my $descent = 0;
 my $maxsize = 0;
 my $minspace = 0;
 my $ascii = '';
+my $filter;
 main();
 sub main {
     my $out = "bdf_font";
@@ -20,7 +21,8 @@ sub main {
                "mode=s" => \$mode,
                "minspace=i" => \$minspace, 
                "maxsize=i" => \$maxsize,
-               "ascii!" =>\$ascii);
+               "ascii!" =>\$ascii,
+               "filter=s" => \$filter);
     my $char = read_bdf(shift @ARGV);
 
     if ($ascii){
@@ -29,6 +31,24 @@ sub main {
             if ($c < 255) {
                 my $v = $char->{$c};
                 $newchar{$c} = $v;
+            }
+        }
+        $char = \%newchar;
+    }
+
+    if ($filter ne "")
+    {
+        my $filters = read_filter($filter);
+        my %newchar;
+        foreach my $c (sort {$a <=> $b} keys %$filters) {
+            if (exists($char->{$c}))
+            {
+                my $v = $char->{$c};
+                $newchar{$c} = $v;
+            }
+            else
+            {
+                print "character $filters->{$c} doesn't exist in font.\n";
             }
         }
         $char = \%newchar;
@@ -44,6 +64,60 @@ sub main {
     if($mode =~ /bin/) {
         build_bin($char, $out)
     }
+}
+
+sub read_filter {
+    my($filter_file)= @_;
+
+    my @files = glob("$filter_file/lang.*");
+    foreach my $file (@files) {
+        open(my $fh, '<:raw', $file)
+            or die "Could not open file '$file' $!";
+
+        read $fh, my $BOM, 1;
+        if (ord($BOM) == 0xef) {
+            read $fh, my $BOM, 2;
+        }
+        else {
+            push(@str, $BOM);
+        }
+
+        # read the first line
+        while (read $fh, my $char, 1)
+        {
+            if (ord($char) != 10) {
+                push(@str, $char);
+            }
+            else
+            {
+                my $x = join '', @str;
+                utf8::decode($x)
+                    or die "Failed to decode UTF-8";
+
+                my $len = length $x;
+                if ($len > 0)
+                {
+                    for my $pos (0 .. $len)
+                    {
+                        my $c = substr($x, $pos, 1);
+                        my $a = ord($c);
+                        if (($a > 256) and ($a != 65279))
+                        {
+                            $char{$a} = $c;
+                        }
+                    }
+                }
+
+                @str = ();
+                # read two bytes hash
+                if (read $fh, my $hash, 2) {
+                    #printf "hash %x\n", unpack("S", $hash);
+                }
+            }
+        }
+    }
+
+    return \%char;
 }
 
 sub read_bdf {
