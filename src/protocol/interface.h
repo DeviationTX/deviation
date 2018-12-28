@@ -31,10 +31,10 @@ enum PinConfigState {
     RESET_PIN,
 };
 
-const u8 EATRG[PROTO_MAP_LEN];
-const u8 TAERG[PROTO_MAP_LEN];
-#define UNCHG ((void*)1)
 #define AETRG ((void*)0)
+#define UNCHG ((void*)1)
+#define EATRG ((void*)2)
+#define TAERG ((void*)3)
 
 #ifndef MODULAR
 #define PROTODEF(proto, module, map, cmd, name) extern const void * cmd(enum ProtoCmds);

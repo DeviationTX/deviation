@@ -22,7 +22,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-extern const u8 EATRG[PROTO_MAP_LEN];
+extern const u8 EATRG0[PROTO_MAP_LEN];
 
 struct Model Model;
 /*set this to write all model data even if it is the same as the default */
@@ -1457,7 +1457,7 @@ u8 CONFIG_ReadModel(u8 model_num) {
         Model.tx_power = TXPOWER_150mW;
     MIXER_SetMixers(NULL, 0);
     if(auto_map)
-        RemapChannelsForProtocol(EATRG);
+        RemapChannelsForProtocol(EATRG0);
     TIMER_Init();
     MIXER_RegisterTrimButtons();
     crc32 = Crc(&Model, sizeof(Model));
@@ -1569,7 +1569,7 @@ u8 CONFIG_ReadTemplate(const char *filename) {
         return 0;
     }
     if(auto_map)
-        RemapChannelsForProtocol(EATRG);
+        RemapChannelsForProtocol(EATRG0);
     MIXER_RegisterTrimButtons();
     STDMIXER_Preset(); // bug fix: this must be invoked in all modes
     if (Model.mixer_mode == MIXER_STANDARD)
