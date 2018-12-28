@@ -33,9 +33,9 @@
 extern struct FAT FontFAT; //defined in screen/lcd_string.c
 
 //Not static because we need it in mixer.c
-const u8 EATRG[PROTO_MAP_LEN] =
+const u8 EATRG0[PROTO_MAP_LEN] =
     { INP_ELEVATOR, INP_AILERON, INP_THROTTLE, INP_RUDDER, INP_GEAR1 };
-const u8 TAERG[PROTO_MAP_LEN] =
+static const u8 TAERG0[PROTO_MAP_LEN] =
     { INP_THROTTLE, INP_AILERON, INP_ELEVATOR, INP_RUDDER, INP_GEAR1 };
 static const u8 AETRG0[PROTO_MAP_LEN] =
     { INP_AILERON, INP_ELEVATOR, INP_THROTTLE, INP_RUDDER, INP_GEAR1 };
@@ -352,14 +352,23 @@ const u8* PROTOCOL_GetChannelMap()
     const u8* channelmap = NULL;
     if(Model.protocol != PROTOCOL_NONE && PROTOCOL_LOADED)
     {
-        channelmap = PROTO_Cmds(PROTOCMD_CHANNELMAP);
-        if (channelmap == AETRG)
+        int map = (int)PROTO_Cmds(PROTOCMD_CHANNELMAP);
+        switch(map)
         {
-            channelmap = AETRG0;
-        }
-        else if (channelmap == UNCHG)
-        {
-            channelmap = NULL;
+            case (int)AETRG:
+                channelmap = AETRG0;
+                break;
+            case (int)UNCHG:
+                channelmap = NULL;
+                break;
+            case (int)TAERG:
+                channelmap = TAERG0;
+                break;
+            case (int)EATRG:
+                channelmap = EATRG0;
+                break;
+            default:
+                printf("Unknown channemap: %d\n", channelmap);
         }
     }
     return channelmap;

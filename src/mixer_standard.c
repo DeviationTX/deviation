@@ -28,7 +28,7 @@
 #include "mixer_standard.h"
 
 MappedSimpleChannels mapped_std_channels;
-extern const u8 EATRG[PROTO_MAP_LEN];
+extern const u8 EATRG0[PROTO_MAP_LEN];
 
 void STDMIXER_Preset()
 {
@@ -48,7 +48,7 @@ void STDMIXER_Preset()
     const u8 *ch_map = CurrentProtocolChannelMap;
     if (! ch_map) {
         // for none protocol, assign any channel to thr is fine
-        ch_map = EATRG;
+        ch_map = EATRG0;
     }
     for (unsigned ch = 0; ch < 3; ch++) {  // only the first 3 channels need to check
         if (ch_map[ch] == INP_THROTTLE) {
@@ -67,7 +67,7 @@ void STDMIXER_SetChannelOrderByProtocol()
     const u8 *ch_map = CurrentProtocolChannelMap;
     if (! ch_map) {
         // for none protocol, assign any channel to thr is fine
-        ch_map = EATRG;
+        ch_map = EATRG0;
     }
     CLOCK_ResetWatchdog();// this function might be invoked after loading from template/model file, so feeding the dog in the middle
     unsigned safetysw = 0;
