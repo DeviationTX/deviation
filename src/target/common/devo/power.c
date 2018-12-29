@@ -62,16 +62,16 @@ void PWR_Shutdown()
 int PWR_CheckPowerSwitch()
 {
 #if defined(HAS_BUTTON_POWER_ON) && HAS_BUTTON_POWER_ON
-    static u16 debounce = 0;
+    static u32 debounce = 0;
 #endif
 
     if(gpio_get(_PWRSW_PORT, _PWRSW_PIN)) {
 #if defined(HAS_BUTTON_POWER_ON) && HAS_BUTTON_POWER_ON
-        debounce++;
+        if (debounce == 0) debounce = CLOCK_getms();
     } else {
         debounce = 0;
     }
-    if(debounce >= 200) { // 200 * 5 msec = 1 sec
+    if(debounce && (CLOCK_getms() - debounce) >= 1000) { // 1 sec
 #endif
         return 1;
     }
