@@ -9,7 +9,7 @@
 #define LCD_ALIGN_CENTER    1
 #define LCD_ALIGN_RIGHT     2
 
-struct FAT FontFAT;
+extern struct FAT FontFAT;
 
 struct font_def 
 {

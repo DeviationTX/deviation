@@ -14,6 +14,6 @@ enum Icons {
     ICON_LAST,
 };
 
-const struct ImageMap icons[ICON_LAST];
+extern const struct ImageMap icons[ICON_LAST];
 
 #endif
