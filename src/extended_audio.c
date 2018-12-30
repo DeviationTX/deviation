@@ -33,7 +33,7 @@ u8 next_audio;
 u8 num_audio;
 u32 audio_queue_time;
 
-static u8 buffer[] = {0x7E, 0xFF, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xEF};
+static u8 player_buffer[] = {0x7E, 0xFF, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xEF};
 
 // Initialize UART for extended-audio
 void AUDIO_Init() {
@@ -133,14 +133,13 @@ int AUDIO_Play(u16 music) {
       AUDIO_Print(buffer);
       break;
     }
-    case AUDIO_DF_PLAYER: {
+    case AUDIO_DF_PLAYER:
         // Fill in track number and checksum
-        buffer[3] = 0x12;
-        u16ToArray(voice_map[music].id, buffer+5);
-        u16ToArray(AUDIO_CalculateChecksum(buffer), buffer+7);
-        AUDIO_Send(buffer, sizeof(buffer));
+        player_buffer[3] = 0x12;
+        u16ToArray(voice_map[music].id, player_buffer+5);
+        u16ToArray(AUDIO_CalculateChecksum(player_buffer), player_buffer+7);
+        AUDIO_Send(player_buffer, sizeof(player_buffer));
         break;
-    }
   }
   return 1;
 #endif // EMULATOR
@@ -164,15 +163,15 @@ void AUDIO_SetVolume() {
       case AUDIO_DISABLED:
       case AUDIO_LAST: // Sigh. Shut up the warnings
       case AUDIO_AUDIOFX: // AUDIOFX only allows up down selection of volume...not implemented
-      case AUDIO_NONE: break;	// Play beeps...
-      case AUDIO_DF_PLAYER: {
+      case AUDIO_NONE:
+          break;	// Play beeps...
+      case AUDIO_DF_PLAYER:
           // Fill in volume and checksum
-          buffer[3] = 0x06;
-          u16ToArray(Transmitter.audio_vol * 3, buffer+5); // DFPlayer has volume range 0-30
-          u16ToArray(AUDIO_CalculateChecksum(buffer), buffer+7);
-          AUDIO_Send(buffer, sizeof(buffer));
+          player_buffer[3] = 0x06;
+          u16ToArray(Transmitter.audio_vol * 3, player_buffer+5); // DFPlayer has volume range 0-30
+          u16ToArray(AUDIO_CalculateChecksum(player_buffer), player_buffer+7);
+          AUDIO_Send(player_buffer, sizeof(player_buffer));
           break;
-      }
     }
 #endif
 }
