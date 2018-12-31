@@ -441,7 +441,7 @@ int PROTOCOL_HasPowerAmp(int idx)
 #endif
     int m = get_module(idx);
     if ((m != TX_MODULE_LAST && Transmitter.module_poweramp & (1 << m))
-#ifndef MODULAR
+#ifndef ENABLE_MODULAR
         || (Model.protocol == PROTOCOL_PXX)
 #endif
        )
