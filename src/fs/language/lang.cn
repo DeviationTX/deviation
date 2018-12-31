@@ -6,22 +6,26 @@
 当前值为%d%%, 安全开机设定为%d%%\n
 : is %d%%,\nsafe value = %d%%
 当前值为%d%%,\n安全开机设定为%d%%
->:1 sec
+:1 sec
+1秒
 :1-to-1
 45度曲线
->:10 sec
+:10 sec
+10秒
 :11 Point
 11点曲线
 :13 Point
 13点曲线
 :3 Point
 3点曲线
->:30 sec
+:30 sec
+30秒
 :4Ch w/ Dual-Rates
 4通直升机
 :5 Point
 5点曲线
->:5 sec
+:5 sec
+5秒
 >:5+1
 >:6+1
 >:60 sec
@@ -37,7 +41,8 @@
 绝对值
 :AIL
 副翼
->:AIL DR
+:AIL DR
+副翼舵量
 :AIL Inv
 副翼方向
 :AIL Mix
@@ -49,7 +54,7 @@
 >:AUX6
 >:AUX7
 :About Deviation
-关于本系统
+关于Deviation
 >:Add
 :Advanced
 高级模式1
@@ -189,16 +194,20 @@ Deviation固件版本:
 下
 :ELE
 升降
->:ELE DR
+:ELE DR
+升降舵量
 :ELE Inv
 升降方向
 :ELE Mix
 升降螺距
 :EXPO %d
 指数曲线%d
->:Edit
->:Enable
->:Enabled
+:Edit
+编辑
+:Enable
+打开
+:Enabled
+打开的
 :Enter
 进入
 :Exit
@@ -206,7 +215,8 @@ Deviation固件版本:
 :Expo&DR
 三段式
 >:Extend
->:FMODE
+:FMODE
+模式
 >:Fades
 :Fahren
 华氏
@@ -296,14 +306,16 @@ LCD设置
 3D飞行2
 :M
 中
->:MIX
+:MIX
+混控
 :Main menu
 主菜单
 :Main page
 主页面
 :Main page config
 定制主页面
->:Manual
+:Manual
+说明书
 :Max Limit
 最大舵量
 :Menu
@@ -316,7 +328,8 @@ LCD设置
 最小舵量
 :Min/Max
 最低/最高
->:Minute
+:Minute
+分钟
 :Mixer
 混控
 :Mixer GUI
@@ -327,7 +340,8 @@ LCD设置
 模式
 :Mode %d
 模式%d
->:Model
+:Model
+模型
 :Model menu
 模型设置
 :Model name
@@ -341,7 +355,8 @@ LCD设置
 :Model type
 模型类型
 >:Momentary
->:Month
+:Month
+月
 :Move Down
 下移
 :Move Up
@@ -363,7 +378,8 @@ LCD设置
 正常
 :Notch PW
 通道间隔
->:Num Channels
+:Num Channels
+通道数
 :Off
 关闭
 :Offset
@@ -372,7 +388,8 @@ LCD设置
 确定
 :On
 开启
->:On/Off
+:On/Off
+开/关
 :PIT
 螺距
 >:PIT Mix
@@ -423,21 +440,25 @@ LCD设置
 通信协议
 :PwrDn alert
 无电提示
->:PwrOn alarm
+:PwrOn alarm
+开机报警
 :RIGHT_H
 右水平
 :RIGHT_V
 右垂直
 :RPM
 转数
->:RTC Time
+:RTC Time
+时间
 :RUD
 方向
->:RUD DR
+:RUD DR
+方向舵量
 >:Rate
 :Re-Init
 初始化
->:Real Time Clock
+:Real Time Clock
+时钟
 :Remove
 删除
 :Reset
@@ -458,7 +479,8 @@ LCD设置
 熄火值
 :Safety
 熄火开关
->:Sample Rate
+:Sample Rate
+采样率
 :Save
 保存
 :Scale
@@ -467,8 +489,10 @@ LCD设置
 比例%s
 :Scanner
 信号扫描器
->:Second
->:Select
+:Second
+秒
+:Select
+选择
 :Servo
 舵机
 >:Set
@@ -494,7 +518,8 @@ LCD设置
 开始时间
 :Step
 幅度
->:Stick
+:Stick
+摇杆
 :Stick input
 摇杆输入
 :Stick mode
@@ -562,7 +587,8 @@ LCD设置
 温度
 :Temperature
 温度
->:Template
+:Template
+模板
 :Template..
 模板..
 :Thr hold
@@ -573,7 +599,8 @@ LCD设置
 油门熄火
 :Time
 时间
->:Time format
+:Time format
+时间格式
 :Timer
 定时器
 :Timer settings
@@ -595,8 +622,10 @@ LCD设置
 触摸屏
 :Touch target %d
 触摸目标%d
->:Touch to Lock
->:Touch to Unlock
+:Touch to Lock
+触碰上锁
+:Touch to Unlock
+触碰解锁
 >:Trainer Cfg (Channel)
 >:Trainer Cfg (Stick)
 >:Trainer Sw
@@ -638,8 +667,10 @@ LCD设置
 虚拟
 :Volt
 电压
->:Welcome
->:Year
+:Welcome
+欢迎
+:Year
+年
 >:Yes
 :Zero/Max
 零/最大
@@ -653,7 +684,8 @@ LCD设置
 >:cntdn-prop
 :countdown
 倒计时
->:delay
+:delay
+延迟
 :is not supported
 不支持
 :is turned off

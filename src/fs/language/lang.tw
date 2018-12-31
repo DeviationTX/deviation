@@ -6,17 +6,20 @@
  = %d%%,熄火保護 = %d%%\n
 : is %d%%,\nsafe value = %d%%
  = %d%%,\n熄火保護 = %d%%
->:1 sec
+:1 sec
+1秒
 :1-to-1
 等比例
->:10 sec
+:10 sec
+10秒
 :11 Point
 11 點
 :13 Point
 13 點
 :3 Point
 3 點
->:30 sec
+:30 sec
+30秒
 :4Ch w/ Dual-Rates
 4通和舵量
 :5 Point
@@ -24,7 +27,8 @@
 >:5 sec
 >:5+1
 >:6+1
->:60 sec
+:60 sec
+60秒
 :6Ch Airplane
 6動固定翼
 :6Ch Helicopter
@@ -38,6 +42,7 @@
 :AIL
 副翼
 >:AIL DR
+副翼大小動
 :AIL Inv
 副翼方向
 :AIL Mix
@@ -90,7 +95,7 @@
 :Button monitor
 按鍵內容檢視
 :Buzz settings
-======警示參數======
+警示參數
 :Buzz volume
 警示音量
 :Buzzer settings
@@ -188,7 +193,8 @@ Deviation 韌體版本:
 下
 :ELE
 升降
->:ELE DR
+:ELE DR
+升降大小動
 :ELE Inv
 升降方向
 :ELE Mix
@@ -229,7 +235,7 @@ PPM週期
 >:GPS Speed
 >:GPS Time
 :Generic settings
-======基本參數======
+基本參數
 :Gyro sense
 鎖尾感度
 :H
@@ -262,7 +268,7 @@ PPM週期
 :L
 低
 :LCD settings
-======液晶參數======
+液晶參數
 :LEFT_H
 左水平
 :LEFT_V
@@ -429,7 +435,8 @@ PPM週期
 >:RTC Time
 :RUD
 方向
->:RUD DR
+:RUD DR
+方向大小動
 >:Rate
 :Re-Init
 重對頻
@@ -553,12 +560,13 @@ PPM週期
 :Telemetry monitor
 遙測內容檢視
 :Telemetry settings
-======遙測參數======
+遙測參數
 :Temp
 溫度
 :Temperature
 溫度單位
->:Template
+:Template
+模板
 :Template..
 模板..
 :Thr hold
@@ -573,7 +581,7 @@ PPM週期
 :Timer
 計時器
 :Timer settings
-======計時參數======
+計時參數
 :Timer%d
 計時器%d
 :Timers
