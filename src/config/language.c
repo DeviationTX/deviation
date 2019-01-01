@@ -247,22 +247,23 @@ void CONFIG_ReadLang(u8 idx)
 
 void CONFIG_EnableLanguage(int state)
 {
-    static u16 disable = 0xffff;
+    static u16 disable = 0;
     if (! state) {
-        disable = lookupmap[0].pos;
-        lookupmap[0].pos = 0xffff;
+        disable = table_size;
+        table_size = 0;
     } else {
-        lookupmap[0].pos = disable;
+        table_size = disable;
     }
 }
+
 int CONFIG_IniParse(const char* filename,
          int (*handler)(void*, const char*, const char*, const char*),
          void* user)
 {
-    u16 tmpval = lookupmap[0].pos;
-    lookupmap[0].pos = 0xffff; //Disable Language parsing;
+    u16 tmpval = table_size;
+    table_size = 0; //Disable Language parsing;
     int result = ini_parse(filename, handler, user);
-    lookupmap[0].pos = tmpval;
+    table_size = tmpval;
     return result;
 }
 
