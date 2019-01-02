@@ -230,7 +230,7 @@ void CONFIG_ReadLang(u8 idx)
     if (fread(line, 1, 1, fh) == 1)
     {
         // move file cursor 1 byte back
-        fseek(fh, -1, SEEK_SET);
+        fseek(fh, -1, SEEK_CUR);
         // check the value of the next character to detect version
         if (line[0] == ':')
             CONFIG_ReadLangV1(fh);
