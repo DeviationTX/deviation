@@ -68,7 +68,7 @@
     #if ! defined BUILDTYPE_DEV  && ! DEBUG_WINDOW_SIZE
         //Use this instead of printf(args...) because this will avoid
         //compile warnings
-        #define printf while(0) tfp_printf
+        #define printf if(0) tfp_printf
     #else
         #define printf tfp_printf
     #endif  //BUILDTYPE_DEV
