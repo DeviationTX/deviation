@@ -29,7 +29,7 @@
 DEVICE_INFO *pInformation;
 /*  Points to the DEVICE_PROP structure of current device */
 /*  The purpose of this register is to speed up the execution */
-DEVICE_PROP *pProperty;
+const DEVICE_PROP *pProperty;
 /*  Temporary save the state of Rx & Tx status. */
 /*  Whenever the Rx or Tx state is changed, its value is saved */
 /*  in this variable first and will be set to the EPRB or EPRA */
@@ -37,7 +37,7 @@ DEVICE_PROP *pProperty;
 uint16_t	SaveState ;
 uint16_t  wInterrupt_Mask;
 DEVICE_INFO	Device_Info;
-USER_STANDARD_REQUESTS  *pUser_Standard_Requests;
+const USER_STANDARD_REQUESTS  *pUser_Standard_Requests;
 
 /* Extern variables ----------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/

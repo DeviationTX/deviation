@@ -28,8 +28,8 @@ extern void (*pEpInt_IN[7])(void);
 extern void (*pEpInt_OUT[7])(void);
 extern void (* const HID_pEpInt_IN[7])(void);
 extern void (* const HID_pEpInt_OUT[7])(void);
-extern DEVICE_PROP HID_Device_Property;
-extern USER_STANDARD_REQUESTS HID_User_Standard_Requests;
+extern const DEVICE_PROP HID_Device_Property;
+extern const USER_STANDARD_REQUESTS HID_User_Standard_Requests;
 extern void USB_Enable(u8 type, u8 use_interrupt);
 extern void USB_Disable();
 
