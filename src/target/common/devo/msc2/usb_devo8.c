@@ -41,18 +41,18 @@ void usb_lp_can_rx0_isr()
 }
 void (*pEpInt_IN[7])(void) = {};
 void (*pEpInt_OUT[7])(void) = {};
-DEVICE_PROP *Device_Property;
-USER_STANDARD_REQUESTS *User_Standard_Requests;
+const DEVICE_PROP *Device_Property;
+const USER_STANDARD_REQUESTS *User_Standard_Requests;
 
 extern void (*MSC_pEpInt_IN[7])(void);
 extern void (*MSC_pEpInt_OUT[7])(void);
-extern DEVICE_PROP MSC_Device_Property;
-extern USER_STANDARD_REQUESTS MSC_User_Standard_Requests;
+extern const DEVICE_PROP MSC_Device_Property;
+extern const USER_STANDARD_REQUESTS MSC_User_Standard_Requests;
 
 extern void (*HID_pEpInt_IN[7])(void);
 extern void (*HID_pEpInt_OUT[7])(void);
-extern DEVICE_PROP HID_Device_Property;
-extern USER_STANDARD_REQUESTS HID_User_Standard_Requests;
+extern const DEVICE_PROP HID_Device_Property;
+extern const USER_STANDARD_REQUESTS HID_User_Standard_Requests;
 
 void MSC_Init() {
     memcpy(pEpInt_IN, MSC_pEpInt_IN, sizeof(pEpInt_IN));

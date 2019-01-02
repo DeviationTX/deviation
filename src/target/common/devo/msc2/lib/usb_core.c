@@ -255,7 +255,7 @@ RESULT Standard_ClearFeature(void)
   }
   else if (Type_Rec == (STANDARD_REQUEST | ENDPOINT_RECIPIENT))
   {/*EndPoint Clear Feature*/
-    DEVICE* pDev;
+    const DEVICE* pDev;
     uint32_t Related_Endpoint;
     uint32_t wIndex0;
     uint32_t rEP;

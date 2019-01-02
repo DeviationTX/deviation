@@ -29,13 +29,13 @@
 /* Private variables ---------------------------------------------------------*/
  uint32_t Max_Lun = 0;
 
-DEVICE Device_Table =
+const DEVICE Device_Table =
   {
     EP_NUM,
     1
   };
 
-DEVICE_PROP MSC_Device_Property =
+const DEVICE_PROP MSC_Device_Property =
   {
     MASS_init,
     MASS_Reset,
@@ -51,7 +51,7 @@ DEVICE_PROP MSC_Device_Property =
     0x40 /*MAX PACKET SIZE*/
   };
 
-USER_STANDARD_REQUESTS MSC_User_Standard_Requests =
+const USER_STANDARD_REQUESTS MSC_User_Standard_Requests =
   {
     Mass_Storage_GetConfiguration,
     Mass_Storage_SetConfiguration,
@@ -64,19 +64,19 @@ USER_STANDARD_REQUESTS MSC_User_Standard_Requests =
     Mass_Storage_SetDeviceAddress
   };
 
-ONE_DESCRIPTOR MSC_Device_Descriptor =
+const ONE_DESCRIPTOR MSC_Device_Descriptor =
   {
     (uint8_t*)MASS_DeviceDescriptor,
     MASS_SIZ_DEVICE_DESC
   };
 
-ONE_DESCRIPTOR MSC_Config_Descriptor =
+const ONE_DESCRIPTOR MSC_Config_Descriptor =
   {
     (uint8_t*)MASS_ConfigDescriptor,
     MASS_SIZ_CONFIG_DESC
   };
 
-ONE_DESCRIPTOR MSC_String_Descriptor[5] =
+const ONE_DESCRIPTOR MSC_String_Descriptor[5] =
   {
     {(uint8_t*)MASS_StringLangID, MASS_SIZ_STRING_LANGID},
     {(uint8_t*)MASS_StringVendor, MASS_SIZ_STRING_VENDOR},
