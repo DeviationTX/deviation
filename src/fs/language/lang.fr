@@ -1,12 +1,12 @@
 ﻿Français
-:# Channels
-Nbr canaux
-:%d bytes left
-%d bytes restant
 : is %d%%, safe value = %d%%\n
  = %d%%,valeur sécu. = %d%%\n
 : is %d%%,\nsafe value = %d%%
  = %d%%,\nvaleur sécu. = %d%%\n
+:# Channels
+Nbr canaux
+:%d bytes left
+%d bytes restant
 >:1 sec
 :1-to-1
 1 à 1
@@ -15,8 +15,11 @@ Nbr canaux
 11 Pts
 :13 Point
 13 Pts
+>:1Mbps
+>:250kbps
 :3 Point
 3 Pts
+>:3 Pos
 >:30 sec
 :4Ch w/ Dual-Rates
 4ch et DR
@@ -38,6 +41,8 @@ Nbr canaux
 9 Pts
 :ABSVAL
 ValAbs
+>:ACKPKT
+>:AD2GAIN
 :AIL
 AIL
 :AIL DR
@@ -46,6 +51,7 @@ AIL DR
 Sens AIL
 :AIL Mix
 Mix. AIL
+>:ANT
 >:AUX2
 >:AUX3
 :AUX4
@@ -60,6 +66,7 @@ A propos...
 Ajouter
 :Advanced
 Expert
+>:AirSpd
 :Airplane
 Avion
 :Alarm
@@ -68,19 +75,35 @@ Alarme
 Tempo alarme
 :Alarm intvl
 Tempo alarme
+>:Alert interval
+>:Alert intvl
 :All
 Tous
+>:AllCell
+>:Alt
+>:Alt.
+>:Alt.max
 :Altitude
 Altitude
+>:Amp
+>:Amps
+>:Antenna
+>:Att.: -20dB
+>:Att.: 0dB
+>:Audio settings
+>:Audio volume
 >:Auto
+>:Average
 :Backlight
 Luminosité
 :Bad/missing\nprotocol modules!
 Module de protocole\nabsent ou défaillant!
 >:Bar
 >:Bargraph
+>:Bat
 :Batt alarm
 Alarme batt.
+>:Battery
 :Battery alarm
 Alarme batterie
 :Battery too low,\ncan't save!
@@ -91,12 +114,15 @@ Grande boite
 Appairer
 :Binding
 Appairage
-:Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
-Appairage en cours...\nS'assurer que le récepteur fonctionne\n\nAppuyer sur OK n'annule pas la procédure \nmais permet le contrôle du TX.
 :Binding %s...\nPress ENT to stop
 Appairage %s...\nENT pour arrêter
+:Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
+Appairage en cours...\nS'assurer que le récepteur fonctionne\n\nAppuyer sur OK n'annule pas la procédure \nmais permet le contrôle du TX.
+>:Blink
+>:Blue-A
 :Box
 Boite
+>:Brightness
 :Button monitor
 Ctrl des boutons
 :Buzz settings
@@ -113,14 +139,20 @@ Sens PAS
 Limite PAS
 :COL Mix
 Mix. PAS
+>:CPPM
+>:CRTP Mode
+>:CRTPLOG
 :CYC
 CYC
 :Calibrate
 Calibrer
-:Calibration done.
-Calibration terminée.\nAppuyer sur ENT\n pour continuer.
+<:Calibration done.
+<Calibration terminée.\nAppuyer sur ENT\n pour continuer.
+>:Calibration done.\n \nPress ENT.
 :Cancel
 Annuler
+>:Cap
+>:Capacity
 :Celsius
 °C
 :Center PW
@@ -138,8 +170,8 @@ Changer
 Canaux
 :Channel monitor
 Ctrl. des Canaux
-:Channel output
-Sorties canaux
+<:Channel output
+<Sorties canaux
 :Clock
 Horloge
 :Complex
@@ -156,6 +188,7 @@ Copier
 Copier...
 :Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
 Niveau batterie critique.\nConfiguration enregistrée.\nCharger la batterie SVP.\n Les chgts de configuration\nne seront plus sauver.
+>:Curr
 :Curve
 Courbe
 :Cyclic1
@@ -171,6 +204,7 @@ D/R & Exp
 D/R&Exp -PROF
 :D/R&Exp -RUD
 D/R&Exp -DERIVE
+>:DIS
 :DR
 DR
 :Datalog
@@ -180,29 +214,33 @@ Journal de données
 Date / Heure
 :Date format
 Format date
->:Date:
 :Day
 Jour
 :Deadband
 Zone inerte
+>:Debuglog
 :Default
 Défaut
 :Delete
 Efface
 :Delta PW
 Delta Imp.
+>:Deviation
 :Deviation FW version:
 Deviation FW version:
+>:Deviation\n   USB
 :Dimmer target
 Lum. veille
 :Dimmer time
 Veille après
+>:Disabled
 :Dn
 Bas
 :Do you really want\nto reset the\n permanent timer %d?
 Remise à zéro\n du totalisateur %d?
 :Down
 Bas
+>:DynTrim
 :ELE
 PROF
 :ELE DR
@@ -222,29 +260,41 @@ Etat
 Entrer
 :Exit
 Sortie
+>:Expert
 :Expo&DR
 Expo&DR
 :Extend
 Etendu
+>:External OSD
+>:External voice\ncurrently not\navailable
+>:F.Log filter
 :FMODE
 FMODE
+>:FMode
 >:Fades
 :Fahren
 °F
 :Fail-safe
 Sécurités
+>:Failsafe
 :File
 Fichier
 :Fixed
 Fixe
 :Fixed ID
 ID fixe
+>:Flight Mode
 :Fly mode
 Acrobatie
 :Foot
 Pied
+>:Format
 :Frame Size
 Larg. Signal
+>:Freq Tune
+>:Freq-Coarse
+>:Freq-Fine
+>:Fuel
 :GEAR
 TRAIN
 :GPS
@@ -255,12 +305,14 @@ GPS
 >:GPS Time
 :Generic settings
 Réglages
+>:Green
 :Gyro sense
 Gain gyro
 >:H
 >:H-trim
 :HOLD
 Maintien
+>:Heading
 :Heli
 Heli
 :Heli/Standard GUI
@@ -269,6 +321,7 @@ Heli/Interface Std.
 Helicoptère
 :High-Rate
 Grand Déb.
+>:HighSpeed
 :Hold position
 Valeur gaz
 >:Holds
@@ -296,6 +349,9 @@ GAUCHE_H
 :LEFT_V
 GAUCHE_V
 >:LIN
+>:LQI
+>:LQI output
+>:LRSSI
 :Language
 Langue
 :Latitude
@@ -309,6 +365,9 @@ Unité Long.
 Lié
 :Load
 Charger
+>:Load Layout
+>:Load Model
+>:Load Model Template
 :Load...
 Charger...
 :Longitude
@@ -341,11 +400,15 @@ Déb. Med
 Limite Min
 :Min/Max
 Min/Max
+>:MinCell
 >:Minute
+>:Missing Modules:\n
 :Mixer
 Mixer
+>:Mixer    Reorder:Hold R+
 :Mixer GUI
 Réglages
+>:Mixer output
 :Mixers
 Nbr mixers
 >:Mode
@@ -365,6 +428,7 @@ Pour le mode de réglage standard,\n le modèle doit être réinitialisé.
 Config. Modèle
 :Model type
 Type Modèle
+>:Module Error
 :Momentary
 Momentané
 :Month
@@ -375,6 +439,8 @@ Baisser
 Monter
 :Move sticks and knobs\nto max & min positions\nthen press ENT
 Bouger sticks et pot.\naux min/max de course\n puis appuyer sur ENT
+>:Multi
+>:Multirotor
 :Mux
 Opération
 :Neg
@@ -384,6 +450,7 @@ Nouveau
 >:No
 :No Trim
 Pas de Trim
+>:No range test possible.
 :None
 Néant
 :Normal
@@ -402,6 +469,8 @@ Ok
 Marche
 :On/Off
 Marche/Arrêt
+>:OrangeRx
+>:Outputs
 :PIT
 PAS
 :PIT Mix
@@ -416,6 +485,8 @@ Cfg PPMIn (Etendu)
 Page
 :Page Config
 Config Page
+>:Peak
+>:Pitch
 :Pitch curves
 Courbes de pas
 :Plane
@@ -430,8 +501,10 @@ Pos.
 :Pos/Neg
 Pos./Neg.
 >:Position %d
+>:Power
 :Power On alarm
 Alarme d'inactivité
+>:Power reduced to
 :Power-down alert
 Alerte arrêt
 :Prealert interval
@@ -448,6 +521,8 @@ Appuyer sur ENT\n pour passer \n le mode USB sur
 'ENT' pour copier
 :Press ENT to load
 'ENT' pour charger
+>:Press ENT to start test.
+>:Press ENT to stop test.
 :Press ENT to turn \nUSB drive
 Appuyer sur ENT\n pour passer \n le mode USB sur
 :Protocol
@@ -456,22 +531,31 @@ Protocole
 Mélodie arrêt
 :PwrOn alarm
 Alarme Inactivité
+>:RF Mode
+>:RFMode
 :RIGHT_H
 DROITE_H
 :RIGHT_V
 DROITE_V
 :RPM
 T/mn
+>:RPYT
+>:RSSI
+>:RSSIChan
 :RTC Time
 Horloge tps réel
 :RUD
 DERIVE
 :RUD DR
 DR DERIVE
+>:RX
+>:RX Id
+>:Range Test
 :Rate
 Taux
 :Re-Init
 Réinit.
+>:Re-bind
 :Real Time Clock
 Horloge tps réel
 :Remove
@@ -490,13 +574,26 @@ Inversé
 Annuler
 :Right
 Droite
+>:Roll
+>:RxV
+>:S.PORT Out
+>:SW A
+>:SW B
+>:SW C
+>:SW D
+>:SW E
+>:SW F
+>:SW G
+>:SW H
 :Safe Val
 Val. Sécu
 :Safety
 Sécurité
 >:Sample Rate
+>:SatCount
 :Save
 Sauve
+>:Save Model as...
 :Scale
 Echelle
 :Scale%s
@@ -507,7 +604,10 @@ Scanner
 Seconde
 :Select
 Choix
+>:Select Icon
+>:Select Language
 >:Servo
+>:Servo Hz
 :Set
 Entrer
 :Set date
@@ -518,8 +618,9 @@ Entrer chrono permanent
 Entrer heurs
 :Set to
 Entrer
-:Set:
-Entrer :
+<:Set:
+<Entrer :
+>:Setup
 :Simple
 Simple
 :Simple 4 Channel
@@ -538,6 +639,7 @@ Standard
 Réglages standard
 :Start
 Durée
+>:Start test
 :Step
 <Pas>
 :Stick
@@ -548,6 +650,7 @@ Entrées  sticks/aux.
 Mode
 :Sticks
 Manches
+>:Stop test
 :Subtrim
 Subtrim
 :Swash
@@ -591,8 +694,11 @@ TRIM_D+
 :TRIM_R-
 TRIM_D-
 >:TRN
+>:TX
+>:Telem %d
 :TelemRPM
 Télém.T/mn
+>:TelemRSSI
 :TelemT
 Télém.T°
 :TelemV
@@ -625,6 +731,7 @@ Heure
 Format Heure
 :Timer
 Chrono
+>:Timer %d
 :Timer settings
 Alarmes Chronos
 :Timer%d
@@ -679,25 +786,36 @@ Désactiver
 Activer
 :Tx power
 Puiss. TX
+>:TxPower
 >:Type
 :USB
 USB
 >:USB Filesystem is currently 
+>:USE A.ACK
 :Unknown
 Inconnu
 :Up
 Haut
 >:V-trim
+>:VSI
 :Value
 Valeur
 :Vibration
 Vibreur
+>:Vibration settings
+>:Vibration:
+>:Video
+>:Video Channel
+>:Video Enable
+>:Video setup
 :Virt
 Virt
+>:Voice config
 :Volt
 Volt
 :Welcome
 Bienvenue
+>:Yaw
 :Year
 Année
 :Yes
@@ -712,12 +830,15 @@ Oui
 Valeur réelle
 :add
 ajouter
+>:beep
 :cntdn-prop
 A rebours prop
 :countdown
 A rebours
 :delay
 Retard
+>:down
+>:from
 :is not supported
 Non supporté
 :is turned off
@@ -730,15 +851,26 @@ min
 multiplier
 :permanent
 permanent
+>:regular
 :replace
 remplacer
 :resulting value
 Valeur résultante
+>:rx Quality
+>:rx SNR
+>:rxQual
 :stop-prop
 Chrono prop
 :stopwatch
 Chrono
+>:tx Quality
+>:tx SNR
+>:txQual
+>:txRSSI
+>:up
+>:vTX MHz
 :value to add or set
 valeur à ajouter ou fixer
 :value to set
 Valeur à fixer
+>:voice

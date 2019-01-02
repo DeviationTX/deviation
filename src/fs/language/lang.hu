@@ -61,6 +61,7 @@ AIL DR
 Csűrés inv.
 :AIL Mix
 Csűrés mix
+>:ANT
 :AUX2
 AUX2
 :AUX3
@@ -109,6 +110,7 @@ Magasság
 Áram
 :Amps
 Áram
+>:Antenna
 :Att.: -20dB
 Csill.: -20dB
 :Att.: 0dB
@@ -191,6 +193,8 @@ Kalibrálás
 Kalibrálás kész.\n \nNyomjon ENT-t.
 :Cancel
 Mégsem
+>:Cap
+>:Capacity
 :Celsius
 °C
 :Center PW
@@ -227,6 +231,7 @@ Másolás
 Másolás...
 :Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
 A telepfeszültség kritikusan alacsony!\nA beállítások el lettek mentve,\nde a további változtatások\nNEM lesznek elmentve!\n\nCseréljen elemet!
+>:Curr
 :Curve
 Görbe
 :Cyclic1
@@ -327,6 +332,7 @@ Külső hang\njelenleg nem\nelérhető
 Napló szűrés
 :FMODE
 FMODE
+>:FMode
 :Fades
 Eltűnés
 :Fahren
@@ -341,6 +347,7 @@ Fájl
 Fix
 :Fixed ID
 Fix ID
+>:Flight Mode
 :Fly mode
 Rep. mód
 :Foot
@@ -355,8 +362,8 @@ Keret
 Frekv. hang.
 :Freq-Coarse
 Frekv. durva
-:Freq-Course
-Frekv. durva
+<:Freq-Course
+<Frekv. durva
 :Freq-Fine
 Frekv. finom
 :Fuel
@@ -591,6 +598,7 @@ Oldal
 Ablak konfig.
 :Peak
 Csúcs
+>:Pitch
 :Pitch curves
 Állásszög görbék
 :Plane
@@ -609,6 +617,7 @@ Poz. 2
 Poz/Neg
 :Position %d
 Pozíció %d
+>:Power
 :Power On alarm
 Bekapcs. riaszt.
 :Power reduced to
@@ -645,6 +654,8 @@ Kikapcs. r.
 Bekapcs. riaszt.
 |devo10:PwrOn alarm
 Bekapcs. r.
+>:RF Mode
+>:RFMode
 :RIGHT_H
 JOBB_V
 :RIGHT_V
@@ -663,6 +674,8 @@ Idő
 RUD
 :RUD DR
 RUD DR
+>:RX
+>:RX Id
 :Range Test
 Hatótáv teszt
 :Rate
@@ -691,6 +704,7 @@ Inverz
 Mégsem
 :Right
 Jobb
+>:Roll
 :RxV
 RxV
 :S.PORT Out
@@ -839,6 +853,7 @@ TRIM_J+
 TRIM_J-
 :TRN
 TRN
+>:TX
 :Telem %d
 Telem. %d
 :TelemRPM
@@ -977,6 +992,7 @@ Hang konfiguráció
 Fesz.
 :Welcome
 Üdvözlet
+>:Yaw
 :Year
 Év
 :Yes
@@ -1023,10 +1039,17 @@ szokásos
 cserél
 :resulting value
 Új érték
+>:rx Quality
+>:rx SNR
+>:rxQual
 :stop-prop
 Gázf. stop.
 :stopwatch
 Stopper
+>:tx Quality
+>:tx SNR
+>:txQual
+>:txRSSI
 :up
 fel
 :vTX MHz

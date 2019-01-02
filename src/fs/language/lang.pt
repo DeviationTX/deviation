@@ -50,6 +50,7 @@ ALAB DR
 ALAB Inv
 :AIL Mix
 ALAB Mix
+>:ANT
 >:AUX2
 >:AUX3
 :AUX4
@@ -80,10 +81,11 @@ Alarme
 Altitude
 >:Amp
 >:Amps
+>:Antenna
 >:Att.: -20dB
 >:Att.: 0dB
 >:Audio settings
->:Volume audio
+>:Audio volume
 >:Auto
 >:Average
 :Backlight
@@ -133,11 +135,11 @@ PASSO Mix
 Cíclico
 :Calibrate
 Calibrar
-<:Calibration done.
-<Calibração OK
 >:Calibration done.\n \nPress ENT.
 :Cancel
 Cancelar
+>:Cap
+>:Capacity
 :Celsius
 Celsius
 :Center PW
@@ -154,8 +156,6 @@ Alterar
 >:Channel
 :Channel monitor
 Monitor canais
-<:Channel output
-<Canais saída
 >:Clock
 :Complex
 Complexo
@@ -170,6 +170,7 @@ Copiar para
 Copiar...
 :Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
 Nivel crítico das baterias.\nAs modificações devem ser gravadas.\nQualquer alteração\nNÃO será gravada.\n\nTroque as baterias imediatamente!
+>:Curr
 :Curve
 Curva
 :Cyclic1
@@ -238,6 +239,7 @@ Expo&DR
 >:External voice\ncurrently not\navailable
 >:F.Log filter
 >:FMODE
+>:FMode
 >:Fades
 :Fahren
 Fahren
@@ -250,6 +252,7 @@ Arquivo
 Fixo
 :Fixed ID
 ID Fixo
+>:Flight Mode
 >:Fly mode
 :Foot
 Pé
@@ -367,8 +370,7 @@ Mixer
 :Mixers
 Mixers
 >:Mode
-:Modo %d
-Modo %d
+>:Mode %d
 >:Model
 :Model menu
 Menu do modelo
@@ -380,6 +382,8 @@ Nome modelo
 Configura modelo
 :Model type
 Tipo modelo
+<:Modo %d
+<Modo %d
 >:Module Error
 >:Momentary
 >:Month
@@ -429,6 +433,7 @@ Lig
 Página
 >:Page Config
 >:Peak
+>:Pitch
 >:Pitch curves
 :Plane
 Aeroplano
@@ -442,6 +447,7 @@ Pos
 :Pos/Neg
 Pos/Neg
 >:Position %d
+>:Power
 >:Power On alarm
 >:Power reduced to
 >:Power-down alert
@@ -467,6 +473,8 @@ Tecle ENT p/ativar USB
 Protocolo
 >:PwrDn alert
 >:PwrOn alarm
+>:RF Mode
+>:RFMode
 :RIGHT_H
 DIREITA_H
 :RIGHT_V
@@ -481,6 +489,8 @@ RPM
 RUD
 :RUD DR
 RUD DR
+>:RX
+>:RX Id
 >:Range Test
 >:Rate
 :Re-Init
@@ -501,6 +511,7 @@ Invertido
 Reverter
 :Right
 Direita
+>:Roll
 >:RxV
 >:S.PORT Out
 >:SW A
@@ -603,6 +614,7 @@ TRIM_D+
 :TRIM_R-
 TRIM_D-
 >:TRN
+>:TX
 >:Telem %d
 :TelemRPM
 TelemRPM
@@ -711,6 +723,7 @@ Virt
 :Volt
 Volt
 >:Welcome
+>:Yaw
 >:Year
 >:Yes
 :Zero/Max
@@ -744,9 +757,16 @@ mult
 :replace
 substituir
 >:resulting value
+>:rx Quality
+>:rx SNR
+>:rxQual
 >:stop-prop
 :stopwatch
 cronometro
+>:tx Quality
+>:tx SNR
+>:txQual
+>:txRSSI
 >:up
 >:vTX MHz
 >:value to add or set

@@ -1,11 +1,11 @@
 ﻿简体中文
-:# Channels
-通道数
->:%d bytes left
 : is %d%%, safe value = %d%%\n
 当前值为%d%%, 安全开机设定为%d%%\n
 : is %d%%,\nsafe value = %d%%
 当前值为%d%%,\n安全开机设定为%d%%
+:# Channels
+通道数
+>:%d bytes left
 :1 sec
 1秒
 :1-to-1
@@ -16,8 +16,11 @@
 11点曲线
 :13 Point
 13点曲线
+>:1Mbps
+>:250kbps
 :3 Point
 3点曲线
+>:3 Pos
 :30 sec
 30秒
 :4Ch w/ Dual-Rates
@@ -39,6 +42,8 @@
 9点曲线
 :ABSVAL
 绝对值
+>:ACKPKT
+>:AD2GAIN
 :AIL
 副翼
 :AIL DR
@@ -47,6 +52,7 @@
 副翼方向
 :AIL Mix
 副翼螺距
+>:ANT
 >:AUX2
 >:AUX3
 >:AUX4
@@ -58,6 +64,7 @@
 >:Add
 :Advanced
 高级模式1
+>:AirSpd
 :Airplane
 固定翼
 :Alarm
@@ -66,18 +73,34 @@
 报警间隔
 :Alarm intvl
 报警间隔
+>:Alert interval
+>:Alert intvl
 >:All
+>:AllCell
+>:Alt
+>:Alt.
+>:Alt.max
 :Altitude
 高度
+>:Amp
+>:Amps
+>:Antenna
+>:Att.: -20dB
+>:Att.: 0dB
+>:Audio settings
+>:Audio volume
 :Auto
 自动
+>:Average
 :Backlight
 背光
 >:Bad/missing\nprotocol modules!
 >:Bar
 >:Bargraph
+>:Bat
 :Batt alarm
 电量报警
+>:Battery
 :Battery alarm
 电量报警
 :Battery too low,\ncan't save!
@@ -87,11 +110,14 @@
 对频
 :Binding
 对频
-:Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
-对频中...\n请确保飞机通电!\n\n点击OK不会中止对频\n但是可以退出本页面
 :Binding %s...\nPress ENT to stop
 对频中 %s...\n按ENT中止
+:Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
+对频中...\n请确保飞机通电!\n\n点击OK不会中止对频\n但是可以退出本页面
+>:Blink
+>:Blue-A
 >:Box
+>:Brightness
 :Button monitor
 按键监控
 :Buzz settings
@@ -108,14 +134,20 @@
 螺距
 :COL Mix
 螺距
+>:CPPM
+>:CRTP Mode
+>:CRTPLOG
 :CYC
 CYC
 :Calibrate
 校准
-:Calibration done.
-校准完成.
+<:Calibration done.
+<校准完成.
+>:Calibration done.\n \nPress ENT.
 :Cancel
 取消
+>:Cap
+>:Capacity
 :Celsius
 摄氏
 :Center PW
@@ -133,8 +165,8 @@ CYC
 通道
 :Channel monitor
 通道监控
-:Channel output
-通道输出
+<:Channel output
+<通道输出
 >:Clock
 :Complex
 多段式
@@ -149,6 +181,7 @@ CYC
 复制...
 :Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
 检测到电压过低.\n当前设置已经存盘.\n以后的设置将无法存盘.\n\n请立即更换电池！
+>:Curr
 :Curve
 曲线
 :Cyclic1
@@ -165,33 +198,38 @@ CCPM3
 升降舵量/曲线
 :D/R&Exp -RUD
 方向舵量/曲线
+>:DIS
 :DR
 舵量
 >:Datalog
 >:Date
 >:Date / Time
 >:Date format
->:Date:
 >:Day
 :Deadband
 死区
+>:Debuglog
 :Default
 缺省
 >:Delete
 :Delta PW
 脉宽变化
+>:Deviation
 :Deviation FW version:
 Deviation固件版本:
+>:Deviation\n   USB
 :Dimmer target
 背光减弱至
 :Dimmer time
 背光减弱时间
+>:Disabled
 :Dn
 下
 :Do you really want\nto reset the\n permanent timer %d?
 是否确定\n重置持续\n计时器%d?
 :Down
 下
+>:DynTrim
 :ELE
 升降
 :ELE DR
@@ -212,28 +250,40 @@ Deviation固件版本:
 进入
 :Exit
 退出
+>:Expert
 :Expo&DR
 三段式
 >:Extend
+>:External OSD
+>:External voice\ncurrently not\navailable
+>:F.Log filter
 :FMODE
 模式
+>:FMode
 >:Fades
 :Fahren
 华氏
 :Fail-safe
 失控保护
+>:Failsafe
 :File
 模型文件
 :Fixed
 固定
 :Fixed ID
 固定ID码
+>:Flight Mode
 :Fly mode
 飞行模式
 :Foot
 英尺
+>:Format
 :Frame Size
 总脉宽
+>:Freq Tune
+>:Freq-Coarse
+>:Freq-Fine
+>:Fuel
 :GEAR
 尾舵
 >:GPS
@@ -243,12 +293,14 @@ Deviation固件版本:
 >:GPS Time
 :Generic settings
 基本设置
+>:Green
 :Gyro sense
 锁尾感度
 :H
 高
 >:H-trim
 >:HOLD
+>:Heading
 :Heli
 直升机
 >:Heli/Standard GUI
@@ -256,6 +308,7 @@ Deviation固件版本:
 直升机
 :High-Rate
 普通飞行
+>:HighSpeed
 :Hold position
 熄火油门值
 >:Holds
@@ -282,6 +335,9 @@ LCD设置
 左垂直
 :LIN
 线性
+>:LQI
+>:LQI output
+>:LRSSI
 :Language
 语言
 :Latitude
@@ -295,6 +351,9 @@ LCD设置
 关联
 :Load
 读取
+>:Load Layout
+>:Load Model
+>:Load Model Template
 :Load...
 读取...
 :Longitude
@@ -328,12 +387,16 @@ LCD设置
 最小舵量
 :Min/Max
 最低/最高
+>:MinCell
 :Minute
 分钟
+>:Missing Modules:\n
 :Mixer
 混控
+>:Mixer    Reorder:Hold R+
 :Mixer GUI
 设置界面
+>:Mixer output
 :Mixers
 混控
 :Mode
@@ -354,6 +417,7 @@ LCD设置
 模型设置
 :Model type
 模型类型
+>:Module Error
 >:Momentary
 :Month
 月
@@ -363,6 +427,8 @@ LCD设置
 上移
 :Move sticks and knobs\nto max & min positions\nthen press ENT
 拨动摇杆和旋钮,\n先至最小再至最大位置,\n然后按ENT
+>:Multi
+>:Multirotor
 :Mux
 作用
 :Neg
@@ -372,6 +438,7 @@ LCD设置
 >:No
 :No Trim
 无
+>:No range test possible.
 :None
 无
 :Normal
@@ -390,6 +457,8 @@ LCD设置
 开启
 :On/Off
 开/关
+>:OrangeRx
+>:Outputs
 :PIT
 螺距
 >:PIT Mix
@@ -400,6 +469,8 @@ LCD设置
 :Page
 模式1-N
 >:Page Config
+>:Peak
+>:Pitch
 :Pitch curves
 螺距曲线
 :Plane
@@ -418,7 +489,9 @@ LCD设置
 正/负
 :Position %d
 档位%1
+>:Power
 >:Power On alarm
+>:Power reduced to
 >:Power-down alert
 :Prealert interval
 预警间隔
@@ -434,6 +507,8 @@ LCD设置
 按ENT复制
 :Press ENT to load
 按ENT读取
+>:Press ENT to start test.
+>:Press ENT to stop test.
 :Press ENT to turn \nUSB drive
 按ENT使U盘
 :Protocol
@@ -442,21 +517,30 @@ LCD设置
 无电提示
 :PwrOn alarm
 开机报警
+>:RF Mode
+>:RFMode
 :RIGHT_H
 右水平
 :RIGHT_V
 右垂直
 :RPM
 转数
+>:RPYT
+>:RSSI
+>:RSSIChan
 :RTC Time
 时间
 :RUD
 方向
 :RUD DR
 方向舵量
+>:RX
+>:RX Id
+>:Range Test
 >:Rate
 :Re-Init
 初始化
+>:Re-bind
 :Real Time Clock
 时钟
 :Remove
@@ -475,14 +559,27 @@ LCD设置
 回滚修改
 :Right
 右
+>:Roll
+>:RxV
+>:S.PORT Out
+>:SW A
+>:SW B
+>:SW C
+>:SW D
+>:SW E
+>:SW F
+>:SW G
+>:SW H
 :Safe Val
 熄火值
 :Safety
 熄火开关
 :Sample Rate
 采样率
+>:SatCount
 :Save
 保存
+>:Save Model as...
 :Scale
 比例
 :Scale%s
@@ -493,14 +590,17 @@ LCD设置
 秒
 :Select
 选择
+>:Select Icon
+>:Select Language
 :Servo
 舵机
+>:Servo Hz
 >:Set
 >:Set date
 >:Set permanent timer
 >:Set time
 >:Set to
->:Set:
+>:Setup
 :Simple
 一段式
 :Simple 4 Channel
@@ -516,6 +616,7 @@ LCD设置
 通用模式
 :Start
 开始时间
+>:Start test
 :Step
 幅度
 :Stick
@@ -526,6 +627,7 @@ LCD设置
 摇杆模式
 :Sticks
 摇杆/旋钮
+>:Stop test
 :Subtrim
 微调
 :Swash
@@ -569,8 +671,11 @@ LCD设置
 :TRIM_R-
 右上-
 >:TRN
+>:TX
+>:Telem %d
 :TelemRPM
 转数
+>:TelemRSSI
 :TelemT
 温度
 :TelemV
@@ -603,6 +708,7 @@ LCD设置
 时间格式
 :Timer
 定时器
+>:Timer %d
 :Timer settings
 定时器设置
 :Timer%d
@@ -652,23 +758,34 @@ LCD设置
 开启
 :Tx power
 发射功率
+>:TxPower
 >:Type
 >:USB
 >:USB Filesystem is currently 
+>:USE A.ACK
 >:Unknown
 :Up
 上
 >:V-trim
+>:VSI
 :Value
 值
 :Vibration
 振动
+>:Vibration settings
+>:Vibration:
+>:Video
+>:Video Channel
+>:Video Enable
+>:Video setup
 :Virt
 虚拟
+>:Voice config
 :Volt
 电压
 :Welcome
 欢迎
+>:Yaw
 :Year
 年
 >:Yes
@@ -681,11 +798,14 @@ LCD设置
 >:actual value
 :add
 附加
+>:beep
 >:cntdn-prop
 :countdown
 倒计时
 :delay
 延迟
+>:down
+>:from
 :is not supported
 不支持
 :is turned off
@@ -698,11 +818,22 @@ LCD设置
 叠加
 :permanent
 持续计时
+>:regular
 :replace
 替换
 >:resulting value
+>:rx Quality
+>:rx SNR
+>:rxQual
 >:stop-prop
 :stopwatch
 秒表
+>:tx Quality
+>:tx SNR
+>:txQual
+>:txRSSI
+>:up
+>:vTX MHz
 >:value to add or set
 >:value to set
+>:voice

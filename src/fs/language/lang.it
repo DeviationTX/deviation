@@ -1,11 +1,11 @@
 ﻿Italiano
-:# Channels
-# Canali
->:%d bytes left
 : is %d%%, safe value = %d%%\n
  = %d%%, valore sicuro  = %d%%\n
 : is %d%%,\nsafe value = %d%%
  = %d%%,\nvalore sicuro=%d%%
+:# Channels
+# Canali
+>:%d bytes left
 >:1 sec
 :1-to-1
 1 a 1
@@ -14,8 +14,11 @@
 11 Punti
 :13 Point
 13 Punti
+>:1Mbps
+>:250kbps
 :3 Point
 3 Punti
+>:3 Pos
 >:30 sec
 :4Ch w/ Dual-Rates
 4Ch con DualRate
@@ -37,6 +40,8 @@ Elicottero 6Ch
 9 Punti
 :ABSVAL
 V_ASSOL
+>:ACKPKT
+>:AD2GAIN
 :AIL
 ALET
 :AIL DR
@@ -45,6 +50,7 @@ DR ALET
 ALET Inv
 :AIL Mix
 ALETT Mix
+>:ANT
 :AUX2
 AUX2
 :AUX3
@@ -62,6 +68,7 @@ A proposito di Deviation
 >:Add
 :Advanced
 Avanzato
+>:AirSpd
 :Airplane
 Aereo
 :Alarm
@@ -70,19 +77,35 @@ Allarme
 Intervallo di allarme
 :Alarm intvl
 Allarme intvl
+>:Alert interval
+>:Alert intvl
 >:All
+>:AllCell
+>:Alt
+>:Alt.
+>:Alt.max
 :Altitude
 Altitudine
+>:Amp
+>:Amps
+>:Antenna
+>:Att.: -20dB
+>:Att.: 0dB
+>:Audio settings
+>:Audio volume
 :Auto
 Auto
+>:Average
 :Backlight
 Luminosità
 :Bad/missing\nprotocol modules!
 Moduli protocollo errati o assenti!
 >:Bar
 >:Bargraph
+>:Bat
 :Batt alarm
 Allarme batteria
+>:Battery
 :Battery alarm
 Allarme batteria
 :Battery too low,\ncan't save!
@@ -92,11 +115,14 @@ Batteria troppo scarica,\nnon posso salvare!
 Bind
 :Binding
 Binding
-:Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
-Binding in corso...\nAssicurati che il modello sia acceso\n\nIl tasto OK non interromperà la procedura di binding\nma permetterà il controllo della TX.
 :Binding %s...\nPress ENT to stop
 Binding %s...\nPremi ENT per fermare
+:Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
+Binding in corso...\nAssicurati che il modello sia acceso\n\nIl tasto OK non interromperà la procedura di binding\nma permetterà il controllo della TX.
+>:Blink
+>:Blue-A
 >:Box
+>:Brightness
 :Button monitor
 Monitor pulsante
 :Buzz settings
@@ -112,14 +138,20 @@ Inv.Collet.
 :COL Limit
 Limite Collet.
 >:COL Mix
+>:CPPM
+>:CRTP Mode
+>:CRTPLOG
 :CYC
 Ciclico
 :Calibrate
 Calibrazione
-:Calibration done.
-Calibrazione completata.
+<:Calibration done.
+<Calibrazione completata.
+>:Calibration done.\n \nPress ENT.
 :Cancel
 Cancella
+>:Cap
+>:Capacity
 :Celsius
 Celsius
 :Center PW
@@ -137,8 +169,8 @@ Cambia
 Canale
 :Channel monitor
 Monitor di Canale
-:Channel output
-Canale di uscita
+<:Channel output
+<Canale di uscita
 >:Clock
 :Complex
 Complesso
@@ -153,6 +185,7 @@ Copia su
 Copia su...
 :Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
 Livello critico della batteria.\nI settaggi sono stati salvati.\nOgni ulteriore modifica dei parametri\nNON sarà salvata.\n\nCarica la batteria ora!
+>:Curr
 :Curve
 Curva
 :Cyclic1
@@ -169,33 +202,38 @@ D/R & Esp.-ALET
 D/R & Esp.-ELEV
 :D/R&Exp -RUD
 D/R & Esp.-TIMONE
+>:DIS
 :DR
 DR
 >:Datalog
 >:Date
 >:Date / Time
 >:Date format
->:Date:
 >:Day
 :Deadband
 Zona morta
+>:Debuglog
 :Default
 Default
 >:Delete
 :Delta PW
 Delta PW
+>:Deviation
 :Deviation FW version:
 Versione del FW Deviation:
+>:Deviation\n   USB
 :Dimmer target
 Dest. del Dimmer
 :Dimmer time
 Durata del Dimmer
+>:Disabled
 :Dn
 Dn
 :Do you really want\nto reset the\n permanent timer %d?
 Vuoi veramente resettare il timer permanente %d?
 :Down
 Giu*
+>:DynTrim
 :ELE
 ELEV
 :ELE DR
@@ -214,28 +252,40 @@ Abilitato
 Entra
 :Exit
 Esci
+>:Expert
 :Expo&DR
 Esp.&DR
 >:Extend
+>:External OSD
+>:External voice\ncurrently not\navailable
+>:F.Log filter
 :FMODE
 Modo di volo
+>:FMode
 >:Fades
 :Fahren
 Fahren
 :Fail-safe
 Fail-safe
+>:Failsafe
 :File
 File
 :Fixed
 Fisso
 :Fixed ID
 ID Fisso
+>:Flight Mode
 :Fly mode
 Modo di volo
 :Foot
 Piede
+>:Format
 :Frame Size
 Dimensione del Frame
+>:Freq Tune
+>:Freq-Coarse
+>:Freq-Fine
+>:Fuel
 :GEAR
 CARRELLO
 :GPS
@@ -246,6 +296,7 @@ GPS
 >:GPS Time
 :Generic settings
 Settaggi generici
+>:Green
 :Gyro sense
 Sens. giroscopio
 :H
@@ -253,6 +304,7 @@ H
 >:H-trim
 :HOLD
 HOLD
+>:Heading
 :Heli
 Eli
 :Heli/Standard GUI
@@ -261,6 +313,7 @@ GUI Eli/Standard
 Elicottero
 :High-Rate
 Rate Alto
+>:HighSpeed
 :Hold position
 Posizione di Hold
 >:Holds
@@ -289,6 +342,9 @@ SINISTRA_H
 SINISTRA_V
 :LIN
 LIN
+>:LQI
+>:LQI output
+>:LRSSI
 :Language
 Lingua
 :Latitude
@@ -302,6 +358,9 @@ Lunghezza
 Linkato
 :Load
 Carica
+>:Load Layout
+>:Load Model
+>:Load Model Template
 :Load...
 Carica...
 :Longitude
@@ -335,11 +394,15 @@ Rate Medio
 Limite Min
 :Min/Max
 Min/Max
+>:MinCell
 >:Minute
+>:Missing Modules:\n
 :Mixer
 Mixer
+>:Mixer    Reorder:Hold R+
 :Mixer GUI
 Mixer GUI
+>:Mixer output
 :Mixers
 Mixers
 :Mode
@@ -359,6 +422,7 @@ Il modello deve essere\nresettato per tornare ai mixer std.
 Setup del modello
 :Model type
 Tipo del modello
+>:Module Error
 >:Momentary
 >:Month
 :Move Down
@@ -367,6 +431,8 @@ Muovi Giu*
 Muovi Su*
 :Move sticks and knobs\nto max & min positions\nthen press ENT
 Muovi gli stick e le manopole\nfino al max e al min\nquindi premi ENT
+>:Multi
+>:Multirotor
 :Mux
 Operazione
 :Neg
@@ -376,6 +442,7 @@ Nuovo
 >:No
 :No Trim
 No Trim
+>:No range test possible.
 :None
 Nessuno
 :Normal
@@ -392,6 +459,8 @@ Ok
 :On
 On
 >:On/Off
+>:OrangeRx
+>:Outputs
 :PIT
 PASSO
 :PIT Mix
@@ -403,6 +472,8 @@ Mix PASSO
 :Page
 Pagina
 >:Page Config
+>:Peak
+>:Pitch
 :Pitch curves
 Curva del passo
 :Plane
@@ -421,7 +492,9 @@ Pos 2
 Pos./Neg.
 :Position %d
 Posizione %d
+>:Power
 >:Power On alarm
+>:Power reduced to
 :Power-down alert
 Allarme di spegnimento
 :Prealert interval
@@ -438,6 +511,8 @@ Premi ENT per cambiare
 Premi ENT per copiare su
 :Press ENT to load
 Premi ENT per caricare
+>:Press ENT to start test.
+>:Press ENT to stop test.
 :Press ENT to turn \nUSB drive
 Premi ENT per attivare il drive USB
 :Protocol
@@ -445,20 +520,29 @@ Protocollo
 :PwrDn alert
 Allarme spegnimento
 >:PwrOn alarm
+>:RF Mode
+>:RFMode
 :RIGHT_H
 DESTRA_H
 :RIGHT_V
 DESTRA_V
 :RPM
 RPM
+>:RPYT
+>:RSSI
+>:RSSIChan
 >:RTC Time
 :RUD
 TIMONE
 :RUD DR
 DRTIMONE
+>:RX
+>:RX Id
+>:Range Test
 >:Rate
 :Re-Init
 Reinizializza
+>:Re-bind
 >:Real Time Clock
 :Remove
 Rimuovi
@@ -476,13 +560,26 @@ Rovesciato
 Inverti
 :Right
 Destra
+>:Roll
+>:RxV
+>:S.PORT Out
+>:SW A
+>:SW B
+>:SW C
+>:SW D
+>:SW E
+>:SW F
+>:SW G
+>:SW H
 :Safe Val
 Val.Sicuro
 :Safety
 Sicurezza
 >:Sample Rate
+>:SatCount
 :Save
 Salva
+>:Save Model as...
 :Scale
 Scala
 :Scale%s
@@ -491,14 +588,17 @@ Scala%s
 Scanner
 >:Second
 >:Select
+>:Select Icon
+>:Select Language
 :Servo
 Servo
+>:Servo Hz
 >:Set
 >:Set date
 >:Set permanent timer
 >:Set time
 >:Set to
->:Set:
+>:Setup
 :Simple
 Sempl.
 :Simple 4 Channel
@@ -515,6 +615,7 @@ Standard
 Mixer Standard
 :Start
 Avvia
+>:Start test
 :Step
 Passo
 >:Stick
@@ -524,6 +625,7 @@ posizione dello stick
 Modo di volo
 :Sticks
 Sticks
+>:Stop test
 :Subtrim
 Subtrim
 :Swash
@@ -568,8 +670,11 @@ TRIM_D+
 TRIM_D-
 :TRN
 TRN
+>:TX
+>:Telem %d
 :TelemRPM
 TelemRPM
+>:TelemRSSI
 :TelemT
 TelemT
 :TelemV
@@ -600,6 +705,7 @@ Tempo
 >:Time format
 :Timer
 Timer
+>:Timer %d
 :Timer settings
 Config. Timer
 :Timer%d
@@ -649,24 +755,35 @@ Disattiva
 Attiva
 :Tx power
 Potenza di TX
+>:TxPower
 >:Type
 :USB
 USB
 >:USB Filesystem is currently 
+>:USE A.ACK
 :Unknown
 Sconosciuto
 :Up
 Su*
 >:V-trim
+>:VSI
 :Value
 Valore
 :Vibration
 Vibrazione
+>:Vibration settings
+>:Vibration:
+>:Video
+>:Video Channel
+>:Video Enable
+>:Video setup
 :Virt
 Virt
+>:Voice config
 :Volt
 Volt
 >:Welcome
+>:Yaw
 >:Year
 >:Yes
 :Zero/Max
@@ -678,10 +795,13 @@ Zero/Max
 >:actual value
 :add
 aggiungi
+>:beep
 >:cntdn-prop
 :countdown
 countdown
 >:delay
+>:down
+>:from
 :is not supported
 non è supportato
 :is turned off
@@ -694,11 +814,22 @@ min
 Mult.
 :permanent
 permanente
+>:regular
 :replace
 Sostituisci
 >:resulting value
+>:rx Quality
+>:rx SNR
+>:rxQual
 >:stop-prop
 :stopwatch
 Cronometro
+>:tx Quality
+>:tx SNR
+>:txQual
+>:txRSSI
+>:up
+>:vTX MHz
 >:value to add or set
 >:value to set
+>:voice
