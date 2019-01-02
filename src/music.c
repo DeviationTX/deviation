@@ -63,12 +63,13 @@ static u8 playback_device;
 #endif
 static u8 vibrate;
 
+#define NUM_FREQ_ONE_SCALE 12
 static const u16 freqs[] = {220, 233, 247, 262, 277, 294, 311, 330, 349, 370, 392, 415};
 
 static u16 get_freq(u8 note)
 {
-    u16 freq = freqs[(note - 1) % 12];
-    for (int j = 0; j < (note - 1) / 12; ++j)
+    u16 freq = freqs[(note - 1) % NUM_FREQ_ONE_SCALE];
+    for (int j = 0; j < (note - 1) / NUM_FREQ_ONE_SCALE; ++j)
         freq *= 2;
 
     return freq;
@@ -77,7 +78,7 @@ static u16 get_freq(u8 note)
 static u8 get_note(const char *value)
 {
     u8 offset;
-    s8 level;
+    s8 level = 0;
     u8 upper = 0;
     switch(value[0])
     {
@@ -97,24 +98,18 @@ static u8 get_note(const char *value)
         upper = 1;
         b = value[2];
     }
-    else if (value[1] == '\0') {
-        upper = 0;
+    else if (value[1] == '\0')
         b = '\0';
-    }
     else
         b = value[1];
 
-    if (b == '\0') {
-        level = -1;
-    }
-    else {
-        level = b - '0';
-    }
+    if (b != '\0')
+        level = b - '0' + 1;
 
-    if (level > 4)
+    if (level > 5)
         return 0;
 
-    return 12 * (1 + level) + offset + upper - 8;
+    return NUM_FREQ_ONE_SCALE * level + offset + upper - 8;
 }
 
 static int ini_handler(void* user, const char* section, const char* name, const char* value)
