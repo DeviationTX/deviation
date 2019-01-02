@@ -155,7 +155,9 @@ void Init() {
     LCD_Init();
     CHAN_Init();
 
+#if HAS_TOUCH
     SPITouch_Init();
+#endif
     SOUND_Init();
     BACKLIGHT_Init();
     BACKLIGHT_Brightness(1);
@@ -252,7 +254,9 @@ void EventLoop()
     }
 #endif
     BUTTON_Handler();
+#if HAS_TOUCH
     TOUCH_Handler();
+#endif
     INPUT_CheckChanges();
 
     if (priority_ready & (1 << LOW_PRIORITY)) {
@@ -285,8 +289,6 @@ void EventLoop()
 }
 
 void TOUCH_Handler() {
-    if(! HAS_TOUCH)
-        return;
     u32 pen_down=0;
 
     static u32 pen_down_last=0;

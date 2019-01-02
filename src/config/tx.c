@@ -186,7 +186,8 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 1;
         }
     }
-    if (HAS_TOUCH) {
+#if HAS_TOUCH
+    {
         if (MATCH_SECTION(SECTION_TOUCH)) {
             if (MATCH_KEY(TOUCH_XSCALE)) {
                 t->touch.xscale = value_int;
@@ -206,6 +207,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             }
         }
     }
+#endif
     if (MATCH_SECTION(SECTION_AUTODIMMER)) {
         if (MATCH_KEY(AUTODIMMER_TIME)) {
             t->auto_dimmer.timer = value_int;

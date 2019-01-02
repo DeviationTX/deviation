@@ -70,8 +70,6 @@ unsigned read_channel(unsigned address)
 
 void SPITouch_Init()
 {
-    if(! HAS_TOUCH)
-        return;
 #if 0
     /* Enable SPI1 */
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_SPI1EN);
