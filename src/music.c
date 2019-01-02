@@ -24,28 +24,6 @@ static struct {u8 note; u8 duration;} Notes[100];
 static u8 Volume;
 static u8 next_note;
 static u8 num_notes;
-struct NoteMap {
-    const char str[4];
-    u16 note;
-};
-static const struct NoteMap note_map[] = {
-    {"xx",   0}, {"a",  220}, {"ax", 233}, {"b",  247},
-
-    {"c0", 262}, {"cx0",277}, {"d0", 294}, {"dx0",311}, {"e0", 330}, {"f0", 349},
-    {"fx0",370}, {"g0", 392}, {"gx0",415}, {"a0", 440}, {"ax0",466}, {"b0", 494},
-
-    {"c1", 523}, {"cx1",554}, {"d1", 587}, {"dx1",622}, {"e1", 659}, {"f1", 698},
-    {"fx1",740}, {"g1", 784}, {"gx1",831}, {"a1", 880}, {"ax1",932}, {"b1", 988},
-
-    {"c2", 1047},{"cx2",1109},{"d2", 1175},{"dx2",1245},{"e2", 1319},{"f2", 1397},
-    {"fx2",1480},{"g2", 1568},{"gx2",1661},{"a2", 1760},{"ax2",1865},{"b2", 1976},
-
-    {"c3", 2093},{"cx3",2217},{"d3", 2349},{"dx3",2489},{"e3", 2637},{"f3", 2794},
-    {"fx3",2960},{"g3", 3136},{"gx3",3322},{"a3", 3520},{"ax3",3729},{"b3", 3951},
-
-    {"c4", 4186},{"cx4",4435},{"d4", 4699},{"dx4",4978},{"e4", 5274},{"f4", 5588},
-    {"fx4",5920},{"g4", 6272},{"gx4",6645},{"a4", 7040},{"ax4",7459},{"b4", 7902},
-};
 
 #if NUM_TIMERS > 4
 #error "Number of timers is != 4.  This will cause the Alarm music to not work properly"
@@ -85,17 +63,67 @@ static u8 playback_device;
 #endif
 static u8 vibrate;
 
-#define NUM_NOTES (sizeof(note_map) / sizeof(struct NoteMap))
+static const u16 freqs[] = {220, 233, 247, 262, 277, 294, 311, 330, 349, 370, 392, 415};
 
+static u16 get_freq(u8 note)
+{
+    u16 freq = freqs[(note - 1) % 12];
+    for (int j = 0; j < (note - 1) / 12; ++j)
+        freq *= 2;
+
+    return freq;
+}
+
+static u8 get_note(const char *value)
+{
+    u8 offset;
+    s8 level;
+    u8 upper = 0;
+    switch(value[0])
+    {
+        case 'c': offset = 0; break;
+        case 'd': offset = 2; break;
+        case 'e': offset = 4; break;
+        case 'f': offset = 5; break;
+        case 'g': offset = 7; break;
+        case 'a': offset = 9; break;
+        case 'b': offset = 11; break;
+        default:
+            return 0;
+    }
+
+    char b;
+    if (value[1] == 'x'){
+        upper = 1;
+        b = value[2];
+    }
+    else if (value[1] == '\0') {
+        upper = 0;
+        b = '\0';
+    }
+    else
+        b = value[1];
+
+    if (b == '\0') {
+        level = -1;
+    }
+    else {
+        level = b - '0';
+    }
+
+    if (level > 4)
+        return 0;
+
+    return 12 * (1 + level) + offset + upper - 8;
+}
 
 static int ini_handler(void* user, const char* section, const char* name, const char* value)
 {
-    u16 i;
     const char *requested_sec = (const char *)user;
     if (strcasecmp(section, requested_sec) == 0) {
 #if HAS_EXTENDED_AUDIO
         if (strcasecmp("device", name) == 0) {
-            for (i = 1; i < AUDDEV_LAST; i++) {
+            for (u16 i = 1; i < AUDDEV_LAST; i++) {
                 if (strcasecmp(audio_devices[i], value) == 0) {
                     playback_device = i;
                     break;
@@ -115,21 +143,18 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             // The music volume should be controlled by TX volume setting as well as sound.ini
             Volume = Transmitter.volume * Volume/10; // = Transmitter.volume * 10 * sound_volume/100;
         }
-        for(i = 0; i < NUM_NOTES; i++) {
-            if(strcasecmp(note_map[i].str, name) == 0) {
-                Notes[num_notes].note = i;
-                Notes[num_notes].duration = atoi(value) / 10; //convert from msec to centi-secs
-                num_notes++;
-                return 1;
-            }
-        }
+        Notes[num_notes].note = get_note(name);
+        Notes[num_notes].duration = atoi(value) / 10; //convert from msec to centi-secs
+        num_notes++;
+        return 1;
     }
     return 1;
 }
+
 u16 next_note_cb() {
     if (next_note == num_notes)
         return 0;
-    SOUND_SetFrequency(note_map[Notes[next_note].note].note, Volume);
+    SOUND_SetFrequency(get_freq(Notes[next_note].note), Volume);
     return Notes[next_note++].duration * 10;
 }
 
@@ -143,12 +168,7 @@ void MUSIC_Beep(char* note, u16 duration, u16 interval, u8 count)
         return;
     if(count > sizeof(Notes)/2)
         count = sizeof(Notes)/2;
-    for(i = 0; i < NUM_NOTES; i++) {
-        if(strcasecmp(note_map[i].str, note) == 0) {
-            tone = i;
-            break;
-        }
-    }
+    tone = get_note(note);
     num_notes = count*2;
     for(i=0; i<count; i++) {
         Notes[i*2].note = tone;
@@ -156,7 +176,7 @@ void MUSIC_Beep(char* note, u16 duration, u16 interval, u8 count)
         Notes[(i*2)+1].note = 0;
         Notes[(i*2)+1].duration = interval / 10;
     }
-    SOUND_SetFrequency(note_map[Notes[0].note].note, Volume);
+    SOUND_SetFrequency(get_freq(Notes[0].note), Volume);
     SOUND_Start((u16)Notes[0].duration * 10, next_note_cb, vibrate);
 }
 
@@ -221,7 +241,7 @@ void MUSIC_Play(u16 music)
 #endif
 
     if(! num_notes) return;
-    SOUND_SetFrequency(note_map[Notes[0].note].note, Volume);
+    SOUND_SetFrequency(get_freq(Notes[next_note].note), Volume);
     SOUND_Start((u16)Notes[0].duration * 10, next_note_cb, vibrate);
 }
 
