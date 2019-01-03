@@ -702,7 +702,6 @@ static const u8 telem_test[][17] = {
 #endif
 
 
-static volatile int mixer_sync;
 static u16 mixer_runtime;
 static u16 frskyx_cb() {
   u8 len;
@@ -737,7 +736,7 @@ static u16 frskyx_cb() {
       set_start(channr);
       CC2500_SetPower(Model.tx_power);
       CC2500_Strobe(CC2500_SFRX);
-      if (!mixer_sync && mixer_runtime < 2000) mixer_runtime += 50;
+      if (mixer_sync != MIX_DONE && mixer_runtime < 2000) mixer_runtime += 50;
       frskyX_data_frame();
       CC2500_Strobe(CC2500_SIDLE);
       CC2500_WriteData(packet, packet[0]+1);
@@ -776,7 +775,7 @@ static u16 frskyx_cb() {
     case FRSKY_DATAM:
       state = datam_state;
 #ifndef EMULATOR
-      CLOCK_RunMixer(&mixer_sync);
+      CLOCK_RunMixer();
       return mixer_runtime;
 #else
       return 5;
@@ -800,7 +799,7 @@ static u16 frskyx_cb() {
       if (seq_tx_send != 8) seq_tx_send = (seq_tx_send + 1) % 4;
       state = FRSKY_DATA1;
 #ifndef EMULATOR
-      if (mixer_runtime <= 500) CLOCK_RunMixer(&mixer_sync);
+      if (mixer_runtime <= 500) CLOCK_RunMixer();
       return 500;
 #else
       return 5;

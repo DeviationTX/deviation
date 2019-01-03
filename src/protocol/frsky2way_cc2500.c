@@ -360,7 +360,6 @@ static u8 testdata[] = {
  0x00 };
 #endif
 
-static volatile int mixer_sync;  // unused but needed for mixer trigger by protocol
 static u16 mixer_runtime;
 static u16 frsky2way_cb()
 {
@@ -391,7 +390,7 @@ static u16 frsky2way_cb()
         state = FRSKY_DATA1;
     case FRSKY_DATA2:
     case FRSKY_DATA4:
-        CLOCK_RunMixer(&mixer_sync);    // clears mixer_sync, which is then set when mixer update complete
+        CLOCK_RunMixer();    // clears mixer_sync, which is then set when mixer update complete
         if (state != FRSKY_DATA1) state++;
         return mixer_runtime;
 
@@ -452,7 +451,7 @@ static u8 *data = testdata;
         CC2500_WriteReg(CC2500_23_FSCAL3, 0x89);
         //CC2500_WriteReg(CC2500_3E_PATABLE, 0xfe);
         CC2500_Strobe(CC2500_SFRX);
-        if (!mixer_sync && mixer_runtime < 2000) mixer_runtime += 50;
+        if (mixer_sync != MIX_DONE && mixer_runtime < 2000) mixer_runtime += 50;
         frsky2way_build_data_packet();
         CC2500_WriteData(packet, packet[0]+1);
         state++;

@@ -99,7 +99,6 @@ static enum {
     ST_DATA2,
 } state;
 
-static volatile int mixer_sync;
 static u16 mixer_runtime;
 static u16 sbus_period;
 static u16 serial_cb()
@@ -109,12 +108,12 @@ static u16 serial_cb()
 
     switch (state) {
     case ST_DATA1:
-        CLOCK_RunMixer(&mixer_sync);    // clears mixer_sync, which is then set when mixer update complete
+        CLOCK_RunMixer();    // clears mixer_sync, which is then set when mixer update complete
         state = ST_DATA2;
         return mixer_runtime;
 
     case ST_DATA2:
-        if (!mixer_sync && mixer_runtime < 2000) mixer_runtime += 50;
+        if (mixer_sync != MIX_DONE && mixer_runtime < 2000) mixer_runtime += 50;
         build_rcdata_pkt();
         UART_Send(packet, sizeof packet);
         state = ST_DATA1;

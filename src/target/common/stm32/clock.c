@@ -220,16 +220,15 @@ void CLOCK_ClearMsecCallback(int cb)
 }
 
 // Run Mixer one time.  Used by protocols that trigger mixer calc in protocol code
-static volatile int *mixer_sync;
-void CLOCK_RunMixer(volatile int *sync) {
-    mixer_sync = sync;
-    if (mixer_sync) *mixer_sync = 0; // set after mixers updated
+volatile mixsync_t mixer_sync;
+void CLOCK_RunMixer(void) {
+    mixer_sync = MIX_NOT_DONE;
     nvic_set_pending_irq(NVIC_EXTI1_IRQ);
 }
 
 // Run Mixer on medium priority interval.  Default behavior - no protocol code required.
 void CLOCK_StartMixer() {
-    mixer_sync = NULL;
+    mixer_sync = MIX_TIMER;
 }
 
 void exti1_isr()
@@ -238,7 +237,7 @@ void exti1_isr()
     // use exti3 for mixer updates.
     ADC_Filter();
     MIXER_CalcChannels();
-    if (mixer_sync) *mixer_sync = 1;
+    mixer_sync = MIX_DONE;
 }
 
 void sys_tick_handler(void)
@@ -256,7 +255,7 @@ void sys_tick_handler(void)
             // If any other code added in medium priority interrupt handler, move the following line to
             // exti1_isr before the CLOCK_UpdateMixers() line.
             // overload mixer_sync to fit in 7e build - NULL indicates mixer run by timer
-            if (mixer_sync == NULL) nvic_set_pending_irq(NVIC_EXTI1_IRQ);
+            if (mixer_sync == MIX_TIMER) nvic_set_pending_irq(NVIC_EXTI1_IRQ);
             priority_ready |= 1 << MEDIUM_PRIORITY;
             msec_cbtime[MEDIUM_PRIORITY] = msecs + MEDIUM_PRIORITY_MSEC;
         }

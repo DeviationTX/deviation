@@ -267,7 +267,6 @@ static void send_packet()
 }
 
 
-static volatile int mixer_sync;
 static u16 mixer_runtime;
 static u16 SFHSS_cb()
 {
@@ -290,7 +289,7 @@ static u16 SFHSS_cb()
 
     /* Work cycle, 6.8ms, second packet 1.65ms after first */
     case SFHSS_DATA1:
-        if (!mixer_sync && mixer_runtime < 2000) mixer_runtime += 50;
+        if (mixer_sync != MIX_DONE && mixer_runtime < 2000) mixer_runtime += 50;
         build_data_packet();
         send_packet();
         state = SFHSS_DATA2;
@@ -311,7 +310,7 @@ static u16 SFHSS_cb()
 
     case SFHSS_MIX:
         state = SFHSS_DATA1;
-        CLOCK_RunMixer(&mixer_sync);
+        CLOCK_RunMixer();
         return mixer_runtime;
 /*
     case SFHSS_DATA1:

@@ -334,7 +334,6 @@ static void flysky_build_packet(u8 init)
     flysky_apply_extension_flags();
 }
 
-static volatile int mixer_sync;  // unused but needed for mixer trigger by protocol
 MODULE_CALLTYPE
 static u16 flysky_cb()
 {
@@ -359,7 +358,7 @@ static u16 flysky_cb()
         }
     }
     hopping_frequency_no++;
-    CLOCK_RunMixer(&mixer_sync);
+    CLOCK_RunMixer();
     return packet_period;
 }
 
