@@ -3,14 +3,13 @@ HAS_FLASH_DETECT ?= $(HAS_4IN1_FLASH)
 
 ifeq "$(HAS_4IN1_FLASH)" "1"
 FILESYSTEMS := common base_fonts 320x240x16
-SCREENSIZE  := 320x240x16
-FONTS        = filesystem/$(FILESYSTEM)/media/15normal.fon \
-               filesystem/$(FILESYSTEM)/media/23bold.fon
 else
 FILESYSTEMS := common base_fonts 320x240x1
-SCREENSIZE  := 320x240x16
-FONTS        = filesystem/$(FILESYSTEM)/media/23bold.fon
 endif
+
+SCREENSIZE  := 320x240x16
+FONTS        = filesystem/$(FILESYSTEM)/media/15ascii.fon \
+               filesystem/$(FILESYSTEM)/media/23bold.fon
 
 DFU_ARGS    := -D 0x0483:0xdf12 -b 0x08003000
 
@@ -81,6 +80,7 @@ $(TARGET)-fs.dfu: $(ODIR)/devo.fs
 	$(SDIR)/../utils/dfu.py --name "$(HGVERSION) Filesystem" -D 0x0483:0xdf12 -b 0x08040000:$< $@
 
 $(TARGET).fs_wrapper: $(LAST_MODEL)
+	perl -p -i -e 's/=15normal/=15ascii/' filesystem/$(FILESYSTEM)/media/config.ini
 	rm filesystem/$(FILESYSTEM)/datalog.bin
 
 $(TARGET).zip: $(ALL)
