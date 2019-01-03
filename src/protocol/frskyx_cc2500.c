@@ -768,7 +768,6 @@ static u16 frskyx_cb() {
           datam_state = FRSKY_DATA4;
           return 3100 - mixer_runtime;
       }
-      return 3100;
 #else
       state = FRSKY_DATA4;
       return 31;
