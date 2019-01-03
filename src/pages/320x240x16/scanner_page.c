@@ -18,61 +18,10 @@
 #include "pages.h"
 #include "config/model.h"
 
+
 #if HAS_SCANNER
-static struct scanner_page * const sp = &pagemem.u.scanner_page;
+#include "../common/_scanner_page.c"
 static struct scanner_obj * const gui = &gui_objs.u.scanner;
-static u8 scanState = 0;
-
-u16 scan_cb()
-{
-    int delay;
-#ifdef EMULATOR
-    int rssi = random() & 0x1F;
-    if(sp->scan_mode) {
-        sp->channelnoise[sp->channel] = (sp->channelnoise[sp->channel] + rssi) / 2;
-    } else {
-        if(rssi > sp->channelnoise[sp->channel])
-            sp->channelnoise[sp->channel] = rssi;
-    }
-    delay = 300;
-#else
-    if(scanState == 0) {
-        if(sp->time_to_scan == 0) {
-            CYRF_ConfigRFChannel(sp->channel + MIN_RADIOCHANNEL);
-            if(sp->attenuator) {
-                CYRF_WriteRegister(CYRF_06_RX_CFG, 0x0A);
-            } else {
-                CYRF_WriteRegister(CYRF_06_RX_CFG, 0x4A);
-            }
-            sp->time_to_scan = 1;
-        }
-        scanState = 1;
-        delay = 300; //slow channel require 270usec for synthesizer to settle
-    } else {
-        if ( !(CYRF_ReadRegister(CYRF_05_RX_CTRL) & 0x80)) {
-            CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x80); //Prepare to receive
-            Delay(10);
-            CYRF_ReadRegister(CYRF_13_RSSI); //dummy read
-            Delay(15);
-        }
-        int rssi = CYRF_ReadRegister(CYRF_13_RSSI) & 0x1F;
-        if(sp->scan_mode) {
-            sp->channelnoise[sp->channel] = (sp->channelnoise[sp->channel] + rssi) / 2;
-        } else {
-            if(rssi > sp->channelnoise[sp->channel])
-                sp->channelnoise[sp->channel] = rssi;
-        }
-        scanState++;
-        delay = 300;
-        if(scanState == 5) {
-            scanState = 0;
-            delay = 50;
-        }
-    }
-#endif
-    return delay;
-}
-
 static s32 show_bar_cb(void *data)
 {
     long ch = (long)data;
@@ -105,16 +54,7 @@ static void press_enable_cb(guiObject_t *obj, const void *data)
     (void)data;
 #ifndef ENABLE_MODULAR
     sp->enable ^= 1;
-    if (sp->enable) {
-        PROTOCOL_DeInit();
-        DEVO_Cmds(0);  //Switch to DEVO configuration
-        PROTOCOL_SetBindState(0); //Disable binding message
-        CLOCK_StopTimer();
-        CYRF_SetTxRxMode(RX_EN); //Receive mode
-        CLOCK_StartTimer(1250, scan_cb);
-    } else {
-        PROTOCOL_Init(0);
-    }
+    _scan_enable(sp->enable);
 #endif
     GUI_Redraw(obj);
 }
@@ -137,7 +77,7 @@ static void press_attenuator_cb(guiObject_t *obj, const void *data)
     GUI_Redraw(obj);
 }
 
-void PAGE_ScannerInit(int page)
+void _draw_page(u8 enable)
 {
     enum {
         SCANBARWIDTH   = (LCD_WIDTH / (MAX_RADIOCHANNEL - MIN_RADIOCHANNEL + 1)),
@@ -145,44 +85,21 @@ void PAGE_ScannerInit(int page)
         SCANBARHEIGHT  = (LCD_HEIGHT - 78),
     };
     u8 i;
-    (void)page;
-    PAGE_SetModal(0);
-    PAGE_ShowHeader(PAGE_GetName(PAGEID_SCANNER));
-    sp->enable = 0;
-    GUI_CreateButton(&gui->enable, LCD_WIDTH/2 - 152, 40, BUTTON_96, enablestr_cb, press_enable_cb, NULL);
-    sp->scan_mode = 0;
-    GUI_CreateButton(&gui->scan_mode, LCD_WIDTH/2 - 48, 40, BUTTON_96, modestr_cb, press_mode_cb, NULL);
-    sp->attenuator = 0;
-    GUI_CreateButton(&gui->attenuator, LCD_WIDTH/2 + 56, 40, BUTTON_96, attstr_cb, press_attenuator_cb, NULL);
-    sp->channel = 0;
-    sp->time_to_scan = 0;
-    for(i = 0; i < (MAX_RADIOCHANNEL - MIN_RADIOCHANNEL + 1); i++) {
-        GUI_CreateBarGraph(&gui->bar[i], SCANBARXOFFSET + i * SCANBARWIDTH, 70, SCANBARWIDTH, SCANBARHEIGHT, 2, 31, BAR_VERTICAL, show_bar_cb, (void *)((long)i));
-        sp->channelnoise[i] = 0;
+    if (enable)
+    {
+        PAGE_ShowHeader(PAGE_GetName(PAGEID_SCANNER));
+        GUI_CreateButton(&gui->enable, LCD_WIDTH/2 - 152, 40, BUTTON_96, enablestr_cb, press_enable_cb, NULL);
+        GUI_CreateButton(&gui->scan_mode, LCD_WIDTH/2 - 48, 40, BUTTON_96, modestr_cb, press_mode_cb, NULL);
+        GUI_CreateButton(&gui->attenuator, LCD_WIDTH/2 + 56, 40, BUTTON_96, attstr_cb, press_attenuator_cb, NULL);
+        for(i = 0; i < (MAX_RADIOCHANNEL - MIN_RADIOCHANNEL + 1); i++) {
+            GUI_CreateBarGraph(&gui->bar[i], SCANBARXOFFSET + i * SCANBARWIDTH, 70, SCANBARWIDTH, SCANBARHEIGHT, 2, 31, BAR_VERTICAL, show_bar_cb, (void *)((long)i));
+        }
     }
 }
 
-void PAGE_ScannerEvent()
+void _draw_channels()
 {
-#ifndef ENABLE_MODULAR
-    if(! sp->enable)
-        return;
     GUI_Redraw(&gui->bar[sp->channel]);
-    //printf("%02X : %d\n",sp->channel,sp->channelnoise[sp->channel]);
-    sp->channel++;
-    if(sp->channel == (MAX_RADIOCHANNEL - MIN_RADIOCHANNEL + 1))
-        sp->channel = 0;
-    sp->channelnoise[sp->channel] = 0;
-    sp->time_to_scan = 0;
-#endif
-}
-
-void PAGE_ScannerExit()
-{
-#ifndef ENABLE_MODULAR
-    if(sp->enable)
-        PROTOCOL_Init(0);
-#endif
 }
 
 #endif //HAS_SCANNER
