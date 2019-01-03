@@ -5,7 +5,6 @@
 #define MAX_RADIOCHANNEL     0x4F
 
 struct scanner_page {
-	struct buttonAction action;
     u8 channelnoise[MAX_RADIOCHANNEL - MIN_RADIOCHANNEL + 1];
     u8 channel;
     u8 scanState;
