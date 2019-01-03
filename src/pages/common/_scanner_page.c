@@ -19,28 +19,11 @@ static void _draw_page(u8 enable);
 static void _draw_channels(void);
 static u16 scan_cb();
 
-#ifdef EMULATOR
-static void _scan_enable(int enable)
-{
-    if (enable) {
-        CLOCK_StartTimer(1250, scan_cb);
-    } else {
-        CLOCK_StopTimer();
-    }
-}
+#ifdef ENABLE_MODULAR
+#error "Not supported in MODULAR build"
+#endif
 
-static void _scan_next()
-{
-
-}
-
-static int _scan_rssi()
-{
-    return rand32() & 0x1f;
-}
-#else
 // The high level interface to do the scan
-#ifndef ENABLE_MODULAR
 static void _scan_enable(int enable)
 {
     if (enable) {
@@ -73,26 +56,12 @@ static int _scan_rssi()
         CYRF_ReadRegister(CYRF_13_RSSI); //dummy read
         Delay(15);
     }
-    return CYRF_ReadRegister(CYRF_13_RSSI) & 0x1F;
-}
-
+#ifdef EMULATOR
+    return rand32() % 0x1F;
 #else
-static void _scan_enable(int enable)
-{
-
+    return CYRF_ReadRegister(CYRF_13_RSSI) & 0x1F;
+#endif
 }
-
-static void _scan_next()
-{
-}
-
-static int _scan_rssi()
-{
-    return 0;
-}
-
-#endif // ENABLEMODULAR
-#endif // EMULATOR
 
 u16 scan_cb()
 {
