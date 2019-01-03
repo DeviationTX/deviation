@@ -36,7 +36,7 @@ static void _scan_next()
 
 static int _scan_rssi()
 {
-    return random() & 0x1f;
+    return rand32() & 0x1f;
 }
 #else
 // The high level interface to do the scan
