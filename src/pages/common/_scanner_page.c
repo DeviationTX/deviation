@@ -91,6 +91,28 @@ u16 scan_cb()
     return delay;
 }
 
+static void press_enable_cb(guiObject_t *obj, const void *data)
+{
+    (void)data;
+    sp->enable ^= 1;
+    _scan_enable(sp->enable);
+    GUI_Redraw(obj);
+}
+
+static void press_mode_cb(guiObject_t *obj, const void *data)
+{
+    (void)data;
+    sp->scan_mode ^= 1;
+    GUI_Redraw(obj);
+}
+
+static void press_attenuator_cb(guiObject_t *obj, const void *data)
+{
+    (void)data;
+    sp->attenuator ^= 1;
+    GUI_Redraw(obj);
+}
+
 void PAGE_ScannerInit(int page)
 {
     (void)page;
@@ -105,7 +127,7 @@ void PAGE_ScannerEvent()
     if(! sp->enable)
         return;
 
-    // draw a line
+    // draw the channels
     _draw_channels();
 
     sp->channel++;
@@ -118,5 +140,4 @@ void PAGE_ScannerEvent()
 void PAGE_ScannerExit()
 {
     _scan_enable(0);
-    _draw_page(0);
 }

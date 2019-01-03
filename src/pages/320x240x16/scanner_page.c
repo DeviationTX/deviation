@@ -49,28 +49,6 @@ static const char *attstr_cb(guiObject_t *obj, const void *data)
     return sp->attenuator ? _tr("Att.: -20dB") : _tr("Att.: 0dB");
 }
 
-static void press_enable_cb(guiObject_t *obj, const void *data)
-{
-    (void)data;
-    sp->enable ^= 1;
-    _scan_enable(sp->enable);
-    GUI_Redraw(obj);
-}
-
-static void press_mode_cb(guiObject_t *obj, const void *data)
-{
-    (void)data;
-    sp->scan_mode ^= 1;
-    GUI_Redraw(obj);
-}
-
-static void press_attenuator_cb(guiObject_t *obj, const void *data)
-{
-    (void)data;
-    sp->attenuator ^= 1;
-    GUI_Redraw(obj);
-}
-
 void _draw_page(u8 enable)
 {
     enum {
