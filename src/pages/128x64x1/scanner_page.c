@@ -21,50 +21,69 @@
 #if HAS_SCANNER
 #include "../common/_scanner_page.c"
 
-static unsigned action_cb(u32 button, unsigned flags, void *data)
+static struct scanner_obj * const gui = &gui_objs.u.scanner;
+static const char *enablestr_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    (void)data;
+    return sp->enable ? _tr("On") : _tr("Off");
+}
+
+static const char *modestr_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    (void)data;
+    return sp->scan_mode ? _tr("Average") : _tr("Peak");
+}
+
+static const char *attstr_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    (void)data;
+    return sp->attenuator ? _tr("-20dB") : _tr("0dB");
+}
+
+static void press_enable_cb(guiObject_t *obj, const void *data)
 {
     (void)data;
-
-    if(flags & BUTTON_RELEASE) {
-        if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
-                sp->enable ^= 1;
-                _scan_enable(sp->enable);
-        } else if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
-                sp->scan_mode ^= 1;
-        } else if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
-                sp->attenuator ^= 1;
-        }
-    }
-
-    return 1;
+    sp->enable ^= 1;
+    _scan_enable(sp->enable);
+    GUI_Redraw(obj);
 }
+
+static void press_mode_cb(guiObject_t *obj, const void *data)
+{
+    (void)data;
+    sp->scan_mode ^= 1;
+    GUI_Redraw(obj);
+}
+
+static void press_attenuator_cb(guiObject_t *obj, const void *data)
+{
+    (void)data;
+    sp->attenuator ^= 1;
+    GUI_Redraw(obj);
+}
+
 
 void _draw_page(u8 enable)
 {
-    if (enable)
-    {
-        PAGE_ShowHeader(PAGE_GetName(PAGEID_SCANNER));
-
-        BUTTON_RegisterCallback(&sp->action,
-              CHAN_ButtonMask(BUT_ENTER)
-              | CHAN_ButtonMask(BUT_LEFT)
-              | CHAN_ButtonMask(BUT_RIGHT),
-              BUTTON_PRESS | BUTTON_RELEASE | BUTTON_PRIORITY, action_cb, NULL);
-    }
-    else
-    {
-        BUTTON_UnregisterCallback(&sp->action);
-    }
+    (void)enable;
+    PAGE_ShowHeader(PAGE_GetName(PAGEID_SCANNER));
+    GUI_CreateButtonPlateText(&gui->enable, 0, HEADER_HEIGHT, 40, LINE_HEIGHT, &BUTTON_FONT, enablestr_cb, press_enable_cb, NULL);
+    GUI_CreateButtonPlateText(&gui->scan_mode, LCD_WIDTH/2 - 20, HEADER_HEIGHT, 40, LINE_HEIGHT, &BUTTON_FONT, modestr_cb, press_mode_cb, NULL);
+    GUI_CreateButtonPlateText(&gui->attenuator, LCD_WIDTH - 40, HEADER_HEIGHT, 40, LINE_HEIGHT, &BUTTON_FONT, attstr_cb, press_attenuator_cb, NULL);
 }
 
 void _draw_channels()
 {
+    const unsigned offset = HEADER_HEIGHT + LINE_HEIGHT;
     // draw a line
     int col = (LCD_WIDTH - (MAX_RADIOCHANNEL - MIN_RADIOCHANNEL)) / 2 + sp->channel;
-    int height = LCD_HEIGHT - sp->channelnoise[sp->channel] * (LCD_HEIGHT - HEADER_HEIGHT) / 0x1F;
+    int height = sp->channelnoise[sp->channel] * (LCD_HEIGHT - offset) / 0x1F;
 
-    LCD_DrawFastVLine(col, HEADER_HEIGHT, height + HEADER_HEIGHT, 0);
-    LCD_DrawFastVLine(col, height + HEADER_HEIGHT, LCD_HEIGHT, Display.xygraph.grid_color);
+    LCD_DrawFastVLine(col, offset, LCD_HEIGHT - height, 0);
+    LCD_DrawFastVLine(col, LCD_HEIGHT - height, LCD_HEIGHT, Display.xygraph.grid_color);
 }
 
 #endif //HAS_SCANNER

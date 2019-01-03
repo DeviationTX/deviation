@@ -52,28 +52,22 @@ static const char *attstr_cb(guiObject_t *obj, const void *data)
 static void press_enable_cb(guiObject_t *obj, const void *data)
 {
     (void)data;
-#ifndef ENABLE_MODULAR
     sp->enable ^= 1;
     _scan_enable(sp->enable);
-#endif
     GUI_Redraw(obj);
 }
 
 static void press_mode_cb(guiObject_t *obj, const void *data)
 {
     (void)data;
-#ifndef ENABLE_MODULAR
     sp->scan_mode ^= 1;
-#endif
     GUI_Redraw(obj);
 }
 
 static void press_attenuator_cb(guiObject_t *obj, const void *data)
 {
     (void)data;
-#ifndef ENABLE_MODULAR
     sp->attenuator ^= 1;
-#endif
     GUI_Redraw(obj);
 }
 
@@ -85,15 +79,13 @@ void _draw_page(u8 enable)
         SCANBARHEIGHT  = (LCD_HEIGHT - 78),
     };
     u8 i;
-    if (enable)
-    {
-        PAGE_ShowHeader(PAGE_GetName(PAGEID_SCANNER));
-        GUI_CreateButton(&gui->enable, LCD_WIDTH/2 - 152, 40, BUTTON_96, enablestr_cb, press_enable_cb, NULL);
-        GUI_CreateButton(&gui->scan_mode, LCD_WIDTH/2 - 48, 40, BUTTON_96, modestr_cb, press_mode_cb, NULL);
-        GUI_CreateButton(&gui->attenuator, LCD_WIDTH/2 + 56, 40, BUTTON_96, attstr_cb, press_attenuator_cb, NULL);
-        for(i = 0; i < (MAX_RADIOCHANNEL - MIN_RADIOCHANNEL + 1); i++) {
-            GUI_CreateBarGraph(&gui->bar[i], SCANBARXOFFSET + i * SCANBARWIDTH, 70, SCANBARWIDTH, SCANBARHEIGHT, 2, 31, BAR_VERTICAL, show_bar_cb, (void *)((long)i));
-        }
+    (void)enable;
+    PAGE_ShowHeader(PAGE_GetName(PAGEID_SCANNER));
+    GUI_CreateButton(&gui->enable, LCD_WIDTH/2 - 152, 40, BUTTON_96, enablestr_cb, press_enable_cb, NULL);
+    GUI_CreateButton(&gui->scan_mode, LCD_WIDTH/2 - 48, 40, BUTTON_96, modestr_cb, press_mode_cb, NULL);
+    GUI_CreateButton(&gui->attenuator, LCD_WIDTH/2 + 56, 40, BUTTON_96, attstr_cb, press_attenuator_cb, NULL);
+    for(i = 0; i < (MAX_RADIOCHANNEL - MIN_RADIOCHANNEL + 1); i++) {
+        GUI_CreateBarGraph(&gui->bar[i], SCANBARXOFFSET + i * SCANBARWIDTH, 70, SCANBARWIDTH, SCANBARHEIGHT, 2, 31, BAR_VERTICAL, show_bar_cb, (void *)((long)i));
     }
 }
 
