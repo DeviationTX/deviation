@@ -52,8 +52,9 @@ void SSER_Initialize()
     /* Enable GPIOA clock. */
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPAEN);
 
-    // Set RX pin mode
-    gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, _USART_GPIO_USART_RX);
+    // Set RX pin mode to pull up
+    gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN, _USART_GPIO_USART_RX);
+    gpio_set(GPIOA, _USART_GPIO_USART_RX);
     
     // Interrupt on input rising edge to find start bit
     exti_select_source(EXTI10, GPIOA);
