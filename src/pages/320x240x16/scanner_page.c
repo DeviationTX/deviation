@@ -26,7 +26,16 @@ static u8 scanState = 0;
 u16 scan_cb()
 {
     int delay;
-    
+#ifdef EMULATOR
+    int rssi = random() & 0x1F;
+    if(sp->scan_mode) {
+        sp->channelnoise[sp->channel] = (sp->channelnoise[sp->channel] + rssi) / 2;
+    } else {
+        if(rssi > sp->channelnoise[sp->channel])
+            sp->channelnoise[sp->channel] = rssi;
+    }
+    delay = 300;
+#else
     if(scanState == 0) {
         if(sp->time_to_scan == 0) {
             CYRF_ConfigRFChannel(sp->channel + MIN_RADIOCHANNEL);
@@ -38,7 +47,7 @@ u16 scan_cb()
             sp->time_to_scan = 1;
         }
         scanState = 1;
-        delay = 300; //slow channel require 270usec for synthesizer to settle 
+        delay = 300; //slow channel require 270usec for synthesizer to settle
     } else {
         if ( !(CYRF_ReadRegister(CYRF_05_RX_CTRL) & 0x80)) {
             CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x80); //Prepare to receive
@@ -60,6 +69,7 @@ u16 scan_cb()
             delay = 50;
         }
     }
+#endif
     return delay;
 }
 
@@ -143,7 +153,7 @@ void PAGE_ScannerInit(int page)
     sp->scan_mode = 0;
     GUI_CreateButton(&gui->scan_mode, LCD_WIDTH/2 - 48, 40, BUTTON_96, modestr_cb, press_mode_cb, NULL);
     sp->attenuator = 0;
-    GUI_CreateButton(&gui->attenuator, LCD_WIDTH/2 + 56, 40, BUTTON_96, attstr_cb, press_attenuator_cb, NULL);    
+    GUI_CreateButton(&gui->attenuator, LCD_WIDTH/2 + 56, 40, BUTTON_96, attstr_cb, press_attenuator_cb, NULL);
     sp->channel = 0;
     sp->time_to_scan = 0;
     for(i = 0; i < (MAX_RADIOCHANNEL - MIN_RADIOCHANNEL + 1); i++) {
