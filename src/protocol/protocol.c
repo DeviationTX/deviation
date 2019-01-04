@@ -129,10 +129,9 @@ void PROTOCOL_Load(int no_dlg)
 {
     (void)no_dlg;
 #ifdef ENABLE_MODULAR
-    if(! PROTOCOL_HasModule(Model.protocol)) {
-        *loaded_protocol = 0;
+    *loaded_protocol = 0;
+    if(! PROTOCOL_HasModule(Model.protocol))
         return;
-    }
     if(*loaded_protocol == Model.protocol)
         return;
     char file[25];
@@ -140,7 +139,7 @@ void PROTOCOL_Load(int no_dlg)
 
     if (Model.protocol > PROTOCOL_COUNT)
     {
-        *loaded_protocol = 0; return;
+        return;
     }
     else
     {
@@ -159,36 +158,23 @@ void PROTOCOL_Load(int no_dlg)
     fh = fopen2(&FontFAT, file, "r");
     //printf("Loading %s: %08lx\n", file, fh);
     if(! fh) {
+        LCD_SetFont(old_font);
         if(! no_dlg) {
             sprintf(tempstring, "Misisng protocol:\n%s", file);
             PAGE_ShowWarning(NULL, tempstring);
         }
-        LCD_SetFont(old_font);
         return;
     }
     setbuf(fh, 0);
-    int size = 0;
-    unsigned char buf[256];
-    int len;
-    char *ptr = (char *)loaded_protocol;
-    while(size < 4096) {
-        len = fread(buf, 1, 256, fh);
-        if(len) {
-            memcpy(ptr, buf, len);
-            ptr += len;
-        }
-        size += len;
-        if (len != 256)
-            break;
-    }
+    fread(loaded_protocol, 1, 4 * 1024, fh);
     fclose(fh);
     LCD_SetFont(old_font);
     if ((unsigned long)&_data_loadaddr != *loaded_protocol) {
+        LCD_SetFont(old_font);
         if(! no_dlg) {
             sprintf(tempstring, "Protocol Mismatch:\n%08x\n%08x", (unsigned long)&_data_loadaddr, *loaded_protocol);
             PAGE_ShowWarning(NULL, tempstring);
         }
-        *loaded_protocol = 0;
         return;
     }
     //printf("Updated %d (%d) bytes: Data: %08lx %08lx %08lx\n", size, len, *loaded_protocol, *(loaded_protocol+1), *(loaded_protocol+2));
