@@ -104,7 +104,7 @@ script:
         export MPG123_DIR=$HOME/mpg123-w32;
     fi;
   - make -j2 $MAKETARGET;
-  - if [ "$MAKTARGET" == "test"]; then
+  - if [ "$MAKTARGET" == "test" ]; then
         ./test.elf;
     fi;
 

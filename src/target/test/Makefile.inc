@@ -6,4 +6,7 @@ LANGUAGE    := devo8
 CFLAGS += -DTEST
 include target/common/emu/Makefile.inc
 SRC_CXX =
+SRC_C += $(ODIR)/AllTests.c
 
+$(ODIR)/AllTests.c:
+	sh target/test/make-tests.sh > $(ODIR)/AllTests.c

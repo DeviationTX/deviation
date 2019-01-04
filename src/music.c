@@ -382,7 +382,7 @@ static const struct NoteMap note_map[] = {
 };
 #define NUM_NOTES (sizeof(note_map) / sizeof(struct NoteMap))
 
-void MusicTest(CuTest *t)
+void TestMusic(CuTest *t)
 {
     for (size_t i = 0;  i < NUM_NOTES; i++)
         CuAssertIntEquals(t, get_note(note_map[i].str), i);
