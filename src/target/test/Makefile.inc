@@ -5,8 +5,11 @@ FONTS        = filesystem/$(FILESYSTEM)/media/15normal.fon \
 LANGUAGE    := devo8
 CFLAGS += -DTEST
 include target/common/emu/Makefile.inc
-SRC_CXX =
-SRC_C += $(ODIR)/AllTests.c
 
-$(ODIR)/AllTests.c:
+ifndef BUILD_TARGET
+SRC_CXX =
+SRC_C += objs/test/AllTests.c
+else
+objs/test/AllTests.c: target/test/make-tests.sh
 	sh target/test/make-tests.sh > $(ODIR)/AllTests.c
+endif

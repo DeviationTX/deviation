@@ -25,7 +25,7 @@ cat $FILES | grep '^void Test' |
 echo \
 '
 
-void RunAllTests(void) 
+int RunAllTests(void) 
 {
     CuString *output = CuStringNew();
     CuSuite* suite = CuSuiteNew();
@@ -42,9 +42,10 @@ echo \
     CuSuiteRun(suite);
     CuSuiteSummary(suite, output);
     CuSuiteDetails(suite, output);
-    printf("%s\n", output->buffer);
+    printf("%s\\n", output->buffer);
     CuStringDelete(output);
     CuSuiteDelete(suite);
+    return suite->failCount;
 }
 
 void PWR_Init(void)
