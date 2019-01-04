@@ -11,6 +11,7 @@ env:
       - TARGET=at9
       - MAKETARGET=zip_win_emu_devo8
       - MAKETARGET=zip_emu_devo8
+      - MAKETARGET=test
 #      - COMPILER=latest TARGET=devo8
 
 # use new docker environment
@@ -103,6 +104,9 @@ script:
         export MPG123_DIR=$HOME/mpg123-w32;
     fi;
   - make -j2 $MAKETARGET;
+  - if [ "$MAKTARGET" == "test"]; then
+        ./test.elf
+    fi;
 
 after_success:
   - if [ "$TRAVIS_EVENT_TYPE" == "api" ]; then
