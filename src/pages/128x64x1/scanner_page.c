@@ -48,7 +48,7 @@ void _draw_page(u8 enable)
     (void)enable;
     PAGE_ShowHeader(PAGE_GetName(PAGEID_SCANNER));
     GUI_CreateButtonPlateText(&gui->enable, 0, HEADER_HEIGHT, 40, LINE_HEIGHT, &BUTTON_FONT, enablestr_cb, press_enable_cb, NULL);
-    GUI_CreateButtonPlateText(&gui->scan_mode, LCD_WIDTH/2 - 20, HEADER_HEIGHT, 40, LINE_HEIGHT, &BUTTON_FONT, modestr_cb, press_mode_cb, NULL);
+    GUI_CreateButtonPlateText(&gui->scan_mode, LCD_WIDTH/2 - 23, HEADER_HEIGHT, 46, LINE_HEIGHT, &BUTTON_FONT, modestr_cb, press_mode_cb, NULL);
     GUI_CreateButtonPlateText(&gui->attenuator, LCD_WIDTH - 40, HEADER_HEIGHT, 40, LINE_HEIGHT, &BUTTON_FONT, attstr_cb, press_attenuator_cb, NULL);
 }
 
@@ -59,8 +59,8 @@ void _draw_channels()
     int col = (LCD_WIDTH - (MAX_RADIOCHANNEL - MIN_RADIOCHANNEL)) / 2 + sp->channel;
     int height = sp->channelnoise[sp->channel] * (LCD_HEIGHT - offset) / 0x1F;
 
-    LCD_DrawFastVLine(col, offset, LCD_HEIGHT - height, 0);
-    LCD_DrawFastVLine(col, LCD_HEIGHT - height, LCD_HEIGHT, Display.xygraph.grid_color);
+    LCD_DrawFastVLine(col, offset, LCD_HEIGHT - offset - height, 0);
+    LCD_DrawFastVLine(col, LCD_HEIGHT - height, height, Display.xygraph.grid_color);
 }
 
 #endif //HAS_SCANNER
