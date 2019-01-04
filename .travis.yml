@@ -105,7 +105,7 @@ script:
     fi;
   - make -j2 $MAKETARGET;
   - if [ "$MAKTARGET" == "test"]; then
-        ./test.elf
+        ./test.elf;
     fi;
 
 after_success:
