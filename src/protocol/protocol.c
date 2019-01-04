@@ -129,9 +129,10 @@ void PROTOCOL_Load(int no_dlg)
 {
     (void)no_dlg;
 #ifdef ENABLE_MODULAR
-    *loaded_protocol = 0;
-    if(! PROTOCOL_HasModule(Model.protocol))
+    if(! PROTOCOL_HasModule(Model.protocol)) {
+        *loaded_protocol = 0;
         return;
+    }
     if(*loaded_protocol == Model.protocol)
         return;
     char file[25];
@@ -139,6 +140,7 @@ void PROTOCOL_Load(int no_dlg)
 
     if (Model.protocol > PROTOCOL_COUNT)
     {
+        *loaded_protocol = 0;
         return;
     }
     else
@@ -175,6 +177,7 @@ void PROTOCOL_Load(int no_dlg)
             sprintf(tempstring, "Protocol Mismatch:\n%08x\n%08x", (unsigned long)&_data_loadaddr, *loaded_protocol);
             PAGE_ShowWarning(NULL, tempstring);
         }
+        *loaded_protocol = 0;
         return;
     }
     //printf("Updated %d (%d) bytes: Data: %08lx %08lx %08lx\n", size, len, *loaded_protocol, *(loaded_protocol+1), *(loaded_protocol+2));
