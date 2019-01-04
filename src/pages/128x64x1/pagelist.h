@@ -40,6 +40,9 @@ PAGEDEF(PAGEID_TELEMMON, PAGE_TelemtestInit,   PAGE_TelemtestEvent,   NULL,     
 #endif
 PAGEDEF(PAGEID_CHANMON,  PAGE_ChantestInit,    PAGE_ChantestEvent,    PAGE_ChantestExit,_tr_noop("Channel monitor"))
 PAGEDEF(PAGEID_RANGE,    PAGE_RangeInit,       NULL,                  PAGE_RangeExit,   _tr_noop("Range Test"))
+#if HAS_SCANNER
+PAGEDEF(PAGEID_SCANNER,  PAGE_ScannerInit,     PAGE_ScannerEvent,     PAGE_ScannerExit, _tr_noop("Scanner"))
+#endif
 PAGEDEF(PAGEID_ABOUT,    PAGE_AboutInit,       NULL,                  NULL,             _tr_noop("About Deviation"))
 PAGEDEF(PAGEID_USB,      PAGE_USBInit,         PAGE_USBEvent,         PAGE_USBExit,     _tr_noop("USB"))
 #if DEBUG_WINDOW_SIZE

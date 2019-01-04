@@ -83,6 +83,9 @@ struct menu_pages menus[] = {
     {PAGEID_TELEMMON, NULL, MENUTYPE_SUBMENU,  1, MIXER_ALL, PREVIOUS_ITEM},
 #endif
     {PAGEID_RANGE,    NULL, MENUTYPE_SUBMENU,  1, MIXER_ALL, PREVIOUS_ITEM},
+#if HAS_SCANNER
+    {PAGEID_SCANNER,  NULL, MENUTYPE_SUBMENU,  1, MIXER_ALL, PREVIOUS_ITEM},
+#endif
 };
 
 static struct menu_page * const mp = &pagemem.u.menu_page;

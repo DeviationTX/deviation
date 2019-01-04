@@ -2,7 +2,6 @@
 #define _PAGES_H_
 
 #include "../common/_pages.h"
-#include "scanner_page.h"
 #include "icons.h"
 #include "guiobj.h"
 
