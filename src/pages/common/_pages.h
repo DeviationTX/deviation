@@ -19,6 +19,7 @@
 #include "toggle_select.h"
 #include "config/display.h"
 #include "rtc_config.h"
+#include "scanner_page.h"
 
 #define PAGE_NAME_MAX 10
 extern struct pagemem pagemem;
