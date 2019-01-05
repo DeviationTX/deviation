@@ -3,7 +3,7 @@ FILESYSTEMS := common base_fonts 320x240x16
 FONTS        = filesystem/$(FILESYSTEM)/media/15normal.fon \
                filesystem/$(FILESYSTEM)/media/23bold.fon
 LANGUAGE    := devo8
-CFLAGS += -DTEST --coverage -g
+CFLAGS += -DTEST --coverage -g -O0 -fPIC
 include target/common/emu/Makefile.inc
 
 ifndef BUILD_TARGET
