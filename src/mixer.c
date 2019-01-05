@@ -918,3 +918,7 @@ int MIXER_SourceAsBoolean(unsigned src)
         val = -val;
     return (val - CHAN_MIN_VALUE > (CHAN_MAX_VALUE - CHAN_MIN_VALUE) / 20) ? 1 : 0;
 }
+
+
+#define TESTNAME mixer
+#include <tests.h>

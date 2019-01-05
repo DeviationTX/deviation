@@ -10,6 +10,6 @@ ifndef BUILD_TARGET
 SRC_CXX =
 SRC_C += objs/test/AllTests.c
 else
-objs/test/AllTests.c: target/test/make-tests.sh
+objs/test/AllTests.c: target/test/make-tests.sh tests/*.c
 	sh target/test/make-tests.sh > $(ODIR)/AllTests.c
 endif
