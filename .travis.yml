@@ -11,6 +11,7 @@ env:
       - TARGET=at9
       - MAKETARGET=zip_win_emu_devo8
       - MAKETARGET=zip_emu_devo8
+      - MAKETARGET=test
 #      - COMPILER=latest TARGET=devo8
 
 # use new docker environment
@@ -29,6 +30,7 @@ addons:
       - mingw32-binutils
       - mingw32-runtime
       - libfltk1.3-dev
+      - gcovr
 #      - gcc-arm-none-eabi
 
 #Do NOT set these.  They set 'CC' which breaks the build
@@ -103,6 +105,9 @@ script:
         export MPG123_DIR=$HOME/mpg123-w32;
     fi;
   - make -j2 $MAKETARGET;
+  - if [ "$MAKETARGET" == "test" ]; then
+        ./test.elf;
+    fi;
 
 after_success:
   - if [ "$TRAVIS_EVENT_TYPE" == "api" ]; then
@@ -127,6 +132,9 @@ after_success:
             ../utils/upload_test_build.pl -skip -nightly "$NIGHTLY_DATE" -delete;
             ../utils/upload_test_build.pl -skip -nightly "$NIGHTLY_DATE" *.zip;
         fi;
+    fi;
+  - if [ "$MAKETARGET" == "test" ]; then
+      ../utils/coverage-summary.sh;
     fi;
        
 cache:
