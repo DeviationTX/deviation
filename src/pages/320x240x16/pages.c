@@ -58,9 +58,9 @@ void PAGE_ChangeByID(enum PageID id, s8 menuPage)
     GUI_SelectionNotify(NULL);
     cur_page = id;
     BUTTON_InterruptLongPress(); //Make sure button press is not passed to the new page
-    if (pages[cur_page].init == PAGE_MainInit)
+    if (cur_page == PAGEID_MAIN)
         quick_page_enabled = 1;
-    else if (pages[cur_page].init == PAGE_MenuInit)
+    else if (cur_page == PAGEID_MENU)
         quick_page_enabled = 0;
     PAGE_RemoveAllObjects();
     if (HAS_TOUCH) {
