@@ -60,7 +60,6 @@ struct Rtc {
 void PAGE_RTCInit(int page)
 {
     (void)page;
-    PAGE_SetModal(0);
     PAGE_ShowHeader(PAGE_GetName(PAGEID_RTC));
     u32 time = RTC_GetValue();
     u32 timevalue = RTC_GetTimeValue(time);

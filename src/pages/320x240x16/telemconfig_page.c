@@ -35,7 +35,6 @@ void PAGE_TelemconfigInit(int page)
         LABEL_WIDTH = (COL2 - COL1),
     };
     const u8 row_height = 25;
-    PAGE_SetModal(0);
     PAGE_ShowHeader(PAGE_GetName(PAGEID_TELEMCFG));
 
     if (telem_state_check() == 0) {

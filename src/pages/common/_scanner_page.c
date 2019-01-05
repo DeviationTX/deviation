@@ -118,7 +118,6 @@ void PAGE_ScannerInit(int page)
     (void)page;
     memset(sp, 0, sizeof(struct scanner_page));
 
-    PAGE_SetModal(0);
     _draw_page(1);
 }
 

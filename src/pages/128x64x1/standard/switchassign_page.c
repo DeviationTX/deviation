@@ -74,7 +74,6 @@ void PAGE_SwitchAssignInit(int page)
 {
     (void)page;
     PAGE_SetActionCB(_action_cb);
-    PAGE_SetModal(0);
     refresh_switches();
 
     PAGE_ShowHeader(_tr("Press ENT to change"));

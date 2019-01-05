@@ -66,6 +66,7 @@ void PAGE_ChangeByID(enum PageID id, s8 menuPage)
     if (HAS_TOUCH) {
         GUI_ChangeSelectionOnTouch(1);
     }
+    PAGE_SetModal(0);
     ActionCB = default_button_action_cb;
     pages[cur_page].init(menuPage);
     if (page_scrollable) {

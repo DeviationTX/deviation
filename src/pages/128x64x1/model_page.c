@@ -149,7 +149,6 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 void PAGE_ModelInit(int page)
 {
     (void)page;
-    PAGE_SetModal(0);
     memset(gui, 0, sizeof(struct modelpage_obj));
     mp->file_state = 0;
     mp->last_txpower = Model.tx_power;

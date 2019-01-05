@@ -55,7 +55,6 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 void PAGE_VoiceconfigInit(int page)
 {
     (void)page;
-    PAGE_SetModal(0);
     if ( !AUDIO_VoiceAvailable() ) {
         GUI_CreateLabelBox(&gui->msg, MSG_X, MSG_Y, 0, 0, &LABEL_FONT, NULL, NULL,
             _tr("External voice\ncurrently not\navailable"));

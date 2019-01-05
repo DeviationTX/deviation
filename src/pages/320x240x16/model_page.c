@@ -49,7 +49,6 @@ void PAGE_ModelInit(int page)
     mp->last_mixermode = Model.mixer_mode;
     mp->last_txpower = Model.tx_power;
     mp->file_state = 0;
-    PAGE_SetModal(0);
     PAGE_ShowHeader(PAGE_GetName(PAGEID_MODEL));
 
     enum {
