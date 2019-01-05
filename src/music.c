@@ -68,6 +68,9 @@ static const u16 freqs[] = {220, 233, 247, 262, 277, 294, 311, 330, 349, 370, 39
 
 static u16 get_freq(u8 note)
 {
+    if (note == 0)
+        return 0;
+
     u16 freq = freqs[(note - 1) % NUM_FREQ_ONE_SCALE];
     for (int j = 0; j < (note - 1) / NUM_FREQ_ONE_SCALE; ++j)
         freq *= 2;
@@ -353,3 +356,5 @@ void MUSIC_PlayValue(u16 music, s32 value, u8 unit, u8 prec)
         AUDIO_AddQueue(unit + VOICE_UNIT_OFFSET);
 }
 #endif
+#define TESTNAME music
+#include <tests.h>
