@@ -37,8 +37,6 @@ void TestApplyMixer(CuTest *t)
         .scalar = 100,
         .offset = 0,
         .flags = MUX_REPLACE,
-        .beep_lock = 0,
-        .voice_lock = 0,
     }, mixer;
     s32 rawdata[NUM_SOURCES + 1];
     s32 origvalue[NUM_SOURCES + 1];
