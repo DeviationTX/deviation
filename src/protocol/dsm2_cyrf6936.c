@@ -100,10 +100,12 @@ enum {
     DSM2_CH2_READ_B  = 10,
     DSM2_BIND        = 11,
     DSM2_CHANSEL     = BIND_COUNT + 11,
+#ifndef MODULAR
     DSM2_CH1_WRITE_A_MIX,
     DSM2_CH1_WRITE_B_MIX,
     DSM2_CH2_READ_A_MIX,
     DSM2_CH2_READ_B_MIX,
+#endif
 };
    
 static const u8 pncodes[5][9][8] = {
@@ -702,7 +704,7 @@ static u16 dsm2_cb()
         state = DSM2_CH1_WRITE_A_MIX;
         return 10000 - mixer_runtime;
     } else if(state == DSM2_CH1_WRITE_A_MIX || state == DSM2_CH1_WRITE_B_MIX) {
-        state = DSM2_CH1_WRITE_A_MIX ? DSM2_CH1_WRITE_A : DSM2_CH1_WRITE_B;
+        state = (state == DSM2_CH1_WRITE_A_MIX) ? DSM2_CH1_WRITE_A : DSM2_CH1_WRITE_B;
         CLOCK_RunMixer();
         return mixer_runtime;
 #endif
@@ -777,7 +779,7 @@ static u16 dsm2_cb()
             CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x80); //Prepare to receive
 #ifndef MODULAR
             if (mixer_runtime > READ_DELAY) {
-                state = DSM2_CH2_READ_A ? DSM2_CH2_READ_A_MIX : DSM2_CH2_READ_B_MIX;
+                state = (state == DSM2_CH2_READ_A) ? DSM2_CH2_READ_A_MIX : DSM2_CH2_READ_B_MIX;
                 return 11000 - CH1_CH2_DELAY - WRITE_DELAY - READ_DELAY - mixer_runtime;
             } else {
 #endif
@@ -786,7 +788,7 @@ static u16 dsm2_cb()
 #ifndef MODULAR
         }
     } else if(state == DSM2_CH2_READ_A_MIX || state == DSM2_CH2_READ_B_MIX) {
-        state = DSM2_CH2_READ_A_MIX ? DSM2_CH2_READ_A : DSM2_CH2_READ_B;
+        state = (state == DSM2_CH2_READ_A_MIX) ? DSM2_CH2_READ_A : DSM2_CH2_READ_B;
         CLOCK_RunMixer();
         return mixer_runtime;
 #endif
