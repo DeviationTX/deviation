@@ -201,11 +201,6 @@ void Banner()
 
 }
 
-void medium_priority_cb()
-{
-    // not currently used. If needed see exti1_isr in clock.c
-}
-
 void EventLoop()
 {
     CLOCK_ResetWatchdog();
