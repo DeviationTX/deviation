@@ -202,7 +202,7 @@ void exti1_isr()
     //ADC_StartCapture();
     //ADC completion will trigger update
     ADC_Filter();
-    medium_priority_cb();
+    MIXER_CalcChannels();
 }
 
 void sys_tick_handler(void)

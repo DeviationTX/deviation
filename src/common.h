@@ -209,7 +209,6 @@ int fexists(const char *file);
 u32 rand32_r(u32 *seed, u8 update); //LFSR based PRNG
 u32 rand32(); //LFSR based PRNG
 extern volatile u8 priority_ready;
-void medium_priority_cb();
 void debug_timing(u32 type, int startend); //This is only defined if TIMING_DEBUG is defined
 void DEBUGLOG_Putc(char c);
 /* Battery */
