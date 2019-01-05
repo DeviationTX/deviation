@@ -339,7 +339,7 @@ void MIXER_ApplyMixer(struct Mixer *mixer, volatile s32 *raw, s32 *orig_value)
                 value = raw[mixer->dest + NUM_INPUTS + 1];
                 break;
             }
-            value = abs(RANGE_TO_PCT(value)) * 50;
+            value = abs(RANGE_TO_PCT(value)) * 50; //'50' represents 1/20 of a second (1000msec/20 = 50)
             //rate represents the maximum travel per iteration (once per MEDIUM_PRIORITY_MSEC)
             s32 rate = CHAN_MAX_VALUE * MEDIUM_PRIORITY_MSEC / value;
 
