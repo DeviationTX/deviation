@@ -15,7 +15,7 @@
 gcovr -p -o raw-report.txt
 
 # strip the full-path and line markers
-sed s@$PWD\/@@ raw-report.txt | sed s/[0-9]\*[,-]//g > simplified.txt
+sed s/objs/test\/@@ raw-report.txt | sed s/[0-9]\*[,-]//g > simplified.txt
 
 # reflow lines that got split
 awk '/.[ch]$/ { printf("%s", $0); next } 1' simplified.txt > rejoined.txt
@@ -24,4 +24,4 @@ awk '/.[ch]$/ { printf("%s", $0); next } 1' simplified.txt > rejoined.txt
 column -t rejoined.txt > final.txt
 
 # and dump, stripping out 0% coverage
-grep -v "0%" final.txt
+grep -v " 0%" final.txt
