@@ -30,6 +30,7 @@ addons:
       - mingw32-binutils
       - mingw32-runtime
       - libfltk1.3-dev
+      - gcovr
 #      - gcc-arm-none-eabi
 
 #Do NOT set these.  They set 'CC' which breaks the build
@@ -106,6 +107,7 @@ script:
   - make -j2 $MAKETARGET;
   - if [ "$MAKETARGET" == "test" ]; then
         ./test.elf;
+        gcovr -r . -p | grep -v "0%" | sed s/[0-9]\*[,-]//g;
     fi;
 
 after_success:
