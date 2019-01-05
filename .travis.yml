@@ -38,6 +38,7 @@ addons:
 #compiler: gcc
 
 before_install:
+   - pip install --user cpp-coveralls
    - if [ ! -d "$HOME/gcc-arm-none-eabi-4_8-2013q4/bin" ]; then
        pushd $HOME;
        curl --retry 10 --retry-max-time 120 -L "https://launchpad.net/gcc-arm-embedded/4.8/4.8-2013-q4-major/+download/gcc-arm-none-eabi-4_8-2013q4-20131204-linux.tar.bz2" | tar xfj -;
@@ -135,6 +136,7 @@ after_success:
     fi;
   - if [ "$MAKETARGET" == "test" ]; then
       ../utils/coverage-summary.sh;
+      coveralls -r . -b . --gcov-options '\-lp' -E '.*/tests/test_.*' -E '.*/objs/';
     fi;
        
 cache:
