@@ -20,21 +20,20 @@
 #define LCD_Init EMULCD_Init
 #endif
 
-extern void EventLoop(void *);
-void start_event_loop() {
+void start_event_loop()
+{
 }
 
 void set_stick_positions()
 {
 }
 
-extern void _lcd_init();
-
 void LCD_Init()
 {
 }
 
-struct touch SPITouch_GetCoords() {
+struct touch SPITouch_GetCoords()
+{
     struct touch t = {256, 16, 0, 0};
     return t;
 }
@@ -46,6 +45,11 @@ int SPITouch_IRQ()
 
 void LCD_DrawStart(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, enum DrawDir dir)
 {
+    (void)x0;
+    (void)y0;
+    (void)x1;
+    (void)y1;
+    (void)dir;
 }
 
 void LCD_DrawStop(void) {
@@ -53,11 +57,14 @@ void LCD_DrawStop(void) {
 
 void LCD_DrawPixelXY(unsigned int x, unsigned int y, unsigned int color)
 {
+    (void)x;
+    (void)y;
+    (void)color;
 }
 
 u32 ScanButtons()
 {
-    return 1; 
+    return 1;
 }
 
 int PWR_CheckPowerSwitch()
@@ -76,6 +83,10 @@ u32 ReadFlashID()
 
 void SPITouch_Calibrate(s32 xscale, s32 yscale, s32 xoff, s32 yoff)
 {
+    (void)xscale;
+    (void)yscale;
+    (void)xoff;
+    (void)yoff;
 }
 
 void CLOCK_Init()
@@ -83,6 +94,8 @@ void CLOCK_Init()
 }
 void CLOCK_StartTimer(unsigned us, u16 (*cb)(void))
 {
+    (void)us;
+    (void)cb;
 }
 
 void CLOCK_StopTimer()
@@ -91,10 +104,13 @@ void CLOCK_StopTimer()
 
 void CLOCK_SetMsecCallback(int cb, u32 msec)
 {
+    (void)msec;
+    (void)cb;
 }
 
 void CLOCK_ClearMsecCallback(int cb)
 {
+    (void)cb;
 }
 
 u32 CLOCK_getms()
@@ -102,8 +118,10 @@ u32 CLOCK_getms()
     return 100000;
 }
 
-void PWR_Sleep() {
+void PWR_Sleep()
+{
 }
 
-void LCD_ForceUpdate() {
+void LCD_ForceUpdate()
+{
 }

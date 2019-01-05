@@ -474,8 +474,6 @@ u32 ScanButtons()
     return gui.buttons;
 }
 
-void PWR_Init(void) {}
-
 int PWR_CheckPowerSwitch()
 {
     Fl::check();

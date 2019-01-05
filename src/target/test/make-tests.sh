@@ -48,9 +48,9 @@ echo \
     return suite->failCount;
 }
 
-void PWR_Init(void)
+int main(void)
 {
-    exit(RunAllTests());
+    return RunAllTests();
 }
 
 '

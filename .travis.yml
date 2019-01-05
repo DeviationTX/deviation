@@ -107,7 +107,6 @@ script:
   - make -j2 $MAKETARGET;
   - if [ "$MAKETARGET" == "test" ]; then
         ./test.elf;
-        gcovr -r . -p | grep -v "0%" | sed s/[0-9]\*[,-]//g;
     fi;
 
 after_success:
@@ -133,6 +132,9 @@ after_success:
             ../utils/upload_test_build.pl -skip -nightly "$NIGHTLY_DATE" -delete;
             ../utils/upload_test_build.pl -skip -nightly "$NIGHTLY_DATE" *.zip;
         fi;
+    fi;
+  - if [ "$MAKETARGET" == "test" ]; then
+      ../utils/coverage-summary.sh;
     fi;
        
 cache:
