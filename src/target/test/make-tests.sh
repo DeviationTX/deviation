@@ -5,8 +5,7 @@
 # Prints to stdout.
 # Author: Asim Jalis
 # Date: 01/08/2003
-FILES=`find . -name '*.c'`
-
+FILES=`find tests/ -name '*.c'`
 echo '
 
 /* This is auto-generated code. Edit at your own peril. */
