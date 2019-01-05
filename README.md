@@ -1,4 +1,9 @@
+# Deviation firmware for RC transmitters
 The Deviation firmware project is hosted at http://www.deviationtx.com
+
+## Current build status
+[![Build Status](https://travis-ci.org/DeviationTX/deviation.png?branch=master)](https://travis-ci.org/DeviationTX/deviation?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/DeviationTX/deviation/badge.svg?branch=master)](https://coveralls.io/github/DeviationTX/deviation?branch=master)
 
 There you can find links to:
   * pre-built binaries: http://www.deviationtx.com/downloads-new/category/1-deviation-releases
