@@ -68,7 +68,6 @@ void PAGE_MainInit(int page)
     memset(gui, 0, sizeof(struct mainpage_obj));
     PAGE_SetModal(0);
     PAGE_SetActionCB(_action_cb);
-    PAGE_RemoveAllObjects();
     next_scan = CLOCK_getms()+BATTERY_SCAN_MSEC;
 
     GUI_CreateLabelBox(&gui->name, MODEL_NAME_X, MODEL_NAME_Y, //64, 12,

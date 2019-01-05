@@ -32,7 +32,6 @@ void PAGE_SplashInit(int page)
         PAGE_ChangeByID(PAGEID_MAIN, 0);
         return;
     }
-    PAGE_RemoveAllObjects();
     PAGE_SetActionCB(_action_cb);
 
     GUI_CreateLabelBox(&gui->splash_text, 3*ITEM_SPACE, 4*LINE_HEIGHT, 0, 0, &MODELNAME_FONT, NULL, NULL, _tr("Deviation"));

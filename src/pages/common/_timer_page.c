@@ -33,7 +33,6 @@ static void _show_page(int page);
 void PAGE_TimerInit(int page)
 {
     PAGE_SetModal(0);
-    PAGE_RemoveAllObjects();
     _show_page(page);
 }
 

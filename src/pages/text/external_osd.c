@@ -20,5 +20,4 @@
 void PAGE_ExternalOSDInit(int page)
 {
     (void)page;
-    PAGE_RemoveAllObjects();
 }

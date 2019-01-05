@@ -35,7 +35,6 @@ static const char *startstop_dlg(struct guiObject *gui, const void *data) {
 #define INFO_Y 70
 
 static void _draw_page(int has_pa) {
-    PAGE_RemoveAllObjects();
     PAGE_ShowHeader(PAGE_GetName(PAGEID_RANGE));
     if (!has_pa) {
         snprintf(tempstring, sizeof(tempstring), _tr("No range test possible."));

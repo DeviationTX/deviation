@@ -36,7 +36,6 @@ void PAGE_ThroHoldInit(int page)
 {
     (void)page;
     PAGE_SetModal(0);
-    PAGE_RemoveAllObjects();
 
     PAGE_ShowHeader(_tr("Throttle hold"));
 

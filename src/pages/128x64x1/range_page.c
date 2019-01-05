@@ -40,7 +40,6 @@ static unsigned action_cb(u32 button, unsigned flags, void *data) {
 }
 
 static void _draw_page(int has_pa) {
-    PAGE_RemoveAllObjects();
     PAGE_ShowHeader(PAGE_GetName(PAGEID_RANGE));
 
     if (!has_pa) {

@@ -46,8 +46,7 @@ static int menu_get_next_rowidx(unsigned *i)
 void _menu_init(int page)
 {
     PAGE_SetModal(0);
-    PAGE_RemoveAllObjects();
-    PAGE_ShowHeader(_tr(PAGE_GetName(page)));
+    PAGE_ShowHeader(PAGE_GetName(page));
 
     unsigned idx = 0;
     unsigned i = 0;

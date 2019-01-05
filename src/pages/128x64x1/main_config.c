@@ -60,7 +60,7 @@ void PAGE_MainLayoutInit(int page)
     PAGE_ShowHeader(_tr("Layout: Long-Press ENT"));
     PAGE_SetActionCB(_action_cb);
 #else
-    PAGE_ShowHeader(_tr(PAGE_GetName(PAGEID_MAINCFG)));
+    PAGE_ShowHeader(PAGE_GetName(PAGEID_MAINCFG));
 #endif
     memset(gui, 0, sizeof(*gui));
     memset(lp, 0, sizeof(*lp));

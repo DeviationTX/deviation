@@ -33,7 +33,6 @@ static struct about_obj * const gui = &gui_objs.u.about;
 void PAGE_AboutInit(int page)
 {
     (void)page;
-    PAGE_RemoveAllObjects();
     PAGE_ShowHeader(PAGE_GetName(PAGEID_ABOUT));
 
     tempstring_cpy((const char *) _tr("Deviation FW version:"));

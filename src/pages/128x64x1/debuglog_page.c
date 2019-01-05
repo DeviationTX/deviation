@@ -32,9 +32,8 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 void PAGE_DebuglogInit(int page)
 {
     (void)page;
-    PAGE_SetModal(0);
-    PAGE_RemoveAllObjects();
     PAGE_ShowHeader(PAGE_GetName(PAGEID_DEBUGLOG));
+    PAGE_SetModal(0);
 
     find_line_ends();
     GUI_CreateScrollable(&gui->scrollable,

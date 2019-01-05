@@ -27,7 +27,6 @@ const char *show_usb_date_cb(guiObject_t *obj, const void *data);
 
 static void _draw_page(u8 enable)
 {
-    PAGE_RemoveAllObjects();
     PAGE_ShowHeader(PAGE_GetName(PAGEID_USB));
 #if HAS_RTC
     GUI_CreateLabelBox(&gui->time, (LCD_WIDTH - (113 + 113 +20)) / 2, 40, 113, 28, &SMALLBOX_FONT, show_usb_time_cb, NULL, NULL);

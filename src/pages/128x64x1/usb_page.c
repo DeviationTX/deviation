@@ -32,7 +32,6 @@ static struct usb_obj * const gui = &gui_objs.u.usb;
 
 static void _draw_page(u8 enable)
 {
-    PAGE_RemoveAllObjects();
     PAGE_ShowHeader(_tr("USB"));
 
     snprintf(tempstring, sizeof(tempstring), "%s %s",

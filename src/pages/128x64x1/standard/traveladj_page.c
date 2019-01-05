@@ -58,7 +58,6 @@ void PAGE_TravelAdjInit(int page)
 {
     (void)page;
     PAGE_SetModal(0);
-    PAGE_RemoveAllObjects();
 
     PAGE_ShowHeader(("")); // draw a underline only
     GUI_CreateLabelBox(&gui->dnlbl, HEADER1_X, 0, HEADER1_WIDTH, LINE_HEIGHT, &TITLE_FONT, NULL, NULL, _tr("Down"));
