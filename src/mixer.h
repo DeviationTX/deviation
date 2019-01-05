@@ -157,16 +157,16 @@ enum LimitMask {
 };
 
 struct Limit {
+    s16 safetyval;  // allow safetyval to be over +/-125
     u8 flags;
     u8 safetysw;
-    s16 safetyval;  // allow safetyval to be over +/-125
     u8 max;
     u8 min;
     u8 servoscale;
     u8 servoscale_neg;
     s8 failsafe;
     u8 speed;     //measured in degrees/100msec
-    u8 padding_1[1];
+    u8 padding_1[2];
     s16 subtrim;  // need to support value greater than 250
     s16 displayscale; // display scale factor
     char displayformat[16];
@@ -178,8 +178,8 @@ struct Trim {
     u8 neg;
     u8 step;
     u8 sw;
-    s8 value[6];
     u8 padding_1[1];
+    s8 value[6];
 };
 
 /* Curve functions */
