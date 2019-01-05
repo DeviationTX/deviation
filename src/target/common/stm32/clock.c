@@ -237,7 +237,7 @@ void exti1_isr()
     // use exti3 for mixer updates.
     ADC_Filter();
     MIXER_CalcChannels();
-    mixer_sync = MIX_DONE;
+    if (mixer_sync == MIX_NOT_DONE) mixer_sync = MIX_DONE;
 }
 
 void sys_tick_handler(void)
