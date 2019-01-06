@@ -238,8 +238,6 @@ void PAGE_TxConfigureInit(int page)
 {
     (void)page;
     cp->enable = CALIB_NONE;
-    PAGE_SetModal(0);
-    PAGE_RemoveAllObjects();
     PAGE_ShowHeader(PAGE_GetName(PAGEID_TXCFG));
     GUI_CreateScrollable(&gui->scrollable, 0, 32, LCD_WIDTH, LCD_HEIGHT-32,
                      LCD_HEIGHT-32, MAX_PAGE+1, row_cb, NULL, NULL, NULL);
@@ -328,7 +326,7 @@ void PAGE_TouchEvent(void)
             printf("Debug: scale(%d, %d) offset(%d, %d)\n", (int)xscale, (int)yscale, (int)xoff, (int)yoff);
             SPITouch_Calibrate(xscale, yscale, xoff, yoff);
             PAGE_RemoveAllObjects();
-            PAGE_ShowHeader(_tr(PAGE_GetName(PAGEID_TOUCH)));
+            PAGE_ShowHeader(PAGE_GetName(PAGEID_TOUCH));
             GUI_CreateLabelBox(&guic->msg, (LCD_WIDTH - 150) / 2, (LCD_HEIGHT - 25) / 2, 150, 25, &SMALLBOX_FONT, coords_cb, NULL, NULL);
             memset(&cp->coords, 0, sizeof(cp->coords));
             cp->state = 6;

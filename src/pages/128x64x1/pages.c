@@ -60,6 +60,7 @@ void PAGE_ChangeByID(enum PageID id, s8 menuPage)
     else if (cur_page == PAGEID_MENU)
         quick_page_enabled = 0;
     PAGE_RemoveAllObjects();
+    PAGE_SetModal(0);
     ActionCB = default_button_action_cb;
     pages[cur_page].init(menuPage);
     if (page_scrollable) {

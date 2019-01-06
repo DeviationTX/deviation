@@ -29,7 +29,6 @@ void PAGE_SplashInit(int page)
         PAGE_ChangeByID(PAGEID_MAIN, 0);
         return;
     }
-    PAGE_RemoveAllObjects();
     PAGE_SetActionCB(_action_cb);
     u16 w, h;
     LCD_ImageDimensions(SPLASH_FILE, &w, &h);

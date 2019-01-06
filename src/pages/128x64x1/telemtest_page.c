@@ -409,7 +409,6 @@ static const struct telem_layout2 *_get_telem_layout2()
 static void _show_page()
 {
     const struct telem_layout2 *page = _get_telem_layout2();
-    PAGE_RemoveAllObjects();
     PAGE_ShowHeader(page->header == dsm_header_basic ? _tr("Telemetry monitor") : "");
     tp->font = TINY_FONT;
     tp->font.style = LABEL_SQUAREBOX;
@@ -443,7 +442,6 @@ void PAGE_ShowTelemetryAlarm()
 void PAGE_TelemtestInit(int page)
 {
     (void)page;
-    PAGE_SetModal(0);
     PAGE_SetActionCB(_action_cb);
     if (telem_state_check() == 0) {
         current_page = telemetry_off;

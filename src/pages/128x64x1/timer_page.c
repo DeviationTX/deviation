@@ -99,7 +99,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 static void _show_page(int page)
 {
     (void)page;
-    PAGE_ShowHeader(_tr(PAGE_GetName(PAGEID_TIMER))); // using the same name as related menu item to reduce language strings
+    PAGE_ShowHeader(PAGE_GetName(PAGEID_TIMER)); // using the same name as related menu item to reduce language strings
 
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                      LCD_HEIGHT - HEADER_HEIGHT, NUM_TIMERS, row_cb, NULL, NULL, NULL);

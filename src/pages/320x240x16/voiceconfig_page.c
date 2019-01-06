@@ -45,7 +45,6 @@ void PAGE_VoiceconfigInit(int page)
 {
     (void)page;
     int init_y = 40;
-    PAGE_SetModal(0);
     PAGE_ShowHeader(PAGE_GetName(PAGEID_VOICECFG));
 
     if ( !AUDIO_VoiceAvailable() ) {

@@ -147,7 +147,6 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
 void PAGE_TrimInit(int page)
 {
     (void)page;
-    PAGE_RemoveAllObjects();
 
     _show_page();
 }

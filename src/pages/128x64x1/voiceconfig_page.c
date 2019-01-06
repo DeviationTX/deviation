@@ -55,13 +55,11 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 void PAGE_VoiceconfigInit(int page)
 {
     (void)page;
-    PAGE_SetModal(0);
     if ( !AUDIO_VoiceAvailable() ) {
         GUI_CreateLabelBox(&gui->msg, MSG_X, MSG_Y, 0, 0, &LABEL_FONT, NULL, NULL,
             _tr("External voice\ncurrently not\navailable"));
         return;
     }
-    PAGE_RemoveAllObjects();
     PAGE_ShowHeader(PAGE_GetName(PAGEID_VOICECFG));
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                      LINE_SPACE * 2, MODEL_CUSTOM_ALARMS, row_cb, NULL, NULL, NULL);

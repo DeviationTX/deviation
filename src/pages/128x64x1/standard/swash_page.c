@@ -37,8 +37,6 @@ enum {
 void PAGE_SwashInit(int page)
 {
     (void)page;
-    PAGE_SetModal(0);
-    PAGE_RemoveAllObjects();
     get_swash();
     PAGE_ShowHeaderWithSize(_tr("SwashType"), LABEL_WIDTH, HEADER_HEIGHT);
     GUI_CreateTextSelectPlate(&gui->type, FIELD_X, 0, FIELD_WIDTH, HEADER_WIDGET_HEIGHT, &TEXTSEL_FONT, NULL, swash_val_cb, NULL); // FIXME: need a special value for header button/textsels

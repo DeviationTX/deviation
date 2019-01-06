@@ -74,8 +74,6 @@ void PAGE_TelemconfigInit(int page)
     (void)page;
     //if (page < 0)
     //    page = current_selected;
-    PAGE_SetModal(0);
-    PAGE_RemoveAllObjects();
     if (telem_state_check() == 0) {
         GUI_CreateLabelBox(&gui->msg, MSG_X, MSG_Y, 0, 0, &DEFAULT_FONT, NULL, NULL, tempstring);
         OBJ_SET_USED(&gui->value, 0);  // A indication not allow to scroll up/down

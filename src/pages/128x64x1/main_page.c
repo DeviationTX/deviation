@@ -66,9 +66,7 @@ void PAGE_MainInit(int page)
     TGLICO_LoadFonts();
     memset(mp, 0, sizeof(struct main_page));// Bug fix: must initialize this structure to avoid unpredictable issues in the PAGE_MainEvent
     memset(gui, 0, sizeof(struct mainpage_obj));
-    PAGE_SetModal(0);
     PAGE_SetActionCB(_action_cb);
-    PAGE_RemoveAllObjects();
     next_scan = CLOCK_getms()+BATTERY_SCAN_MSEC;
 
     GUI_CreateLabelBox(&gui->name, MODEL_NAME_X, MODEL_NAME_Y, //64, 12,

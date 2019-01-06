@@ -40,7 +40,7 @@ void PAGE_LanguageInit(int page)
 {
     (void)page;
     int num_lang = count_num_languages();
-    PAGE_ShowHeader(_tr(PAGE_GetName(PAGEID_LANGUAGE)));
+    PAGE_ShowHeader(PAGE_GetName(PAGEID_LANGUAGE));
 
     int min_rows = num_lang >= LISTBOX_ITEMS ? num_lang : LISTBOX_ITEMS;
     GUI_CreateScrollable(&gui->scrollable, LCD_WIDTH/2-100, 40, 200, LISTBOX_ITEMS * LINE_HEIGHT, LINE_HEIGHT, min_rows, row_cb, NULL, NULL, (void *)(long)num_lang);

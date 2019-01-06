@@ -88,8 +88,6 @@ static void press_cb(guiObject_t *obj, void *data)
 static void show_page(CurvesMode _curve_mode, int page)
 {
     (void)page;
-    PAGE_SetModal(0);
-    PAGE_RemoveAllObjects();
     memset(mp, 0, sizeof(*mp));
     curve_mode = _curve_mode;
     int count;
