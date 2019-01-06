@@ -34,6 +34,7 @@
 
 
 enum {
+    TRIM_MAX_VALUE = 190,
     TRIM_ONOFF     = 191,
     TRIM_TOGGLE    = 192,
     TRIM_MOMENTARY = 193,

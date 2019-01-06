@@ -89,9 +89,9 @@ static const char *set_trimstep_cb(guiObject_t *obj, int dir, void *data)
     int i = ((long)data)& 0xff;
     u8 *value = ((long)data >> 8) ? &tp->trim.step : &Model.trims[i].step;
     //place switches before 0.1 on the spinbox
-    u8 v = ((int)*value + TRIM_SWITCH_TYPES - 1) % (190 + TRIM_SWITCH_TYPES);
-    v = GUI_TextSelectHelper(v, 0, 190 + TRIM_SWITCH_TYPES - 1, dir, 1, 5, NULL);
-    *value = ((int)v + 190) % (190 + TRIM_SWITCH_TYPES) + 1;
+    u8 v = ((int)*value + TRIM_SWITCH_TYPES - 1) % (TRIM_MAX_VALUE + TRIM_SWITCH_TYPES);
+    v = GUI_TextSelectHelper(v, 0, TRIM_MAX_VALUE + TRIM_SWITCH_TYPES - 1, dir, 1, 5, NULL);
+    *value = ((int)v + TRIM_MAX_VALUE) % (TRIM_MAX_VALUE + TRIM_SWITCH_TYPES) + 1;
 
     guiObject_t *negtrimObj = _get_obj(i, TRIM_MINUS);
     guiObject_t *switchObj  = _get_obj(i, TRIM_SWITCH);
