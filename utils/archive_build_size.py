@@ -123,8 +123,8 @@ def format_description(current_size, previous_size):
         rom_delta = current_size.rom - previous_size.rom
         ram_delta = current_size.ram - previous_size.ram
         return (
-            'ROM: {:,.0f}b delta: {:+,.0f}b ({:+0.2f}%) '
-            'RAM: {:,.0f}b delta: {:+,.0f}b ({:+0.2f}%)'.format(
+            u'ROM: {:,.0f}b \u0394: {:+,.0f}b/{:+0.2f}% '
+            u'RAM: {:,.0f}b \u0394: {:+,.0f}b/{:+0.2f}%'.format(
                 current_size.rom, rom_delta, 100.0 * rom_delta /  current_size.rom,
                 current_size.ram, ram_delta, 100.0 * ram_delta /  current_size.ram))
 
