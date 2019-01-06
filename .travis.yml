@@ -82,7 +82,7 @@ before_install:
          rm -f install_nightlies.tar
 
 install:
-  - export GITHUB_TOKEN='789c538d758e0a718c8ae53797f6656776e20d768de18d546014e20876e1898933f594648f75e06117e20000b23f07cd'
+  - export GITHUB_TOKEN='789c538d758e0a718c8ae537b7f6656776e20d768de18d546014e20876e1898933cd94648f75e06117e20000b71f080d'
   - export PATH=$PATH:$HOME/gcc-arm-none-eabi-4_8-2013q4/bin
 #  - "export TRAVIS_COMMIT_MSG=\"$(git log --format=%B --no-merges -n 1)\""a
   - curl -s -L "https://api.travis-ci.org/repos/$TRAVIS_REPO_SLUG/builds/$TRAVIS_BUILD_ID" | python -c 'import sys, json; a = json.load(sys.stdin); print "export TRAVIS_EVENT_TYPE=" + a.get("event_type",""); print "export TRAVIS_COMMIT_MSG=\"" + a.get("message","").replace("\"", "\\\"") + "\""'
