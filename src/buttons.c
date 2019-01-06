@@ -166,4 +166,7 @@ void exec_callbacks(u32 buttons, enum ButtonFlags flags) {
         ptr = ptr->next;
     }
 
-}  
+}
+
+#define TESTNAME buttons
+#include <tests.h>  
