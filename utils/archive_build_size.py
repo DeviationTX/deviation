@@ -136,7 +136,7 @@ def parse_description(description):
     match = re.search(r'ROM:\s*([0-9,]+)b.*\sRAM:\s*([0-9,]+)b', description)
     assert match, 'Unable to parse "%s"' % description
     rom_size = int(match.group(1).replace(',', ''))
-    ram_size = int(match.group(1).replace(',', ''))
+    ram_size = int(match.group(2).replace(',', ''))
     return ImageSize(rom=rom_size, ram=ram_size)
 
 
