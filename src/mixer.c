@@ -372,7 +372,7 @@ void MIXER_ApplyMixer(struct Mixer *mixer, volatile s32 *raw, s32 *orig_value)
                     (value < *orig_value && value > scaled_value) ||
                     (abs(value - scaled_value) <= 10)) {
                     MIXER_SET_BEEP_LOCK(mixer, 1);
-                    MUSIC_Play(MUSIC_SAVING);
+                    MUSIC_Play(MUSIC_MAXLEN);
                 }
             }
         }
