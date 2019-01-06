@@ -77,6 +77,9 @@ void MIXER_EvalMixers(volatile s32 *raw)
     for (i = 0; i < NUM_CHANNELS; i++) {
         orig_value[i] = raw[i + NUM_INPUTS + 1];
     }
+    for (i = 0; i < NUM_CHANNELS; i++) {
+        orig_value[i] = raw[i + NUM_INPUTS + 1];
+    }
     for (i = 0; i < NUM_MIXERS; i++) {
         struct Mixer *mixer = &Model.mixers[i];
         // Linkers are pre-ordred such that we can process them in order
