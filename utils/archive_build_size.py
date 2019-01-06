@@ -119,7 +119,7 @@ def format_description(current_size, previous_size):
                 current_size.rom, rom_delta, 100.0 * rom_delta /  current_size.rom,
                 current_size.ram, ram_delta, 100.0 * ram_delta /  current_size.ram))
 
-    return 'ROM: {:,.0f}kb RAM: {:,.0f}kb'.format(current_size.rom, current_size.ram)
+    return 'ROM: {:,.0f}b RAM: {:,.0f}b'.format(current_size.rom, current_size.ram)
 
 
 def parse_description(description):
