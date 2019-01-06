@@ -19,6 +19,7 @@ import re
 import sys
 import json
 import urllib2
+import zlib
 from collections import namedtuple
 
 TRAVIS = os.environ.get('TRAVIS')
@@ -46,6 +47,14 @@ def raise_for_status(url, response):
         raise Exception('Request for %s failed: %s' % (url, response.getcode()))
 
 
+def get_token():
+    """Return github token"""
+    token = zlib.decompress(GITHUB_TOKEN.decode("hex"))
+    length = len(token)
+    return ''.join(chr(ord(a) ^ ord(b))
+                   for a, b in zip(token, (TRAVIS_REPO_SLUG * length)[:length]))
+
+
 def post_status(url, state, context, description):
     """Send status update to GitHub"""
     data = {
@@ -53,7 +62,7 @@ def post_status(url, state, context, description):
         'context': context,
         'description': description
     }
-    headers = {'Authorization': 'token ' + GITHUB_TOKEN}
+    headers = {'Authorization': 'token ' + get_token()}
 
     request = urllib2.Request(url, json.dumps(data), headers)
     res = urllib2.urlopen(request)
@@ -64,7 +73,7 @@ def post_status(url, state, context, description):
 
 def get_status(url, context):
     """Request status for previous build from GitHub"""
-    headers = {'Authorization': 'token ' + GITHUB_TOKEN}
+    headers = {'Authorization': 'token ' + get_token()}
     request = urllib2.Request(url, None, headers)
     res = urllib2.urlopen(request)
     raise_for_status(url, res)
@@ -79,7 +88,7 @@ def get_status(url, context):
 def get_pr_info(slug, pull_number):
     """Retireve pull-request info"""
     url = 'https://api.github.com/repos/%s/pulls/%s' % (slug, pull_number)
-    headers = {'Authorization': 'token ' + GITHUB_TOKEN}
+    headers = {'Authorization': 'token ' + get_token()}
     request = urllib2.Request(url, None, headers)
     res = urllib2.urlopen(request)
     raise_for_status(url, res)
@@ -187,10 +196,10 @@ def main():
     if len(sys.argv) != 2:
         sys.stderr.write('Usage: %s path/to/mapfile\n' % sys.argv[0])
         sys.exit(1)
-    
-    filename = sys.argv[1].replace("zip_","").replace("win_", "") + ".map"
+
+    filename = sys.argv[1].replace("zip_", "").replace("win_", "") + ".map"
     if not os.path.exists(filename):
-        print("No map file generated: " + filename)
+        print "No map file generated ({}): {}".format(sys.argv[1], filename)
         return
 
     check_environment()
