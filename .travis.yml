@@ -109,6 +109,7 @@ script:
   - if [ "$MAKETARGET" == "test" ]; then
         ./test.elf;
     fi;
+    ../utils/archive_build_size.py "$MAKETARGET"
 
 after_success:
   - if [ "$TRAVIS_EVENT_TYPE" == "api" ]; then
