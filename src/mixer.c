@@ -323,23 +323,24 @@ void MIXER_ApplyMixer(struct Mixer *mixer, volatile s32 *raw, s32 *orig_value)
     value = value * mixer->scalar / 100 + PCT_TO_RANGE(mixer->offset);
 
     //4th: multiplex result
+    s32 scaled_value = raw[mixer->dest + NUM_INPUTS + 1];
     switch(MIXER_MUX(mixer)) {
     case MUX_REPLACE:
         break;
     case MUX_MULTIPLY:
-        value = raw[mixer->dest + NUM_INPUTS + 1] * value / CHAN_MAX_VALUE;
+        value = scaled_value * value / CHAN_MAX_VALUE;
         break;
     case MUX_ADD:
-        value = raw[mixer->dest + NUM_INPUTS + 1] + value;
+        value = scaled_value + value;
         break;
     case MUX_MAX:
-        value = raw[mixer->dest + NUM_INPUTS + 1] > value
-                  ? raw[mixer->dest + NUM_INPUTS + 1]
+        value = scaled_value > value
+                  ? scaled_value
                   : value;
         break;
     case MUX_MIN:
-        value = raw[mixer->dest + NUM_INPUTS + 1] < value
-                  ? raw[mixer->dest + NUM_INPUTS + 1]
+        value = scaled_value < value
+                  ? scaled_value
                   : value;
         break;
     case MUX_DELAY:
@@ -347,14 +348,14 @@ void MIXER_ApplyMixer(struct Mixer *mixer, volatile s32 *raw, s32 *orig_value)
             //value initially represents 20ths of seconds to cover 60-degrees
             //convert value to represent #msecs to cover 60-degrees (zero->full)
             if (value == 0 || orig_value == NULL) {
-                value = raw[mixer->dest + NUM_INPUTS + 1];
+                value = scaled_value;
                 break;
             }
             value = abs(RANGE_TO_PCT(value)) * 50; //'50' represents 1/20 of a second (1000msec/20 = 50)
             //rate represents the maximum travel per iteration (once per mixer_period)
             s32 rate = CHAN_MAX_VALUE * mixer_period / value;
 
-            value = raw[mixer->dest + NUM_INPUTS + 1];
+            value = scaled_value;
             if (value - *orig_value > rate)
                 value = *orig_value + rate;
             else if(value - *orig_value < -rate)
@@ -364,36 +365,34 @@ void MIXER_ApplyMixer(struct Mixer *mixer, volatile s32 *raw, s32 *orig_value)
 #if HAS_EXTENDED_AUDIO
     case MUX_BEEP:
         if (orig_value) {
-            s32 new_value = raw[mixer->dest + NUM_INPUTS + 1];
-            if (abs(value - new_value) > 100)
+            if (abs(value - scaled_value) > 100)
                 MIXER_SET_BEEP_LOCK(mixer, 0);
             if (! MIXER_BEEP_LOCK(mixer)) {
-                if ((value > *orig_value && value < new_value) ||
-                    (value < *orig_value && value > new_value) ||
-                    (abs(value - new_value) <= 10)) {
+                if ((value > *orig_value && value < scaled_value) ||
+                    (value < *orig_value && value > scaled_value) ||
+                    (abs(value - scaled_value) <= 10)) {
                     MIXER_SET_BEEP_LOCK(mixer, 1);
-                    MUSIC_Play(MUSIC_MAXLEN);
+                    MUSIC_Play(MUSIC_SAVING);
                 }
             }
         }
-        value = raw[mixer->dest + NUM_INPUTS + 1];	// Use input value
+        value = scaled_value;	// Use input value
         break;
     case MUX_VOICE:
         if (orig_value) {
-            s32 new_value = raw[mixer->dest + NUM_INPUTS + 1];
-            if (abs(value - new_value) > 100)
+            if (abs(value - scaled_value) > 100)
                 MIXER_SET_VOICE_LOCK(mixer, 0);
             if (! MIXER_VOICE_LOCK(mixer)) {
-                if ((value > *orig_value && value < new_value) ||
-                    (value < *orig_value && value > new_value) ||
-                    (abs(value - new_value) <= 10)) {
+                if ((value > *orig_value && value < scaled_value) ||
+                    (value < *orig_value && value > scaled_value) ||
+                    (abs(value - scaled_value) <= 10)) {
                     MIXER_SET_VOICE_LOCK(mixer, 1);
                     if (Model.voice.mixer[mixer->dest].music)
                         MUSIC_Play(Model.voice.mixer[mixer->dest].music);
                 }
             }
         }
-        value = raw[mixer->dest + NUM_INPUTS + 1];	// Use input value
+        value = scaled_value;	// Use input value
         break;
 #endif
     case MUX_LAST: break;
@@ -487,7 +486,7 @@ s32 MIXER_GetTrimValue(int i)
     else if (Model.trims[i].step <= TRIM_MAX_VALUE) //Trims are in 1% increments from 100-190
         value = value * (Model.trims[i].step - 90);
     return PCT_TO_RANGE(value);
-        
+
 }
 
 s32 get_trim(unsigned src)
