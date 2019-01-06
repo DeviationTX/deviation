@@ -259,41 +259,36 @@ void MIXER_CreateCyclicOutput(volatile s32 *raw, s32 *cyclic)
     if (Model.swash_invert & SWASH_INV_AILERON_MASK)    aileron    = -aileron;
     if (Model.swash_invert & SWASH_INV_COLLECTIVE_MASK) collective = -collective;
 
-    switch(Model.swash_type) {
-    case SWASH_TYPE_NONE:
-    case SWASH_TYPE_LAST:
+    if ( (Model.swash_type == SWASH_TYPE_NONE) || (Model.swash_type == SWASH_TYPE_LAST) ) {
         cyclic[0] = aileron;
         cyclic[1] = elevator;
         cyclic[2] = collective;
+    }
+    //Normalize for swash setups
+    aileron  = Model.swashmix[0] * aileron / normalize;
+    elevator = Model.swashmix[1] * elevator / normalize;
+    collective = Model.swashmix[2] * collective / normalize;
+
+    switch(Model.swash_type) {
+    case SWASH_TYPE_NONE:
+    case SWASH_TYPE_LAST:
         break;
     case SWASH_TYPE_120:
-        aileron  = Model.swashmix[0] * aileron / normalize;
-        elevator = Model.swashmix[1] * elevator / normalize;
-        collective = Model.swashmix[2] * collective / normalize;
         cyclic[0] = collective - elevator;
         cyclic[1] = collective + elevator/2 + aileron;
         cyclic[2] = collective + elevator/2 - aileron;
         break;
     case SWASH_TYPE_120X:
-        aileron  = Model.swashmix[0] * aileron / normalize;
-        elevator = Model.swashmix[1] * elevator / normalize;
-        collective = Model.swashmix[2] * collective / normalize;
         cyclic[0] = collective - aileron;
         cyclic[1] = collective + aileron/2 + elevator;
         cyclic[2] = collective + aileron/2 - elevator;
         break;
     case SWASH_TYPE_140:
-        aileron  = Model.swashmix[0] * aileron / normalize;
-        elevator = Model.swashmix[1] * elevator / normalize;
-        collective = Model.swashmix[2] * collective / normalize;
         cyclic[0] = collective - elevator;
         cyclic[1] = collective + elevator + aileron;
         cyclic[2] = collective + elevator - aileron;
         break;
     case SWASH_TYPE_90:
-        aileron  = Model.swashmix[0] * aileron / normalize;
-        elevator = Model.swashmix[1] * elevator / normalize;
-        collective = Model.swashmix[2] * collective / normalize;
         cyclic[0] = collective - elevator;
         cyclic[1] = collective + aileron;
         cyclic[2] = collective - aileron;
