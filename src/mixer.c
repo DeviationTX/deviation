@@ -448,6 +448,7 @@ s32 MIXER_ApplyLimits(unsigned channel, struct Limit *limit, volatile s32 *_raw,
     return value;
 }
 
+//Returns the raw trim value (between -100 and 100)
 s8 *MIXER_GetTrim(unsigned i)
 {
     if (Model.trims[i].sw) {
@@ -465,10 +466,12 @@ s32 MIXER_GetTrimValue(int i)
 {
     s32 value = *(MIXER_GetTrim(i));
     //0 to 100 step is 0.1
-    if (Model.trims[i].step < 10)
+    if (Model.trims[i].step < 100) //Trims are in tenths of a percent from 0 - 100
         return PCT_TO_RANGE(value * Model.trims[i].step) / 10;
-    else
-        return PCT_TO_RANGE(value);
+    else if (Model.trims[i].step <= TRIM_MAX_VALUE) //Trims are in 1% increments from 100-190
+        value = value * (Model.trims[i].step - 90);
+    return PCT_TO_RANGE(value);
+        
 }
 
 s32 get_trim(unsigned src)
@@ -772,35 +775,22 @@ unsigned MIXER_UpdateTrim(u32 buttons, unsigned flags, void *data)
 #define START_TONE 1000
     (void)data;
     int i;
-    int orig_step_size = 1;
     int tmp;
     unsigned reach_end = 0; // reach either 100 , 0, or -100
-    if (flags & BUTTON_LONGPRESS) {
-        if (orig_step_size == 1)
-            orig_step_size = 9;
-        else if (orig_step_size == 9)
-            orig_step_size = 10;
-    }
-    if (! orig_step_size)
-        return 1;
+    int orig_step_size = (flags & BUTTON_LONGPRESS)  ? 9 : 1;
     unsigned volume = 10 * Transmitter.volume;
     for (i = 0; i < NUM_TRIMS; i++) {
         int step_size = orig_step_size;
         reach_end = 0;
         int neg_button = CHAN_ButtonIsPressed(buttons, Model.trims[i].neg);
         if (neg_button || CHAN_ButtonIsPressed(buttons, Model.trims[i].pos)) {
-            if (Model.trims[i].step > 190) {
+            if (Model.trims[i].step > TRIM_MAX_VALUE) {
                 _trim_as_switch(flags, i, neg_button);
                 continue;
             }
             if (flags & BUTTON_RELEASE)
                 continue;
             int max = 100;
-            if (Model.trims[i].step >= 100) {
-                step_size = Model.trims[i].step - 90;
-            } else if (Model.trims[i].step > 10) {
-                step_size = step_size * Model.trims[i].step / 10;
-            }
             if (neg_button)
                 step_size = -step_size;
             s8 *value = MIXER_GetTrim(i);
