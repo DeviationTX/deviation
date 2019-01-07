@@ -13,13 +13,20 @@
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "common.h"
-#include "../../common/emu/fltk.h"
+#include "fltk.h"
 #include "mixer.h"
 
 #define SET_INP_THROTTLE() gui.throttle = (value - CHAN_MIN_VALUE) / step
 #define SET_INP_RUDDER()   gui.rudder = (value - CHAN_MIN_VALUE) / step
 #define SET_INP_ELEVATOR() gui.elevator = (value - CHAN_MIN_VALUE) / step
 #define SET_INP_AILERON()  gui.aileron = (value - CHAN_MIN_VALUE) / step
+
+#define SET_INP_AUX2()  gui.aux2 = 1
+#define SET_INP_AUX3()  gui.aux3 = 1
+#define SET_INP_AUX4()  gui.aux4 = 1
+#define SET_INP_AUX5()  gui.aux5 = 1
+#define SET_INP_AUX6()  gui.aux6 = 1
+#define SET_INP_AUX7()  gui.aux7 = 1
 
 #define SET_INP_RUD_DR0()  gui.rud_dr = 0
 #define SET_INP_RUD_DR1()  gui.rud_dr = 1
@@ -51,6 +58,31 @@
 #define SET_INP_SWB0()
 #define SET_INP_SWB1()
 #define SET_INP_SWB2()
+
+#define SET_INP_SWC0()
+#define SET_INP_SWC1()
+#define SET_INP_SWC2()
+
+#define SET_INP_SWD0()
+#define SET_INP_SWD1()
+#define SET_INP_SWD2()
+
+#define SET_INP_SWE0()
+#define SET_INP_SWE1()
+#define SET_INP_SWE2()
+
+#define SET_INP_SWF0()
+#define SET_INP_SWF1()
+#define SET_INP_SWF2()
+
+#define SET_INP_SWG0()
+#define SET_INP_SWG1()
+#define SET_INP_SWG2()
+
+#define SET_INP_SWH0()
+#define SET_INP_SWH1()
+#define SET_INP_SWH2()
+
 
 void TEST_CHAN_SetChannelValue(int channel, s32 value)
 {

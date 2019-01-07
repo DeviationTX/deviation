@@ -10,8 +10,12 @@ env:
       - MAKETARGET=zip_t8sg
       - TARGET=at9
       - MAKETARGET=zip_win_emu_devo8
-      - MAKETARGET=zip_emu_devo8
-      - MAKETARGET=test
+      - MAKETARGET=test_devo8
+      - MAKETARGET=test_devo10
+      - MAKETARGET=test_devo12
+      - MAKETARGET=test_devo7e
+      - MAKETARGET=test_devof12e
+      - MAKETARGET=test_t8sg
 #      - COMPILER=latest TARGET=devo8
 
 # use new docker environment
