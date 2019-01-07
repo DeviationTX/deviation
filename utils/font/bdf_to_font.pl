@@ -68,7 +68,8 @@ sub main {
 
 sub read_filter {
     my($filter_file)= @_;
-
+    my @str;
+    my %chars;
     my @files = glob("$filter_file/lang.*");
     foreach my $file (@files) {
         open(my $fh, '<:raw', $file)
@@ -103,7 +104,7 @@ sub read_filter {
                         my $a = ord($c);
                         if (($a > 256) and ($a != 65279))
                         {
-                            $char{$a} = $c;
+                            %chars{$a} = $c;
                         }
                     }
                 }
@@ -117,7 +118,7 @@ sub read_filter {
         }
     }
 
-    return \%char;
+    return \%chars;
 }
 
 sub read_bdf {
