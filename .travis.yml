@@ -111,10 +111,10 @@ script:
         export MPG123_DIR=$HOME/mpg123-w32;
     fi;
   - make -j2 $MAKETARGET;
-  - if [ $MAKETARGET == test_* ]; then
+  - if [[ $MAKETARGET == test_* ]]; then
         ./test.elf;
     fi;
-    ../utils/archive_build_size.py "$MAKETARGET" || /bin/true;
+  - ../utils/archive_build_size.py "$MAKETARGET" || /bin/true;
 
 after_success:
   - if [ "$TRAVIS_EVENT_TYPE" == "api" ]; then
@@ -140,7 +140,7 @@ after_success:
             ../utils/upload_test_build.pl -skip -nightly "$NIGHTLY_DATE" *.zip;
         fi;
     fi;
-  - if [ $MAKETARGET == test_* ]; then
+  - if [[ $MAKETARGET == test_* ]]; then
       ../utils/coverage-summary.sh;
       coveralls -r . -b . --gcov-options '\-lp' -E '.*/tests/test_.*' -E '.*/objs/';
     fi;
