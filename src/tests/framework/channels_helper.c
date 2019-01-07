@@ -30,12 +30,15 @@
 
 #define SET_INP_RUD_DR0()  gui.rud_dr = 0
 #define SET_INP_RUD_DR1()  gui.rud_dr = 1
+#define SET_INP_RUD_DR1()  gui.rud_dr = 2
 
 #define SET_INP_ELE_DR0()  gui.ele_dr = 0
 #define SET_INP_ELE_DR1()  gui.ele_dr = 1
+#define SET_INP_ELE_DR1()  gui.ele_dr = 2
 
 #define SET_INP_AIL_DR0()  gui.ail_dr = 0
 #define SET_INP_AIL_DR1()  gui.ail_dr = 1
+#define SET_INP_AIL_DR1()  gui.ail_dr = 2
 
 #define SET_INP_GEAR0()  gui.gear = 0
 #define SET_INP_GEAR1()  gui.gear = 1
@@ -82,6 +85,10 @@
 #define SET_INP_SWH0()
 #define SET_INP_SWH1()
 #define SET_INP_SWH2()
+
+#define SET_INP_TRN0()
+#define SET_INP_TRN1()
+
 
 
 void TEST_CHAN_SetChannelValue(int channel, s32 value)
