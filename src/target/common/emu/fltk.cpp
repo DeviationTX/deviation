@@ -536,6 +536,7 @@ void ALARMhandler()
             CLOCK_getms() >= msec_cbtime[MEDIUM_PRIORITY])
             // msecs == msec_cbtime[MEDIUM_PRIORITY])
     {
+        MIXER_CalcChannels();
         priority_ready |= 1 << MEDIUM_PRIORITY;
         msec_cbtime[MEDIUM_PRIORITY] += MEDIUM_PRIORITY_MSEC;
     }
