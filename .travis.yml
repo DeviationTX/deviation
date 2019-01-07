@@ -114,7 +114,6 @@ script:
   - if [ "$MAKETARGET" == "test" ]; then
         ./test.elf;
     fi;
-    ../utils/archive_build_size.py "${MAKETARGET/test_/emu_" || /bin/true;
 
 after_success:
   - if [ "$TRAVIS_EVENT_TYPE" == "api" ]; then
@@ -140,6 +139,7 @@ after_success:
             ../utils/upload_test_build.pl -skip -nightly "$NIGHTLY_DATE" *.zip;
         fi;
     fi;
+  - ../utils/archive_build_size.py "${MAKETARGET/test_/emu_}" || /bin/true;
   - if [ "$MAKETARGET" == "test" ]; then
       ../utils/coverage-summary.sh;
       coveralls -r . -b . --gcov-options '\-lp' -E '.*/tests/test_.*' -E '.*/objs/';
