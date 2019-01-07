@@ -16,9 +16,41 @@
 #include "../common/emu/fltk.h"
 #include "mixer.h"
 
+void TEST_CHAN_SetChannelValue(int channel, s32 value)
+{
+    s32 step = (CHAN_MAX_VALUE - CHAN_MIN_VALUE) / 100;
+    switch(channel) {
+        case INP_THROTTLE: gui.throttle = (value - CHAN_MIN_VALUE) / step; break;
+        case INP_RUDDER:   gui.rudder = (value - CHAN_MIN_VALUE) / step; break;
+        case INP_ELEVATOR: gui.elevator = (value - CHAN_MIN_VALUE) / step; break;
+        case INP_AILERON:  gui.aileron = (value - CHAN_MIN_VALUE) / step; break;
+
+        case INP_RUD_DR0:  gui.rud_dr = 0; break;
+        case INP_RUD_DR1:  gui.rud_dr = 1; break;
+
+        case INP_ELE_DR0:  gui.ele_dr = 0; break;
+        case INP_ELE_DR1:  gui.ele_dr = 1; break;
+
+        case INP_AIL_DR0:  gui.ail_dr = 0; break;
+        case INP_AIL_DR1:  gui.ail_dr = 1; break;
+
+        case INP_GEAR0:  gui.gear = 0; break;
+        case INP_GEAR1:  gui.gear = 1; break;
+
+        case INP_MIX0:  gui.mix = 0; break;
+        case INP_MIX1:  gui.mix = 1; break;
+        case INP_MIX2:  gui.mix = 2; break;
+
+        case INP_FMOD0:  gui.fmod = 0; break;
+        case INP_FMOD1:  gui.fmod = 1; break;
+        case INP_FMOD2:  gui.fmod = 2; break;
+    }
+    return;
+}
+
 s32 CHAN_ReadInput(int channel)
 {
-    s32 step = (CHAN_MAX_VALUE - CHAN_MIN_VALUE) / 10;
+    s32 step = (CHAN_MAX_VALUE - CHAN_MIN_VALUE) / 100;
     switch(channel) {
         case INP_THROTTLE: return CHAN_MIN_VALUE + step * gui.throttle;
         case INP_RUDDER:   return CHAN_MIN_VALUE + step * gui.rudder;

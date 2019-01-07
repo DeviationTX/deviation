@@ -22,6 +22,7 @@ utils/genspeech/*.zip
 #.settings/org.eclipse.cdt.*
 #src/beta-*
 /local/
+coverage/
 
 src/filesystem/
 

@@ -1,31 +1,108 @@
 #include "CuTest.h"
 
+extern void TEST_CHAN_SetChannelValue(int channel, s32 value);
+
 extern struct Transmitter Transmitter;
 extern u8 TEST_Button_InterruptLongPress();
 
+void TestGetAllMixers(CuTest *t)
+{
+    CuAssertPtrEquals(t, MIXER_GetAllMixers(), Model.mixers);
+}
+
+void TestGetAllTrims(CuTest *t)
+{
+    CuAssertPtrEquals(t, MIXER_GetAllTrims(), Model.trims);
+}
+
+void TestEvalMixers(CuTest *t)
+{
+    s32 rawdata[NUM_SOURCES + 1] = {0};
+    memset(Model.mixers, 0, sizeof(Model.mixers));
+    rawdata[1] = 1;
+    for (unsigned i = 0; i < NUM_MIXERS - 1; i++) {
+        Model.mixers[i].src = 1;
+        Model.mixers[i].dest = 2;
+        Model.mixers[i].scalar = 100;
+        Model.mixers[i].flags = MUX_ADD;
+    }
+    MIXER_EvalMixers(rawdata);
+    CuAssertIntEquals(t, NUM_MIXERS -1, rawdata[3 + NUM_INPUTS]);
+}
+
 void TestMixerMapChannel(CuTest *t)
 {
-     unsigned channels[] = {INP_THROTTLE, INP_ELEVATOR, INP_AILERON, INP_RUDDER};
+     unsigned channels[] = {INP_THROTTLE, INP_ELEVATOR, INP_AILERON, INP_RUDDER, 5};
      Transmitter.mode = MODE_1;
      for (unsigned i = 0; i < sizeof(channels) / sizeof(channels[0]); i++) {
-         unsigned expected[] = {INP_THROTTLE, INP_ELEVATOR, INP_AILERON, INP_RUDDER};
+         unsigned expected[] = {INP_THROTTLE, INP_ELEVATOR, INP_AILERON, INP_RUDDER, 5};
          CuAssertIntEquals(t, expected[i], MIXER_MapChannel(channels[i]));
      }
      Transmitter.mode = MODE_2;
      for (unsigned i = 0; i < sizeof(channels) / sizeof(channels[0]); i++) {
-         unsigned expected[] = {INP_ELEVATOR, INP_THROTTLE, INP_AILERON, INP_RUDDER};
+         unsigned expected[] = {INP_ELEVATOR, INP_THROTTLE, INP_AILERON, INP_RUDDER, 5};
          CuAssertIntEquals(t, expected[i], MIXER_MapChannel(channels[i]));
      }
      Transmitter.mode = MODE_3;
      for (unsigned i = 0; i < sizeof(channels) / sizeof(channels[0]); i++) {
-         unsigned expected[] = {INP_THROTTLE, INP_ELEVATOR, INP_RUDDER, INP_AILERON};
+         unsigned expected[] = {INP_THROTTLE, INP_ELEVATOR, INP_RUDDER, INP_AILERON, 5};
          CuAssertIntEquals(t, expected[i], MIXER_MapChannel(channels[i]));
      }
      Transmitter.mode = MODE_4;
      for (unsigned i = 0; i < sizeof(channels) / sizeof(channels[0]); i++) {
-         unsigned expected[] = {INP_ELEVATOR, INP_THROTTLE, INP_RUDDER, INP_AILERON};
+         unsigned expected[] = {INP_ELEVATOR, INP_THROTTLE, INP_RUDDER, INP_AILERON, 5};
          CuAssertIntEquals(t, expected[i], MIXER_MapChannel(channels[i]));
      }
+}
+
+void TestUpdateRawInputs(CuTest *t)
+{
+    memset(&Model, 0, sizeof(Model));
+    memset((s32 *)raw, 0, sizeof(raw));
+    for (int i = 1; i <= NUM_TX_INPUTS; i++) {
+        TEST_CHAN_SetChannelValue(i, (i + 1) * 200);
+        Model.mixers[i].src = i;
+        Model.mixers[i].dest = i;
+        Model.mixers[i].scalar = 100;
+        Model.mixers[i].flags = MUX_REPLACE;
+    }
+    MIXER_UpdateRawInputs();
+    s32 expected[] = {
+       0, 1000, 800, 600, 400, -10000, 10000, -10000, 10000, -10000,
+       10000, -10000, 10000, -10000, -10000, 10000, -10000, -10000, 10000,
+    };
+    for(unsigned i = 0; i < sizeof(raw) / sizeof(raw[0]); i++) {
+        s32 exp = i*sizeof(s32) < sizeof(expected) ? expected[i] : 0;
+        CuAssertIntEquals(t, exp, raw[i]);
+    }
+
+    //PPMin = TRAIN2
+    memset((s32 *)raw, 0, sizeof(raw));
+    Model.num_ppmin = PPM_IN_TRAIN2 << 6;
+    Model.train_sw = INP_GEAR1;
+    raw[Model.train_sw] = 100;
+    for(int i = 0; i < MAX_PPM_IN_CHANNELS; i++) {
+        Model.ppm_map[i] = i;
+        ppmChannels[i] = -100 * i ;
+    }
+    MIXER_UpdateRawInputs();
+    for(unsigned i = 0; i < MAX_PPM_IN_CHANNELS; i++) {
+        CuAssertIntEquals(t, 0, raw[i]);
+    }
+    ppmSync = 1;
+    MIXER_UpdateRawInputs();
+    for(unsigned i = 0; i < MAX_PPM_IN_CHANNELS; i++) {
+        CuAssertIntEquals(t, -100 * i, raw[i]);
+    }
+
+    //PPMin = Source
+    ppmSync = 1;
+    memset((s32 *)raw, 0, sizeof(raw));
+    Model.num_ppmin = (PPM_IN_SOURCE << 6) | MAX_PPM_IN_CHANNELS;
+    MIXER_UpdateRawInputs();
+    for(unsigned i = 0; i < MAX_PPM_IN_CHANNELS; i++) {
+        CuAssertIntEquals(t, -100 * i, raw[1 + NUM_INPUTS + NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS + i]);
+    }
 }
 
 void TestApplyMixerSimple(CuTest *t)

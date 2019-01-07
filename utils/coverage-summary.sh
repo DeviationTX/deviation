@@ -12,7 +12,10 @@
 # the COPYING file in the top-level directory.
 
 # first generate the coverage report
-gcovr -r . --object-directory objs/test/ -e '.*tests/test_.*' -e '.*AllTests.c' -e '.*target/test/CuTest.c' -p -o raw-report.txt
+rm -rf coverage/ 2> /dev/null
+mkdir coverage
+gcovr -k -r . --object-directory objs/test/ -e '.*tests/test_.*' -e '.*AllTests.c' -e '.*target/test/CuTest.c' -p --html --html-details -o coverage/coverage.html
+gcovr -g -r . --object-directory objs/test/ -e '.*tests/test_.*' -e '.*AllTests.c' -e '.*target/test/CuTest.c' -p -o raw-report.txt
 
 # strip the full-path and line markers
 sed s/objs/test\/ raw-report.txt | sed s/[0-9]\*[,-]//g > simplified.txt
