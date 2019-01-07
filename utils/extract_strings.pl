@@ -226,7 +226,7 @@ foreach my $file (@files) {
 
         foreach(sort{$a <=> $b} keys %hashvalues)
         {
-            print $fh pack("S<", $_);
+            print $fh pack("CC", $_ & 0xFF, $_ >> 8);
             print $fh "$hashvalues{$_}\n";
         }
         close $fh;
