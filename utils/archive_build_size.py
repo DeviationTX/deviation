@@ -82,6 +82,10 @@ def get_status(url, context):
     for status in data:
         if status['context'] == context:
             return status['description']
+    for status in data:
+        # Legacy support
+        if status['context'] == "image_size/" + context:
+            return status['description']
     return None
 
 
@@ -97,7 +101,7 @@ def get_pr_info(slug, pull_number):
 
 def get_context(filename):
     """Define status context"""
-    return "image_size/" + filename
+    return filename
 
 
 def get_base_size(filename):
@@ -123,17 +127,18 @@ def format_description(current_size, previous_size):
         rom_delta = current_size.rom - previous_size.rom
         ram_delta = current_size.ram - previous_size.ram
         return (
-            u'ROM: {:,.0f}b \u0394: {:+,.0f}b/{:+0.2f}% '
-            u'RAM: {:,.0f}b \u0394: {:+,.0f}b/{:+0.2f}%'.format(
+            u'ROM: {:,.0f} \u0394: {:+,.0f}b/{:+0.2f}% '
+            u'RAM: {:,.0f} \u0394: {:+,.0f}b/{:+0.2f}%'.format(
                 current_size.rom, rom_delta, 100.0 * rom_delta /  current_size.rom,
                 current_size.ram, ram_delta, 100.0 * ram_delta /  current_size.ram))
 
-    return 'ROM: {:,.0f}b RAM: {:,.0f}b'.format(current_size.rom, current_size.ram)
+    return 'ROM: {:,.0f} RAM: {:,.0f}'.format(current_size.rom, current_size.ram)
 
 
 def parse_description(description):
     """Parse size info from existsing status"""
-    match = re.search(r'ROM:\s*([0-9,]+)b.*\sRAM:\s*([0-9,]+)b', description)
+      
+    match = re.search(r'ROM:\s*([0-9,]+).*\sRAM:\s*([0-9,]+)', description)
     assert match, 'Unable to parse "%s"' % description
     rom_size = int(match.group(1).replace(',', ''))
     ram_size = int(match.group(2).replace(',', ''))
