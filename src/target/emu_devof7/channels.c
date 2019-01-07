@@ -25,7 +25,7 @@
 
 s32 CHAN_ReadInput(int channel)
 {
-    s32 step = (CHAN_MAX_VALUE - CHAN_MIN_VALUE) / 10;
+    s32 step = (CHAN_MAX_VALUE - CHAN_MIN_VALUE) / 100;
     switch(channel) {
         case INP_THROTTLE: return CHAN_MIN_VALUE + step * gui.throttle;
         case INP_RUDDER:   return CHAN_MIN_VALUE + step * gui.rudder;

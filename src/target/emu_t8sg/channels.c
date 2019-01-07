@@ -72,7 +72,7 @@
 
 s32 CHAN_ReadInput(int channel)
 {
-    s32 step = (CHAN_MAX_VALUE - CHAN_MIN_VALUE) / 10;
+    s32 step = (CHAN_MAX_VALUE - CHAN_MIN_VALUE) / 100;
     if ((~Transmitter.ignore_src & SWITCH_STOCK) == SWITCH_STOCK) {
       switch(channel) {
         case INP_HOLD0: return (gui.gear % 2) ? CHAN_MIN_VALUE : CHAN_MAX_VALUE;
