@@ -24,6 +24,7 @@ emus: $(EMUS)
 both: txs emus
 fss: $(TXS:%=fs_%)
 zips: $(TXS:%=zip_%)
+tests: $(TXS:%=test_%)
 emuzips: $(EMUS:%=zip_%)
 winzips: $(EMUS:%=zip_win_%)
 everything: txs emus fss
@@ -45,6 +46,8 @@ ifneq "$(INCLUDE_FS)" "1"
 	+$(MAKE) TARGET=$1 fs
 endif
 both_$1: $1 emu_$1
+test_$1:
+	+$(MAKE) TARGET=emu_$1 test
 zip_$1:
 	+$(MAKE) TARGET=$1 zip
 zip_win_$1:
@@ -104,6 +107,7 @@ DUMP ?= objdump
 ############################################
 SRC_C    +=  $(wildcard *.c) $(wildcard screen/*.c) $(wildcard screen/$(SCREENSIZE)/*.c) \
              $(wildcard gui/*.c) $(wildcard pages/$(SCREENSIZE)/*.c) $(wildcard config/*.c)
+TEST_C   += tests/AllTests.c $(wildcard tests/framework/*.c)
 
 ifdef MODULAR
    SRC_C    += protocol/protocol.c
@@ -118,6 +122,7 @@ SRC_C    := $(SRC_C) $(wildcard pages/$(SCREENSIZE)/advanced/*.c)
 SRC_S    := $(SRC_S) $(wildcard *.s)
 SRC_CXX  := $(SRC_CXX) $(wildcard *.cpp)
 SRCS     := $(SRC_C) $(SRC_CXX) $(SRC_S)
+TESTS    := $(TEST_C) $(TEST_CXX) $(TEST_S)
 ############################################
 #END SECTION                               #
 ############################################
@@ -128,6 +133,7 @@ SRCS     := $(SRC_C) $(SRC_CXX) $(SRC_S)
 ############################################
 ODIR     = objs/$(TARGET)$(ODIREXT)
 OBJS 	 = $(addprefix $(ODIR)/, $(notdir $(SRC_C:.c=.o) $(SRC_S:.s=.o) $(SRC_CXX:.cpp=.o)))
+TESTOBJS = $(addprefix $(ODIR)/, $(notdir $(TEST_C:.c=.o) $(TEST_S:.s=.o) $(TEST_CXX:.cpp=.o)))
 
 ifdef MODULAR
 PROTO_OBJS  := $(addprefix $(ODIR)/, $(notdir $(PROTO_SRC_C:.c=.o)))
@@ -157,6 +163,7 @@ HGTEST := $(shell mkdir -p $(ODIR); \
 ifeq "$(TYPE)" "dev"
   CFLAGS   := $(CFLAGS) -g -DBUILDTYPE_DEV
 endif
+
 ifdef MODULAR
 EXTRA_CFLAGS   :=  -DMODULAR=$(MODULAR)
 CFLAGS   +=  -DENABLE_MODULAR=$(MODULAR)
@@ -220,6 +227,10 @@ distclean:
 language:
 	../utils/extract_strings.pl -update
 
+test: CFLAGS += -DTEST=1 -I./tests/framework -coverage -g -O0 -fPIC
+test: tests/AllTests.c $(TARGET)_test.$(EXEEXT)
+	@echo Execute tests
+	./$(TARGET)_test.$(EXEEXT)
 
 zip: $(TARGET).zip
 
@@ -260,6 +271,7 @@ coverity:
 #Ensure necessary directories are created#
 ##########################################
 $(OBJS): | $(ODIR)
+$(TESTOBJS): | $(ODIR)
 
 $(ODIR):
 	@mkdir -p $@
@@ -279,6 +291,17 @@ ifeq ("$(SRC_CXX)", " ")
 	$(CC) -o $@ $(OBJS) $(LIBOPENCM3) $(LFLAGS) $(LFLAGS2) $(CFLAGS)
 else
 	$(CXX) -o $@ $(OBJS) $(LIBOPENCM3) $(LFLAGS) $(LFLAGS2) $(CFLAGS)
+endif
+
+######################
+#The main executable #
+######################
+$(TARGET)_test.$(EXEEXT): $(LINKFILE) $(OBJS) $(LIBOPENCM3) $(TESTOBJS)
+	@echo " + Building '$@'"
+ifeq ("$(SRC_CXX)", " ")
+	$(CC) -o $@ $(OBJS) $(TESTOBJS) $(LIBOPENCM3) $(LFLAGS) $(LFLAGS2) $(CFLAGS)
+else
+	$(CXX) -o $@ $(OBJS) $(TESTOBJS) $(LIBOPENCM3) $(LFLAGS) $(LFLAGS2) $(CFLAGS)
 endif
 
 #################
@@ -344,6 +367,7 @@ filesystem/$(FILESYSTEM)/media/04b03.fon: fonts/04b03.bdf
 ## The autodependency magic below was adapeted from:
 ## http://mad-scientist.net/make/autodep.html
 -include $(OBJS:.o=.P)
+-include $(TESTOBJS:.o=.P)
 -include $(PROTO_OBJS:.o=.P)
 -include $(PROTO_EXTRA_OBJS:.o_=.P)
 
@@ -375,7 +399,7 @@ $(ODIR)/%.o_: $(1)%.c $(LIBOPENCM3)
             rm -f $(ODIR)/$$*.d
 
 endef
-$(foreach directory,$(sort $(dir $(SRCS) $(PROTO_EXTRA_C))),$(eval $(call define_compile_rules,$(directory))))
+$(foreach directory,$(sort $(dir $(SRCS) $(PROTO_EXTRA_C) $(TESTS))),$(eval $(call define_compile_rules,$(directory))))
 
 ##############################
 #Ensure version is up to date#
@@ -391,3 +415,6 @@ include target/$(TARGET)/Makefile.inc
 ifdef MODULAR
 include protocol/Makefile.inc
 endif
+
+tests/AllTests.c: $(SDIR)/tests/make-tests.sh $(SDIR)/tests/*.c
+	sh tests/make-tests.sh > tests/AllTests.c
