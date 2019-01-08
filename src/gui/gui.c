@@ -15,7 +15,7 @@
 #include "common.h"
 #define ENABLE_GUIOBJECT
 #include "gui.h"
-#include "target_defs.h"
+#include "target.h"
 #include "config/display.h"
 #include "_mapped_gfx.h"
 

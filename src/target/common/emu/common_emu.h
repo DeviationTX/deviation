@@ -1,6 +1,10 @@
 #ifndef _COMMON_EMU_H_
 #define _COMMON_EMU_H_
 
+#ifndef _TARGET_H_
+#error "Don't include target_defs.h directly, include target.h instead."
+#endif
+
 //FAT is unused for the emulator
 #if EMULATOR == USE_NATIVE_FS
     #define FATSTRUCT_SIZE 1

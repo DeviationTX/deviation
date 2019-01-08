@@ -53,7 +53,7 @@ static int size_cb(int absrow, void *data)
 {
     (void)data;
     switch(absrow) {
-#ifndef NO_LANGUAGE_SUPPORT
+#if SUPPORT_MULTI_LANGUAGE
         case ITEM_LANG:
 #else
         case ITEM_MODE:
@@ -89,7 +89,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     u8 x = LARGE_SEL_X_OFFSET;
 
     switch(absrow) {
-#ifndef NO_LANGUAGE_SUPPORT
+#if SUPPORT_MULTI_LANGUAGE
         case ITEM_LANG:
             title = _tr_noop("Generic settings");
             label = _tr_noop("Language");
@@ -97,7 +97,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             break;
 #endif
         case ITEM_MODE:
-#ifdef NO_LANGUAGE_SUPPORT
+#if !SUPPORT_MULTI_LANGUAGE
             title = _tr_noop("Generic settings");
 #endif
             label = _tr_noop("Stick mode");
@@ -148,7 +148,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             label = _tr_noop("Backlight");
             value = backlight_select_cb; x = SMALL_SEL_X_OFFSET;
             break;
-#endif 
+#endif
         case ITEM_CONTRAST:
 #ifdef HAS_OLED_DISPLAY
             title = _tr_noop("LCD settings");

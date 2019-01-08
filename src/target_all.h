@@ -1,0 +1,3 @@
+#ifndef SUPPORT_MULTI_LANGUAGE
+#define SUPPORT_MULTI_LANGUAGE 1
+#endif
