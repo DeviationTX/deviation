@@ -246,7 +246,10 @@ static enum {
   PXX_BIND_DONE = 50,
 #endif
   PXX_DATA1,
+  PXX_DATA2,
 } state;
+
+static u16 mixer_runtime;
 
 MODULE_CALLTYPE
 static u16 pxxout_cb()
@@ -254,24 +257,24 @@ static u16 pxxout_cb()
     switch (state) {
     default: // binding
         build_data_pkt(1);
+        PXX_Enable(packet);
         state++;
-        break;
+        return 9000;
     case PXX_BIND_DONE:
         PROTOCOL_SetBindState(0);
         state++;
         // intentional fall-through
     case PXX_DATA1:
+        CLOCK_RunMixer();    // clears mixer_sync, which is then set when mixer update complete
+        state = PXX_DATA2;
+        return mixer_runtime;
+    case PXX_DATA2:
+        if (mixer_sync != MIX_DONE && mixer_runtime < 2000) mixer_runtime += 50;
         build_data_pkt(0);
-        break;
+        PXX_Enable(packet);
+        state = PXX_DATA1;
+        return 9000 - mixer_runtime;
     }
-
-    PXX_Enable(packet);   // send PXX bitstream using timer1
-
-#ifdef EMULATOR
-    return 300;
-#else
-    return 9000;
-#endif
 }
 
 #if HAS_EXTENDED_TELEMETRY
@@ -306,6 +309,7 @@ static void initialize(u8 bind)
     chan_offset = 0;
     FS_flag = 0;
     packet[0] = (u8) Model.fixed_id & 0x3f;  // limit to valid range - 6 bits
+    mixer_runtime = 50;
 
     if (bind) {
         state = PXX_BIND;
