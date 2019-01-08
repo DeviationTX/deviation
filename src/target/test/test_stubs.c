@@ -17,21 +17,10 @@
 #include "config/tx.h"
 #include "emu.h"
 
-#ifdef LCD_EMU_LOWLEVEL
-#define LCD_Init EMULCD_Init
-#endif
-
 void start_event_loop()
 {
 }
 
-void set_stick_positions()
-{
-}
-
-void LCD_Init()
-{
-}
 
 struct touch SPITouch_GetCoords()
 {
@@ -42,25 +31,6 @@ struct touch SPITouch_GetCoords()
 int SPITouch_IRQ()
 {
     return 0;
-}
-
-void LCD_DrawStart(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, enum DrawDir dir)
-{
-    (void)x0;
-    (void)y0;
-    (void)x1;
-    (void)y1;
-    (void)dir;
-}
-
-void LCD_DrawStop(void) {
-}
-
-void LCD_DrawPixelXY(unsigned int x, unsigned int y, unsigned int color)
-{
-    (void)x;
-    (void)y;
-    (void)color;
 }
 
 u32 ScanButtons()
@@ -123,10 +93,6 @@ void PWR_Sleep()
 {
 }
 
-void LCD_ForceUpdate()
-{
-}
-
 void _usleep(u32 usec) {
     usleep(usec);
 }
@@ -154,15 +120,7 @@ unsigned  PWR_ReadVoltage() { return (DEFAULT_BATTERY_ALARM + 1000); }
 void CHAN_Init() {}
 
 void CLOCK_StartWatchdog() {}
-void CLOCK_ResetWatchdog() {
-    //This isn't an intuitive placeeeeeto initializethe sticks
-    //But it needs to be done after reading the config fies
-    //And this is the easiest place I could find.
-    if(gui.init) {
-        gui.init = 0;
-        set_stick_positions();
-    }
-}
+void CLOCK_ResetWatchdog() {}
 
 u32  SPIFlash_ReadID() { return 0x12345678; }
 void SPI_FlashBlockWriteEnable(unsigned enable) {(void)enable;}
