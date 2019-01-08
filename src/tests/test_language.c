@@ -12,11 +12,13 @@ void TestLanguage(CuTest *t)
 
     // loc string is not equals to input
     CONFIG_ReadLang(1);
+    CuAssertIntEquals(t, 1, Transmitter.language);
     CuAssertTrue(t, strcmp(_tr(input), input) != 0);
     loc = _tr(input);
 
     // After switch language, the text should be different
     CONFIG_ReadLang(2);
+    CuAssertIntEquals(t, 2, Transmitter.language);
     CuAssertTrue(t, strcmp(_tr(input), loc) != 0);
 
 	CuAssertStrEquals(t, "ok1", _tr("ok1"));
