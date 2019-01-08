@@ -10,6 +10,7 @@
 
 //Load target-specific include
 #include "target_defs.h"
+#include "target_all.h"
 
 /* List of channels provided by the Tx */
 #define CHANDEF(x) INP_##x,

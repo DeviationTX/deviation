@@ -26,7 +26,7 @@
    defined as extern char tempstring[TEMPSTRINGLENGTH] in common.h */
 char tempstring[TEMPSTRINGLENGTH];
 
-#ifdef NO_LANGUAGE_SUPPORT
+#if !SUPPORT_MULTI_LANGUAGE
 int CONFIG_IniParse(const char* filename,
          int (*handler)(void*, const char*, const char*, const char*),
          void* user)
@@ -259,7 +259,7 @@ int CONFIG_IniParse(const char* filename,
          void* user)
 {
     u16 tmpval = table_size;
-    table_size = 0; //Disable Language parsing;
+    table_size = 0; //Disable Language parsing
     int result = ini_parse(filename, handler, user);
     table_size = tmpval;
     return result;

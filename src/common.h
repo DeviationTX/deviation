@@ -47,7 +47,7 @@ extern const char DeviationVersion[33];
 
 /* Temproary definition until we have real translation */
 #define _tr_noop(x) x
-#ifdef NO_LANGUAGE_SUPPORT
+#if !SUPPORT_MULTI_LANGUAGE
 #define _tr(x) x
 #else
 const char *_tr(const char *str);

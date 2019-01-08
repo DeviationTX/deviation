@@ -14,7 +14,7 @@
 */
 
 #include "common.h"
-#include "target_defs.h"
+#include "target.h"
 #include "config/model.h"
 
 #include <stdio.h>

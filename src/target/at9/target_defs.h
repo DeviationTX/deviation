@@ -16,7 +16,7 @@
 #endif
 
 #define DISABLE_PWM 1                 //FIXME
-#define NO_LANGUAGE_SUPPORT 1
+#define SUPPORT_MULTI_LANGUAGE 0
 
 #ifndef FATSTRUCT_SIZE
     #if defined USE_DEVOFS && USE_DEVOFS == 1
