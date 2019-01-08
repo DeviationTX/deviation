@@ -296,5 +296,5 @@ void LCD_SetFontColor(u16 color) {
     cur_str.color = color;
 }
 
-#define TESTNAME string
+#define TESTNAME drawtext
 #include "tests.h"

@@ -15,6 +15,7 @@ void TestLabel(CuTest* t)
 {
     guiLabel_t label;
     InitializeFont();
+    LCD_Clear(0);
 
     GUI_CreateLabelBox(&label, 10, 10, LCD_WIDTH, 15, &DEFAULT_FONT,
         NULL, NULL, "TestLabel");

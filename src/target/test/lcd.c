@@ -27,11 +27,16 @@ void LCD_Init()
 
 void LCD_DrawStart(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, enum DrawDir dir)
 {
-    (void)x0;
-    (void)y0;
-    (void)x1;
-    (void)y1;
-    (void)dir;
+    if (dir == DRAW_SWNE) {
+        gui.y = y1;  // bug fix: must do it this way to draw bmp
+        gui.dir = -1;
+    } else {
+        gui.y = y0;
+        gui.dir = 1;
+    }
+    gui.xstart = x0;
+    gui.xend = x1;
+    gui.x = x0;
 }
 
 void LCD_DrawStop(void) {
