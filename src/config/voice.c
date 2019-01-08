@@ -48,7 +48,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
 
 #if HAS_MUSIC_CONFIG
     if ( (*req_id != MAX_VOICEMAP_ENTRIES) && (*req_id == id) ) {
-        strlcpy(voicelabel,getfield(tmp, 1), MAX_VOICE_LABEL);
+        strlcpy(tempstring,getfield(tmp, 1), MAX_VOICE_LABEL);
         return 1;
     }
 #endif
