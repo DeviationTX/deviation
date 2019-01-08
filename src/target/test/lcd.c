@@ -16,6 +16,40 @@
 #include "common.h"
 #include "emu.h"
 
+void LCD_Init()
+{
+    memset(gui.image, 0xf0, sizeof(gui.image));
+    gui.x = 0;
+    gui.y = 10;
+    gui.xstart = 100;
+    gui.xend = 47;
+}
+
+void LCD_DrawStart(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, enum DrawDir dir)
+{
+    if (dir == DRAW_SWNE) {
+        gui.y = y1;  // bug fix: must do it this way to draw bmp
+        gui.dir = -1;
+    } else {
+        gui.y = y0;
+        gui.dir = 1;
+    }
+    gui.xstart = x0;
+    gui.xend = x1;
+    gui.x = x0;
+}
+
+void LCD_DrawStop(void) {
+}
+
+void LCD_DrawPixelXY(unsigned int x, unsigned int y, unsigned int color)
+{
+    gui.xstart = x;
+    gui.x = x;
+    gui.y = y;
+    LCD_DrawPixel(color);
+}
+
 void LCD_DrawPixel(unsigned int color)
 {
 	if (gui.x < LCD_WIDTH && gui.y < LCD_HEIGHT) {	// both are unsigned, can not be < 0
@@ -33,4 +67,8 @@ void LCD_DrawPixel(unsigned int color)
         gui.x = gui.xstart;
         gui.y += gui.dir;
     }
+}
+
+void LCD_ForceUpdate()
+{
 }

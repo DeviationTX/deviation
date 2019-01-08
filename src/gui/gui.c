@@ -840,3 +840,6 @@ int GUI_InTouch()
     return in_touch;
 }
 #endif
+
+#define TESTNAME gui
+#include "tests.h"
