@@ -1,6 +1,6 @@
 #include "CuTest.h"
 
-void TestModelLoadSave(CuTest *t)
+void TestLanguage(CuTest *t)
 {
 	static const char input[] = "Configure";
 	const char *loc;
@@ -18,4 +18,31 @@ void TestModelLoadSave(CuTest *t)
     // After switch language, the text should be different
     CONFIG_ReadLang(2);
     CuAssertTrue(t, strcmp(_tr(input), loc) != 0);
+
+	CuAssertStrEquals(t, "ok1", _tr("ok1"));
+}
+
+void TestV1Language(CuTest *t)
+{
+	const char name[] = "language/lang.tst";
+	FILE *fh;
+	fh = fopen(name, "w");
+	fprintf(fh,
+		"Test\n"
+		":test\n"
+		"abcd\n"
+		":ok\n"
+		"ko\n");
+	fclose(fh);
+
+	ReadLang(name);
+#if SUPPORT_LANG_V1
+	CuAssertTrue(t, table_size > 0);
+	CuAssertTrue(t, lookupmap[0].hash < lookupmap[1].hash);
+	CuAssertStrEquals(t, "abcd", _tr("test"));
+	CuAssertStrEquals(t, "ko", _tr("ok"));
+	CuAssertStrEquals(t, "ok1", _tr("ok1"));
+#else
+	CuAssertTrue(t, table_size == 0);
+#endif
 }

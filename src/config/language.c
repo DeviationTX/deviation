@@ -106,7 +106,7 @@ static unsigned fix_crlf(char *str)
 }
 
 #if SUPPORT_LANG_V1
-static void CONFIG_ReadLangV1(FILE* fh)
+static void ReadLangV1(FILE* fh)
 {
     struct str_map *lookup = lookupmap;
     unsigned pos = 0;
@@ -157,7 +157,7 @@ static void CONFIG_ReadLangV1(FILE* fh)
 }
 #endif
 
-static void CONFIG_ReadLangV2(FILE* fh)
+static void ReadLangV2(FILE* fh)
 {
     u16 hash;
     unsigned pos = 0;
@@ -189,6 +189,37 @@ static void CONFIG_ReadLangV2(FILE* fh)
     table_size = lookup - lookupmap;
 }
 
+static int ReadLang(const char *file)
+{
+    FILE *fh = fopen(file, "r");
+    if (! fh) {
+        printf("Couldn't open language file: %s\n", file);
+        return 0;
+    }
+
+    // first line of langauge name, ignore it
+    fgets(tempstring, sizeof(tempstring), fh);
+
+#if SUPPORT_LANG_V1
+    // Try to detect the version
+    if (fread(tempstring, 1, 1, fh) == 1)
+    {
+        // move file cursor 1 byte back
+        fseek(fh, -1, SEEK_CUR);
+        // check the value of the next character to detect version
+        if (tempstring[0] == ':')
+            ReadLangV1(fh);
+        else
+            ReadLangV2(fh);
+    }
+#else
+    CONFIG_ReadLangV2(fh);
+#endif
+
+    fclose(fh);
+    return 1;
+}
+
 void CONFIG_ReadLang(u8 idx)
 {
     u8 cnt = 0;
@@ -214,33 +245,9 @@ void CONFIG_ReadLang(u8 idx)
     FS_CloseDir();
     if(cnt != idx)
         return;
-    FILE *fh = fopen(file, "r");
-    if (! fh) {
-        printf("Couldn't open language file: %s\n", file);
-        return;
-    }
 
-    // first line of langauge name, ignore it
-    fgets(tempstring, sizeof(tempstring), fh);
-
-#if SUPPORT_LANG_V1
-    // Try to detect the version
-    if (fread(tempstring, 1, 1, fh) == 1)
-    {
-        // move file cursor 1 byte back
-        fseek(fh, -1, SEEK_CUR);
-        // check the value of the next character to detect version
-        if (tempstring[0] == ':')
-            CONFIG_ReadLangV1(fh);
-        else
-            CONFIG_ReadLangV2(fh);
-    }
-#else
-    CONFIG_ReadLangV2(fh);
-#endif
-
-    fclose(fh);
-    Transmitter.language = idx;
+    if (ReadLang(file))
+        Transmitter.language = idx;
 }
 
 void CONFIG_EnableLanguage(int state)
