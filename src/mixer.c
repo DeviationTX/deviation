@@ -168,17 +168,17 @@ int MIXER_GetCachedInputs(s32 *cache, unsigned threshold)
     return changed;
 }
 
-void MIXER_CalcChannels()
+void MIXER_CalcChannels(unsigned num_channels)
 {
     //We retain this array so that we can refer to the prevous values in the next iteration
-    int i;
+    unsigned i;
     //1st step: Read Tx inputs
     MIXER_UpdateRawInputs();
     //3rd steps
     MIXER_EvalMixers(raw);
 
     //4th step: apply auto-templates
-    for (i = 0; i < NUM_OUT_CHANNELS; i++) {
+    for (i = 0; i < num_channels; i++) {
         switch(Model.templates[i]) {
             case MIXERTEMPLATE_CYC1:
             case MIXERTEMPLATE_CYC2:
@@ -189,7 +189,7 @@ void MIXER_CalcChannels()
         }
     }
     //5th step: apply limits
-    for (i = 0; i < NUM_OUT_CHANNELS; i++) {
+    for (i = 0; i < num_channels; i++) {
         Channels[i] = MIXER_GetChannel(i, APPLY_ALL);
     }
 }

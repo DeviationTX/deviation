@@ -195,7 +195,7 @@ static void press_cb(guiObject_t *obj, s8 press_type, const void *data)
             CONFIG_SaveTxIfNeeded();  //Save here to ensure in case of crash we restart on the right model
             /* Need to recalculate channels to see if we're in a safe state */
             MIXER_Init();
-            MIXER_CalcChannels();
+            MIXER_CalcChannels(NUM_OUT_CHANNELS);
             PROTOCOL_Init(0);
         }
     } else if (mp->menu_type == SAVE_MODEL) {

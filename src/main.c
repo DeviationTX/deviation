@@ -206,7 +206,7 @@ void medium_priority_cb()
 #ifdef TIMING_DEBUG
     debug_timing(3, 0);
 #endif
-    MIXER_CalcChannels();
+    MIXER_CalcChannels(Model.num_channels);
 #ifdef TIMING_DEBUG
     debug_timing(3, 1);
 #endif

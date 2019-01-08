@@ -99,7 +99,7 @@ void LCD_DrawUSBLogo(int lcd_width, int lcd_height);
 /* Music */
 
 /* Mixer functions */
-void MIXER_CalcChannels();
+void MIXER_CalcChannels(unsigned num_out_channels);
 
 /* GUI Pages */
 void PAGE_Init();
