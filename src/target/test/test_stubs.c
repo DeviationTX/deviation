@@ -121,6 +121,9 @@ void CHAN_Init() {}
 
 void CLOCK_StartWatchdog() {}
 void CLOCK_ResetWatchdog() {}
+void CLOCK_RunMixer() {}
+void CLOCK_StartMixer() {}
+volatile mixsync_t mixer_sync;
 
 u32  SPIFlash_ReadID() { return 0x12345678; }
 void SPI_FlashBlockWriteEnable(unsigned enable) {(void)enable;}

@@ -89,8 +89,8 @@ static enum {
   FRSKY_DATA2,
   FRSKY_DATA3,
   FRSKY_DATA4,
-  FRSKY_DATA5
-} state;
+  FRSKY_DATAM
+} state, datam_state;
 
 static u16 fixed_id;
 static u8 packet[MAX_PACKET_SIZE];
@@ -702,6 +702,7 @@ static const u8 telem_test[][17] = {
 #endif
 
 
+static u16 mixer_runtime;
 static u16 frskyx_cb() {
   u8 len;
 
@@ -725,6 +726,7 @@ static u16 frskyx_cb() {
       channr = 0;
       state++;
       break;
+
     case FRSKY_DATA1:
       if (fine != (s8)Model.proto_opts[PROTO_OPTS_FREQFINE]) {
           fine = (s8)Model.proto_opts[PROTO_OPTS_FREQFINE];
@@ -734,6 +736,7 @@ static u16 frskyx_cb() {
       set_start(channr);
       CC2500_SetPower(Model.tx_power);
       CC2500_Strobe(CC2500_SFRX);
+      if (mixer_sync != MIX_DONE && mixer_runtime < 2000) mixer_runtime += 50;
       frskyX_data_frame();
       CC2500_Strobe(CC2500_SIDLE);
       CC2500_WriteData(packet, packet[0]+1);
@@ -755,12 +758,29 @@ static u16 frskyx_cb() {
 #endif
     case FRSKY_DATA3:
       CC2500_Strobe(CC2500_SRX);
-      state++;
 #ifndef EMULATOR
-      return 3100;
+      if (mixer_runtime <= 500) {
+          state = FRSKY_DATA4;
+          return 3100;
+      } else {
+          state = FRSKY_DATAM;
+          datam_state = FRSKY_DATA4;
+          return 3100 - mixer_runtime;
+      }
 #else
+      state = FRSKY_DATA4;
       return 31;
 #endif
+
+    case FRSKY_DATAM:
+      state = datam_state;
+#ifndef EMULATOR
+      CLOCK_RunMixer();
+      return mixer_runtime;
+#else
+      return 5;
+#endif
+
     case FRSKY_DATA4:
       len = CC2500_ReadReg(CC2500_3B_RXBYTES | CC2500_READ_BURST) & 0x7F;
 #ifndef EMULATOR
@@ -779,6 +799,7 @@ static u16 frskyx_cb() {
       if (seq_tx_send != 8) seq_tx_send = (seq_tx_send + 1) % 4;
       state = FRSKY_DATA1;
 #ifndef EMULATOR
+      if (mixer_runtime <= 500) CLOCK_RunMixer();
       return 500;
 #else
       return 5;
@@ -883,6 +904,7 @@ static int get_tx_id()
 static void initialize(int bind)
 {
     CLOCK_StopTimer();
+    mixer_runtime = 50;
 
     // initialize statics since 7e modules don't initialize
     fine = Model.proto_opts[PROTO_OPTS_FREQFINE];

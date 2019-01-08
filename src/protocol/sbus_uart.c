@@ -32,8 +32,18 @@
   const unsigned long protocol_type = (unsigned long)&_data_loadaddr;
 #endif
 
+static const char * const sbus_opts[] = {
+  _tr_noop("Period (ms)"),  "6", "14", NULL,
+  NULL
+};
+enum {
+    PROTO_OPTS_PERIOD,
+    LAST_PROTO_OPT,
+};
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
+
 #define SBUS_DATARATE             100000
-#define SBUS_FRAME_PERIOD         14000   // 14ms
+#define SBUS_FRAME_PERIOD_MAX     14000   // 14ms
 #define SBUS_CHANNELS             16
 #define SBUS_PACKET_SIZE          25
 
@@ -84,12 +94,32 @@ static void build_rcdata_pkt()
 
 // static u8 testrxframe[] = { 0x00, 0x0C, 0x14, 0x00, 0x00, 0x00, 0x00, 0xFF, 0x01, 0x03, 0x00, 0x00, 0x00, 0xF4 };
 
+static enum {
+    ST_DATA1,
+    ST_DATA2,
+} state;
+
+static u16 mixer_runtime;
+static u16 sbus_period;
 static u16 serial_cb()
 {
-    build_rcdata_pkt();
-    UART_Send(packet, sizeof packet);
+    if (sbus_period != Model.proto_opts[PROTO_OPTS_PERIOD] * 1000)
+        sbus_period = Model.proto_opts[PROTO_OPTS_PERIOD] * 1000;
 
-    return SBUS_FRAME_PERIOD;
+    switch (state) {
+    case ST_DATA1:
+        CLOCK_RunMixer();    // clears mixer_sync, which is then set when mixer update complete
+        state = ST_DATA2;
+        return mixer_runtime;
+
+    case ST_DATA2:
+        if (mixer_sync != MIX_DONE && mixer_runtime < 2000) mixer_runtime += 50;
+        build_rcdata_pkt();
+        UART_Send(packet, sizeof packet);
+        state = ST_DATA1;
+        return sbus_period - mixer_runtime;
+    }
+    return sbus_period;   // avoid compiler warning
 }
 
 static void initialize()
@@ -108,6 +138,9 @@ static void initialize()
     UART_Initialize();
     UART_SetDataRate(SBUS_DATARATE);
 	UART_SetFormat(8, UART_PARITY_EVEN, UART_STOPBITS_2);
+    state = ST_DATA1;
+    mixer_runtime = 50;
+    sbus_period = Model.proto_opts[PROTO_OPTS_PERIOD] ? (Model.proto_opts[PROTO_OPTS_PERIOD] * 1000) : SBUS_FRAME_PERIOD_MAX;
 
     CLOCK_StartTimer(1000, serial_cb);
 }
@@ -123,6 +156,10 @@ const void * SBUS_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
 	case PROTOCMD_CHANNELMAP: return UNCHG;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
+        case PROTOCMD_GETOPTIONS:
+            if (!Model.proto_opts[PROTO_OPTS_PERIOD])
+                Model.proto_opts[PROTO_OPTS_PERIOD] = SBUS_FRAME_PERIOD_MAX;
+            return sbus_opts;
         default: break;
     }
     return 0;

@@ -111,8 +111,10 @@ void PROTOCOL_Init(u8 force)
 
     if(Model.protocol == PROTOCOL_NONE || ! PROTOCOL_LOADED)
         CLOCK_StopTimer();
-    else
+    else {
+        CLOCK_StartMixer(); // enable mixer updates on timer
         PROTO_Cmds(PROTOCMD_INIT);
+    }
 }
 
 void PROTOCOL_DeInit()

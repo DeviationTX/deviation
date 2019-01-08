@@ -536,7 +536,7 @@ void ALARMhandler()
             CLOCK_getms() >= msec_cbtime[MEDIUM_PRIORITY])
             // msecs == msec_cbtime[MEDIUM_PRIORITY])
     {
-        medium_priority_cb();
+        MIXER_CalcChannels();
         priority_ready |= 1 << MEDIUM_PRIORITY;
         msec_cbtime[MEDIUM_PRIORITY] += MEDIUM_PRIORITY_MSEC;
     }
@@ -638,6 +638,9 @@ void CLOCK_ClearMsecCallback(int cb)
 {
     timer_enable &= ~(1 << cb);
 }
+void CLOCK_RunMixer() {}
+void CLOCK_StartMixer() {}
+volatile mixsync_t mixer_sync;
 
 u32 CLOCK_getms()
 {

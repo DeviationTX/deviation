@@ -57,6 +57,11 @@ static buttonAction_t button_action;
 static unsigned switch_is_on(unsigned sw, volatile s32 *raw);
 static s32 get_trim(unsigned src);
 
+// keep track of interval between calls to MIXER_CalcChannels
+// for calculation of MUX_DELAY and ApplyLimits
+// Period depends on protocol for protocols that run mixer manually
+static u32 mixer_period;
+
 static s32 MIXER_CreateCyclicOutput(volatile s32 *raw, unsigned cycnum);
 
 struct Mixer *MIXER_GetAllMixers()
@@ -170,6 +175,11 @@ int MIXER_GetCachedInputs(s32 *cache, unsigned threshold)
 
 void MIXER_CalcChannels()
 {
+    static u32 prev_run;
+    u32 now = CLOCK_getms();
+    mixer_period = now - prev_run;
+    prev_run = now;
+
     //We retain this array so that we can refer to the prevous values in the next iteration
     int i;
     //1st step: Read Tx inputs
@@ -340,8 +350,8 @@ void MIXER_ApplyMixer(struct Mixer *mixer, volatile s32 *raw, s32 *orig_value)
                 break;
             }
             value = abs(RANGE_TO_PCT(value)) * 50; //'50' represents 1/20 of a second (1000msec/20 = 50)
-            //rate represents the maximum travel per iteration (once per MEDIUM_PRIORITY_MSEC)
-            s32 rate = CHAN_MAX_VALUE * MEDIUM_PRIORITY_MSEC / value;
+            //rate represents the maximum travel per iteration (once per mixer_period)
+            s32 rate = CHAN_MAX_VALUE * mixer_period / value;
 
             value = raw[mixer->dest + NUM_INPUTS + 1];
             if (value - *orig_value > rate)
@@ -427,7 +437,7 @@ s32 MIXER_ApplyLimits(unsigned channel, struct Limit *limit, volatile s32 *_raw,
     if (! applied_safety) {
         //degrees / 100msec
         if (_Channels && (flags & APPLY_SPEED) && limit->speed) {
-            s32 rate = CHAN_MAX_VALUE * limit->speed / 60 * MEDIUM_PRIORITY_MSEC / 100;
+            s32 rate = CHAN_MAX_VALUE * limit->speed / 60 * mixer_period / 100;
             if (value - _Channels[channel] > rate)
                 value = _Channels[channel] + rate;
             else if(value - _Channels[channel] < -rate)

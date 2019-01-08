@@ -131,8 +131,17 @@ u32 CLOCK_getms(void);
 void CLOCK_StartTimer(unsigned us, u16 (*cb)(void));
 void CLOCK_StopTimer();
 void CLOCK_SetMsecCallback(int cb, u32 msec);
+void CLOCK_ClearMsecCallback(int cb);
 void CLOCK_StartWatchdog();
 void CLOCK_ResetWatchdog();
+void CLOCK_RunMixer();
+void CLOCK_StartMixer();
+typedef enum {
+    MIX_TIMER,
+    MIX_NOT_DONE,
+    MIX_DONE
+} mixsync_t;
+extern volatile mixsync_t mixer_sync;
 
 /*PWM/PPM functions */
 void PWM_Initialize();

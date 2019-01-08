@@ -135,7 +135,7 @@ void CLOCK_Init()
 
     timer_enable_counter(TIMx);
 
-    /* Enable EXTI1 interrupt. */
+    /* Enable EXTI1 interrupt for medium priority callback. */
     /* We are enabling only the interrupt
      * We'll manually trigger this via set_pending_interrupt
      */
@@ -219,46 +219,63 @@ void CLOCK_ClearMsecCallback(int cb)
     msec_callbacks &= ~(1 << cb);
 }
 
+// Run Mixer one time.  Used by protocols that trigger mixer calc in protocol code
+volatile mixsync_t mixer_sync;
+void CLOCK_RunMixer(void) {
+    mixer_sync = MIX_NOT_DONE;
+    nvic_set_pending_irq(NVIC_EXTI1_IRQ);
+}
+
+// Run Mixer on medium priority interval.  Default behavior - no protocol code required.
+void CLOCK_StartMixer() {
+    mixer_sync = MIX_TIMER;
+}
 
 void exti1_isr()
 {
-    //ADC_StartCapture();
-    //ADC completion will trigger update
+    // medium_priority_cb();  Currently not used. If needed, 
+    // use exti3 for mixer updates.
     ADC_Filter();
-    medium_priority_cb();
+    MIXER_CalcChannels();
+    if (mixer_sync == MIX_NOT_DONE) mixer_sync = MIX_DONE;
 }
 
 void sys_tick_handler(void)
 {
 	msecs++;
-        if(msecs - wdg_time > 2000) {
-            nvic_set_pending_irq(NVIC_EXTI2_IRQ);
-            return;
+    if(msecs - wdg_time > 2000) {
+        nvic_set_pending_irq(NVIC_EXTI2_IRQ);
+        return;
+    }
+    if(msec_callbacks & (1 << MEDIUM_PRIORITY)) {
+        //medium priority tasks execute in interrupt and main loop context
+        if (msecs == msec_cbtime[MEDIUM_PRIORITY]) {
+            // currently the mixer calculations is the only code that runs under medium interrupt priority,
+            // so only schedule interrupt if using periodic mixer calc (not per-protocol mixer calc)
+            // If any other code added in medium priority interrupt handler, move the following line to
+            // exti1_isr before the CLOCK_UpdateMixers() line.
+            // overload mixer_sync to fit in 7e build - NULL indicates mixer run by timer
+            if (mixer_sync == MIX_TIMER) nvic_set_pending_irq(NVIC_EXTI1_IRQ);
+            priority_ready |= 1 << MEDIUM_PRIORITY;
+            msec_cbtime[MEDIUM_PRIORITY] = msecs + MEDIUM_PRIORITY_MSEC;
         }
-        if(msec_callbacks & (1 << MEDIUM_PRIORITY)) {
-            if (msecs == msec_cbtime[MEDIUM_PRIORITY]) {
-                //medium priority tasks execute in interrupt and main loop context
-                nvic_set_pending_irq(NVIC_EXTI1_IRQ);
-                priority_ready |= 1 << MEDIUM_PRIORITY;
-                msec_cbtime[MEDIUM_PRIORITY] = msecs + MEDIUM_PRIORITY_MSEC;
-            }
+    }
+    if(msec_callbacks & (1 << LOW_PRIORITY)) {
+        if (msecs == msec_cbtime[LOW_PRIORITY]) {
+            //Low priority tasks execute in the main loop
+            priority_ready |= 1 << LOW_PRIORITY;
+            msec_cbtime[LOW_PRIORITY] = msecs + LOW_PRIORITY_MSEC;
         }
-        if(msec_callbacks & (1 << LOW_PRIORITY)) {
-            if (msecs == msec_cbtime[LOW_PRIORITY]) {
-                //Low priority tasks execute in the main loop
-                priority_ready |= 1 << LOW_PRIORITY;
-                msec_cbtime[LOW_PRIORITY] = msecs + LOW_PRIORITY_MSEC;
-            }
+    }
+    if(msec_callbacks & (1 << TIMER_SOUND)) {
+        if (msecs == msec_cbtime[TIMER_SOUND]) {
+            unsigned ms = SOUND_Callback();
+            if(! ms)
+                msec_callbacks &= ~(1 << TIMER_SOUND);
+            else
+                msec_cbtime[TIMER_SOUND] = msecs + ms;
         }
-        if(msec_callbacks & (1 << TIMER_SOUND)) {
-            if (msecs == msec_cbtime[TIMER_SOUND]) {
-                unsigned ms = SOUND_Callback();
-                if(! ms)
-                    msec_callbacks &= ~(1 << TIMER_SOUND);
-                else
-                    msec_cbtime[TIMER_SOUND] = msecs + ms;
-            }
-        }
+    }
 }
 
 // initialize RTC
