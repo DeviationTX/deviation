@@ -1,7 +1,7 @@
 #ifndef _EXTENDED_AUDIO_H_
 #define _EXTENDED_AUDIO_H_
 
-#ifdef HAS_EXTENDED_AUDIO
+#if HAS_EXTENDED_AUDIO
 
 #define AUDIO_QUEUE_LENGTH 20 // arbitraty chosen, do we need more?
 
@@ -16,6 +16,7 @@ extern u16 audio_queue[AUDIO_QUEUE_LENGTH];
 extern u8 next_audio;
 extern u8 num_audio;
 extern u32 audio_queue_time;
+extern char voicelabel[MAX_VOICE_LABEL];
 
 #endif
 #endif

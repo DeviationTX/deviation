@@ -95,7 +95,7 @@ struct CustomVoice {
     u16 music;
 };
 
-struct  Voice {
+struct Voice {
     struct CustomVoice switches[NUM_SWITCHES];	//Switch array to point to music file number, no pots
     struct CustomVoice telemetry[TELEM_NUM_ALARMS]; //Telemetry Alarm array to point to music file number
     struct CustomVoice timer[NUM_TIMERS]; //Timer Alarm array to point to music file number
@@ -112,7 +112,7 @@ struct VoiceMap {
     u16 id;
     u16 duration;
 #if HAS_MUSIC_CONFIG
-    char label[MAX_VOICE_LABEL];
+//    char label[MAX_VOICE_LABEL];
 #endif
 };
 
