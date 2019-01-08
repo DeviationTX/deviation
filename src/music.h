@@ -111,9 +111,6 @@ extern u16 voice_map_entries;
 struct VoiceMap {
     u16 id;
     u16 duration;
-#if HAS_MUSIC_CONFIG
-//    char label[MAX_VOICE_LABEL];
-#endif
 };
 
 extern struct VoiceMap voice_map[MAX_VOICEMAP_ENTRIES];

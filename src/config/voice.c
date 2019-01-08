@@ -40,19 +40,19 @@ static const char* getfield(char* value, int num) {
 
 static int ini_handler(void* user, const char* section, const char* name, const char* value)
 {
-    u16 *req_id = user;
+    u16 req_id = *((long*)user);
     char tmp[100];
     strlcpy(tmp, value, 100);
     int duration = atoi(getfield(tmp,2));
     u16 id = atoi(name);
 
 #if HAS_MUSIC_CONFIG
-    if ( (*req_id != MAX_VOICEMAP_ENTRIES) && (*req_id == id) ) {
+    if ( (req_id != MAX_VOICEMAP_ENTRIES) && (req_id == id) ) {
         strlcpy(tempstring,getfield(tmp, 1), MAX_VOICE_LABEL);
         return 1;
     }
 #endif
-    if ( *req_id == MAX_VOICEMAP_ENTRIES ) {
+    if ( req_id == MAX_VOICEMAP_ENTRIES ) {
         if (MATCH_SECTION(SECTION_VOICE_GLOBAL)) {
             for (int i = 0; i < CUSTOM_ALARM_ID; i++) {
                 snprintf(tempstring, 4, "%d", i);
@@ -75,7 +75,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
     return 1; // voice label ignored
 }
 
-void CONFIG_VoiceParse(u16 id)
+void CONFIG_VoiceParse(unsigned id)
 {
     #ifdef _DEVO12_TARGET_H_
     static char filename[] = "media/voice.ini\0\0\0"; // placeholder for longer folder name
