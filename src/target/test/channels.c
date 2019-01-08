@@ -13,7 +13,7 @@
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "common.h"
-#include "../common/emu/fltk.h"
+#include "emu.h"
 #include "mixer.h"
 
 void TEST_CHAN_SetChannelValue(int channel, s32 value)
