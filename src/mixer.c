@@ -62,7 +62,7 @@ static s32 get_trim(unsigned src);
 // Period depends on protocol for protocols that run mixer manually
 static u32 mixer_period;
 
-static void MIXER_CreateCyclicOutput(volatile s32 *raw, s32 *cyc);
+static void MIXER_CreateCyclicOutput(volatile s32 *raw, s32 *cyclic);
 
 struct Mixer *MIXER_GetAllMixers()
 {
@@ -188,14 +188,14 @@ void MIXER_CalcChannels()
     MIXER_EvalMixers(raw);
 
     //4th step: apply auto-templates
-    s32 cyc[3];
-    MIXER_CreateCyclicOutput(raw, cyc);
+    s32 cyclic[3];
+    MIXER_CreateCyclicOutput(raw, cyclic);
     for (i = 0; i < NUM_OUT_CHANNELS; i++) {
         switch(Model.templates[i]) {
             case MIXERTEMPLATE_CYC1:
             case MIXERTEMPLATE_CYC2:
             case MIXERTEMPLATE_CYC3:
-                raw[NUM_INPUTS+i+1] = cyc[Model.templates[i] - MIXERTEMPLATE_CYC1];
+                raw[NUM_INPUTS+i+1] = cyclic[Model.templates[i] - MIXERTEMPLATE_CYC1];
                 break;
         }
     }
@@ -242,12 +242,12 @@ char* MIXER_GetChannelDisplayFormat(unsigned channel)
 
 #define REZ_SWASH_X(x)  ((x) - (x)/8 - (x)/128 - (x)/512)   //  1024*sin(60) ~= 886
 #define REZ_SWASH_Y(x)  (1*(x))   //  1024 => 1024
-void MIXER_CreateCyclicOutput(volatile s32 *raw, s32 *cyc)
+void MIXER_CreateCyclicOutput(volatile s32 *raw, s32 *cyclic)
 {
     if (! Model.swash_type) {
-        cyc[0] = raw[NUM_INPUTS + NUM_OUT_CHANNELS + 1];
-        cyc[1] = raw[NUM_INPUTS + NUM_OUT_CHANNELS + 2];
-        cyc[2] = raw[NUM_INPUTS + NUM_OUT_CHANNELS + 3];
+        cyclic[0] = raw[NUM_INPUTS + NUM_OUT_CHANNELS + 1];
+        cyclic[1] = raw[NUM_INPUTS + NUM_OUT_CHANNELS + 2];
+        cyclic[2] = raw[NUM_INPUTS + NUM_OUT_CHANNELS + 3];
         return;
     }
     s32 aileron    = raw[NUM_INPUTS + NUM_OUT_CHANNELS + 1];
@@ -262,41 +262,41 @@ void MIXER_CreateCyclicOutput(volatile s32 *raw, s32 *cyc)
     switch(Model.swash_type) {
     case SWASH_TYPE_NONE:
     case SWASH_TYPE_LAST:
-        cyc[0] = aileron;
-        cyc[1] = elevator;
-        cyc[2] = collective;
+        cyclic[0] = aileron;
+        cyclic[1] = elevator;
+        cyclic[2] = collective;
         break;
     case SWASH_TYPE_120:
         aileron  = Model.swashmix[0] * aileron / normalize;
         elevator = Model.swashmix[1] * elevator / normalize;
         collective = Model.swashmix[2] * collective / normalize;
-        cyc[0] = collective - elevator;
-        cyc[1] = collective + elevator/2 + aileron;
-        cyc[2] = collective + elevator/2 - aileron;
+        cyclic[0] = collective - elevator;
+        cyclic[1] = collective + elevator/2 + aileron;
+        cyclic[2] = collective + elevator/2 - aileron;
         break;
     case SWASH_TYPE_120X:
         aileron  = Model.swashmix[0] * aileron / normalize;
         elevator = Model.swashmix[1] * elevator / normalize;
         collective = Model.swashmix[2] * collective / normalize;
-        cyc[0] = collective - aileron;
-        cyc[1] = collective + aileron/2 + elevator;
-        cyc[2] = collective + aileron/2 - elevator;
+        cyclic[0] = collective - aileron;
+        cyclic[1] = collective + aileron/2 + elevator;
+        cyclic[2] = collective + aileron/2 - elevator;
         break;
     case SWASH_TYPE_140:
         aileron  = Model.swashmix[0] * aileron / normalize;
         elevator = Model.swashmix[1] * elevator / normalize;
         collective = Model.swashmix[2] * collective / normalize;
-        cyc[0] = collective - elevator;
-        cyc[1] = collective + elevator + aileron;
-        cyc[2] = collective + elevator - aileron;
+        cyclic[0] = collective - elevator;
+        cyclic[1] = collective + elevator + aileron;
+        cyclic[2] = collective + elevator - aileron;
         break;
     case SWASH_TYPE_90:
         aileron  = Model.swashmix[0] * aileron / normalize;
         elevator = Model.swashmix[1] * elevator / normalize;
         collective = Model.swashmix[2] * collective / normalize;
-        cyc[0] = collective - elevator;
-        cyc[1] = collective + aileron;
-        cyc[2] = collective - aileron;
+        cyclic[0] = collective - elevator;
+        cyclic[1] = collective + aileron;
+        cyclic[2] = collective - aileron;
         break;
     }
 }
