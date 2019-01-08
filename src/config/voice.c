@@ -18,6 +18,7 @@
 #include "common.h"
 #include "model.h"
 #include "../music.h"
+#include "extended_audio.h"
 #include "tx.h"
 
 #define MATCH_SECTION(s) (strcasecmp(section, s) == 0)
@@ -39,44 +40,46 @@ static const char* getfield(char* value, int num) {
 
 static int ini_handler(void* user, const char* section, const char* name, const char* value)
 {
-    (void) user;
+    u16 *req_id = user;
     char tmp[100];
     strlcpy(tmp, value, 100);
     int duration = atoi(getfield(tmp,2));
+    u16 id = atoi(name);
+
 #if HAS_MUSIC_CONFIG
-    char label[MAX_VOICE_LABEL];
-    strlcpy(label,getfield(tmp, 1), MAX_VOICE_LABEL);
+    if ( (*req_id != MAX_VOICEMAP_ENTRIES) && (*req_id == id) ) {
+        strlcpy(voicelabel,getfield(tmp, 1), MAX_VOICE_LABEL);
+        return 1;
+    }
 #endif
 
-    if (MATCH_SECTION(SECTION_VOICE_GLOBAL)) {
+    if ( (*req_id == MAX_VOICEMAP_ENTRIES) && MATCH_SECTION(SECTION_VOICE_GLOBAL) ) {
         for (int i = 0; i < CUSTOM_ALARM_ID; i++) {
             snprintf(tempstring, 4, "%d", i);
             if (MATCH_KEY(tempstring)) {
                 voice_map[i].duration = duration;
                 voice_map[i].id = i;
-#if HAS_MUSIC_CONFIG
-                strcpy(voice_map[i].label, label);
-#endif
+                printf("id %d, duration %d\n", id, duration);
                 return 1;
             }
         }
     }
-    if (MATCH_SECTION(SECTION_VOICE_CUSTOM)) {
+    if ( (*req_id == MAX_VOICEMAP_ENTRIES) && MATCH_SECTION(SECTION_VOICE_CUSTOM) ) {
         voice_map[voice_map_entries].duration = duration;
         voice_map[voice_map_entries].id = atoi(name);
-#if HAS_MUSIC_CONFIG
-        strcpy(voice_map[voice_map_entries].label, label);
-#endif
         voice_map_entries++;
         return 1;
     }
-    printf("Unknown entry in voice.ini: %s\n", value);
-    return 0;
+    if ( *req_id == MAX_VOICEMAP_ENTRIES ) {
+        printf("Unknown entry in voice.ini: %s\n", value);
+        return 0;
+    }
+
+    return 1; // voice label ignored
 }
 
-void CONFIG_VoiceParse()
+void CONFIG_VoiceParse(u16 music)
 {
-    voice_map_entries = CUSTOM_ALARM_ID;
     #ifdef _DEVO12_TARGET_H_
     static char filename[] = "media/voice.ini\0\0\0"; // placeholder for longer folder name
     static u8 checked;
@@ -92,9 +95,17 @@ void CONFIG_VoiceParse()
     #else
     char filename[] = "media/voice.ini";
     #endif
-    if (CONFIG_IniParse(filename, ini_handler, NULL)) {
-        printf("Failed to parse voice.ini\n");
-        Transmitter.audio_player = AUDIO_NONE; // disable external voice output
+    if (music == MAX_VOICEMAP_ENTRIES) { // initial parse of voice.ini
+        voice_map_entries = CUSTOM_ALARM_ID; // Reserve space in map for global alerts
+        if (CONFIG_IniParse(filename, ini_handler, &music)) {
+            printf("Failed to parse voice.ini\n");
+            Transmitter.audio_player = AUDIO_NONE; // disable external voice output
+        }
+    }
+    if (music >= CUSTOM_ALARM_ID) {
+        if (CONFIG_IniParse(filename, ini_handler, &music)) {
+            printf("Failed to find label in voice.ini\n");
+        }
     }
 }
 #endif
