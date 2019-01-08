@@ -62,7 +62,7 @@ static s32 get_trim(unsigned src);
 // Period depends on protocol for protocols that run mixer manually
 static u32 mixer_period;
 
-static s32 MIXER_CreateCyclicOutput(volatile s32 *raw, unsigned cycnum);
+static void MIXER_CreateCyclicOutput(volatile s32 *raw, s32 *cyc);
 
 struct Mixer *MIXER_GetAllMixers()
 {
@@ -188,13 +188,14 @@ void MIXER_CalcChannels()
     MIXER_EvalMixers(raw);
 
     //4th step: apply auto-templates
+    s32 cyc[3];
+    MIXER_CreateCyclicOutput(raw, cyc);
     for (i = 0; i < NUM_OUT_CHANNELS; i++) {
         switch(Model.templates[i]) {
             case MIXERTEMPLATE_CYC1:
             case MIXERTEMPLATE_CYC2:
             case MIXERTEMPLATE_CYC3:
-                raw[NUM_INPUTS+i+1] = MIXER_CreateCyclicOutput(raw,
-                                             Model.templates[i] - MIXERTEMPLATE_CYC1 + 1);
+                raw[NUM_INPUTS+i+1] = cyc[Model.templates[i] - MIXERTEMPLATE_CYC1];
                 break;
         }
     }
@@ -241,11 +242,13 @@ char* MIXER_GetChannelDisplayFormat(unsigned channel)
 
 #define REZ_SWASH_X(x)  ((x) - (x)/8 - (x)/128 - (x)/512)   //  1024*sin(60) ~= 886
 #define REZ_SWASH_Y(x)  (1*(x))   //  1024 => 1024
-s32 MIXER_CreateCyclicOutput(volatile s32 *raw, unsigned cycnum)
+void MIXER_CreateCyclicOutput(volatile s32 *raw, s32 *cyc)
 {
-    s32 cyc[3];
     if (! Model.swash_type) {
-        return raw[NUM_INPUTS + NUM_OUT_CHANNELS + cycnum];
+        cyc[0] = raw[NUM_INPUTS + NUM_OUT_CHANNELS + 1];
+        cyc[1] = raw[NUM_INPUTS + NUM_OUT_CHANNELS + 2];
+        cyc[2] = raw[NUM_INPUTS + NUM_OUT_CHANNELS + 3];
+        return;
     }
     s32 aileron    = raw[NUM_INPUTS + NUM_OUT_CHANNELS + 1];
     s32 elevator   = raw[NUM_INPUTS + NUM_OUT_CHANNELS + 2];
@@ -296,8 +299,6 @@ s32 MIXER_CreateCyclicOutput(volatile s32 *raw, unsigned cycnum)
         cyc[2] = collective - aileron;
         break;
     }
-
-    return cyc[cycnum-1];
 }
 
 void MIXER_ApplyMixer(struct Mixer *mixer, volatile s32 *raw, s32 *orig_value)

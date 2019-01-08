@@ -61,10 +61,6 @@ void TestUpdateRawInputs(CuTest *t)
     memset((s32 *)raw, 0, sizeof(raw));
     for (int i = 1; i <= NUM_TX_INPUTS; i++) {
         TEST_CHAN_SetChannelValue(i, (i + 1) * 200);
-        Model.mixers[i].src = i;
-        Model.mixers[i].dest = i;
-        Model.mixers[i].scalar = 100;
-        Model.mixers[i].flags = MUX_REPLACE;
     }
     MIXER_UpdateRawInputs();
     s32 expected[] = {
@@ -102,6 +98,161 @@ void TestUpdateRawInputs(CuTest *t)
     MIXER_UpdateRawInputs();
     for(unsigned i = 0; i < MAX_PPM_IN_CHANNELS; i++) {
         CuAssertIntEquals(t, -100 * i, raw[1 + NUM_INPUTS + NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS + i]);
+    }
+}
+
+void TestGetCachedInputs(CuTest *t)
+{
+    s32 cache[NUM_SOURCES + 1];
+    for (int i = 0; i < NUM_SOURCES + 1; i++) {
+        cache[i] = i + 1;
+        raw[i] = i;
+    }
+    CuAssertIntEquals(t, 0, MIXER_GetCachedInputs(cache, 1));
+    for (int i = 0; i < NUM_SOURCES + 1; i++) {
+        CuAssertIntEquals(t, i + 1, cache[i]);
+    }
+    CuAssertIntEquals(t, 1, MIXER_GetCachedInputs(cache, 0));
+    for (int i = 0; i < NUM_SOURCES + 1; i++) {
+        //values from 1 - NUM_TX_INPUTS should match raw
+        CuAssertIntEquals(t, i ? (i <= NUM_TX_INPUTS ? i : i + 1) : 1, cache[i]);
+    }
+}
+
+void TestCalcChannels(CuTest *t)
+{
+    memset(&Model, 0, sizeof(Model));
+    memset((s32 *)raw, 0, sizeof(raw));
+    for (int i = 0; i < 4; i++) {
+        TEST_CHAN_SetChannelValue(i, (i + 1) * 200);
+        Model.mixers[i].src = i + 1;
+        Model.mixers[i].dest = NUM_OUT_CHANNELS + i;
+        Model.mixers[i].scalar = 100;
+        Model.mixers[i].flags = MUX_REPLACE;
+    }
+    for (int i = 0; i < NUM_OUT_CHANNELS; i++) {
+        Model.limits[i].servoscale = 100;
+        Model.limits[i].max = 200;
+        Model.limits[i].min = 200;
+    }
+    Model.templates[5] = MIXERTEMPLATE_CYC1;
+    Model.templates[6] = MIXERTEMPLATE_CYC2;
+    Model.templates[7] = MIXERTEMPLATE_CYC3;
+    MIXER_CalcChannels();
+    s32 expected[NUM_OUT_CHANNELS] = {0, 0, 0, 0, 0, 1000, 800, 600, 0, 0, 0, 0, 0, 0, 0, 0};
+    for (int i = 0; i < NUM_OUT_CHANNELS; i++) {
+        CuAssertIntEquals(t, expected[i], Channels[i]);
+    }
+}
+
+void TestGetInputs(CuTest *t)
+{
+    CuAssertPtrEquals(t, (void *)raw, (void *)MIXER_GetInputs());
+}
+
+void TestGetChannel(CuTest *t)
+{
+    memset(&Model, 0, sizeof(Model));
+    memset((s32 *)raw, 0, sizeof(raw));
+    raw[NUM_INPUTS + 1] = 1000;
+    CuAssertIntEquals(t, 1000, MIXER_GetChannel(0, 0));
+
+    Model.num_ppmin = PPM_IN_TRAIN1 << 6;
+    Model.train_sw = INP_GEAR1;
+    raw[Model.train_sw] = 100;
+    ppmSync = 1;
+    ppmChannels[0] = 2000;
+    CuAssertIntEquals(t, 2000, MIXER_GetChannel(0, 0));
+
+    ppmSync = 0;
+    Channels[0] = 3000;    
+    CuAssertIntEquals(t, 3000, MIXER_GetChannel(0, 0));
+}
+
+void TestGetChannelDisplayScale(CuTest *t)
+{
+    memset(&Model, 0, sizeof(Model));
+    Model.limits[0].displayscale = 100;
+    CuAssertIntEquals(t, 100, MIXER_GetChannelDisplayScale(0));
+    CuAssertIntEquals(t, DEFAULT_DISPLAY_SCALE, MIXER_GetChannelDisplayScale(NUM_OUT_CHANNELS));
+}
+
+void TestGetChannelDisplayFormat(CuTest *t)
+{
+    memset(&Model, 0, sizeof(Model));
+    strcpy(Model.limits[0].displayformat, "%");
+    CuAssertStrEquals(t, "%", MIXER_GetChannelDisplayFormat(0));
+    CuAssertStrEquals(t, DEFAULT_DISPLAY_FORMAT, MIXER_GetChannelDisplayFormat(NUM_OUT_CHANNELS));
+}
+
+void TestCreateCyclicOutput(CuTest *t)
+{
+    s32 rawdata[NUM_SOURCES + 1] = {0};
+    memset(&Model, 0, sizeof(Model));
+    s32 cyc[3] = {0};
+    rawdata[NUM_INPUTS + NUM_OUT_CHANNELS + 1] = 1000;
+    rawdata[NUM_INPUTS + NUM_OUT_CHANNELS + 2] = 2000;
+    rawdata[NUM_INPUTS + NUM_OUT_CHANNELS + 3] = 3000;
+    MIXER_CreateCyclicOutput(rawdata, cyc);
+    for (int i = 0; i < 3; i ++) {
+        CuAssertIntEquals(t, rawdata[NUM_INPUTS + NUM_OUT_CHANNELS + 1 + i], cyc[i]);
+    }
+    Model.swash_type = SWASH_TYPE_LAST;
+    memset(cyc, 0, sizeof(cyc));
+    MIXER_CreateCyclicOutput(rawdata, cyc);
+    for (int i = 0; i < 3; i ++) {
+        CuAssertIntEquals(t, rawdata[NUM_INPUTS + NUM_OUT_CHANNELS + 1 + i], cyc[i]);
+    }
+
+    Model.swash_invert = SWASH_INV_ELEVATOR_MASK | SWASH_INV_AILERON_MASK | SWASH_INV_COLLECTIVE_MASK;
+    memset(cyc, 0, sizeof(cyc));
+    MIXER_CreateCyclicOutput(rawdata, cyc);
+    for (int i = 0; i < 3; i ++) {
+        CuAssertIntEquals(t, -rawdata[NUM_INPUTS + NUM_OUT_CHANNELS + 1 + i], cyc[i]);
+    }
+    Model.swash_invert = 0;
+
+    Model.swash_type = SWASH_TYPE_120;
+    {
+        memset(cyc, 0, sizeof(cyc));
+        Model.swashmix[0] = 25;
+        Model.swashmix[1] = 50;
+        Model.swashmix[2] = 75;
+        MIXER_CreateCyclicOutput(rawdata, cyc);
+        s32 expected[] = {1250, 3000, 2500};
+        for (int i = 0; i < 3; i ++) {
+            CuAssertIntEquals(t, expected[i], cyc[i]);
+        }
+    }
+
+    Model.swash_type = SWASH_TYPE_120X;
+    {
+        memset(cyc, 0, sizeof(cyc));
+        MIXER_CreateCyclicOutput(rawdata, cyc);
+        s32 expected[] = {2000, 3375, 1375};
+        for (int i = 0; i < 3; i ++) {
+            CuAssertIntEquals(t, expected[i], cyc[i]);
+        }
+    }
+
+    Model.swash_type = SWASH_TYPE_140;
+    {
+        memset(cyc, 0, sizeof(cyc));
+        MIXER_CreateCyclicOutput(rawdata, cyc);
+        s32 expected[] = {1250, 3500, 3000};
+        for (int i = 0; i < 3; i ++) {
+            CuAssertIntEquals(t, expected[i], cyc[i]);
+        }
+    }
+
+    Model.swash_type = SWASH_TYPE_90;
+    {
+        memset(cyc, 0, sizeof(cyc));
+        MIXER_CreateCyclicOutput(rawdata, cyc);
+        s32 expected[] = {1250, 2500, 2000};
+        for (int i = 0; i < 3; i ++) {
+            CuAssertIntEquals(t, expected[i], cyc[i]);
+        }
     }
 }
 
