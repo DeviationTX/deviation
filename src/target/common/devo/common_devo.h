@@ -1,6 +1,10 @@
 #ifndef _COMMON_DEVO_H_
 #define _COMMON_DEVO_H_
 
+#ifndef _TARGET_H_
+#error "Don't include target_defs.h directly, include target.h instead."
+#endif
+
 #ifndef FATSTRUCT_SIZE
     #if defined USE_DEVOFS && USE_DEVOFS == 1
         #include "enable_devofs.h"

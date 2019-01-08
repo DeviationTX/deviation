@@ -14,7 +14,7 @@
 */
 
 #include "common.h"
-#include "target_defs.h"
+#include "target.h"
 #include "config/tx.h"
 #include "rtc.h"
 #if HAS_RTC

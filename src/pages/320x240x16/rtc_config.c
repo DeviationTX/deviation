@@ -19,7 +19,7 @@
 #include "gui/gui.h"
 #include "rtc.h"
 
-#include "target_defs.h"
+#include "target.h"
 
 #if HAS_RTC
 static struct rtc_obj * const gui = &gui_objs.u.rtc;
