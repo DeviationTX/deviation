@@ -326,6 +326,7 @@ static void press_cb(guiObject_t *obj, const void *data)
     }
 }
 
+#if SUPPORT_MULTI_LANGUAGE
 static const char *langstr_cb(guiObject_t *obj, const void *data)
 {
     (void)data;
@@ -339,6 +340,7 @@ static void lang_select_cb(guiObject_t *obj, const void *data)
     (void)obj;
     PAGE_PushByID(PAGEID_LANGUAGE, 0);
 }
+#endif
 
 static const char *units_cb(guiObject_t *obj, int dir, void *data)
 {

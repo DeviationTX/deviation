@@ -161,7 +161,6 @@ static void ReadLangV2(FILE* fh)
 {
     u16 hash;
     unsigned pos = 0;
-    char tempstring[MAX_LINE];
     struct str_map *lookup = lookupmap;
 
     while (fread(&hash, 2, 1, fh) == 1) {
