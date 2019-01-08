@@ -1085,7 +1085,7 @@ static void get_model_file(char *file, u8 model_num)
         sprintf(file, "models/model%d.ini", model_num);
 }
 
-void write_int(FILE *fh, void* ptr, const struct struct_map *map, int map_size)
+static void write_int(FILE *fh, void* ptr, const struct struct_map *map, int map_size)
 {
     char tmpstr[20];
     for(int i = 0; i < map_size; i++) {
@@ -1115,7 +1115,7 @@ void write_int(FILE *fh, void* ptr, const struct struct_map *map, int map_size)
     }
 }
 
-u8 write_mixer(FILE *fh, struct Model *m, u8 channel)
+static u8 write_mixer(FILE *fh, struct Model *m, u8 channel)
 {
     int idx;
     int i;
@@ -1407,7 +1407,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
     return 1;
 }
 
-void clear_model(u8 full)
+static void clear_model(u8 full)
 {
     u8 i;
     if (full) {
@@ -1585,3 +1585,6 @@ u8 CONFIG_ReadLayout(const char *filename) {
     }
     return 1;
 }
+
+#define TESTNAME model
+#include "tests.h"
