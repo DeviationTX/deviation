@@ -47,6 +47,7 @@ static void _scan_enable(int enable)
         CYRF_ReadRegister = (T_CYRF_ReadRegister)PROTO_Cmds(PROTOCMD_READREG);
         CYRF_WriteRegister = (T_CYRF_WriteRegister)PROTO_Cmds(PROTOCMD_WRITEREG);
         CYRF_SetTxRxMode = (T_CYRF_SetTxRxMode)PROTO_Cmds(PROTOCMD_SETTXRX);
+        PROTO_Cmds(0);
 #endif
         PROTOCOL_SetBindState(0); //Disable binding message
         CLOCK_StopTimer();
