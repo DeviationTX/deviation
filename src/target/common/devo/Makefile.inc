@@ -54,6 +54,12 @@ ALL = $(LIBOPENCM3) $(TARGET).dfu
 
 else #BUILD_TARGET
 
+ifeq ($(OS),Windows_NT)
+	FLOCKS =
+else
+	FLOCKS = flock objs/.lock
+endif
+
 $(TARGET).bin: $(TARGET).elf
 ifdef OPTIMIZE_DFU
 	$(CP) $(TARGET).elf objs/$(TARGET)/$(TARGET).elf
@@ -68,7 +74,7 @@ endif
 	$(DUMP) -S $< > $(TARGET).list
 
 $(LIBOPENCM3):
-	+flock objs/.lock $(MAKE) -C $(SDIR)/libopencm3 TARGETS=stm32/f1 lib
+	+$(FLOCKS) $(MAKE) -C $(SDIR)/libopencm3 TARGETS=stm32/f1 lib
 
 $(TARGET).dfu: $(TARGET).bin
 	$(SDIR)/../utils/dfu.py --name "$(HGVERSION) Firmware" $(DFU_ARGS):$< $@
