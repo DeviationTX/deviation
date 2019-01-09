@@ -379,6 +379,7 @@ void TestApplyMixerDelay(CuTest *t)
     s32 rawdata[NUM_SOURCES + 1];
     s32 origvalue;
     memset(&Model, 0, sizeof(Model));
+    mixer_period = 5;
 
     rawdata[1] = 1000;
     mixer_period = 5;
@@ -387,6 +388,7 @@ void TestApplyMixerDelay(CuTest *t)
     s32 target[] = {550, 550, 550, 550, 550, 550, 550, 400, 400, 400};
     s32 expected[] = {100, 200, 300, 400, 500, 550, 550, 450, 400, 400};
     rawdata[3 + NUM_INPUTS] = 0;
+    mixer_period = 5;
     for(unsigned i = 0; i < sizeof(expected) / sizeof(expected[0]); i++) {
         origvalue = rawdata[3 + NUM_INPUTS];
         rawdata[3 + NUM_INPUTS] = target[i];
