@@ -36,9 +36,7 @@ void TOUCH_Handler(); // temporarily in main()
 void VIDEO_Update();
 void PAGE_Test();
 
-#ifdef TEST
-#define main _main
-#endif
+int main() __attribute__((weak));
 
 #ifndef DUMP_BOOTLOADER
 int main() {
