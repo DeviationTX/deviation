@@ -492,7 +492,7 @@ static u16 devo_telemetry_cb()
     if(txState == 2) {  // this won't be true in emulator so we need to simulate it somehow
         u8 rx_state = CYRF_ReadRegister(CYRF_07_RX_IRQ_STATUS);
         if((rx_state & 0x03) == 0x02) {  // RXC=1, RXE=0 then 2nd check is required (debouncing)
-            rx_state |= CYRF_ReadRegister(CYRF_07_RX_IRQ_STATUS);   
+            rx_state |= CYRF_ReadRegister(CYRF_07_RX_IRQ_STATUS);
         }
         if((rx_state & 0x07) == 0x02) { // good data (complete with no errors)
             CYRF_WriteRegister(CYRF_07_RX_IRQ_STATUS, 0x80); // need to set RXOW before data read
@@ -512,7 +512,7 @@ static u16 devo_telemetry_cb()
 #endif
         delay = 200;
     }
-    txState = 0;   
+    txState = 0;
     return delay;
 }
 
@@ -535,7 +535,7 @@ static u16 devo_cb()
         /* exit binding state */
         state = DEVO_BOUND_3;
         cyrf_set_bound_sop_code();
-    }   
+    }
     if(pkt_num == 0) {
         //Keep tx power updated
         CYRF_SetPower(Model.tx_power);
@@ -616,10 +616,18 @@ const void *DEVO_Cmds(enum ProtoCmds cmd)
             break;
         case PROTOCMD_TELEMETRYSTATE:
             return (void *)(long)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
-        case PROTOCMD_TELEMETRYTYPE: 
+        case PROTOCMD_TELEMETRYTYPE:
             return (void *)(long) TELEM_DEVO;
         case PROTOCMD_CHANNELMAP:
             return EATRG;
+#ifdef MODULAR
+        case PROTOCMD_READREG:
+            return CYRF_ReadRegister;
+        case PROTOCMD_WRITEREG:
+            return CYRF_WriteRegister;
+        case PROTOCMD_SETTXRX:
+            return CYRF_SetTxRxMode;
+#endif
         default: break;
     }
     return 0;

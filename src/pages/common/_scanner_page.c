@@ -20,15 +20,34 @@ static void _draw_channels(void);
 static u16 scan_cb();
 
 #ifdef ENABLE_MODULAR
-#error "Not supported in MODULAR build"
+extern void * (* const PROTO_Cmds)(enum ProtoCmds);
+
+typedef void (*T_CYRF_SetTxRxMode)(enum TXRX_State);
+typedef void (*T_CYRF_WriteRegister)(u8 address, u8 data);
+typedef u8 (*T_CYRF_ReadRegister)(u8 address);
+
+static T_CYRF_SetTxRxMode _CYRF_SetTxRxMode;
+static T_CYRF_WriteRegister _CYRF_WriteRegister;
+static T_CYRF_ReadRegister _CYRF_ReadRegister;
+
+#define CYRF_SetTxRxMode _CYRF_SetTxRxMode
+#define CYRF_WriteRegister _CYRF_WriteRegister
+#define CYRF_ReadRegister _CYRF_ReadRegister
+#define CYRF_ConfigRFChannel(ch) CYRF_WriteRegister(CYRF_00_CHANNEL, ch);
 #endif
 
 // The high level interface to do the scan
 static void _scan_enable(int enable)
 {
     if (enable) {
+#ifndef ENABLE_MODULAR
         PROTOCOL_DeInit();
         DEVO_Cmds(0);  //Switch to DEVO configuration
+#else
+        CYRF_ReadRegister = (T_CYRF_ReadRegister)PROTO_Cmds(PROTOCMD_READREG);
+        CYRF_WriteRegister = (T_CYRF_WriteRegister)PROTO_Cmds(PROTOCMD_WRITEREG);
+        CYRF_SetTxRxMode = (T_CYRF_SetTxRxMode)PROTO_Cmds(PROTOCMD_SETTXRX);
+#endif
         PROTOCOL_SetBindState(0); //Disable binding message
         CLOCK_StopTimer();
         CYRF_SetTxRxMode(RX_EN); //Receive mode
@@ -95,7 +114,14 @@ static void press_enable_cb(guiObject_t *obj, const void *data)
 {
     (void)data;
     sp->enable ^= 1;
-    _scan_enable(sp->enable);
+#ifdef ENABLE_MODULAR
+    if (Model.protocol != PROTOCOL_DEVO)
+    {
+        PAGE_ShowWarning(NULL, "Switch to Protocol Devo please");
+    }
+    else
+#endif
+        _scan_enable(sp->enable);
     GUI_Redraw(obj);
 }
 
