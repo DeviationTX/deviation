@@ -652,3 +652,27 @@ void TestTrimAsSwitch(CuTest *t)
     MIXER_UpdateTrim(CHAN_ButtonMask(neg), BUTTON_RELEASE, NULL);
     CuAssertIntEquals(t, 0, Model.trims[0].value[0]);
 }
+
+void TestTemplateName(CuTest *t)
+{
+    CONFIG_ReadLang(0);
+    CuAssertStrEquals(t, "None", MIXER_TemplateName(MIXERTEMPLATE_NONE));
+    CuAssertStrEquals(t, "Simple", MIXER_TemplateName(MIXERTEMPLATE_SIMPLE));
+    CuAssertStrEquals(t, "Expo&DR", MIXER_TemplateName(MIXERTEMPLATE_EXPO_DR));
+    CuAssertStrEquals(t, "Complex", MIXER_TemplateName(MIXERTEMPLATE_COMPLEX));
+    CuAssertStrEquals(t, "Cyclic1", MIXER_TemplateName(MIXERTEMPLATE_CYC1));
+    CuAssertStrEquals(t, "Cyclic2", MIXER_TemplateName(MIXERTEMPLATE_CYC2));
+    CuAssertStrEquals(t, "Cyclic3", MIXER_TemplateName(MIXERTEMPLATE_CYC3));
+    CuAssertStrEquals(t, "Unknown", MIXER_TemplateName(MIXERTEMPLATE_CYC3 + 1));
+}
+
+void TestSwashType(CuTest *t)
+{
+    CONFIG_ReadLang(0);
+    CuAssertStrEquals(t, "None", MIXER_SwashType(SWASH_TYPE_NONE));
+    CuAssertStrEquals(t, "120", MIXER_SwashType(SWASH_TYPE_120));
+    CuAssertStrEquals(t, "120X", MIXER_SwashType(SWASH_TYPE_120X));
+    CuAssertStrEquals(t, "140", MIXER_SwashType(SWASH_TYPE_140));
+    CuAssertStrEquals(t, "90", MIXER_SwashType(SWASH_TYPE_90));
+    CuAssertStrEquals(t, "", MIXER_SwashType(SWASH_TYPE_LAST));
+}
