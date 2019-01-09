@@ -463,6 +463,11 @@ s32 MIXER_ApplyLimits(unsigned channel, struct Limit *limit, volatile s32 *_raw,
 s8 *MIXER_GetTrim(unsigned i)
 {
     if (Model.trims[i].sw) {
+        //when using 0/1 the assumption is that sw points at the '0' input of a 2-way switch
+        //when using 0/1/2 the assumption is that sw points at the '0' input of a 3-way switch
+        //when using upto 6 positions, the assumption is that the sw points at a virtual channel
+        //the next n virtual channels (upto 6) make up a virtual n-way switch with only one having
+        //a value > 0.  This is described here: https://github.com/DeviationTX/deviation/pull/351
         for (int j = 0; j < 6; j++) {
             // Assume switch 0/1/2 are in order
             if(raw[Model.trims[i].sw+j] > 0) {

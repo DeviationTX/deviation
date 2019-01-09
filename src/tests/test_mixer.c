@@ -15,6 +15,19 @@ void TestGetAllTrims(CuTest *t)
     CuAssertPtrEquals(t, MIXER_GetAllTrims(), Model.trims);
 }
 
+void TestMixerInit(CuTest *t)
+{
+    for (unsigned i = 0; i < sizeof(Channels)/sizeof(Channels[0]); i++)
+        Channels[i] = i;
+    for (unsigned i = 0; i < sizeof(raw)/sizeof(raw[0]); i++)
+        raw[i] = i;
+    MIXER_Init();
+    for (unsigned i = 0; i < sizeof(Channels)/sizeof(Channels[0]); i++)
+        CuAssertIntEquals(t, 0, Channels[i]);
+    for (unsigned i = 0; i < sizeof(raw)/sizeof(raw[0]); i++)
+        CuAssertIntEquals(t, 0, raw[i]);
+}
+
 void TestEvalMixers(CuTest *t)
 {
     s32 rawdata[NUM_SOURCES + 1] = {0};
@@ -423,6 +436,7 @@ void TestApplyMixerTrim(CuTest *t)
 void TestApplyLimits(CuTest *t)
 {
     struct Limit limit;
+    mixer_period = 5;
     s32 rawdata[NUM_SOURCES + 1] = {0};
     memset(&Model, 0, sizeof(Model));
     memset((s32 *)Channels, 0, sizeof(Channels));
@@ -438,6 +452,46 @@ void TestApplyLimits(CuTest *t)
     CuAssertIntEquals(t, 200, MIXER_ApplyLimits(0, &limit, rawdata, Channels, APPLY_SAFETY));
     rawdata[INP_GEAR1] = 100;
     CuAssertIntEquals(t, 5000, MIXER_ApplyLimits(0, &limit, rawdata, Channels, APPLY_SAFETY));
+
+    //Scalar
+    limit.servoscale = 50;
+    CuAssertIntEquals(t, 100, MIXER_ApplyLimits(0, &limit, rawdata, Channels, APPLY_SCALAR));
+    rawdata[NUM_INPUTS + 1] = -200;
+    CuAssertIntEquals(t, -100, MIXER_ApplyLimits(0, &limit, rawdata, Channels, APPLY_SCALAR));
+    limit.servoscale_neg = 25;
+    CuAssertIntEquals(t, -50, MIXER_ApplyLimits(0, &limit, rawdata, Channels, APPLY_SCALAR));
+
+    //Reverse
+    limit.flags = CH_REVERSE;
+    CuAssertIntEquals(t, 200, MIXER_ApplyLimits(0, &limit, rawdata, Channels, APPLY_REVERSE));
+
+    //Subtrim
+    limit.subtrim = 1;
+    CuAssertIntEquals(t, -190, MIXER_ApplyLimits(0, &limit, rawdata, Channels, APPLY_SUBTRIM));
+   
+    //Speed
+    limit.speed = 3;
+    CuAssertIntEquals(t, -25, MIXER_ApplyLimits(0, &limit, rawdata, Channels, APPLY_SPEED));
+    rawdata[NUM_INPUTS + 1] = 200;
+    CuAssertIntEquals(t, 25, MIXER_ApplyLimits(0, &limit, rawdata, Channels, APPLY_SPEED));
+    limit.speed = 60;
+    CuAssertIntEquals(t, 200, MIXER_ApplyLimits(0, &limit, rawdata, Channels, APPLY_SPEED));
+
+    //Limits
+    limit.max = 3;
+    CuAssertIntEquals(t, 200, MIXER_ApplyLimits(0, &limit, rawdata, Channels, APPLY_LIMITS));
+    limit.max = 1;
+    CuAssertIntEquals(t, 100, MIXER_ApplyLimits(0, &limit, rawdata, Channels, APPLY_LIMITS));
+    limit.min = 3;
+    rawdata[NUM_INPUTS + 1] = -200;
+    CuAssertIntEquals(t, -200, MIXER_ApplyLimits(0, &limit, rawdata, Channels, APPLY_LIMITS));
+    limit.min = 1;
+    CuAssertIntEquals(t, -100, MIXER_ApplyLimits(0, &limit, rawdata, Channels, APPLY_LIMITS));
+   
+    rawdata[NUM_INPUTS + 1] = INT16_MAX + 1;
+    CuAssertIntEquals(t, INT16_MAX, MIXER_ApplyLimits(0, &limit, rawdata, Channels, 0));
+    rawdata[NUM_INPUTS + 1] = INT16_MIN - 1;
+    CuAssertIntEquals(t, INT16_MIN, MIXER_ApplyLimits(0, &limit, rawdata, Channels, 0));
 }
 
 void TestGetTrim(CuTest *t)
@@ -452,7 +506,26 @@ void TestGetTrim(CuTest *t)
         Model.trims[0].step = i;
         CuAssertIntEquals(t, 1000 * (i- 90), MIXER_GetTrimValue(0));
     }
+
+    Model.trims[0].sw = 1;
+    for (int j = 0; j < 6; j++) {
+        for (int i = 1; i <= 6; i++) {
+            raw[i] = -100000;
+            Model.trims[0].value[i-1] = 10 * i;
+        }
+        raw[j+1] = 10000;
+        CuAssertIntEquals(t, 10*(j+1), *MIXER_GetTrim(0));
+    }
 }
+
+void TestGetSetTemplate(CuTest *t)
+{
+    memset(&Model, 0, sizeof(Model));
+    MIXER_SetTemplate(1, MIXERTEMPLATE_SIMPLE);
+    CuAssertIntEquals(t, MIXERTEMPLATE_SIMPLE, MIXER_GetTemplate(1));
+    CuAssertIntEquals(t, MIXERTEMPLATE_SIMPLE, Model.templates[1]);
+}
+
 
 void TestUpdateTrim(CuTest *t)
 {
