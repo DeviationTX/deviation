@@ -114,15 +114,17 @@ u16 scan_cb()
 static void press_enable_cb(guiObject_t *obj, const void *data)
 {
     (void)data;
-    sp->enable ^= 1;
+
 #ifdef ENABLE_MODULAR
     if (Model.protocol != PROTOCOL_DEVO)
     {
-        PAGE_ShowWarning(NULL, "Switch to Protocol Devo please");
+        PAGE_ShowWarning(NULL, _tr("Switch to protocol\nDevo"));
+        return;
     }
-    else
 #endif
-        _scan_enable(sp->enable);
+
+    sp->enable ^= 1;
+    _scan_enable(sp->enable);
     GUI_Redraw(obj);
 }
 
