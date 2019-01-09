@@ -388,6 +388,7 @@ static u16 frsky2way_cb()
 
     case FRSKY_DATA8:
         state = FRSKY_DATA1;
+	/* FALLTHROUGH */
     case FRSKY_DATA2:
     case FRSKY_DATA4:
         CLOCK_RunMixer();    // clears mixer_sync, which is then set when mixer update complete
@@ -422,7 +423,7 @@ static u16 frsky2way_cb()
             frsky2way_parse_telem(packet, len);
         }
 #ifdef EMULATOR
-static u8 *data = testdata;
+        static u8 *data = testdata;
 
         if (!*data) data = testdata;
         len = *data + 3;
@@ -432,7 +433,7 @@ static u8 *data = testdata;
         data += len;
         frsky2way_parse_telem(packet, len);
 #endif //EMULATOR
-        // no break - fall through
+        /* FALLTHROUGH */
 
     case FRSKY_DATA3:
     case FRSKY_DATA5:
