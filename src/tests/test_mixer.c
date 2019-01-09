@@ -418,6 +418,26 @@ void TestApplyMixerTrim(CuTest *t)
     CuAssertIntEquals(t, 1499, rawdata[3 + NUM_INPUTS]);
 }
 
+void TestApplyLimits(CuTest *t)
+{
+    struct Limit limit;
+    s32 rawdata[NUM_SOURCES + 1] = {0};
+    memset(&Model, 0, sizeof(Model));
+    memset((s32 *)Channels, 0, sizeof(Channels));
+
+    rawdata[NUM_INPUTS + 1 + NUM_OUT_CHANNELS] = 1000;
+    CuAssertIntEquals(t, 1000, MIXER_ApplyLimits(NUM_OUT_CHANNELS, &limit, rawdata, Channels, 0));
+
+    //Safety
+    limit.safetysw = INP_GEAR1;
+    Model.limits[0].safetyval = 50;
+    rawdata[INP_GEAR1] = -1;
+    rawdata[NUM_INPUTS + 1] = 200;
+    CuAssertIntEquals(t, 200, MIXER_ApplyLimits(0, &limit, rawdata, Channels, APPLY_SAFETY));
+    rawdata[INP_GEAR1] = 100;
+    CuAssertIntEquals(t, 5000, MIXER_ApplyLimits(0, &limit, rawdata, Channels, APPLY_SAFETY));
+}
+
 void TestGetTrim(CuTest *t)
 {
     memset(&Model, 0, sizeof(Model));
