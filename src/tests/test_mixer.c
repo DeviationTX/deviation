@@ -676,3 +676,45 @@ void TestSwashType(CuTest *t)
     CuAssertStrEquals(t, "90", MIXER_SwashType(SWASH_TYPE_90));
     CuAssertStrEquals(t, "", MIXER_SwashType(SWASH_TYPE_LAST));
 }
+
+void TestGetSourceVal(CuTest *t)
+{
+    s32 expected[NUM_SOURCES + 1];
+    memset(&Model, 0, sizeof(Model));
+    for (int i = 0; i < NUM_CHANNELS; i++) {
+        Model.limits[i].flags = CH_REVERSE;
+    } 
+    for (int i = 0; i < NUM_TRIMS; i++) {
+        Model.trims[i].src = i + 1 + NUM_INPUTS + NUM_OUT_CHANNELS;
+        Model.trims[i].step = 100;
+        Model.trims[i].value[0] = 1;
+    } 
+    for (unsigned i = 0; i < sizeof(raw)/sizeof(raw[0]); i++) {
+        raw[i] = i * 10;
+        if (i <= NUM_INPUTS || i > NUM_INPUTS + NUM_CHANNELS)
+            expected[i] = raw[i];
+        else if (i < NUM_INPUTS + NUM_OUT_CHANNELS + 1)
+            expected[i] = -raw[i];
+        else
+            expected[i] = raw[i] + 1000;
+    }
+    for (unsigned i = 0; i < sizeof(raw)/sizeof(raw[0]); i++) {
+        CuAssertIntEquals(t, expected[i], MIXER_GetSourceVal(i, APPLY_REVERSE));
+    }
+}
+
+void TestSourceAsBoolean(CuTest *t)
+{
+    memset(&Model, 0, sizeof(Model));
+    CuAssertIntEquals(t, 0, MIXER_SourceAsBoolean(0));
+    raw[1] = CHAN_MAX_VALUE;
+    CuAssertIntEquals(t, 1, MIXER_SourceAsBoolean(1));
+    CuAssertIntEquals(t, 0, MIXER_SourceAsBoolean(0x81));
+    while (raw[1] >= CHAN_MIN_VALUE) {
+        int expected;
+        raw[1] -= 1000;
+        expected = raw[1] > CHAN_MIN_VALUE + 1000 ? 1 : 0;
+        CuAssertIntEquals(t, expected, MIXER_SourceAsBoolean(1));
+    }
+
+}
