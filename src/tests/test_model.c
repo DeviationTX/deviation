@@ -4,7 +4,6 @@ void TestModelLoadSave(CuTest *t)
 {
     struct Model ValidateModel;
 
-    chdir(FILESYSTEM_DIR);
     CONFIG_ResetModel();
     Model.fixed_id = 0xFEEDFEED;
     memcpy(&ValidateModel, &Model, sizeof(Model));
@@ -20,7 +19,6 @@ void TestModelLoadSaveWithLoc(CuTest *t)
 {
     struct Model ValidateModel;
 
-    chdir(FILESYSTEM_DIR);
     CONFIG_ReadLang(2);
 
     CONFIG_ResetModel();

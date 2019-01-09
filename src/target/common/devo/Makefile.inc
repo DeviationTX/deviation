@@ -48,6 +48,9 @@ LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -lc -lno
 LFLAGS2  = -Wl,-T$(LINKFILE)
 LFLAGS2OPT  = -Wl,-T$(SDIR)/target/$(TARGET)/$(TARGET)_opt.ld
 
+# Enable warning as error
+CFLAGS += -Werror
+
 #-lnosys
 
 ALL = $(LIBOPENCM3) $(TARGET).dfu
