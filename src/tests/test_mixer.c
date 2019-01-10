@@ -230,6 +230,7 @@ void TestApplyMixerDelay(CuTest *t)
     memset(&Model, 0, sizeof(Model));
 
     rawdata[1] = 1000;
+    mixer_period = 5;
 
     //Delay
     s32 target[] = {550, 550, 550, 550, 550, 550, 550, 400, 400, 400};
