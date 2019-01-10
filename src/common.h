@@ -29,11 +29,6 @@ typedef uint64_t u64;
 #include "target.h"
 #include "std.h"
 
-//FATFS is defined by target_defs.h
-struct FAT {
-    char inaccessible[FATSTRUCT_SIZE];
-};
-
 //Compatibility with Atmega
 #define FLASHBYTETABLE static const u8
 #define FLASHWORDTABLE static const u16

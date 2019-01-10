@@ -5,7 +5,7 @@
 #error "Don't include target_defs.h directly, include target.h instead."
 #endif
 
-#ifndef FATSTRUCT_SIZE
+#if !defined(EMULATOR) || EMULATOR != USE_NATIVE_FS
     #if defined USE_DEVOFS && USE_DEVOFS == 1
         #include "enable_devofs.h"
     #else

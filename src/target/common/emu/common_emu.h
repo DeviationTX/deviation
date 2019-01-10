@@ -7,7 +7,9 @@
 
 //FAT is unused for the emulator
 #if EMULATOR == USE_NATIVE_FS
-    #define FATSTRUCT_SIZE 1
+    typedef struct {
+        int dummy;
+    }FATFS;
     #define fs_is_initialized(x) x
     #define fs_add_file_descriptor(x, y) (void)NULL
 #endif

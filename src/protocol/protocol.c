@@ -30,7 +30,7 @@
 #define HAS_4IN1_FLASH 0
 #endif
 
-extern struct FAT FontFAT; //defined in screen/lcd_string.c
+extern FATFS FontFAT; //defined in screen/lcd_string.c
 
 //Not static because we need it in mixer.c
 const u8 EATRG0[PROTO_MAP_LEN] =

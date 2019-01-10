@@ -15,7 +15,7 @@
 #include "common.h"
 #include "gui/gui.h"
 
-struct FAT FontFAT = {{0}};
+FATFS FontFAT;
 /*
  * The font 'font_table' begins with a list of u24 values which represent
  * the offeset (from the beginning of the font file) of each character.

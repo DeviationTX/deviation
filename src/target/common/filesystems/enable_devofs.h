@@ -3,8 +3,6 @@
 
     #include "devofs/devofs.h"
 
-    #define FATSTRUCT_SIZE sizeof(FATFS)
-
     #define fs_mount      df_mount
     #define fs_open       df_open
     #define fs_read       df_read

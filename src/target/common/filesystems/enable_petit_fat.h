@@ -3,8 +3,6 @@
 
     #include "petit_fat/petit_fat.h"
 
-    #define FATSTRUCT_SIZE sizeof(FATFS)
-
     #define fs_mount                        pf_mount
     #define fs_is_initialized(x)            (((char *)(x))[0] != 0)
     #define fs_add_file_descriptor(x, y)    FS_Mount(x, y)
