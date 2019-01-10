@@ -7,7 +7,6 @@ ifndef BUILD_TARGET
 CROSS    = arm-none-eabi-
 EXTRA_MAKEFILES := $(EXTRA_MAKEFILES) $(SDIR)/target/common/devo/Makefile.inc
 
-LINKFILE = $(SDIR)/target/$(TARGET)/$(TARGET).ld
 PROTO_LINKFILE = $(SDIR)/target/$(TARGET)/protocol.ld
 
 LIBOPENCM3 = $(SDIR)/libopencm3/lib/libopencm3_stm32f1.a
@@ -45,8 +44,18 @@ MODULE_FLAGS = -fno-builtin
 
 #LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -nostdlib
 LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -lc -lnosys -L$(SDIR) -Lobjs/$(TARGET) -Wl,-warn-common
+
+LINKFILE = $(SDIR)/target/$(TARGET)/$(TARGET).ld
 LFLAGS2  = -Wl,-T$(LINKFILE)
-LFLAGS2OPT  = -Wl,-T$(SDIR)/target/$(TARGET)/$(TARGET)_opt.ld
+
+ifdef OPTIMIZE_DFU
+LINKFILEOPT = $(SDIR)/target/$(TARGET)/$(TARGET)_opt.ld
+ifeq (,$(wildcard $(LINKFILEOPT)))
+LINKFILEOPT = $(LINKFILE)
+endif
+LFLAGS2OPT  = -Wl,-T$(LINKFILEOPT)
+CRC_OFFSET=$(shell grep _crc_offset $(LINKFILEOPT) | awk -F'[= ;]' '{print $$4}')
+endif
 
 #-lnosys
 

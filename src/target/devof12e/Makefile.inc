@@ -3,15 +3,16 @@ FILESYSTEMS := common text text_gfx
 
 DFU_ARGS         := -c 12 -b 0x08004000
 
-DEFAULT_PROTOCOLS := 
+DEFAULT_PROTOCOLS :=
 INCLUDE_FS := 0
+OPTIMIZE_DFU := 1
 
 include $(SDIR)/target/common/devo/Makefile.inc
 include target/common/devo/Makefile.devofs.inc
 
 ifndef BUILD_TARGET
 
-MEDIA_FILES = 
+MEDIA_FILES =
 NUM_MODELS ?= 10
 
 else

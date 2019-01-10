@@ -1,7 +1,6 @@
 FILESYSTEMS := common text
 SCREENSIZE  := text
 
-CRC_OFFSET       := 8192
 OPTIMIZE_DFU     := 1
 MODULAR          := 0x20004000
 DFU_ARGS         := -c 4 -b 0x08003000
