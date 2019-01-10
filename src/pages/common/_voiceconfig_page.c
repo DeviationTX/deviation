@@ -122,36 +122,26 @@ static const char *voicelbl_cb(guiObject_t *obj, const void *data)
     int idx = (long)data;
     switch (voiceconfig_getsrctype(idx)) {
         case VOICE_SRC_SWITCH:
-            if (Model.voice.switches[idx - VOICE_SRC_SWITCH].music) {
-                CONFIG_VoiceParse(voice_map[Model.voice.switches[idx - VOICE_SRC_SWITCH].music].id);
-                return tempstring;
-            }
+            if (Model.voice.switches[idx - VOICE_SRC_SWITCH].music)
+                return CONFIG_VoiceParse(voice_map[Model.voice.switches[idx - VOICE_SRC_SWITCH].music].id);
             break;
 #if NUM_AUX_KNOBS
         case VOICE_SRC_AUX:
-            if(Model.voice.aux[idx - VOICE_SRC_AUX].music) {
-                CONFIG_VoiceParse(voice_map[Model.voice.aux[idx - VOICE_SRC_AUX].music].id);
-                return tempstring;
-            }
+            if(Model.voice.aux[idx - VOICE_SRC_AUX].music)
+                return CONFIG_VoiceParse(voice_map[Model.voice.aux[idx - VOICE_SRC_AUX].music].id);
             break;
 #endif
         case VOICE_SRC_TIMER:
-            if (Model.voice.timer[idx - VOICE_SRC_TIMER].music) {
-                CONFIG_VoiceParse(voice_map[Model.voice.timer[idx - VOICE_SRC_TIMER].music].id);
-                return tempstring;
-            }
+            if (Model.voice.timer[idx - VOICE_SRC_TIMER].music)
+                return CONFIG_VoiceParse(voice_map[Model.voice.timer[idx - VOICE_SRC_TIMER].music].id);
             break;
         case VOICE_SRC_TELEMETRY:
-            if (Model.voice.telemetry[idx - VOICE_SRC_TELEMETRY].music) {
-                CONFIG_VoiceParse(voice_map[Model.voice.telemetry[idx - VOICE_SRC_TELEMETRY].music].id);
-                return tempstring;
-            }
+            if (Model.voice.telemetry[idx - VOICE_SRC_TELEMETRY].music)
+                return CONFIG_VoiceParse(voice_map[Model.voice.telemetry[idx - VOICE_SRC_TELEMETRY].music].id);
             break;
         case VOICE_SRC_MIXER:
-            if (Model.voice.mixer[idx - VOICE_SRC_MIXER].music) {
-                CONFIG_VoiceParse(voice_map[Model.voice.mixer[idx - VOICE_SRC_MIXER].music].id);
-                return tempstring;
-            }
+            if (Model.voice.mixer[idx - VOICE_SRC_MIXER].music)
+                return CONFIG_VoiceParse(voice_map[Model.voice.mixer[idx - VOICE_SRC_MIXER].music].id);
             break;
     }
     return strcpy(tempstring, "");

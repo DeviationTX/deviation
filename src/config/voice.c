@@ -20,6 +20,7 @@
 #include "../music.h"
 #include "extended_audio.h"
 #include "tx.h"
+#include "voice.h"
 
 #define MATCH_SECTION(s) (strcasecmp(section, s) == 0)
 #define MATCH_KEY(s)     (strcasecmp(name,    s) == 0)
@@ -29,26 +30,26 @@
 const char SECTION_VOICE_GLOBAL[] = "global";
 const char SECTION_VOICE_CUSTOM[] = "custom";
 
-static const char* getfield(char* value, int num) {
-    const char* tok;
-    for (tok = strtok(value, ","); tok && *tok; tok = strtok(NULL, ",\n")) {
-        if (!--num)
-            return tok;
-    }
-    return "";
-}
-
 static int ini_handler(void* user, const char* section, const char* name, const char* value)
 {
     u16 req_id = *((long*)user);
-    char tmp[100];
-    strlcpy(tmp, value, 100);
-    int duration = atoi(getfield(tmp,2));
     u16 id = atoi(name);
+    const char* ptr = value;
+    u8 k = 0;
+    u16 duration = 0;
+
+    while (*ptr && *ptr != ',') {
+        ptr++;
+        k++;
+    }
+    if (*ptr == ',') {
+        duration = atoi(ptr + 1);
+        }
 
 #if HAS_MUSIC_CONFIG
-    if ( (req_id != MAX_VOICEMAP_ENTRIES) && (req_id == id) ) {
-        strlcpy(tempstring,getfield(tmp, 1), MAX_VOICE_LABEL);
+    if ( k && (req_id != MAX_VOICEMAP_ENTRIES) && (req_id == id) ) {
+        strlcpy(tempstring, value, k+1);
+        tempstring[MAX_VOICE_LABEL] = '\0';
         return 1;
     }
 #endif
@@ -65,7 +66,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         }
         if (MATCH_SECTION(SECTION_VOICE_CUSTOM)) {
             voice_map[voice_map_entries].duration = duration;
-            voice_map[voice_map_entries].id = atoi(name);
+            voice_map[voice_map_entries].id = id;
             voice_map_entries++;
             return 1;
         }
@@ -75,7 +76,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
     return 1; // voice label ignored
 }
 
-void CONFIG_VoiceParse(unsigned id)
+const char* CONFIG_VoiceParse(unsigned id)
 {
     #ifdef _DEVO12_TARGET_H_
     static char filename[] = "media/voice.ini\0\0\0"; // placeholder for longer folder name
@@ -97,11 +98,14 @@ void CONFIG_VoiceParse(unsigned id)
         if (CONFIG_IniParse(filename, ini_handler, &id)) {
             printf("Failed to parse voice.ini\n");
             Transmitter.audio_player = AUDIO_NONE; // disable external voice output
+            strcpy(tempstring, "");
         }
     }
     if (id >= CUSTOM_ALARM_ID) {
         if (CONFIG_IniParse(filename, ini_handler, &id)) {
+            //ini handler will set tempstring to label of mp3id
         }
     }
+    return tempstring;
 }
 #endif
