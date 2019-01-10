@@ -16,7 +16,6 @@ extern u16 audio_queue[AUDIO_QUEUE_LENGTH];
 extern u8 next_audio;
 extern u8 num_audio;
 extern u32 audio_queue_time;
-extern char voicelabel[MAX_VOICE_LABEL];
 
 #endif
 #endif
