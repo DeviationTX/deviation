@@ -102,7 +102,7 @@ const char* CONFIG_VoiceParse(unsigned id)
             strcpy(tempstring, "");
         }
     }
-    if (id >= CUSTOM_ALARM_ID) {
+    if ( (id < MAX_VOICEMAP_ENTRIES) && (id >= CUSTOM_ALARM_ID) ) {
         if (CONFIG_IniParse(filename, ini_handler, &id)) {
             //ini handler will return tempstring with label of id
         }

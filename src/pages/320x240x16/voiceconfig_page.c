@@ -32,12 +32,10 @@ enum {
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
-        int row = y;
-        int voice_num = absrow;
         //Row 1
-        GUI_CreateLabelBox(&gui->name[relrow], COL1, row, COL2-COL1, 18, &LABEL_FONT,voiceconfig_str_cb, NULL, (void *)(long)voice_num);
-        GUI_CreateTextSelect(&gui->voiceidx[relrow],  COL2, row, TEXTSELECT_64, voice_test_cb, voiceid_cb, (void *)(long)voice_num);
-        GUI_CreateLabelBox(&gui->voicelbl[relrow], COL3, row, LCD_WIDTH - COL3 - ARROW_WIDTH, 18, &TINY_FONT, voicelbl_cb, NULL, (void *)(long)voice_num);
+        GUI_CreateLabelBox(&gui->name[relrow], COL1, y, COL2-COL1, 18, &LABEL_FONT,voiceconfig_str_cb, NULL, (void *)(long)absrow);
+        GUI_CreateTextSelect(&gui->voiceidx[relrow],  COL2, y, TEXTSELECT_64, voice_test_cb, voiceid_cb, (void *)(long)absrow);
+        GUI_CreateLabelBox(&gui->voicelbl[relrow], COL3, y, LCD_WIDTH - COL3 - ARROW_WIDTH, 18, &TINY_FONT, voicelbl_cb, NULL, (void *)(long)absrow);
     return 1;
 }
 
@@ -52,7 +50,7 @@ void PAGE_VoiceconfigInit(int page)
             _tr("External voice\ncurrently not\navailable"));
         return;
     }
-    
+
     GUI_CreateScrollable(&gui->scrollable, 0, init_y, LCD_WIDTH, LCD_HEIGHT-init_y,
                      VOICEROWSPACER, MODEL_CUSTOM_ALARMS, row_cb, NULL, NULL, NULL);
     PAGE_SetScrollable(&gui->scrollable, &current_selected);
