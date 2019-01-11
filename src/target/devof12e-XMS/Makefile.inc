@@ -3,8 +3,9 @@ SCREENSIZE  := text
 DFU_ARGS    := -c 12 -b 0x08004000
 LANGUAGE   := devo10
 
-include $(SDIR)/target/common/devo/Makefile.inc
+OPTIMIZE_DFU := 1
 
+include $(SDIR)/target/common/devo/Makefile.inc
 
 ifndef BUILD_TARGET
 
