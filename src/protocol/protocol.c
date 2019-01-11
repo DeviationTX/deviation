@@ -131,6 +131,8 @@ void PROTOCOL_Load(int no_dlg)
     (void)no_dlg;
 #ifdef ENABLE_MODULAR
     FATFS ModuleFAT;
+    FILE *fh;
+
     if(! PROTOCOL_HasModule(Model.protocol)) {
         *loaded_protocol = 0;
         return;
@@ -151,11 +153,9 @@ void PROTOCOL_Load(int no_dlg)
     }
     file[17] = '\0'; //truncate filename to 8 characters
     strcat(file, ".mod");
-    FILE *fh;
-    //Thatis necessary because we need to be able to load the
-    //protocol while an ini file is open, and we don't want to
-    //waste the RAM for an extra filehandle
-    finit(&ModuleFAT, "module"); //In case no fonts are loaded yet
+
+    memset(&ModuleFAT, 0, sizeof(ModuleFAT));
+    finit(&ModuleFAT, "protocol");
     fh = fopen2(&ModuleFAT, file, "r");
     //printf("Loading %s: %08lx\n", file, fh);
     if(! fh) {
