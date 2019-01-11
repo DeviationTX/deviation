@@ -653,6 +653,37 @@ void TestTrimAsSwitch(CuTest *t)
     CuAssertIntEquals(t, 0, Model.trims[0].value[0]);
 }
 
+void TestSetMixers(CuTest *t)
+{
+    struct Mixer newmixers[3];
+    memset(&Model, 0, sizeof(Model));
+    for (int i = 0; i < 3; i++) {
+        newmixers[i].src = 10 + i;
+        newmixers[i].dest = 21;
+    }
+    for (int i = 0; i < NUM_MIXERS-2; i++) {
+        Model.mixers[i].src = 1;
+        Model.mixers[i].dest = 20;
+    }
+    CuAssertIntEquals(t, 0, MIXER_SetMixers(newmixers, 3));
+    memset(&Model, 0, sizeof(Model));
+    Model.templates[20] = MIXERTEMPLATE_SIMPLE;
+    Model.templates[21] = MIXERTEMPLATE_SIMPLE;
+    for (int i = 0; i < 10; i++) {
+        Model.mixers[i].src = i + 1;
+        Model.mixers[i].dest = (i % 2) + 20;
+    }
+    CuAssertIntEquals(t, 1, MIXER_SetMixers(newmixers, 3));
+    int expected_src[] = {1, 3, 5, 7, 9, 10, 11, 12, 0, 0, 0};
+    int expected_dst[] = {20, 20, 20, 20, 20, 21, 21, 21, 0, 0, 0};
+    for (int i = 0; i < 10; i++) {
+        CuAssertIntEquals(t, expected_src[i], Model.mixers[i].src);
+        if (expected_src[i]) {
+            CuAssertIntEquals(t, expected_dst[i], Model.mixers[i].dest);
+        }
+    }
+}
+
 void TestTemplateName(CuTest *t)
 {
     CONFIG_ReadLang(0);
