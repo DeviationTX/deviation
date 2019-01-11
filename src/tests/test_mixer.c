@@ -395,7 +395,6 @@ void TestApplyMixerDelay(CuTest *t)
     mixer_period = 5;
 
     rawdata[1] = 1000;
-    mixer_period = 5;
 
     //Delay
     s32 target[] = {550, 550, 550, 550, 550, 550, 550, 400, 400, 400};
@@ -655,12 +654,15 @@ void TestTrimAsSwitch(CuTest *t)
 
 void TestSetMixers(CuTest *t)
 {
-    struct Mixer newmixers[3];
+    struct Mixer newmixers[4] = {0};
     memset(&Model, 0, sizeof(Model));
     for (int i = 0; i < 3; i++) {
         newmixers[i].src = 10 + i;
         newmixers[i].dest = 21;
     }
+    newmixers[3].dest = 21;
+    newmixers[3].curve.type = CURVE_FIXED;
+    
     for (int i = 0; i < NUM_MIXERS-2; i++) {
         Model.mixers[i].src = 1;
         Model.mixers[i].dest = 20;
@@ -673,15 +675,60 @@ void TestSetMixers(CuTest *t)
         Model.mixers[i].src = i + 1;
         Model.mixers[i].dest = (i % 2) + 20;
     }
-    CuAssertIntEquals(t, 1, MIXER_SetMixers(newmixers, 3));
-    int expected_src[] = {1, 3, 5, 7, 9, 10, 11, 12, 0, 0, 0};
-    int expected_dst[] = {20, 20, 20, 20, 20, 21, 21, 21, 0, 0, 0};
+    CuAssertIntEquals(t, 1, MIXER_SetMixers(newmixers, 4));
+    int expected_src[] = {1, 3, 5, 7, 9, 10, 11, 12, 1, 0, 0};
+    int expected_dst[] = {20, 20, 20, 20, 20, 21, 21, 21, 21, 0, 0};
     for (int i = 0; i < 10; i++) {
         CuAssertIntEquals(t, expected_src[i], Model.mixers[i].src);
         if (expected_src[i]) {
             CuAssertIntEquals(t, expected_dst[i], Model.mixers[i].dest);
         }
     }
+}
+
+void TestGetLimit(CuTest *t)
+{
+    struct Limit limit = {0};
+    for (int i = 0; i < NUM_OUT_CHANNELS; i++) {
+        limit.max = i;
+        MIXER_SetLimit(i, &limit);
+        struct Limit *limit2 = MIXER_GetLimit(i);
+        CuAssertPtrEquals(t, (void *)&Model.limits[i], (void *)limit2);
+        CuAssertIntEquals(t, i, limit2->max);
+    }
+    CuAssertPtrEquals(t, NULL, (void *)MIXER_GetLimit(NUM_OUT_CHANNELS));
+}
+
+void TestInitMixer(CuTest *t)
+{
+    struct Mixer mixer = {
+        .src = 0,
+        .dest = 0,
+        .scalar = 0,
+        .offset = 100,
+        .sw = 1,
+        .curve = { .type = CURVE_NONE, .points = {1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12, 13}},
+        };
+    MIXER_InitMixer(&mixer, 5);
+    CuAssertIntEquals(t, 6, mixer.src);
+    CuAssertIntEquals(t, 5, mixer.dest);
+    CuAssertIntEquals(t, 100, mixer.scalar);
+    CuAssertIntEquals(t, 0, mixer.offset);
+    CuAssertIntEquals(t, 0, mixer.sw);
+    CuAssertIntEquals(t, CURVE_EXPO, mixer.curve.type);
+    for (int i = 0; i < 13; i++) {
+        CuAssertIntEquals(t, 0, mixer.curve.points[i]);
+    }
+
+
+}
+
+void TestSourceHasTrim(CuTest *t)
+{
+    memset(&Model, 0, sizeof(Model));
+    Model.trims[1].src = 10;
+    CuAssertIntEquals(t, 1, MIXER_SourceHasTrim(10));
+    CuAssertIntEquals(t, 0, MIXER_SourceHasTrim(9));
 }
 
 void TestTemplateName(CuTest *t)
