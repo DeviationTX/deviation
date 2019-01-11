@@ -21,8 +21,6 @@
 #define HEIGHT(x) (x.zoom)
 #define get_width(x) HEIGHT(cur_str.font)
 
-FATFS FontFAT;
-
 void LCD_SetXY(unsigned int x, unsigned int y)
 {
     cur_str.x_start = x;

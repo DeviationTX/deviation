@@ -30,7 +30,6 @@
 #define HAS_4IN1_FLASH 0
 #endif
 
-extern FATFS FontFAT; //defined in screen/lcd_string.c
 
 //Not static because we need it in mixer.c
 const u8 EATRG0[PROTO_MAP_LEN] =
@@ -131,6 +130,7 @@ void PROTOCOL_Load(int no_dlg)
 {
     (void)no_dlg;
 #ifdef ENABLE_MODULAR
+    FATFS ModuleFAT;
     if(! PROTOCOL_HasModule(Model.protocol)) {
         *loaded_protocol = 0;
         return;
@@ -152,17 +152,13 @@ void PROTOCOL_Load(int no_dlg)
     file[17] = '\0'; //truncate filename to 8 characters
     strcat(file, ".mod");
     FILE *fh;
-    //We close the current font because on the dveo8 we reuse
-    //the font filehandle to read the protocol.
     //Thatis necessary because we need to be able to load the
     //protocol while an ini file is open, and we don't want to
     //waste the RAM for an extra filehandle
-    u8 old_font = LCD_SetFont(0);
-    finit(&FontFAT, ""); //In case no fonts are loaded yet
-    fh = fopen2(&FontFAT, file, "r");
+    finit(&ModuleFAT, "module"); //In case no fonts are loaded yet
+    fh = fopen2(&ModuleFAT, file, "r");
     //printf("Loading %s: %08lx\n", file, fh);
     if(! fh) {
-        LCD_SetFont(old_font);
         if(! no_dlg) {
             sprintf(tempstring, "Misisng protocol:\n%s", file);
             PAGE_ShowWarning(NULL, tempstring);
@@ -172,9 +168,7 @@ void PROTOCOL_Load(int no_dlg)
     setbuf(fh, 0);
     fread(loaded_protocol, 1, 4 * 1024, fh);
     fclose(fh);
-    LCD_SetFont(old_font);
     if ((unsigned long)&_data_loadaddr != *loaded_protocol) {
-        LCD_SetFont(old_font);
         if(! no_dlg) {
             sprintf(tempstring, "Protocol Mismatch:\n%08x\n%08x", (unsigned long)&_data_loadaddr, *loaded_protocol);
             PAGE_ShowWarning(NULL, tempstring);
