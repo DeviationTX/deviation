@@ -32,6 +32,7 @@ const char SECTION_VOICE_CUSTOM[] = "custom";
 
 static int ini_handler(void* user, const char* section, const char* name, const char* value)
 {
+    // ini_handler returns a requested mp3 label passed at *user to tempstring
     u16 req_id = *((long*)user);
     u16 id = atoi(name);
     const char* ptr = value;
@@ -49,7 +50,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
 #if HAS_MUSIC_CONFIG
     if ( k && (req_id != MAX_VOICEMAP_ENTRIES) && (req_id == id) ) {
         strlcpy(tempstring, value, k+1);
-        tempstring[MAX_VOICE_LABEL] = '\0';
+        tempstring[MAX_VOICE_LABEL] = '\0'; // limit label length
         return 1;
     }
 #endif
@@ -103,7 +104,7 @@ const char* CONFIG_VoiceParse(unsigned id)
     }
     if (id >= CUSTOM_ALARM_ID) {
         if (CONFIG_IniParse(filename, ini_handler, &id)) {
-            //ini handler will set tempstring to label of mp3id
+            //ini handler will return tempstring with label of id
         }
     }
     return tempstring;
