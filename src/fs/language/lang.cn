@@ -28,7 +28,8 @@
 5秒
 >:5+1
 >:6+1
->:60 sec
+:60 sec
+60秒
 :6Ch Airplane
 6通直升机
 :6Ch Helicopter
@@ -55,9 +56,10 @@
 >:AUX7
 :About Deviation
 关于Deviation
->:Add
+:Add
+相加
 :Advanced
-高级模式1
+高级模式
 :Airplane
 固定翼
 :Alarm
@@ -66,7 +68,8 @@
 报警间隔
 :Alarm intvl
 报警间隔
->:All
+:All
+全选
 :Altitude
 高度
 :Auto
@@ -75,14 +78,16 @@
 背光
 >:Bad/missing\nprotocol modules!
 >:Bar
->:Bargraph
+:Bargraph
+输出显示
 :Batt alarm
 电量报警
 :Battery alarm
 电量报警
 :Battery too low,\ncan't save!
-电压过低,\n无法存盘!
->:Big-box
+电压过低,\n无法保存!
+:Big-box
+大显示框
 :Bind
 对频
 :Binding
@@ -91,7 +96,8 @@
 对频中...\n请确保飞机通电!\n\n点击OK不会中止对频\n但是可以退出本页面
 :Binding %s...\nPress ENT to stop
 对频中 %s...\n按ENT中止
->:Box
+:Box
+显示框
 :Button monitor
 按键监控
 :Buzz settings
@@ -135,20 +141,22 @@ CYC
 通道监控
 :Channel output
 通道输出
->:Clock
+:Clock
+时钟
 :Complex
 多段式
 :Configure
 设置
 :Contrast
 对比度
->:Control
+:Control
+控制开关
 :Copy To
 复制到
 :Copy To...
 复制...
 :Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
-检测到电压过低.\n当前设置已经存盘.\n以后的设置将无法存盘.\n\n请立即更换电池！
+检测到电压过低.\n当前设置已经保存.\n以后的设置将无法保存.\n\n请立即更换电池！
 :Curve
 曲线
 :Cyclic1
@@ -167,17 +175,23 @@ CCPM3
 方向舵量/曲线
 :DR
 舵量
->:Datalog
->:Date
->:Date / Time
->:Date format
+:Datalog
+数据日志
+:Date
+日期
+:Date / Time
+日期/时间
+:Date format
+日期格式
 >:Date:
->:Day
+:Day
+日
 :Deadband
 死区
 :Default
 缺省
->:Delete
+:Delete
+删除
 :Delta PW
 脉宽变化
 :Deviation FW version:
@@ -192,6 +206,8 @@ Deviation固件版本:
 是否确定\n重置持续\n计时器%d?
 :Down
 下
+:External voice\ncurrently not\navailable
+语音模块不可用请\n开启模块和检查\nsound文件是否正确
 :ELE
 升降
 :ELE DR
@@ -214,7 +230,8 @@ Deviation固件版本:
 退出
 :Expo&DR
 三段式
->:Extend
+:Extend
+扩展
 :FMODE
 模式
 >:Fades
@@ -247,7 +264,8 @@ Deviation固件版本:
 锁尾感度
 :H
 高
->:H-trim
+:H-trim
+水平微调
 >:HOLD
 :Heli
 直升机
@@ -259,11 +277,14 @@ Deviation固件版本:
 :Hold position
 熄火油门值
 >:Holds
->:Hour
+:Hour
+小时
 :Icon
 图标
->:Idle Up 1
->:Idle Up 2
+:Idle Up 1
+特殊模式1
+:Idle Up 2
+特殊模式2
 :Input
 输入
 :Input monitor
@@ -354,7 +375,8 @@ LCD设置
 模型设置
 :Model type
 模型类型
->:Momentary
+:Momentary
+复位
 :Month
 月
 :Move Down
@@ -369,7 +391,8 @@ LCD设置
 负
 :New
 新增
->:No
+:No
+否
 :No Trim
 无
 :None
@@ -392,14 +415,17 @@ LCD设置
 开/关
 :PIT
 螺距
->:PIT Mix
+:PIT Mix
+螺距混控
 >:PPM
->:PPM In
+:PPM In
+PPM输入
 >:PPM%d
 >:PPMIn Cfg (Extend)
 :Page
-模式1-N
->:Page Config
+模式
+:Page Config
+页面配置
 :Pitch curves
 螺距曲线
 :Plane
@@ -418,8 +444,10 @@ LCD设置
 正/负
 :Position %d
 档位%1
->:Power On alarm
->:Power-down alert
+:Power On alarm
+无操作报警
+:Power-down alert
+关控提示
 :Prealert interval
 预警间隔
 :Prealert intvl
@@ -427,7 +455,7 @@ LCD设置
 :Prealert time
 预警时间
 :Press 'Ent' to turn USB Filesystem
-按ENT改变USB盘状态
+按ENT改变USB状态
 :Press ENT to change
 按ENT更改
 :Press ENT to copy to
@@ -439,9 +467,9 @@ LCD设置
 :Protocol
 通信协议
 :PwrDn alert
-无电提示
+关控提示
 :PwrOn alarm
-开机报警
+无操作报警
 :RIGHT_H
 右水平
 :RIGHT_V
@@ -454,7 +482,8 @@ LCD设置
 方向
 :RUD DR
 方向舵量
->:Rate
+:Rate
+取样间隔
 :Re-Init
 初始化
 :Real Time Clock
@@ -472,7 +501,7 @@ LCD设置
 :Reversed
 反向
 :Revert
-回滚修改
+重置修改
 :Right
 右
 :Safe Val
@@ -495,23 +524,31 @@ LCD设置
 选择
 :Servo
 舵机
->:Set
->:Set date
->:Set permanent timer
->:Set time
+:Set
+设置
+:Set date
+设置当前日期
+:Set permanent timer
+设置持续计时器
+:Set time
+设置时间
 >:Set to
+设置
 >:Set:
 :Simple
 一段式
 :Simple 4 Channel
 4通道
->:Small-box
->:Smooth
+:Small-box
+小显示框
+:Smooth
+平滑性
 :Speed
 舵机速率
 :Src
 输入
->:Standard
+:Standard
+通用模式
 :Standard Mixer
 通用模式
 :Start
@@ -576,13 +613,13 @@ LCD设置
 :TelemV
 电压
 :Telemetry
-双向回传
+回传
 :Telemetry config
-双向回传设置
+回传设置
 :Telemetry monitor
-双向回传监控
+回传监控
 :Telemetry settings
-双向回传设置
+回传设置
 :Temp
 温度
 :Temperature
@@ -613,7 +650,8 @@ LCD设置
 超时报警间隔
 :Timeup intvl
 超时报警间隔
->:Toggle
+:Toggle
+开关
 :Touch Calibrate
 触摸屏校准
 :Touch Test
@@ -626,9 +664,12 @@ LCD设置
 触碰上锁
 :Touch to Unlock
 触碰解锁
->:Trainer Cfg (Channel)
->:Trainer Cfg (Stick)
->:Trainer Sw
+:Trainer Cfg (Channel)
+教练配置(通道)
+:Trainer Cfg (Stick)
+教练配置(摇杆)
+:Trainer Sw
+教练开关
 :Transmitter config
 遥控设置
 :Transmitter menu
@@ -643,7 +684,8 @@ LCD设置
 微调-
 :Trim Step
 微调幅度
->:Trimbar
+:Trimbar
+微调
 :Trims
 微调数
 :Turn Off
@@ -652,13 +694,17 @@ LCD设置
 开启
 :Tx power
 发射功率
->:Type
->:USB
+:Type
+类型
+:USB
+U盘模式
 >:USB Filesystem is currently 
->:Unknown
+:Unknown
+未知!!!
 :Up
 上
->:V-trim
+:V-trim
+垂直微调
 :Value
 值
 :Vibration
@@ -671,17 +717,20 @@ LCD设置
 欢迎
 :Year
 年
->:Yes
+:Yes
+是
 :Zero/Max
 零/最大
 :\n%d seconds left
 \n还剩%d秒
 :\n\nBinding will end in %d seconds...
 \n\n对频在%d秒后结束
->:actual value
+:actual value
+实际值
 :add
-附加
->:cntdn-prop
+相加
+:cntdn-prop
+倒计时插件
 :countdown
 倒计时
 :delay
@@ -695,14 +744,18 @@ LCD设置
 :min
 最小
 :mult
-叠加
+相乘
 :permanent
 持续计时
 :replace
 替换
->:resulting value
->:stop-prop
+:resulting value
+结果值
+:stop-prop
+暂停插件
 :stopwatch
 秒表
->:value to add or set
->:value to set
+:value to add or set
+添加或设置的值
+:value to set
+设置的值
