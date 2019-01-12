@@ -6,6 +6,8 @@ MODULAR          := 0x20004000
 DFU_ARGS         := -c 4 -b 0x08003000
 # 0x08003000
 
+LINKFILE = $(SDIR)/target/devof7/devof7.ld
+
 PRE_FS = $(ODIR)/.pre_fs
 
 INCLUDE_FS := 0

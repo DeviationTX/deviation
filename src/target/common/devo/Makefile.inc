@@ -45,11 +45,13 @@ MODULE_FLAGS = -fno-builtin
 #LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -nostdlib
 LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -lc -lnosys -L$(SDIR) -Lobjs/$(TARGET) -Wl,-warn-common
 
+ifeq ($(LINKFILE),)
 LINKFILE = $(SDIR)/target/$(TARGET)/$(TARGET).ld
+endif
 LFLAGS2  = -Wl,-T$(LINKFILE)
 
 ifdef OPTIMIZE_DFU
-LINKFILEOPT = $(SDIR)/target/$(TARGET)/$(TARGET)_opt.ld
+LINKFILEOPT = $(basename $(LINKFILE))_opt.ld
 ifeq (,$(wildcard $(LINKFILEOPT)))
 LINKFILEOPT = $(LINKFILE)
 endif

@@ -5,6 +5,8 @@ LANGUAGE   := devo10
 
 OPTIMIZE_DFU := 1
 
+LINKFILE = $(SDIR)/target/devof12e/devof12e.ld
+
 include $(SDIR)/target/common/devo/Makefile.inc
 
 ifndef BUILD_TARGET

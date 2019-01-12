@@ -5,6 +5,8 @@ OPTIMIZE_DFU     := 1
 MODULAR          := 0x20004000
 DFU_ARGS         := -c 7 -b 0x08003000
 
+LINKFILE = $(SDIR)/target/devof7/devof7.ld
+
 include target/common/devo/Makefile.inc
 
 ifndef BUILD_TARGET
