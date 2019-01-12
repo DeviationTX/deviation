@@ -1,11 +1,16 @@
 ﻿简体中文
 :# Channels
 通道数
->:%d bytes left
+:%d bytes left
+%d字节以上
 : is %d%%, safe value = %d%%\n
 当前值为%d%%, 安全开机设定为%d%%\n
 : is %d%%,\nsafe value = %d%%
 当前值为%d%%,\n安全开机设定为%d%%
+:\n%d seconds left
+\n还剩%d秒
+:\n\nBinding will end in %d seconds...
+\n\n对频在%d秒后结束
 :1 sec
 1秒
 :1-to-1
@@ -57,6 +62,8 @@
 :About Deviation
 关于Deviation
 :Add
+添加
+:add
 相加
 :Advanced
 高级模式
@@ -74,12 +81,20 @@
 高度
 :Auto
 自动
+:Audio settings
+音量设置
+:Audio volume
+扬声器音量
+:actual value
+实际值
 :Backlight
-背光
->:Bad/missing\nprotocol modules!
->:Bar
+背光亮度
+:Bad/missing\nprotocol modules!
+协议模块\n损坏或者缺失!
+:Bar
+光柱
 :Bargraph
-输出显示
+光柱
 :Batt alarm
 电量报警
 :Battery alarm
@@ -101,11 +116,15 @@
 :Button monitor
 按键监控
 :Buzz settings
-报警设置
+提示音设置
 :Buzz volume
-音量
+蜂鸣器音量
 :Buzzer settings
-报警设置
+提示音设置
+:Battery
+电池
+beep
+蜂鸣器
 :COL
 螺距
 :COL Inv
@@ -138,7 +157,7 @@ CYC
 :Channel
 通道
 :Channel monitor
-通道监控
+通道监视器
 :Channel output
 通道输出
 :Clock
@@ -146,7 +165,7 @@ CYC
 :Complex
 多段式
 :Configure
-设置
+遥控设置
 :Contrast
 对比度
 :Control
@@ -165,6 +184,10 @@ CCPM1
 CCPM2
 :Cyclic3
 CCPM3
+:cntdn-prop
+倒计时插件
+:countdown
+倒计时
 :D/R & Exp
 舵量/曲线
 :D/R&Exp -AIL
@@ -208,6 +231,8 @@ Deviation固件版本:
 下
 :External voice\ncurrently not\navailable
 语音模块不可用请\n开启模块和检查\nsound文件是否正确
+:delay
+延迟
 :ELE
 升降
 :ELE DR
@@ -221,7 +246,7 @@ Deviation固件版本:
 :Edit
 编辑
 :Enable
-打开
+激活开关
 :Enabled
 打开的
 :Enter
@@ -234,7 +259,8 @@ Deviation固件版本:
 扩展
 :FMODE
 模式
->:Fades
+:Fades
+模糊
 :Fahren
 华氏
 :Fail-safe
@@ -242,7 +268,7 @@ Deviation固件版本:
 :File
 模型文件
 :Fixed
-固定
+固定值
 :Fixed ID
 固定ID码
 :Fly mode
@@ -251,13 +277,19 @@ Deviation固件版本:
 英尺
 :Frame Size
 总脉宽
+:from
+到
 :GEAR
 尾舵
 >:GPS
->:GPS Alt.
->:GPS Coords
->:GPS Speed
->:GPS Time
+:GPS Alt.
+GPS高度
+:GPS Coords
+GPS距离
+:GPS Speed
+GPS速度
+:GPS Time
+GPS时间
 :Generic settings
 基本设置
 :Gyro sense
@@ -269,14 +301,16 @@ Deviation固件版本:
 >:HOLD
 :Heli
 直升机
->:Heli/Standard GUI
+:Heli/Standard GUI
+直升机标准界面
 :Helicopter
 直升机
 :High-Rate
 普通飞行
 :Hold position
-熄火油门值
->:Holds
+位置保持
+:Holds
+保持
 :Hour
 小时
 :Icon
@@ -293,10 +327,14 @@ Deviation固件版本:
 插入
 :Inverted
 反向
+:is not supported
+当前模块不支持!
+:is turned off
+未开启
 :L
 低
 :LCD settings
-LCD设置
+屏幕设置
 :LEFT_H
 左水平
 :LEFT_V
@@ -307,7 +345,8 @@ LCD设置
 语言
 :Latitude
 纬度
->:Layout: Long-Press ENT
+:Layout: Long-Press ENT
+长按ENT进行预览
 :Left
 左
 :Length
@@ -352,11 +391,11 @@ LCD设置
 :Minute
 分钟
 :Mixer
-混控
+混控设置
 :Mixer GUI
 设置界面
 :Mixers
-混控
+混控数
 :Mode
 模式
 :Mode %d
@@ -386,7 +425,17 @@ LCD设置
 :Move sticks and knobs\nto max & min positions\nthen press ENT
 拨动摇杆和旋钮,\n先至最小再至最大位置,\n然后按ENT
 :Mux
-作用
+混控方式
+:Mixer output
+混控输出
+:Mixer    Reorder:Hold R+
+长按R+,重新排序混控
+:max
+最大
+:min
+最小
+:mult
+相乘
 :Neg
 负
 :New
@@ -421,9 +470,10 @@ LCD设置
 :PPM In
 PPM输入
 >:PPM%d
->:PPMIn Cfg (Extend)
+:PPMIn Cfg (Extend)
+PPM输入设置(延伸)
 :Page
-模式
+层数
 :Page Config
 页面配置
 :Pitch curves
@@ -449,11 +499,11 @@ PPM输入
 :Power-down alert
 关控提示
 :Prealert interval
-预警间隔
+报警间隔
 :Prealert intvl
-预警间隔
+报警间隔
 :Prealert time
-预警时间
+报警时间
 :Press 'Ent' to turn USB Filesystem
 按ENT改变USB状态
 :Press ENT to change
@@ -463,13 +513,21 @@ PPM输入
 :Press ENT to load
 按ENT读取
 :Press ENT to turn \nUSB drive
-按ENT使U盘
+按ENT将运行\nU盘模式
 :Protocol
 通信协议
 :PwrDn alert
 关控提示
 :PwrOn alarm
 无操作报警
+:Power reduced to
+功率降低至
+:Press ENT to start test.
+按ENT开始测试
+:Press ENT to stop test.
+按ENT停止测试.
+:permanent
+持续计时
 :RIGHT_H
 右水平
 :RIGHT_V
@@ -497,17 +555,23 @@ PPM输入
 :Reset sw
 重置开关
 :Reverse
-反向
+通道反向
 :Reversed
 反向
 :Revert
-重置修改
+还原修改
 :Right
 右
+:Range Test
+范围测试
+:replace
+替换
+:resulting value
+结果值
 :Safe Val
-熄火值
+安全值
 :Safety
-熄火开关
+安全开关
 :Sample Rate
 采样率
 :Save
@@ -532,7 +596,7 @@ PPM输入
 设置持续计时器
 :Set time
 设置时间
->:Set to
+:Set to
 设置
 >:Set:
 :Simple
@@ -546,7 +610,7 @@ PPM输入
 :Speed
 舵机速率
 :Src
-输入
+输入源
 :Standard
 通用模式
 :Standard Mixer
@@ -564,7 +628,7 @@ PPM输入
 :Sticks
 摇杆/旋钮
 :Subtrim
-微调
+通道中心点
 :Swash
 斜盘设置
 :SwashType
@@ -579,6 +643,10 @@ PPM输入
 开关2
 :Symmetric
 对称
+:stop-prop
+暂停插件
+:stopwatch
+秒表
 :THR
 油门
 :TRIMLH+
@@ -645,7 +713,7 @@ PPM输入
 :Timer%d
 定时器%d
 :Timers
-定时器
+定时器设置
 :Timeup interval
 超时报警间隔
 :Timeup intvl
@@ -687,12 +755,14 @@ PPM输入
 :Trimbar
 微调
 :Trims
-微调数
+辅助微调
 :Turn Off
 关闭
 :Turn On
 开启
 :Tx power
+发射功率
+:TxPower
 发射功率
 :Type
 类型
@@ -713,6 +783,10 @@ U盘模式
 虚拟
 :Volt
 电压
+:value to add or set
+添加或设置的值
+:value to set
+设置的值
 :Welcome
 欢迎
 :Year
@@ -721,41 +795,3 @@ U盘模式
 是
 :Zero/Max
 零/最大
-:\n%d seconds left
-\n还剩%d秒
-:\n\nBinding will end in %d seconds...
-\n\n对频在%d秒后结束
-:actual value
-实际值
-:add
-相加
-:cntdn-prop
-倒计时插件
-:countdown
-倒计时
-:delay
-延迟
-:is not supported
-不支持
-:is turned off
-未开启
-:max
-最大
-:min
-最小
-:mult
-相乘
-:permanent
-持续计时
-:replace
-替换
-:resulting value
-结果值
-:stop-prop
-暂停插件
-:stopwatch
-秒表
-:value to add or set
-添加或设置的值
-:value to set
-设置的值
