@@ -9,7 +9,11 @@ use Getopt::Long;
 my %map;
 my $free = 0;
 my $mapfile;
-GetOptions("mapfile=s" => \$mapfile, "size=o" => \$free);
+my $linkfile;
+GetOptions("mapfile=s" => \$mapfile, "linkfile=s" => \$linkfile, "size=o" => \$free);
+if (! $free && $linkfile) {
+    $free = extract_crcoffset_from_linkfile($linkfile);
+}
 read_map($mapfile);
 repack_obj();
 
@@ -74,4 +78,30 @@ sub read_map {
         #    }
         }
     }
+}
+
+sub read_linkfile {
+    my($file) = @_;
+    open my $fh, "<", $file;
+    my @lines = <$fh>;
+    close $fh;
+    my @final;
+    for my $line (@lines) {
+        if($line =~ /^\s*INCLUDE\s+(\S+)/) {
+            push @final, read_linkfile($1);
+        } else {
+            push @final, $line;
+        }
+    }
+    return @final;
+}
+sub extract_crcoffset_from_linkfile {
+    my($file) = @_;
+    my @lines = read_linkfile($file);
+    for (@lines) {
+        if (/^\s*_crc_offset\s*=\s*([0-9xX]+);/) {
+            return hex($1);
+        }
+    }
+    return 0;
 }
