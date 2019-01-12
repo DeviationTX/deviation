@@ -43,7 +43,7 @@ static const char *attstr_cb(guiObject_t *obj, const void *data)
     return sp->attenuator ? _tr("-20dB") : _tr("0dB");
 }
 
-void _draw_page(u8 enable)
+static void _draw_page(u8 enable)
 {
     (void)enable;
     PAGE_ShowHeader(PAGE_GetName(PAGEID_SCANNER));

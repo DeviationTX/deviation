@@ -51,6 +51,11 @@ LFLAGS2OPT  = -Wl,-T$(SDIR)/target/$(TARGET)/$(TARGET)_opt.ld
 # Enable warning as error
 CFLAGS += -Werror
 
+# Enable stack usage analyze
+ifeq "$(TYPE)" "dev"
+CFLAGS += -fstack-usage -Wno-error -Wstack-usage=1024
+endif
+
 #-lnosys
 
 ALL = $(LIBOPENCM3) $(TARGET).dfu

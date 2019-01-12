@@ -49,7 +49,7 @@ static const char *attstr_cb(guiObject_t *obj, const void *data)
     return sp->attenuator ? _tr("Att.: -20dB") : _tr("Att.: 0dB");
 }
 
-void _draw_page(u8 enable)
+static void _draw_page(u8 enable)
 {
     enum {
         SCANBARWIDTH   = (LCD_WIDTH / (MAX_RADIOCHANNEL - MIN_RADIOCHANNEL + 1)),
