@@ -1,0 +1,256 @@
+/***************************************************************
+ Common s.port telemetry processing for FrskyX and PXX
+***************************************************************/
+
+/* SPORT details serial
+  100K 8E2 normal-multiprotocol
+  -every 12ms-
+  1  2  3  4  5  6  7  8  9  CRC DESCR
+  7E 98 10 05 F1 20 23 0F 00 A6 SWR_ID
+  7E 98 10 01 F1 33 00 00 00 C9 RSSI_ID
+  7E 98 10 04 F1 58 00 00 00 A1 BATT_ID
+  7E BA 10 03 F1 E2 00 00 00 18 ADC2_ID
+  7E BA 10 03 F1 E2 00 00 00 18 ADC2_ID
+  7E BA 10 03 F1 E2 00 00 00 18 ADC2_ID
+  7E BA 10 03 F1 E2 00 00 00 18 ADC2_ID
+  7E BA 10 03 F1 E2 00 00 00 18 ADC2_ID
+  7E BA 10 03 F1 E2 00 00 00 18 ADC2_ID
+
+
+  Telemetry frames(RF) SPORT info 15 bytes
+  SPORT frame 6+3 bytes
+  [00] PKLEN  0E 0E 0E 0E
+  [01] TXID1  DD DD DD DD
+  [02] TXID2  6D 6D 6D 6D
+  [03] CONST  02 02 02 02
+  [04] RS/RB  2C D0 2C CE // D0,CE = 2*RSSI; ....2C = RX battery voltage(5V from Bec)
+  [05] SEQ    03 10 21 32 // TX/RX telemetry hand-shake sequence number
+  [06] NO.BT  00 00 06 03 // No.of valid SPORT frame bytes in the frame
+  [07] STRM1  00 00 7E 00
+  [08] STRM2  00 00 1A 00
+  [09] STRM3  00 00 10 00
+  [10] STRM4  03 03 03 03
+  [11] STRM5  F1 F1 F1 F1
+  [12] STRM6  D1 D1 D0 D0
+  [13] CHKSUM1
+  [14] CHKSUM2
+  [15] RSSI
+  [16] LQI
+
+  The sequence byte contains 2 nibbles. The low nibble normally contains a 2-bit
+  sequence number (0-3) that is the sequence of sending packets. The high nibble
+  contains the "next expected" packet sequence to be received.
+  Bit 2 of this nibble (bit 6 of the byte) is set to request a re-transmission of a missed packet.
+  Bit 3 of the nibbles is used to indicate/acknowledge startup synchronisation.
+
+*/
+
+#define START_STOP              0x7e
+#define BYTESTUFF               0x7d
+#define STUFF_MASK              0x20
+#define FRSKY_SPORT_PACKET_SIZE    8
+
+static void serial_echo(u8 *packet);
+
+// FrSky PRIM IDs (1 byte)
+#define DATA_FRAME                0x10
+
+#define SPORT_DATA_U8(packet)   (packet[4])
+#define SPORT_DATA_S32(packet)  (*((int32_t *)(packet+4)))
+#define SPORT_DATA_U32(packet)  (*((uint32_t *)(packet+4)))
+#define HUB_DATA_U16(packet)    (*((uint16_t *)(packet+4)))
+
+
+static void processSportPacket(u8 *packet) {
+//    u8  instance = (packet[0] & 0x1F) + 1;    // all instances of same sensor write to same telemetry value
+    u8  prim = packet[1];
+    u16 id = *((u16 *)(packet+2));
+
+        serial_echo(packet);   // echo to trainer port
+
+    if (prim != DATA_FRAME)
+        return;
+
+    if ((id >> 8) == 0) {
+        // The old FrSky IDs
+        processHubPacket(id, HUB_DATA_U16(packet));
+        return;
+    }
+
+    // rx telemetry in stream data
+    // 8 bit voltages are raw ADC with 3.3V reference => 13.2mV/bit
+    // Convert to two decimal places (hundredths of volts)
+    switch(id) {
+    case ADC1_ID:    // put in VOLT3 so ADC2_ID (external input) stays consistent with frsky2way
+        set_telemetry(TELEM_FRSKY_VOLT3, SPORT_DATA_U8(packet) * 132 / 100);
+        break;
+    case ADC2_ID:    // put in VOLT2 for consistency with frsky2way
+        set_telemetry(TELEM_FRSKY_VOLT2, ((s32)SPORT_DATA_U8(packet) * 132 * Model.proto_opts[PROTO_OPTS_AD2GAIN]) / 10000);
+        break;
+    case BATT_ID:   // receiver battery voltage from R9M/XJT
+//TODO        set_telemetry(TELEM_FRSKY_VOLT1, SPORT_DATA_U8(packet) * 132 / 100);
+        set_telemetry(TELEM_FRSKY_VOLT1, (1320 * SPORT_DATA_U8(packet) + 1220) / 255);
+        break;
+    case RSSI_ID:
+        set_telemetry(TELEM_FRSKY_RSSI, SPORT_DATA_U8(packet));
+        break;
+    }
+
+    s32 data = SPORT_DATA_S32(packet);
+    switch (id & 0xfff0) {
+    case ALT_FIRST_ID & 0xfff0:
+        if (Model.ground_level == 0) Model.ground_level = data;
+        set_telemetry(TELEM_FRSKY_ALTITUDE, data - Model.ground_level);
+        break;
+    case VARIO_FIRST_ID & 0xfff0:
+        set_telemetry(TELEM_FRSKY_VARIO, data);
+        break;
+    case CURR_FIRST_ID & 0xfff0:
+        set_telemetry(TELEM_FRSKY_CURRENT, data);
+        if (discharge_time == 0) discharge_time = CLOCK_getms();
+        discharge_dAms += data * (CLOCK_getms() - discharge_time);
+        discharge_time = CLOCK_getms();
+        set_telemetry(TELEM_FRSKY_DISCHARGE, discharge_dAms / 36000);
+        break;
+    case VFAS_FIRST_ID & 0xfff0:
+        set_telemetry(TELEM_FRSKY_VOLTA, data);
+        break;
+
+    case CELLS_FIRST_ID & 0xfff0:{
+        u8 cells_count = (data & 0xF0) >> 4;
+        u8 cell_index  = (data & 0x0F);
+        update_cell(cell_index, ((data & 0x000FFF00) >> 8) / 5);
+        if (cell_index+1 < cells_count)
+            update_cell(cell_index+1, ((data & 0xFFF00000) >> 20) / 5);
+        update_min_cell(cells_count);
+        break;}
+
+    case T1_FIRST_ID & 0xfff0:
+        set_telemetry(TELEM_FRSKY_TEMP1, data);
+        break;
+    case T2_FIRST_ID & 0xfff0:
+        set_telemetry(TELEM_FRSKY_TEMP2, data);
+        break;
+    case RPM_FIRST_ID & 0xfff0:
+        set_telemetry(TELEM_FRSKY_RPM, data);
+        break;
+    case FUEL_FIRST_ID & 0xfff0:
+        set_telemetry(TELEM_FRSKY_FUEL, data);
+        break;
+
+    case GPS_LONG_LATI_FIRST_ID & 0xfff0:{
+        u32 gps_long_lati_b1w = (data & 0x3fffffff) / 10000;
+        u32 gps_long_lati_a1w = (data & 0x3fffffff) % 10000;
+        s32 bp = (gps_long_lati_b1w / 60 * 100) + (gps_long_lati_b1w % 60);
+        s32 ap = gps_long_lati_a1w;
+        s32 deg = bp / 100;
+        s32 min = bp % 100;
+        if (data & (1 << 31)) {
+            Telemetry.gps.longitude = (deg * 60 + min) * 60 * 1000 + ap * 6;
+            if (data & (1 << 30))
+                Telemetry.gps.longitude = -Telemetry.gps.longitude;   // west negative
+            TELEMETRY_SetUpdated(TELEM_GPS_LONG);
+        } else {
+            Telemetry.gps.latitude = (deg * 60 + min) * 60 * 1000 + ap * 6;
+            if (data & (1 << 30))
+                Telemetry.gps.latitude = -Telemetry.gps.latitude;   // south negative
+            TELEMETRY_SetUpdated(TELEM_GPS_LAT);
+        }
+        break;}
+
+    case GPS_ALT_FIRST_ID & 0xfff0:
+        Telemetry.gps.altitude = data * 10;
+        TELEMETRY_SetUpdated(TELEM_GPS_ALT);
+        break;
+    case GPS_SPEED_FIRST_ID & 0xfff0:
+        Telemetry.gps.velocity = data * 5556 / 10800;
+        TELEMETRY_SetUpdated(TELEM_GPS_SPEED);
+        break;
+    case GPS_COURS_FIRST_ID & 0xfff0:
+        // = TELEM_GPS_HEADING;
+        break;
+    case GPS_TIME_DATE_FIRST_ID & 0xfff0:
+        if (data & 0x000000ff) {
+            fr_gps.year =      (u16) ((data & 0xff000000) >> 24);
+            fr_gps.day_month = (u16) ((data & 0x00ffff00) >> 8);
+        } else {
+            fr_gps.hour_min = (u16) ((data & 0xffff0000) >> 16);
+            fr_gps.second =   (u16) ((data & 0x0000ff00) >> 8);
+            Telemetry.gps.time = ( (u32)fr_gps.year & 0x3f)            << 26
+                               | (((u32)fr_gps.day_month >> 8) & 0x0f) << 22
+                               | ( (u32)fr_gps.day_month & 0x1f)       << 17
+                               | (((u32)fr_gps.hour_min >> 8) & 0x1f)  << 12
+                               | ( (u32)fr_gps.hour_min & 0x3f)        << 6
+                               | ( (u32)fr_gps.second & 0x3f);
+            TELEMETRY_SetUpdated(TELEM_GPS_TIME);
+        }
+        break;
+    } // switch
+// not sure about these
+//    case A3_FIRST_ID & 0xfff0:
+//    case A4_FIRST_ID & 0xfff0:
+//    case AIR_SPEED_FIRST_ID & 0xfff0:
+//    case ACCX_FIRST_ID & 0xfff0:
+//    case ACCY_FIRST_ID & 0xfff0:
+//    case ACCZ_FIRST_ID & 0xfff0:
+}
+
+
+typedef enum {
+    STATE_DATA_IDLE,
+    STATE_DATA_START,
+    STATE_DATA_IN_FRAME,
+    STATE_DATA_XOR,
+} SportStates;
+static SportStates dataState = STATE_DATA_IDLE;   // file scope so can be reset on loss of rx packet sync
+
+static void frsky_parse_sport_stream(u8 data) {
+    static u8 sportRxBufferCount;
+    static u8 sportRxBuffer[FRSKY_SPORT_PACKET_SIZE];   // Receive buffer. 8 bytes (full packet)
+
+    switch (dataState) {
+    case STATE_DATA_START:
+        if (data == START_STOP) {
+            dataState = STATE_DATA_IN_FRAME ;
+            sportRxBufferCount = 0;
+        } else {
+            if (sportRxBufferCount < FRSKY_SPORT_PACKET_SIZE)
+                sportRxBuffer[sportRxBufferCount++] = data;
+            dataState = STATE_DATA_IN_FRAME;
+        }
+        break;
+
+    case STATE_DATA_IN_FRAME:
+        if (data == BYTESTUFF) {
+            dataState = STATE_DATA_XOR; // XOR next byte
+        }
+        else if (data == START_STOP) {
+            dataState = STATE_DATA_IN_FRAME ;
+            sportRxBufferCount = 0;
+        }
+        else if (sportRxBufferCount < FRSKY_SPORT_PACKET_SIZE) {
+            sportRxBuffer[sportRxBufferCount++] = data;
+        }
+        break;
+
+    case STATE_DATA_XOR:
+        if (sportRxBufferCount < FRSKY_SPORT_PACKET_SIZE) {
+          sportRxBuffer[sportRxBufferCount++] = data ^ STUFF_MASK;
+        }
+        dataState = STATE_DATA_IN_FRAME;
+        break;
+
+    case STATE_DATA_IDLE:
+        if (data == START_STOP) {
+          sportRxBufferCount = 0;
+          dataState = STATE_DATA_START;
+        }
+        break;
+    } // switch
+
+    if (sportRxBufferCount >= FRSKY_SPORT_PACKET_SIZE) {
+        processSportPacket(sportRxBuffer);
+        dataState = STATE_DATA_IDLE;
+    }
+}
+

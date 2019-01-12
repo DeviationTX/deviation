@@ -95,6 +95,12 @@ static const struct mcu_pin PROTO_MOSI_PIN  = _SPI_PROTO_MOSI_PIN;
     #define _PWM_PIN                   GPIO_USART1_TX    //GPIO9
     #define _PWM_EXTI                  EXTI9
     #define _PWM_TIM_OC                TIM_OC2
+    #define _PWM_TIM_ARR               TIM1_ARR
+    #define _PWM_TIM_DIER_DMAEN        TIM_DIER_CC2DE
+    #define _PWM_DMA                   DMA1
+    #define _PWM_DMA_CHANNEL           DMA_CHANNEL3
+    #define _PWM_DMA_ISR               dma1_channel3_isr
+    #define _PWM_NVIC_DMA_CHANNEL_IRQ  NVIC_DMA1_CHANNEL3_IRQ
 #endif //_PWM_PIN
 
 #ifndef _USART

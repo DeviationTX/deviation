@@ -440,7 +440,11 @@ int PROTOCOL_HasPowerAmp(int idx)
     } else {
 #endif
     int m = get_module(idx);
-    if(m != TX_MODULE_LAST && Transmitter.module_poweramp & (1 << m))
+    if ((m != TX_MODULE_LAST && Transmitter.module_poweramp & (1 << m))
+#ifndef ENABLE_MODULAR
+        || (Model.protocol == PROTOCOL_PXX)
+#endif
+       )
         return 1;
     return 0;
 #if HAS_4IN1_FLASH

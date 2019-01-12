@@ -29,9 +29,9 @@
   extern unsigned _data_loadaddr;
   const unsigned long protocol_type = (unsigned long)&_data_loadaddr;
 #endif
+
 #define PPMOUT_MAX_CHANNELS NUM_OUT_CHANNELS
-static volatile u16 pulses[PPMOUT_MAX_CHANNELS+2];
-static u8 num_channels;
+static volatile u16 pulses[PPMOUT_MAX_CHANNELS+1];  // +1 for "inter-packet" pulse at end
 
 #define STEP_SIZE "3276810"  // == 10small/50large == (50 << 16) | 10
 #define STEPSIZE2 "32768100" // == 100small / 500large == (500 << 16) | 100
@@ -54,21 +54,22 @@ ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 static void build_data_pkt()
 {
     int i;
-    for (i = 0; i < num_channels; i++) {
+    for (i = 0; i < Model.num_channels; i++) {
         s32 value = (s32)Channels[i] * Model.proto_opts[DELTA_PW] / CHAN_MAX_VALUE
                     + Model.proto_opts[CENTER_PW] + Model.proto_opts[NOTCH_PW];
-                   //FIXME fix timing options, remove notch here, center to real center value (e.g. 1500)
-        pulses[i] = value;
+                   //FIXME fix PPM timing options, remove notch here, center to real center value (e.g. 1500)
+                   //      requires model file versioning to not break existing models
+        pulses[i] = value - 1;  // -1 due to timer hardware adding one count
     }
-    pulses[num_channels] = Model.proto_opts[PERIOD_PW]; // extra period so last preload cycle is run
-    pulses[num_channels+1] = 0;
+    // last width just needs to be long enough not to end before callback
+    pulses[Model.num_channels] = 50000;
 }
 
 MODULE_CALLTYPE
 static u16 ppmout_cb()
 {
     build_data_pkt();
-    PPM_Enable(Model.proto_opts[NOTCH_PW], pulses);
+    PPM_Enable(Model.proto_opts[NOTCH_PW], pulses, Model.num_channels+1);
 #ifdef EMULATOR
     return 3000;
 #else
@@ -83,7 +84,6 @@ static void initialize()
         return;
 
     PWM_Initialize();
-    num_channels = Model.num_channels;
     if (Model.proto_opts[CENTER_PW] == 0) {
         Model.proto_opts[CENTER_PW] = 1100;
         Model.proto_opts[DELTA_PW] = 400;

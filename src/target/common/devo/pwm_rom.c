@@ -17,23 +17,21 @@
 #ifndef DISABLE_PWM
 
 #include <libopencm3/stm32/rcc.h>
-#include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/timer.h>
+#include <libopencm3/stm32/gpio.h>
+#include <libopencm3/stm32/dma.h>
 #include <libopencm3/cm3/nvic.h>
 
 #include "../ports.h"
 
 
-volatile u16 *pwm;
-
-void tim1_up_isr()
+void _PWM_DMA_ISR(void)
 {
-    timer_clear_flag(TIM1, TIM_SR_UIF);
-
-    if (*pwm)
-        timer_set_period(TIM1, *pwm++ - 1);
-    else
-        timer_set_oc_value(TIM1, _PWM_TIM_OC, 0); // hold output inactive
+    timer_disable_counter(TIM1);
+    nvic_disable_irq(_PWM_NVIC_DMA_CHANNEL_IRQ);
+    DMA_IFCR(_PWM_DMA) |= DMA_IFCR_CTCIF(_PWM_DMA_CHANNEL);
+    dma_disable_transfer_complete_interrupt(_PWM_DMA, _PWM_DMA_CHANNEL);
+    dma_disable_channel(_PWM_DMA, _PWM_DMA_CHANNEL);
 }
 
 #endif

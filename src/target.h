@@ -147,7 +147,8 @@ extern volatile mixsync_t mixer_sync;
 void PWM_Initialize();
 void PWM_Stop();
 void PWM_Set(int);
-void PPM_Enable(unsigned low_time, volatile u16 *pulses);
+void PPM_Enable(unsigned low_time, volatile u16 *pulses, u8 num_pulses);
+void PXX_Enable(u8 *packet);
 
 /* PPM-In functions */
 #define MAX_PPM_IN_CHANNELS 8
@@ -217,6 +218,10 @@ typedef void usart_callback_t(u8 ch, u8 status);
 void UART_StartReceive(usart_callback_t isr_callback);
 void UART_StopReceive();
 void UART_SetDuplex(uart_duplex duplex);
+typedef void sser_callback_t(u8 data);
+void SSER_StartReceive(sser_callback_t isr_callback);
+void SSER_Initialize();
+void SSER_Stop();
 
 /* USB*/
 void USB_Enable(unsigned type, unsigned use_interrupt);

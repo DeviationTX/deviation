@@ -38,7 +38,7 @@ static s16 speed, databits, parity, stopbits, duplex;
 
 static const char * const testser_opts[] = {
   "Mode", "Loopback", "Send H", NULL,
-  "Speed", "115200", "9600", "1000000", "400000", NULL,
+  "Speed", "115200", "57600", "9600", "1000000", "400000", NULL,
   "Bits", "Eight", "Seven", NULL,
   "Parity", "None", "Even", "Odd", NULL,
   "StopBits", "One", "One+", "Two", NULL,
@@ -64,9 +64,10 @@ void check_options(u8 init) {
         speed = Model.proto_opts[TESTSER_SPEED];
         switch(speed) {
         case 0: UART_SetDataRate(115200); break;
-        case 1: UART_SetDataRate(9600); break;
-        case 2: UART_SetDataRate(100000); break;
-        case 3: UART_SetDataRate(400000); break;
+        case 1: UART_SetDataRate(57600); break;
+        case 2: UART_SetDataRate(9600); break;
+        case 3: UART_SetDataRate(100000); break;
+        case 4: UART_SetDataRate(400000); break;
         }
     }
 

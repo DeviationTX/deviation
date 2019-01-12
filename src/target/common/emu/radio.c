@@ -140,10 +140,16 @@ int CYRF_Reset() {return 1;}
 void SPI_AVRProgramInit() {}
 void PWM_Initialize() {}
 void PWM_Stop() {}
-void PPM_Enable(unsigned low_time, volatile u16 *pulses) {
+void PXX_Enable(u8 *packet) {
+    printf("PXX: ");
+    for(int i = 0; i < 18; i++)
+        printf("%02x ", packet[i]);
+    printf("\n");
+}
+void PPM_Enable(unsigned low_time, volatile u16 *pulses, u8 num_pulses) {
     int i;
     printf("PPM: low=%d ", (int)low_time);
-    for(i = 0; pulses[i]; i++)
+    for(i = 0; i < num_pulses; i++)
         printf("%04d ", pulses[i]);
     printf("\n");
 }
