@@ -36,6 +36,9 @@ addons:
 #language: c
 #compiler: gcc
 
+git:
+  depth: 5
+
 before_install:
    - pip install --user cpp-coveralls
    - if [ ! -d "$HOME/gcc-arm-none-eabi-4_8-2013q4/bin" ]; then
