@@ -27,7 +27,7 @@
 
 // soft serial receiver for s.port data
 // receive inverted data (high input volgate = 0, low is 1)
-// 57600 bps, no stop, 8 data bits, 1 stop bit
+// 57600 bps, no stop, 8 data bits, 1 stop bit, lsb first
 // 1) Enable rising edge interrupt on RX line to search for start bit
 // 2) On rising edge, set timer for half a bit time to get to bit center
 // 3) Verify start bit, set timer for interrupts at full bit time
@@ -38,7 +38,7 @@
 
 static u8 in_byte;
 static u8 data_byte;
-static u8 bit_count;
+static u8 bit_pos;
 
 void SSER_Initialize()
 {
@@ -46,7 +46,7 @@ void SSER_Initialize()
     UART_Stop();  // disable USART1 for GPIO PA9 & PA10 (Trainer Tx(PA9) & Rx(PA10))
 #endif
     in_byte = 0;
-    bit_count = 0;
+    bit_pos = 0;
     data_byte = 0;
 
     /* Enable GPIOA clock. */
@@ -99,7 +99,7 @@ void exti15_10_isr(void)
 
     // start bit detected
     in_byte = 1;
-    bit_count = 0;
+    bit_pos = 0;
     data_byte = 0;
     nvic_disable_irq(NVIC_EXTI15_10_IRQ);
 
@@ -131,12 +131,12 @@ void tim6_isr(void) {
         return;
     }
 
-    if (bit_count == 8) {
+    if (bit_pos == 8) {
         if (!value && rx_callback) rx_callback(data_byte);  // invoke callback if stop bit valid
         next_byte();
     }
 
-    if (!value) data_byte |= (1 << bit_count);   // s.port is MSB first on the wire
-    bit_count += 1;
+    if (!value) data_byte |= (1 << bit_pos);
+    bit_pos += 1;
 }
 #endif //MODULAR
