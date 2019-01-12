@@ -17,7 +17,9 @@ static struct tx_configure_page * const cp = &pagemem.u.tx_configure_page;  // M
 static struct calibrate_obj * const guic = &gui_objs.u.calibrate;
 
 enum {
+#if SUPPORT_MULTI_LANGUAGE
     ITEM_LANG,
+#endif
     ITEM_MODE,
     ITEM_STICKS,
     ITEM_BUZZ,
