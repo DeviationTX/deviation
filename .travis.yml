@@ -14,10 +14,6 @@ env:
       - MAKETARGET=test
 #      - COMPILER=latest TARGET=devo8
 
-# use new docker environment
-#sudo: false
-
-#sudo: required
 dist: trusty
 
 addons:
