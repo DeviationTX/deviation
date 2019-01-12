@@ -34,7 +34,7 @@ addons:
 #      - gcc-arm-none-eabi
 
 #Do NOT set these.  They set 'CC' which breaks the build
-#language: c
+language: minimal
 #compiler: gcc
 
 git:
