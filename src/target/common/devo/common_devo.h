@@ -5,12 +5,12 @@
 #error "Don't include target_defs.h directly, include target.h instead."
 #endif
 
-#if !defined(EMULATOR) || EMULATOR != USE_NATIVE_FS
-    #if defined USE_DEVOFS && USE_DEVOFS == 1
-        #include "enable_devofs.h"
-    #else
-        #include "enable_petit_fat.h"
-    #endif
+#if defined(EMULATOR) && EMULATOR == USE_NATIVE_FS
+    #include "enable_native_fs.h"
+#elif defined USE_DEVOFS && USE_DEVOFS == 1
+    #include "enable_devofs.h"
+#else
+    #include "enable_petit_fat.h"
 #endif
 
 #include "ports.h"
