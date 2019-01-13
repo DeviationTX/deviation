@@ -111,21 +111,25 @@ static const char *reorder_text_cb(u8 idx)
 
 static void reorder_mixers_by_list(u8 *list)
 {
-    int i, j, k = 0;
-    struct Mixer tmpmix[NUM_MIXERS];
-    memset(tmpmix, 0, sizeof(tmpmix));
-    for(j = 0; j < NUM_CHANNELS; j++) {
-        for(i = 0; i <NUM_MIXERS; i++) {
-            if(Model.mixers[i].src && Model.mixers[i].dest == list[j]-1) {
-                memcpy(&tmpmix[k], &Model.mixers[i], sizeof(struct Mixer));
-                tmpmix[k].dest = j;
-                k++;
+    struct Mixer tmpmix;
+    int pos = 0;
+    for(int newdest = 0; newdest < NUM_CHANNELS; newdest++) {
+        int olddest = list[newdest]-1;
+        int match = pos;
+        while(match < NUM_MIXERS) {
+            if (Model.mixers[match].src && Model.mixers[match].dest == olddest) {
+                if (match != pos) {
+                    tmpmix = Model.mixers[match];
+                    memmove(&Model.mixers[pos+1], &Model.mixers[pos], sizeof(struct Mixer) * (match-pos));
+                    Model.mixers[pos] = tmpmix;
+                }
+                Model.mixers[pos].dest = newdest;
+                pos++;
             }
+            match++;
         }
     }
-    memcpy(Model.mixers, tmpmix, sizeof(Model.mixers));
 }
-
 
 static void reorder_limits_by_list(u8 *list)
 {
