@@ -686,6 +686,61 @@ void TestSetMixers(CuTest *t)
     }
 }
 
+#define TO_SOURCE(x) ((x) < 0 ? (NUM_SOURCES + 1 - (x)) : (x))
+#define FROM_SOURCE(x) ((x) > NUM_SOURCES ? -((x)-NUM_SOURCES-1) : (x))
+void TestSetMixerDepends(CuTest *t)
+{
+    int sources[]  = {-6, 1, -2,  1, -1, 1};
+    int switches[] = { 0, 0,  0, -5,  0, 0};
+    int dests[]    = { 4, 1,  6,  6,  2, 5};
+    memset(&Model, 0, sizeof(Model));
+    for (unsigned i = 0; i < sizeof(Model.templates)/sizeof(Model.templates[0]); i++) {
+        Model.templates[i] = MIXERTEMPLATE_SIMPLE;
+    }
+    for (unsigned i = 0; i < sizeof(sources)/sizeof(sources[0]); i++) {
+        Model.mixers[i].src = TO_SOURCE(sources[i]);
+        Model.mixers[i].sw = TO_SOURCE(switches[i]);
+        Model.mixers[i].dest = dests[i];
+        Model.mixers[i].scalar = i;
+        Model.mixers[i].curve.type = CURVE_FIXED;
+    }
+    MIXER_SetMixers(NULL, 0);
+    int expected[] = {1, 4, 5, 2, 3, 0};
+    for (unsigned i = 0; i < sizeof(sources)/sizeof(sources[0]); i++) {
+        //printf("%d: orig:%d src:%d sw:%d dest:%d\n",
+        //       i, Model.mixers[i].scalar, FROM_SOURCE(Model.mixers[i].src),
+        //       FROM_SOURCE(Model.mixers[i].sw), Model.mixers[i].dest);
+        CuAssertIntEquals(t, expected[i], Model.mixers[i].scalar);
+    }
+}
+
+void TestSetMixerLoop(CuTest *t)
+{
+    //negaitve values mean to use a dest as source
+    int sources[]  = {-6, 1, -2,  1, -1, 1};
+    int switches[] = { 0, 0,  0, -5,  0, 0};
+    int dests[]    = { 1, 4,  6,  6,  2, 5};
+    memset(&Model, 0, sizeof(Model));
+    for (unsigned i = 0; i < sizeof(Model.templates)/sizeof(Model.templates[0]); i++) {
+        Model.templates[i] = MIXERTEMPLATE_SIMPLE;
+    }
+    for (unsigned i = 0; i < sizeof(sources)/sizeof(sources[0]); i++) {
+        Model.mixers[i].src = TO_SOURCE(sources[i]);
+        Model.mixers[i].sw = TO_SOURCE(switches[i]);
+        Model.mixers[i].dest = dests[i];
+        Model.mixers[i].scalar = i;
+        Model.mixers[i].curve.type = CURVE_FIXED;
+    }
+    MIXER_SetMixers(NULL, 0);
+    int expected[] = {1, 5, 0, 4, 2, 3};
+    for (unsigned i = 0; i < sizeof(sources)/sizeof(sources[0]); i++) {
+        //printf("%d: orig:%d src:%d sw:%d dest:%d\n",
+        //       i, Model.mixers[i].scalar, FROM_SOURCE(Model.mixers[i].src),
+        //       FROM_SOURCE(Model.mixers[i].sw), Model.mixers[i].dest);
+        CuAssertIntEquals(t, expected[i], Model.mixers[i].scalar);
+    }
+}
+
 void TestGetLimit(CuTest *t)
 {
     struct Limit limit = {0};
