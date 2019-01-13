@@ -47,6 +47,7 @@
 # interrupt handler which might execute.
 
 use strict;
+use warnings;
 use Data::Dumper;
 
 # Configuration: set these as appropriate for your architecture/project.
@@ -182,7 +183,7 @@ sub trace {
 
     if ($visited{$f}) {
 	$visited{$f} = "R" if $visited{$f} eq "?";
-	return;
+	return 0;
     }
 
     $visited{$f} = "?";
@@ -196,9 +197,10 @@ sub trace {
 	    my $t = $_;
 
 	    $has_caller{$t} = 1;
-	    trace($t);
+	    next unless trace($t);
 
-	    my $is = $total_cost{$t};
+            warn "No cost found for $t" if (! defined $total_cost{$t});
+	    my $is = $total_cost{$t} || 0;
 	    my $d = $call_depth{$t};
 
 	    $max_frame = $is if $is > $max_frame;
@@ -209,6 +211,14 @@ sub trace {
     $call_depth{$f} = $max_depth + 1;
     $total_cost{$f} = $max_frame + ($frame_size{$f} || 0);
     $visited{$f} = " " if $visited{$f} eq "?";
+    return 1;
+}
+
+sub main_cost {
+    if (defined $global_name{"main"} && defined $total_cost{$global_name{"main"}}) {
+        return $total_cost{$global_name{"main"}};
+    }
+    return 0;
 }
 
 foreach (keys %call_graph) { trace $_; }
@@ -251,9 +261,9 @@ print "\n";
 
 print "Peak execution estimate (main + worst-case IV):\n";
 printf "  main = %d, worst IV = %d, total = %d\n",
-      $total_cost{$global_name{"main"}},
+      main_cost(),
       $total_cost{"INTERRUPT"},
-      $total_cost{$global_name{"main"}} + $total_cost{"INTERRUPT"};
+      main_cost() + $total_cost{"INTERRUPT"};
 
 print "\n";
 
