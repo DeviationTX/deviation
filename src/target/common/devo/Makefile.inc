@@ -59,6 +59,11 @@ endif
 # Enable warning as error
 CFLAGS += -Werror
 
+# Enable stack usage analyze
+ifeq "$(TYPE)" "stack"
+CFLAGS += -fstack-usage -Wno-error -Wstack-usage=1024
+endif
+
 #-lnosys
 
 ALL = $(LIBOPENCM3) $(TARGET).dfu
