@@ -560,7 +560,7 @@ static void reorder_return_cb(u8 *list)
     }
 }
 
-void reorder_cb(guiObject_t *obj, void *data)
+static void reorder_cb(guiObject_t *obj, void *data)
 {
     (void)data;
     (void)obj;
