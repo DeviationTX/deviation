@@ -104,6 +104,21 @@ foreach (@ARGV) {
 
 	    $call_graph{$source}->{$t} = 1;
 	}
+	if (/: R_[A-Za-z0-9_]+_JUMP\d+[ \t]+(.*)/) {
+            # Optimizing compiler can jump instead of call last function
+	    my $t = $1;
+
+	    if ($t eq ".text") {
+		$t = "\@$objfile";
+	    } elsif ($t =~ /^\.text\+0x(.*)$/) {
+		$t = "$1\@$objfile";
+	    }
+            if ($t ne $source) {
+		$call_graph{$source}->{$t} = 1;
+	    } else {
+		warn "May have found optimized recursive call for $source ...ignoring recursion\n";
+	    }
+	}
     }
     close(DISASSEMBLY);
 
