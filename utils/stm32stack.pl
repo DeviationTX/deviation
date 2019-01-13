@@ -51,7 +51,7 @@ use warnings;
 use Data::Dumper;
 
 # Configuration: set these as appropriate for your architecture/project.
-
+my $debug = 0;
 my $objdump = "arm-none-eabi-objdump";
 my $call_cost = 4;
 
@@ -179,11 +179,17 @@ my %total_cost;
 my %call_depth;
 
 sub trace {
-    my $f = shift;
+    my ($f, $indent) = (@_);
+    $indent ||= "";
 
     if ($visited{$f}) {
-	$visited{$f} = "R" if $visited{$f} eq "?";
-	return 0;
+	if ($visited{$f} eq "?") {
+	    $visited{$f} = "R";
+            $call_depth{$f} = 1;
+            $total_cost{$f} = $frame_size{$f} || 0;
+        }
+        printf("${indent}$f -> %d\n", $total_cost{$f}) if($debug);
+	return;
     }
 
     $visited{$f} = "?";
@@ -197,10 +203,8 @@ sub trace {
 	    my $t = $_;
 
 	    $has_caller{$t} = 1;
-	    next unless trace($t);
-
-            warn "No cost found for $t" if (! defined $total_cost{$t});
-	    my $is = $total_cost{$t} || 0;
+	    trace($t, "$indent  ");
+	    my $is = $total_cost{$t};
 	    my $d = $call_depth{$t};
 
 	    $max_frame = $is if $is > $max_frame;
@@ -211,7 +215,8 @@ sub trace {
     $call_depth{$f} = $max_depth + 1;
     $total_cost{$f} = $max_frame + ($frame_size{$f} || 0);
     $visited{$f} = " " if $visited{$f} eq "?";
-    return 1;
+    printf("${indent}$f -> %d\n", $total_cost{$f}) if($debug);
+    return;
 }
 
 sub main_cost {
