@@ -52,7 +52,7 @@ LFLAGS2OPT  = -Wl,-T$(SDIR)/target/$(TARGET)/$(TARGET)_opt.ld
 CFLAGS += -Werror
 
 # Enable stack usage analyze
-ifeq "$(TYPE)" "dev"
+ifeq "$(TYPE)" "stack"
 CFLAGS += -fstack-usage -Wno-error -Wstack-usage=1024
 endif
 
