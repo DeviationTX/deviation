@@ -56,7 +56,7 @@ void PWR_Shutdown()
     printf("Shutdown\n");
     BACKLIGHT_Brightness(0);
     rcc_set_sysclk_source(RCC_CFGR_SW_SYSCLKSEL_HSICLK);
-    rcc_wait_for_osc_ready(HSI);
+    rcc_wait_for_osc_ready(RCC_HSI);
     gpio_clear(_PWREN_PORT, _PWREN_PIN);
     while(1) ;
 }

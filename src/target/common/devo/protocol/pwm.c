@@ -48,7 +48,8 @@ void PWM_Initialize()
     // connect timer compare output to pin
     gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, _PWM_PIN);
 
-    timer_reset(TIM1);
+    rcc_periph_reset_pulse(RST_TIM1);
+
     // Timer global mode: No divider, Alignment edge, Direction up, auto-preload buffered
     timer_set_mode(TIM1, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
 

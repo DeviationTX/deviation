@@ -29,7 +29,7 @@ void ADC_Init(void)
 {
     rcc_peripheral_enable_clock(&RCC_APB2ENR, _RCC_APB2ENR_ADCEN);
     /* Make sure the ADC doesn't run during config. */
-    adc_off(_ADC);
+    adc_power_off(_ADC);
     rcc_peripheral_reset(&RCC_APB2RSTR, _RCC_APB2RSTR_ADCRST);
     rcc_peripheral_clear_reset(&RCC_APB2RSTR, _RCC_APB2RSTR_ADCRST);
     rcc_set_adcpre(RCC_CFGR_ADCPRE_PCLK2_DIV6);
@@ -41,12 +41,12 @@ void ADC_Init(void)
     adc_set_right_aligned(_ADC);
 
     /* We want to read the temperature sensor, so we have to enable it. */
-    adc_enable_temperature_sensor(_ADC); 
+    adc_enable_temperature_sensor();
     adc_set_sample_time_on_all_channels(_ADC, _ADC_SMPR_SMP_XXDOT5CYC);
 
     adc_power_on(_ADC);
     adc_reset_calibration(_ADC);
-    adc_calibration(_ADC);
+    adc_calibrate(_ADC);
 
     //Build a RNG seed using ADC 14, 16, 17
     for(int i = 0; i < 8; i++) {
@@ -58,7 +58,7 @@ void ADC_Init(void)
     //This is important.  We're using the temp value as a buffer because otherwise the channel data
     //Can bleed into the voltage-sense data.
     //By disabling the temperature, we always read a consistent value
-    adc_disable_temperature_sensor(_ADC);
+    adc_disable_temperature_sensor();
     printf("RNG Seed: %08x\n", (int)rand32());
 
     /* The following is based on code from here: http://code.google.com/p/rayaairbot */

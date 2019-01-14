@@ -31,18 +31,10 @@
 #define TIM_CONCAT(x, y, z)  _TIM_CONCAT(x, y, z)
 
 #define TIMx               TIM_CONCAT(TIM,             SYSCLK_TIM,)
+#define RST_TIMx           TIM_CONCAT(RST_TIM,         SYSCLK_TIM,)
 #define NVIC_TIMx_IRQ      TIM_CONCAT(NVIC_TIM,        SYSCLK_TIM, _IRQ)
 #define RCC_APB1ENR_TIMxEN TIM_CONCAT(RCC_APB1ENR_TIM, SYSCLK_TIM, EN)
 #define TIMx_ISR           TIM_CONCAT(tim,             SYSCLK_TIM, _isr)
-//The following is from an unreleased libopencm3
-//We should remove it eventually
-#if 1
-void iwdg_start(void);
-void iwdg_set_period_ms(u32 period);
-bool iwdg_reload_busy(void);
-bool iwdg_prescaler_busy(void);
-void iwdg_reset(void);
-#endif
 
 volatile u32 msecs;
 volatile u32 wdg_time;
@@ -98,7 +90,7 @@ void CLOCK_Init()
 
     timer_disable_counter(TIMx);
     /* Reset TIMx peripheral. */
-    timer_reset(TIMx);
+    rcc_periph_reset_pulse(RST_TIMx);
 
     /* Timer global mode:
      * - No divider
@@ -281,7 +273,7 @@ void sys_tick_handler(void)
 // initialize RTC
 void RTC_Init()
 {
-    rtc_auto_awake(LSE, 32767); // LowSpeed External source, divided by (clock-1)=32767
+    rtc_auto_awake(RCC_LSE, 32767); // LowSpeed External source, divided by (clock-1)=32767
 }
 
 // set date value (deviation epoch = seconds since 1.1.2012, 00:00:00)

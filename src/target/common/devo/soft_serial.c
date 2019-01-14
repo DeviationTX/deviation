@@ -63,7 +63,7 @@ void SSER_Initialize()
 
     // Configure bit timer
     rcc_peripheral_enable_clock(&RCC_APB1ENR, RCC_APB1ENR_TIM6EN);
-    timer_reset(TIM6);
+    rcc_periph_reset_pulse(RST_TIM6);
     nvic_set_priority(NVIC_TIM6_IRQ, 8);
     timer_set_prescaler(TIM6, 0);
     timer_enable_irq(TIM6, TIM_DIER_UIE);

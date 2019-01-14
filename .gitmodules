@@ -1,0 +1,3 @@
+[submodule "libopencm3"]
+	path = src/libopencm3
+	url = https://github.com/DeviationTx/libopencm3.git
