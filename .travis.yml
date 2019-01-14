@@ -2,7 +2,6 @@
 env:
 #Do not define 'global' env vars here.  They cannot be used with API builds
     matrix:
-      fast_finish: true
       - MAKETARGET=zip_devo8
       - MAKETARGET=zip_devo10
       - MAKETARGET=zip_devo12
@@ -15,6 +14,9 @@ env:
       - MAKETARGET=test
 #      - COMPILER=latest TARGET=devo8
 
+matrix:
+  fast_finish: true
+  
 dist: trusty
 
 addons:
