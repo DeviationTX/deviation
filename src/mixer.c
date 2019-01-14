@@ -649,8 +649,7 @@ void fix_mixer_dependencies(unsigned mixer_count)
             pos += MIXER_GetMixers(source, &mixers[pos], NUM_MIXERS);
         }
     }
-    for (i = 0; i < NUM_MIXERS; i++)
-        Model.mixers[i] = mixers[i];
+    memcpy(Model.mixers, mixers, sizeof(mixers));
 }
 
 int MIXER_SetMixers(struct Mixer *mixers, int count)
