@@ -579,77 +579,80 @@ int compact_mixers() {
     return i;
 }
 
-unsigned find_dependencies(unsigned ch, unsigned *deps)
+void MIXER_ReorderMixers(struct Mixer *mixers, const u8 *neworder, unsigned count)
 {
-    unsigned found = 0;
-    unsigned i;
-    struct Mixer *mixer;
-    for (i = 0; i < NUM_SOURCES; i++)
-        deps[i] = 0;
-    for (mixer = Model.mixers; mixer < Model.mixers + NUM_MIXERS; mixer++) {
-        if (MIXER_SRC(mixer->src) && mixer->dest == ch) {
-            found = 1;
-            if (MIXER_SRC(mixer->src) > NUM_SOURCES && MIXER_SRC(mixer->src) != NUM_SOURCES + 1 + ch) {
-                deps[MIXER_SRC(mixer->src) - NUM_SOURCES - 1] = 1;
-            }
-            if (MIXER_SRC(mixer->sw) > NUM_SOURCES && MIXER_SRC(mixer->sw) != NUM_SOURCES + 1 + ch) {
-                deps[MIXER_SRC(mixer->sw) - NUM_SOURCES - 1] = 1;
-            }
-        }
+    u8 reorder[NUM_MIXERS];  //map oldpos -> new
+    struct Mixer tmpmixer;
+    for (unsigned i = 0; i < count; i++) {
+        reorder[i] = i;
     }
-    return found;
+    for (unsigned newpos = 0; newpos < count; newpos++) {
+        unsigned oldpos = neworder[newpos];
+        while (reorder[oldpos] != oldpos)
+            oldpos = reorder[oldpos];
+        if (oldpos == newpos)
+            continue;
+        tmpmixer = mixers[newpos];
+        mixers[newpos] = mixers[oldpos];
+        mixers[oldpos] = tmpmixer;
+        reorder[newpos] = oldpos;
+    }
 }
 
 void fix_mixer_dependencies(unsigned mixer_count)
 {
-    unsigned dependencies[NUM_SOURCES];
-    unsigned placed[NUM_SOURCES];
+    u8 order[NUM_MIXERS];
+    u8 placed[NUM_SOURCES];
     unsigned pos = 0;
-    unsigned last_count = 0;
-    unsigned i;
-    struct Mixer mixers[NUM_MIXERS];
-    memset(mixers, 0, sizeof(mixers));
-    for (i = 0; i < NUM_MIXERS; i++) {
-        mixers[i].src = 0;
-    }
     memset(placed, 0, sizeof(placed));
-    while(mixer_count && last_count != mixer_count) {
-        last_count = mixer_count;
-        for (i = 0; i < NUM_SOURCES; i++) {
-            if (placed[i])
+    while(pos < mixer_count) {
+        unsigned last_count = pos;
+        for (unsigned source = 0; source < NUM_SOURCES; source++) {
+            if (placed[source])
                 continue;
-            if (! find_dependencies(i, dependencies)) {
-                placed[i] = 1;
-                continue;
-            }
+            unsigned newpos = pos;
             unsigned ok = 1;
-            unsigned j;
-            // determine if all dependencies have been placed
-            for (j = 0; j < NUM_SOURCES; j++) {
-                if (dependencies[j] && ! placed[j]) {
-                    ok = 0;
-                    break;
+            for(unsigned mixidx = 0; mixidx < NUM_MIXERS; mixidx++) {
+                if (MIXER_SRC(Model.mixers[mixidx].src) && Model.mixers[mixidx].dest == source) {
+                    if ((MIXER_SRC(Model.mixers[mixidx].src) > NUM_SOURCES
+                         && MIXER_SRC(Model.mixers[mixidx].src) != NUM_SOURCES + 1 + source
+                         && ! placed[MIXER_SRC(Model.mixers[mixidx].src) - NUM_SOURCES - 1])
+                         ||
+                        (MIXER_SRC(Model.mixers[mixidx].sw) > NUM_SOURCES
+                         && MIXER_SRC(Model.mixers[mixidx].sw) != NUM_SOURCES + 1 + source
+                         && ! placed[MIXER_SRC(Model.mixers[mixidx].sw) - NUM_SOURCES - 1])
+                        )
+                    {
+                        // We found an unplaced dependency
+                        ok = 0;
+                        break;
+                    }
+                    order[newpos++] = mixidx;
                 }
             }
             if (ok) {
-                unsigned num = MIXER_GetMixers(i, &mixers[pos], NUM_MIXERS);
-                pos += num;
-                mixer_count -= num;
-                placed[i] = 1;
+                placed[source] = 1;
+                pos = newpos;
             }
         }
+        if (last_count == pos)
+            break;
     }
-    if (mixer_count) {
+    if (pos != mixer_count) {
         // We found a mixer loop....add missing mixers to the end of the order
-        printf("Mix loop detected.  The following mixers may have a circular dependency!\n");
+        printf("Mix loop detected (%d mixers affected).  The following mixers may have a circular dependency!\n", mixer_count);
         for (unsigned source = 0; source < NUM_SOURCES; source++) {
             if (placed[source])
                 continue;
             printf("  Mixer source: %d\n", source);
-            pos += MIXER_GetMixers(source, &mixers[pos], NUM_MIXERS);
+            for(unsigned mixidx = 0; mixidx < NUM_MIXERS; mixidx++) {
+                if (MIXER_SRC(Model.mixers[mixidx].src) && Model.mixers[mixidx].dest == source) {
+                    order[pos++] = mixidx;
+                }
+            }
         }
     }
-    memcpy(Model.mixers, mixers, sizeof(mixers));
+    MIXER_ReorderMixers(Model.mixers, order, pos);
 }
 
 int MIXER_SetMixers(struct Mixer *mixers, int count)
