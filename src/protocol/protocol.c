@@ -121,6 +121,7 @@ void PROTOCOL_DeInit()
     CLOCK_StopTimer();
     if(Model.protocol != PROTOCOL_NONE && PROTOCOL_LOADED)
         PROTO_Cmds(PROTOCMD_DEINIT);
+    CLOCK_StartMixer(); // run mixer on timer so channels are updated for things like calibration
     proto_state = PROTO_DEINIT;
 }
 
