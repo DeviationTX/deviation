@@ -574,15 +574,15 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
         unsigned last_pixel_transparent = row_has_transparency;
         row_has_transparency = 0;
 #endif
-        for (i = 0; i < w; i++ ) {
+        for (i = 0; i < w; i++) {
             if (i % FILEBUF_SIZE == 0) {
                 fread(buf, w - i > FILEBUF_SIZE? FILEBUF_SIZE: w - i, 2, fh);
                 color = (u16 *)buf;
             }
 
-            if(transparent) {
+            if (transparent) {
 #ifdef TRANSPARENT_COLOR
-                //Display supports a transparent color
+                //  Display supports a transparent color
                 u32 c;
                 if((*color & 0x8000)) {
                     //convert 1555 -> 565
@@ -615,7 +615,7 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
                     *color = (*color & 0x8410) == 0x8410 ?  0 : 0xffff;
                 LCD_DrawPixel(*color++);
             }
-	}
+        }
         if((u16)w < img_w) {
             fseek(fh, 2 * (img_w - w), SEEK_CUR);
         }
