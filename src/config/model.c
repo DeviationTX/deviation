@@ -41,12 +41,12 @@ const char * const RADIO_TX_POWER_VAL[TXPOWER_LAST] =
 #define WRITE_FULL_MODEL 0
 static u8 auto_map;
 
-const char *MODEL_NAME = "name";
-const char *MODEL_ICON = "icon";
-const char *MODEL_TYPE = "type";
-const char *MODEL_TEMPLATE = "template";
-const char *MODEL_AUTOMAP = "automap";
-const char *MODEL_MIXERMODE = "mixermode";
+const char MODEL_NAME[] = "name";
+const char MODEL_ICON[] = "icon";
+const char MODEL_TYPE[] = "type";
+const char MODEL_TEMPLATE[] = "template";
+const char MODEL_AUTOMAP[] = "automap";
+const char MODEL_MIXERMODE[] = "mixermode";
 
 /* Section: Radio */
 static const char SECTION_RADIO[]   = "radio";

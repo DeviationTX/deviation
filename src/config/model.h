@@ -17,10 +17,10 @@
 #endif
 
 /* INI file consts */
-extern const char *MODEL_NAME;
-extern const char *MODEL_ICON;
-extern const char *MODEL_TYPE;
-extern const char *MODEL_TEMPLATE;
+extern const char MODEL_NAME[];
+extern const char MODEL_ICON[];
+extern const char MODEL_TYPE[];
+extern const char MODEL_TEMPLATE[];
 #define UNKNOWN_ICON ("media/noicon" IMG_EXT)
 
 //This cannot be computed, and must be manually updated
