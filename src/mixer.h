@@ -93,7 +93,7 @@ struct Curve {
 };
 
 //The followingis defined bythe target
-extern const char *tx_stick_names[4];
+extern const char *const tx_stick_names[4];
 
 enum TemplateType {
     MIXERTEMPLATE_NONE,
