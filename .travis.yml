@@ -2,6 +2,7 @@
 env:
 #Do not define 'global' env vars here.  They cannot be used with API builds
     matrix:
+      fast_finish: true
       - MAKETARGET=zip_devo8
       - MAKETARGET=zip_devo10
       - MAKETARGET=zip_devo12
@@ -14,17 +15,13 @@ env:
       - MAKETARGET=test
 #      - COMPILER=latest TARGET=devo8
 
-# use new docker environment
-sudo: false
-
-#sudo: required
-#dist: trusty
+dist: trusty
 
 addons:
   apt:
+    update: false
     packages:
       - build-essential
-      - git
       - libc6-i386
       - mingw32
       - mingw32-binutils
@@ -34,8 +31,11 @@ addons:
 #      - gcc-arm-none-eabi
 
 #Do NOT set these.  They set 'CC' which breaks the build
-#language: c
+language: minimal
 #compiler: gcc
+
+git:
+  depth: 5
 
 before_install:
    - pip install --user cpp-coveralls
