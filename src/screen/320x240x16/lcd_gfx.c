@@ -570,15 +570,19 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
     /* Bitmap start is at lower-left corner */
     for (j = 0; j < h; j++) {
         u16 *color = NULL;
-        if(transparent) {
-#ifdef TRANSPARENT_COLOR
-            //Display supports a transparent color
-            for (i = 0; i < w; i++ ) {
-                if (i % FILEBUF_SIZE == 0) {
-                    fread(buf, w - i > FILEBUF_SIZE? FILEBUF_SIZE: w - i, 2, fh);
-                    color = (u16 *)buf;
-                }
+#ifndef TRANSPARENT_COLOR
+        unsigned last_pixel_transparent = row_has_transparency;
+        row_has_transparency = 0;
+#endif
+        for (i = 0; i < w; i++ ) {
+            if (i % FILEBUF_SIZE == 0) {
+                fread(buf, w - i > FILEBUF_SIZE? FILEBUF_SIZE: w - i, 2, fh);
+                color = (u16 *)buf;
+            }
 
+            if(transparent) {
+#ifdef TRANSPARENT_COLOR
+                //Display supports a transparent color
                 u32 c;
                 if((*color & 0x8000)) {
                     //convert 1555 -> 565
@@ -588,16 +592,7 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
                 }
                 LCD_DrawPixel(c);
                 color++;
-            }
 #else
-            unsigned last_pixel_transparent = row_has_transparency;
-            row_has_transparency = 0;
-            for (i = 0; i < w; i++ ) {
-                if (i % FILEBUF_SIZE == 0) {
-                    fread(buf, w - i > FILEBUF_SIZE? FILEBUF_SIZE: w - i, 2, fh);
-                    color = (u16 *)buf;
-                }
-
                 if((*color & 0x8000)) {
                     //convert 1555 -> 565
                     unsigned c = ((*color & 0x7fe0) << 1) | (*color & 0x1f);
@@ -614,20 +609,13 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
                     last_pixel_transparent = 1;
                 }
                 color++;
-            }
 #endif
-        } else {
-            for (i = 0; i < w; i++ ) {
-                if (i % FILEBUF_SIZE == 0) {
-                    fread(buf, w - i > FILEBUF_SIZE? FILEBUF_SIZE: w - i, 2, fh);
-                    color = (u16*)buf;
-                }
-
+            } else {
                 if (LCD_DEPTH == 1)
                     *color = (*color & 0x8410) == 0x8410 ?  0 : 0xffff;
                 LCD_DrawPixel(*color++);
             }
-        }
+	}
         if((u16)w < img_w) {
             fseek(fh, 2 * (img_w - w), SEEK_CUR);
         }
