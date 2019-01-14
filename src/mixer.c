@@ -613,7 +613,7 @@ void fix_mixer_dependencies(unsigned mixer_count)
         mixers[i].src = 0;
     }
     memset(placed, 0, sizeof(placed));
-    while(mixer_count || last_count != mixer_count) {
+    while(mixer_count && last_count != mixer_count) {
         last_count = mixer_count;
         for (i = 0; i < NUM_SOURCES; i++) {
             if (placed[i])
@@ -626,7 +626,7 @@ void fix_mixer_dependencies(unsigned mixer_count)
             unsigned j;
             // determine if all dependencies have been placed
             for (j = 0; j < NUM_SOURCES; j++) {
-                if (dependencies[i] && ! placed[i]) {
+                if (dependencies[j] && ! placed[j]) {
                     ok = 0;
                     break;
                 }
@@ -639,13 +639,17 @@ void fix_mixer_dependencies(unsigned mixer_count)
             }
         }
     }
-    //mixer_count s gauranteed to be 0 when we get here
-    //if (mixer_count) {
-    //    printf("Could not place all mixers!\n");
-    //    return;
-    //}
-    for (i = 0; i < NUM_MIXERS; i++)
-        Model.mixers[i] = mixers[i];
+    if (mixer_count) {
+        // We found a mixer loop....add missing mixers to the end of the order
+        printf("Mix loop detected.  The following mixers may have a circular dependency!\n");
+        for (unsigned source = 0; source < NUM_SOURCES; source++) {
+            if (placed[source])
+                continue;
+            printf("  Mixer source: %d\n", source);
+            pos += MIXER_GetMixers(source, &mixers[pos], NUM_MIXERS);
+        }
+    }
+    memcpy(Model.mixers, mixers, sizeof(mixers));
 }
 
 int MIXER_SetMixers(struct Mixer *mixers, int count)
