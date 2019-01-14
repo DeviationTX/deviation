@@ -27,6 +27,8 @@ EXTERN (vector_table)
 /* Define the entry point of the output file. */
 ENTRY(reset_handler)
 
+_stack_size = 4096;
+
 /* Define sections. */
 SECTIONS
 {
@@ -81,6 +83,7 @@ SECTIONS
 	_etext = .;
 
 	.data : {
+                . = . + _stack_size;
 		_data = .;
 		*(.data*)	/* Read-write initialized data */
 		. = ALIGN(4);
@@ -105,5 +108,5 @@ SECTIONS
 	end = .;
 }
 
-PROVIDE(_stack = ORIGIN(ram) + LENGTH(ram));
+PROVIDE(_stack = ORIGIN(ram) + _stack_size);
 
