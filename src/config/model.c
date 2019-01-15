@@ -162,7 +162,9 @@ static const char * const TIMER_TYPE_VAL[TIMER_LAST] = {
     };
 static const char TIMER_TIME[] = "time";
 static const char TIMER_RESETSRC[] = "resetsrc";
+#if HAS_PERMANENT_TIMER
 static const char PERMANENT_TIMER[] = "permanent_timer";
+#endif
 static const char TIMER_VAL[] = "val";
 
 /* Section: Safety */
@@ -526,10 +528,12 @@ struct struct_map {const char *str;  u16 offset; u16 defval;};
 #define OFFSETS(s,v) (((long)(&s.v) - (long)(&s)) | ((sizeof(s.v)+3) << 13))
 #define OFFSET_SRC(s,v) (((long)(&s.v) - (long)(&s)) | (2 << 13))
 #define OFFSET_BUT(s,v) (((long)(&s.v) - (long)(&s)) | (6 << 13))
+#if HAS_PERMANENT_TIMER
 static const struct struct_map _secnone[] =
 {
     {PERMANENT_TIMER, OFFSET(Model, permanent_timer), 0},
 };
+#endif
 static const struct struct_map _secradio[] = {
     {RADIO_NUM_CHANNELS, OFFSET(Model, num_channels), 0},
     {RADIO_FIXED_ID,     OFFSET(Model, fixed_id), 0},
@@ -628,8 +632,10 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
             CONFIG_ParseIconName(m->icon, value);
             return 1;
         }
+#if HAS_PERMANENT_TIMER
         if(assign_int(&Model, _secnone, MAPSIZE(_secnone)))
             return 1;
+#endif
         if (MATCH_KEY(MODEL_TYPE)) {
             for (i = 0; i < NUM_STR_ELEMS(MODEL_TYPE_VAL); i++) {
                 if (MATCH_VALUE(MODEL_TYPE_VAL[i])) {
@@ -1193,7 +1199,9 @@ u8 CONFIG_WriteModel(u8 model_num) {
     }
     CONFIG_EnableLanguage(0);
     fprintf(fh, "%s=%s\n", MODEL_NAME, m->name);
+#if HAS_PERMANENT_TIMER
     write_int(fh, m, _secnone, MAPSIZE(_secnone));
+#endif
     fprintf(fh, "%s=%s\n", MODEL_MIXERMODE, STDMIXER_ModeName(m->mixer_mode));
     if(m->icon[0] != 0)
         fprintf(fh, "%s=%s\n", MODEL_ICON, m->icon + 9);

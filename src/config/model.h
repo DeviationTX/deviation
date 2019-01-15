@@ -53,7 +53,9 @@ struct Model {
     MixerMode mixer_mode;
     s8 ppm_map[MAX_PPM_IN_CHANNELS];
     u8 padding_1[2];
+#if HAS_PERMANENT_TIMER
     u32 permanent_timer;
+#endif
 #if HAS_VIDEO
     u8 videosrc;
     u8 videoch;
