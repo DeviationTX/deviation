@@ -22,17 +22,9 @@ static u16 scan_cb();
 #ifdef ENABLE_MODULAR
 extern void * (* const PROTO_Cmds)(enum ProtoCmds);
 
-typedef void (*T_CYRF_SetTxRxMode)(enum TXRX_State);
-typedef void (*T_CYRF_WriteRegister)(u8 address, u8 data);
-typedef u8 (*T_CYRF_ReadRegister)(u8 address);
-
-static T_CYRF_SetTxRxMode _CYRF_SetTxRxMode;
-static T_CYRF_WriteRegister _CYRF_WriteRegister;
-static T_CYRF_ReadRegister _CYRF_ReadRegister;
-
-#define CYRF_SetTxRxMode _CYRF_SetTxRxMode
-#define CYRF_WriteRegister _CYRF_WriteRegister
-#define CYRF_ReadRegister _CYRF_ReadRegister
+#define CYRF_SetTxRxMode sp->_CYRF_SetTxRxMode
+#define CYRF_WriteRegister sp->_CYRF_WriteRegister
+#define CYRF_ReadRegister sp->_CYRF_ReadRegister
 #define CYRF_ConfigRFChannel(ch) CYRF_WriteRegister(CYRF_00_CHANNEL, ch);
 #endif
 
