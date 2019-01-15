@@ -58,11 +58,13 @@ sub read_map {
             }
             chomp;
             my($address, $obj) = (/^\s+\S+\s+(\S+)\s.*\s(\S+)$/);
-            $address = hex($address);
-            if($obj ne $lastobj) {
-                $map{$lastobj} = $address - $objstart if($lastobj);
-                $lastobj = $obj;
-                $objstart = $address;
+            if ($obj !~ m/^.+ltrans.+$/) {
+                $address = hex($address);
+                if($obj ne $lastobj) {
+                    $map{$lastobj} = $address - $objstart if($lastobj);
+                    $lastobj = $obj;
+                    $objstart = $address;
+                }
             }
         } elsif(/\. = ALIGN/) {
             my($address) = (/^\s+(\S+)/);
