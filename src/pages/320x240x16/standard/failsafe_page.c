@@ -23,6 +23,7 @@
 #include "../../common/standard/_failsafe_page.c"
 
 static struct stdchan_obj * const gui = &gui_objs.u.stdchan;
+static struct mixer_failsave_page * mp = &pagemem.u.mixer_failsave_page;
 
 static void show_page(int page)
 {
@@ -33,7 +34,6 @@ static void show_page(int page)
         ROW_HEIGHT = 24,
         LABEL_WIDTH = (COL2 - COL1),
     };
-    struct mixer_page * mp = &pagemem.u.mixer_page;
     if (mp->firstObj) {
         GUI_RemoveHierObjects(mp->firstObj);
         FullRedraw = REDRAW_ONLY_DIRTY;
@@ -56,7 +56,6 @@ static void show_page(int page)
 void PAGE_FailSafeInit(int page)
 {
     (void)page;
-    struct mixer_page * mp = &pagemem.u.mixer_page;
     PAGE_ShowHeader(PAGE_GetName(PAGEID_FAILSAFE));
     mp->max_scroll = Model.num_channels > ENTRIES_PER_PAGE ?
                           Model.num_channels - ENTRIES_PER_PAGE

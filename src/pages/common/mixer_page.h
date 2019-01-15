@@ -17,6 +17,20 @@ struct curve_edit {
     u8 reverse;
 };
 
+struct mixer_limit_page {
+    struct Limit origin_limit;
+    struct Limit *limit;
+    u8 channel;
+    u8 entries_per_page;
+};
+
+struct mixer_failsave_page
+{
+    struct Limit *limit;
+    guiObject_t *firstObj;
+    u8 max_scroll;
+};
+
 struct mixer_page {
     struct buttonAction action;
     guiObject_t *firstObj;
