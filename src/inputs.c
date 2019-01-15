@@ -111,7 +111,7 @@
 #define BUTNAME_ENTER       _tr("Enter")
 #define BUTNAME_EXIT        _tr("Exit")
 
-const char *tx_stick_names[4] = {
+const char * const tx_stick_names[4] = {
     _tr_noop("RIGHT_H"),
     _tr_noop("LEFT_V"),
     _tr_noop("RIGHT_V"),
