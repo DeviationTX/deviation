@@ -117,16 +117,6 @@ void ADC_StartCapture()
     adc_start_conversion_direct(_ADC);
 }
 
-#if 0
-void _DMA_ISR()
-{
-    ADC_Filter();
-    medium_priority_cb();
-    /* clear the interrupt flag */
-    DMA_IFCR(_DMA) |= _DMA_IFCR_CGIF;
-}
-#endif
-
 void ADC_Filter()
 {
     for (int i = 0; i < NUM_ADC_CHANNELS; i++) {

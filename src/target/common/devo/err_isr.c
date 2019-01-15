@@ -12,26 +12,29 @@
     You should have received a copy of the GNU General Public License
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-#include "common.h"
-#ifndef DISABLE_PWM
-
-#include <libopencm3/stm32/rcc.h>
-#include <libopencm3/stm32/timer.h>
-#include <libopencm3/stm32/gpio.h>
-#include <libopencm3/stm32/dma.h>
 #include <libopencm3/cm3/nvic.h>
 
-#include "../ports.h"
+/*
+    asm(
+"    TST LR, #4\n"
+"    ITE EQ\n"
+"    MRSEQ R0, MSP\n"
+"    MRSNE R0, PSP\n"
+"    B fault_handler_c\n");
+*/
 
-
-void _PWM_DMA_ISR(void)
+void __attribute__((__used__)) hard_fault_handler()
 {
-    timer_disable_counter(TIM1);
-    nvic_disable_irq(_PWM_NVIC_DMA_CHANNEL_IRQ);
-    DMA_IFCR(_PWM_DMA) |= DMA_IFCR_CTCIF(_PWM_DMA_CHANNEL);
-    dma_disable_transfer_complete_interrupt(_PWM_DMA, _PWM_DMA_CHANNEL);
-    dma_disable_channel(_PWM_DMA, _PWM_DMA_CHANNEL);
+    asm(
+"    MRS   R0, MSP\n"
+"    MOVS  R1, #0\n"
+"    B fault_handler_c\n");
 }
 
-#endif
+void __attribute__((__used__)) exti2_isr()
+{
+    asm(
+"    MRS   R0, MSP\n"
+"    MOVS  R1, #1\n"
+"    B fault_handler_c\n");
+}
