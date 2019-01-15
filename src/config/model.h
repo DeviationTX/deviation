@@ -28,31 +28,27 @@ extern const char *MODEL_TEMPLATE;
 #define VIRT_NAME_LEN 10
 
 struct Model {
-    u32 fixed_id;
-    enum ModelType type;
-    enum Protocols protocol;
-    s16 proto_opts[NUM_PROTO_OPTS];
     u8 num_channels;
     u8 num_ppmin;
-    u16 ppmin_centerpw;
-    u16 ppmin_deltapw;
     u8 train_sw;
+    u8 swashmix[3];
+    u8 swash_invert;
+    MixerMode mixer_mode;
+    enum ModelType type;
+    enum Protocols protocol;
     enum TxPower tx_power;
     enum SwashType swash_type;
-    u8 swash_invert;
-    u8 swashmix[3];
-    char name[24];
-    char icon[24];
-    char virtname[NUM_VIRT_CHANNELS][VIRT_NAME_LEN];
+
+    s16 proto_opts[NUM_PROTO_OPTS];
+    u16 ppmin_centerpw;
+    u16 ppmin_deltapw;
     u8 templates[NUM_CHANNELS];
     u8 safety[NUM_SOURCES+1];
-    u8 telem_alarm[TELEM_NUM_ALARMS];
-    s32 telem_alarm_val[TELEM_NUM_ALARMS];
-    u8 telem_alarm_th[TELEM_NUM_ALARMS];
     u8 telem_flags;
-    MixerMode mixer_mode;
+    u8 telem_alarm[TELEM_NUM_ALARMS];
+    u8 telem_alarm_th[TELEM_NUM_ALARMS];
+    s32 telem_alarm_val[TELEM_NUM_ALARMS];
     s8 ppm_map[MAX_PPM_IN_CHANNELS];
-    u8 padding_1[2];
     u32 permanent_timer;
 #if HAS_VIDEO
     u8 videosrc;
@@ -74,6 +70,10 @@ struct Model {
 #if HAS_EXTENDED_TELEMETRY
     s32 ground_level;
 #endif
+    u32 fixed_id;
+    char name[24];
+    char icon[24];
+    char virtname[NUM_VIRT_CHANNELS][VIRT_NAME_LEN];
 };
 extern struct Model Model;
 extern const char * const RADIO_TX_POWER_VAL[TXPOWER_LAST];

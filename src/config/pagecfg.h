@@ -78,7 +78,6 @@ struct elem {
 struct PageCfg2 {
     struct elem elem[NUM_ELEMS];
     u8 quickpage[NUM_QUICKPAGES];
-    u8 padding_1[3];
 };
 
 enum {
