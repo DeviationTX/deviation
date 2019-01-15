@@ -90,6 +90,7 @@ endif
 	$(DUMP) -S $< > $(TARGET).list
 
 $(LIBOPENCM3):
+	test -s $(SDIR)/libopencm3/Makefile || { echo "Fetch libopencm3 via 'git submodule update --init'"; exit 1; }
 	+$(FLOCKS) $(MAKE) -C $(SDIR)/libopencm3 TARGETS=stm32/f1 lib
 
 $(TARGET).dfu: $(TARGET).bin
