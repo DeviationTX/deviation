@@ -7,9 +7,9 @@ use Getopt::Long;
 
 my $target;
 my $quiet;
-my $objdir;
+my $elffile;
 my $log = "";
-GetOptions("target=s" => \$target, "quiet" => \$quiet, "objdir=s" => \$objdir);
+GetOptions("target=s" => \$target, "quiet" => \$quiet, "elffile=s" => \$elffile);
 
 my @dirs = grep {$_ !~ /common/ && (! $target || $_ =~ /$target/)} glob("filesystem/*");
 my $max_line_length = 0;
@@ -55,7 +55,7 @@ foreach my $target_dir (@dirs) {
         $target_line_length = $line_length if($line_length > $target_line_length);
     }
     my $cmd = "../utils/extract_strings.pl -target $target";
-    $cmd .= " -objdir $objdir" if($objdir);
+    $cmd .= " -elffile $elffile" if($elffile);
     my @lines = `$cmd`;
     my $count = scalar(@lines);
     $log .= sprintf("%-35s: %5d lines\n", $target, $count);

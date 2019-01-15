@@ -287,7 +287,7 @@ endif
 %.fs_wrapper: $(LAST_MODEL)
 	true
 
-.PHONY: $(PRE_FS) $(LAST_MODEL)
+.PHONY: $(PRE_FS) $(LAST_MODEL) $(TARGET).elf
 $(LAST_MODEL): model_template.ini tx_template.ini $(FONTS) $(PRE_FS)
 	@echo " + Copying template files for $(FILESYSTEM)"
 	mkdir -p filesystem/$(FILESYSTEM) || true
@@ -301,7 +301,7 @@ $(LAST_MODEL): model_template.ini tx_template.ini $(FONTS) $(PRE_FS)
 	cp model_template.ini filesystem/$(FILESYSTEM)/models/default.ini
 ifdef LANGUAGE
 	mkdir filesystem/$(FILESYSTEM)/language 2> /dev/null; \
-               ../utils/extract_strings.pl -fs $(FILESYSTEM) -targets $(LANGUAGE) -update -objdir $(ODIR)
+               ../utils/extract_strings.pl -fs $(FILESYSTEM) -targets $(LANGUAGE) -update -elffile $(TARGET).elf
 endif
 	export tx=$(FILESYSTEM); \
 	number=2 ; while [ $$number -le $(NUM_MODELS) ] ; do \
@@ -309,7 +309,7 @@ endif
 		number=`expr $$number + 1`; \
 		done
 	@echo " + Checking string list length for $(FILESYSTEM)"
-	../utils/check_string_size.pl -target $(FILESYSTEM) -objdir $(ODIR) -quiet
+	../utils/check_string_size.pl -target $(FILESYSTEM) -elffile $(TARGET).elf -quiet
 
 ######################
 #Necessary Font files#
