@@ -41,13 +41,13 @@ struct disp_keyboard {
 };
 
 struct disp_listbox {
-    u16 font;
     u16 bg_color;
     u16 fg_color;
     u16 bg_select;
     u16 fg_select;
     u16 bg_bar;
     u16 fg_bar;
+    u8 font;
 };
 
 struct disp_bargraph {
