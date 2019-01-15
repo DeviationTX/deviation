@@ -30,14 +30,14 @@ const char * _timer_new_str_cb(guiObject_t *obj, int dir, void *data)
     u8 changed = 0;
     tempstring[0] = '\0';
     if (index == TIMER_SECONDS) {
-        permanent.second = GUI_TextSelectHelper(permanent.second, 0, 59, dir, 1, 10, &changed);
-        sprintf(tempstring, "%2d", permanent.second);
+        tp->second = GUI_TextSelectHelper(tp->second, 0, 59, dir, 1, 10, &changed);
+        sprintf(tempstring, "%2d", tp->second);
     } else if (index == TIMER_MINUTES) {
-        permanent.minute = GUI_TextSelectHelper(permanent.minute, 0, 59, dir, 1, 10, &changed);
-        sprintf(tempstring, "%2d", permanent.minute);
+        tp->minute = GUI_TextSelectHelper(tp->minute, 0, 59, dir, 1, 10, &changed);
+        sprintf(tempstring, "%2d", tp->minute);
     } else if (index == TIMER_HOURS) {
-        permanent.hour   = GUI_TextSelectHelper(permanent.hour,   0, 99, dir, 1, 10, &changed);
-        sprintf(tempstring, "%2d", permanent.hour);
+        tp->hour   = GUI_TextSelectHelper(tp->hour,   0, 99, dir, 1, 10, &changed);
+        sprintf(tempstring, "%2d", tp->hour);
     }
     if (changed) GUI_Redraw(&guiset->addvalue);
     return tempstring;
@@ -46,18 +46,19 @@ const char * _timer_new_str_cb(guiObject_t *obj, int dir, void *data)
 void add_set_button_cb(struct guiObject *obj, const void *data)
 {
     (void)obj;
-    permanent.newvalue = ((permanent.hour * 60 + permanent.minute) * 60 + permanent.second) * 1000;
-    if ((long)data == ADD_BUTTON) permanent.newvalue += permanent.oldvalue;
-    if (permanent.newvalue > 100*60*60*1000) permanent.newvalue = 0;
+    tp->newvalue = ((tp->hour * 60 + tp->minute) * 60 + tp->second) * 1000;
+    if ((long)data == ADD_BUTTON) tp->newvalue += tp->oldvalue;
+    if (tp->newvalue > 100*60*60*1000) tp->newvalue = 0;
     GUI_Redraw(&guiset->newvalue);
 }
 
 static void _show_settimer_page(u8 index)
 {
-    memset(&permanent, 0, sizeof(permanent));
-    permanent.index = index;
-    permanent.oldvalue = TIMER_GetValue(permanent.index);
-    permanent.newvalue = TIMER_GetValue(permanent.index);   // set to original value since it is written anyway
+    memset(tp, 0, sizeof(*tp));
+    tp->index = index;
+    tp->oldvalue = TIMER_GetValue(tp->index);
+    tp->newvalue = TIMER_GetValue(tp->index);   // set to original value since it is written anyway
+
 
     firstObj = NULL;
     PAGE_ShowHeader(PAGE_GetName(PAGEID_SETTIMER));

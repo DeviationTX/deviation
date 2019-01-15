@@ -24,8 +24,6 @@ enum { OLD_TIMER=0, ADD_TIMER, NEW_TIMER,               // only for readability
 
 static void _show_settimer_page(u8 index);
 
-static struct permanent_timer { u8 index; u8 second, minute, hour; u32 oldvalue; u32 newvalue; int hms; int addset; } permanent;
-
 void PAGE_SetTimerInit(int index)
 {
     _show_settimer_page(index);
@@ -33,8 +31,8 @@ void PAGE_SetTimerInit(int index)
 
 void PAGE_SetTimerExit()
 {
-    TIMER_SetValue(permanent.index, permanent.newvalue);
-    Model.timer[permanent.index].val = permanent.newvalue;
+    TIMER_SetValue(tp->index, tp->newvalue);
+    Model.timer[tp->index].val = tp->newvalue;
 }
 
 const char * timer_value_str_cb(guiObject_t *obj, const void *data)
@@ -42,13 +40,13 @@ const char * timer_value_str_cb(guiObject_t *obj, const void *data)
     (void)obj;
     switch ((long)data) {
         case OLD_TIMER:
-            TIMER_SetString(tempstring, permanent.oldvalue);
+            TIMER_SetString(tempstring, tp->oldvalue);
             return tempstring;
         case ADD_TIMER:
-            TIMER_SetString(tempstring, ((permanent.hour * 60 + permanent.minute) * 60 + permanent.second) * 1000);
+            TIMER_SetString(tempstring, ((tp->hour * 60 + tp->minute) * 60 + tp->second) * 1000);
             return tempstring;
         case NEW_TIMER:
-            TIMER_SetString(tempstring, permanent.newvalue);
+            TIMER_SetString(tempstring, tp->newvalue);
             return tempstring;
         case ADD_BUTTON:
             return _tr("Add");

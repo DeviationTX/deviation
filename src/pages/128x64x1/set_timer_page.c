@@ -38,8 +38,8 @@ const char *settimer_select_cb(guiObject_t *obj, int dir, void *data)
     (void)dir;
     u8 changed = 0;
     if ((long)data == SELECT_HMS) {
-        permanent.hms = GUI_TextSelectHelper(permanent.hms, TIMER_SECONDS, TIMER_HOURS, dir, 1, 1, &changed);
-        switch (permanent.hms) {
+        tp->hms = GUI_TextSelectHelper(tp->hms, TIMER_SECONDS, TIMER_HOURS, dir, 1, 1, &changed);
+        switch (tp->hms) {
             case TIMER_SECONDS:
                 return _tr("Second");
             case TIMER_MINUTES:
@@ -51,26 +51,26 @@ const char *settimer_select_cb(guiObject_t *obj, int dir, void *data)
     }
     if ((long)data == SELECT_VALUE) {
         tempstring[0] = '\0';
-        switch (permanent.hms) {
+        switch (tp->hms) {
             case TIMER_SECONDS:
-                permanent.second = GUI_TextSelectHelper(permanent.second, 0, 59, dir, 1, 10, &changed);
-                sprintf(tempstring, "%d", permanent.second);
+                tp->second = GUI_TextSelectHelper(tp->second, 0, 59, dir, 1, 10, &changed);
+                sprintf(tempstring, "%d", tp->second);
                 break;
             case TIMER_MINUTES:
-                permanent.minute = GUI_TextSelectHelper(permanent.minute, 0, 59, dir, 1, 10, &changed);
-                sprintf(tempstring, "%d", permanent.minute);
+                tp->minute = GUI_TextSelectHelper(tp->minute, 0, 59, dir, 1, 10, &changed);
+                sprintf(tempstring, "%d", tp->minute);
                 break;
             case TIMER_HOURS:
-                permanent.hour = GUI_TextSelectHelper(permanent.hour, 0, 99, dir, 1, 10, &changed);
-                sprintf(tempstring, "%d", permanent.hour);
+                tp->hour = GUI_TextSelectHelper(tp->hour, 0, 99, dir, 1, 10, &changed);
+                sprintf(tempstring, "%d", tp->hour);
                 break;
         }
         if (changed) GUI_Redraw(&guiset->addtime);
         return tempstring;
     }
     if ((long)data == ADDSET_SELECT) {
-        permanent.addset = GUI_TextSelectHelper(permanent.addset, SET_BUTTON, ADD_BUTTON, dir, 1, 1, NULL);
-        return permanent.addset == SET_BUTTON ? _tr("Set") : _tr("Add");
+        tp->addset = GUI_TextSelectHelper(tp->addset, SET_BUTTON, ADD_BUTTON, dir, 1, 1, NULL);
+        return tp->addset == SET_BUTTON ? _tr("Set") : _tr("Add");
     }
     return "";
 }
@@ -78,21 +78,21 @@ const char *settimer_select_cb(guiObject_t *obj, int dir, void *data)
 void add_set_button_cb(struct guiObject *obj, void *data)
 {
     (void)obj;
-    permanent.newvalue = ((permanent.hour * 60 + permanent.minute) * 60 + permanent.second) * 1000;
-    if ((long)data == ADDSET_SELECT && permanent.addset == ADD_BUTTON)
-        permanent.newvalue += permanent.oldvalue;
-    if (permanent.newvalue > 100*60*60*1000) permanent.newvalue = 0;
+    tp->newvalue = ((tp->hour * 60 + tp->minute) * 60 + tp->second) * 1000;
+    if ((long)data == ADDSET_SELECT && tp->addset == ADD_BUTTON)
+        tp->newvalue += tp->oldvalue;
+    if (tp->newvalue > 100*60*60*1000) tp->newvalue = 0;
     GUI_Redraw(&guiset->newvalue);
 }
 
 static void _show_settimer_page(u8 index)
 {
-    memset(&permanent, 0, sizeof(permanent));
-    permanent.index = index;
-    permanent.oldvalue = TIMER_GetValue(permanent.index);
-    permanent.newvalue = TIMER_GetValue(permanent.index);   // set to original value since it is written anyway
-    permanent.addset = ADD_BUTTON;
-    permanent.hms = TIMER_HOURS;
+    memset(tp, 0, sizeof(*tp));
+    tp->index = index;
+    tp->oldvalue = TIMER_GetValue(tp->index);
+    tp->newvalue = TIMER_GetValue(tp->index);   // set to original value since it is written anyway
+    tp->addset = ADD_BUTTON;
+    tp->hms = TIMER_HOURS;
 
     snprintf(tempstring, sizeof(tempstring), "%s %d", _tr(PAGE_GetName(PAGEID_SETTIMER)), index + 1);
     PAGE_ShowHeader(tempstring);
