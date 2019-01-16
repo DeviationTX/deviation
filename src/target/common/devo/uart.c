@@ -125,7 +125,7 @@ void UART_SetFormat(int bits, uart_parity parity, uart_stopbits stopbits)
     }
 }
 
-static volatile u8 busy;
+volatile u8 busy;
 u8 UART_Send(u8 *data, u16 len) {
     if (busy) return 1;
     busy = 1;
@@ -148,27 +148,7 @@ u8 UART_Send(u8 *data, u16 len) {
     return 0;
 }
 
-void _USART_DMA_ISR(void)
-{
-    DMA_IFCR(_USART_DMA) |= DMA_IFCR_CTCIF(_USART_DMA_CHANNEL);
-
-    dma_disable_transfer_complete_interrupt(_USART_DMA, _USART_DMA_CHANNEL);
-    usart_disable_tx_dma(_USART);
-    dma_disable_channel(_USART_DMA, _USART_DMA_CHANNEL);
-
-    busy = 0;
-}
-
-static usart_callback_t *rx_callback;
-void _USART_ISR(void)
-{
-	u8 status = USART_SR(_USART) & (USART_SR_RXNE | USART_SR_PE | USART_SR_FE | USART_SR_NE | USART_SR_ORE) ;
-    u8 data = usart_recv(_USART);       // read unconditionally to reset interrupt and error flags
-
-    if (rx_callback) rx_callback(data, status);
-
-    // interrupt cleared by reading data register
-}
+usart_callback_t *rx_callback;
 
 /* Enable serial data reception by providing a callback function
    to accept received character and status. Disable by calling with argument NULL.

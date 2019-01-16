@@ -39,29 +39,6 @@ extern int disk_writep (const u8*, u32);
 extern unsigned _stack; //Defined in devo.ld
 extern u8 _drive_num;
 
-/*
-    asm(
-"    TST LR, #4\n"
-"    ITE EQ\n"
-"    MRSEQ R0, MSP\n"
-"    MRSNE R0, PSP\n"
-"    B fault_handler_c\n");
-*/
-
-void hard_fault_handler()
-{
-    asm(
-"    MRS   R0, MSP\n"
-"    MOVS  R1, #0\n"
-"    B fault_handler_c\n");
-}
-void exti2_isr()
-{
-    asm(
-"    MRS   R0, MSP\n"
-"    MOVS  R1, #1\n"
-"    B fault_handler_c\n");
-}
 static u32 debug_addr = 0;
 void write_byte(u8 x) {
     if(debug_addr)
@@ -95,7 +72,7 @@ void fault_printf(const char *str, unsigned int val)
 // hard fault handler in C,
 // with stack frame location as input parameter
 // called from HardFault_Handler in file xxx.s
-void fault_handler_c (unsigned int * hardfault_args, unsigned int fault_type)
+void __attribute__((used)) fault_handler_c (unsigned int * hardfault_args, unsigned int fault_type)
 {
   unsigned int stacked_r0;
   unsigned int stacked_r1;

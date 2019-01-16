@@ -28,17 +28,7 @@
 
 void USB_Init();
 void USB_Istr(void);
-/*
-void usb_hp_can_tx_isr()
-{
-        USB_Istr();
-}
-*/
 
-void usb_lp_can_rx0_isr()
-{
-        USB_Istr();
-}
 void (*pEpInt_IN[7])(void) = {};
 void (*pEpInt_OUT[7])(void) = {};
 const DEVICE_PROP *Device_Property;
