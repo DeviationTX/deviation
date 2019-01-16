@@ -79,7 +79,6 @@ void PWM_Stop()
 #endif
 }
 
-extern volatile u16 *pwm; // defined in pwm_isr.c
 void PPM_Enable(unsigned low_time, volatile u16 *pulses, u8 num_pulses)
 {
     if (!pulses || num_pulses < 1) return;

@@ -23,8 +23,6 @@
 
 #include "../ports.h"
 
-__attribute__((__used__)) volatile u16 *pwm;
-
 void __attribute__((__used__)) _PWM_DMA_ISR(void)
 {
     timer_disable_counter(TIM1);
