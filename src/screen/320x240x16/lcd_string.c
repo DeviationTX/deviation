@@ -46,6 +46,7 @@ static FATFS FontFAT;
  */
 //#define LINE_SPACING 2 // move to _gui.h as devo10's line spacing is different from devo8's
 #define CHAR_SPACING 1
+#define CHAR_BUF_SIZE 80
 #define RANGE_TABLE_SIZE 20
 #define NUM_FONTS 10
 
@@ -53,13 +54,12 @@ static FATFS FontFAT;
 #define FONT_NAME_LEN 9
 char FontNames[NUM_FONTS][FONT_NAME_LEN];
 
-struct font_def 
+struct font_def
 {
-        u8 idx;
-        FILE *fh;
-        u8 font[80];
+    u8 idx;
+    FILE *fh;
     u8 height;          /* Character height for storage        */
-        u16 range[2 * (RANGE_TABLE_SIZE + 1)];  /* Array containing the ranges of supported characters */
+    u16 range[2 * (RANGE_TABLE_SIZE + 1)];  /* Array containing the ranges of supported characters */
 };
 static struct {
     struct font_def font;
@@ -89,6 +89,7 @@ u8 get_char_range(u32 c, u32 *begin, u32 *end)
 {
     u32 offset = 0;
     u32 pos = 5;
+    u8 buf[6];
     u16 *range = cur_str.font.range;
     while(1) {
         if (range[0] == 0 && range[1] == 0)
@@ -102,30 +103,27 @@ u8 get_char_range(u32 c, u32 *begin, u32 *end)
         pos += 4;
     }
     fseek(cur_str.font.fh, pos, SEEK_SET);
-    u8 *font = cur_str.font.font;
-    fread(font, 6, 1, cur_str.font.fh);
-    *begin = font[0] | (font[1] << 8) | (font[2] << 16);
-    *end   = font[3] | (font[4] << 8) | (font[5] << 16);
+    fread(buf, 6, 1, cur_str.font.fh);
+    *begin = buf[0] | (buf[1] << 8) | (buf[2] << 16);
+    *end   = buf[3] | (buf[4] << 8) | (buf[5] << 16);
     return 1;
 }
 
-const u8 *char_offset(u32 c, u8 *width)
+void char_read(u8 *font, u32 c, u8 *width)
 {
     u32 begin;
     u32 end;
-    u8 *font = cur_str.font.font;
 
     u8 row_bytes = ((cur_str.font.height - 1) / 8) + 1;
     get_char_range(c, &begin, &end);
     *width = (end - begin) / row_bytes;
     fseek(cur_str.font.fh, begin, SEEK_SET);
-    if (end - begin > sizeof(cur_str.font.font)) {
+    if (end - begin > CHAR_BUF_SIZE) {
         printf("Character '%04d' is larger than allowed size\n", (int)c);
-        end = begin + (sizeof(cur_str.font.font) / row_bytes) * row_bytes;
+        end = begin + (CHAR_BUF_SIZE / row_bytes) * row_bytes;
         *width = (end - begin) / row_bytes;
     }
     fread(font, end - begin, 1, cur_str.font.fh);
-    return font;
 }
 
 u8 get_width(u32 c)
@@ -136,12 +134,15 @@ u8 get_width(u32 c)
     u8 row_bytes = ((cur_str.font.height - 1) / 8) + 1;
     get_char_range(c, &begin, &end);
     return (end - begin) / row_bytes;
-} 
+}
 
 void LCD_PrintCharXY(unsigned int x, unsigned int y, u32 c)
 {
     u8 row, col, width;
-    const u8 *offset = char_offset(c, &width);
+    u8 font[CHAR_BUF_SIZE];
+    const u8 *offset;
+    offset = font;
+    char_read(font, c, &width);
     if (! offset || ! width) {
         printf("Could not locate character U-%04x\n", (int)c);
         return;
@@ -178,17 +179,17 @@ void close_font()
 
 u8 open_font(unsigned int idx)
 {
-    char font[20];
+    char fontname[20];
     close_font();
     if (! idx) {
         cur_str.font.idx = 0;
         return 1;
     }
-    sprintf(font, "media/%s.fon", FontNames[idx-1]);
+    sprintf(fontname, "media/%s.fon", FontNames[idx-1]);
     finit(&FontFAT, "media");
-    cur_str.font.fh = fopen2(&FontFAT, font, "rb");
+    cur_str.font.fh = fopen2(&FontFAT, fontname, "rb");
     if (! cur_str.font.fh) {
-        printf("Couldn't open font file: %s\n", font);
+        printf("Couldn't open font file: %s\n", fontname);
         return 0;
     }
     setbuf(cur_str.font.fh, 0);
@@ -199,19 +200,19 @@ u8 open_font(unsigned int idx)
         return 0;
     }
     cur_str.font.idx = idx;
-    idx = 0;
-    u8 *f = (u8 *)font;
+    int range_idx = 0;
+    u8 buf[4];
     while(1) {
-        if (fread(f, 4, 1, cur_str.font.fh) != 1) {
+        if (fread(buf, 4, 1, cur_str.font.fh) != 1) {
             printf("Failed to parse font range table\n");
             fclose(cur_str.font.fh);
             cur_str.font.fh = NULL;
             return 0;
         }
-        u16 start_c = f[0] | (f[1] << 8);
-        u16 end_c = f[2] | (f[3] << 8);
-        cur_str.font.range[idx++] = start_c;
-        cur_str.font.range[idx++] = end_c;
+        u16 start_c = buf[0] | (buf[1] << 8);
+        u16 end_c = buf[2] | (buf[3] << 8);
+        cur_str.font.range[range_idx++] = start_c;
+        cur_str.font.range[range_idx++] = end_c;
         if (start_c == 0 && end_c == 0)
             break;
     }
