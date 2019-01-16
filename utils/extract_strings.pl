@@ -8,6 +8,7 @@ my $update;
 my $lang;
 my $fs;
 my $target_list;
+my $objdir;
 my $elffile;
 my $count;
 # The following are legal alternatives to the default string
@@ -31,7 +32,8 @@ sub fnv_16 {
 
 $ENV{CROSS} ||= "";
 GetOptions("update" => \$update, "language=s" => \$lang, "fs=s" => \$fs,
-    "targets=s" => \$target_list, "count" => \$count, "elffile=s" => \$elffile);
+    "targets=s" => \$target_list, "count" => \$count,
+    "objdir=s" => \$objdir, "elffile=s" => \$elffile);
 my @requested_targets = ();
 @requested_targets = split(/,/, $target_list) if($target_list);
 if($fs || @requested_targets) {
@@ -93,12 +95,22 @@ if($str) {
 #}
 #build string list
 my @out;
+@files = ();
 #Filter out any strings that do not appear in any obj files
-if($elffile) {
+if ($objdir) {
+    print $objdir;
+    push @files, glob("$objdir/*.o");
+}
+
+if ($elffile) {
+    print "add $elffile";
+    push @files, $elffile;
+}
+
+foreach my $file (@files) {
     my %allstr;
-    my @files;
     #Parse all strings from the object files and add to the allstr hash
-    my @od = `$ENV{CROSS}objdump -s $elffile`;
+    my @od = `$ENV{CROSS}objdump -s $file`;
     my $str = "";
     my $state = 0;
     foreach(@od) {
@@ -137,7 +149,9 @@ if($elffile) {
             #print STDERR "Ignoring unused string '$_'\n";
         }
     }
-} else {
+}
+
+if (!$objdir && !$elffile) {
     @out = values(%filemap);
 }
 #append template names

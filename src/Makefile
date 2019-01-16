@@ -309,7 +309,11 @@ endif
 		number=`expr $$number + 1`; \
 		done
 	@echo " + Checking string list length for $(FILESYSTEM)"
+ifeq "$(TYPE)" "dev"
+	../utils/check_string_size.pl -target $(FILESYSTEM) -elffile $(TARGET).elf
+else
 	../utils/check_string_size.pl -target $(FILESYSTEM) -elffile $(TARGET).elf -quiet
+endif
 
 ######################
 #Necessary Font files#
