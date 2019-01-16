@@ -7,9 +7,12 @@ OPTIMIZE_DFU     := 1
 MODULAR          := 0x20004000
 DFU_ARGS         := -c 7 -b 0x08003000
 
+
 include $(SDIR)/target/common/devo/Makefile.inc
 
 ifdef BUILD_TARGET
+SRC_C += $(SDIR)/target/common/drivers/lcd_128x64/lcd.c
+
 $(TARGET).fs_wrapper: $(LAST_MODEL)
 	perl -p -i -e 's/; has_pa-cyrf6936 = 1/  has_pa-cyrf6936 = 0/' filesystem/$(FILESYSTEM)/hardware.ini
 
