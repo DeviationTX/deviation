@@ -41,44 +41,40 @@ const char * const RADIO_TX_POWER_VAL[TXPOWER_LAST] =
 #define WRITE_FULL_MODEL 0
 static u8 auto_map;
 
-const char MODEL_NAME[] = "name";
-const char MODEL_ICON[] = "icon";
-const char MODEL_TYPE[] = "type";
-const char MODEL_TEMPLATE[] = "template";
-const char MODEL_AUTOMAP[] = "automap";
-const char MODEL_MIXERMODE[] = "mixermode";
+#define   MODEL_AUTOMAP     "automap"
+#define   MODEL_MIXERMODE   "mixermode"
 
-/* Section: Radio */
-static const char SECTION_RADIO[]   = "radio";
+/*        Section:   Radio           */
+#define   SECTION_RADIO     "radio"
 
-static const char RADIO_PROTOCOL[] = "protocol";
+#define   RADIO_PROTOCOL    "protocol"
 #if HAS_VIDEO
-static const char RADIO_VIDEOSRC[] = "videosrc";
-static const char RADIO_VIDEOCH[]  = "videoch";
-static const char RADIO_VIDEOCONTRAST[]  = "videocontrast";
-static const char RADIO_VIDEOBRIGHTNESS[]  = "videobrightness";
+#define   RADIO_VIDEOSRC          "videosrc"
+#define   RADIO_VIDEOCH           "videoch"
+#define   RADIO_VIDEOCONTRAST     "videocontrast"
+#define   RADIO_VIDEOBRIGHTNESS   "videobrightness"
 #endif
 
-static const char RADIO_NUM_CHANNELS[] = "num_channels";
-static const char RADIO_FIXED_ID[] = "fixed_id";
+#define   RADIO_NUM_CHANNELS   "num_channels"
+#define   RADIO_FIXED_ID       "fixed_id"
 
-static const char RADIO_TX_POWER[] = "tx_power";
+#define   RADIO_TX_POWER       "tx_power"
 #if HAS_EXTENDED_TELEMETRY
-static const char RADIO_GROUND_LEVEL[] = "ground_level";
+#define   RADIO_GROUND_LEVEL   "ground_level"
 #endif  // HAS_EXTENDED_TELEMETRY
 
-static const char SECTION_PROTO_OPTS[] = "protocol_opts";
+#define   SECTION_PROTO_OPTS   "protocol_opts"
 /* Section: Mixer */
-static const char SECTION_MIXER[]   = "mixer";
+#define   SECTION_MIXER        "mixer"
 
-static const char MIXER_SOURCE[] = "src";
-static const char MIXER_DEST[] = "dest";
-static const char MIXER_SWITCH[] = "switch";
-static const char MIXER_SCALAR[] = "scalar";
-static const char MIXER_OFFSET[] = "offset";
-static const char MIXER_USETRIM[] = "usetrim";
+#define   MIXER_SOURCE    "src"
+#define   MIXER_DEST      "dest"
+#define   MIXER_SWITCH    "switch"
+#define   MIXER_SCALAR    "scalar"
+#define   MIXER_OFFSET    "offset"
+#define   MIXER_USETRIM   "usetrim"
 
-static const char MIXER_MUXTYPE[] = "muxtype";
+#define  MIXER_MUXTYPE "muxtype"
 static const char * const MIXER_MUXTYPE_VAL[MUX_LAST]  = {
   "replace", "multiply", "add", "max", "min", "delay",
 #if HAS_EXTENDED_AUDIO
@@ -86,70 +82,70 @@ static const char * const MIXER_MUXTYPE_VAL[MUX_LAST]  = {
 #endif
 };
 
-static const char MIXER_CURVETYPE[] = "curvetype";
+#define  MIXER_CURVETYPE    "curvetype"
 static const char * const MIXER_CURVETYPE_VAL[CURVE_MAX+1] = {
    "none", "fixed", "min/max", "zero/max", "greater-than-0", "less-than-0", "absval",
    "expo", "deadband", "3point", "5point", "7point", "9point", "11point", "13point" };
-static const char MIXER_CURVE_POINTS[] = "points";
-static const char MIXER_CURVE_SMOOTH[] = "smooth";
+#define  MIXER_CURVE_POINTS "points"
+#define  MIXER_CURVE_SMOOTH "smooth"
 
 /* Section: Channel */
-static const char SECTION_CHANNEL[] = "channel";
+#define   SECTION_CHANNEL        "channel"
 
-static const char CHAN_DISPLAY_FORMAT[] = "display-format";
-static const char CHAN_DISPLAY_SCALE[] = "display-scale";
-static const char CHAN_LIMIT_REVERSE[] = "reverse";
-static const char CHAN_LIMIT_SAFETYSW[] = "safetysw";
-static const char CHAN_LIMIT_SAFETYVAL[] = "safetyval";
-static const char CHAN_LIMIT_FAILSAFE[] = "failsafe";
-static const char CHAN_LIMIT_MAX[] = "max";
-static const char CHAN_LIMIT_MIN[] = "min";
-static const char CHAN_LIMIT_SPEED[] = "speed";
-static const char CHAN_SUBTRIM[] = "subtrim";
-static const char CHAN_SCALAR_NEG[] = "scalar-";
-#define CHAN_SCALAR   MIXER_SCALAR
-#define CHAN_TEMPLATE MODEL_TEMPLATE
+#define   CHAN_DISPLAY_FORMAT    "display-format"
+#define   CHAN_DISPLAY_SCALE     "display-scale"
+#define   CHAN_LIMIT_REVERSE     "reverse"
+#define   CHAN_LIMIT_SAFETYSW    "safetysw"
+#define   CHAN_LIMIT_SAFETYVAL   "safetyval"
+#define   CHAN_LIMIT_FAILSAFE    "failsafe"
+#define   CHAN_LIMIT_MAX         "max"
+#define   CHAN_LIMIT_MIN         "min"
+#define   CHAN_LIMIT_SPEED       "speed"
+#define   CHAN_SUBTRIM           "subtrim"
+#define   CHAN_SCALAR_NEG        "scalar-"
+#define   CHAN_SCALAR            MIXER_SCALAR
+#define   CHAN_TEMPLATE          MODEL_TEMPLATE
 static const char * const CHAN_TEMPLATE_VAL[MIXERTEMPLATE_MAX+1] =
      { "none", "simple", "expo_dr", "complex", "cyclic1", "cyclic2", "cyclic3" };
 
 /* Section: Virtual Channel */
-static const char SECTION_VIRTCHAN[] = "virtchan";
-#define VCHAN_TEMPLATE CHAN_TEMPLATE
-#define VCHAN_TEMPLATE_VAL CHAN_TEMPLATE_VAL
-#define VCHAN_NAME MODEL_NAME
+#define   SECTION_VIRTCHAN     "virtchan"
+#define   VCHAN_TEMPLATE       CHAN_TEMPLATE
+#define   VCHAN_TEMPLATE_VAL   CHAN_TEMPLATE_VAL
+#define   VCHAN_NAME           MODEL_NAME
 
 /* Section: PPM-In */
-static const char SECTION_PPMIN[] = "ppm-in";
-static const char PPMIN_MAP[] = "map";
-static const char PPMIN_MODE[] = "mode";
+#define   SECTION_PPMIN   "ppm-in"
+#define   PPMIN_MAP       "map"
+#define   PPMIN_MODE      "mode"
 static const char * const PPMIN_MODE_VALUE[4] =  {"none", "channel", "stick", "extend"};
-static const char PPMIN_CENTERPW[] = "centerpw";
-static const char PPMIN_DELTAPW[] = "deltapw";
-#define PPMIN_NUM_CHANNELS  RADIO_NUM_CHANNELS
-#define PPMIN_SWITCH MIXER_SWITCH
+#define   PPMIN_CENTERPW  "centerpw"
+#define   PPMIN_DELTAPW   "deltapw"
+#define   PPMIN_NUM_CHANNELS   RADIO_NUM_CHANNELS
+#define   PPMIN_SWITCH         MIXER_SWITCH
 
 /* Section: Trim */
-static const char SECTION_TRIM[] = "trim";
+#define  SECTION_TRIM "trim"
 
 #define TRIM_SOURCE MIXER_SOURCE
-static const char TRIM_POS[]  = "pos";
-static const char TRIM_NEG[]  = "neg";
-static const char TRIM_STEP[] = "step";
-static const char TRIM_VALUE[] = "value";
-#define TRIM_SWITCH MIXER_SWITCH
+#define   TRIM_POS      "pos"
+#define   TRIM_NEG      "neg"
+#define   TRIM_STEP     "step"
+#define   TRIM_VALUE    "value"
+#define   TRIM_SWITCH   MIXER_SWITCH
 
 /* Section: Heli */
-static const char SECTION_SWASH[] = "swash";
-#define SWASH_TYPE MODEL_TYPE
-static const char SWASH_AIL_INV[] = "ail_inv";
-static const char SWASH_ELE_INV[] = "ele_inv";
-static const char SWASH_COL_INV[] = "col_inv";
-static const char SWASH_AILMIX[] = "ail_mix";
-static const char SWASH_ELEMIX[] = "ele_mix";
-static const char SWASH_COLMIX[] = "col_mix";
+#define   SECTION_SWASH   "swash"
+#define   SWASH_TYPE      MODEL_TYPE
+#define   SWASH_AIL_INV   "ail_inv"
+#define   SWASH_ELE_INV   "ele_inv"
+#define   SWASH_COL_INV   "col_inv"
+#define   SWASH_AILMIX    "ail_mix"
+#define   SWASH_ELEMIX    "ele_mix"
+#define   SWASH_COLMIX    "col_mix"
 
 /* Section: Timer */
-static const char SECTION_TIMER[] = "timer";
+#define  SECTION_TIMER "timer"
 
 #define TIMER_SOURCE  MIXER_SOURCE
 #define TIMER_TYPE MODEL_TYPE
@@ -160,30 +156,30 @@ static const char * const TIMER_TYPE_VAL[TIMER_LAST] = {
     [TIMER_COUNTDOWN_PROP] = "cntdn-prop",
     [TIMER_PERMANENT]      = "permanent",
     };
-static const char TIMER_TIME[] = "time";
-static const char TIMER_RESETSRC[] = "resetsrc";
+#define   TIMER_TIME       "time"
+#define   TIMER_RESETSRC   "resetsrc"
 #if HAS_PERMANENT_TIMER
-static const char PERMANENT_TIMER[] = "permanent_timer";
+#define   PERMANENT_TIMER  "permanent_timer"
 #endif
-static const char TIMER_VAL[] = "val";
+#define   TIMER_VAL        "val"
 
 /* Section: Safety */
-static const char SECTION_SAFETY[] = "safety";
+#define  SECTION_SAFETY    "safety"
 static const char * const SAFETY_VAL[SAFE_MAX+1] = { "none", "min", "zero", "max" };
 
 /* Section: Telemetry */
-static const char SECTION_TELEMALARM[] = "telemalarm";
-static const char TELEM_SRC[] = "source";
-static const char TELEM_ABOVE[] =  "above";
-static const char TELEM_VALUE[] = "value";
-static const char TELEM_TH[] ="threshold";
+#define   SECTION_TELEMALARM   "telemalarm"
+#define   TELEM_SRC            "source"
+#define   TELEM_ABOVE          "above"
+#define   TELEM_VALUE          "value"
+#define   TELEM_TH             "threshold"
 
 #if HAS_DATALOG
 /* Section: Datalog */
-static const char SECTION_DATALOG[] = "datalog";
-static const char DATALOG_RATE[] = "rate";
-#define DATALOG_SWITCH MIXER_SWITCH
-#define DATALOG_SOURCE TELEM_SRC
+#define   SECTION_DATALOG   "datalog"
+#define   DATALOG_RATE      "rate"
+#define   DATALOG_SWITCH    MIXER_SWITCH
+#define   DATALOG_SOURCE    TELEM_SRC
 #endif
 
 /* Section: Gui-QVGA */
@@ -194,7 +190,7 @@ static const char GUI_QUICKPAGE[] = "quickpage";
 
 #if HAS_EXTENDED_AUDIO
 /* Section: Music */
-static const char SECTION_VOICE[] = "voice";
+#define  SECTION_VOICE "voice"
 static const char * const VOICE_TELEMALARM[TELEM_NUM_ALARMS] =
     { "telemalarm1", "telemalarm2", "telemalarm3", "telemalarm4", "telemalarm5", "telemalarm6" };
 static const char * const VOICE_TIMER[NUM_TIMERS] =
