@@ -32,46 +32,45 @@ static u16 xstart, xend;  // After introducing logical view for devo10, the coor
 static u16 xpos, ypos;
 static s8 dir;
 
-void LCD_Cmd(unsigned cmd) {
+static void LCD_Cmd(unsigned cmd) {
     CMD_MODE();
     CS_LO();
     spi_xfer(SPI1, cmd);
     CS_HI();
 }
 
-void LCD_Data(unsigned cmd) {
+static void LCD_Data(unsigned cmd) {
     DATA_MODE();
     CS_LO();
     spi_xfer(SPI1, cmd);
     CS_HI();
 }
 
-void lcd_display(uint8_t on)
+static void lcd_display(uint8_t on)
 {
     LCD_Cmd(0xAE | (on ? 1 : 0));
 }
 
-void lcd_set_page_address(uint8_t page)
+static void lcd_set_page_address(uint8_t page)
 {
     LCD_Cmd(0xB0 | (page & 0x07));
 }
 
-void lcd_set_column_address(uint8_t column)
+static void lcd_set_column_address(uint8_t column)
 {
     LCD_Cmd(0x10 | ((column >> 4) & 0x0F));  //MSB
     LCD_Cmd(column & 0x0F);                  //LSB
 }
 
-void lcd_set_start_line(int line)
+static void lcd_set_start_line(int line)
 {
-  LCD_Cmd((line & 0x3F) | 0x40); 
+    LCD_Cmd((line & 0x3F) | 0x40);
 }
 
 void LCD_Contrast(unsigned contrast)
 {
-    //int data = 0x20 + contrast * 0xC / 10;
-    LCD_Cmd(0x81);
     int c = contrast * 12 + 76; //contrast should range from ~72 to ~200
+    LCD_Cmd(0x81);
     LCD_Cmd(c);
 }
 
@@ -85,27 +84,22 @@ void LCD_Init()
                   GPIO_CNF_OUTPUT_PUSHPULL, GPIO0);
     gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_50_MHZ,
                   GPIO_CNF_OUTPUT_PUSHPULL, GPIO5);
-    LCD_Cmd(0xE2);  //Reset
-    volatile int i = 0x8000;
-    while(i) i--;
-    LCD_Cmd(0xAE);  //Display off
-    LCD_Cmd(0xA6);  //Normal display
-    LCD_Cmd(0xA4);  //All Points Normal
-    LCD_Cmd(0xEA);  //??
-    LCD_Cmd(0xA0);  //ADC Normal
-    LCD_Cmd(0xC4);  //Common Output Mode Scan Rate
-    LCD_Cmd(0x2C); //Power Controller:Booster ON
-    i = 0x8000;
-    while(i) i--;
-    LCD_Cmd(0x2E); //Power Controller: VReg ON
-    i = 0x8000;
-    while(i) i--;
-    LCD_Cmd(0x2F); //Power Controller: VFollower ON
-    i = 0x8000;
-    while(i) i--;
+
+
+    LCD_Cmd(0xE2);  // Software Reset
+
+    memset(img, 0, sizeof(img));
+    memset(dirty, 0, sizeof(dirty));
+
+    LCD_Cmd(0xAE);  // Display off
+    LCD_Cmd(0xA6);  // Normal display
+    LCD_Cmd(0xA4);  // All Points Normal
+    LCD_Cmd(0xA0);  // ADC Normal
+    LCD_Cmd(0xC4);  // Common Output Mode Scan Rate
+    LCD_Cmd(0x2F);  // Power Controller: VFollower ON
     lcd_set_start_line(0);
-    // Display data write (6)
-    //Clear the screen
+
+    // Clear the screen
     for(int page = 0; page < LCD_PAGES; page++) {
         lcd_set_page_address(page);
         lcd_set_column_address(0);
@@ -114,8 +108,6 @@ void LCD_Init()
     }
     lcd_display(1);
     LCD_Contrast(5);
-    memset(img, 0, sizeof(img));
-    memset(dirty, 0, sizeof(dirty));
 }
 
 void LCD_Clear(unsigned int val)
