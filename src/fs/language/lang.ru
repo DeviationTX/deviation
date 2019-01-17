@@ -9,6 +9,8 @@
 Количество каналов
 :%d bytes left
 осталось %d байт
+>:-20dB
+>:0dB
 :1 sec
 1 сек
 :1-to-1
@@ -19,8 +21,11 @@
 11 точек
 :13 Point
 13 точек
+>:1Mbps
+>:250kbps
 :3 Point
 3 точки
+>:3 Pos
 :30 sec
 30 сек
 :4Ch w/ Dual-Rates
@@ -47,6 +52,8 @@
 9 точек
 :ABSVAL
 Абсолют.
+>:ACKPKT
+>:AD2GAIN
 :AIL
 Элер
 :AIL DR
@@ -75,6 +82,7 @@ AUX7
 Добавить
 :Advanced
 Микшеры
+>:AirSpd
 :Airplane
 Самолет
 :Alarm
@@ -85,10 +93,19 @@ AUX7
 Интервал
 :All
 Все
+>:AllCell
+>:Alt
+>:Alt.
+>:Alt.max
 :Altitude
 Высота
+>:Amp
+>:Amps
+>:Att.: -20dB
+>:Att.: 0dB
 :Auto
 Авто
+>:Average
 :Backlight
 Подсветка
 :Bad/missing\nprotocol modules!
@@ -97,6 +114,7 @@ AUX7
 Полоса
 :Bargraph
 Полоса
+>:Bat
 :Batt alarm
 Сигнал бат.
 :Battery
@@ -117,8 +135,11 @@ AUX7
 Привязка %s...\nENT для остановки
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 Производится привязка...\nУбедитесь, что модель включена!\n\nНажатие OK не отменит процедуру привязки,\nно позволит управлять передатчиком.
+>:Blink
+>:Blue-A
 :Box
 Бокс
+>:Brightness
 :Button monitor
 Монитор кнопок
 :Buzz settings
@@ -137,12 +158,16 @@ AUX7
 Колл Предел
 :COL Mix
 Колл Микш
+>:CPPM
+>:CRTP Mode
+>:CRTPLOG
 :CYC
 Цикл
 :Calibrate
 Калибровка
-:Calibration done.
-Калибровка выполнена.
+<:Calibration done.
+<Калибровка выполнена.
+>:Calibration done.\n \nPress ENT.
 :Cancel
 Отмена
 :Celsius
@@ -169,8 +194,8 @@ AUX7
 Канал
 :Channel monitor
 Монитор каналов
-:Channel output
-Выход канала
+<:Channel output
+<Выход канала
 :Clock
 Часы
 :Complex
@@ -203,6 +228,7 @@ AUX7
 ДР&Экспо РВыс
 :D/R&Exp -RUD
 ДР&Экспо РНапр
+>:DIS
 :DR
 ДР
 :Datalog
@@ -219,14 +245,17 @@ AUX7
 День
 :Deadband
 Мертв.зона
+>:Debuglog
 :Default
 Умолчание
 :Delete
 Удалить
 :Delta PW
 Дельта ШИ
+>:Deviation
 :Deviation FW version:
 Версия Deviation:
+>:Deviation\n   USB
 :Dimmer target
 Гашение до
 :Dimmer time
@@ -237,6 +266,7 @@ AUX7
 Вы действительно\nхотите сбросить\nинтегральный таймер %d?
 :Down
 Вниз
+>:DynTrim
 :ELE
 РВыс
 :ELE DR
@@ -259,12 +289,15 @@ AUX7
 Ввод
 :Exit
 Выход
+>:Expert
 :Expo&DR
 Эксп&ДР
 |devo8:Expo&DR
 Экспо&ДР
 :Extend
 Расширен.
+>:External OSD
+>:F.Log filter
 :FMODE
 ПРеж
 |devo8:FMODE
@@ -277,6 +310,7 @@ F°
 Фаренгейт
 :Fail-safe
 Отказоуст.
+>:Failsafe
 :File
 Файл
 :Fixed
@@ -291,8 +325,13 @@ F°
 Полетный режим
 :Foot
 Фут
+>:Format
 :Frame Size
 Период
+>:Freq Tune
+>:Freq-Coarse
+>:Freq-Fine
+>:Fuel
 :GEAR
 Шасси
 :GPS
@@ -307,6 +346,7 @@ GPS скорость
 GPS время
 :Generic settings
 Основные настройки
+>:Green
 :Gyro sense
 Чувств.гиро
 |devo8:Gyro sense
@@ -317,6 +357,7 @@ H
 Г-триммер
 :HOLD
 HOLD
+>:Heading
 :Heli
 Вертолет
 :Heli/Standard GUI
@@ -327,6 +368,7 @@ HOLD
 Выс.расход
 |devo8:High-Rate
 Высокий расход
+>:HighSpeed
 :Hold position
 Положение
 :Holds
@@ -357,6 +399,9 @@ L
 ЛЕВЫЙ_В
 :LIN
 Линейно
+>:LQI
+>:LQI output
+>:LRSSI
 :Language
 Язык
 :Latitude
@@ -415,14 +460,18 @@ M
 Мин. предел
 :Min/Max
 Мин/Макс
+>:MinCell
 :Minute
 Минуты
+>:Missing Modules:\n
 :Mixer
 Микшер
+>:Mixer    Reorder:Hold R+
 :Mixer GUI
 Интерфейс
 |devo8:Mixer GUI
 Интерфейс микшеров
+>:Mixer output
 :Mixers
 Микшер
 :Mode
@@ -443,6 +492,7 @@ M
 Модель
 :Model type
 Тип модели
+>:Module Error
 :Momentary
 Кнопка
 :Month
@@ -453,6 +503,8 @@ M
 Вверх
 :Move sticks and knobs\nto max & min positions\nthen press ENT
 Cместите стики и ручки\nв максимум и минимум,\nзатем нажмите ENT
+>:Multi
+>:Multirotor
 :Mux
 Мульт
 :Neg
@@ -463,6 +515,7 @@ Cместите стики и ручки\nв максимум и минимум,
 Нет
 :No Trim
 Без триммера
+>:No range test possible.
 :None
 Нет
 :Normal
@@ -483,6 +536,8 @@ Cместите стики и ручки\nв максимум и минимум,
 Вкл
 :On/Off
 Вкл/Выкл
+>:OrangeRx
+>:Outputs
 :PIT
 Шаг
 :PIT Mix
@@ -499,6 +554,7 @@ PPM-Вход (расширенный)
 Стр.
 :Page Config
 Настройка страницы
+>:Peak
 :Pitch curves
 Кривые шага
 :Plane
@@ -519,6 +575,7 @@ PPM-Вход (расширенный)
 Положение %d
 :Power On alarm
 Сигнал вкл.
+>:Power reduced to
 :Power-down alert
 Сигнал выкл.
 :Prealert interval
@@ -543,6 +600,8 @@ ENT для копирования в
 ENT для загрузки
 |devo8:Press ENT to load
 Нажмите ENT для загрузки
+>:Press ENT to start test.
+>:Press ENT to stop test.
 :Press ENT to turn \nUSB drive
 Нажмите ENT для\nперевода USB диска\nв состояние
 :Protocol
@@ -557,6 +616,9 @@ ENT для загрузки
 ПРАВЫЙ_В
 :RPM
 RPM
+>:RPYT
+>:RSSI
+>:RSSIChan
 :RTC Time
 Часы RTC
 :RUD
@@ -567,10 +629,13 @@ RPM
 РН.ДР
 |devo8:RUD DR
 РНапр ДР
+>:RX Id
+>:Range Test
 :Rate
 Частота
 :Re-Init
 Привязка
+>:Re-bind
 :Real Time Clock
 Часы
 :Remove
@@ -589,6 +654,7 @@ RPM
 Отменить
 :Right
 Вправо
+>:RxV
 >:SW A
 >:SW B
 >:SW C
@@ -607,6 +673,7 @@ RPM
 Безопасность
 :Sample Rate
 Частота
+>:SatCount
 :Save
 Сохр.
 |devo8:Save
@@ -623,6 +690,7 @@ RPM
 Выбор
 :Servo
 серво
+>:Servo Hz
 :Set
 Установить
 :Set date
@@ -637,6 +705,7 @@ RPM
 Установить
 :Set:
 Установить:
+>:Setup
 :Simple
 Простой
 :Simple 4 Channel
@@ -655,6 +724,7 @@ RPM
 Стандартный микшер
 :Start
 Время
+>:Start test
 :Step
 Шаг
 :Stick
@@ -665,6 +735,7 @@ RPM
 Режим стиков
 :Sticks
 Стики
+>:Stop test
 :Subtrim
 Субтриммер
 :Swash
@@ -713,6 +784,7 @@ RPM
 Тренер
 :TelemRPM
 ТелеRPM
+>:TelemRSSI
 :TelemT
 ТелеT
 :TelemV
@@ -817,16 +889,24 @@ RPM
 USB
 :USB Filesystem is currently 
 Файловая система сейчас 
+>:USE A.ACK
 :Unknown
 Неизвестный
 :Up
 Вверх
 :V-trim
 В-триммер
+>:VSI
 :Value
 Значение
 :Vibration
 Вибрация
+>:Vibration settings
+>:Vibration:
+>:Video
+>:Video Channel
+>:Video Enable
+>:Video setup
 :Virt
 Вирт.
 :Volt
@@ -847,12 +927,14 @@ USB
 Актуальное значение
 :add
 добавить
+>:beep
 :cntdn-prop
 обр.отсч.пр
 :countdown
 обр.отсчет
 :delay
 задержка
+>:from
 :is not supported
 не поддерживается
 :is turned off
@@ -865,6 +947,7 @@ USB
 умножить
 :permanent
 интеграл
+>:regular
 :replace
 заменить
 :resulting value

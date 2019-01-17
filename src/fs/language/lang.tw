@@ -1,11 +1,13 @@
 繁體中文
-:# Channels
-通道數
->:%d bytes left
 : is %d%%, safe value = %d%%\n
  = %d%%,熄火保護 = %d%%\n
 : is %d%%,\nsafe value = %d%%
  = %d%%,\n熄火保護 = %d%%
+:# Channels
+通道數
+>:%d bytes left
+>:-20dB
+>:0dB
 >:1 sec
 :1-to-1
 等比例
@@ -14,8 +16,11 @@
 11 點
 :13 Point
 13 點
+>:1Mbps
+>:250kbps
 :3 Point
 3 點
+>:3 Pos
 >:30 sec
 :4Ch w/ Dual-Rates
 4通和舵量
@@ -35,6 +40,8 @@
 9 點
 :ABSVAL
 絕對值
+>:ACKPKT
+>:AD2GAIN
 :AIL
 副翼
 >:AIL DR
@@ -53,6 +60,7 @@
 >:Add
 :Advanced
 增強模式1
+>:AirSpd
 :Airplane
 飛機
 :Alarm
@@ -62,17 +70,28 @@
 :Alarm intvl
 警示間隔
 >:All
+>:AllCell
+>:Alt
+>:Alt.
+>:Alt.max
 :Altitude
 海拔
+>:Amp
+>:Amps
+>:Att.: -20dB
+>:Att.: 0dB
 :Auto
 自動
+>:Average
 :Backlight
 背光亮度
 >:Bad/missing\nprotocol modules!
 >:Bar
 >:Bargraph
+>:Bat
 :Batt alarm
 低電警示
+>:Battery
 :Battery alarm
 低電警示
 :Battery too low,\ncan't save!
@@ -82,11 +101,14 @@
 連結
 :Binding
 連結中
-:Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
-連結中...\n確認模型已通電!\n\n按 OK 提前完成\n可以完整控制發射機
 :Binding %s...\nPress ENT to stop
 對頻中%s...\n按ENT鍵中止對頻
+:Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
+連結中...\n確認模型已通電!\n\n按 OK 提前完成\n可以完整控制發射機
+>:Blink
+>:Blue-A
 >:Box
+>:Brightness
 :Button monitor
 按鍵內容檢視
 :Buzz settings
@@ -103,11 +125,15 @@
 集體螺距
 :COL Mix
 集體螺距
+>:CPPM
+>:CRTP Mode
+>:CRTPLOG
 >:CYC
 :Calibrate
 校正
-:Calibration done.
-校正完成
+<:Calibration done.
+<校正完成
+>:Calibration done.\n \nPress ENT.
 :Cancel
 取消
 :Celsius
@@ -127,8 +153,8 @@
 通道
 :Channel monitor
 通道內容檢視
-:Channel output
-輸出通道
+<:Channel output
+<輸出通道
 >:Clock
 :Complex
 多段式
@@ -159,6 +185,7 @@
 大小動-升降
 :D/R&Exp -RUD
 大小動-方向
+>:DIS
 :DR
 大小動
 >:Datalog
@@ -169,13 +196,16 @@
 >:Day
 :Deadband
 死區
+>:Debuglog
 :Default
 預設
 >:Delete
 :Delta PW
 增減幅度
+>:Deviation
 :Deviation FW version:
 Deviation 韌體版本:
+>:Deviation\n   USB
 :Dimmer target
 背光省電亮度
 :Dimmer time
@@ -186,6 +216,7 @@ Deviation 韌體版本:
 是否確定重置\n持久計時器%d?
 :Down
 下
+>:DynTrim
 :ELE
 升降
 >:ELE DR
@@ -202,14 +233,18 @@ Deviation 韌體版本:
 輸入
 :Exit
 退出
+>:Expert
 :Expo&DR
 三段式
 >:Extend
+>:External OSD
+>:F.Log filter
 >:FMODE
 >:Fades
 :Fahren
 華氏
 >:Fail-safe
+>:Failsafe
 :File
 檔案
 :Fixed
@@ -220,8 +255,13 @@ Deviation 韌體版本:
 飛行模式
 :Foot
 英呎
+>:Format
 :Frame Size
 PPM週期
+>:Freq Tune
+>:Freq-Coarse
+>:Freq-Fine
+>:Fuel
 >:GEAR
 >:GPS
 >:GPS Alt.
@@ -230,12 +270,14 @@ PPM週期
 >:GPS Time
 :Generic settings
 ======基本參數======
+>:Green
 :Gyro sense
 鎖尾感度
 :H
 高
 >:H-trim
 >:HOLD
+>:Heading
 :Heli
 直升機
 >:Heli/Standard GUI
@@ -243,6 +285,7 @@ PPM週期
 直升機
 :High-Rate
 高位
+>:HighSpeed
 :Hold position
 鎖定準位
 >:Holds
@@ -269,6 +312,9 @@ PPM週期
 左垂直
 :LIN
 線性
+>:LQI
+>:LQI output
+>:LRSSI
 :Language
 使用語系
 :Latitude
@@ -312,11 +358,15 @@ PPM週期
 輸出下限
 :Min/Max
 上/下限
+>:MinCell
 >:Minute
+>:Missing Modules:\n
 :Mixer
 混控器
+>:Mixer    Reorder:Hold R+
 :Mixer GUI
 混控界面
+>:Mixer output
 :Mixers
 段數
 :Mode
@@ -336,6 +386,7 @@ PPM週期
 模型設定
 :Model type
 機種選擇
+>:Module Error
 >:Momentary
 >:Month
 :Move Down
@@ -344,6 +395,8 @@ PPM週期
 上移
 :Move sticks and knobs\nto max & min positions\nthen press ENT
 移動所有搖桿\n通過上下極限區域\n按 ENT 校準
+>:Multi
+>:Multirotor
 :Mux
 混合
 :Neg
@@ -353,6 +406,7 @@ PPM週期
 >:No
 :No Trim
 無微調
+>:No range test possible.
 :None
 無
 :Normal
@@ -369,6 +423,8 @@ PPM週期
 :On
 開啟
 >:On/Off
+>:OrangeRx
+>:Outputs
 :PIT
 螺距
 >:PIT Mix
@@ -379,6 +435,7 @@ PPM週期
 :Page
 頁碼：
 >:Page Config
+>:Peak
 :Pitch curves
 螺距曲線
 :Plane
@@ -398,6 +455,7 @@ PPM週期
 :Position %d
 档位%d
 >:Power On alarm
+>:Power reduced to
 >:Power-down alert
 :Prealert interval
 倒數預警間隔
@@ -413,6 +471,8 @@ PPM週期
 按 ENT 複製到：
 :Press ENT to load
 按 ENT 載入
+>:Press ENT to start test.
+>:Press ENT to stop test.
 :Press ENT to turn \nUSB drive
 按 ENT 讓 USB：
 :Protocol
@@ -426,13 +486,19 @@ PPM週期
 右垂直
 :RPM
 轉速
+>:RPYT
+>:RSSI
+>:RSSIChan
 >:RTC Time
 :RUD
 方向
 >:RUD DR
+>:RX Id
+>:Range Test
 >:Rate
 :Re-Init
 重對頻
+>:Re-bind
 >:Real Time Clock
 :Remove
 刪除
@@ -450,11 +516,21 @@ PPM週期
 復原
 :Right
 右
+>:RxV
+>:SW A
+>:SW B
+>:SW C
+>:SW D
+>:SW E
+>:SW F
+>:SW G
+>:SW H
 :Safe Val
 安全值
 :Safety
 安全開關
 >:Sample Rate
+>:SatCount
 :Save
 儲存
 :Scale
@@ -467,12 +543,14 @@ PPM週期
 >:Select
 :Servo
 舵機
+>:Servo Hz
 >:Set
 >:Set date
 >:Set permanent timer
 >:Set time
 >:Set to
 >:Set:
+>:Setup
 :Simple
 單段式
 :Simple 4 Channel
@@ -488,6 +566,7 @@ PPM週期
 通用模式
 :Start
 開始時間
+>:Start test
 :Step
 步幅
 >:Stick
@@ -497,6 +576,7 @@ PPM週期
 搖桿模式
 :Sticks
 搖桿校正
+>:Stop test
 :Subtrim
 微調
 :Swash
@@ -542,6 +622,7 @@ PPM週期
 >:TRN
 :TelemRPM
 遠端轉
+>:TelemRSSI
 :TelemT
 遠端溫
 :TelemV
@@ -621,18 +702,27 @@ PPM週期
 開啟
 :Tx power
 發射功率
+>:TxPower
 >:Type
 >:USB
 >:USB Filesystem is currently 
+>:USE A.ACK
 :Unknown
 未知
 :Up
 上
 >:V-trim
+>:VSI
 :Value
 數值
 :Vibration
 震動警示
+>:Vibration settings
+>:Vibration:
+>:Video
+>:Video Channel
+>:Video Enable
+>:Video setup
 :Virt
 虛擬
 :Volt
@@ -649,10 +739,12 @@ PPM週期
 >:actual value
 :add
 相加
+>:beep
 >:cntdn-prop
 :countdown
 倒數
 >:delay
+>:from
 :is not supported
 並未支援
 :is turned off
@@ -665,11 +757,13 @@ PPM週期
 相乘
 :permanent
 持久計時
+>:regular
 :replace
 取代
 >:resulting value
 >:stop-prop
 :stopwatch
 碼錶
+>:vTX MHz
 >:value to add or set
 >:value to set

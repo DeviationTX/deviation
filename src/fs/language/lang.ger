@@ -7,6 +7,8 @@
 Kanäle
 :%d bytes left
 %d Bytes übrig
+>:-20dB
+>:0dB
 :1 sec
 1 Sek.
 :1-to-1
@@ -17,8 +19,11 @@ Kanäle
 11 Punkt
 :13 Point
 13 Punkt
+>:1Mbps
+>:250kbps
 :3 Point
 3 Punkt
+>:3 Pos
 :30 sec
 30 Sek.
 :4Ch w/ Dual-Rates
@@ -45,6 +50,8 @@ Kanäle
 9 Punkt
 :ABSVAL
 Absolut
+>:ACKPKT
+>:AD2GAIN
 :AIL
 QR
 :AIL DR
@@ -75,6 +82,7 @@ AUX7
 Hinzu
 :Advanced
 Erweitert
+>:AirSpd
 :Airplane
 Flugzeug
 :Alarm
@@ -85,10 +93,19 @@ Alarm-Intervall
 Alarm-Intrvl
 :All
 Alle
+>:AllCell
+>:Alt
+>:Alt.
+>:Alt.max
 :Altitude
 Höhe
+>:Amp
+>:Amps
+>:Att.: -20dB
+>:Att.: 0dB
 :Auto
 Auto
+>:Average
 :Backlight
 Helligkeit
 :Bad/missing\nprotocol modules!
@@ -97,6 +114,7 @@ Falsches/fehlen-\ndes Protokollmodul!
 Balken
 :Bargraph
 Balken
+>:Bat
 :Batt alarm
 Akkuwarner
 :Battery
@@ -111,12 +129,15 @@ Box groß
 Binden
 :Binding
 Binden
-:Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
-Bindevorgang läuft...\nSchalte das Modell ein!\n\nOK beendet NICHT den Bindevorgang,\nes erlaubt die Bedienung des Senders.
 :Binding %s...\nPress ENT to stop
 Binden %s...\nENT zum Stoppen
+:Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
+Bindevorgang läuft...\nSchalte das Modell ein!\n\nOK beendet NICHT den Bindevorgang,\nes erlaubt die Bedienung des Senders.
+>:Blink
+>:Blue-A
 :Box
 Box
+>:Brightness
 :Button monitor
 Tasten-Anzeige
 :Buzz settings
@@ -137,14 +158,18 @@ COL Limit
 COL Mix
 |devo8:COL Mix
 Mischanteil Pitch
+>:CPPM
+>:CRTP Mode
+>:CRTPLOG
 :CYC
 TAUM
 :Calibrate
 Kalibrier.
 |devo8:Calibrate
 Kalibrieren
-:Calibration done.
-Kalibrierung\nabgeschlossen.
+<:Calibration done.
+<Kalibrierung\nabgeschlossen.
+>:Calibration done.\n \nPress ENT.
 :Cancel
 Abbr.
 |devo8:Cancel
@@ -167,8 +192,8 @@ K Modus
 Kanal
 :Channel monitor
 Kanal-Anzeige
-:Channel output
-Kanal-Ausgabe
+<:Channel output
+<Kanal-Ausgabe
 :Clock
 Uhr
 :Complex
@@ -201,6 +226,7 @@ D/R&Exp -QR
 D/R&Exp -HR
 :D/R&Exp -RUD
 D/R&Exp -SR
+>:DIS
 :DR
 DR
 :Datalog
@@ -217,14 +243,17 @@ Datum:
 Tag
 :Deadband
 Totzone
+>:Debuglog
 :Default
 Standard
 :Delete
 Lösche
 :Delta PW
 Delta PW
+>:Deviation
 :Deviation FW version:
 Deviation FW Version:
+>:Deviation\n   USB
 :Dimmer target
 Dimmer Ziel
 :Dimmer time
@@ -237,6 +266,7 @@ Soll der permanente\nZeitgeber %d zurück-\ngesetzt werden?
 Soll der permanente Zeitgeber %d\nwirklich zurückgesetzt werden?
 :Down
 Runter
+>:DynTrim
 :ELE
 HR
 :ELE DR
@@ -261,10 +291,13 @@ Aktiv
 Eingabe
 :Exit
 EXT
+>:Expert
 :Expo&DR
 Expo&DR
 :Extend
 Erweitert
+>:External OSD
+>:F.Log filter
 :FMODE
 FMODE
 >:Fades
@@ -274,6 +307,7 @@ Fahren
 Fahrenheit
 :Fail-safe
 Fail-safe
+>:Failsafe
 :File
 Modell
 :Fixed
@@ -284,8 +318,13 @@ Feste ID
 Flugmodus
 :Foot
 Fuß
+>:Format
 :Frame Size
 Paketgröße
+>:Freq Tune
+>:Freq-Coarse
+>:Freq-Fine
+>:Fuel
 :GEAR
 FAHRW
 :GPS
@@ -304,6 +343,7 @@ GPS Zeit
 Allgemeine Einstell.
 |devo8:Generic settings
 Allgemeine Einstellungen
+>:Green
 :Gyro sense
 Kreiselempf.
 |devo8:Gyro sense
@@ -311,6 +351,7 @@ Kreiselempfindlichkeit
 >:H
 >:H-trim
 >:HOLD
+>:Heading
 :Heli
 Heli
 :Heli/Standard GUI
@@ -321,6 +362,7 @@ Heli, Standard Mischer
 Helikopter
 :High-Rate
 Hoch
+>:HighSpeed
 :Hold position
 Halteposition
 >:Holds
@@ -348,6 +390,9 @@ LINKS_H
 :LEFT_V
 LINKS_V
 >:LIN
+>:LQI
+>:LQI output
+>:LRSSI
 :Language
 Sprache
 :Latitude
@@ -400,14 +445,18 @@ Mittel
 Min Limit
 :Min/Max
 Min/Max
+>:MinCell
 :Minute
 Minute
+>:Missing Modules:\n
 :Mixer
 Mischer
+>:Mixer    Reorder:Hold R+
 :Mixer GUI
 Mischer GUI
 |devo8:Mixer GUI
 Mischeroberfläche
+>:Mixer output
 :Mixers
 Mischer
 :Mode
@@ -428,6 +477,7 @@ Modell muss zurückgesetzt werden,\num den Standard-Mischer zu nutzen
 Modelleinstellungen
 :Model type
 Modelltyp
+>:Module Error
 :Momentary
 Taster
 :Month
@@ -438,6 +488,8 @@ Nach unten
 Nach oben
 :Move sticks and knobs\nto max & min positions\nthen press ENT
 Bewege Knüppel und\nRegler in die Max & Min\nPositionen\nDann drücke ENT
+>:Multi
+>:Multirotor
 :Mux
 Funktion
 :Neg
@@ -450,6 +502,7 @@ Nein
 Kein Trim
 |devo8:No Trim
 Keine Trimmung
+>:No range test possible.
 :None
 keine
 :Normal
@@ -468,6 +521,8 @@ Ok
 Ein
 :On/Off
 Ein/Aus
+>:OrangeRx
+>:Outputs
 >:PIT
 >:PIT Mix
 >:PPM
@@ -482,6 +537,7 @@ PPMIn Konf. (Erweitert)
 Seite
 :Page Config
 Startseitenkonfiguration
+>:Peak
 :Pitch curves
 Pitch-Kurven
 :Plane
@@ -498,6 +554,7 @@ Punkt
 >:Position %d
 :Power On alarm
 Einschaltalarm
+>:Power reduced to
 :Power-down alert
 Abschaltalarm
 :Prealert interval
@@ -516,6 +573,8 @@ Drücke ENT zum Ändern
 Drücke ENT zum Kopier.
 :Press ENT to load
 Drücke ENT zum Laden
+>:Press ENT to start test.
+>:Press ENT to stop test.
 :Press ENT to turn \nUSB drive
 ENT schaltet \ndas USB Laufwerk
 :Protocol
@@ -530,15 +589,21 @@ RECHTS_H
 RECHTS_V
 :RPM
 UPM
+>:RPYT
+>:RSSI
+>:RSSIChan
 :RTC Time
 Uhrzeit
 :RUD
 SR
 :RUD DR
 SR DR
+>:RX Id
+>:Range Test
 >:Rate
 :Re-Init
 Neu binden
+>:Re-bind
 :Real Time Clock
 Echtzeituhr
 :Remove
@@ -563,6 +628,7 @@ Umgekehrt
 Ursprung
 :Right
 Rechts
+>:RxV
 >:SW A
 >:SW B
 >:SW C
@@ -579,6 +645,7 @@ Sicherheitswert
 Sicherheit
 :Sample Rate
 Messrate
+>:SatCount
 :Save
 Sichrn
 |devo8:Save
@@ -596,6 +663,7 @@ Sekunde
 :Select
 Auswahl
 >:Servo
+>:Servo Hz
 :Set
 Setzen
 :Set date
@@ -608,6 +676,7 @@ Setze Zeit
 Setze auf
 :Set:
 Setzen:
+>:Setup
 :Simple
 Einfach
 :Simple 4 Channel
@@ -627,6 +696,7 @@ Quelle
 Standard Mischer
 :Start
 Start
+>:Start test
 :Step
 Stufe
 :Stick
@@ -639,6 +709,7 @@ Knüppelmode
 Knüppelmodus
 :Sticks
 Knüppel
+>:Stop test
 :Subtrim
 Servomitte
 :Swash
@@ -686,6 +757,7 @@ TRIM_R-
 >:TRN
 :TelemRPM
 TelemUPM
+>:TelemRSSI
 :TelemT
 TelemT
 :TelemV
@@ -789,15 +861,23 @@ Typ
 USB
 :USB Filesystem is currently 
 Das USB-Dateisystem ist jetzt 
+>:USE A.ACK
 :Unknown
 Unbekannt
 :Up
 Hoch
 >:V-trim
+>:VSI
 :Value
 Wert
 :Vibration
 Vibration
+>:Vibration settings
+>:Vibration:
+>:Video
+>:Video Channel
+>:Video Enable
+>:Video setup
 :Virt
 Virt
 :Volt
@@ -818,6 +898,7 @@ Null/Max
 jetziger Wert
 :add
 addiere
+>:beep
 >:cntdn-prop
 :countdown
 Countdown
@@ -825,6 +906,7 @@ Countdown
 verzög.
 |devo8:delay
 verzögern
+>:from
 :is not supported
 wird nicht unterstützt
 :is turned off
@@ -843,6 +925,7 @@ mult.
 multipliziere
 :permanent
 dauerhaft
+>:regular
 :replace
 ersetzen
 :resulting value

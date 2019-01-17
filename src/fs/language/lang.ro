@@ -1,12 +1,14 @@
 Română
-:# Channels
-Canale
-:%d bytes left
-%d octeți liberi
 : is %d%%, safe value = %d%%\n
  = %d%%, valoare de siguranță = %d%%\n
 : is %d%%,\nsafe value = %d%%
  = %d%%,\nvaloare sigur=%d%%\n
+:# Channels
+Canale
+:%d bytes left
+%d octeți liberi
+>:-20dB
+>:0dB
 :1 sec
 1 sec
 :1-to-1
@@ -17,8 +19,11 @@ Canale
 11 puncte
 :13 Point
 13 puncte
+>:1Mbps
+>:250kbps
 :3 Point
 3 puncte
+>:3 Pos
 :30 sec
 30 sec
 :4Ch w/ Dual-Rates
@@ -43,6 +48,8 @@ Canale
 9 puncte
 :ABSVAL
 VAL ABS
+>:ACKPKT
+>:AD2GAIN
 :AIL
 AIL
 :AIL DR
@@ -69,6 +76,7 @@ Despre Deviation
 Adaugă
 :Advanced
 Avansat
+>:AirSpd
 :Airplane
 Avion
 :Alarm
@@ -79,10 +87,19 @@ Int. alarmă
 Int. alarmă
 :All
 Toate
+>:AllCell
+>:Alt
+>:Alt.
+>:Alt.max
 :Altitude
 Altitudine
+>:Amp
+>:Amps
+>:Att.: -20dB
+>:Att.: 0dB
 :Auto
 Auto
+>:Average
 :Backlight
 Iluminare
 :Bad/missing\nprotocol modules!
@@ -91,8 +108,10 @@ Module protocol\nlipsă sau corupte!
 Bară
 :Bargraph
 Bară
+>:Bat
 :Batt alarm
 Alarmă bat.
+>:Battery
 :Battery alarm
 Alarmă baterie
 :Battery too low,\ncan't save!
@@ -103,12 +122,15 @@ Box mare
 Bind
 :Binding
 Conectare
-:Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
-Conectare în progres\nAsigurați-vă că modelul este pornit!\n\nApăsând ENT puteți controla telecomanda\nfară a întrerupe procesul de conectare.
 :Binding %s...\nPress ENT to stop
 Conectare %s...\nApăsați ENT pentru a opri
+:Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
+Conectare în progres\nAsigurați-vă că modelul este pornit!\n\nApăsând ENT puteți controla telecomanda\nfară a întrerupe procesul de conectare.
+>:Blink
+>:Blue-A
 :Box
 Box
+>:Brightness
 :Button monitor
 Monitor butoane
 :Buzz settings
@@ -125,12 +147,16 @@ Colectiv inv.
 COL Limită
 :COL Mix
 COL Mix
+>:CPPM
+>:CRTP Mode
+>:CRTPLOG
 :CYC
 CYC
 :Calibrate
 Calibrare
-:Calibration done.
-Calibrare efectuată.
+<:Calibration done.
+<Calibrare efectuată.
+>:Calibration done.\n \nPress ENT.
 :Cancel
 Anulează
 :Celsius
@@ -151,8 +177,8 @@ Modifică
 Canal
 :Channel monitor
 Monitor canale
-:Channel output
-Canale
+<:Channel output
+<Canale
 :Clock
 Ceas
 :Complex
@@ -185,6 +211,7 @@ D/R&Exp -AIL
 D/R&Exp - ELE
 :D/R&Exp -RUD
 D/R&Exp -RUD
+>:DIS
 :DR
 DR
 :Datalog
@@ -201,14 +228,17 @@ Dată:
 Zi
 :Deadband
 Bandă moartă
+>:Debuglog
 :Default
 Default
 :Delete
 Șterge
 :Delta PW
 Delta PW
+>:Deviation
 :Deviation FW version:
 Deviation fw. versiune:
+>:Deviation\n   USB
 :Dimmer target
 Nivel auto
 :Dimmer time
@@ -219,6 +249,7 @@ Jos
 Sigur doriți să\resetați\ntimerul permanent %d?
 :Down
 Jos
+>:DynTrim
 :ELE
 ELE
 :ELE DR
@@ -239,10 +270,13 @@ Activat
 Enter
 :Exit
 Exit
+>:Expert
 :Expo&DR
 Expo+DR
 :Extend
 Extinde
+>:External OSD
+>:F.Log filter
 :FMODE
 FMODE
 :Fades
@@ -251,6 +285,7 @@ Atenuări
 F°
 :Fail-safe
 Fail-safe
+>:Failsafe
 :File
 Fișier
 :Fixed
@@ -261,8 +296,13 @@ ID Fix
 Mod zbor
 :Foot
 Picior
+>:Format
 :Frame Size
 Dim. pachet
+>:Freq Tune
+>:Freq-Coarse
+>:Freq-Fine
+>:Fuel
 :GEAR
 GEAR
 :GPS
@@ -277,6 +317,7 @@ Viteză GPS
 Oră GPS
 :Generic settings
 Setări generale
+>:Green
 :Gyro sense
 Sens giro
 :H
@@ -285,6 +326,7 @@ H
 H-Trim
 :HOLD
 HOLD
+>:Heading
 :Heli
 Elic.
 :Heli/Standard GUI
@@ -293,6 +335,7 @@ Elicopter/Std GUI
 Elicopter
 :High-Rate
 Pos0
+>:HighSpeed
 :Hold position
 Poziție fixă
 :Holds
@@ -323,6 +366,9 @@ STÂNGA_H
 STÂNGA_V
 :LIN
 LIN
+>:LQI
+>:LQI output
+>:LRSSI
 :Language
 Limbă
 :Latitude
@@ -371,12 +417,16 @@ Pos1
 Limită min
 :Min/Max
 Min/Max
+>:MinCell
 :Minute
 Minut
+>:Missing Modules:\n
 :Mixer
 Configurare mixer
+>:Mixer    Reorder:Hold R+
 :Mixer GUI
 GUI mixer
+>:Mixer output
 :Mixers
 Mixere
 :Mode
@@ -397,6 +447,7 @@ Modelul va fi resetat pentru\întoarcerea la modul simplu
 Profil model
 :Model type
 Tip model
+>:Module Error
 :Momentary
 Momentan
 :Month
@@ -407,6 +458,8 @@ Mișcă în jos
 Mișcă în sus
 :Move sticks and knobs\nto max & min positions\nthen press ENT
 Mută stick-urile și potențiometrele\nla MAX și MIN\ndupă care apasă ENT
+>:Multi
+>:Multirotor
 :Mux
 Mux
 :Neg
@@ -417,6 +470,7 @@ Now
 Nu
 :No Trim
 nimic
+>:No range test possible.
 :None
 nimic
 :Normal
@@ -435,6 +489,8 @@ Ok
 Pornit
 :On/Off
 Pornit/Oprit
+>:OrangeRx
+>:Outputs
 :PIT
 PIT
 :PIT Mix
@@ -451,6 +507,7 @@ Config PPM (Extinde)
 Pagină
 :Page Config
 Config pagină
+>:Peak
 :Pitch curves
 Curbe pitch
 :Plane
@@ -471,6 +528,7 @@ Poz/Neg
 Poziția %d
 :Power On alarm
 Ton pornire
+>:Power reduced to
 :Power-down alert
 Ton oprire
 :Prealert interval
@@ -487,6 +545,8 @@ Apasaă ENT pentru schimbare
 Apasa ENT pentru copiere
 :Press ENT to load
 Apasă ENT pentru incarcare
+>:Press ENT to start test.
+>:Press ENT to stop test.
 :Press ENT to turn \nUSB drive
 Apasă ENT pentru a seta\nmodul USB
 :Protocol
@@ -501,16 +561,22 @@ DREAPTA_V
 DREAPTA_F
 :RPM
 RPM
+>:RPYT
+>:RSSI
+>:RSSIChan
 :RTC Time
 Timp RTC
 :RUD
 RUD
 :RUD DR
 RUD DR
+>:RX Id
+>:Range Test
 :Rate
 Rată
 :Re-Init
 Re-init
+>:Re-bind
 :Real Time Clock
 Ceas timp real
 :Remove
@@ -529,12 +595,22 @@ Inversat
 Inversează
 :Right
 Dreapta
+>:RxV
+>:SW A
+>:SW B
+>:SW C
+>:SW D
+>:SW E
+>:SW F
+>:SW G
+>:SW H
 :Safe Val
 Valoare sig.
 :Safety
 Siguranță
 :Sample Rate
 Rată eșantion
+>:SatCount
 :Save
 Salv.
 :Scale
@@ -549,6 +625,7 @@ Secundă
 Selectează
 :Servo
 Servo
+>:Servo Hz
 :Set
 Setează
 :Set date
@@ -561,6 +638,7 @@ Setează oră
 Setează
 :Set:
 Setează:
+>:Setup
 :Simple
 Simplu
 :Simple 4 Channel
@@ -579,6 +657,7 @@ Standard
 Mixer standard
 :Start
 Start
+>:Start test
 :Step
 Pas
 :Stick
@@ -589,6 +668,7 @@ Intrări
 Mod
 :Sticks
 Stick-uri
+>:Stop test
 :Subtrim
 Subtrim
 :Swash
@@ -635,6 +715,7 @@ TRIM_D-
 TRN
 :TelemRPM
 TelemRPM
+>:TelemRSSI
 :TelemT
 TelemT
 :TelemV
@@ -721,22 +802,31 @@ Oprește
 Pornește
 :Tx power
 Putere tx
+>:TxPower
 :Type
 Tip
 :USB
 USB
 :USB Filesystem is currently 
 Sistemul de fișiere USB este
+>:USE A.ACK
 :Unknown
 Necunoscut
 :Up
 Sus
 :V-trim
 V-Trim
+>:VSI
 :Value
 Valoare
 :Vibration
 Vibrație
+>:Vibration settings
+>:Vibration:
+>:Video
+>:Video Channel
+>:Video Enable
+>:Video setup
 :Virt
 Virt.
 :Volt
@@ -757,12 +847,14 @@ Zero/Max
 valoare reală
 :add
 aditiv
+>:beep
 :cntdn-prop
 cntdn-prop
 :countdown
 countdown
 :delay
 delay
+>:from
 :is not supported
 nu este suportat(ă)
 :is turned off
@@ -775,6 +867,7 @@ min
 mult.
 :permanent
 permanent
+>:regular
 :replace
 înloc.
 :resulting value
@@ -783,6 +876,7 @@ valoare
 stop-prop
 :stopwatch
 crono
+>:vTX MHz
 :value to add or set
 valoare de adăugat sau setat
 :value to set

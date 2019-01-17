@@ -1,11 +1,13 @@
 ﻿Français
-:# Channels
-Nbr canaux
->:%d bytes left
 : is %d%%, safe value = %d%%\n
  = %d%%,valeur sécu. = %d%%\n
 : is %d%%,\nsafe value = %d%%
  = %d%%,\nvaleur sécu. = %d%%\n
+:# Channels
+Nbr canaux
+>:%d bytes left
+>:-20dB
+>:0dB
 >:1 sec
 :1-to-1
 1 à 1
@@ -14,8 +16,11 @@ Nbr canaux
 11 Pts
 :13 Point
 13 Pts
+>:1Mbps
+>:250kbps
 :3 Point
 3 Pts
+>:3 Pos
 >:30 sec
 :4Ch w/ Dual-Rates
 4ch et DR
@@ -37,6 +42,8 @@ Nbr canaux
 9 Pts
 :ABSVAL
 ValAbs
+>:ACKPKT
+>:AD2GAIN
 :AIL
 AIL
 :AIL DR
@@ -58,6 +65,7 @@ A propos...
 >:Add
 :Advanced
 Expert
+>:AirSpd
 :Airplane
 Avion
 :Alarm
@@ -67,17 +75,28 @@ Tempo alarme
 :Alarm intvl
 Tempo alarme
 >:All
+>:AllCell
+>:Alt
+>:Alt.
+>:Alt.max
 :Altitude
 Altitude
+>:Amp
+>:Amps
+>:Att.: -20dB
+>:Att.: 0dB
 >:Auto
+>:Average
 :Backlight
 Luminosité
 :Bad/missing\nprotocol modules!
 Module de protocole\nabsent ou défaillant!
 >:Bar
 >:Bargraph
+>:Bat
 :Batt alarm
 Alarme batt.
+>:Battery
 :Battery alarm
 Alarme batterie
 :Battery too low,\ncan't save!
@@ -87,11 +106,14 @@ Batterie vide!\n Sauvegarde \n impossible.
 Appairer
 :Binding
 Appairage
-:Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
-Appairage en cours...\nS'assurer que le récepteur fonctionne\n\nAppuyer sur OK n'annule pas la procédure \nmais permet le contrôle du TX.
 :Binding %s...\nPress ENT to stop
 Appairage %s...\nENT pour arrêter
+:Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
+Appairage en cours...\nS'assurer que le récepteur fonctionne\n\nAppuyer sur OK n'annule pas la procédure \nmais permet le contrôle du TX.
+>:Blink
+>:Blue-A
 >:Box
+>:Brightness
 :Button monitor
 Ctrl des boutons
 :Buzz settings
@@ -108,12 +130,16 @@ Sens PAS
 Limite PAS
 :COL Mix
 Mix. PAS
+>:CPPM
+>:CRTP Mode
+>:CRTPLOG
 :CYC
 CYC
 :Calibrate
 Calibrer
-:Calibration done.
-Calibration terminée.\nAppuyer sur ENT\n pour continuer.
+<:Calibration done.
+<Calibration terminée.\nAppuyer sur ENT\n pour continuer.
+>:Calibration done.\n \nPress ENT.
 :Cancel
 Annuler
 :Celsius
@@ -133,8 +159,8 @@ Changer
 Canaux
 :Channel monitor
 Ctrl. des Canaux
-:Channel output
-Sorties canaux
+<:Channel output
+<Sorties canaux
 >:Clock
 :Complex
 Complexe
@@ -162,6 +188,7 @@ D/R & Exp
 >:D/R&Exp -AIL
 >:D/R&Exp -ELE
 >:D/R&Exp -RUD
+>:DIS
 :DR
 DR
 >:Datalog
@@ -172,13 +199,16 @@ DR
 >:Day
 :Deadband
 Deadband
+>:Debuglog
 :Default
 Défaut
 >:Delete
 :Delta PW
 Delta Imp.
+>:Deviation
 :Deviation FW version:
 Deviation FW version:
+>:Deviation\n   USB
 :Dimmer target
 Lum. veille
 :Dimmer time
@@ -189,6 +219,7 @@ Bas
 Remise à zéro\n du totalisateur %d?
 :Down
 Bas
+>:DynTrim
 :ELE
 ELE
 :ELE DR
@@ -207,9 +238,12 @@ Etat
 Entrée
 :Exit
 Sortie
+>:Expert
 :Expo&DR
 Expo&DR
 >:Extend
+>:External OSD
+>:F.Log filter
 :FMODE
 FMODE
 >:Fades
@@ -217,6 +251,7 @@ FMODE
 °F
 :Fail-safe
 Sécurités
+>:Failsafe
 :File
 Fichier
 :Fixed
@@ -227,8 +262,13 @@ ID fixe
 Acrobatie
 :Foot
 Pied
+>:Format
 :Frame Size
 Larg. Signal
+>:Freq Tune
+>:Freq-Coarse
+>:Freq-Fine
+>:Fuel
 :GEAR
 GEAR
 :GPS
@@ -239,11 +279,13 @@ GPS
 >:GPS Time
 :Generic settings
 Réglages
+>:Green
 :Gyro sense
 Gain gyro
 >:H
 >:H-trim
 >:HOLD
+>:Heading
 :Heli
 Heli
 :Heli/Standard GUI
@@ -252,6 +294,7 @@ Heli/Interface Std.
 Helicoptère
 :High-Rate
 Petit Déb.
+>:HighSpeed
 :Hold position
 Valeur gaz
 >:Holds
@@ -278,6 +321,9 @@ GAUCHE_H
 :LEFT_V
 GAUCHE_V
 >:LIN
+>:LQI
+>:LQI output
+>:LRSSI
 :Language
 Langue
 :Latitude
@@ -321,11 +367,15 @@ Déb. Med
 Limite Min
 :Min/Max
 Min/Max
+>:MinCell
 >:Minute
+>:Missing Modules:\n
 :Mixer
 Mixer
+>:Mixer    Reorder:Hold R+
 :Mixer GUI
 Réglages
+>:Mixer output
 :Mixers
 Nbr mixers
 >:Mode
@@ -344,6 +394,7 @@ Pour le mode de réglage standard,\n le modèle doit être réinitialisé.
 Config. Modèle
 :Model type
 Type Modèle
+>:Module Error
 >:Momentary
 >:Month
 :Move Down
@@ -352,6 +403,8 @@ Baisser
 Monter
 :Move sticks and knobs\nto max & min positions\nthen press ENT
 Bouger sticks et pot.\naux min/max de course\n puis appuyer sur ENT
+>:Multi
+>:Multirotor
 :Mux
 Opération
 :Neg
@@ -361,6 +414,7 @@ Nouveau
 >:No
 :No Trim
 Pas de Trim
+>:No range test possible.
 :None
 Néant
 :Normal
@@ -377,6 +431,8 @@ Ok
 :On
 Marche
 >:On/Off
+>:OrangeRx
+>:Outputs
 :PIT
 PAS
 :PIT Mix
@@ -388,6 +444,7 @@ Mix. PAS
 :Page
 Page
 >:Page Config
+>:Peak
 :Pitch curves
 Courbes de pas
 :Plane
@@ -403,6 +460,7 @@ Pos.
 Pos./Neg.
 >:Position %d
 >:Power On alarm
+>:Power reduced to
 >:Power-down alert
 :Prealert interval
 Tempo préAlarm
@@ -418,6 +476,8 @@ Appuyer sur ENT\n pour passer \n le mode USB sur
 'ENT' pour copier
 :Press ENT to load
 'ENT' pour charger
+>:Press ENT to start test.
+>:Press ENT to stop test.
 :Press ENT to turn \nUSB drive
 Appuyer sur ENT\n pour passer \n le mode USB sur
 :Protocol
@@ -431,14 +491,20 @@ DROITE_H
 DROITE_V
 :RPM
 T/mn
+>:RPYT
+>:RSSI
+>:RSSIChan
 >:RTC Time
 :RUD
 RUD
 :RUD DR
 RUD DR
+>:RX Id
+>:Range Test
 >:Rate
 :Re-Init
 Réinit.
+>:Re-bind
 >:Real Time Clock
 :Remove
 Supprimer
@@ -456,11 +522,21 @@ Inversé
 Annuler
 :Right
 Droite
+>:RxV
+>:SW A
+>:SW B
+>:SW C
+>:SW D
+>:SW E
+>:SW F
+>:SW G
+>:SW H
 :Safe Val
 Val. Sécu
 :Safety
 Sécurité
 >:Sample Rate
+>:SatCount
 :Save
 Sauve
 >:Scale
@@ -471,12 +547,14 @@ Scanner
 >:Second
 >:Select
 >:Servo
+>:Servo Hz
 >:Set
 >:Set date
 >:Set permanent timer
 >:Set time
 >:Set to
 >:Set:
+>:Setup
 :Simple
 Simple
 :Simple 4 Channel
@@ -492,6 +570,7 @@ Standard
 >:Standard Mixer
 :Start
 Durée
+>:Start test
 :Step
 <Pas>
 >:Stick
@@ -501,6 +580,7 @@ Entrées  sticks/aux.
 Mode
 :Sticks
 Sticks
+>:Stop test
 :Subtrim
 Subtrim
 :Swash
@@ -546,6 +626,7 @@ TRIM_D-
 >:TRN
 :TelemRPM
 Télém.T/mn
+>:TelemRSSI
 :TelemT
 Télém.T°
 :TelemV
@@ -625,19 +706,28 @@ Désactiver
 Activer
 :Tx power
 Puiss. TX
+>:TxPower
 >:Type
 :USB
 USB
 >:USB Filesystem is currently 
+>:USE A.ACK
 :Unknown
 Inconnu
 :Up
 Haut
 >:V-trim
+>:VSI
 :Value
 Valeur
 :Vibration
 Vibreur
+>:Vibration settings
+>:Vibration:
+>:Video
+>:Video Channel
+>:Video Enable
+>:Video setup
 :Virt
 Virt
 :Volt
@@ -654,10 +744,12 @@ Volt
 >:actual value
 :add
 ajouter
+>:beep
 >:cntdn-prop
 :countdown
 A rebours
 >:delay
+>:from
 :is not supported
 Non supporté
 :is turned off
@@ -670,11 +762,13 @@ min
 multiplier
 :permanent
 permanent
+>:regular
 :replace
 remplacer
 >:resulting value
 >:stop-prop
 :stopwatch
 Chrono
+>:vTX MHz
 >:value to add or set
 >:value to set

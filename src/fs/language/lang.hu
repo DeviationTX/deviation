@@ -1,12 +1,13 @@
 ﻿Magyar
+: is %d%%, safe value = %d%%\n
+ = %d%%, a biztonságos érték = %d%%\n
+>: is %d%%,\nsafe value = %d%%
 :# Channels
 Csatornák
 :%d bytes left
 %d bájt maradt
-: is %d%%, safe value = %d%%\n
- = %d%%, a biztonságos érték = %d%%\n
-:n is %d%%,\nsafe value = %d%%
- = %d%%,\nbiztonságos = %d%%\n
+>:-20dB
+>:0dB
 :1 sec
 1 mp
 :1-to-1
@@ -17,8 +18,11 @@ Csatornák
 11 pont
 :13 Point
 13 pont
+>:1Mbps
+>:250kbps
 :3 Point
 3 pont
+>:3 Pos
 :30 sec
 30 mp
 :4Ch w/ Dual-Rates
@@ -43,6 +47,8 @@ Csatornák
 9 pont
 :ABSVAL
 ABSZ.É.
+>:ACKPKT
+>:AD2GAIN
 :AIL
 AIL
 :AIL DR
@@ -69,6 +75,7 @@ Deviation névjegye
 Új
 :Advanced
 Haladó
+>:AirSpd
 :Airplane
 Repülőgép
 :Alarm
@@ -79,10 +86,19 @@ Riaszt. int.
 Riaszt. int.
 :All
 Mind
+>:AllCell
+>:Alt
+>:Alt.
+>:Alt.max
 :Altitude
 Magasság
+>:Amp
+>:Amps
+>:Att.: -20dB
+>:Att.: 0dB
 :Auto
 Auto
+>:Average
 :Backlight
 Fényerő
 :Bad/missing\nprotocol modules!
@@ -91,8 +107,10 @@ Hibás/hiányzó\nprotokoll modulok!
 Oszlop
 :Bargraph
 Oszlopdiagr.
+>:Bat
 :Batt alarm
 Fesz. riaszt.
+>:Battery
 :Battery alarm
 Fesz. riasztás
 :Battery too low,\ncan't save!
@@ -103,12 +121,15 @@ Nagy doboz
 Csatol
 :Binding
 Kapcsolódás a modellhez
-:Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
-Kapcsolódás folyamatban...\nGyőződjön meg róla, hogy a modell be van kapcsolva!\n\nAz OK gomb NEM szakítja meg a kapcsolódást,\ncsak lehetővé teszi a rádió használatát.
 :Binding %s...\nPress ENT to stop
 Kapcsolódás %s...\nENT megállítani
+:Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
+Kapcsolódás folyamatban...\nGyőződjön meg róla, hogy a modell be van kapcsolva!\n\nAz OK gomb NEM szakítja meg a kapcsolódást,\ncsak lehetővé teszi a rádió használatát.
+>:Blink
+>:Blue-A
 :Box
 Doboz
+>:Brightness
 :Button monitor
 Nyomógomb ellenőrzés
 :Buzz settings
@@ -129,12 +150,16 @@ Koll. limit
 Kollektív mix
 |devo10:COL Mix
 Koll. mix
+>:CPPM
+>:CRTP Mode
+>:CRTPLOG
 :CYC
 CYC
 :Calibrate
 Kalibrálás
-:Calibration done.
-Kalibrálás kész.
+<:Calibration done.
+<Kalibrálás kész.
+>:Calibration done.\n \nPress ENT.
 :Cancel
 Mégsem
 :Celsius
@@ -157,8 +182,8 @@ Váltás
 Csatorna
 :Channel monitor
 Csatornák
-:Channel output
-Csatornák
+<:Channel output
+<Csatornák
 :Clock
 Óra
 :Complex
@@ -191,6 +216,7 @@ D/R&Expó -AIL
 D/R&Expó -ELE
 :D/R&Exp -RUD
 D/R&Expó -RUD
+>:DIS
 :DR
 DR
 :Datalog
@@ -207,6 +233,7 @@ Dátum:
 Nap
 :Deadband
 Holtsáv
+>:Debuglog
 :Default
 Default
 :Delete
@@ -215,8 +242,10 @@ Törlés
 Impulzus kitérés
 |devo10:Delta PW
 Kitérés
+>:Deviation
 :Deviation FW version:
 Deviation verzió:
+>:Deviation\n   USB
 :Dimmer target
 Alvó fényerő
 :Dimmer time
@@ -227,6 +256,7 @@ Le
 Valóban nullázni\nakarja az üzemidő\nidőzítő %d-t?
 :Down
 Le
+>:DynTrim
 :ELE
 ELE
 :ELE DR
@@ -251,10 +281,13 @@ Engedélyezett
 Enter
 :Exit
 Exit
+>:Expert
 :Expo&DR
 Expó+DR
 :Extend
 Kiterj.
+>:External OSD
+>:F.Log filter
 :FMODE
 FMODE
 :Fades
@@ -263,6 +296,7 @@ Eltűnés
 °F
 :Fail-safe
 Hibaérték
+>:Failsafe
 :File
 Fájl
 :Fixed
@@ -273,10 +307,15 @@ Fix ID
 Rep. mód
 :Foot
 Láb
+>:Format
 :Frame Size
 Keret hossza
 |devo10:Frame Size
 Keret
+>:Freq Tune
+>:Freq-Coarse
+>:Freq-Fine
+>:Fuel
 :GEAR
 GEAR
 :GPS
@@ -291,6 +330,7 @@ GPS sebes.
 GPS idő
 :Generic settings
 Általános beállítások
+>:Green
 :Gyro sense
 Giró
 :H
@@ -299,6 +339,7 @@ H
 Függ. trim
 :HOLD
 HOLD
+>:Heading
 :Heli
 Heli
 :Heli/Standard GUI
@@ -307,6 +348,7 @@ Heli/Szokásos felület
 Helikopter
 :High-Rate
 Magas
+>:HighSpeed
 :Hold position
 TH érték
 :Holds
@@ -337,6 +379,9 @@ BAL_V
 BAL_F
 :LIN
 LIN
+>:LQI
+>:LQI output
+>:LRSSI
 :Language
 Nyelv
 :Latitude
@@ -385,12 +430,16 @@ Közepes
 Min korlát
 :Min/Max
 Min/Max
+>:MinCell
 :Minute
 Perc
+>:Missing Modules:\n
 :Mixer
 Mixer
+>:Mixer    Reorder:Hold R+
 :Mixer GUI
 Felület
+>:Mixer output
 :Mixers
 Mixerek
 :Mode
@@ -411,6 +460,7 @@ A modellt törölni kell\na szokásos felületre váltáshoz
 Modell konfig.
 :Model type
 Modell típus
+>:Module Error
 :Momentary
 Pillanat k.
 :Month
@@ -421,6 +471,8 @@ Lejjebb
 Feljebb
 :Move sticks and knobs\nto max & min positions\nthen press ENT
 Mozgassa a botokat és potikat\nmin-tól max-ig\nés nyomjon ENT-t
+>:Multi
+>:Multirotor
 :Mux
 Művelet
 :Neg
@@ -431,6 +483,7 @@ Neg.
 Nem
 :No Trim
 Nincs Trim
+>:No range test possible.
 :None
 Nincs
 :Normal
@@ -451,6 +504,8 @@ Ok
 Be
 :On/Off
 Ki/Be
+>:OrangeRx
+>:Outputs
 :PIT
 PIT
 :PIT Mix
@@ -467,6 +522,7 @@ PPM be konf. (Kiterj.)
 Oldal
 :Page Config
 Ablak konfig.
+>:Peak
 :Pitch curves
 Állásszög görbék
 :Plane
@@ -487,6 +543,7 @@ Poz/Neg
 Pozíció %d
 :Power On alarm
 Bekapcs. riaszt.
+>:Power reduced to
 :Power-down alert
 Kikapcs. riaszt.
 :Prealert interval
@@ -503,6 +560,8 @@ Változtatáshoz ENT
 Másolás ENT
 :Press ENT to load
 Betöltés ENT
+>:Press ENT to start test.
+>:Press ENT to stop test.
 :Press ENT to turn \nUSB drive
 ENT-el kapcsolhatja \naz USB-t
 :Protocol
@@ -521,16 +580,22 @@ JOBB_V
 JOBB_F
 :RPM
 Ford.
+>:RPYT
+>:RSSI
+>:RSSIChan
 :RTC Time
 Idő
 :RUD
 RUD
 :RUD DR
 RUD DR
+>:RX Id
+>:Range Test
 :Rate
 Fok
 :Re-Init
 Csatol
+>:Re-bind
 :Real Time Clock
 Óra
 :Remove
@@ -551,12 +616,22 @@ Inverz
 Mégsem
 :Right
 Jobb
+>:RxV
+>:SW A
+>:SW B
+>:SW C
+>:SW D
+>:SW E
+>:SW F
+>:SW G
+>:SW H
 :Safe Val
 Bizt. érték
 :Safety
 Biztonság
 :Sample Rate
 Mintavétel
+>:SatCount
 :Save
 Mentés
 :Scale
@@ -567,14 +642,15 @@ Skála%s
 Szkenner
 :Second
 Másodperc
-|devo12:Second
-Másodp.
 |devo10:Second
+Másodp.
+|devo12:Second
 Másodp.
 :Select
 Kiválaszt
 :Servo
 Szervó
+>:Servo Hz
 :Set
 Beállítás
 :Set date
@@ -587,6 +663,7 @@ Idő beáll.
 Beállít
 :Set:
 Beállítás:
+>:Setup
 :Simple
 Egyszerű
 |devo10:Simple
@@ -607,6 +684,7 @@ Szokásos
 Szokásos mixer
 :Start
 Start
+>:Start test
 :Step
 Lépés
 :Stick
@@ -617,6 +695,7 @@ Bemenetek
 Mód
 :Sticks
 Botkormány
+>:Stop test
 :Subtrim
 Subtrim
 :Swash
@@ -665,6 +744,7 @@ TRIM_J-
 TRN
 :TelemRPM
 TelemFord
+>:TelemRSSI
 :TelemT
 TelemHőm
 :TelemV
@@ -751,22 +831,31 @@ Kikapcsol
 Bekapcsol
 :Tx power
 Kimenő telj.
+>:TxPower
 :Type
 Típus
 :USB
 USB
 :USB Filesystem is currently 
 USB fájlrendszer jelenleg 
+>:USE A.ACK
 :Unknown
 Ismeretlen
 :Up
 Fel
 :V-trim
 Vsz. trim
+>:VSI
 :Value
 Érték
 :Vibration
 Rezgés
+>:Vibration settings
+>:Vibration:
+>:Video
+>:Video Channel
+>:Video Enable
+>:Video setup
 :Virt
 Virt.
 :Volt
@@ -787,6 +876,7 @@ Nulla/Max
 Aktuális érték
 :add
 hozzáad
+>:beep
 :cntdn-prop
 Gázf. időz.
 :countdown
@@ -795,6 +885,7 @@ Időzítő
 késleltetés
 |devo10:delay
 késlelt.
+>:from
 :is not supported
 nem támogatott
 :is turned off
@@ -805,8 +896,11 @@ max
 min
 :mult
 szoroz
+<:n is %d%%,\nsafe value = %d%%
+< = %d%%,\nbiztonságos = %d%%\n
 :permanent
 Üzemidő
+>:regular
 :replace
 cserél
 :resulting value
@@ -815,6 +909,7 @@ cserél
 Gázf. stop.
 :stopwatch
 Stopper
+>:vTX MHz
 :value to add or set
 Beállítandó/hozzáadandó
 :value to set

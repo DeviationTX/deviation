@@ -7,6 +7,8 @@
 Aantal Kanale
 :%d bytes left
 %d Bytes oor
+>:-20dB
+>:0dB
 :1 sec
 1 sek
 :1-to-1
@@ -17,8 +19,11 @@ Aantal Kanale
 11 Punt
 :13 Point
 13 Punt
+>:1Mbps
+>:250kbps
 :3 Point
 3 Punt
+>:3 Pos
 :30 sec
 30 sek
 :4Ch w/ Dual-Rates
@@ -43,6 +48,8 @@ Aantal Kanale
 9 Punt
 :ABSVAL
 AbsWrde
+>:ACKPKT
+>:AD2GAIN
 :AIL
 AIL
 :AIL DR
@@ -69,6 +76,7 @@ Deviation Info
 voeg
 :Advanced
 Gevorderd
+>:AirSpd
 :Airplane
 Vliegtuig
 :Alarm
@@ -79,10 +87,19 @@ Alarm interval
 Alarm interval
 :All
 Almal
+>:AllCell
+>:Alt
+>:Alt.
+>:Alt.max
 :Altitude
 Hoogte
+>:Amp
+>:Amps
+>:Att.: -20dB
+>:Att.: 0dB
 :Auto
 Outo
+>:Average
 :Backlight
 Skermlig
 :Bad/missing\nprotocol modules!
@@ -91,6 +108,7 @@ Protokol modules\nis sleg of weg!
 Balk
 :Bargraph
 Balkgrafiek
+>:Bat
 :Batt alarm
 Bat Alarm
 :Battery
@@ -105,12 +123,15 @@ Groot boks
 Bind
 :Binding
 Bind...
-:Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
-Bind in proses...\nMaak seker die model is aan!\n\n "OK" sal nie die proses stop nie,\nmaar sal volle beheer toelaat.
 :Binding %s...\nPress ENT to stop
 Bind %s...\nDruk ENT om te stop
+:Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
+Bind in proses...\nMaak seker die model is aan!\n\n "OK" sal nie die proses stop nie,\nmaar sal volle beheer toelaat.
+>:Blink
+>:Blue-A
 :Box
 Boks
+>:Brightness
 :Button monitor
 Knoppie Monitor
 :Buzz settings
@@ -127,12 +148,16 @@ KOL Inv
 KOL Limiet
 :COL Mix
 KOL Meng
+>:CPPM
+>:CRTP Mode
+>:CRTPLOG
 :CYC
 CYC
 :Calibrate
 Kalibreer
-:Calibration done.
-Kalibrasie Voltooi.
+<:Calibration done.
+<Kalibrasie Voltooi.
+>:Calibration done.\n \nPress ENT.
 :Cancel
 Kanselleer
 :Celsius
@@ -153,8 +178,8 @@ Verander
 Kannaal
 :Channel monitor
 Kanaal Monitor
-:Channel output
-Kanaal Uitset
+<:Channel output
+<Kanaal Uitset
 :Clock
 Horlosie
 :Complex
@@ -187,6 +212,7 @@ D/R&Exp -AIL
 D/R&Exp -ELE
 :D/R&Exp -RUD
 D/R&Exp -RUD
+>:DIS
 :DR
 DR
 :Datalog
@@ -203,14 +229,17 @@ Datum:
 Dag
 :Deadband
 Dooieband
+>:Debuglog
 :Default
 Default
 :Delete
 Vee uit
 :Delta PW
 Delta PW
+>:Deviation
 :Deviation FW version:
 Deviation Sagteware:
+>:Deviation\n   USB
 :Dimmer target
 Verdof Teiken
 :Dimmer time
@@ -221,6 +250,7 @@ Af
 Wil jy regtig die\npermanente Tydteller %d\nnul maak?
 :Down
 Af
+>:DynTrim
 :ELE
 ELE
 :ELE DR
@@ -241,10 +271,13 @@ Geaktiveer
 Enter
 :Exit
 Exit
+>:Expert
 :Expo&DR
 Expo&DR
 :Extend
 Bereik
+>:External OSD
+>:F.Log filter
 :FMODE
 FMODE
 :Fades
@@ -253,6 +286,7 @@ Verdof
 Beweeg
 :Fail-safe
 Falingveilig
+>:Failsafe
 :File
 Lêer
 :Fixed
@@ -263,8 +297,13 @@ Vaste ID
 Vliegmode
 :Foot
 Voet
+>:Format
 :Frame Size
 Raam Grootte
+>:Freq Tune
+>:Freq-Coarse
+>:Freq-Fine
+>:Fuel
 :GEAR
 GEAR
 :GPS
@@ -279,6 +318,7 @@ GPS Spoed
 GPS Tyd
 :Generic settings
 Generiese Opstelling
+>:Green
 :Gyro sense
 Gyro Monitor
 :H
@@ -287,6 +327,7 @@ H
 H-trim
 :HOLD
 HOU
+>:Heading
 :Heli
 Heli
 :Heli/Standard GUI
@@ -295,6 +336,7 @@ Heli/Standaard GUI
 Helikopter
 :High-Rate
 Hoë tempo
+>:HighSpeed
 :Hold position
 Hou Posisie
 :Holds
@@ -325,6 +367,9 @@ LINKS_H
 LINKS_V
 :LIN
 LIN
+>:LQI
+>:LQI output
+>:LRSSI
 :Language
 Taal
 :Latitude
@@ -373,12 +418,16 @@ Mid tempo
 Min Limiet
 :Min/Max
 Min/Max
+>:MinCell
 :Minute
 Minuut
+>:Missing Modules:\n
 :Mixer
 Menger
+>:Mixer    Reorder:Hold R+
 :Mixer GUI
 Menger GUI
+>:Mixer output
 :Mixers
 Mengers
 :Mode
@@ -399,6 +448,7 @@ Model moet eers Reset\nom oor teskakel na die Standaard Menger
 Modelopstelling
 :Model type
 Model tipe
+>:Module Error
 :Momentary
 Moment
 :Month
@@ -409,6 +459,8 @@ Beweeg Af
 Beweeg Op
 :Move sticks and knobs\nto max & min positions\nthen press ENT
 Beweeg stokke en skakelaars na max & min/nDruk dan ENT
+>:Multi
+>:Multirotor
 :Mux
 Mux
 :Neg
@@ -419,6 +471,7 @@ Nuwe
 Nee
 :No Trim
 Geen Trim
+>:No range test possible.
 :None
 Geen
 :Normal
@@ -437,6 +490,8 @@ Ok
 Aan
 :On/Off
 Aan/Af
+>:OrangeRx
+>:Outputs
 :PIT
 PIT
 :PIT Mix
@@ -453,6 +508,7 @@ PPM_In Konf.
 Bladsy
 :Page Config
 Bladsy Konfig.
+>:Peak
 :Pitch curves
 PIT kurwes
 :Plane
@@ -473,6 +529,7 @@ Pos 2
 Posisie %d
 :Power On alarm
 Krag aan alarm
+>:Power reduced to
 :Power-down alert
 Krag-af Waarskuwing
 :Prealert interval
@@ -489,6 +546,8 @@ Druk ENT om te verander
 Druk ENT om te kopieër na
 :Press ENT to load
 Druk ENT om te laai
+>:Press ENT to start test.
+>:Press ENT to stop test.
 :Press ENT to turn \nUSB drive
 Druk ENT vir USB aan
 :Protocol
@@ -503,16 +562,22 @@ REGS_H
 REGS_V
 :RPM
 RPM
+>:RPYT
+>:RSSI
+>:RSSIChan
 :RTC Time
 RTC Tyd
 :RUD
 RUD
 :RUD DR
 RUD DR
+>:RX Id
+>:Range Test
 :Rate
 Tempo
 :Re-Init
 Her-ini
+>:Re-bind
 :Real Time Clock
 Waretyd Horlosie
 :Remove
@@ -531,6 +596,7 @@ Omgekeerd
 Verander terug
 :Right
 Regs
+>:RxV
 :SW A
 SK A
 :SW B
@@ -553,6 +619,7 @@ Veiligew
 Veiligheid
 :Sample Rate
 Monstertyd 
+>:SatCount
 :Save
 Stoor
 :Scale
@@ -567,6 +634,7 @@ Sekonde
 Selekteer
 :Servo
 Servo
+>:Servo Hz
 :Set
 Set
 :Set date
@@ -579,6 +647,7 @@ Stel Tyd
 Stel na
 :Set:
 Set:
+>:Setup
 :Simple
 Eenvoudig
 :Simple 4 Channel
@@ -597,6 +666,7 @@ Standaard
 Standaard Menger
 :Start
 Begin
+>:Start test
 :Step
 Stap
 :Stick
@@ -607,6 +677,7 @@ Stokinset
 Stok mode
 :Sticks
 Stokke
+>:Stop test
 :Subtrim
 SubTrim
 :Swash
@@ -653,6 +724,7 @@ TRIM_R-
 TRN
 :TelemRPM
 TelemRPM
+>:TelemRSSI
 :TelemT
 TelemT
 :TelemV
@@ -747,16 +819,24 @@ Tipe
 USB
 :USB Filesystem is currently 
 USB Leerstelsel is tans
+>:USE A.ACK
 :Unknown
 Onbekend
 :Up
 Op
 :V-trim
 V-trim
+>:VSI
 :Value
 Waarde
 :Vibration
 Vibrasie
+>:Vibration settings
+>:Vibration:
+>:Video
+>:Video Channel
+>:Video Enable
+>:Video setup
 :Virt
 Virt
 :Volt
@@ -777,12 +857,14 @@ Zero/Max
 Regte waarde
 :add
 +
+>:beep
 :cntdn-prop
 aftel-prop
 :countdown
 Afteller
 :delay
 Vertraging
+>:from
 :is not supported
 word nie ondersteun nie
 :is turned off
@@ -795,6 +877,7 @@ min
 *
 :permanent
 Permanent
+>:regular
 :replace
 vervang
 :resulting value
