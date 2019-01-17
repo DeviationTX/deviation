@@ -47,7 +47,6 @@ extern const char *DATALOG_Source(char *str, int idx);
 extern int DATALOG_Remaining();
 extern void DATALOG_Reset();
 extern void DATALOG_UpdateState();
-extern int DATALOG_IsEnabled();
 extern const char *DATALOG_RateString(int idx);
 extern void DATALOG_ApplyMask(int idx, int set);
 #endif
