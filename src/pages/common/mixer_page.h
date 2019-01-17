@@ -24,7 +24,7 @@ struct mixer_limit_page {
     u8 entries_per_page;
 };
 
-struct mixer_failsave_page
+struct mixer_failsafe_page
 {
     struct Limit *limit;
     guiObject_t *firstObj;

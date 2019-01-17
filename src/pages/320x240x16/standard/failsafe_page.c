@@ -23,7 +23,7 @@
 #include "../../common/standard/_failsafe_page.c"
 
 static struct stdchan_obj * const gui = &gui_objs.u.stdchan;
-static struct mixer_failsave_page * mp = &pagemem.u.mixer_failsave_page;
+static struct mixer_failsafe_page * mp = &pagemem.u.mixer_failsafe_page;
 
 static void show_page(int page)
 {
