@@ -108,7 +108,6 @@ void PPM_Enable(unsigned low_time, volatile u16 *pulses, u8 num_pulses)
     timer_enable_counter(TIM1);
 }
 
-#ifndef MODULAR
 #define PXX_PKT_BYTES 18
 #define PXX_PKT_BITS  (20 * 8 + 32)  // every 5th bit might be escaped
 static const u8 pxx_flag[] = {15, 23, 23, 23, 23, 23, 23, 15};  // 7e
@@ -178,8 +177,6 @@ void PXX_Enable(u8 *packet)
     timer_enable_counter(TIM1);
     timer_generate_event(TIM1, TIM_EGR_UG);             // Generate event to start DMA
 }
-
-#endif  //MODULAR
 
 #endif //DISABLE_PWM
 #pragma long_calls_off
