@@ -105,7 +105,8 @@ AUX7
 >:Att.: 0dB
 :Auto
 Авто
->:Average
+:Average
+Средний
 :Backlight
 Подсветка
 :Bad/missing\nprotocol modules!
@@ -556,7 +557,8 @@ PPM-Вход (расширенный)
 Стр.
 :Page Config
 Настройка страницы
->:Peak
+:Peak
+Пиковый
 :Pitch curves
 Кривые шага
 :Plane
