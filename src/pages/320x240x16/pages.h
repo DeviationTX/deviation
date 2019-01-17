@@ -13,6 +13,8 @@ struct pagemem {
         struct main_page main_page;
         struct layout_page layout_page;
         struct mixer_page mixer_page;
+        struct mixer_failsafe_page mixer_failsafe_page;
+        struct mixer_limit_page mixer_limit_page;
         struct trim_page trim_page;
         struct model_page model_page;
         struct timer_page timer_page;

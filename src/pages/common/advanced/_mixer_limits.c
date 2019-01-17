@@ -12,10 +12,8 @@
  You should have received a copy of the GNU General Public License
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
-static struct Limit origin_limit;
-
 static struct advlimit_obj * const gui = &gui_objs.u.advlimit;
-static struct mixer_page   * const mp  = &pagemem.u.mixer_page;
+static struct mixer_limit_page   * const mp  = &pagemem.u.mixer_limit_page;
 
 static inline guiObject_t *_get_obj(int idx, int objid);
 static void sourceselect_cb(guiObject_t *obj, void *data);
@@ -51,7 +49,7 @@ void PAGE_EditLimitsInit(int ch)
 {
     mp->limit = MIXER_GetLimit(ch);
     mp->channel = ch;
-    memcpy(&origin_limit, (const void *)mp->limit, sizeof(origin_limit)); // back up for reverting purpose
+    memcpy(&mp->origin_limit, (const void *)mp->limit, sizeof(mp->origin_limit)); // back up for reverting purpose
     _show_titlerow();
     _show_limits();
 }
@@ -224,7 +222,7 @@ static void revert_cb(guiObject_t *obj, const void *data)
 {
     (void)data;
     (void)obj;
-    memcpy(mp->limit, (const void *)&origin_limit, sizeof(origin_limit));
+    memcpy(mp->limit, (const void *)&mp->origin_limit, sizeof(mp->origin_limit));
     FullRedraw = REDRAW_EVERYTHING;
 }
 
