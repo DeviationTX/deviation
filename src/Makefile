@@ -351,7 +351,7 @@ dollar = $$
 define define_compile_rules
 $(ODIR)/%.o: $(1)%.c $(LIBOPENCM3)
 	@echo " + Compiling '$$<'"
-	$(CC) $$(CFLAGS) -MD -c -o $$@ $$<
+	$(CC) $$(CFLAGS) $$(CFLAGS_$$(basename $$(notdir $$<))) -MD -c -o $$@ $$<
 	@cp $(ODIR)/$$*.d $(ODIR)/$$*.P; \
             sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$(dollar)//' \
                 -e '/^$$(dollar)/ d' -e 's/$$(dollar)/ :/' < $(ODIR)/$$*.d >> $(ODIR)/$$*.P; \
@@ -359,7 +359,7 @@ $(ODIR)/%.o: $(1)%.c $(LIBOPENCM3)
 
 $(ODIR)/%.o: $(1)%.cpp $(LIBOPENCM3)
 	@echo " + Compiling '$$<'"
-	$(CXX) $$(CXXFLAGS) -MD -c -o $$@ $$<
+	$(CXX) $$(CXXFLAGS) $$(CXXFLAGS_$$(basename $$(notdir $$<))) -MD -c -o $$@ $$<
 	@cp $(ODIR)/$$*.d $(ODIR)/$$*.P; \
             sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$(dollar)//' \
                 -e '/^$$(dollar)/ d' -e 's/$$(dollar)/ :/' < $(ODIR)/$$*.d >> $(ODIR)/$$*.P; \
@@ -368,7 +368,7 @@ $(ODIR)/%.o: $(1)%.cpp $(LIBOPENCM3)
 #For module building
 $(ODIR)/%.o_: $(1)%.c $(LIBOPENCM3)
 	@echo " + Compiling '$$<' as module"
-	$(CC) $$(CFLAGS) $$(EXTRA_CFLAGS) $$(MODULE_FLAGS) -MD -c -o $$@ $$<
+	$(CC) $$(CFLAGS) $$(CFLAGS_$$(basename $$(notdir $$<))) $$(EXTRA_CFLAGS) $$(MODULE_FLAGS) -MD -c -o $$@ $$<
 	@cp $(ODIR)/$$*.d $(ODIR)/$$*.P; \
             sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$(dollar)//' \
                 -e '/^$$(dollar)/ d' -e 's/$$(dollar)/ :/' < $(ODIR)/$$*.d >> $(ODIR)/$$*.P; \
