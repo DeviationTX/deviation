@@ -139,7 +139,8 @@ AUX7
 >:Blue-A
 :Box
 Бокс
->:Brightness
+:Brightness
+Яркость
 :Button monitor
 Монитор кнопок
 :Buzz settings
@@ -165,9 +166,8 @@ AUX7
 Цикл
 :Calibrate
 Калибровка
-<:Calibration done.
-<Калибровка выполнена.
->:Calibration done.\n \nPress ENT.
+:Calibration done.\n \nPress ENT.
+Калибровка выполнена.\n \nНажмите ENT.
 :Cancel
 Отмена
 :Celsius
@@ -296,7 +296,8 @@ AUX7
 Экспо&ДР
 :Extend
 Расширен.
->:External OSD
+:External OSD
+Внешний OSD
 >:F.Log filter
 :FMODE
 ПРеж
@@ -515,7 +516,8 @@ Cместите стики и ручки\nв максимум и минимум,
 Нет
 :No Trim
 Без триммера
->:No range test possible.
+:No range test possible.
+Тест дистанции недоступен
 :None
 Нет
 :Normal
@@ -575,7 +577,8 @@ PPM-Вход (расширенный)
 Положение %d
 :Power On alarm
 Сигнал вкл.
->:Power reduced to
+:Power reduced to
+Мощность снижена до
 :Power-down alert
 Сигнал выкл.
 :Prealert interval
@@ -600,8 +603,10 @@ ENT для копирования в
 ENT для загрузки
 |devo8:Press ENT to load
 Нажмите ENT для загрузки
->:Press ENT to start test.
->:Press ENT to stop test.
+:Press ENT to start test.
+Нажмите ENT для запуска.
+:Press ENT to stop test.
+Нажмите ENT для остановки.
 :Press ENT to turn \nUSB drive
 Нажмите ENT для\nперевода USB диска\nв состояние
 :Protocol
@@ -630,7 +635,8 @@ RPM
 |devo8:RUD DR
 РНапр ДР
 >:RX Id
->:Range Test
+:Range Test
+Тест дистанции
 :Rate
 Частота
 :Re-Init
@@ -901,12 +907,18 @@ USB
 Значение
 :Vibration
 Вибрация
->:Vibration settings
->:Vibration:
->:Video
->:Video Channel
->:Video Enable
->:Video setup
+:Vibration settings
+Настройки вибрации
+:Vibration:
+Вибрация:
+:Video
+Видео
+:Video Channel
+Видео канал
+:Video Enable
+Вкл. видео
+:Video setup
+Настройка видео
 :Virt
 Вирт.
 :Volt
@@ -934,7 +946,8 @@ USB
 обр.отсчет
 :delay
 задержка
->:from
+:from
+от
 :is not supported
 не поддерживается
 :is turned off
