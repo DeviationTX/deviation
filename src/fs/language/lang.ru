@@ -194,8 +194,6 @@ AUX7
 Канал
 :Channel monitor
 Монитор каналов
-<:Channel output
-<Выход канала
 :Clock
 Часы
 :Complex
@@ -472,7 +470,8 @@ M
 Интерфейс
 |devo8:Mixer GUI
 Интерфейс микшеров
->:Mixer output
+:Mixer output
+Выход микшера
 :Mixers
 Микшер
 :Mode
@@ -493,7 +492,8 @@ M
 Модель
 :Model type
 Тип модели
->:Module Error
+:Module Error
+Ошибка модуля
 :Momentary
 Кнопка
 :Month
@@ -641,7 +641,8 @@ RPM
 Частота
 :Re-Init
 Привязка
->:Re-bind
+:Re-bind
+Привязка
 :Real Time Clock
 Часы
 :Remove
@@ -679,7 +680,8 @@ RPM
 Безопасность
 :Sample Rate
 Частота
->:SatCount
+:SatCount
+Спутники
 :Save
 Сохр.
 |devo8:Save
@@ -711,7 +713,8 @@ RPM
 Установить
 :Set:
 Установить:
->:Setup
+:Setup
+Настройка
 :Simple
 Простой
 :Simple 4 Channel
@@ -730,7 +733,8 @@ RPM
 Стандартный микшер
 :Start
 Время
->:Start test
+:Start test
+Старт тест
 :Step
 Шаг
 :Stick
@@ -741,7 +745,8 @@ RPM
 Режим стиков
 :Sticks
 Стики
->:Stop test
+:Stop test
+Стоп тест
 :Subtrim
 Субтриммер
 :Swash
@@ -939,7 +944,8 @@ USB
 Актуальное значение
 :add
 добавить
->:beep
+:beep
+сигнал
 :cntdn-prop
 обр.отсч.пр
 :countdown
