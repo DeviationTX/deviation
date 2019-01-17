@@ -194,7 +194,7 @@ const char *INPUT_ButtonName(unsigned src);
 void INPUT_CheckChanges(void);
 
 /* Misc */
-#define Delay(count) usleep(count)
+void Delay(u32 count);
 u32 Crc(const void *buffer, u32 size);
 const char *utf8_to_u32(const char *str, u32 *ch);
 int exact_atoi(const char *str); //Like atoi but will not decode a number followed by non-number
