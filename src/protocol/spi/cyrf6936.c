@@ -38,6 +38,8 @@
 //Disable AWA24S
 #define AWA24S 0
 
+#define Delay usleep
+
 static void CS_HI() {
     PROTO_CS_HI(CYRF6936);
 }
