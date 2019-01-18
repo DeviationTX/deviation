@@ -8,7 +8,8 @@ env:
       - MAKETARGET=zip_devo7e
       - MAKETARGET=zip_devof12e
       - MAKETARGET=zip_t8sg
-      - TARGET=at9
+      - MAKETARGET=zo[_at9
+      - MAKETARGET=zip_devof7
       - MAKETARGET=zip_win_emu_devo8
       - MAKETARGET=zip_emu_devo8
       - MAKETARGET=test
