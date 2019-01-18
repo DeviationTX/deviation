@@ -14,8 +14,7 @@
 */
 #include "common.h"
 #include "gui/gui.h"
-
-static FATFS FontFAT;
+#include "screen/font.h"
 
 /*
  * The font 'font_table' begins with a list of u24 values which represent
@@ -46,28 +45,52 @@ static FATFS FontFAT;
  */
 //#define LINE_SPACING 2 // move to _gui.h as devo10's line spacing is different from devo8's
 #define CHAR_SPACING 1
-#define CHAR_BUF_SIZE 80
-#define RANGE_TABLE_SIZE 20
 #define NUM_FONTS 10
 
-#define HEIGHT(x) x.height
 #define FONT_NAME_LEN 9
 char FontNames[NUM_FONTS][FONT_NAME_LEN];
 
-struct font_def
-{
-    u8 idx;
-    FILE *fh;
-    u8 height;          /* Character height for storage        */
-    u16 range[2 * (RANGE_TABLE_SIZE + 1)];  /* Array containing the ranges of supported characters */
-};
 static struct {
-    struct font_def font;
+    u8 font_idx;
     unsigned int x_start;
     unsigned int x;
     unsigned int y;
     u16          color;
 } cur_str;
+
+
+void LCD_PrintCharXY(unsigned int x, unsigned int y, u32 c)
+{
+    u8 row, col, width;
+    u8 font[CHAR_BUF_SIZE];
+    const u8 *offset;
+    offset = font;
+    char_read(font, c, &width);
+    if (! offset || ! width) {
+        printf("Could not locate character U-%04x\n", (int)c);
+        return;
+    }
+    // Check if the requested character is available
+    LCD_DrawStart(x, y, x + width - 1,  y + get_height() - 1, DRAW_NWSE);
+    for (col = 0; col < width; col++)
+    {
+        const u8 *data = offset++;
+        u8 bit = 0;
+        // Data is right aligned,adrawn top to bottom
+        for (row = 0; row < get_height(); ++row)
+        {
+            if (bit == 8) {
+                data = offset++;
+                bit = 0;
+            }
+            if (*data & (1 << bit)) {
+                LCD_DrawPixelXY(x + col, y + row, cur_str.color);
+            }
+            bit++;
+        }
+    }
+    LCD_DrawStop();
+}
 
 u8 FONT_GetFromString(const char *value)
 {
@@ -85,153 +108,29 @@ u8 FONT_GetFromString(const char *value)
     return 0;
 }
 
-u8 get_char_range(u32 c, u32 *begin, u32 *end)
-{
-    u32 offset = 0;
-    u32 pos = 5;
-    u8 buf[6];
-    u16 *range = cur_str.font.range;
-    while(1) {
-        if (range[0] == 0 && range[1] == 0)
-            break;
-        if (c >= range[0] && c <= range[1]) {
-            pos += 3 * (offset + c - range[0]);
-        } else {
-            offset += range[1] + 1 - range[0];
-        }
-        range += 2;
-        pos += 4;
-    }
-    fseek(cur_str.font.fh, pos, SEEK_SET);
-    fread(buf, 6, 1, cur_str.font.fh);
-    *begin = buf[0] | (buf[1] << 8) | (buf[2] << 16);
-    *end   = buf[3] | (buf[4] << 8) | (buf[5] << 16);
-    return 1;
-}
-
-void char_read(u8 *font, u32 c, u8 *width)
-{
-    u32 begin;
-    u32 end;
-
-    u8 row_bytes = ((cur_str.font.height - 1) / 8) + 1;
-    get_char_range(c, &begin, &end);
-    *width = (end - begin) / row_bytes;
-    fseek(cur_str.font.fh, begin, SEEK_SET);
-    if (end - begin > CHAR_BUF_SIZE) {
-        printf("Character '%04d' is larger than allowed size\n", (int)c);
-        end = begin + (CHAR_BUF_SIZE / row_bytes) * row_bytes;
-        *width = (end - begin) / row_bytes;
-    }
-    fread(font, end - begin, 1, cur_str.font.fh);
-}
-
-u8 get_width(u32 c)
-{
-    u32 begin;
-    u32 end;
-
-    u8 row_bytes = ((cur_str.font.height - 1) / 8) + 1;
-    get_char_range(c, &begin, &end);
-    return (end - begin) / row_bytes;
-}
-
-void LCD_PrintCharXY(unsigned int x, unsigned int y, u32 c)
-{
-    u8 row, col, width;
-    u8 font[CHAR_BUF_SIZE];
-    const u8 *offset;
-    offset = font;
-    char_read(font, c, &width);
-    if (! offset || ! width) {
-        printf("Could not locate character U-%04x\n", (int)c);
-        return;
-    }
-    // Check if the requested character is available
-    LCD_DrawStart(x, y, x + width - 1,  y + HEIGHT(cur_str.font) - 1, DRAW_NWSE);
-    for (col = 0; col < width; col++)
-    {
-        const u8 *data = offset++;
-        u8 bit = 0;
-        // Data is right aligned,adrawn top to bottom
-        for (row = 0; row < HEIGHT(cur_str.font); ++row)
-        {
-            if (bit == 8) {
-                data = offset++;
-                bit = 0;
-            }
-            if (*data & (1 << bit)) {
-                LCD_DrawPixelXY(x + col, y + row, cur_str.color);
-            }
-            bit++;
-        }
-    }
-    LCD_DrawStop();
-}
-
-void close_font()
-{
-    if(cur_str.font.fh) {
-        fclose(cur_str.font.fh);
-        cur_str.font.fh = NULL;
-    }
-}
-
-u8 open_font(unsigned int idx)
-{
-    char fontname[20];
-    close_font();
-    if (! idx) {
-        cur_str.font.idx = 0;
-        return 1;
-    }
-    sprintf(fontname, "media/%s.fon", FontNames[idx-1]);
-    finit(&FontFAT, "media");
-    cur_str.font.fh = fopen2(&FontFAT, fontname, "rb");
-    if (! cur_str.font.fh) {
-        printf("Couldn't open font file: %s\n", fontname);
-        return 0;
-    }
-    setbuf(cur_str.font.fh, 0);
-    if(fread(&cur_str.font.height, 1, 1, cur_str.font.fh) != 1) {
-        printf("Failed to read height from font\n");
-        fclose(cur_str.font.fh);
-        cur_str.font.fh = NULL;
-        return 0;
-    }
-    cur_str.font.idx = idx;
-    int range_idx = 0;
-    u8 buf[4];
-    while(1) {
-        if (fread(buf, 4, 1, cur_str.font.fh) != 1) {
-            printf("Failed to parse font range table\n");
-            fclose(cur_str.font.fh);
-            cur_str.font.fh = NULL;
-            return 0;
-        }
-        u16 start_c = buf[0] | (buf[1] << 8);
-        u16 end_c = buf[2] | (buf[3] << 8);
-        cur_str.font.range[range_idx++] = start_c;
-        cur_str.font.range[range_idx++] = end_c;
-        if (start_c == 0 && end_c == 0)
-            break;
-    }
-    return 1;
-}
-
 u8 LCD_SetFont(unsigned int idx)
 {
     u8 old = LCD_GetFont();
     if (old == idx)
         return old;
-    if (! open_font(idx))
-        open_font(old);
+    if (idx == 0) {
+        close_font();
+        cur_str.font_idx = 0;
+        return 0;
+    } else if (! open_font(FontNames[idx - 1])){
+        if (old == 0)
+            close_font();
+        else
+            open_font(FontNames[old - 1]);
+    }
+    else
+        cur_str.font_idx = idx;
     return old;
 }
 
 u8 LCD_GetFont()
 {
-    return cur_str.font.idx;
+    return cur_str.font_idx;
 }
 
 void LCD_SetXY(unsigned int x, unsigned int y)
@@ -260,7 +159,7 @@ void LCD_PrintChar(u32 c)
 {
     if(c == '\n') {
         cur_str.x = cur_str.x_start;
-        cur_str.y += HEIGHT(cur_str.font) + LINE_SPACING;
+        cur_str.y += get_height() + LINE_SPACING;
     } else {
         LCD_PrintCharXY(cur_str.x, cur_str.y, c);
         cur_str.x += get_width(c) + CHAR_SPACING;
@@ -268,20 +167,20 @@ void LCD_PrintChar(u32 c)
 }
 
 void LCD_GetCharDimensions(u32 c, u16 *width, u16 *height) {
-    *height = HEIGHT(cur_str.font);
+    *height = get_height();
     *width = get_width(c);
 }
 
 void LCD_GetStringDimensions(const u8 *str, u16 *width, u16 *height) {
     int line_width = 0;
-    *height = HEIGHT(cur_str.font);
+    *height = get_height();
     *width = 0;
     //printf("String: %s\n", str);
     while(*str) {
         u32 ch;
         str = (const u8 *)utf8_to_u32((const char *)str, &ch);
         if(ch == '\n') {
-            *height += HEIGHT(cur_str.font) + LINE_SPACING;
+            *height += get_height() + LINE_SPACING;
             if(line_width > *width)
                 *width = line_width;
             line_width = 0;
