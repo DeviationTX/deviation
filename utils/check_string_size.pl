@@ -8,8 +8,9 @@ use Getopt::Long;
 my $target;
 my $quiet;
 my $objdir;
+my $elffile;
 my $log = "";
-GetOptions("target=s" => \$target, "quiet" => \$quiet, "objdir=s" => \$objdir);
+GetOptions("target=s" => \$target, "quiet" => \$quiet, "objdir=s" => \$objdir, "elffile=s" => \$elffile);
 
 my @dirs = grep {$_ !~ /common/ && (! $target || $_ =~ /$target/)} glob("filesystem/*");
 my $max_line_length = 0;
@@ -33,22 +34,35 @@ foreach my $target_dir (@dirs) {
         my $bytes = 0;
         my $count = 0;
         my $line_length = 0;
-        for (my $idx = 0; $idx < $#lines; $idx++) {
-            if($lines[$idx] =~ /^:/) {
-                my $hashval = fnv(substr($lines[$idx], 1));
-                if($hash{$hashval}) {
-                    print "Found hash collision between:\n    $hash{$hashval}\n    " . substr($lines[$idx], 1) . "\n";
-                    $error = 1;
+        if ($lines[0] =~ /^:/) {
+            # language v1 format
+            for (my $idx = 0; $idx < $#lines; $idx++) {
+                if($lines[$idx] =~ /^:/) {
+                    my $hashval = fnv(substr($lines[$idx], 1));
+                    if($hash{$hashval}) {
+                        print "Found hash collision between:\n    $hash{$hashval}\n    " . substr($lines[$idx], 1) . "\n";
+                        $error = 1;
+                    }
+                    #printf "%6d: %s\n", $hashval, substr($lines[$idx], 1);
+                    $hash{$hashval} ||= substr($lines[$idx], 1);
+                    my $len = length($lines[$idx+1]) + 1; #Count the NULL too
+                    $bytes += $len;
+                    $line_length = $len if($len > $line_length);
+                    $count++;
+                    $idx++;
                 }
-                #printf "%6d: %s\n", $hashval, substr($lines[$idx], 1);
-                $hash{$hashval} ||= substr($lines[$idx], 1);
-                my $len = length($lines[$idx+1]) + 1; #Count the NULL too
-                $bytes += $len;
-                $line_length = $len if($len > $line_length);
-                $count++;
-                $idx++;
             }
         }
+        else {
+            # language V2 format
+            for (my $idx = 0; $idx < $#lines; $idx++) {
+                my $len = length($lines[$idx]) - 1;
+                $bytes += $len;
+                $line_length = $len if ($len > $line_length);
+                $count++;
+            }
+        }
+
         $log .= sprintf("%-35s: %5d lines, %5d bytes, %4d bytes/line\n", $file, $count, $bytes, $line_length);
         $target_bytes = $bytes if($bytes > $target_bytes);
         $target_count = $count if($count > $target_count);
@@ -56,6 +70,9 @@ foreach my $target_dir (@dirs) {
     }
     my $cmd = "../utils/extract_strings.pl -target $target";
     $cmd .= " -objdir $objdir" if($objdir);
+    $cmd .= " -elffile $elffile" if($elffile);
+    print $cmd;
+    print "\n";
     my @lines = `$cmd`;
     my $count = scalar(@lines);
     $log .= sprintf("%-35s: %5d lines\n", $target, $count);
