@@ -14,7 +14,7 @@
 */
 #include "common.h"
 #include "gui/gui.h"
-#include "config/font.h"
+#include "screen/font.h"
 
 /*
  * The font 'font_table' begins with a list of u24 values which represent
