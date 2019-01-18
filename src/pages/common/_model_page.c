@@ -249,6 +249,7 @@ static const char *protoselect_cb(guiObject_t *obj, int dir, void *data)
         PROTOCOL_DeInit();
         // Load() the new protocol
         Model.protocol = new_protocol;
+        Model.radio = PROTOCOL_GetRadio(new_protocol);
         PROTOCOL_Load(1);
         Model.num_channels = PROTOCOL_DefaultNumChannels();
         if (! PROTOCOL_HasPowerAmp(Model.protocol))

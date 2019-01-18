@@ -29,23 +29,21 @@ struct Model Model;
 static u32 crc32;
 
 const char * const MODEL_TYPE_VAL[MODELTYPE_LAST] = { "heli", "plane", "multi" };
-const char * const RADIO_TX_POWER_VAL[TX_MODULE_LAST+1][TXPOWER_LAST] = {
+const char * const RADIO_TX_POWER_VAL[TX_MODULE_LAST][TXPOWER_LAST] = {
      { "100uW", "300uW", "1mW", "3mW", "10mW", "30mW", "100mW", "150mW" },  //   CYRF6936,
      { "100uW", "300uW", "1mW", "3mW", "10mW", "30mW", "100mW" },           //   A7105,
      { "100uW", "300uW", "1mW", "3mW", "10mW", "30mW", "100mW", "150mW" },  //   CC2500,
      { "1mW", "6mW", "25mW", "100mW" },                                     //   NRF24L01,
      { "100uW", "300uW", "1mW", "3mW", "10mW", "30mW", "100mW", "150mW" },  //   MULTIMOD,
      { "10/25mW", "100/25mW", "500/500mW", "Auto/200mW" },                  //   R9M (FCC/EU),
-     { "Default" }                                                          //   None
 };
-const u8 RADIO_TX_POWER_COUNT[TX_MODULE_LAST+1] = {
+const u8 RADIO_TX_POWER_COUNT[TX_MODULE_LAST] = {
      8,    //   CYRF6936,
      7,    //   A7105,
      8,    //   CC2500,
      4,    //   NRF24L01,
      8,    //   MULTIMOD,
      4,    //   R9M (FCC/EU),
-     1,    //   NONE
 };
 
 #define MATCH_SECTION(s) (strcasecmp(section, s) == 0)
@@ -689,6 +687,10 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
         if(assign_int(&Model, _secradio, MAPSIZE(_secradio)))
             return 1;
         if (MATCH_KEY(RADIO_TX_POWER)) {
+            if (m->radio == TX_MODULE_LAST) {
+                m->tx_power = TXPOWER_150mW;
+                return 1;
+            }
             for (i = 0; i < RADIO_TX_POWER_COUNT[m->radio]; i++) {
                 if (MATCH_VALUE(RADIO_TX_POWER_VAL[m->radio][i])) {
                     m->tx_power = i;
