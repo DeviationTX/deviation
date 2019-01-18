@@ -29,8 +29,24 @@ struct Model Model;
 static u32 crc32;
 
 const char * const MODEL_TYPE_VAL[MODELTYPE_LAST] = { "heli", "plane", "multi" };
-const char * const RADIO_TX_POWER_VAL[TXPOWER_LAST] =
-     { "100uW", "300uW", "1mW", "3mW", "10mW", "30mW", "100mW", "150mW" };
+const char * const RADIO_TX_POWER_VAL[TX_MODULE_LAST+1][TXPOWER_LAST] = {
+     { "100uW", "300uW", "1mW", "3mW", "10mW", "30mW", "100mW", "150mW" },  //   CYRF6936,
+     { "100uW", "300uW", "1mW", "3mW", "10mW", "30mW", "100mW" },           //   A7105,
+     { "100uW", "300uW", "1mW", "3mW", "10mW", "30mW", "100mW", "150mW" },  //   CC2500,
+     { "1mW", "6mW", "25mW", "100mW" },                                     //   NRF24L01,
+     { "100uW", "300uW", "1mW", "3mW", "10mW", "30mW", "100mW", "150mW" },  //   MULTIMOD,
+     { "10/25mW", "100/25mW", "500/500mW", "Auto/200mW" },                  //   R9M (FCC/EU),
+     { "Default" }                                                          //   None
+};
+const u8 RADIO_TX_POWER_COUNT[TX_MODULE_LAST+1] = {
+     8,    //   CYRF6936,
+     7,    //   A7105,
+     8,    //   CC2500,
+     4,    //   NRF24L01,
+     8,    //   MULTIMOD,
+     4,    //   R9M (FCC/EU),
+     1,    //   NONE
+};
 
 #define MATCH_SECTION(s) (strcasecmp(section, s) == 0)
 #define MATCH_START(x,y) (strncasecmp(x, y, sizeof(y)-1) == 0)
@@ -662,6 +678,7 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
             for (i = 0; i < PROTOCOL_COUNT; i++) {
                 if (MATCH_VALUE(PROTOCOL_GetName(i))) {
                     m->protocol = i;
+                    m->radio = PROTOCOL_GetRadio(i);
                     PROTOCOL_Load(1);
                     return 1;
                 }
@@ -672,13 +689,14 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
         if(assign_int(&Model, _secradio, MAPSIZE(_secradio)))
             return 1;
         if (MATCH_KEY(RADIO_TX_POWER)) {
-            for (i = 0; i < NUM_STR_ELEMS(RADIO_TX_POWER_VAL); i++) {
-                if (MATCH_VALUE(RADIO_TX_POWER_VAL[i])) {
+            for (i = 0; i < RADIO_TX_POWER_COUNT[m->radio]; i++) {
+                if (MATCH_VALUE(RADIO_TX_POWER_VAL[m->radio][i])) {
                     m->tx_power = i;
                     return 1;
                 }
             }
             printf("Unknown Tx power: %s\n", value);
+            m->tx_power = RADIO_TX_POWER_COUNT[m->radio]-1; // default to radio maximum
             return 1;
         }
         printf("Unknown Radio Key: %s\n", name);
@@ -1210,7 +1228,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
     fprintf(fh, "[%s]\n", SECTION_RADIO);
     fprintf(fh, "%s=%s\n", RADIO_PROTOCOL, PROTOCOL_GetName(m->protocol));
     write_int(fh, m, _secradio, MAPSIZE(_secradio));
-    fprintf(fh, "%s=%s\n", RADIO_TX_POWER, RADIO_TX_POWER_VAL[m->tx_power]);
+    fprintf(fh, "%s=%s\n", RADIO_TX_POWER, RADIO_TX_POWER_VAL[m->radio][m->tx_power]);
     fprintf(fh, "\n");
     write_proto_opts(fh, m);
     struct Limit default_limit;

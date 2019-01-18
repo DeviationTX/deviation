@@ -201,13 +201,9 @@ u8 NRF24L01_SetPower(u8 power)
     u8 nrf_power = 0;
     switch(power) {
         case TXPOWER_100uW: nrf_power = 0; break;
-        case TXPOWER_300uW: nrf_power = 0; break;
-        case TXPOWER_1mW:   nrf_power = 0; break;
-        case TXPOWER_3mW:   nrf_power = 1; break;
-        case TXPOWER_10mW:  nrf_power = 1; break;
-        case TXPOWER_30mW:  nrf_power = 2; break;
-        case TXPOWER_100mW: nrf_power = 3; break;
-        case TXPOWER_150mW: nrf_power = 3; break;
+        case TXPOWER_300uW: nrf_power = 1; break;
+        case TXPOWER_1mW:   nrf_power = 2; break;
+        case TXPOWER_3mW:   nrf_power = 3; break;
         default:            nrf_power = 0; break;
     }
     // Power is in range 0..3 for nRF24L01

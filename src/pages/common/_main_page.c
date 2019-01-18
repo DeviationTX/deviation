@@ -40,7 +40,7 @@ struct ImageMap TGLICO_GetImage(int idx);
  */
 static const char *_power_to_string()
 {
-    return RADIO_TX_POWER_VAL[Model.tx_power];
+    return RADIO_TX_POWER_VAL[Model.radio][Model.tx_power];
 }
 
 struct LabelDesc *get_box_font(u8 idx, u8 neg)

@@ -71,7 +71,7 @@ const struct{
 #else
 #define PROTODEF(proto, module, map, cmd, name) {module, cmd, name},
 const struct{
-    int module;
+    enum Radio module;
     const void * (*cmd)(enum ProtoCmds);
     const char* name;
 }Protocols[PROTOCOL_COUNT] = {
@@ -89,6 +89,11 @@ const char * PROTOCOL_GetName(u16 idx)
         return _tr("None");
     else
         return Protocols[idx].name;
+}
+
+enum Radio PROTOCOL_GetRadio(u16 idx)
+{
+    return (enum Radio)get_module(idx);
 }
 
 const char * PROTOCOL_Name()
@@ -425,6 +430,7 @@ int PROTOCOL_HasModule(int idx)
     } else {
 #endif
     int m = get_module(idx);
+    if (m > MULTIMOD) return 1;  // last internal module
     if(m == TX_MODULE_LAST || Transmitter.module_enable[m].port != 0)
         return 1;
     return 0;
@@ -441,6 +447,7 @@ int PROTOCOL_HasPowerAmp(int idx)
     } else {
 #endif
     int m = get_module(idx);
+    if (m > MULTIMOD) return 1;  // last internal module
     if ((m != TX_MODULE_LAST && Transmitter.module_poweramp & (1 << m))
 #ifndef ENABLE_MODULAR
         || (Model.protocol == PROTOCOL_PXX)
