@@ -80,7 +80,7 @@ void LCD_DrawPixel(unsigned int color)
 /*
  * Since we have a text based screen we need some of the text writing functions here
  */
-u8 get_char_range(u32 c, u32 *begin, u32 *end)
+static u8 get_char_range(u32 c, u32 *begin, u32 *end)
 {
     u32 offset = 0;
     u32 pos = 5;
@@ -102,7 +102,7 @@ u8 get_char_range(u32 c, u32 *begin, u32 *end)
     return 1;
 }
 
-const u8 *char_offset(u32 c, u8 *width)
+static const u8 *char_offset(u32 c, u8 *width)
 {
     u32 begin;
     u32 end;
@@ -113,11 +113,11 @@ const u8 *char_offset(u32 c, u8 *width)
     return default_font.data + begin;
 }
 
-void close_font()
+static void close_font()
 {
 }
 
-void open_font(struct font_def_rom *font, const u8 *data, int fontidx)
+static void open_font(struct font_def_rom *font, const u8 *data, int fontidx)
 {
     font->height = *data;
     font->zoom = *data / CHAR_HEIGHT;
