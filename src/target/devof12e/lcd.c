@@ -18,6 +18,15 @@
 
 #include "common.h"
 #include "lcd.h"
+#include "screen/font.h"
+
+#if SUPPORT_MULTI_LANGUAGE
+#define CHAR_CACHE_SIZE 150
+#define LOC_CHAR_STARTS 50
+u16 loadedchars[CHAR_CACHE_SIZE];
+static u8 height;
+static u16 load_char_font(u32 c);
+#endif
 
 void LCD_Init()
 {
@@ -28,11 +37,25 @@ void LCD_Clear(unsigned int color) {
     (void)color;
     //printf("Clearing display\n");
     TW8816_ClearDisplay();
+#if SUPPORT_MULTI_LANGUAGE
+    memset(loadedchars, 0, sizeof(loadedchars));
+#endif
 }
 
 void LCD_PrintCharXY(unsigned int x, unsigned int y, u32 c)
 {
     c = TW8816_map_char(c);
+#if SUPPORT_MULTI_LANGUAGE
+    if (c > 0x300) {
+
+        if (height == 0) {
+            open_font("12normal");
+            height = get_height();
+        }
+
+        c = load_char_font(c);
+    }
+#endif
     if (x >= LCD_WIDTH)
         x = LCD_WIDTH - 1;
     u16 pos = ((y >> 1)*(LCD_WIDTH>>1)) + (x>>1);
@@ -158,5 +181,69 @@ u8 VIDEO_GetStandard()
 void VIDEO_SetStandard(u8 standard)
 {
     TW8816_SetVideoStandard(standard);
+}
+
+#endif
+
+#if SUPPORT_MULTI_LANGUAGE
+u16 load_char_font(u32 c)
+{
+    u8 width;
+    u8 font[CHAR_BUF_SIZE];
+    u8 lcdfont[27];
+    int idx;
+
+    char_read(font, c, &width);
+    if (width == 0) {
+        return (u16)'?';
+    }
+
+    for(idx = 0; idx < CHAR_CACHE_SIZE; idx++)
+    {
+        if (loadedchars[idx] == 0) // empty slot
+            break;
+        if (loadedchars[idx] == (u16)c) {
+            return 0x300 + 50 + idx;
+        }
+    }
+
+    if (idx == CHAR_CACHE_SIZE) {
+        printf("Char cache is over");
+        return '~';
+    }
+
+    memset(lcdfont, 0, sizeof(lcdfont));
+
+    u8 *offset = &font[0];
+
+    // convert font to tw8816 format
+    for (int x = 0; x < width; x++)
+    {
+        const u8 *data = offset++;
+        u8 bit = 0;
+        // Data is right aligned, drawn top to bottom
+        for (int y = 3; y < height + 3; ++y)
+        {
+            if (bit == 8) {
+                data = offset++;
+                bit = 0;
+            }
+            if (*data & (1 << bit)) {
+                //there are 3 bytes across, contianing a total of 2 rows
+                int byte = y / 2 * 3 + x / 4;
+                //each byte is  4pixels wide by 2 rows tall
+                int bit = 4 * (y & 1) + 3 - (x & 0x3);
+                lcdfont[byte] |= 1 << bit;
+            }
+            bit++;
+        }
+
+    }
+
+    // load into memory
+    TW8816_LoadFont(lcdfont, 50 + idx, 1);
+    loadedchars[idx] = (u16)c;
+
+    return 0x300 + 50 + idx;
 }
 #endif
