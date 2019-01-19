@@ -18,11 +18,13 @@ sub main {
     my $elffile;
     my $count;
     my $po;
+    my $format = "v2";
 
     $ENV{CROSS} ||= "";
     GetOptions("update" => \$update, "language=s" => \$lang, "fs=s" => \$fs,
         "targets=s" => \$target_list, "count" => \$count, "po" => \$po,
-        "objdir=s" => \$objdir, "elffile=s" => \$elffile);
+        "objdir=s" => \$objdir, "elffile=s" => \$elffile,
+        "format=s" => \$format);
     @requested_targets = split(/,/, $target_list) if($target_list);
     if($fs || @requested_targets) {
         if (! @requested_targets || ! $fs) {
@@ -64,7 +66,7 @@ sub main {
             ? parse_po_file($file, $uniq)
             : parse_v1lang_file($file, $uniq);
         my ($ext) = ($file =~ /[^\/.]+\.([^\/.\s]+)(?:\.po)?$/);
-        write_lang_file("$fs/lang.$ext", $language, $translation);
+        write_lang_file("$fs/lang.$ext", $language, $translation, $format);
     }
 }
 
@@ -158,8 +160,9 @@ sub fnv_16 {
 
 
 sub write_lang_file {
-    my($outf, $language, $translation) = @_;
+    my($outf, $language, $translation, $format) = @_;
     my %strings;
+    my %final;
     my %hashvalues;
     foreach ("DEFAULT", @requested_targets) {
         #Hierarchically try to find best string
@@ -176,14 +179,21 @@ sub write_lang_file {
             exit 1;
         }
         $hashvalues{$hash} = $value;
+        $final{$_} = $value;
     }
 
     open(my $fh, ">", $outf) or die "ERROR: Can't write $outf\n";
     print $fh $language;
-    foreach(sort{$a <=> $b} keys %hashvalues)
-    {
-        print $fh pack("CC", $_ & 0xFF, $_ >> 8);
-        print $fh "$hashvalues{$_}\n";
+    if ($format eq "v2") {
+        foreach(sort{$a <=> $b} keys %hashvalues)
+        {
+            print $fh pack("CC", $_ & 0xFF, $_ >> 8);
+            print $fh "$hashvalues{$_}\n";
+        }
+    } else {
+       foreach (sort keys %final) {
+           print $fh ":$_\n$final{$_}\n";
+       }
     }
     close $fh;
 }
