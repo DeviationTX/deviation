@@ -59,9 +59,15 @@ def main():
                         help="Only lint uncommitted lines (or those from Travis-CI PR)")
     parser.add_argument("--debug", action="store_true",
                         help="Add debug output")
+    parser.add_argument("--skip-github", action="store_true",
+                        help="Don't update GitHub")
     args = parser.parse_args()
     if args.debug:
         logging.basicConfig(level=logging.DEBUG)
+    logging.debug("TRAVIS_PULL_REQUEST:     " + TRAVIS_PULL_REQUEST or "False")
+    logging.debug("TRAVIS_PULL_REQUEST_SHA: " + TRAVIS_PULL_REQUEST_SHA)
+    logging.debug("TRAVIS_BRANCH:           " + TRAVIS_BRANCH)
+    logging.debug("TRAVIS_REPO_SLUG:        " + TRAVIS_REPO_SLUG)
 
     changed = {}
     if args.diff:
@@ -69,7 +75,7 @@ def main():
 
     paths = filter_paths(args.path, changed, pwd)
     violations = run_lint(paths, changed)
-    if GITHUB_TOKEN and TRAVIS_PULL_REQUEST:
+    if GITHUB_TOKEN and TRAVIS_PULL_REQUEST and not args.skip_github:
         update_github_status(violations)
 
 def get_changed_lines():
@@ -77,10 +83,10 @@ def get_changed_lines():
     cmd = ["git", "diff", "--name-only", "--diff-filter", "AM"]
     sha1 = "000000000";
     if TRAVIS_BRANCH:
-        begin = os.environ.get("OVERRIDE_HEAD") or "HEAD"
-        cmd.append("{}..{}".format(begin, TRAVIS_BRANCH))
+        cmd.append("{}..HEAD".format(TRAVIS_BRANCH))
         sha1 = subprocess.check_output(
-            ["git", "rev-parse", "--short=9", TRAVIS_BRANCH]).rstrip()
+            ["git", "rev-parse", "--short=9", "HEAD"]).rstrip()
+        logging.debug("Matching sha1: " + sha1)
     logging.debug("Running: " + " ".join(cmd))
     files = subprocess.check_output(cmd).split("\n")
     for _file in [_f.rstrip() for _f in files]:
