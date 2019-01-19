@@ -53,7 +53,7 @@ use Data::Dumper;
 # Configuration: set these as appropriate for your architecture/project.
 my $debug = 0;
 my $objdump = "arm-none-eabi-objdump";
-my $call_cost = 4;
+my $call_cost = 0;
 
 # First, we need to read all object and corresponding .su files. We're
 # gathering a mapping of functions to callees and functions to frame
@@ -164,17 +164,48 @@ foreach (keys %call_graph) {
     $call_graph{$from} = \%resolved;
 }
 
+#
+# All Page entry functions are called from well-known functions
+#
+foreach (keys %call_graph) {
+	my $from = $_;
+	my $callees = $call_graph{$from};
+	my %resolved;
+
+	if ($from =~ /^PAGE_ChangeByID@/)
+	{
+		foreach (keys %call_graph) {
+			$call_graph{$from}->{$_} = 1 if /^PAGE_.+Init@/;
+			$call_graph{$from}->{$_} = 1 if /^PAGE_.+Exit@/;
+		}
+	}
+
+	if ($from =~ /^PAGE_Exit@/)
+	{
+		foreach (keys %call_graph) {
+			$call_graph{$from}->{$_} = 1 if /^PAGE_.+Exit@/;
+		}
+	}
+
+	if ($from =~ /^PAGE_Event@/)
+	{
+		foreach (keys %call_graph) {
+			$call_graph{$from}->{$_} = 1 if /^PAGE_.+Event@/;
+		}
+	}
+}
+
 # Create fake edges and nodes to account for dynamic behaviour.
 $call_graph{"INTERRUPT"} = {};
 
 foreach (keys %call_graph) {
-    $call_graph{"INTERRUPT"}->{$_} = 1 if /^.+_isr@/;
-    $call_graph{"INTERRUPT"}->{$_} = 1 if /^reset_handler@/;
-    $call_graph{"INTERRUPT"}->{$_} = 1 if /^nmi_handler@/;
-    $call_graph{"INTERRUPT"}->{$_} = 1 if /^hard_fault_handler@/;
-    $call_graph{"INTERRUPT"}->{$_} = 1 if /^sv_call_handler@/;
-    $call_graph{"INTERRUPT"}->{$_} = 1 if /^pend_sv_handler@/;
-    $call_graph{"INTERRUPT"}->{$_} = 1 if /^sys_tick_handler@/;
+	$call_graph{"INTERRUPT"}->{$_} = 1 if /^.+_isr@/;
+	$call_graph{"INTERRUPT"}->{$_} = 1 if /^reset_handler@/;
+	$call_graph{"INTERRUPT"}->{$_} = 1 if /^nmi_handler@/;
+	$call_graph{"INTERRUPT"}->{$_} = 1 if /^hard_fault_handler@/;
+	$call_graph{"INTERRUPT"}->{$_} = 1 if /^sv_call_handler@/;
+	$call_graph{"INTERRUPT"}->{$_} = 1 if /^pend_sv_handler@/;
+	$call_graph{"INTERRUPT"}->{$_} = 1 if /^sys_tick_handler@/;
 }
 
 print "Interrupt routes:\n";
@@ -244,8 +275,9 @@ sub main_cost {
 foreach (keys %call_graph) { trace $_; }
 
 # Now, print results in a nice table.
-printf "  %-30s %8s %8s %8s\n",
+printf "  %-50s %8s %8s %8s\n",
     "Func", "Cost", "Frame", "Height";
+print "------------------------------------";
 print "------------------------------------";
 print "------------------------------------\n";
 
@@ -273,7 +305,7 @@ foreach (sort { $total_cost{$b} <=> $total_cost{$a} } keys %visited) {
 
     if ($ambiguous{$name}) { $name = $_; }
 
-    printf "%s %-30s %8d %8d %8d\n", $tag, $name, $cost,
+    printf "%s %-50s %8d %8d %8d\n", $tag, $name, $cost,
 	$frame_size{$_} || 0, $call_depth{$_};
 }
 
