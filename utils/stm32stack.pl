@@ -199,13 +199,13 @@ foreach (keys %call_graph) {
 $call_graph{"INTERRUPT"} = {};
 
 foreach (keys %call_graph) {
-	$call_graph{"INTERRUPT"}->{$_} = 1 if /^.+_isr@/;
-	$call_graph{"INTERRUPT"}->{$_} = 1 if /^reset_handler@/;
-	$call_graph{"INTERRUPT"}->{$_} = 1 if /^nmi_handler@/;
-	$call_graph{"INTERRUPT"}->{$_} = 1 if /^hard_fault_handler@/;
-	$call_graph{"INTERRUPT"}->{$_} = 1 if /^sv_call_handler@/;
-	$call_graph{"INTERRUPT"}->{$_} = 1 if /^pend_sv_handler@/;
-	$call_graph{"INTERRUPT"}->{$_} = 1 if /^sys_tick_handler@/;
+    $call_graph{"INTERRUPT"}->{$_} = 1 if /^.+_isr@/;
+    $call_graph{"INTERRUPT"}->{$_} = 1 if /^reset_handler@/;
+    $call_graph{"INTERRUPT"}->{$_} = 1 if /^nmi_handler@/;
+    $call_graph{"INTERRUPT"}->{$_} = 1 if /^hard_fault_handler@/;
+    $call_graph{"INTERRUPT"}->{$_} = 1 if /^sv_call_handler@/;
+    $call_graph{"INTERRUPT"}->{$_} = 1 if /^pend_sv_handler@/;
+    $call_graph{"INTERRUPT"}->{$_} = 1 if /^sys_tick_handler@/;
 }
 
 print "Interrupt routes:\n";
