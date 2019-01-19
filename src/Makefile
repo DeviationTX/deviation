@@ -258,7 +258,7 @@ coverity:
 	tar -cvzf coverity-$(HGVERSION).tgz cov-int
 
 lint:
-	../utils/run_linter.pl --diff
+	../utils/run_linter.py --diff
 
 ##########################################
 #Ensure necessary directories are created#
