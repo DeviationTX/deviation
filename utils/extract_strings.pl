@@ -39,7 +39,7 @@ sub main {
         if ($po) {
             print "msgid \"$PO_LANGUAGE_STRING\"\nmsgstr \"\"\n\n";
         }
-        foreach (keys %$uniq) {
+        foreach (@{ $uniq->{__ORDER__} }) {
             if ($po) {
                 # Match same syntax used by getopt
                 print $uniq->{$_}; # Comment
@@ -101,6 +101,7 @@ sub get_strings {
     foreach (`head -n 1 fs/common/template/*.ini`) {
         chomp;
         if(/template=(.*?)\s*$/) {
+            push @{ $strings->{__ORDER__} }, $1 if (! $strings->{$1});
             $strings->{$1} = "#: Model template\n";
         }
     }
@@ -110,12 +111,12 @@ sub get_strings {
 sub extract_all_strings {
     my @lines = `/usr/bin/find . -name "*.[hc]" | grep -v libopencm3 | xargs xgettext -o - --omit-header -k --keyword=_tr --keyword=_tr_noop --no-wrap`;
     my $idx = 0;
-    my %strings;
-    tie(%strings, 'Tie::IxHash');
+    my %strings = (__ORDER__ => [] );  # Crude Tie::IxHash implementation
     #Read all strings and put into a hash that maps the containing file to the string
     while(@lines) {
         my($msgid, $msgstr, $comment) = parse_gettext(\@lines);
         next unless($msgid);
+        push @{ $strings{__ORDER__} }, $msgid if(! defined $strings{$msgid});
         $strings{$msgid} = $comment;
     }
     return \%strings;
@@ -161,6 +162,7 @@ sub extract_target_strings {
             }
         }
     }
+    $strings{__ORDER__} = [ grep { defined $strings{$_} } @{ $valid_strings->{__ORDER__} } ];
     return \%strings;
 }
 
