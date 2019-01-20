@@ -53,7 +53,7 @@ use Data::Dumper;
 # Configuration: set these as appropriate for your architecture/project.
 my $debug = 0;
 my $objdump = "arm-none-eabi-objdump";
-my $call_cost = 4;
+my $call_cost = 0;
 
 # First, we need to read all object and corresponding .su files. We're
 # gathering a mapping of functions to callees and functions to frame
@@ -164,6 +164,7 @@ foreach (keys %call_graph) {
     $call_graph{$from} = \%resolved;
 }
 
+map_page_entry(\%call_graph);
 # Create fake edges and nodes to account for dynamic behaviour.
 $call_graph{"INTERRUPT"} = {};
 
@@ -244,8 +245,9 @@ sub main_cost {
 foreach (keys %call_graph) { trace $_; }
 
 # Now, print results in a nice table.
-printf "  %-30s %8s %8s %8s\n",
+printf "  %-50s %8s %8s %8s\n",
     "Func", "Cost", "Frame", "Height";
+print "------------------------------------";
 print "------------------------------------";
 print "------------------------------------\n";
 
@@ -273,7 +275,7 @@ foreach (sort { $total_cost{$b} <=> $total_cost{$a} } keys %visited) {
 
     if ($ambiguous{$name}) { $name = $_; }
 
-    printf "%s %-30s %8d %8d %8d\n", $tag, $name, $cost,
+    printf "%s %-50s %8d %8d %8d\n", $tag, $name, $cost,
 	$frame_size{$_} || 0, $call_depth{$_};
 }
 
@@ -289,3 +291,28 @@ print "\n";
 
 print "The following functions were not resolved:\n";
 foreach (keys %unresolved) { print "  $_\n"; }
+
+sub map_page_entry {
+    my($call_graph) = @_;
+    #
+    # All Page entry functions are called from well-known functions
+    #
+    my %funcmap = (init => {}, exit => {}, event => {});
+    for (keys %$call_graph) {
+        if(/^PAGE_.+(Init|Exit|Event)\@/) {
+            $funcmap{lc($1)}{$_} = 1;
+        }
+    }
+    for my $from (keys %$call_graph) {
+        if ($from =~ /^PAGE_ChangeByID@/) {
+            $call_graph->{$from} = {%{ $call_graph->{$from} }, %{ $funcmap{init} }, %{ $funcmap{exit} } };
+        }
+        if ($from =~ /^PAGE_Exit@/) {
+            $call_graph->{$from} = {%{ $call_graph->{$from} }, %{ $funcmap{exit} } };
+        }
+        if ($from =~ /^PAGE_Event@/) {
+            $call_graph->{$from} = {%{ $call_graph->{$from} }, %{ $funcmap{event} } };
+        }
+    }
+}
+
