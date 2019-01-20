@@ -67,10 +67,10 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 static void _show_page()
 {
     //PAGE_ShowHeader(_tr("Trim")); // no title for devo10
-    GUI_CreateLabelBox(&gui->inputlbl, 0, 0, TEXTSEL_X, HEADER_HEIGHT, &TITLE_FONT, NULL, NULL, _tr("Input"));
-    GUI_CreateLabelBox(&gui->steplbl, TEXTSEL_X, STEP_Y, TRIMPOS_X - TEXTSEL_X, LINE_HEIGHT, &TITLE_FONT, NULL, NULL, _tr("Step"));
+    GUI_CreateLabelBox(&gui->inputlbl, 0, 0, TEXTSEL_X, HEADER_HEIGHT, &TITLE_FONT, GUI_Localize, NULL, _tr_noop("Input"));
+    GUI_CreateLabelBox(&gui->steplbl, TEXTSEL_X, STEP_Y, TRIMPOS_X - TEXTSEL_X, LINE_HEIGHT, &TITLE_FONT, GUI_Localize, NULL, _tr_noop("Step"));
     // no enought space in Devo10, so just display trim + in the 1st page
-    GUI_CreateLabelBox(&gui->trimposlbl, TRIMPOS_X, STEP_Y, LCD_WIDTH - TRIMPOS_X, LINE_HEIGHT, &TITLE_FONT, NULL, NULL, _tr("Trim +"));
+    GUI_CreateLabelBox(&gui->trimposlbl, TRIMPOS_X, STEP_Y, LCD_WIDTH - TRIMPOS_X, LINE_HEIGHT, &TITLE_FONT, GUI_Localize, NULL, _tr_noop("Trim +"));
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                          LINE_SPACE, NUM_TRIMS, row_cb, getobj_cb, NULL, NULL);
     PAGE_SetScrollable(&gui->scrollable, &current_selected);
@@ -121,7 +121,7 @@ static int row2_cb(int absrow, int relrow, int y, void *data)
             break;
     }
     GUI_CreateLabelBox(&guit->label[relrow], LABEL2_X, y, LABEL2_WIDTH, LINE_HEIGHT,
-            &LABEL_FONT, NULL, NULL, _tr(label));
+            &LABEL_FONT, GUI_Localize, NULL, label);
     GUI_CreateTextSourcePlate(&guit->value[relrow], TEXTSEL2_X, y,
             TEXTSEL2_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT,  NULL, value, input_value, data);
     return 1;
@@ -132,9 +132,9 @@ void PAGE_TrimEditInit(int page)
     struct Trim *trim = MIXER_GetAllTrims();
     tp->index = page;
     tp->trim = trim[tp->index];
-    GUI_CreateLabelBox(&guit->header, 0, 0, LABEL2_WIDTH, HEADER_HEIGHT, &TITLE_FONT, NULL, NULL, _tr("Edit"));
+    GUI_CreateLabelBox(&guit->header, 0, 0, LABEL2_WIDTH, HEADER_HEIGHT, &TITLE_FONT, GUI_Localize, NULL, _tr_noop("Edit"));
     GUI_CreateButtonPlateText(&guit->save, BUTTON2_X, BUTTON2_Y, BUTTON2_WIDTH, LINE_HEIGHT,
-            &BUTTON_FONT, NULL, okcancel_cb, (void *)_tr("Save"));
+            &BUTTON_FONT, GUI_Localize, okcancel_cb, _tr_noop("Save"));
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                          LINE_SPACE, ITEM_LAST, row2_cb, getobj2_cb, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
