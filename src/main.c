@@ -430,7 +430,7 @@ void debug_switches()
             }
         }
         if (changed) { printf("\n"); }
-        if(PWR_CheckPowerSwitch()) PWR_Shutdown(); // extra
+        if(PWR_CheckPowerSwitch()) PWR_Shutdown();
     }
 }
 void debug_buttons()
