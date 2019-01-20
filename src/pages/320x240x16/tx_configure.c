@@ -192,7 +192,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         GUI_CreateLabelBox(&gui3->head3_1, col1, row, col2 + BUTTON_WIDTH - col1, 0, &SECTION_FONT, GUI_Localize, NULL, _tr_noop("Timer settings"));
         row += space;
         if (row+8 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
-        GUI_CreateLabelBox(&gui3->prealertlbl, col1, row, col2 - col1, 0, &LABEL_FONT, NGUI_Localize NULL,  _tr_noop("Prealert time"));
+        GUI_CreateLabelBox(&gui3->prealertlbl, col1, row, col2 - col1, 0, &LABEL_FONT, GUI_Localize, NULL,  _tr_noop("Prealert time"));
         GUI_CreateTextSelect(&gui3->prealert, col2, row, TEXTSELECT_96,NULL, prealert_time_cb, (void *)0L);
         row += space;
         if (row+8 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
@@ -201,7 +201,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
                 &Transmitter.countdown_timer_settings.prealert_interval);
         row += space;
         if (row+8 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
-        GUI_CreateLabelBox(&gui3->timeuplbl, col1, row, col2 - col1, 0, &LABEL_FONT,GUI_LocalizeL, NULL,_tr_noop("Timeup interval"));
+        GUI_CreateLabelBox(&gui3->timeuplbl, col1, row, col2 - col1, 0, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Timeup interval"));
         GUI_CreateTextSelect(&gui3->timeup, col2, row, TEXTSELECT_96, NULL, timer_interval_cb,
                 &Transmitter.countdown_timer_settings.timeup_interval);
         row += space + 3;
