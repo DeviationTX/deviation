@@ -698,7 +698,7 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
                 }
             }
             printf("Unknown Tx power: %s\n", value);
-            m->tx_power = RADIO_TX_POWER_COUNT[m->radio]-1; // default to radio maximum
+            m->tx_power = RADIO_TX_POWER_COUNT[m->radio]-1;  // default to radio maximum
             return 1;
         }
         printf("Unknown Radio Key: %s\n", name);

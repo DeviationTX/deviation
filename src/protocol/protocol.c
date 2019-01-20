@@ -91,8 +91,7 @@ const char * PROTOCOL_GetName(u16 idx)
         return Protocols[idx].name;
 }
 
-enum Radio PROTOCOL_GetRadio(u16 idx)
-{
+enum Radio PROTOCOL_GetRadio(u16 idx) {
     return (enum Radio)get_module(idx);
 }
 
