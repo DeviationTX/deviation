@@ -485,7 +485,7 @@ int GUI_InTouch();
 const char* _GUI_Localize(struct guiObject *obj, const void* str);
 #define GUI_Localize _GUI_Localize
 #else
-#define GUI_LocalizeString NULL
+#define GUI_Localize NULL
 #endif
 
 #endif /* GUI_H_ */
