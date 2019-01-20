@@ -86,7 +86,7 @@ def get_changed_lines():
     cmd = ["git", "diff", "--name-only", "--diff-filter", "AM", base]
     sha1s = ["000000000"];
     # Find all sha's on this branch
-    sha1s += [commit[:9] for commit in system(["git", "rev-list", base + "..HEAD"]).rstrip().split('\n')]
+    sha1s += [commit[:9] for commit in system(["git", "rev-list", base + "..HEAD"]).rstrip().split('\n') if commit]
     logging.debug("Mathing SHA1s: %s", sha1s)
     files = system(cmd).rstrip().split("\n")
     for _file in files:
