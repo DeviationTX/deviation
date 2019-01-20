@@ -1,0 +1,2479 @@
+# Translators:
+# PhracturedBlue <rc2012@pblue.org>, 2019
+# 
+msgid ""
+msgstr ""
+"Last-Translator: PhracturedBlue <rc2012@pblue.org>, 2019\n"
+"Language-Team: Hungarian (https://www.transifex.com/deviationtx/teams/73329/hu/)\n"
+"Language: hu\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "->Translated Language Name<-"
+msgstr "Magyar"
+
+#: inputs.c:35 pages/common/standard/_drexp_page.c:57
+#: pages/common/advanced/_mixer_page.c:63
+msgid "AIL"
+msgstr "AIL"
+
+#: inputs.c:36 pages/common/standard/_drexp_page.c:60
+#: pages/common/advanced/_mixer_page.c:64
+msgid "ELE"
+msgstr "ELE"
+
+#: inputs.c:37
+msgid "THR"
+msgstr "THR"
+
+#: inputs.c:38 pages/common/standard/_drexp_page.c:63
+msgid "RUD"
+msgstr "RUD"
+
+#: inputs.c:39 pages/common/standard/_gyrosense_page.c:61
+msgid "AUX2"
+msgstr "AUX2"
+
+#: inputs.c:40
+msgid "AUX3"
+msgstr "AUX3"
+
+#: inputs.c:41
+msgid "AUX4"
+msgstr "AUX4"
+
+#: inputs.c:42
+msgid "AUX5"
+msgstr "AUX5"
+
+#: inputs.c:43
+msgid "AUX6"
+msgstr "AUX6"
+
+#: inputs.c:44
+msgid "AUX7"
+msgstr "AUX7"
+
+#: inputs.c:45 inputs.c:46
+msgid "DR"
+msgstr "DR"
+
+#: inputs.c:47 inputs.c:48 inputs.c:49
+msgid "RUD DR"
+msgstr "RUD DR"
+
+#: inputs.c:50 inputs.c:51 inputs.c:52
+msgid "ELE DR"
+msgstr "ELE DR"
+
+#: inputs.c:53 inputs.c:54 inputs.c:55
+msgid "AIL DR"
+msgstr "AIL DR"
+
+#: inputs.c:56 inputs.c:57 inputs.c:91 inputs.c:92 inputs.c:93
+#: pages/common/standard/_gyrosense_page.c:59
+#: pages/common/standard/_common_standard.c:38
+msgid "GEAR"
+msgstr "GEAR"
+
+#: inputs.c:58 inputs.c:59 inputs.c:60
+msgid "MIX"
+msgstr "MIX"
+
+#: inputs.c:61 inputs.c:62 inputs.c:63
+msgid "FMODE"
+msgstr "FMODE"
+
+#: inputs.c:64 inputs.c:65
+msgid "HOLD"
+msgstr "HOLD"
+
+#: inputs.c:66 inputs.c:67
+msgid "TRN"
+msgstr "TRN"
+
+#: inputs.c:68 inputs.c:69 inputs.c:70
+msgid "SW A"
+msgstr "SW A"
+
+#: inputs.c:71 inputs.c:72 inputs.c:73
+msgid "SW B"
+msgstr "SW B"
+
+#: inputs.c:74 inputs.c:75 inputs.c:76
+msgid "SW C"
+msgstr "SW C"
+
+#: inputs.c:77 inputs.c:78 inputs.c:79
+msgid "SW D"
+msgstr "SW D"
+
+#: inputs.c:80 inputs.c:81 inputs.c:82
+msgid "SW E"
+msgstr "SW E"
+
+#: inputs.c:83 inputs.c:84
+msgid "SW F"
+msgstr "SW F"
+
+#: inputs.c:85 inputs.c:86 inputs.c:87
+msgid "SW G"
+msgstr "SW G"
+
+#: inputs.c:88 inputs.c:89
+msgid "SW H"
+msgstr "SW H"
+
+#: inputs.c:95
+msgid "TRIMLV-"
+msgstr "TRIM_BF-"
+
+#: inputs.c:96
+msgid "TRIMLV+"
+msgstr "TRIM_BF+"
+
+#: inputs.c:97
+msgid "TRIMRV-"
+msgstr "TRIM_JF-"
+
+#: inputs.c:98
+msgid "TRIMRV+"
+msgstr "TRIM_JF+"
+
+#: inputs.c:99
+msgid "TRIMLH-"
+msgstr "TRIM_BV-"
+
+#: inputs.c:100
+msgid "TRIMLH+"
+msgstr "TRIM_BV+"
+
+#: inputs.c:101
+msgid "TRIMRH-"
+msgstr "TRIM_JV-"
+
+#: inputs.c:102
+msgid "TRIMRH+"
+msgstr "TRIM_JV+"
+
+#: inputs.c:103
+msgid "TRIM_L-"
+msgstr "TRIM_B-"
+
+#: inputs.c:104
+msgid "TRIM_L+"
+msgstr "TRIM_B+"
+
+#: inputs.c:105
+msgid "TRIM_R-"
+msgstr "TRIM_J-"
+
+#: inputs.c:106
+msgid "TRIM_R+"
+msgstr "TRIM_J+"
+
+#: inputs.c:107
+msgid "Left"
+msgstr "Bal"
+
+#: inputs.c:108
+msgid "Right"
+msgstr "Jobb"
+
+#: inputs.c:109 pages/320x240x16/standard/traveladj_page.c:68
+#: pages/128x64x1/standard/traveladj_page.c:61
+msgid "Down"
+msgstr "Le"
+
+#: inputs.c:110 pages/320x240x16/standard/traveladj_page.c:69
+#: pages/128x64x1/reorder_list.c:38
+#: pages/128x64x1/standard/traveladj_page.c:62
+msgid "Up"
+msgstr "Fel"
+
+#: inputs.c:111
+msgid "Enter"
+msgstr "Enter"
+
+#: inputs.c:112
+msgid "Exit"
+msgstr "Exit"
+
+#: inputs.c:115
+msgid "RIGHT_H"
+msgstr "JOBB_V"
+
+#: inputs.c:116
+msgid "LEFT_V"
+msgstr "BAL_F"
+
+#: inputs.c:117
+msgid "RIGHT_V"
+msgstr "JOBB_F"
+
+#: inputs.c:118
+msgid "LEFT_H"
+msgstr "BAL_V"
+
+#: inputs.c:144 inputs.c:257 telemetry/telem_crsf.c:80
+#: telemetry/telem_frsky.c:58 telemetry/telem_dsm.c:261
+#: telemetry/telem_devo.c:76 protocol/protocol.c:89 mixer.c:873 mixer.c:887
+#: pages/common/_pages.c:152 pages/common/_voiceconfig_page.c:185
+#: pages/common/_model_page.c:221 pages/common/_model_page.c:274
+#: pages/common/standard/_failsafe_page.c:33
+#: pages/common/standard/_reverse_page.c:21
+#: pages/common/standard/_swash_page.c:65 pages/common/_trim_page.c:56
+#: pages/common/_trim_page.c:74 pages/common/advanced/_mixer_setup.c:400
+#: pages/common/_model_config.c:132 pages/common/_main_config.c:177
+#: pages/common/_main_config.c:181 pages/320x240x16/trim_page.c:46
+#: pages/320x240x16/model_page.c:99 pages/320x240x16/datalog_page.c:92
+#: pages/128x64x1/model_page.c:158 pages/128x64x1/datalog_page.c:79
+msgid "None"
+msgstr "Nincs"
+
+#: inputs.c:154 pages/common/standard/_gyrosense_page.c:59
+#: pages/common/standard/_gyrosense_page.c:61
+msgid "Ch"
+msgstr "Cs"
+
+#: inputs.c:160 pages/320x240x16/chantest_page.c:219
+msgid "Virt"
+msgstr "Virt."
+
+#: inputs.c:163
+msgid "PPM"
+msgstr "PPM"
+
+#: telemetry/telem_crsf.c:81
+msgid "tx SNR"
+msgstr ""
+
+#: telemetry/telem_crsf.c:82
+msgid "txRSSI"
+msgstr ""
+
+#: telemetry/telem_crsf.c:83
+msgid "rx SNR"
+msgstr ""
+
+#: telemetry/telem_crsf.c:86
+msgid "FMode"
+msgstr ""
+
+#: telemetry/telem_crsf.c:87
+msgid "RFMode"
+msgstr ""
+
+#: telemetry/telem_crsf.c:88
+msgid "ANT"
+msgstr ""
+
+#: telemetry/telem_crsf.c:89
+msgid "Power"
+msgstr ""
+
+#: telemetry/telem_crsf.c:90
+msgid "rxQual"
+msgstr ""
+
+#: telemetry/telem_crsf.c:91
+msgid "txQual"
+msgstr ""
+
+#: telemetry/telem_crsf.c:92 telemetry/telem_frsky.c:64
+#: telemetry/telem_frsky.c:70 telemetry/telem_dsm.c:192
+#: telemetry/telem_devo.c:79 pages/128x64x1/telemtest_page.c:340
+msgid "Volt"
+msgstr "Fesz."
+
+#: telemetry/telem_crsf.c:93
+msgid "Curr"
+msgstr ""
+
+#: telemetry/telem_crsf.c:94
+msgid "Cap"
+msgstr ""
+
+#: telemetry/telem_crsf.c:95
+msgid "Pitch"
+msgstr ""
+
+#: telemetry/telem_crsf.c:96
+msgid "Roll"
+msgstr ""
+
+#: telemetry/telem_crsf.c:97
+msgid "Yaw"
+msgstr ""
+
+#: telemetry/telem_crsf.c:106
+msgid "Flight Mode"
+msgstr ""
+
+#: telemetry/telem_crsf.c:107
+msgid "RF Mode"
+msgstr ""
+
+#: telemetry/telem_crsf.c:108
+msgid "Antenna"
+msgstr ""
+
+#: telemetry/telem_crsf.c:109
+msgid "rx Quality"
+msgstr ""
+
+#: telemetry/telem_crsf.c:110
+msgid "tx Quality"
+msgstr ""
+
+#: telemetry/telem_crsf.c:111
+msgid "Capacity"
+msgstr ""
+
+#: telemetry/telem_frsky.c:66 telemetry/telem_dsm.c:213
+msgid "RSSI"
+msgstr "RSSI"
+
+#: telemetry/telem_frsky.c:67
+msgid "LRSSI"
+msgstr "LRSSI"
+
+#: telemetry/telem_frsky.c:68
+msgid "LQI"
+msgstr "LQI"
+
+#: telemetry/telem_frsky.c:70 telemetry/telem_frsky.c:83
+#: telemetry/telem_dsm.c:201
+msgid "Amps"
+msgstr "Áram"
+
+#: telemetry/telem_frsky.c:71
+msgid "MinCell"
+msgstr "Min. cella"
+
+#: telemetry/telem_frsky.c:72
+msgid "AllCell"
+msgstr "Össz. cella"
+
+#: telemetry/telem_frsky.c:79 telemetry/telem_dsm.c:194
+#: telemetry/telem_devo.c:81 pages/128x64x1/telemtest_page.c:341
+msgid "RPM"
+msgstr "Ford."
+
+#: telemetry/telem_frsky.c:81 telemetry/telem_dsm.c:193
+#: telemetry/telem_devo.c:85 pages/128x64x1/telemtest_page.c:339
+msgid "Temp"
+msgstr "Hőm."
+
+#: telemetry/telem_frsky.c:82
+msgid "Fuel"
+msgstr "Üzemany."
+
+#: telemetry/telem_frsky.c:84
+msgid "Alt"
+msgstr "Magas."
+
+#: telemetry/telem_frsky.c:85
+msgid "VSI"
+msgstr "VSI"
+
+#: telemetry/telem_frsky.c:86
+msgid "DIS"
+msgstr "DIS"
+
+#: telemetry/telem_frsky.c:101 telemetry/telem_frsky.c:108
+#: telemetry/telem_devo.c:55
+msgid "TelemV"
+msgstr "TelemFesz"
+
+#: telemetry/telem_frsky.c:104
+msgid "TelemRSSI"
+msgstr "TelemRSSI"
+
+#: telemetry/telem_frsky.c:108
+msgid "Amp"
+msgstr "Áram"
+
+#: telemetry/telem_frsky.c:112 telemetry/telem_devo.c:61
+msgid "TelemT"
+msgstr "TelemHőm"
+
+#: telemetry/telem_frsky.c:115 telemetry/telem_devo.c:65
+msgid "TelemRPM"
+msgstr "TelemFord"
+
+#: telemetry/telem_dsm.c:147 protocol/devo_cyrf6936.c:54
+#: protocol/cg023_nrf24l01.c:60 protocol/bayang_nrf24l01.c:100
+#: protocol/inav_nrf24l01.c:182 protocol/fy326_nrf24l01.c:59
+#: protocol/hubsan_a7105.c:126 protocol/kn_nrf24l01.c:172
+#: protocol/dsm2_cyrf6936.c:49 protocol/dsm2_cyrf6936.c:52
+#: protocol/dsm2_cyrf6936.c:53 protocol/symax_nrf24l01.c:109
+#: protocol/frsky2way_cc2500.c:40 protocol/yd717_nrf24l01.c:111
+#: pages/common/standard/_curves_page.c:109
+#: pages/common/standard/_throhold_page.c:40 pages/common/_tx_configure.c:376
+#: pages/320x240x16/usb_page.c:39 pages/320x240x16/usb_page.c:41
+#: pages/128x64x1/scanner_page.c:29 pages/128x64x1/tx_configure.c:248
+#: pages/128x64x1/datalog_page.c:56 pages/128x64x1/usb_page.c:39
+msgid "On"
+msgstr "Be"
+
+#: telemetry/telem_dsm.c:195 telemetry/telem_dsm.c:196
+#: telemetry/telem_dsm.c:197 telemetry/telem_dsm.c:198
+msgid "Fades"
+msgstr "Eltűnés"
+
+#: telemetry/telem_dsm.c:199
+msgid "Loss"
+msgstr "Vesztés"
+
+#: telemetry/telem_dsm.c:200
+msgid "Holds"
+msgstr "Tartás"
+
+#: telemetry/telem_dsm.c:202
+msgid "AirSpd"
+msgstr "Légseb."
+
+#: telemetry/telem_dsm.c:203
+msgid "Alt."
+msgstr "Magas."
+
+#: telemetry/telem_dsm.c:204
+msgid "Alt.max"
+msgstr "Max magas."
+
+#: telemetry/telem_dsm.c:262
+msgid "RxV"
+msgstr "RxV"
+
+#: telemetry/telem_dsm.c:263
+msgid "Bat"
+msgstr "Telep"
+
+#: datalog.c:57
+msgid "1 sec"
+msgstr "1 mp"
+
+#: datalog.c:58
+msgid "5 sec"
+msgstr "5 mp"
+
+#: datalog.c:59
+msgid "10 sec"
+msgstr "10 mp"
+
+#: datalog.c:60
+msgid "30 sec"
+msgstr "30 mp"
+
+#: datalog.c:61
+msgid "60 sec"
+msgstr "60 mp"
+
+#: datalog.c:70
+msgid "RTC Time"
+msgstr "Idő"
+
+#: datalog.c:74
+msgid "GPS Time"
+msgstr "GPS idő"
+
+#: datalog.c:76
+msgid "GPS Coords"
+msgstr "GPS koord."
+
+#: datalog.c:78
+msgid "GPS Alt."
+msgstr "GPS magas."
+
+#: datalog.c:80
+msgid "GPS Speed"
+msgstr "GPS sebes."
+
+#: protocol/h8_3d_nrf24l01.c:63 protocol/mt99xx_nrf24l01.c:127
+#: protocol/bayang_nrf24l01.c:101 protocol/v202_nrf24l01.c:127
+#: protocol/fy326_nrf24l01.c:58 protocol/hisky_nrf24l01.c:73
+#: protocol/fq777_nrf24l01.c:83 protocol/cx10_nrf24l01.c:69
+#: protocol/slt_nrf24l01.c:85 protocol/hontai_nrf24l01.c:62
+#: protocol/hubsan_a7105.c:124 protocol/q303_nrf24l01.c:76
+#: protocol/frskyx_cc2500.c:45 protocol/hitec_cc2500.c:62
+#: protocol/kn_nrf24l01.c:171 protocol/corona_cc2500.c:41
+#: protocol/mjxq_nrf24l01.c:60 protocol/yd717_nrf24l01.c:108
+msgid "Format"
+msgstr "Formátum"
+
+#: protocol/devo_cyrf6936.c:54 protocol/bayang_nrf24l01.c:100
+#: protocol/inav_nrf24l01.c:182 protocol/cflie_nrf24l01.c:200
+#: protocol/hubsan_a7105.c:126 protocol/dsm2_cyrf6936.c:49
+#: protocol/frsky2way_cc2500.c:40 protocol/yd717_nrf24l01.c:111
+#: pages/common/_pages.c:110 pages/common/_pages.c:117
+msgid "Telemetry"
+msgstr "Telemetria"
+
+#: protocol/devo_cyrf6936.c:54 protocol/cg023_nrf24l01.c:60
+#: protocol/bayang_nrf24l01.c:100 protocol/inav_nrf24l01.c:182
+#: protocol/flysky_a7105.c:48 protocol/fy326_nrf24l01.c:59
+#: protocol/cflie_nrf24l01.c:200 protocol/hubsan_a7105.c:126
+#: protocol/kn_nrf24l01.c:172 protocol/dsm2_cyrf6936.c:49
+#: protocol/dsm2_cyrf6936.c:52 protocol/dsm2_cyrf6936.c:53
+#: protocol/symax_nrf24l01.c:109 protocol/frsky2way_cc2500.c:40
+#: protocol/yd717_nrf24l01.c:111 pages/common/standard/_failsafe_page.c:36
+#: pages/common/standard/_curves_page.c:111
+#: pages/common/standard/_throhold_page.c:44
+#: pages/common/standard/_throhold_page.c:55
+#: pages/common/advanced/_mixer_limits.c:189 pages/common/_tx_configure.c:198
+#: pages/common/_tx_configure.c:212 pages/common/_tx_configure.c:231
+#: pages/common/_tx_configure.c:250 pages/common/_tx_configure.c:265
+#: pages/common/_tx_configure.c:278 pages/common/_tx_configure.c:305
+#: pages/common/_tx_configure.c:374 pages/common/_tx_configure.c:390
+#: pages/common/_tx_configure.c:412 pages/320x240x16/usb_page.c:39
+#: pages/320x240x16/usb_page.c:41 pages/128x64x1/scanner_page.c:29
+#: pages/128x64x1/tx_configure.c:236 pages/128x64x1/tx_configure.c:246
+#: pages/128x64x1/datalog_page.c:57 pages/128x64x1/usb_page.c:39
+msgid "Off"
+msgstr "Ki"
+
+#: protocol/bugs3_a7105.c:244 protocol/hubsan_a7105.c:127
+#: protocol/flysky_afhds2a_a7105.c:80 protocol/joysway_a7105.c:55
+msgid "Freq Tune"
+msgstr "Frekv. hang."
+
+#: protocol/bayang_nrf24l01.c:101
+msgid "regular"
+msgstr "szokásos"
+
+#: protocol/bugs3mini_nrf24l01.c:133
+msgid "RX Id"
+msgstr ""
+
+#: protocol/frsky1way_cc2500.c:40 protocol/frskyx_cc2500.c:44
+#: protocol/hitec_cc2500.c:63 protocol/corona_cc2500.c:42
+#: protocol/sfhss_cc2500.c:42 protocol/frsky2way_cc2500.c:41
+msgid "Freq-Fine"
+msgstr "Frekv. finom"
+
+#: protocol/frsky1way_cc2500.c:41 protocol/sfhss_cc2500.c:43
+#: protocol/frsky2way_cc2500.c:42
+msgid "Freq-Coarse"
+msgstr "Frekv. durva"
+
+#: protocol/v202_nrf24l01.c:128 protocol/kn_nrf24l01.c:169
+#: protocol/esky150_nrf24l01.c:150
+msgid "Re-bind"
+msgstr "Csatol"
+
+#: protocol/v202_nrf24l01.c:128 protocol/v202_nrf24l01.c:129
+#: protocol/v202_nrf24l01.c:131 protocol/kn_nrf24l01.c:169
+#: protocol/kn_nrf24l01.c:170 protocol/dsm2_cyrf6936.c:50
+#: protocol/esky150_nrf24l01.c:150 protocol/yd717_nrf24l01.c:109
+#: pages/common/advanced/_mixer_curves.c:157
+msgid "No"
+msgstr "Nem"
+
+#: protocol/v202_nrf24l01.c:128 protocol/v202_nrf24l01.c:129
+#: protocol/v202_nrf24l01.c:131 protocol/kn_nrf24l01.c:169
+#: protocol/kn_nrf24l01.c:170 protocol/dsm2_cyrf6936.c:50
+#: protocol/esky150_nrf24l01.c:150 protocol/yd717_nrf24l01.c:109
+#: pages/common/advanced/_mixer_curves.c:157
+msgid "Yes"
+msgstr "Igen"
+
+#: protocol/v202_nrf24l01.c:129
+msgid "250kbps"
+msgstr "250kbps"
+
+#: protocol/v202_nrf24l01.c:131
+msgid "Blink"
+msgstr "Villogás"
+
+#: protocol/fy326_nrf24l01.c:59
+msgid "Expert"
+msgstr "Haladó"
+
+#: protocol/cflie_nrf24l01.c:200
+msgid "ACKPKT"
+msgstr "ACKPKT"
+
+#: protocol/cflie_nrf24l01.c:200
+msgid "CRTPLOG"
+msgstr "CRTPLOG"
+
+#: protocol/cflie_nrf24l01.c:201
+msgid "CRTP Mode"
+msgstr "CRTP mód"
+
+#: protocol/cflie_nrf24l01.c:201
+msgid "RPYT"
+msgstr "RPYT"
+
+#: protocol/cflie_nrf24l01.c:201
+msgid "CPPM"
+msgstr "CPPM"
+
+#: protocol/hisky_nrf24l01.c:73 pages/common/_model_page.c:181
+#: pages/common/_model_loadsave.c:114 pages/128x64x1/model_page.c:51
+msgid "Default"
+msgstr "Default"
+
+#: protocol/sbus_uart.c:36
+msgid "Period (ms)"
+msgstr ""
+
+#: protocol/cx10_nrf24l01.c:69
+msgid "Green"
+msgstr "Zöld"
+
+#: protocol/cx10_nrf24l01.c:69
+msgid "Blue-A"
+msgstr "Kék-A"
+
+#: protocol/wk2x01.c:79
+msgid "Chan mode"
+msgstr "Csat. mód"
+
+#: protocol/wk2x01.c:79
+msgid "5+1"
+msgstr "5+1"
+
+#: protocol/wk2x01.c:79 pages/128x64x1/model_page.c:38
+msgid "Heli"
+msgstr "Heli"
+
+#: protocol/wk2x01.c:79
+msgid "6+1"
+msgstr "6+1"
+
+#: protocol/wk2x01.c:80 pages/320x240x16/model_config.c:50
+#: pages/128x64x1/model_config.c:69
+msgid "COL Inv"
+msgstr ""
+"Kollektív inv.\n"
+"devo10:Koll. inv."
+
+#: protocol/wk2x01.c:80 pages/common/standard/_common_standard.c:67
+#: pages/common/standard/_reverse_page.c:28
+#: pages/common/advanced/_mixer_limits.c:208 pages/common/_model_config.c:36
+msgid "Normal"
+msgstr "Normál"
+
+#: protocol/wk2x01.c:80 pages/common/_model_config.c:37
+msgid "Inverted"
+msgstr "Inverz"
+
+#: protocol/wk2x01.c:81
+msgid "COL Limit"
+msgstr "Koll. limit"
+
+#: protocol/hubsan_a7105.c:125
+msgid "vTX MHz"
+msgstr "vTX MHz"
+
+#: protocol/flysky_afhds2a_a7105.c:77
+msgid "Outputs"
+msgstr "Kimentek"
+
+#: protocol/flysky_afhds2a_a7105.c:78
+msgid "Servo Hz"
+msgstr "Szervó Hz"
+
+#: protocol/flysky_afhds2a_a7105.c:79
+msgid "LQI output"
+msgstr "LQI kimenet"
+
+#: protocol/frskyx_cc2500.c:42 protocol/pxxout.c:48
+msgid "Failsafe"
+msgstr "Hibaérték"
+
+#: protocol/frskyx_cc2500.c:43 protocol/frsky2way_cc2500.c:43
+msgid "AD2GAIN"
+msgstr "AD2GAIN"
+
+#: protocol/frskyx_cc2500.c:46 protocol/frsky2way_cc2500.c:44
+msgid "RSSIChan"
+msgstr "RSSI cs."
+
+#: protocol/frskyx_cc2500.c:47
+msgid "S.PORT Out"
+msgstr "S.PORT ki"
+
+#: protocol/frskyx_cc2500.c:47
+msgid "Disabled"
+msgstr "Letiltva"
+
+#: protocol/frskyx_cc2500.c:47 pages/320x240x16/standard/curves_page.c:127
+msgid "Enabled"
+msgstr "Engedélyezett"
+
+#: protocol/ppmout.c:39 pages/320x240x16/model_config.c:103
+#: pages/128x64x1/model_config.c:139
+msgid "Center PW"
+msgstr ""
+"Közép imp. hossz\n"
+"devo10:Közép imp."
+
+#: protocol/ppmout.c:40 pages/320x240x16/model_config.c:106
+#: pages/128x64x1/model_config.c:143
+msgid "Delta PW"
+msgstr ""
+"Impulzus kitérés\n"
+"devo10:Kitérés"
+
+#: protocol/ppmout.c:41
+msgid "Notch PW"
+msgstr ""
+"Szünet hossz\n"
+"devo10:Szünet"
+
+#: protocol/ppmout.c:42
+msgid "Frame Size"
+msgstr ""
+"Keret hossza\n"
+"devo10:Keret"
+
+#: protocol/kn_nrf24l01.c:170
+msgid "1Mbps"
+msgstr "1Mbps"
+
+#: protocol/kn_nrf24l01.c:172
+msgid "DynTrim"
+msgstr "Din. trim"
+
+#: protocol/pxxout.c:49
+msgid "Country"
+msgstr ""
+
+#: protocol/pxxout.c:50
+msgid "Rx PWM out"
+msgstr ""
+
+#: protocol/pxxout.c:51
+msgid "Rx Telem"
+msgstr ""
+
+#: protocol/dsm2_cyrf6936.c:50
+msgid "OrangeRx"
+msgstr "OrangeRx"
+
+#: protocol/dsm2_cyrf6936.c:52
+msgid "HighSpeed"
+msgstr "Gyors"
+
+#: protocol/dsm2_cyrf6936.c:53
+msgid "F.Log filter"
+msgstr "Napló szűrés"
+
+#: protocol/yd717_nrf24l01.c:109
+msgid "USE A.ACK"
+msgstr "Auto ACK"
+
+#: tests/test_language.c:23 tests/test_language.c:45
+msgid "ok1"
+msgstr ""
+
+#: tests/test_language.c:43
+msgid "test"
+msgstr ""
+
+#: tests/test_language.c:44
+msgid "ok"
+msgstr ""
+
+#: curves.c:221
+msgid "1-to-1"
+msgstr "1 az 1"
+
+#: curves.c:222
+msgid "Fixed"
+msgstr "Fix"
+
+#: curves.c:223
+msgid "Min/Max"
+msgstr "Min/Max"
+
+#: curves.c:224
+msgid "Zero/Max"
+msgstr "Nulla/Max"
+
+#: curves.c:227
+msgid "ABSVAL"
+msgstr "ABSZ.É."
+
+#: curves.c:228
+#, c-format
+msgid "EXPO %d"
+msgstr "EXP. %d"
+
+#: curves.c:229
+msgid "Deadband"
+msgstr "Holtsáv"
+
+#: curves.c:230
+msgid "3 Point"
+msgstr "3 pont"
+
+#: curves.c:231
+msgid "5 Point"
+msgstr "5 pont"
+
+#: curves.c:232
+msgid "7 Point"
+msgstr "7 pont"
+
+#: curves.c:233
+msgid "9 Point"
+msgstr "9 pont"
+
+#: curves.c:234
+msgid "11 Point"
+msgstr "11 pont"
+
+#: curves.c:235
+msgid "13 Point"
+msgstr "13 pont"
+
+#: curves.c:237 mixer.c:880 pages/common/_lang_select.c:29
+#: pages/common/_lang_select.c:59 pages/common/_model_loadsave.c:111
+#: pages/common/_model_loadsave.c:116 pages/common/_model_loadsave.c:123
+#: pages/320x240x16/rtc_config.c:163
+msgid "Unknown"
+msgstr "Ismeretlen"
+
+#: screen/text/lcd_gfx.c:234 screen/text/lcd_gfx.c:236
+msgid ""
+"Deviation\n"
+"   USB"
+msgstr ""
+"Deviation\n"
+"   USB"
+
+#: rtc.c:303 pages/320x240x16/tx_configure.c:127
+msgid "Clock"
+msgstr "Óra"
+
+#: rtc.c:303
+msgid "Date"
+msgstr "Dátum"
+
+#: gui/dialog.c:154 pages/320x240x16/pages.c:160
+msgid "Ok"
+msgstr "Ok"
+
+#: gui/dialog.c:160 pages/320x240x16/pages.c:160
+msgid "Cancel"
+msgstr "Mégsem"
+
+#: telemetry.c:247
+msgid "Longitude"
+msgstr "Hosszúság"
+
+#: telemetry.c:248
+msgid "Latitude"
+msgstr "Szélesség"
+
+#: telemetry.c:249
+msgid "Altitude"
+msgstr "Magasság"
+
+#: telemetry.c:250 pages/320x240x16/advanced/mixer_limits.c:68
+#: pages/128x64x1/advanced/mixer_limits.c:99
+msgid "Speed"
+msgstr "Sebesség"
+
+#: telemetry.c:251
+msgid "Time"
+msgstr "Idő"
+
+#: telemetry.c:252
+msgid "SatCount"
+msgstr "Műholdak"
+
+#: telemetry.c:253
+msgid "Heading"
+msgstr "Irány"
+
+#: mixer.c:874
+msgid "Simple"
+msgstr ""
+"Egyszerű\n"
+"devo10:Egysz."
+
+#: mixer.c:875
+msgid "Expo&DR"
+msgstr "Expó+DR"
+
+#: mixer.c:876
+msgid "Complex"
+msgstr "Komplex"
+
+#: mixer.c:877
+msgid "Cyclic1"
+msgstr "Ciklikus1"
+
+#: mixer.c:878
+msgid "Cyclic2"
+msgstr "Ciklikus2"
+
+#: mixer.c:879
+msgid "Cyclic3"
+msgstr "Ciklikus3"
+
+#: timer.c:52
+msgid "Timer"
+msgstr "Időzítő"
+
+#: mixer_standard.c:169
+msgid "Advanced"
+msgstr "Haladó"
+
+#: mixer_standard.c:169
+msgid "Standard"
+msgstr "Szokásos"
+
+#: pages/common/_datalog_page.c:63 pages/common/_model_page.c:300
+#: pages/320x240x16/timer_page.c:60 pages/128x64x1/timer_page.c:62
+msgid "Reset"
+msgstr "Törlés"
+
+#: pages/common/_main_layout.c:49 pages/common/_main_config.c:91
+#: pages/320x240x16/main_layout.c:290
+msgid "Model"
+msgstr "Modell"
+
+#: pages/common/_pages.c:112
+msgid "is not supported"
+msgstr "nem támogatott"
+
+#: pages/common/_pages.c:119
+msgid "is turned off"
+msgstr "ki van kapcsolva"
+
+#: pages/common/_telemconfig_page.c:32
+msgid "Alarm"
+msgstr "Riasztás"
+
+#: pages/common/_voiceconfig_page.c:64
+msgid "up"
+msgstr "fel"
+
+#: pages/common/_voiceconfig_page.c:69
+msgid "down"
+msgstr "le"
+
+#: pages/common/_voiceconfig_page.c:74
+#, c-format
+msgid "Timer %d"
+msgstr "Időzítő %d"
+
+#: pages/common/_voiceconfig_page.c:78
+#, c-format
+msgid "Telem %d"
+msgstr "Telem. %d"
+
+#: pages/common/_model_page.c:83
+msgid "Re-Init"
+msgstr "Csatol"
+
+#: pages/common/_model_page.c:83
+msgid "Bind"
+msgstr "Csatol"
+
+#: pages/common/_model_page.c:223
+#: pages/320x240x16/standard/gyrosense_page.c:64
+#: pages/128x64x1/standard/gyrosense_page.c:57
+msgid "Channel"
+msgstr "Csatorna"
+
+#: pages/common/_model_page.c:225
+msgid "Stick"
+msgstr "Bot"
+
+#: pages/common/_model_page.c:227
+msgid "Extend"
+msgstr "Kiterj."
+
+#: pages/common/_model_page.c:294
+msgid "Load..."
+msgstr "Betöltés..."
+
+#: pages/common/_model_page.c:296
+msgid "Copy To..."
+msgstr "Másolás..."
+
+#: pages/common/_model_page.c:298
+msgid "Template.."
+msgstr "Sablon..."
+
+#: pages/common/_chantest_page.c:36
+msgid "Touch to Unlock"
+msgstr "Érintse meg a feloldáshoz"
+
+#: pages/common/_chantest_page.c:38
+msgid "Touch to Lock"
+msgstr "Érintse meg a zároláshoz"
+
+#: pages/common/_dialogs.c:78
+#, c-format
+msgid " is %d%%, safe value = %d%%\n"
+msgstr " = %d%%, a biztonságos érték = %d%%\n"
+
+#: pages/common/_dialogs.c:80
+#, c-format
+msgid ""
+" is %d%%,\n"
+"safe value = %d%%"
+msgstr ""
+" = %d%%,\n"
+"a biztonságos érték = %d%%\n"
+
+#: pages/common/_dialogs.c:131
+#, c-format
+msgid ""
+"Do you really want\n"
+"to reset the\n"
+" permanent timer %d?"
+msgstr ""
+"Valóban nullázni\n"
+"akarja az üzemidő\n"
+"időzítő %d-t?"
+
+#: pages/common/standard/_gyrosense_page.c:27
+#: pages/320x240x16/advanced/mixer_curves.c:51
+#: pages/128x64x1/advanced/mixer_curves.c:83
+msgid "Value"
+msgstr "Érték"
+
+#: pages/common/standard/_drexp_page.c:89
+#, c-format
+msgid "Position %d"
+msgstr "Pozíció %d"
+
+#: pages/common/standard/_drexp_page.c:106
+msgid "LIN"
+msgstr "LIN"
+
+#: pages/common/standard/_common_standard.c:40
+msgid "PIT"
+msgstr "PIT"
+
+#: pages/common/standard/_common_standard.c:69
+msgid "Idle Up 1"
+msgstr "Alapjárat 1"
+
+#: pages/common/standard/_common_standard.c:72
+msgid "Idle Up 2"
+msgstr "Alapjárat 2"
+
+#: pages/common/standard/_common_standard.c:74
+#: pages/320x240x16/standard/throhold_page.c:49
+#: pages/320x240x16/standard/switchassign_page.c:51
+#: pages/128x64x1/standard/throhold_page.c:41
+#: pages/128x64x1/standard/switchassign_page.c:45
+msgid "Thr hold"
+msgstr "Gáz kapcs."
+
+#: pages/common/standard/_reverse_page.c:28
+#: pages/common/advanced/_mixer_limits.c:208
+msgid "Reversed"
+msgstr "Inverz"
+
+#: pages/common/standard/_swash_page.c:41
+#: pages/common/standard/_swash_page.c:44
+#: pages/common/standard/_swash_page.c:47
+#: pages/common/standard/_swash_page.c:50
+#: pages/common/standard/_swash_page.c:53
+msgid "Servo"
+msgstr "Szervó"
+
+#: pages/common/_timer_page.c:54
+msgid "Control"
+msgstr "Kontroll"
+
+#: pages/common/_timer_page.c:56 pages/320x240x16/trim_page.c:113
+#: pages/320x240x16/standard/curves_page.c:57
+#: pages/320x240x16/advanced/mixer_setup.c:145 pages/128x64x1/trim_page.c:119
+#: pages/128x64x1/advanced/mixer_setup.c:149
+msgid "Switch"
+msgstr "Kapcsoló"
+
+#: pages/common/_timer_page.c:74
+msgid "stopwatch"
+msgstr "Stopper"
+
+#: pages/common/_timer_page.c:75
+msgid "stop-prop"
+msgstr "Gázf. stop."
+
+#: pages/common/_timer_page.c:76
+msgid "countdown"
+msgstr "Időzítő"
+
+#: pages/common/_timer_page.c:77
+msgid "cntdn-prop"
+msgstr "Gázf. időz."
+
+#: pages/common/_timer_page.c:78
+msgid "permanent"
+msgstr "Üzemidő"
+
+#: pages/common/_timer_page.c:138
+#, c-format
+msgid "Timer%d"
+msgstr "Időzítő %d"
+
+#: pages/common/_timer_page.c:192
+msgid "Set to"
+msgstr "Beállít"
+
+#: pages/common/_trim_page.c:102
+msgid "Momentary"
+msgstr "Pillanat k."
+
+#: pages/common/_trim_page.c:105 pages/common/_main_config.c:87
+#: pages/128x64x1/main_config.c:96
+msgid "Toggle"
+msgstr "Kapcs. "
+
+#: pages/common/_trim_page.c:108
+msgid "On/Off"
+msgstr "Ki/Be"
+
+#: pages/common/_trim_page.c:111
+msgid "3 Pos"
+msgstr "3 állású"
+
+#: pages/common/advanced/_mixer_limits.c:133
+#: pages/common/advanced/_mixer_setup.c:596
+#, c-format
+msgid "Scale%s"
+msgstr "Skála%s"
+
+#: pages/common/advanced/_mixer_curves.c:137
+msgid "Symmetric"
+msgstr "Szimmetr."
+
+#: pages/common/advanced/_mixer_curves.c:138
+msgid "Pos"
+msgstr "Poz."
+
+#: pages/common/advanced/_mixer_curves.c:139
+msgid "Neg"
+msgstr "Neg."
+
+#: pages/common/advanced/_mixer_setup.c:152 pages/common/_main_config.c:178
+#: pages/320x240x16/trim_page.c:86
+msgid "Trim"
+msgstr "Trim"
+
+#: pages/common/advanced/_mixer_setup.c:152
+msgid "No Trim"
+msgstr "Nincs Trim"
+
+#: pages/common/advanced/_mixer_setup.c:188
+msgid "Mid-Rate"
+msgstr "Közepes"
+
+#: pages/common/advanced/_mixer_setup.c:188
+msgid "Low-Rate"
+msgstr "Alacsony"
+
+#: pages/common/advanced/_mixer_setup.c:341
+msgid "replace"
+msgstr "cserél"
+
+#: pages/common/advanced/_mixer_setup.c:342
+msgid "mult"
+msgstr "szoroz"
+
+#: pages/common/advanced/_mixer_setup.c:343
+msgid "add"
+msgstr "hozzáad"
+
+#: pages/common/advanced/_mixer_setup.c:344
+msgid "max"
+msgstr "max"
+
+#: pages/common/advanced/_mixer_setup.c:345
+msgid "min"
+msgstr "min"
+
+#: pages/common/advanced/_mixer_setup.c:346
+msgid "delay"
+msgstr ""
+"késleltetés\n"
+"devo10:késlelt."
+
+#: pages/common/advanced/_mixer_setup.c:348
+msgid "beep"
+msgstr "csipogás"
+
+#: pages/common/advanced/_mixer_setup.c:349
+msgid "voice"
+msgstr "hang"
+
+#: pages/common/advanced/_mixer_setup.c:484
+#: pages/320x240x16/advanced/mixer_setup.c:101
+#: pages/320x240x16/advanced/mixer_setup.c:104
+msgid "Linked"
+msgstr "Csatolt"
+
+#: pages/common/advanced/_mixer_setup.c:531
+msgid "New"
+msgstr "Új"
+
+#: pages/common/advanced/_mixer_setup.c:532 pages/320x240x16/pagelist.h:41
+#: pages/128x64x1/pagelist.h:43
+msgid "Mixer"
+msgstr "Mixer"
+
+#: pages/common/advanced/_mixer_page.c:63
+#: pages/common/advanced/_mixer_page.c:64
+#: pages/common/advanced/_mixer_page.c:65
+msgid "CYC"
+msgstr "CYC"
+
+#: pages/common/advanced/_mixer_page.c:65
+msgid "COL"
+msgstr "Kollektív"
+
+#: pages/common/_model_config.c:133
+#, c-format
+msgid "Ch%d"
+msgstr "Cs%d"
+
+#: pages/common/_model_config.c:186
+#, c-format
+msgid "PPM%d"
+msgstr "PPM%d"
+
+#: pages/common/_main_config.c:85
+msgid "Small-box"
+msgstr "Kis doboz"
+
+#: pages/common/_main_config.c:86
+msgid "Big-box"
+msgstr "Nagy doboz"
+
+#: pages/common/_main_config.c:88
+msgid "Bargraph"
+msgstr "Oszlopdiagr."
+
+#: pages/common/_main_config.c:89
+msgid "V-trim"
+msgstr "Vsz. trim"
+
+#: pages/common/_main_config.c:90
+msgid "H-trim"
+msgstr "Függ. trim"
+
+#: pages/common/_main_config.c:92
+msgid "Battery"
+msgstr "Telep"
+
+#: pages/common/_main_config.c:93
+msgid "TxPower"
+msgstr "Tx telj."
+
+#: pages/common/_main_config.c:130 pages/common/_set_timer_page.c:52
+#: pages/128x64x1/set_timer_page.c:73
+msgid "Add"
+msgstr "Új"
+
+#: pages/common/_main_config.c:130
+msgid "Load"
+msgstr "Betöltés"
+
+#: pages/common/_main_config.c:234
+msgid "Menu"
+msgstr "Menü"
+
+#: pages/common/_tx_configure.c:92
+msgid ""
+"Move sticks and knobs\n"
+"to max & min positions\n"
+"then press ENT"
+msgstr ""
+"Mozgassa a botokat \n"
+"és a tekerőket\n"
+"min-tól max-ig,\n"
+"majd nyomjon ENT-t"
+
+#: pages/common/_tx_configure.c:101
+msgid ""
+"Calibration done.\n"
+" \n"
+"Press ENT."
+msgstr ""
+"Kalibrálás kész.\n"
+" \n"
+"Nyomjon ENT-t."
+
+#: pages/common/_tx_configure.c:123
+msgid ""
+"Center all \n"
+"sticks and knobs\n"
+"then press ENT"
+msgstr ""
+"Állítsa középre a \n"
+"botkormányokat \n"
+"és a tekerőket,\n"
+"majd nyomjon ENT-t"
+
+#: pages/common/_tx_configure.c:166
+msgid "Calibrate"
+msgstr "Kalibrálás"
+
+#: pages/common/_tx_configure.c:174 pages/common/_set_timer_page.c:54
+#: pages/128x64x1/set_timer_page.c:73
+msgid "Set"
+msgstr "Beállítás"
+
+#: pages/common/_tx_configure.c:183
+#, c-format
+msgid "Mode %d"
+msgstr "Mód %d"
+
+#: pages/common/_tx_configure.c:336
+msgid "Change"
+msgstr "Váltás"
+
+#: pages/common/_tx_configure.c:362
+msgid "Fahren"
+msgstr "°F"
+
+#: pages/common/_tx_configure.c:362
+msgid "Celsius"
+msgstr "°C"
+
+#: pages/common/_tx_configure.c:364
+msgid "Foot"
+msgstr "Láb"
+
+#: pages/common/_tx_configure.c:364
+msgid "Meter"
+msgstr "Méter"
+
+#: pages/320x240x16/scanner_page.c:35
+msgid "Turn Off"
+msgstr "Kikapcsol"
+
+#: pages/320x240x16/scanner_page.c:35
+msgid "Turn On"
+msgstr "Bekapcsol"
+
+#: pages/320x240x16/scanner_page.c:42 pages/128x64x1/scanner_page.c:36
+msgid "Average"
+msgstr "Átlag"
+
+#: pages/320x240x16/scanner_page.c:42 pages/128x64x1/scanner_page.c:36
+msgid "Peak"
+msgstr "Csúcs"
+
+#: pages/320x240x16/scanner_page.c:49
+msgid "Att.: -20dB"
+msgstr "Csill.: -20dB"
+
+#: pages/320x240x16/scanner_page.c:49
+msgid "Att.: 0dB"
+msgstr "Csill.: 0dB"
+
+#: pages/320x240x16/trim_page.c:67 pages/320x240x16/trim_page.c:100
+#: pages/128x64x1/trim_page.c:70 pages/128x64x1/trim_page.c:103
+msgid "Input"
+msgstr "Bemenet"
+
+#: pages/320x240x16/trim_page.c:68 pages/320x240x16/trim_page.c:107
+#: pages/128x64x1/trim_page.c:107
+msgid "Trim -"
+msgstr "Trim -"
+
+#: pages/320x240x16/trim_page.c:69 pages/320x240x16/trim_page.c:110
+#: pages/128x64x1/trim_page.c:73 pages/128x64x1/trim_page.c:111
+msgid "Trim +"
+msgstr "Trim +"
+
+#: pages/320x240x16/trim_page.c:70 pages/320x240x16/trim_page.c:103
+#: pages/128x64x1/trim_page.c:115
+msgid "Trim Step"
+msgstr "Trim lépés"
+
+#: pages/320x240x16/tx_configure.c:101 pages/128x64x1/tx_configure.c:94
+#: pages/128x64x1/tx_configure.c:101
+msgid "Generic settings"
+msgstr "Általános beállítások"
+
+#: pages/320x240x16/tx_configure.c:106 pages/128x64x1/tx_configure.c:95
+msgid "Language"
+msgstr "Nyelv"
+
+#: pages/320x240x16/tx_configure.c:112 pages/128x64x1/tx_configure.c:103
+msgid "Stick mode"
+msgstr "Mód"
+
+#: pages/320x240x16/tx_configure.c:117
+msgid "Touch screen"
+msgstr "Képernyő"
+
+#: pages/320x240x16/tx_configure.c:122 pages/128x64x1/tx_configure.c:107
+msgid "Sticks"
+msgstr "Botkormány"
+
+#: pages/320x240x16/tx_configure.c:138 pages/128x64x1/tx_configure.c:112
+msgid "Audio settings"
+msgstr "Audió beállítások"
+
+#: pages/320x240x16/tx_configure.c:140
+msgid "Buzzer settings"
+msgstr "Hang beállítások"
+
+#: pages/320x240x16/tx_configure.c:144
+msgid "Power On alarm"
+msgstr "Bekapcs. riaszt."
+
+#: pages/320x240x16/tx_configure.c:148
+msgid "Battery alarm"
+msgstr "Fesz. riasztás"
+
+#: pages/320x240x16/tx_configure.c:152
+msgid "Alarm interval"
+msgstr "Riaszt. int."
+
+#: pages/320x240x16/tx_configure.c:156 pages/128x64x1/tx_configure.c:116
+msgid "Buzz volume"
+msgstr "Hangerő"
+
+#: pages/320x240x16/tx_configure.c:161 pages/128x64x1/tx_configure.c:121
+msgid "Audio volume"
+msgstr "Audió hangerő"
+
+#: pages/320x240x16/tx_configure.c:166
+msgid "Power-down alert"
+msgstr "Kikapcs. riaszt."
+
+#: pages/320x240x16/tx_configure.c:174 pages/128x64x1/tx_configure.c:147
+#: pages/128x64x1/tx_configure.c:154
+msgid "LCD settings"
+msgstr "LCD beállítások"
+
+#: pages/320x240x16/tx_configure.c:177 pages/128x64x1/tx_configure.c:148
+msgid "Backlight"
+msgstr "Fényerő"
+
+#: pages/320x240x16/tx_configure.c:181 pages/128x64x1/tx_configure.c:160
+msgid "Dimmer time"
+msgstr "Alvó mód ideje"
+
+#: pages/320x240x16/tx_configure.c:185 pages/128x64x1/tx_configure.c:164
+msgid "Dimmer target"
+msgstr "Alvó fényerő"
+
+#: pages/320x240x16/tx_configure.c:192 pages/128x64x1/tx_configure.c:168
+msgid "Timer settings"
+msgstr "Időzítő beállítások"
+
+#: pages/320x240x16/tx_configure.c:195 pages/128x64x1/tx_configure.c:169
+msgid "Prealert time"
+msgstr "Előjelz. idő"
+
+#: pages/320x240x16/tx_configure.c:199
+msgid "Prealert interval"
+msgstr "Előjelz. interv."
+
+#: pages/320x240x16/tx_configure.c:204
+msgid "Timeup interval"
+msgstr "Ismétlés interv."
+
+#: pages/320x240x16/tx_configure.c:209 pages/128x64x1/tx_configure.c:181
+msgid "Telemetry settings"
+msgstr "Telemetria beállítások"
+
+#: pages/320x240x16/tx_configure.c:212 pages/128x64x1/tx_configure.c:182
+msgid "Temperature"
+msgstr "Hőmérséklet"
+
+#: pages/320x240x16/tx_configure.c:216 pages/128x64x1/tx_configure.c:186
+msgid "Length"
+msgstr "Hossz"
+
+#: pages/320x240x16/tx_configure.c:220
+msgid "Alert interval"
+msgstr "Figyelm. int."
+
+#: pages/320x240x16/tx_configure.c:227
+msgid "Vibration settings"
+msgstr "Rezgés beállítások"
+
+#: pages/320x240x16/tx_configure.c:229
+msgid "Vibration:"
+msgstr "Rezgés:"
+
+#: pages/320x240x16/tx_configure.c:262
+#, c-format
+msgid "Touch target %d"
+msgstr "Érintse meg a(z) %d pontot!"
+
+#: pages/320x240x16/tx_configure.c:285
+msgid "Touch Calibrate"
+msgstr "Érintés kalibrálás"
+
+#: pages/320x240x16/set_timer_page.c:86
+msgid "actual value"
+msgstr "Aktuális érték"
+
+#: pages/320x240x16/set_timer_page.c:90
+msgid "value to add or set"
+msgstr "Beállítandó/hozzáadandó"
+
+#: pages/320x240x16/set_timer_page.c:94 pages/320x240x16/rtc_config.c:136
+#: pages/128x64x1/set_timer_page.c:48
+msgid "Hour"
+msgstr "Óra"
+
+#: pages/320x240x16/set_timer_page.c:96 pages/320x240x16/rtc_config.c:135
+#: pages/128x64x1/set_timer_page.c:46
+msgid "Minute"
+msgstr "Perc"
+
+#: pages/320x240x16/set_timer_page.c:98 pages/320x240x16/rtc_config.c:134
+#: pages/128x64x1/set_timer_page.c:44
+msgid "Second"
+msgstr ""
+"Másodperc\n"
+"devo10:Másodp.\n"
+"devo12:Másodp."
+
+#: pages/320x240x16/set_timer_page.c:106 pages/320x240x16/rtc_config.c:161
+msgid "resulting value"
+msgstr "Új érték"
+
+#: pages/320x240x16/model_page.c:25 pages/320x240x16/model_config.c:38
+#: pages/128x64x1/model_config.c:96
+msgid "Helicopter"
+msgstr "Helikopter"
+
+#: pages/320x240x16/model_page.c:26 pages/320x240x16/model_config.c:38
+#: pages/128x64x1/model_config.c:97
+msgid "Airplane"
+msgstr "Repülőgép"
+
+#: pages/320x240x16/model_page.c:27 pages/128x64x1/model_config.c:98
+msgid "Multirotor"
+msgstr "Multirotor"
+
+#: pages/320x240x16/model_page.c:62 pages/128x64x1/model_page.c:85
+msgid "File"
+msgstr "Fájl"
+
+#: pages/320x240x16/model_page.c:67 pages/128x64x1/model_page.c:128
+msgid "Mixer GUI"
+msgstr "Felület"
+
+#: pages/320x240x16/model_page.c:72 pages/128x64x1/model_page.c:89
+msgid "Model name"
+msgstr "Modell név"
+
+#: pages/320x240x16/model_page.c:74 pages/128x64x1/model_page.c:93
+msgid "Icon"
+msgstr "Ikon"
+
+#: pages/320x240x16/model_page.c:77 pages/128x64x1/model_page.c:97
+msgid "Model type"
+msgstr "Modell típus"
+
+#: pages/320x240x16/model_page.c:81 pages/128x64x1/model_page.c:105
+msgid "PPM In"
+msgstr "PPM be"
+
+#: pages/320x240x16/model_page.c:85
+msgid "Protocol"
+msgstr "Protokoll"
+
+#: pages/320x240x16/model_page.c:89 pages/128x64x1/model_page.c:123
+msgid "# Channels"
+msgstr "Csatornák"
+
+#: pages/320x240x16/model_page.c:94 pages/128x64x1/model_page.c:101
+msgid "Tx power"
+msgstr "Kimenő telj."
+
+#: pages/320x240x16/model_page.c:102 pages/128x64x1/model_page.c:119
+msgid "Fixed ID"
+msgstr "Fix ID"
+
+#: pages/320x240x16/toggle_select.c:86
+#: pages/320x240x16/advanced/mixer_limits.c:76
+#: pages/128x64x1/toggle_select.c:84 pages/128x64x1/advanced/mixer_limits.c:42
+msgid "Revert"
+msgstr "Mégsem"
+
+#: pages/320x240x16/toggle_select.c:116
+msgid "Pos 0"
+msgstr "Poz. 0"
+
+#: pages/320x240x16/toggle_select.c:121
+msgid "Pos 1"
+msgstr "Poz. 1"
+
+#: pages/320x240x16/toggle_select.c:126
+msgid "Pos 2"
+msgstr "Poz. 2"
+
+#: pages/320x240x16/model_config.c:41
+#: pages/320x240x16/standard/swash_page.c:40 pages/128x64x1/model_config.c:57
+#: pages/128x64x1/standard/swash_page.c:41
+msgid "SwashType"
+msgstr ""
+"Imbolygó típusa\n"
+"devo10:Imbolygó"
+
+#: pages/320x240x16/model_config.c:44 pages/128x64x1/model_config.c:61
+msgid "ELE Inv"
+msgstr ""
+"Magassági inv.\n"
+"devo10:Magas. inv."
+
+#: pages/320x240x16/model_config.c:47 pages/128x64x1/model_config.c:65
+msgid "AIL Inv"
+msgstr "Csűrés inv."
+
+#: pages/320x240x16/model_config.c:53
+#: pages/320x240x16/standard/swash_page.c:45 pages/128x64x1/model_config.c:73
+#: pages/128x64x1/standard/swash_page.c:45
+msgid "ELE Mix"
+msgstr ""
+"Magassági mix\n"
+"devo10:Magas. mix"
+
+#: pages/320x240x16/model_config.c:56
+#: pages/320x240x16/standard/swash_page.c:50 pages/128x64x1/model_config.c:77
+#: pages/128x64x1/standard/swash_page.c:49
+msgid "AIL Mix"
+msgstr "Csűrés mix"
+
+#: pages/320x240x16/model_config.c:59 pages/128x64x1/model_config.c:81
+msgid "COL Mix"
+msgstr ""
+"Kollektív mix\n"
+"devo10:Koll. mix"
+
+#: pages/320x240x16/model_config.c:90 pages/128x64x1/model_config.c:240
+msgid "Trainer Cfg (Channel)"
+msgstr "Oktató konf. (Csatorna)"
+
+#: pages/320x240x16/model_config.c:92 pages/128x64x1/model_config.c:242
+msgid "Trainer Cfg (Stick)"
+msgstr "Oktató konf. (Bot)"
+
+#: pages/320x240x16/model_config.c:93 pages/128x64x1/model_config.c:243
+msgid "PPMIn Cfg (Extend)"
+msgstr "PPM be konf. (Kiterj.)"
+
+#: pages/320x240x16/model_config.c:96 pages/128x64x1/model_config.c:148
+msgid "Trainer Sw"
+msgstr ""
+"Oktató kapcs.\n"
+"devo10:Oktató k."
+
+#: pages/320x240x16/model_config.c:99 pages/128x64x1/model_config.c:151
+msgid "Num Channels"
+msgstr "Csat. száma"
+
+#: pages/320x240x16/dialogs.c:49 pages/320x240x16/advanced/mixer_limits.c:41
+#: pages/128x64x1/advanced/mixer_limits.c:71
+msgid "Safety"
+msgstr "Biztonság"
+
+#: pages/320x240x16/dialogs.c:63
+msgid ""
+"Binding is in progress...\n"
+"Make sure model is on!\n"
+"\n"
+"Pressing OK will NOT cancel binding procedure\n"
+"but will allow full control of Tx."
+msgstr ""
+"Kapcsolódás folyamatban...\n"
+"Győződjön meg róla, hogy a modell be van kapcsolva!\n"
+"\n"
+"Az OK gomb NEM szakítja meg a kapcsolódást,\n"
+"csak lehetővé teszi a rádió használatát."
+
+#: pages/320x240x16/dialogs.c:66
+#, c-format
+msgid ""
+"\n"
+"\n"
+"Binding will end in %d seconds..."
+msgstr ""
+"\n"
+"\n"
+"Kapcsolódás vége %d másodperc múlva..."
+
+#: pages/320x240x16/dialogs.c:93
+msgid "Binding"
+msgstr "Kapcsolódás a modellhez"
+
+#: pages/320x240x16/dialogs.c:110
+msgid "Low Battery"
+msgstr "Telep üres"
+
+#: pages/320x240x16/dialogs.c:111
+msgid ""
+"Critical battery level detected.\n"
+"Settings have been saved.\n"
+"Any future configuration settings\n"
+"will NOT be saved.\n"
+"\n"
+"Change batteries now!"
+msgstr ""
+"A telepfeszültség kritikusan alacsony!\n"
+"A beállítások el lettek mentve,\n"
+"de a további változtatások\n"
+"NEM lesznek elmentve!\n"
+"\n"
+"Cseréljen elemet!"
+
+#: pages/320x240x16/dialogs.c:122
+msgid ""
+"Model needs to be reset\n"
+"in order to switch to the standard mixer"
+msgstr ""
+"A modellt törölni kell\n"
+"a szokásos felületre váltáshoz"
+
+#: pages/320x240x16/dialogs.c:129
+msgid "Standard Mixer"
+msgstr "Szokásos mixer"
+
+#: pages/320x240x16/dialogs.c:143
+msgid "Reset Permanent Timer?"
+msgstr "Nullázza az üzemidőt?"
+
+#: pages/320x240x16/dialogs.c:151 pages/128x64x1/dialogs.c:178
+msgid "Missing Modules:\n"
+msgstr "Hiányzó modulok:\n"
+
+#: pages/320x240x16/dialogs.c:157
+msgid "Module Error"
+msgstr "Modul hiba"
+
+#: pages/320x240x16/rtc_config.c:137
+msgid "Day"
+msgstr "Nap"
+
+#: pages/320x240x16/rtc_config.c:138
+msgid "Month"
+msgstr "Hónap"
+
+#: pages/320x240x16/rtc_config.c:139
+msgid "Year"
+msgstr "Év"
+
+#: pages/320x240x16/rtc_config.c:156
+msgid "Set time"
+msgstr "Idő beáll."
+
+#: pages/320x240x16/rtc_config.c:157
+msgid "Set date"
+msgstr "Dátum beáll."
+
+#: pages/320x240x16/rtc_config.c:158
+msgid "Time format"
+msgstr "Idő formátum"
+
+#: pages/320x240x16/rtc_config.c:159
+msgid "Date format"
+msgstr "Dátum formátum"
+
+#: pages/320x240x16/rtc_config.c:160
+msgid "value to set"
+msgstr "Beállítandó érték"
+
+#: pages/320x240x16/reorder_list.c:28
+msgid "Move Up"
+msgstr "Feljebb"
+
+#: pages/320x240x16/reorder_list.c:29
+msgid "Move Down"
+msgstr "Lejjebb"
+
+#: pages/320x240x16/reorder_list.c:30 pages/128x64x1/reorder_list.c:40
+msgid "Copy To"
+msgstr "Másolás"
+
+#: pages/320x240x16/reorder_list.c:31
+msgid "Insert"
+msgstr "Beszúrás"
+
+#: pages/320x240x16/reorder_list.c:32
+msgid "Remove"
+msgstr "Törlés"
+
+#: pages/320x240x16/reorder_list.c:33 pages/128x64x1/trim_page.c:137
+#: pages/128x64x1/reorder_list.c:94 pages/128x64x1/advanced/mixer_curves.c:62
+#: pages/128x64x1/advanced/mixer_setup.c:54
+msgid "Save"
+msgstr "Mentés"
+
+#: pages/320x240x16/timer_page.c:64 pages/128x64x1/timer_page.c:68
+msgid "Reset sw"
+msgstr ""
+"Törlés kapcs.\n"
+"devo10:Törlés k."
+
+#: pages/320x240x16/timer_page.c:69 pages/128x64x1/timer_page.c:76
+msgid "Start"
+msgstr "Start"
+
+#: pages/320x240x16/timer_page.c:156
+msgid "Date / Time"
+msgstr "Dátum / Idő"
+
+#: pages/320x240x16/model_loadsave.c:92
+msgid "Load Model"
+msgstr "Modell betöltése"
+
+#: pages/320x240x16/model_loadsave.c:93
+msgid "Save Model as..."
+msgstr "Mentés másként..."
+
+#: pages/320x240x16/model_loadsave.c:94
+msgid "Load Model Template"
+msgstr "Sablon betöltése"
+
+#: pages/320x240x16/model_loadsave.c:95
+msgid "Select Icon"
+msgstr "Ikon választás"
+
+#: pages/320x240x16/model_loadsave.c:96
+msgid "Load Layout"
+msgstr "Elrend. betöltése"
+
+#: pages/320x240x16/standard/drexp_page.c:59
+#: pages/320x240x16/advanced/mixer_setup.c:59
+#: pages/320x240x16/advanced/mixer_setup.c:84
+#: pages/320x240x16/advanced/mixer_setup.c:151
+#: pages/128x64x1/advanced/mixer_setup.c:78
+#: pages/128x64x1/advanced/mixer_setup.c:157
+#: pages/128x64x1/advanced/mixer_setup.c:265
+msgid "Src"
+msgstr "Forrás"
+
+#: pages/320x240x16/standard/throhold_page.c:52
+#: pages/128x64x1/standard/throhold_page.c:45
+msgid "Hold position"
+msgstr "TH érték"
+
+#: pages/320x240x16/standard/switchassign_page.c:46
+#: pages/128x64x1/standard/switchassign_page.c:42
+msgid "Fly mode"
+msgstr "Rep. mód"
+
+#: pages/320x240x16/standard/switchassign_page.c:56
+#: pages/320x240x16/pagelist.h:50
+#: pages/128x64x1/standard/switchassign_page.c:48
+#: pages/128x64x1/standard/gyrosense_page.c:54 pages/128x64x1/pagelist.h:52
+msgid "Gyro sense"
+msgstr "Giró"
+
+#: pages/320x240x16/standard/switchassign_page.c:59
+#: pages/128x64x1/standard/switchassign_page.c:51
+msgid "D/R&Exp -AIL"
+msgstr "D/R&Expó -AIL"
+
+#: pages/320x240x16/standard/switchassign_page.c:63
+#: pages/128x64x1/standard/switchassign_page.c:54
+msgid "D/R&Exp -ELE"
+msgstr "D/R&Expó -ELE"
+
+#: pages/320x240x16/standard/switchassign_page.c:67
+#: pages/128x64x1/standard/switchassign_page.c:58
+msgid "D/R&Exp -RUD"
+msgstr "D/R&Expó -RUD"
+
+#: pages/320x240x16/standard/curves_page.c:28
+msgid "L"
+msgstr "L"
+
+#: pages/320x240x16/standard/curves_page.c:28
+msgid "M"
+msgstr "M"
+
+#: pages/320x240x16/standard/curves_page.c:28
+msgid "H"
+msgstr "H"
+
+#: pages/320x240x16/standard/curves_page.c:35
+msgid "Manual"
+msgstr "Kézi"
+
+#: pages/320x240x16/standard/curves_page.c:35
+msgid "Auto"
+msgstr "Auto"
+
+#: pages/320x240x16/standard/curves_page.c:125
+#: pages/128x64x1/standard/curves_page.c:110
+msgid "Mode"
+msgstr "Mód"
+
+#: pages/320x240x16/standard/swash_page.c:55
+#: pages/128x64x1/standard/swash_page.c:53
+msgid "PIT Mix"
+msgstr "Koll. mix"
+
+#: pages/320x240x16/voiceconfig_page.c:52 pages/128x64x1/voiceconfig_page.c:60
+msgid ""
+"External voice\n"
+"currently not\n"
+"available"
+msgstr ""
+"Külső hang\n"
+"jelenleg nem\n"
+"elérhető"
+
+#: pages/320x240x16/datalog_page.c:61 pages/128x64x1/datalog_page.c:135
+#, c-format
+msgid "%d bytes left"
+msgstr "%d bájt maradt"
+
+#: pages/320x240x16/datalog_page.c:92 pages/128x64x1/datalog_page.c:79
+msgid "All"
+msgstr "Mind"
+
+#: pages/320x240x16/datalog_page.c:139 pages/128x64x1/datalog_page.c:96
+msgid "Enable"
+msgstr "Engedélyez"
+
+#: pages/320x240x16/datalog_page.c:146
+msgid "Sample Rate"
+msgstr "Mintavétel"
+
+#: pages/320x240x16/datalog_page.c:152 pages/128x64x1/datalog_page.c:105
+msgid "Select"
+msgstr "Kiválaszt"
+
+#: pages/320x240x16/main_layout.c:235 pages/320x240x16/main_layout.c:335
+msgid "Page Config"
+msgstr "Ablak konfig."
+
+#: pages/320x240x16/main_layout.c:240
+msgid "Type"
+msgstr "Típus"
+
+#: pages/320x240x16/main_layout.c:254
+msgid "Template"
+msgstr "Sablon"
+
+#: pages/320x240x16/main_layout.c:271 pages/128x64x1/trim_page.c:135
+msgid "Edit"
+msgstr "Szerkeszt"
+
+#: pages/320x240x16/main_layout.c:271 pages/128x64x1/main_config.c:134
+msgid "Delete"
+msgstr "Törlés"
+
+#: pages/320x240x16/advanced/mixer_limits.c:33 pages/320x240x16/pagelist.h:43
+#: pages/128x64x1/standard/reverse_page.c:26
+#: pages/128x64x1/advanced/mixer_limits.c:63 pages/128x64x1/pagelist.h:45
+msgid "Reverse"
+msgstr "Invertálás"
+
+#: pages/320x240x16/advanced/mixer_limits.c:37 pages/320x240x16/pagelist.h:52
+#: pages/128x64x1/standard/failsafe_page.c:26
+#: pages/128x64x1/advanced/mixer_limits.c:67 pages/128x64x1/pagelist.h:54
+msgid "Fail-safe"
+msgstr "Hibaérték"
+
+#: pages/320x240x16/advanced/mixer_limits.c:45
+#: pages/128x64x1/advanced/mixer_limits.c:75
+msgid "Safe Val"
+msgstr "Bizt. érték"
+
+#: pages/320x240x16/advanced/mixer_limits.c:49
+#: pages/128x64x1/advanced/mixer_limits.c:79
+msgid "Min Limit"
+msgstr "Min korlát"
+
+#: pages/320x240x16/advanced/mixer_limits.c:53
+#: pages/128x64x1/advanced/mixer_limits.c:83
+msgid "Max Limit"
+msgstr "Max korlát"
+
+#: pages/320x240x16/advanced/mixer_limits.c:64 pages/320x240x16/pagelist.h:45
+#: pages/128x64x1/standard/subtrim_page.c:25
+#: pages/128x64x1/advanced/mixer_limits.c:95 pages/128x64x1/pagelist.h:47
+msgid "Subtrim"
+msgstr "Subtrim"
+
+#: pages/320x240x16/advanced/mixer_curves.c:41
+#: pages/128x64x1/advanced/mixer_curves.c:71
+msgid "Smooth"
+msgstr "Simítás"
+
+#: pages/320x240x16/advanced/mixer_curves.c:44
+#: pages/128x64x1/advanced/mixer_curves.c:74
+msgid "Point"
+msgstr "Pont"
+
+#: pages/320x240x16/advanced/mixer_curves.c:47
+#: pages/128x64x1/advanced/mixer_curves.c:77
+msgid "Pos/Neg"
+msgstr "Poz/Neg"
+
+#: pages/320x240x16/advanced/mixer_setup.c:63
+#: pages/320x240x16/advanced/mixer_setup.c:155
+#: pages/128x64x1/advanced/mixer_setup.c:82
+#: pages/128x64x1/advanced/mixer_setup.c:161
+msgid "Curve"
+msgstr "Görbe"
+
+#: pages/320x240x16/advanced/mixer_setup.c:76
+#: pages/320x240x16/advanced/mixer_setup.c:161
+#: pages/128x64x1/advanced/mixer_setup.c:90
+#: pages/128x64x1/advanced/mixer_setup.c:169
+msgid "Offset"
+msgstr "Eltolás"
+
+#: pages/320x240x16/advanced/mixer_setup.c:85
+#: pages/128x64x1/advanced/mixer_setup.c:279
+msgid "Switch1"
+msgstr "Kapcs.1"
+
+#: pages/320x240x16/advanced/mixer_setup.c:86
+#: pages/128x64x1/advanced/mixer_setup.c:279
+msgid "Switch2"
+msgstr "Kapcs.2"
+
+#: pages/320x240x16/advanced/mixer_setup.c:95
+#: pages/128x64x1/advanced/mixer_setup.c:269
+msgid "High-Rate"
+msgstr "Magas"
+
+#: pages/320x240x16/advanced/mixer_setup.c:135
+#: pages/128x64x1/advanced/mixer_setup.c:141
+msgid "Mixers"
+msgstr "Mixerek"
+
+#: pages/320x240x16/advanced/mixer_setup.c:137
+#: pages/128x64x1/advanced/mixer_setup.c:145
+msgid "Page"
+msgstr "Oldal"
+
+#: pages/320x240x16/advanced/mixer_setup.c:148
+#: pages/128x64x1/advanced/mixer_setup.c:153
+msgid "Mux"
+msgstr "Művelet"
+
+#: pages/320x240x16/pagelist.h:18 pages/128x64x1/pagelist.h:20
+msgid "Main page"
+msgstr "Főablak"
+
+#: pages/320x240x16/pagelist.h:19 pages/128x64x1/pagelist.h:21
+msgid "Main menu"
+msgstr "Főmenü"
+
+#: pages/320x240x16/pagelist.h:21 pages/128x64x1/pagelist.h:24
+msgid "Set permanent timer"
+msgstr "Üzemidő beállítása"
+
+#: pages/320x240x16/pagelist.h:24
+msgid "Real Time Clock"
+msgstr "Óra"
+
+#: pages/320x240x16/pagelist.h:27
+msgid "Touch Test"
+msgstr "Érintés teszt"
+
+#: pages/320x240x16/pagelist.h:31 pages/128x64x1/pagelist.h:32
+msgid "Model menu"
+msgstr "Modell menü"
+
+#: pages/320x240x16/pagelist.h:32 pages/128x64x1/pagelist.h:33
+msgid "Transmitter menu"
+msgstr "Távirányító menü"
+
+#: pages/320x240x16/pagelist.h:33 pages/128x64x1/pagelist.h:34
+#: pages/128x64x1/usb_page.c:35
+msgid "USB"
+msgstr "USB"
+
+#: pages/320x240x16/pagelist.h:35 pages/128x64x1/pagelist.h:36
+msgid "Debuglog"
+msgstr "Hiba napló"
+
+#: pages/320x240x16/pagelist.h:40 pages/128x64x1/model_page.c:155
+#: pages/128x64x1/pagelist.h:42
+msgid "Model setup"
+msgstr "Modell konfig."
+
+#: pages/320x240x16/pagelist.h:44 pages/128x64x1/pagelist.h:46
+msgid "D/R & Exp"
+msgstr "D/R & Expó"
+
+#: pages/320x240x16/pagelist.h:46 pages/128x64x1/pagelist.h:48
+msgid "Travel adjust"
+msgstr "Szervóút állítás"
+
+#: pages/320x240x16/pagelist.h:47 pages/128x64x1/pagelist.h:49
+msgid "Throttle curves"
+msgstr "Gáz görbék"
+
+#: pages/320x240x16/pagelist.h:48 pages/128x64x1/pagelist.h:50
+msgid "Pitch curves"
+msgstr "Állásszög görbék"
+
+#: pages/320x240x16/pagelist.h:49 pages/128x64x1/standard/throhold_page.c:38
+#: pages/128x64x1/pagelist.h:51
+msgid "Throttle hold"
+msgstr "Gáz kapcsoló"
+
+#: pages/320x240x16/pagelist.h:51 pages/128x64x1/pagelist.h:53
+msgid "Swash"
+msgstr "Imbolygó"
+
+#: pages/320x240x16/pagelist.h:53 pages/128x64x1/pagelist.h:55
+msgid "Switch assignment"
+msgstr ""
+"Kapcsoló összerendelés\n"
+"devo10:Kapcs. összerend."
+
+#: pages/320x240x16/pagelist.h:55 pages/128x64x1/pagelist.h:57
+msgid "Timers"
+msgstr "Időzítők"
+
+#: pages/320x240x16/pagelist.h:56 pages/128x64x1/telemconfig_page.c:83
+#: pages/128x64x1/pagelist.h:59
+msgid "Telemetry config"
+msgstr "Telemetria konfig."
+
+#: pages/320x240x16/pagelist.h:57 pages/128x64x1/pagelist.h:61
+msgid "Trims"
+msgstr "Trim-ek"
+
+#: pages/320x240x16/pagelist.h:59 pages/128x64x1/pagelist.h:63
+msgid "Datalog"
+msgstr "Adat napló"
+
+#: pages/320x240x16/pagelist.h:61 pages/128x64x1/pagelist.h:65
+msgid "Main page config"
+msgstr "Főablak konfig."
+
+#: pages/320x240x16/pagelist.h:63 pages/128x64x1/pagelist.h:67
+msgid "Voice config"
+msgstr "Hang konfiguráció"
+
+#: pages/320x240x16/pagelist.h:67 pages/128x64x1/pagelist.h:72
+msgid "Transmitter config"
+msgstr "Távirányító konfig."
+
+#: pages/320x240x16/pagelist.h:68 pages/128x64x1/pagelist.h:73
+msgid "Channel monitor"
+msgstr "Csatornák"
+
+#: pages/320x240x16/pagelist.h:69 pages/128x64x1/telemtest_page.c:412
+#: pages/128x64x1/pagelist.h:75
+msgid "Telemetry monitor"
+msgstr "Telemetria adatok"
+
+#: pages/320x240x16/pagelist.h:70 pages/128x64x1/pagelist.h:77
+msgid "Range Test"
+msgstr "Hatótáv teszt"
+
+#: pages/320x240x16/pagelist.h:71
+msgid "Input monitor"
+msgstr "Bemenetek"
+
+#: pages/320x240x16/pagelist.h:72
+msgid "Button monitor"
+msgstr "Nyomógomb ellenőrzés"
+
+#: pages/320x240x16/pagelist.h:74 pages/128x64x1/pagelist.h:79
+msgid "Scanner"
+msgstr "Szkenner"
+
+#: pages/320x240x16/pagelist.h:78 pages/128x64x1/pagelist.h:91
+msgid "Welcome"
+msgstr "Üdvözlet"
+
+#: pages/320x240x16/pagelist.h:84
+msgid "Select Language"
+msgstr "Nyelv választás"
+
+#: pages/320x240x16/range_page.c:31
+msgid "Stop test"
+msgstr "Teszt stop"
+
+#: pages/320x240x16/range_page.c:31
+msgid "Start test"
+msgstr "Teszt start"
+
+#: pages/320x240x16/range_page.c:40 pages/128x64x1/range_page.c:46
+msgid "No range test possible."
+msgstr "Nincs hatótáv teszt."
+
+#: pages/320x240x16/range_page.c:49 pages/128x64x1/range_page.c:51
+msgid "Power reduced to"
+msgstr "Telj. csökkentve"
+
+#: pages/320x240x16/range_page.c:50 pages/128x64x1/range_page.c:52
+msgid "from"
+msgstr "-ra, erről:"
+
+#: pages/320x240x16/usb_page.c:38 pages/128x64x1/about_page.c:38
+msgid "Deviation FW version:"
+msgstr "Deviation verzió:"
+
+#: pages/320x240x16/usb_page.c:39
+msgid "USB Filesystem is currently "
+msgstr "USB fájlrendszer jelenleg "
+
+#: pages/320x240x16/usb_page.c:40
+msgid "Press 'Ent' to turn USB Filesystem"
+msgstr ""
+"\n"
+"'ENT'-el kapcsolhatja az USB-t"
+
+#: pages/128x64x1/scanner_page.c:43
+msgid "-20dB"
+msgstr ""
+
+#: pages/128x64x1/scanner_page.c:43
+msgid "0dB"
+msgstr ""
+
+#: pages/128x64x1/chantest_page.c:111
+msgid "Stick input"
+msgstr "Bemenetek"
+
+#: pages/128x64x1/chantest_page.c:111
+msgid "Mixer output"
+msgstr "Mixer kimenet"
+
+#: pages/128x64x1/trim_page.c:71
+msgid "Step"
+msgstr "Lépés"
+
+#: pages/128x64x1/main_config.c:60
+msgid "Layout: Long-Press ENT"
+msgstr "Elrendezés: Hosszú ENT"
+
+#: pages/128x64x1/main_config.c:86
+msgid "Trimbar"
+msgstr "Trim"
+
+#: pages/128x64x1/main_config.c:90
+msgid "Box"
+msgstr "Doboz"
+
+#: pages/128x64x1/main_config.c:93
+msgid "Bar"
+msgstr "Oszlop"
+
+#: pages/128x64x1/tx_configure.c:114
+msgid "Buzz settings"
+msgstr "Hang beállítások"
+
+#: pages/128x64x1/tx_configure.c:126
+msgid "Vibration"
+msgstr "Rezgés"
+
+#: pages/128x64x1/tx_configure.c:130
+msgid "Batt alarm"
+msgstr "Fesz. riaszt."
+
+#: pages/128x64x1/tx_configure.c:134
+msgid "Alarm intvl"
+msgstr "Riaszt. int."
+
+#: pages/128x64x1/tx_configure.c:138
+msgid "PwrOn alarm"
+msgstr ""
+"Bekapcs. riaszt.\n"
+"devo10:Bekapcs. r."
+
+#: pages/128x64x1/tx_configure.c:142
+msgid "PwrDn alert"
+msgstr ""
+"Kikapcs. riaszt.\n"
+"devo10:Kikapcs. r."
+
+#: pages/128x64x1/tx_configure.c:156 pages/128x64x1/model_config.c:187
+msgid "Contrast"
+msgstr "Kontraszt"
+
+#: pages/128x64x1/tx_configure.c:173
+msgid "Prealert intvl"
+msgstr "Előjelz. interv."
+
+#: pages/128x64x1/tx_configure.c:177
+msgid "Timeup intvl"
+msgstr "Ismétlés interv."
+
+#: pages/128x64x1/tx_configure.c:190
+msgid "Alert intvl"
+msgstr "Figy. int."
+
+#: pages/128x64x1/tx_configure.c:215
+msgid "Configure"
+msgstr "Konfigurálás"
+
+#: pages/128x64x1/model_page.c:39
+msgid "Plane"
+msgstr "Repülő"
+
+#: pages/128x64x1/model_page.c:40
+msgid "Multi"
+msgstr "Multi"
+
+#: pages/128x64x1/model_page.c:110 pages/128x64x1/model_config.c:205
+msgid "Video"
+msgstr "Videó"
+
+#: pages/128x64x1/model_page.c:111
+msgid "Setup"
+msgstr "Beállítás"
+
+#: pages/128x64x1/model_config.c:179
+msgid "Video Enable"
+msgstr "Videó enged."
+
+#: pages/128x64x1/model_config.c:183
+msgid "Video Channel"
+msgstr "Videó csatorna"
+
+#: pages/128x64x1/model_config.c:191
+msgid "Brightness"
+msgstr "Fényerő"
+
+#: pages/128x64x1/dialogs.c:82
+#, c-format
+msgid ""
+"Binding %s...\n"
+"Press ENT to stop"
+msgstr ""
+"Kapcsolódás %s...\n"
+"ENT megállítani"
+
+#: pages/128x64x1/dialogs.c:85
+#, c-format
+msgid ""
+"\n"
+"%d seconds left"
+msgstr ""
+"\n"
+"%d másodperc van hátra"
+
+#: pages/128x64x1/dialogs.c:132
+msgid ""
+"Battery too low,\n"
+"can't save!"
+msgstr ""
+"Tápfesz. túl alacsony,\n"
+"nem tudok menteni!"
+
+#: pages/128x64x1/dialogs.c:139
+msgid ""
+"Model needs reset\n"
+"for standard mixer"
+msgstr ""
+"A modellt törölni kell\n"
+"a szokásos felülethez"
+
+#: pages/128x64x1/dialogs.c:153
+msgid ""
+"Bad/missing\n"
+"protocol modules!"
+msgstr ""
+"Hibás/hiányzó\n"
+"protokoll modulok!"
+
+#: pages/128x64x1/reorder_list.c:39
+msgid "Dn"
+msgstr "Le"
+
+#: pages/128x64x1/lang_select.c:44
+#: pages/128x64x1/standard/switchassign_page.c:79
+msgid "Press ENT to change"
+msgstr "Változtatáshoz ENT"
+
+#: pages/128x64x1/model_loadsave.c:69
+msgid "Press ENT to copy to"
+msgstr "Másolás ENT"
+
+#: pages/128x64x1/model_loadsave.c:71
+msgid "Press ENT to load"
+msgstr "Betöltés ENT"
+
+#: pages/128x64x1/telemtest_page.c:342
+msgid "GPS"
+msgstr "GPS"
+
+#: pages/128x64x1/telemtest_page.c:351
+msgid "RX"
+msgstr ""
+
+#: pages/128x64x1/telemtest_page.c:352
+msgid "TX"
+msgstr ""
+
+#: pages/128x64x1/datalog_page.c:102
+msgid "Rate"
+msgstr "Fok"
+
+#: pages/128x64x1/advanced/mixer_page.c:44
+msgid "Mixer    Reorder:Hold R+"
+msgstr "Mixer  Sorrend:Hosszú R+"
+
+#: pages/128x64x1/advanced/mixer_setup.c:86
+#: pages/128x64x1/advanced/mixer_setup.c:165
+msgid "Scale"
+msgstr "Skála"
+
+#: pages/128x64x1/pagelist.h:27
+msgid "Video setup"
+msgstr "Videó beáll."
+
+#: pages/128x64x1/pagelist.h:38
+msgid "About Deviation"
+msgstr "Deviation névjegye"
+
+#: pages/128x64x1/pagelist.h:86
+msgid "External OSD"
+msgstr "Külső OSD"
+
+#: pages/128x64x1/range_page.c:53
+msgid "Press ENT to stop test."
+msgstr "ENT: Leállítás."
+
+#: pages/128x64x1/range_page.c:56
+msgid "Press ENT to start test."
+msgstr "ENT: Indítás."
+
+#: pages/128x64x1/usb_page.c:38
+msgid ""
+"Press ENT to turn \n"
+"USB drive"
+msgstr ""
+"ENT-el kapcsolhatja \n"
+"az USB-t"
+
+#: pages/text/splash_page.c:37
+msgid "Deviation"
+msgstr "Deviation"
+
+#: Model template
+msgid "4Ch w/ Dual-Rates"
+msgstr "4 csat. + DR"
+
+#: Model template
+msgid "Simple 4 Channel"
+msgstr "Egyszerű 4 csat."
+
+#: Model template
+msgid "6Ch Helicopter"
+msgstr "6 csat. helikopter"
+
+#: Model template
+msgid "6Ch Airplane"
+msgstr "6 csat. repülőgép"
+
+#: Model template
+msgid "Heli/Standard GUI"
+msgstr "Heli/Szokásos felület"

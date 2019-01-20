@@ -25,10 +25,10 @@ foreach my $target_dir (@dirs) {
     my $target_count = 0;
     my $target_line_length = 0;
     foreach my $file (@langfiles) {
+        local $/;
         my %hash;
-        open my $fh, "<", $file || die("Couldn't read $file\n");
-        my @lines = <$fh>;
-        foreach (@lines) { chomp; }
+        open my $fh, "<:raw", $file || die("Couldn't read $file\n");
+        my @lines = split(/\n/, <$fh>);
         close $fh;
         shift @lines;
         my $bytes = 0;
@@ -55,8 +55,9 @@ foreach my $target_dir (@dirs) {
         }
         else {
             # language V2 format
-            for (my $idx = 0; $idx < $#lines; $idx++) {
-                my $len = length($lines[$idx]) - 1;
+            my $lines = join("\n", @lines);
+            while($lines =~ /..([^\n]*)(?:\n|$)/sg) {
+                my $len = length($1) + 1;
                 $bytes += $len;
                 $line_length = $len if ($len > $line_length);
                 $count++;
