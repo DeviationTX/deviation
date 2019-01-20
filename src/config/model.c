@@ -35,7 +35,7 @@ const char * const RADIO_TX_POWER_VAL[TX_MODULE_LAST][TXPOWER_LAST] = {
      { "100uW", "300uW", "1mW", "3mW", "10mW", "30mW", "100mW", "150mW" },  //   CC2500,
      { "1mW", "6mW", "25mW", "100mW" },                                     //   NRF24L01,
      { "100uW", "300uW", "1mW", "3mW", "10mW", "30mW", "100mW", "150mW" },  //   MULTIMOD,
-     { "10/25mW", "100/25mW", "500/500mW", "Auto/200mW" },                  //   R9M (FCC/EU),
+     { "10/25mW", "100/25mW", "500/500", "Auto/200" },                      //   R9M (FCC/EU),
 };
 const u8 RADIO_TX_POWER_COUNT[TX_MODULE_LAST] = {
      8,    //   CYRF6936,
