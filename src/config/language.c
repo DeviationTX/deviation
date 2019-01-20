@@ -39,7 +39,7 @@ void CONFIG_EnableLanguage(int state) {(void)state;}
 static u16 fnv_16_str(const char *str);
 static char strings[8192];
 static u16 table_size;
-#define MAX_STRINGS 450
+#define MAX_STRINGS 475
 #define MAX_LINE 300
 
 /* tempstring[] must be at least long as line[], otherwise they are too small/big to fit in each other */
