@@ -35,6 +35,7 @@ UNMATCHED_LINT_ERROR = "Unmatched Lint Error(s):\n"
 LINT_ERROR = "Lint Error:\n"
 
 GITHUB_TOKEN = os.environ.get('GITHUB_TOKEN')
+TRAVIS = os.environ.get('TRAVIS')
 TRAVIS_PULL_REQUEST = os.environ.get('TRAVIS_PULL_REQUEST')
 TRAVIS_PULL_REQUEST_SHA = os.environ.get('TRAVIS_PULL_REQUEST_SHA')
 TRAVIS_BRANCH = os.environ.get('TRAVIS_BRANCH')
@@ -72,6 +73,9 @@ def main():
 
     changed = {}
     if args.diff:
+        if TRAVIS and not TRAVIS_PULL_REQUEST:
+            # FIXME: This shouldn't be needed, but not sure why TRAVIS is so special
+            return
         changed = get_changed_lines()
 
     paths = filter_paths(args.path, changed, pwd)
