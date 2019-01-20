@@ -50,7 +50,12 @@ guiObject_t *GUI_CreateButton(guiButton_t *button, u16 x, u16 y, enum ButtonType
 
     // bug fix: must set a default font, otherwise language other than English might not be displayed in some dialogs
     button->desc.font = DEFAULT_FONT.font;
-    button->strCallback = strCallback;
+#if SUPPORT_MULTI_LANGUAGE
+    if (strCallback == GUI_Localize)
+        button->strCallback = _GUI_Localize;
+    else
+#endif
+        button->strCallback = strCallback;
     button->CallBack = CallBack;
     button->cb_data = cb_data;
     button->flags |= FLAG_ENABLE;
