@@ -51,7 +51,7 @@ static void _show_titlerow()
     GUI_CreateLabelBox(&gui->chan, LABEL_X, 0 , TYPE_X - LABEL_X, HEADER_HEIGHT, &TITLE_FONT,
             MIXPAGE_ChanNameProtoCB, NULL, (void *)((long)mp->cur_mixer->dest));
     GUI_CreateTextSelectPlate(&gui->tmpl, TYPE_X, 0,  TYPE_W, HEADER_WIDGET_HEIGHT, &TEXTSEL_FONT, NULL, templatetype_cb, (void *)((long)mp->channel));
-    GUI_CreateButtonPlateText(&gui->save, SAVE_X, 0, SAVE_W, HEADER_WIDGET_HEIGHT, &BUTTON_FONT, NULL, okcancel_cb, (void *)_tr("Save"));
+    GUI_CreateButtonPlateText(&gui->save, SAVE_X, 0, SAVE_W, HEADER_WIDGET_HEIGHT, &BUTTON_FONT, GUI_Localize, okcancel_cb, _tr_noop("Save"));
 }
 
 static guiObject_t *simple_getobj_cb(int relrow, int col, void *data)
@@ -91,7 +91,7 @@ static int simple_row_cb(int absrow, int relrow, int y, void *data)
             value = set_number100_cb; data = &mp->mixer[0].offset;
             break;
     }
-    GUI_CreateLabelBox(&gui->label[relrow].lbl, LABEL_X, y, LABEL_W, LINE_HEIGHT, &LABEL_FONT, NULL, NULL, _tr(label));
+    GUI_CreateLabelBox(&gui->label[relrow].lbl, LABEL_X, y, LABEL_W, LINE_HEIGHT, &LABEL_FONT, GUI_Localize, NULL, _tr_noop(label));
     GUI_CreateTextSourcePlate(&gui->value[relrow].ts, TEXTSEL_X, y + (LINES_PER_ROW - 1) * LINE_SPACE,
                          TEXTSEL_W, LINE_HEIGHT, &TEXTSEL_FONT,
                          tgl, value, input_value, data);
@@ -171,7 +171,7 @@ static int complex_row_cb(int absrow, int relrow, int y, void *data)
             break;
     }
     GUI_CreateLabelBox(&gui->label[relrow].lbl, LABEL_X, y, LABEL_W, LINE_HEIGHT,
-            &LABEL_FONT, NULL, NULL, _tr(label));
+            &LABEL_FONT, GUI_Localize, NULL, label);
     GUI_CreateTextSourcePlate(&gui->value[relrow].ts, TEXTSEL_X, y + (LINES_PER_ROW - 1) * LINE_SPACE,
                          TEXTSEL_W, LINE_HEIGHT, &TEXTSEL_FONT, tgl, value, input_value, data);
     if (absrow + COMMON_LAST == COMPLEX_SRC)
@@ -248,7 +248,7 @@ static int expo_row_cb(int absrow, int relrow, int y, void *data)
 {
     const char *label = NULL;
     int underline = 0;
-    void * label_cb = NULL;
+    void * label_cb = GUI_Localize;
     void *tgl = NULL;
     void *value = NULL;
     void *input_value = NULL;
@@ -262,21 +262,21 @@ static int expo_row_cb(int absrow, int relrow, int y, void *data)
 
     switch(absrow) {
         case COMMON_SRC:
-            label = _tr("Src");
+            label = _tr_noop("Src");
             tgl = sourceselect_cb; value = set_source_cb; data = &mp->mixer[0].src; input_value = set_input_source_cb;
             break;
         case COMMON_CURVE:
-            label = _tr("High-Rate");
+            label = _tr_noop("High-Rate");
             tgl = curveselect_cb; value = set_curvename_cb; data = &mp->mixer[0];
             break;
         case COMMON_SCALE:
-            label = (void *)0; label_cb = scalestring_cb;
+            label = NULL; label_cb = scalestring_cb;
             value = set_number100_cb; data = &mp->mixer[0].scalar;
             break;
         case EXPO_SWITCH1:
         case EXPO_SWITCH2:
             idx = (absrow == EXPO_SWITCH1) ? 1 : 2;
-            label = idx == 1 ? _tr("Switch1") : _tr("Switch2");
+            label = idx == 1 ? _tr_noop("Switch1") : _tr_noop("Switch2");
             underline = UNDERLINE;
             tgl = sourceselect_cb; value = set_drsource_cb; data = &mp->mixer[idx].sw; input_value = set_input_source_cb;
             break;

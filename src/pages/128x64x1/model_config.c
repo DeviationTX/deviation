@@ -54,36 +54,36 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     void *tgl = NULL;
     switch(absrow) {
         case ITEM_SWASHTYPE:
-            label = _tr("SwashType");
+            label = _tr_noop("SwashType");
             value = swash_val_cb;
             break;
         case ITEM_ELEINV:
-            label = _tr("ELE Inv");
+            label = _tr_noop("ELE Inv");
             tgl = swashinv_press_cb; value = swashinv_val_cb; data = (void *)1L;
             break;
         case ITEM_AILINV:
-            label = _tr("AIL Inv");
+            label = _tr_noop("AIL Inv");
             tgl = swashinv_press_cb; value = swashinv_val_cb; data = (void *)2L;
             break;
         case ITEM_COLINV:
-            label = _tr("COL Inv");
+            label = _tr_noop("COL Inv");
             tgl = swashinv_press_cb; value = swashinv_val_cb; data = (void *)4L;
             break;
         case ITEM_ELEMIX:
-            label = _tr("ELE Mix");
+            label = _tr_noop("ELE Mix");
             value = swashmix_val_cb; data = (void *)1L;
             break;
         case ITEM_AILMIX:
-            label = _tr("AIL Mix");
+            label = _tr_noop("AIL Mix");
             value = swashmix_val_cb; data = (void *)0L;
             break;
         case ITEM_COLMIX:
-            label = _tr("COL Mix");
+            label = _tr_noop("COL Mix");
             value = swashmix_val_cb; data = (void *)2L;
             break;
     }
     GUI_CreateLabelBox(&gui->label[relrow], LABEL_X, y,
-                LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, NULL, NULL, label);
+                LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, GUI_Localize, NULL, label);
     GUI_CreateTextSelectPlate(&gui->value[relrow], SELECT_X, y,
                 SELECT_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT, tgl, value, data);
     return 1;
@@ -118,7 +118,7 @@ static int row2_cb(int absrow, int relrow, int y, void *data)
         idx++;
     }
     GUI_CreateLabelBox(&gui->label[relrow], LABEL_X, y,
-            LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, NULL, NULL, _tr(proto_strs[pos]));
+            LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, GUI_Localize, NULL, proto_strs[pos]);
     GUI_CreateTextSelectPlate(&gui->value[relrow], SELECT_X, y,
             SELECT_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT, NULL, proto_opt_cb, (void *)(long)absrow);
     return 1;
@@ -132,7 +132,7 @@ static int row3_cb(int absrow, int relrow, int y, void *data)
     void *ts_press = NULL;
     void *ts_data = NULL;
     char *label = NULL;
-    void *label_cmd = NULL;
+    void *label_cmd = GUI_Localize;
 
     switch (absrow) {
     case 0:
@@ -158,7 +158,7 @@ static int row3_cb(int absrow, int relrow, int y, void *data)
         break;
     }
     GUI_CreateLabelBox(&gui->label[relrow], LABEL_X, y,
-            LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, label_cmd, NULL, label_cmd ? label : _tr(label));
+            LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, label_cmd, NULL, label);
     GUI_CreateTextSourcePlate(&gui->value[relrow], SELECT_X, y,
             SELECT_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT, ts_press, ts, input_ts, ts_data);
     return 1;
@@ -193,7 +193,7 @@ static int row4_cb(int absrow, int relrow, int y, void *data)
         break;
     }
     GUI_CreateLabelBox(&gui->label[relrow], LABEL_X, y,
-            LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, NULL, NULL, _tr(label));
+            LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, GUI_Localize, NULL, label);
     GUI_CreateTextSourcePlate(&gui->value[relrow], SELECT_X, y,
             SELECT_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT, ts_press, ts, input_ts, ts_data);
     return 1;

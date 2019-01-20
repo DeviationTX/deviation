@@ -83,7 +83,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
     const void *lbl_data = NULL;
-    void *lbl_cb = NULL;
+    void *lbl_cb = GUI_Localize;
     void *but_press = NULL;
     const void *but_data = NULL;
     void *but_txt = NULL;
@@ -93,16 +93,16 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     void *selpress_cb = NULL;
 
     if (absrow == DL_ENABLE) {
-        lbl_cb = NULL; lbl_data = _tr("Enable");
+        lbl_data = _tr_noop("Enable");
         sel_cb = sourcesel_cb; sel_data = NULL; sel_input_cb = sourcesel_input_cb;
     } else if (absrow == DL_RESET) {
         lbl_data = NULL;
         but_press = reset_press_cb; but_txt = reset_str_cb;
     } else if (absrow == DL_RATE) {
-        lbl_cb = NULL; lbl_data = _tr("Rate");
+        lbl_data = _tr_noop("Rate");
         sel_cb = ratesel_cb; sel_data = NULL;
     } else if (absrow == DL_SELECT) {
-        lbl_cb = NULL; lbl_data = _tr("Select");
+        lbl_data = _tr_noop("Select");
         selpress_cb = select_press_cb; sel_cb = select_cb; sel_data = NULL;
     } else {
         long row = absrow-DL_SOURCE;
