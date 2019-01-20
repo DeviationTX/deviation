@@ -91,9 +91,8 @@ def get_changed_lines():
     files = system(cmd).rstrip().split("\n")
     for _file in files:
         changed[_file] = {}
-        _p = subprocess.Popen(["git", "blame", _file], stdout=subprocess.PIPE)
+        _p = subprocess.Popen(["git", "blame", "--abbrev=8", _file], stdout=subprocess.PIPE)
         for line in _p.stdout:
-            logging.debug(line)
             sha = line[:9]
             if sha not in sha1s:
                 continue
