@@ -16,18 +16,16 @@
 #include "common.h"
 #include "protocol/interface.h"
 #include "mixer.h"
-#include "gui/gui.h" //diff1
-#include "buttons.h" //diff2
-                     //diff3
+#include "gui/gui.h"
+#include "buttons.h"
 #include "timer.h"
-#include "autodimmer.h" //diff4
-#include "music.h"      //diff5
+#include "autodimmer.h"
+#include "music.h"
 #include "config/model.h"
-                        //diff6
 #include "config/tx.h"
 #include "config/display.h"
 #include "rtc.h"
-#include "extended_audio.h" //diff7
+#include "extended_audio.h"
 
 void Init();
 void Banner();
@@ -51,13 +49,13 @@ int main() {
 #endif
     if(PWR_CheckPowerSwitch()) PWR_Shutdown();
 
-    LCD_Clear(0x0000); //diff8
-                       //diff9
-                       //diff10
-                       //diff11
-    u32 buttons = ScanButtons(); //diff12
-    if(CHAN_ButtonIsPressed(buttons, BUT_ENTER) || !FS_Mount(NULL, NULL)) { //diff13
-        LCD_DrawUSBLogo(LCD_WIDTH, LCD_HEIGHT); //diff14
+    LCD_Clear(0x0000);
+#ifdef TEST_ADC
+    ADC_ScanChannels(); while(1);
+#endif
+    u32 buttons = ScanButtons();
+    if(CHAN_ButtonIsPressed(buttons, BUT_ENTER) || !FS_Mount(NULL, NULL)) {
+        LCD_DrawUSBLogo(LCD_WIDTH, LCD_HEIGHT);
         USB_Connect();
         LCD_Clear(0x0000);
         FS_Mount(NULL, NULL);
@@ -67,16 +65,16 @@ int main() {
     SPI_ProtoInit();
     CONFIG_ReadDisplay();
     CONFIG_ReadModel(CONFIG_GetCurrentModel());
-    CONFIG_ReadLang(Transmitter.language); //diff15
+    CONFIG_ReadLang(Transmitter.language);
 
-    BACKLIGHT_Brightness(Transmitter.backlight); //diff16
+    BACKLIGHT_Brightness(Transmitter.backlight);
     LCD_Contrast(Transmitter.contrast);
-    LCD_SetFont(DEFAULT_FONT.font); //diff17
+    LCD_SetFont(DEFAULT_FONT.font);
     LCD_SetFontColor(DEFAULT_FONT.font_color);
 
-    GUI_HandleButtons(1); //diff18
+    GUI_HandleButtons(1);
 
-    MIXER_Init(); //diff19
+    MIXER_Init();
     PAGE_Init();
 
     CLOCK_StartWatchdog();
@@ -432,7 +430,7 @@ void debug_switches()
             }
         }
         if (changed) { printf("\n"); }
-        if(PWR_CheckPowerSwitch()) PWR_Shutdown();
+        if(PWR_CheckPowerSwitch()) PWR_Shutdown(); // extra
     }
 }
 void debug_buttons()
