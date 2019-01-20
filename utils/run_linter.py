@@ -50,9 +50,6 @@ def main():
             print("Please install cpplint via 'pip install cpplint' or equivalent")
             sys.exit(1)
 
-    pwd = os.getcwd()
-    os.chdir(subprocess.check_output(["git", "rev-parse", "--show-toplevel"]).rstrip())
-
     parser = argparse.ArgumentParser()
     parser.add_argument("path", nargs='*', help="Paths to lint")
     parser.add_argument("--diff", action="store_true",
@@ -64,10 +61,14 @@ def main():
     args = parser.parse_args()
     if args.debug:
         logging.basicConfig(level=logging.DEBUG)
-    logging.debug("TRAVIS_PULL_REQUEST:     " + TRAVIS_PULL_REQUEST or "False")
-    logging.debug("TRAVIS_PULL_REQUEST_SHA: " + TRAVIS_PULL_REQUEST_SHA)
-    logging.debug("TRAVIS_BRANCH:           " + TRAVIS_BRANCH)
-    logging.debug("TRAVIS_REPO_SLUG:        " + TRAVIS_REPO_SLUG)
+
+    pwd = os.getcwd()
+    os.chdir(system(["git", "rev-parse", "--show-toplevel"]).rstrip())
+
+    logging.debug("TRAVIS_PULL_REQUEST:     %s",  TRAVIS_PULL_REQUEST)
+    logging.debug("TRAVIS_PULL_REQUEST_SHA: %s",  TRAVIS_PULL_REQUEST_SHA)
+    logging.debug("TRAVIS_BRANCH:           %s", TRAVIS_BRANCH)
+    logging.debug("TRAVIS_REPO_SLUG:        %s", TRAVIS_REPO_SLUG)
 
     changed = {}
     if args.diff:
@@ -80,22 +81,22 @@ def main():
 
 def get_changed_lines():
     changed = {}
-    cmd = ["git", "diff", "--name-only", "--diff-filter", "AM"]
-    sha1 = "000000000";
-    if TRAVIS_BRANCH:
-        cmd.append("{}..HEAD".format(TRAVIS_BRANCH))
-        sha1 = subprocess.check_output(
-            ["git", "rev-parse", "--short=9", "HEAD"]).rstrip()
-        logging.debug("Matching sha1: " + sha1)
-    logging.debug("Running: " + " ".join(cmd))
-    files = subprocess.check_output(cmd).split("\n")
-    for _file in [_f.rstrip() for _f in files]:
-        if not _file:
-            continue
+    master = TRAVIS_BRANCH or "master"
+    base = system(["git", "merge-base", "HEAD", master]).rstrip()
+    cmd = ["git", "diff", "--name-only", "--diff-filter", "AM", base]
+    sha1s = ["000000000"];
+    # Find all sha's on this branch
+    sha1s += [commit[:9] for commit in system(["git", "rev-list", base + "..HEAD"]).rstrip().split('\n')]
+    logging.debug("Mathing SHA1s: %s", sha1s)
+    files = system(cmd).rstrip().split("\n")
+    for _file in files:
         changed[_file] = {}
         _p = subprocess.Popen(["git", "blame", _file], stdout=subprocess.PIPE)
         for line in _p.stdout:
-            match = re.search("^{}\s[^\(]*\([^\)]*\s(\d+)\)".format(sha1), line)
+            sha = line[:9]
+            if sha not in sha1s:
+                continue
+            match = re.search("^[^\(]*\([^\)]*\s(\d+)\)", line)
             if not match:
                 continue
             changed[_file][int(match.group(1))] = 1
@@ -362,6 +363,14 @@ def delete_comment(_type, _id):
         print e
         print e.read()
         sys.exit(1)
+
+
+def system(cmd):
+    logging.debug("Running: " + " ".join(cmd))
+    if isinstance(cmd, list):
+        return subprocess.check_output(cmd)
+    else:
+        return subprocess.check_output(cmd, shell=True)
 
 
 main()
