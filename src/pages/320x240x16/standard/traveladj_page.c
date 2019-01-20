@@ -65,8 +65,8 @@ void PAGE_TravelAdjInit(int page)
                         : 0;
     mp->firstObj = NULL;
     GUI_CreateScrollbar(&gui->scrollbar, LCD_WIDTH - 16, 32, LCD_HEIGHT-32, mp->max_scroll+1, NULL, STDMIX_ScrollCB, show_page);
-    GUI_CreateLabelBox(&gui->dnlbl, 90 + ((LCD_WIDTH - 320) / 2), 36 + ((LCD_HEIGHT - 240) / 2),  96, 16, &NARROW_FONT, NULL, NULL, _tr("Down"));
-    GUI_CreateLabelBox(&gui->uplbl, 196 + ((LCD_WIDTH - 320) / 2), 36 + ((LCD_HEIGHT - 240) / 2),  96, 16, &NARROW_FONT, NULL, NULL, _tr("Up"));
+    GUI_CreateLabelBox(&gui->dnlbl, 90 + ((LCD_WIDTH - 320) / 2), 36 + ((LCD_HEIGHT - 240) / 2),  96, 16, &NARROW_FONT, GUI_Localize, NULL, _tr_noop("Down"));
+    GUI_CreateLabelBox(&gui->uplbl, 196 + ((LCD_WIDTH - 320) / 2), 36 + ((LCD_HEIGHT - 240) / 2),  96, 16, &NARROW_FONT, GUI_Localize, NULL, _tr_noop("Up"));
     show_page(page);
 }
 #endif //HAS_STANDARD_GUI

@@ -46,10 +46,10 @@ void PAGE_ThroHoldInit(int page)
     };
     PAGE_ShowHeader(NULL);
     PAGE_ShowHeader_SetLabel(STDMIX_TitleString, SET_TITLE_DATA(PAGEID_THROHOLD, SWITCHFUNC_HOLD));
-    GUI_CreateLabelBox(&gui->enlbl, COL1, ROW1, LABEL_WIDTH, 16, &LABEL_FONT, NULL, NULL, _tr("Thr hold"));
+    GUI_CreateLabelBox(&gui->enlbl, COL1, ROW1, LABEL_WIDTH, 16, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Thr hold"));
     GUI_CreateTextSelect(&gui->en, COL2, ROW1, TEXTSELECT_128, toggle_thold_cb, throhold_cb,  NULL);
 
-    GUI_CreateLabelBox(&gui->valuelbl, COL1, ROW2, LABEL_WIDTH, 16, &LABEL_FONT, NULL, NULL, _tr("Hold position"));
+    GUI_CreateLabelBox(&gui->valuelbl, COL1, ROW2, LABEL_WIDTH, 16, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Hold position"));
     GUI_CreateTextSelect(&gui->value, COL2, ROW2, TEXTSELECT_128, NULL, holdpostion_cb,  NULL);
 }
 #endif //HAS_STANDARD_GUI

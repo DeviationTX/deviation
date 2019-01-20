@@ -48,8 +48,8 @@ void PAGE_VoiceconfigInit(int page)
     PAGE_ShowHeader(PAGE_GetName(PAGEID_VOICECFG));
 
     if ( !AUDIO_VoiceAvailable() ) {
-        GUI_CreateLabelBox(&gui->msg, 20, 80, 280, 100, &NARROW_FONT, NULL, NULL,
-            _tr("External voice\ncurrently not\navailable"));
+        GUI_CreateLabelBox(&gui->msg, 20, 80, 280, 100, &NARROW_FONT, GUI_Localize, NULL,
+            _tr_noop("External voice\ncurrently not\navailable"));
         return;
     }
     
