@@ -291,7 +291,7 @@ endif
 %.fs_wrapper: $(LAST_MODEL)
 	true
 
-.PHONY: $(PRE_FS) $(LAST_MODEL) $(TARGET).elf
+.PHONY: $(PRE_FS) $(LAST_MODEL)
 $(LAST_MODEL): model_template.ini tx_template.ini $(FONTS) $(PRE_FS)
 	@echo " + Copying template files for $(FILESYSTEM)"
 	mkdir -p filesystem/$(FILESYSTEM) || true
