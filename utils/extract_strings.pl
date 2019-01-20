@@ -76,8 +76,8 @@ sub main {
 sub check_targets {
     my($fs, @requested_targets) = @_;
     if($fs || @requested_targets) {
-        if (! @requested_targets || ! $fs) {
-            print "ERROR: Must specify both -fs and -targets\n";
+        if (! @requested_targets) {
+            print "ERROR: Must specify both -targets with -fs\n";
             exit 1;
         }
         my $ok = 1;
