@@ -1,0 +1,18 @@
+# run the clang-format to format the code:
+# clang-format -style=file -sort-includes -i <xyz>.c
+BasedOnStyle: Google
+
+IndentWidth: 4
+
+TabWidth: 4
+UseTab: Never
+
+IncludeCategories:
+  - Regex:           '^"common'
+    Priority:        -1
+  - Regex:           '^"(gui|screen|config)/'
+    Priority:        2
+  - Regex:           '^(<|".+/)'
+    Priority:        1
+  - Regex:           '.*'
+    Priority:        3
