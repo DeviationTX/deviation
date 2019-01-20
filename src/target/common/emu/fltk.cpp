@@ -36,6 +36,7 @@
 #include "fltk_resample.h"
 
 bool changed = false;
+static bool singlethread = false;
 
 #define USE_OWN_PRINTF 0 //Disable sprintf mappingdue to need for %f
 //Windows
@@ -557,6 +558,11 @@ void _ALARMhandler(int sig) {
 
 void CLOCK_Init()
 {
+    singlethread = getenv("SINGLETHREAD") != NULL;
+
+    if (singlethread)
+        return;
+
     timer_callback = NULL;
     signal(SIGALRM, _ALARMhandler);
 #if 1  //Mac OSX doesn't support posix timers, but does support itimers
@@ -653,6 +659,8 @@ u32 CLOCK_getms()
 
 void PWR_Sleep() {
     Fl::wait(0.1);
+    if (singlethread)
+        ALARMhandler();
 }
 void LCD_ForceUpdate() {
     if (changed) {

@@ -89,7 +89,7 @@ int main() {
 
     // We need to wait until we've actually measured the ADC before proceeding
     while(! (priority_ready & (1 << LOW_PRIORITY)))
-        ;
+        PWR_Sleep();
 
     //Only do this after we've initialized all channel data so the saftey works
     PROTOCOL_InitModules();
