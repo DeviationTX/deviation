@@ -70,12 +70,12 @@ def main():
     logging.debug("TRAVIS_PULL_REQUEST_SHA: %s",  TRAVIS_PULL_REQUEST_SHA)
     logging.debug("TRAVIS_BRANCH:           %s", TRAVIS_BRANCH)
     logging.debug("TRAVIS_REPO_SLUG:        %s", TRAVIS_REPO_SLUG)
-
     changed = {}
     if args.diff:
         if TRAVIS and not TRAVIS_PULL_REQUEST:
             # FIXME: This shouldn't be needed, but not sure why TRAVIS is so special
             return
+        check_depth()
         changed = get_changed_lines()
 
     paths = filter_paths(args.path, changed, pwd)
@@ -375,6 +375,16 @@ def system(cmd):
         return subprocess.check_output(cmd)
     else:
         return subprocess.check_output(cmd, shell=True)
+
+def check_depth():
+    if TRAVIS and TRAVIS_PULL_REQUEST_SHA:
+        with open(os.devnull, 'w') as devnull:
+            if subprocess.call(["git", "merge-base", TRAVIS_PULL_REQUEST_SHA, TRAVIS_BRANCH], stdout=devnull):
+                # Current depth is not deep enough
+                logging.debug(system(["git", "fetch", "--deepen", "100"]))
+                if subprocess.call(["git", "merge-base", TRAVIS_PULL_REQUEST_SHA, TRAVIS_BRANCH], stdout=devnull):
+                    logging.error("Can't find common base for comparison. Aborting")
+                    sys.exit(1)
 
 
 main()
