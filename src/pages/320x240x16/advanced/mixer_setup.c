@@ -56,11 +56,11 @@ static void _show_simple()
     const int space = 40;
     int y = 60;
     //Row 1
-    mp->firstObj = GUI_CreateLabelBox(&gui1->srclbl, COL1_TEXT, y, COL1_VALUE - COL1_TEXT, 0, &LABEL_FONT, NULL, NULL, _tr("Src"));
+    mp->firstObj = GUI_CreateLabelBox(&gui1->srclbl, COL1_TEXT, y, COL1_VALUE - COL1_TEXT, 0, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Src"));
     GUI_CreateTextSource(&gui1->src, COL1_VALUE, y, TEXTSELECT_96, sourceselect_cb, set_source_cb, set_input_source_cb, &mp->mixer[0].src);
     y += space;
     //Row 2
-    GUI_CreateLabelBox(&gui1->curvelbl, COL1_TEXT, y, COL1_VALUE - COL1_TEXT, 0, &LABEL_FONT, NULL, NULL, _tr("Curve"));
+    GUI_CreateLabelBox(&gui1->curvelbl, COL1_TEXT, y, COL1_VALUE - COL1_TEXT, 0, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Curve"));
     GUI_CreateTextSelect(&gui1->curve, COL1_VALUE, y, TEXTSELECT_96, curveselect_cb, set_curvename_cb, &mp->mixer[0]);
     y += space;
 
@@ -73,7 +73,7 @@ static void _show_simple()
     GUI_CreateTextSelect(&gui1->scale, COL1_VALUE, y, TEXTSELECT_96, NULL, set_number100_cb, &mp->mixer[0].scalar);
     y += space;
     //Row 4
-    GUI_CreateLabelBox(&gui1->offsetlbl, COL1_TEXT, y, COL1_VALUE - COL1_TEXT, 0, &LABEL_FONT, NULL, NULL, _tr("Offset"));
+    GUI_CreateLabelBox(&gui1->offsetlbl, COL1_TEXT, y, COL1_VALUE - COL1_TEXT, 0, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Offset"));
     GUI_CreateTextSelect(&gui1->offset, COL1_VALUE, y, TEXTSELECT_96, NULL, set_number100_cb, &mp->mixer[0].offset);
 }
 
@@ -81,9 +81,9 @@ static void _show_expo_dr()
 {
     sync_mixers();
     //Row 1
-    mp->firstObj = GUI_CreateLabelBox(&gui2->srclbl, COL1_TEXT, 32, 96, 16, &NARROW_FONT, NULL, NULL, _tr("Src"));
-    GUI_CreateLabelBox(&gui2->sw1lbl, COL_EXP2, 32, 96, 16, &NARROW_FONT, NULL, NULL, _tr("Switch1"));
-    GUI_CreateLabelBox(&gui2->sw2lbl, COL_EXP3, 32, 96, 16, &NARROW_FONT, NULL, NULL, _tr("Switch2"));
+    mp->firstObj = GUI_CreateLabelBox(&gui2->srclbl, COL1_TEXT, 32, 96, 16, &NARROW_FONT, GUI_Localize, NULL, _tr_noop("Src"));
+    GUI_CreateLabelBox(&gui2->sw1lbl, COL_EXP2, 32, 96, 16, &NARROW_FONT, GUI_Localize, NULL, _tr_noop("Switch1"));
+    GUI_CreateLabelBox(&gui2->sw2lbl, COL_EXP3, 32, 96, 16, &NARROW_FONT, GUI_Localize, NULL, _tr_noop("Switch2"));
     //Row 2
     GUI_CreateTextSource(&gui2->src, COL1_TEXT, 48, TEXTSELECT_96, sourceselect_cb, set_source_cb,
                          set_input_source_cb, &mp->mixer[0].src);
@@ -92,16 +92,16 @@ static void _show_expo_dr()
     GUI_CreateTextSource(&gui2->sw2, COL_EXP3, 48, TEXTSELECT_96, sourceselect_cb, set_drsource_cb,
                          set_input_source_cb, &mp->mixer[2].sw);
     //Row 3
-    GUI_CreateLabelBox(&gui2->high, COL1_TEXT, 72, 96, 16, &NARROW_FONT, NULL, NULL, _tr("High-Rate"));
+    GUI_CreateLabelBox(&gui2->high, COL1_TEXT, 72, 96, 16, &NARROW_FONT, GUI_Localize, NULL, _tr_noop("High-Rate"));
     GUI_CreateButton(&gui2->rate[0], COL_EXP2, 72, BUTTON_96x16, show_rate_cb, toggle_link_cb, (void *)0);
     GUI_CreateButton(&gui2->rate[1], COL_EXP3, 72, BUTTON_96x16, show_rate_cb, toggle_link_cb, (void *)1);
     //Row 4
     GUI_CreateTextSelect(&gui2->curvehi, COL1_TEXT, 96, TEXTSELECT_96, curveselect_cb, set_curvename_cb, &mp->mixer[0]);
     //The following 2 items are mutex.  One is always hidden
-    GUI_CreateLabelBox(&gui2->linked[0], COL_EXP2, 96, 96, 16, &NARROW_FONT, NULL, NULL, _tr("Linked"));
+    GUI_CreateLabelBox(&gui2->linked[0], COL_EXP2, 96, 96, 16, &NARROW_FONT, GUI_Localize, NULL, _tr_noop("Linked"));
     GUI_CreateTextSelect(&gui2->curve[0], COL_EXP2, 96, TEXTSELECT_96, curveselect_cb, set_curvename_cb, &mp->mixer[1]);
     //The following 2 items are mutex.  One is always hidden
-    GUI_CreateLabelBox(&gui2->linked[1], COL_EXP3, 96, 96, 16, &NARROW_FONT, NULL, NULL, _tr("Linked"));
+    GUI_CreateLabelBox(&gui2->linked[1], COL_EXP3, 96, 96, 16, &NARROW_FONT, GUI_Localize, NULL, _tr_noop("Linked"));
     GUI_CreateTextSelect(&gui2->curve[1], COL_EXP3, 96, TEXTSELECT_96, curveselect_cb, set_curvename_cb, &mp->mixer[2]);
     //Row 5
     GUI_CreateLabelBox(&gui2->scalelbl, COL1_TEXT, 122, COL_SCALEHI - COL1_TEXT, 0, &LABEL_FONT, scalestring_cb, NULL, (void *)0);
@@ -132,9 +132,9 @@ static void _show_complex(int page_change)
     (void)page_change;
     //Row 1
     if (! mp->firstObj) {
-        mp->firstObj = GUI_CreateLabelBox(&gui3->nummixlbl, COL1_TEXT, 40, COL1_VALUE - COL1_TEXT, 0, &LABEL_FONT, NULL, NULL, _tr("Mixers"));
+        mp->firstObj = GUI_CreateLabelBox(&gui3->nummixlbl, COL1_TEXT, 40, COL1_VALUE - COL1_TEXT, 0, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Mixers"));
         GUI_CreateTextSelect(&gui3->nummix, COL1_VALUE, 40, TEXTSELECT_96, NULL, set_nummixers_cb, NULL);
-        GUI_CreateLabelBox(&gui3->pagelbl, COL2_TEXT, 40, COL2_VALUE - COL2_TEXT, 0, &LABEL_FONT, NULL, NULL, _tr("Page"));
+        GUI_CreateLabelBox(&gui3->pagelbl, COL2_TEXT, 40, COL2_VALUE - COL2_TEXT, 0, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Page"));
         guiObject_t *obj = GUI_CreateTextSelect(&gui3->page, COL2_VALUE, 40, TEXTSELECT_96, reorder_cb, set_mixernum_cb, NULL);
         if (! GUI_GetSelected()) //Set the page button to be selected if nothinge else is yet
             GUI_SetSelected(obj);
@@ -142,23 +142,23 @@ static void _show_complex(int page_change)
         GUI_RemoveHierObjects((guiObject_t *)&gui3->swlbl);
     }
     //Row 2
-    GUI_CreateLabelBox(&gui3->swlbl, COL1_TEXT, 64, COL1_VALUE - COL1_TEXT, 0, &LABEL_FONT, NULL, NULL, _tr("Switch"));
+    GUI_CreateLabelBox(&gui3->swlbl, COL1_TEXT, 64, COL1_VALUE - COL1_TEXT, 0, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Switch"));
     GUI_CreateTextSource(&gui3->sw, COL1_VALUE, 64, TEXTSELECT_96, sourceselect_cb, set_drsource_cb,
                          set_input_source_cb, &mp->cur_mixer->sw);
-    GUI_CreateLabelBox(&gui3->muxlbl, COL2_TEXT, 64, COL2_VALUE - COL2_TEXT, 0, &LABEL_FONT, NULL, NULL, _tr("Mux"));
+    GUI_CreateLabelBox(&gui3->muxlbl, COL2_TEXT, 64, COL2_VALUE - COL2_TEXT, 0, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Mux"));
     GUI_CreateTextSelect(&gui3->mux, COL2_VALUE, 64, TEXTSELECT_96, NULL, set_mux_cb, NULL);
     //Row 3
-    GUI_CreateLabelBox(&gui3->srclbl, COL1_TEXT, 98, COL1_VALUE - COL1_TEXT, 0, &LABEL_FONT, NULL, NULL, _tr("Src"));
+    GUI_CreateLabelBox(&gui3->srclbl, COL1_TEXT, 98, COL1_VALUE - COL1_TEXT, 0, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Src"));
     GUI_CreateTextSource(&gui3->src, COL1_VALUE, 98, TEXTSELECT_96, sourceselect_cb, set_source_cb,
                          set_input_source_cb, &mp->cur_mixer->src);
     //Row 4
-    GUI_CreateLabelBox(&gui3->curvelbl, COL1_TEXT, 122, COL1_VALUE - COL1_TEXT, 0, &LABEL_FONT, NULL, NULL, _tr("Curve"));
+    GUI_CreateLabelBox(&gui3->curvelbl, COL1_TEXT, 122, COL1_VALUE - COL1_TEXT, 0, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Curve"));
     GUI_CreateTextSelect(&gui3->curve, COL1_VALUE, 122, TEXTSELECT_96, curveselect_cb, set_curvename_cb, mp->cur_mixer);
     //Row 5
     GUI_CreateLabelBox(&gui3->scalelbl, COL1_TEXT, 156, COL1_VALUE - COL1_TEXT, 0, &LABEL_FONT, scalestring_cb, NULL, (void *)0);
     GUI_CreateTextSelect(&gui3->scale, COL1_VALUE, 156, TEXTSELECT_96, NULL, set_number100_cb, &mp->cur_mixer->scalar);
     //Row 6
-    GUI_CreateLabelBox(&gui3->offsetlbl, COL1_TEXT, 180, COL1_VALUE - COL1_TEXT, 0, &LABEL_FONT, NULL, NULL, _tr("Offset"));
+    GUI_CreateLabelBox(&gui3->offsetlbl, COL1_TEXT, 180, COL1_VALUE - COL1_TEXT, 0, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Offset"));
     GUI_CreateTextSelect(&gui3->offset, COL1_VALUE, 180, TEXTSELECT_96, NULL, set_number100_cb, &mp->cur_mixer->offset);
     GUI_CreateBarGraph(&gui3->bar, COL2_TEXT, 86, 10, 150,
                               CHAN_MIN_VALUE, CHAN_MAX_VALUE, BAR_VERTICAL,

@@ -193,11 +193,11 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     }
     if (title) {
         GUI_CreateLabelBox(&gui->title[relrow], TITLE_X_OFFSET, y,
-                TITLE_WIDTH, LINE_HEIGHT, &SECTION_FONT, NULL, NULL, _tr(title));
+                TITLE_WIDTH, LINE_HEIGHT, &SECTION_FONT, GUI_Localize, NULL, title);
         y += LINE_SPACE;
     }
     GUI_CreateLabelBox(&gui->label[relrow], LABEL_X_OFFSET, y,
-            LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, NULL, NULL, _tr(label));
+            LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, GUI_Localize, NULL, label);
     if(but_str) {
         GUI_CreateButtonPlateText(&gui->value[relrow].but, x, y,
             TEXTSEL_X_WIDTH, LINE_HEIGHT, &BUTTON_FONT, but_str, tgl, data);
