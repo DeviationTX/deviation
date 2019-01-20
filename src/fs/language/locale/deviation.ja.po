@@ -9,6 +9,9 @@ msgstr ""
 "Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
+msgid "->Translated Language Name<-"
+msgstr "日本語"
+
 #: inputs.c:35 pages/common/standard/_drexp_page.c:57
 #: pages/common/advanced/_mixer_page.c:63
 msgid "AIL"

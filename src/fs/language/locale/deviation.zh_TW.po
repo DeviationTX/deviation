@@ -1602,7 +1602,7 @@ msgstr "升降方向"
 
 #: pages/320x240x16/model_config.c:47 pages/128x64x1/model_config.c:65
 msgid "AIL Inv"
-msgstr ""
+msgstr "副翼方向"
 
 #: pages/320x240x16/model_config.c:53
 #: pages/320x240x16/standard/swash_page.c:45 pages/128x64x1/model_config.c:73
@@ -1614,7 +1614,7 @@ msgstr "升降螺距"
 #: pages/320x240x16/standard/swash_page.c:50 pages/128x64x1/model_config.c:77
 #: pages/128x64x1/standard/swash_page.c:49
 msgid "AIL Mix"
-msgstr ""
+msgstr "副翼螺距"
 
 #: pages/320x240x16/model_config.c:59 pages/128x64x1/model_config.c:81
 msgid "COL Mix"

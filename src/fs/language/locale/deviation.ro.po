@@ -1017,8 +1017,7 @@ msgid ""
 "to reset the\n"
 " permanent timer %d?"
 msgstr ""
-"Sigur doriți să\r"
-"esetați\n"
+"Sigur doriți să\\resetați\n"
 "timerul permanent %d?"
 
 #: pages/common/standard/_gyrosense_page.c:27

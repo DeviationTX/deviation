@@ -1655,7 +1655,7 @@ msgstr ""
 "Bind in proses...\n"
 "Maak seker die model is aan!\n"
 "\n"
-" OK sal nie die proses stop nie,\n"
+" \"OK\" sal nie die proses stop nie,\n"
 "maar sal volle beheer toelaat."
 
 #: pages/320x240x16/dialogs.c:66

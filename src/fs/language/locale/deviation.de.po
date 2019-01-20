@@ -2491,7 +2491,9 @@ msgstr ""
 
 #: Model template
 msgid "4Ch w/ Dual-Rates"
-msgstr "4-Kanal Heli mit DR"
+msgstr ""
+"4-Kanal Heli mit DR\n"
+"devo8:4-Kanal Heli mit Dual-Rate"
 
 #: Model template
 msgid "Simple 4 Channel"
