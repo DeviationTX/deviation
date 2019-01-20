@@ -305,7 +305,7 @@ $(LAST_MODEL): model_template.ini tx_template.ini $(FONTS) $(PRE_FS)
 	cp model_template.ini filesystem/$(FILESYSTEM)/models/default.ini
 ifdef LANGUAGE
 	mkdir filesystem/$(FILESYSTEM)/language 2> /dev/null; \
-               ../utils/extract_strings.pl -po -fs filesystem/$(FILESYSTEM)/language -targets $(LANGUAGE) -update -elffile $(TARGET).elf
+               ../utils/extract_strings.pl -po -fs filesystem/$(FILESYSTEM)/language -targets $(LANGUAGE) -update -objdir $(ODIR)
 endif
 	export tx=$(FILESYSTEM); \
 	number=2 ; while [ $$number -le $(NUM_MODELS) ] ; do \
@@ -314,9 +314,9 @@ endif
 		done
 	@echo " + Checking string list length for $(FILESYSTEM)"
 ifeq "$(TYPE)" "dev"
-	../utils/check_string_size.pl -target $(FILESYSTEM) -elffile $(TARGET).elf
+	../utils/check_string_size.pl -target $(FILESYSTEM) -objdir $(ODIR)
 else
-	../utils/check_string_size.pl -target $(FILESYSTEM) -elffile $(TARGET).elf -quiet
+	../utils/check_string_size.pl -target $(FILESYSTEM) -objdir $(ODIR) -quiet
 endif
 
 ######################
