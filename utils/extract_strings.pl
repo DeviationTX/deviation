@@ -3,11 +3,12 @@ use strict;
 use warnings;
 
 use Getopt::Long;
+use Tie::IxHash;
 
 my @requested_targets;
 # The following are legal alternatives to the default string
 my @targets = ("devo8", "devo10", "devo12");
-my $PO_LANGUAGE_STRING = "<Translated Language Name>";
+my $PO_LANGUAGE_STRING = "->Translated Language Name<-";
 
 sub main {
     my $update;
@@ -26,6 +27,54 @@ sub main {
         "objdir=s" => \$objdir, "elffile=s" => \$elffile,
         "format=s" => \$format);
     @requested_targets = split(/,/, $target_list) if($target_list);
+    check_targets($fs, @requested_targets);
+
+    my $uniq = get_strings($elffile || $objdir);
+    if($count) {
+        printf "%d", scalar(keys(%$uniq));
+        exit 0;
+    }
+
+    if(! $update) {
+        if ($po) {
+            print "msgid \"$PO_LANGUAGE_STRING\"\nmsgstr \"\"\n\n";
+        }
+        foreach (keys %$uniq) {
+            if ($po) {
+                # Match same syntax used by getopt
+                print $uniq->{$_}; # Comment
+                my @msg = split(/(?<=\\n)/, $_);
+                if (scalar(@msg) > 1) {
+                    print "msgid \"\"\n\"" . join("\"\n\"", @msg) . "\"\n";
+                } else {
+                    print "msgid \"$msg[0]\"\n";
+                }
+                print "msgstr \"\"\n";
+                print "\n";
+            } else {
+                print ":$_\n";
+           }
+        }
+        exit 0;
+    }
+
+    my @files = ($po ?
+                 ($lang ?
+                     "fs/language/locale/deviation.$lang.po" :
+                     glob("fs/language/locale/*.po")) :
+                 glob($lang ?
+                     "fs/language/lang*.$lang" :
+                     "fs/language/lang*"));
+    for my $file (@files) {
+        my($ext, $language, $translation) = $po
+            ? parse_po_file($file, $uniq)
+            : parse_v1lang_file($file, $uniq);
+        write_lang_file("$fs/lang.$ext", $language, $translation, $format);
+    }
+}
+
+sub check_targets {
+    my($fs, @requested_targets) = @_;
     if($fs || @requested_targets) {
         if (! @requested_targets || ! $fs) {
             print "ERROR: Must specify both -fs and -targets\n";
@@ -40,34 +89,6 @@ sub main {
         }
         exit 1 if(! $ok);
     }
-
-    my $uniq = get_strings($elffile || $objdir);
-    if($count) {
-        printf "%d", scalar(keys(%$uniq));
-        exit 0;
-    }
-
-    if(! $update) {
-        foreach (sort keys %$uniq) {
-            print ":$_\n";
-        }
-        exit 0;
-    }
-
-    my @files = ($po ?
-                 ($lang ?
-                     "fs/language/$lang.po" :
-                     glob("fs/language/*.po")) :
-                 glob($lang ?
-                     "fs/language/lang*.$lang" :
-                     "fs/language/lang*"));
-    for my $file (@files) {
-        my($language, $translation) = $po
-            ? parse_po_file($file, $uniq)
-            : parse_v1lang_file($file, $uniq);
-        my ($ext) = ($file =~ /[^\/.]+\.([^\/.\s]+)(?:\.po)?$/);
-        write_lang_file("$fs/lang.$ext", $language, $translation, $format);
-    }
 }
 
 sub get_strings {
@@ -80,7 +101,7 @@ sub get_strings {
     foreach (`head -n 1 fs/common/template/*.ini`) {
         chomp;
         if(/template=(.*?)\s*$/) {
-            $strings->{$1} = 1;
+            $strings->{$1} = "#: Model template\n";
         }
     }
     return $strings;
@@ -90,11 +111,12 @@ sub extract_all_strings {
     my @lines = `/usr/bin/find . -name "*.[hc]" | grep -v libopencm3 | xargs xgettext -o - --omit-header -k --keyword=_tr --keyword=_tr_noop --no-wrap`;
     my $idx = 0;
     my %strings;
+    tie(%strings, 'Tie::IxHash');
     #Read all strings and put into a hash that maps the containing file to the string
     while(@lines) {
-        my($msgid, $msgstr) = parse_gettext(\@lines);
+        my($msgid, $msgstr, $comment) = parse_gettext(\@lines);
         next unless($msgid);
-        $strings{$msgid} = 1;
+        $strings{$msgid} = $comment;
     }
     return \%strings;
 }
@@ -129,7 +151,7 @@ sub extract_target_strings {
                         #NULL termination
                         if($str) {
                             $str =~ s/\n/\\n/g;  #Convert <CR> to \n
-                            $strings{$str} = 1 if($valid_strings->{$str});
+                            $strings{$str} = $valid_strings->{$str} if($valid_strings->{$str});
                             $str = "";
                         }
                     } else {
@@ -201,8 +223,13 @@ sub write_lang_file {
 sub parse_gettext {
     my($lines) = @_;
     my $msgid;
+    my $comment = "";
     while(1) {
         my $line = shift(@$lines);
+        if ($line =~ /^#[:,]/) {
+            $comment .= $line;
+            next;
+        }
         if ($line =~ /^\s*(msgid|msgstr)\s+"(.*)"\s*$/) {
             my($type, $str) = ($1, $2);
             while(@$lines && $lines->[0] =~ /^\s*"(.*)"\s*$/) {
@@ -216,11 +243,11 @@ sub parse_gettext {
                 $msgid = $str;
             }
             elsif ($type eq "msgstr") {
-                if (! $msgid) {
+                if (! defined $msgid) {
                     print "Error: no msgid for msgstr '$str'.  Ignoring\n";
                     next;
                 }
-                return($msgid, $str);
+                return($msgid, $str, $comment || "#");
             }
         }
     }
@@ -230,6 +257,7 @@ sub parse_po_file {
     my($file, $uniq) = @_;
     my %strings;
     my $language = "Unknown";
+    my $ext;
     my $re_target = join("|", @targets);
 
     open my $fh, "<", $file;
@@ -237,19 +265,28 @@ sub parse_po_file {
     close($fh);
     while(@lines) {
         my($msgid, $msgstr) = parse_gettext(\@lines);
-        next if(! $msgid || ! $uniq->{$msgid});
+        next if(! $msgstr);
+        if ($msgid eq "" && $msgstr =~ /(?:\b|\\n)Language:\s+(\S+?)(?:\b|\\n)/) {
+            $ext = lc($1);
+            if (length($ext) > 3) {
+                $ext =~ s/^.*_//;
+                $ext = substr($ext, -3);
+            }
+        }
+        next if(! $msgid);
         if ($msgid eq $PO_LANGUAGE_STRING) {
-            $language = $msgstr;
+            $language = $msgstr . "\n";
             next;
         }
-        my @values = split(/\n(?=(?:$re_target):)/, $msgstr);
+        next if(! $uniq->{$msgid});
+        my @values = split(/\\n(?=(?:$re_target)?:)/, $msgstr);
         foreach (@values) {
-            my($target, $target_str) = (/^(?:($re_target):)(.*)/);
+            my($target, $target_str) = (/^(?:($re_target):)?(.*)/);
             $strings{$target}{$msgid} = $target_str if($target);
-            $strings{DEFAULT}{$msgid} |= $target_str;
+            $strings{DEFAULT}{$msgid} ||= $target_str;
         }
     }
-    return ($language, \%strings);
+    return ($ext, $language, \%strings);
 }
 
 sub parse_v1lang_file {
@@ -258,6 +295,7 @@ sub parse_v1lang_file {
     open my $fh, "<", $file;
     my $language = <$fh>;
     my(@lines) = <$fh>;
+    my ($ext) = ($file =~ /[^\/.]+\.([^\/.\s]+)(?:\.po)?$/);
     for (my $line = 0; $line < $#lines; $line++) {
         $_ = $lines[$line];
         chomp;
@@ -276,7 +314,7 @@ sub parse_v1lang_file {
             $strings{DEFAULT}{$eng} ||= $next;
         }
     }
-    return($language, \%strings);
+    return($ext, $language, \%strings);
 }
 
 main();

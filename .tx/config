@@ -1,0 +1,10 @@
+[main]
+host = https://www.transifex.com
+
+[deviation-1.deviationpo]
+file_filter = src/fs/language/locale/deviation.<lang>.po
+minimum_perc = 0
+source_file = src/fs/language/deviation.po
+source_lang = en
+type = PO
+

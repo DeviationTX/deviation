@@ -1,0 +1,2427 @@
+# Translators:
+# PhracturedBlue <rc2012@pblue.org>, 2019
+# 
+msgid ""
+msgstr ""
+"Last-Translator: PhracturedBlue <rc2012@pblue.org>, 2019\n"
+"Language-Team: Afrikaans (https://www.transifex.com/deviationtx/teams/73329/af/)\n"
+"Language: af\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "->Translated Language Name<-"
+msgstr "Afrikaans"
+
+#: inputs.c:35 pages/common/standard/_drexp_page.c:57
+#: pages/common/advanced/_mixer_page.c:63
+msgid "AIL"
+msgstr "AIL"
+
+#: inputs.c:36 pages/common/standard/_drexp_page.c:60
+#: pages/common/advanced/_mixer_page.c:64
+msgid "ELE"
+msgstr "ELE"
+
+#: inputs.c:37
+msgid "THR"
+msgstr "THR"
+
+#: inputs.c:38 pages/common/standard/_drexp_page.c:63
+msgid "RUD"
+msgstr "RUD"
+
+#: inputs.c:39 pages/common/standard/_gyrosense_page.c:61
+msgid "AUX2"
+msgstr "AUX2"
+
+#: inputs.c:40
+msgid "AUX3"
+msgstr "AUX3"
+
+#: inputs.c:41
+msgid "AUX4"
+msgstr "AUX4"
+
+#: inputs.c:42
+msgid "AUX5"
+msgstr "AUX5"
+
+#: inputs.c:43
+msgid "AUX6"
+msgstr "AUX6"
+
+#: inputs.c:44
+msgid "AUX7"
+msgstr "AUX7"
+
+#: inputs.c:45 inputs.c:46
+msgid "DR"
+msgstr "DR"
+
+#: inputs.c:47 inputs.c:48 inputs.c:49
+msgid "RUD DR"
+msgstr "RUD DR"
+
+#: inputs.c:50 inputs.c:51 inputs.c:52
+msgid "ELE DR"
+msgstr "ELE DR"
+
+#: inputs.c:53 inputs.c:54 inputs.c:55
+msgid "AIL DR"
+msgstr "AIL DR"
+
+#: inputs.c:56 inputs.c:57 inputs.c:91 inputs.c:92 inputs.c:93
+#: pages/common/standard/_gyrosense_page.c:59
+#: pages/common/standard/_common_standard.c:38
+msgid "GEAR"
+msgstr "GEAR"
+
+#: inputs.c:58 inputs.c:59 inputs.c:60
+msgid "MIX"
+msgstr "MIX"
+
+#: inputs.c:61 inputs.c:62 inputs.c:63
+msgid "FMODE"
+msgstr "FMODE"
+
+#: inputs.c:64 inputs.c:65
+msgid "HOLD"
+msgstr "HOU"
+
+#: inputs.c:66 inputs.c:67
+msgid "TRN"
+msgstr "TRN"
+
+#: inputs.c:68 inputs.c:69 inputs.c:70
+msgid "SW A"
+msgstr "SK A"
+
+#: inputs.c:71 inputs.c:72 inputs.c:73
+msgid "SW B"
+msgstr "SK B"
+
+#: inputs.c:74 inputs.c:75 inputs.c:76
+msgid "SW C"
+msgstr "SK C"
+
+#: inputs.c:77 inputs.c:78 inputs.c:79
+msgid "SW D"
+msgstr "SK D"
+
+#: inputs.c:80 inputs.c:81 inputs.c:82
+msgid "SW E"
+msgstr "SK E"
+
+#: inputs.c:83 inputs.c:84
+msgid "SW F"
+msgstr "SK F"
+
+#: inputs.c:85 inputs.c:86 inputs.c:87
+msgid "SW G"
+msgstr "SK G"
+
+#: inputs.c:88 inputs.c:89
+msgid "SW H"
+msgstr "SK H"
+
+#: inputs.c:95
+msgid "TRIMLV-"
+msgstr "TRIMLV-"
+
+#: inputs.c:96
+msgid "TRIMLV+"
+msgstr "TRIMLV+"
+
+#: inputs.c:97
+msgid "TRIMRV-"
+msgstr "TRIMRV-"
+
+#: inputs.c:98
+msgid "TRIMRV+"
+msgstr "TRIMRV+"
+
+#: inputs.c:99
+msgid "TRIMLH-"
+msgstr "TRIMLH-"
+
+#: inputs.c:100
+msgid "TRIMLH+"
+msgstr "TRIMLH+"
+
+#: inputs.c:101
+msgid "TRIMRH-"
+msgstr "TRIMRH-"
+
+#: inputs.c:102
+msgid "TRIMRH+"
+msgstr "TRIMRH+"
+
+#: inputs.c:103
+msgid "TRIM_L-"
+msgstr "TRIM_L-"
+
+#: inputs.c:104
+msgid "TRIM_L+"
+msgstr "TRIM_L+"
+
+#: inputs.c:105
+msgid "TRIM_R-"
+msgstr "TRIM_R-"
+
+#: inputs.c:106
+msgid "TRIM_R+"
+msgstr "TRIM_R+"
+
+#: inputs.c:107
+msgid "Left"
+msgstr "Links"
+
+#: inputs.c:108
+msgid "Right"
+msgstr "Regs"
+
+#: inputs.c:109 pages/320x240x16/standard/traveladj_page.c:68
+#: pages/128x64x1/standard/traveladj_page.c:61
+msgid "Down"
+msgstr "Af"
+
+#: inputs.c:110 pages/320x240x16/standard/traveladj_page.c:69
+#: pages/128x64x1/reorder_list.c:38
+#: pages/128x64x1/standard/traveladj_page.c:62
+msgid "Up"
+msgstr "Op"
+
+#: inputs.c:111
+msgid "Enter"
+msgstr "Enter"
+
+#: inputs.c:112
+msgid "Exit"
+msgstr "Exit"
+
+#: inputs.c:115
+msgid "RIGHT_H"
+msgstr "REGS_H"
+
+#: inputs.c:116
+msgid "LEFT_V"
+msgstr "LINKS_V"
+
+#: inputs.c:117
+msgid "RIGHT_V"
+msgstr "REGS_V"
+
+#: inputs.c:118
+msgid "LEFT_H"
+msgstr "LINKS_H"
+
+#: inputs.c:144 inputs.c:257 telemetry/telem_crsf.c:80
+#: telemetry/telem_frsky.c:58 telemetry/telem_dsm.c:261
+#: telemetry/telem_devo.c:76 protocol/protocol.c:89 mixer.c:873 mixer.c:887
+#: pages/common/_pages.c:152 pages/common/_voiceconfig_page.c:185
+#: pages/common/_model_page.c:221 pages/common/_model_page.c:274
+#: pages/common/standard/_failsafe_page.c:33
+#: pages/common/standard/_reverse_page.c:21
+#: pages/common/standard/_swash_page.c:65 pages/common/_trim_page.c:56
+#: pages/common/_trim_page.c:74 pages/common/advanced/_mixer_setup.c:400
+#: pages/common/_model_config.c:132 pages/common/_main_config.c:177
+#: pages/common/_main_config.c:181 pages/320x240x16/trim_page.c:46
+#: pages/320x240x16/model_page.c:99 pages/320x240x16/datalog_page.c:92
+#: pages/128x64x1/model_page.c:158 pages/128x64x1/datalog_page.c:79
+msgid "None"
+msgstr "Geen"
+
+#: inputs.c:154 pages/common/standard/_gyrosense_page.c:59
+#: pages/common/standard/_gyrosense_page.c:61
+msgid "Ch"
+msgstr "Knl"
+
+#: inputs.c:160 pages/320x240x16/chantest_page.c:219
+msgid "Virt"
+msgstr "Virt"
+
+#: inputs.c:163
+msgid "PPM"
+msgstr "PPM"
+
+#: telemetry/telem_crsf.c:81
+msgid "tx SNR"
+msgstr ""
+
+#: telemetry/telem_crsf.c:82
+msgid "txRSSI"
+msgstr ""
+
+#: telemetry/telem_crsf.c:83
+msgid "rx SNR"
+msgstr ""
+
+#: telemetry/telem_crsf.c:86
+msgid "FMode"
+msgstr ""
+
+#: telemetry/telem_crsf.c:87
+msgid "RFMode"
+msgstr ""
+
+#: telemetry/telem_crsf.c:88
+msgid "ANT"
+msgstr ""
+
+#: telemetry/telem_crsf.c:89
+msgid "Power"
+msgstr ""
+
+#: telemetry/telem_crsf.c:90
+msgid "rxQual"
+msgstr ""
+
+#: telemetry/telem_crsf.c:91
+msgid "txQual"
+msgstr ""
+
+#: telemetry/telem_crsf.c:92 telemetry/telem_frsky.c:64
+#: telemetry/telem_frsky.c:70 telemetry/telem_dsm.c:192
+#: telemetry/telem_devo.c:79 pages/128x64x1/telemtest_page.c:340
+msgid "Volt"
+msgstr "Volt"
+
+#: telemetry/telem_crsf.c:93
+msgid "Curr"
+msgstr ""
+
+#: telemetry/telem_crsf.c:94
+msgid "Cap"
+msgstr ""
+
+#: telemetry/telem_crsf.c:95
+msgid "Pitch"
+msgstr ""
+
+#: telemetry/telem_crsf.c:96
+msgid "Roll"
+msgstr ""
+
+#: telemetry/telem_crsf.c:97
+msgid "Yaw"
+msgstr ""
+
+#: telemetry/telem_crsf.c:106
+msgid "Flight Mode"
+msgstr ""
+
+#: telemetry/telem_crsf.c:107
+msgid "RF Mode"
+msgstr ""
+
+#: telemetry/telem_crsf.c:108
+msgid "Antenna"
+msgstr ""
+
+#: telemetry/telem_crsf.c:109
+msgid "rx Quality"
+msgstr ""
+
+#: telemetry/telem_crsf.c:110
+msgid "tx Quality"
+msgstr ""
+
+#: telemetry/telem_crsf.c:111
+msgid "Capacity"
+msgstr ""
+
+#: telemetry/telem_frsky.c:66 telemetry/telem_dsm.c:213
+msgid "RSSI"
+msgstr ""
+
+#: telemetry/telem_frsky.c:67
+msgid "LRSSI"
+msgstr ""
+
+#: telemetry/telem_frsky.c:68
+msgid "LQI"
+msgstr ""
+
+#: telemetry/telem_frsky.c:70 telemetry/telem_frsky.c:83
+#: telemetry/telem_dsm.c:201
+msgid "Amps"
+msgstr ""
+
+#: telemetry/telem_frsky.c:71
+msgid "MinCell"
+msgstr ""
+
+#: telemetry/telem_frsky.c:72
+msgid "AllCell"
+msgstr ""
+
+#: telemetry/telem_frsky.c:79 telemetry/telem_dsm.c:194
+#: telemetry/telem_devo.c:81 pages/128x64x1/telemtest_page.c:341
+msgid "RPM"
+msgstr "RPM"
+
+#: telemetry/telem_frsky.c:81 telemetry/telem_dsm.c:193
+#: telemetry/telem_devo.c:85 pages/128x64x1/telemtest_page.c:339
+msgid "Temp"
+msgstr "Temp"
+
+#: telemetry/telem_frsky.c:82
+msgid "Fuel"
+msgstr ""
+
+#: telemetry/telem_frsky.c:84
+msgid "Alt"
+msgstr ""
+
+#: telemetry/telem_frsky.c:85
+msgid "VSI"
+msgstr ""
+
+#: telemetry/telem_frsky.c:86
+msgid "DIS"
+msgstr ""
+
+#: telemetry/telem_frsky.c:101 telemetry/telem_frsky.c:108
+#: telemetry/telem_devo.c:55
+msgid "TelemV"
+msgstr "TelemV"
+
+#: telemetry/telem_frsky.c:104
+msgid "TelemRSSI"
+msgstr ""
+
+#: telemetry/telem_frsky.c:108
+msgid "Amp"
+msgstr ""
+
+#: telemetry/telem_frsky.c:112 telemetry/telem_devo.c:61
+msgid "TelemT"
+msgstr "TelemT"
+
+#: telemetry/telem_frsky.c:115 telemetry/telem_devo.c:65
+msgid "TelemRPM"
+msgstr "TelemRPM"
+
+#: telemetry/telem_dsm.c:147 protocol/devo_cyrf6936.c:54
+#: protocol/cg023_nrf24l01.c:60 protocol/bayang_nrf24l01.c:100
+#: protocol/inav_nrf24l01.c:182 protocol/fy326_nrf24l01.c:59
+#: protocol/hubsan_a7105.c:126 protocol/kn_nrf24l01.c:172
+#: protocol/dsm2_cyrf6936.c:49 protocol/dsm2_cyrf6936.c:52
+#: protocol/dsm2_cyrf6936.c:53 protocol/symax_nrf24l01.c:109
+#: protocol/frsky2way_cc2500.c:40 protocol/yd717_nrf24l01.c:111
+#: pages/common/standard/_curves_page.c:109
+#: pages/common/standard/_throhold_page.c:40 pages/common/_tx_configure.c:376
+#: pages/320x240x16/usb_page.c:39 pages/320x240x16/usb_page.c:41
+#: pages/128x64x1/scanner_page.c:29 pages/128x64x1/tx_configure.c:248
+#: pages/128x64x1/datalog_page.c:56 pages/128x64x1/usb_page.c:39
+msgid "On"
+msgstr "Aan"
+
+#: telemetry/telem_dsm.c:195 telemetry/telem_dsm.c:196
+#: telemetry/telem_dsm.c:197 telemetry/telem_dsm.c:198
+msgid "Fades"
+msgstr "Verdof"
+
+#: telemetry/telem_dsm.c:199
+msgid "Loss"
+msgstr "Verlies"
+
+#: telemetry/telem_dsm.c:200
+msgid "Holds"
+msgstr "Hou"
+
+#: telemetry/telem_dsm.c:202
+msgid "AirSpd"
+msgstr ""
+
+#: telemetry/telem_dsm.c:203
+msgid "Alt."
+msgstr ""
+
+#: telemetry/telem_dsm.c:204
+msgid "Alt.max"
+msgstr ""
+
+#: telemetry/telem_dsm.c:262
+msgid "RxV"
+msgstr ""
+
+#: telemetry/telem_dsm.c:263
+msgid "Bat"
+msgstr ""
+
+#: datalog.c:57
+msgid "1 sec"
+msgstr "1 sek"
+
+#: datalog.c:58
+msgid "5 sec"
+msgstr "5 sek"
+
+#: datalog.c:59
+msgid "10 sec"
+msgstr "10 sek"
+
+#: datalog.c:60
+msgid "30 sec"
+msgstr "30 sek"
+
+#: datalog.c:61
+msgid "60 sec"
+msgstr "60 sek"
+
+#: datalog.c:70
+msgid "RTC Time"
+msgstr "RTC Tyd"
+
+#: datalog.c:74
+msgid "GPS Time"
+msgstr "GPS Tyd"
+
+#: datalog.c:76
+msgid "GPS Coords"
+msgstr "GPS Koord."
+
+#: datalog.c:78
+msgid "GPS Alt."
+msgstr "GPS Hooghte"
+
+#: datalog.c:80
+msgid "GPS Speed"
+msgstr "GPS Spoed"
+
+#: protocol/h8_3d_nrf24l01.c:63 protocol/mt99xx_nrf24l01.c:127
+#: protocol/bayang_nrf24l01.c:101 protocol/v202_nrf24l01.c:127
+#: protocol/fy326_nrf24l01.c:58 protocol/hisky_nrf24l01.c:73
+#: protocol/fq777_nrf24l01.c:83 protocol/cx10_nrf24l01.c:69
+#: protocol/slt_nrf24l01.c:85 protocol/hontai_nrf24l01.c:62
+#: protocol/hubsan_a7105.c:124 protocol/q303_nrf24l01.c:76
+#: protocol/frskyx_cc2500.c:45 protocol/hitec_cc2500.c:62
+#: protocol/kn_nrf24l01.c:171 protocol/corona_cc2500.c:41
+#: protocol/mjxq_nrf24l01.c:60 protocol/yd717_nrf24l01.c:108
+msgid "Format"
+msgstr ""
+
+#: protocol/devo_cyrf6936.c:54 protocol/bayang_nrf24l01.c:100
+#: protocol/inav_nrf24l01.c:182 protocol/cflie_nrf24l01.c:200
+#: protocol/hubsan_a7105.c:126 protocol/dsm2_cyrf6936.c:49
+#: protocol/frsky2way_cc2500.c:40 protocol/yd717_nrf24l01.c:111
+#: pages/common/_pages.c:110 pages/common/_pages.c:117
+msgid "Telemetry"
+msgstr "Telemetrie"
+
+#: protocol/devo_cyrf6936.c:54 protocol/cg023_nrf24l01.c:60
+#: protocol/bayang_nrf24l01.c:100 protocol/inav_nrf24l01.c:182
+#: protocol/flysky_a7105.c:48 protocol/fy326_nrf24l01.c:59
+#: protocol/cflie_nrf24l01.c:200 protocol/hubsan_a7105.c:126
+#: protocol/kn_nrf24l01.c:172 protocol/dsm2_cyrf6936.c:49
+#: protocol/dsm2_cyrf6936.c:52 protocol/dsm2_cyrf6936.c:53
+#: protocol/symax_nrf24l01.c:109 protocol/frsky2way_cc2500.c:40
+#: protocol/yd717_nrf24l01.c:111 pages/common/standard/_failsafe_page.c:36
+#: pages/common/standard/_curves_page.c:111
+#: pages/common/standard/_throhold_page.c:44
+#: pages/common/standard/_throhold_page.c:55
+#: pages/common/advanced/_mixer_limits.c:189 pages/common/_tx_configure.c:198
+#: pages/common/_tx_configure.c:212 pages/common/_tx_configure.c:231
+#: pages/common/_tx_configure.c:250 pages/common/_tx_configure.c:265
+#: pages/common/_tx_configure.c:278 pages/common/_tx_configure.c:305
+#: pages/common/_tx_configure.c:374 pages/common/_tx_configure.c:390
+#: pages/common/_tx_configure.c:412 pages/320x240x16/usb_page.c:39
+#: pages/320x240x16/usb_page.c:41 pages/128x64x1/scanner_page.c:29
+#: pages/128x64x1/tx_configure.c:236 pages/128x64x1/tx_configure.c:246
+#: pages/128x64x1/datalog_page.c:57 pages/128x64x1/usb_page.c:39
+msgid "Off"
+msgstr "Af"
+
+#: protocol/bugs3_a7105.c:244 protocol/hubsan_a7105.c:127
+#: protocol/flysky_afhds2a_a7105.c:80 protocol/joysway_a7105.c:55
+msgid "Freq Tune"
+msgstr ""
+
+#: protocol/bayang_nrf24l01.c:101
+msgid "regular"
+msgstr ""
+
+#: protocol/bugs3mini_nrf24l01.c:133
+msgid "RX Id"
+msgstr ""
+
+#: protocol/frsky1way_cc2500.c:40 protocol/frskyx_cc2500.c:44
+#: protocol/hitec_cc2500.c:63 protocol/corona_cc2500.c:42
+#: protocol/sfhss_cc2500.c:42 protocol/frsky2way_cc2500.c:41
+msgid "Freq-Fine"
+msgstr ""
+
+#: protocol/frsky1way_cc2500.c:41 protocol/sfhss_cc2500.c:43
+#: protocol/frsky2way_cc2500.c:42
+msgid "Freq-Coarse"
+msgstr ""
+
+#: protocol/v202_nrf24l01.c:128 protocol/kn_nrf24l01.c:169
+#: protocol/esky150_nrf24l01.c:150
+msgid "Re-bind"
+msgstr ""
+
+#: protocol/v202_nrf24l01.c:128 protocol/v202_nrf24l01.c:129
+#: protocol/v202_nrf24l01.c:131 protocol/kn_nrf24l01.c:169
+#: protocol/kn_nrf24l01.c:170 protocol/dsm2_cyrf6936.c:50
+#: protocol/esky150_nrf24l01.c:150 protocol/yd717_nrf24l01.c:109
+#: pages/common/advanced/_mixer_curves.c:157
+msgid "No"
+msgstr "Nee"
+
+#: protocol/v202_nrf24l01.c:128 protocol/v202_nrf24l01.c:129
+#: protocol/v202_nrf24l01.c:131 protocol/kn_nrf24l01.c:169
+#: protocol/kn_nrf24l01.c:170 protocol/dsm2_cyrf6936.c:50
+#: protocol/esky150_nrf24l01.c:150 protocol/yd717_nrf24l01.c:109
+#: pages/common/advanced/_mixer_curves.c:157
+msgid "Yes"
+msgstr "Ja"
+
+#: protocol/v202_nrf24l01.c:129
+msgid "250kbps"
+msgstr ""
+
+#: protocol/v202_nrf24l01.c:131
+msgid "Blink"
+msgstr ""
+
+#: protocol/fy326_nrf24l01.c:59
+msgid "Expert"
+msgstr ""
+
+#: protocol/cflie_nrf24l01.c:200
+msgid "ACKPKT"
+msgstr ""
+
+#: protocol/cflie_nrf24l01.c:200
+msgid "CRTPLOG"
+msgstr ""
+
+#: protocol/cflie_nrf24l01.c:201
+msgid "CRTP Mode"
+msgstr ""
+
+#: protocol/cflie_nrf24l01.c:201
+msgid "RPYT"
+msgstr ""
+
+#: protocol/cflie_nrf24l01.c:201
+msgid "CPPM"
+msgstr ""
+
+#: protocol/hisky_nrf24l01.c:73 pages/common/_model_page.c:181
+#: pages/common/_model_loadsave.c:114 pages/128x64x1/model_page.c:51
+msgid "Default"
+msgstr "Default"
+
+#: protocol/sbus_uart.c:36
+msgid "Period (ms)"
+msgstr ""
+
+#: protocol/cx10_nrf24l01.c:69
+msgid "Green"
+msgstr ""
+
+#: protocol/cx10_nrf24l01.c:69
+msgid "Blue-A"
+msgstr ""
+
+#: protocol/wk2x01.c:79
+msgid "Chan mode"
+msgstr "Kanaal Mode"
+
+#: protocol/wk2x01.c:79
+msgid "5+1"
+msgstr "5+1"
+
+#: protocol/wk2x01.c:79 pages/128x64x1/model_page.c:38
+msgid "Heli"
+msgstr "Heli"
+
+#: protocol/wk2x01.c:79
+msgid "6+1"
+msgstr "6+1"
+
+#: protocol/wk2x01.c:80 pages/320x240x16/model_config.c:50
+#: pages/128x64x1/model_config.c:69
+msgid "COL Inv"
+msgstr "KOL Inv"
+
+#: protocol/wk2x01.c:80 pages/common/standard/_common_standard.c:67
+#: pages/common/standard/_reverse_page.c:28
+#: pages/common/advanced/_mixer_limits.c:208 pages/common/_model_config.c:36
+msgid "Normal"
+msgstr "Normal"
+
+#: protocol/wk2x01.c:80 pages/common/_model_config.c:37
+msgid "Inverted"
+msgstr "Omgekeerd"
+
+#: protocol/wk2x01.c:81
+msgid "COL Limit"
+msgstr "KOL Limiet"
+
+#: protocol/hubsan_a7105.c:125
+msgid "vTX MHz"
+msgstr "vTX MHz"
+
+#: protocol/flysky_afhds2a_a7105.c:77
+msgid "Outputs"
+msgstr ""
+
+#: protocol/flysky_afhds2a_a7105.c:78
+msgid "Servo Hz"
+msgstr ""
+
+#: protocol/flysky_afhds2a_a7105.c:79
+msgid "LQI output"
+msgstr ""
+
+#: protocol/frskyx_cc2500.c:42 protocol/pxxout.c:48
+msgid "Failsafe"
+msgstr ""
+
+#: protocol/frskyx_cc2500.c:43 protocol/frsky2way_cc2500.c:43
+msgid "AD2GAIN"
+msgstr ""
+
+#: protocol/frskyx_cc2500.c:46 protocol/frsky2way_cc2500.c:44
+msgid "RSSIChan"
+msgstr ""
+
+#: protocol/frskyx_cc2500.c:47
+msgid "S.PORT Out"
+msgstr ""
+
+#: protocol/frskyx_cc2500.c:47
+msgid "Disabled"
+msgstr ""
+
+#: protocol/frskyx_cc2500.c:47 pages/320x240x16/standard/curves_page.c:127
+msgid "Enabled"
+msgstr "Geaktiveer"
+
+#: protocol/ppmout.c:39 pages/320x240x16/model_config.c:103
+#: pages/128x64x1/model_config.c:139
+msgid "Center PW"
+msgstr "Center PW"
+
+#: protocol/ppmout.c:40 pages/320x240x16/model_config.c:106
+#: pages/128x64x1/model_config.c:143
+msgid "Delta PW"
+msgstr "Delta PW"
+
+#: protocol/ppmout.c:41
+msgid "Notch PW"
+msgstr "Notch PW"
+
+#: protocol/ppmout.c:42
+msgid "Frame Size"
+msgstr "Raam Grootte"
+
+#: protocol/kn_nrf24l01.c:170
+msgid "1Mbps"
+msgstr ""
+
+#: protocol/kn_nrf24l01.c:172
+msgid "DynTrim"
+msgstr ""
+
+#: protocol/pxxout.c:49
+msgid "Country"
+msgstr ""
+
+#: protocol/pxxout.c:50
+msgid "Rx PWM out"
+msgstr ""
+
+#: protocol/pxxout.c:51
+msgid "Rx Telem"
+msgstr ""
+
+#: protocol/dsm2_cyrf6936.c:50
+msgid "OrangeRx"
+msgstr ""
+
+#: protocol/dsm2_cyrf6936.c:52
+msgid "HighSpeed"
+msgstr ""
+
+#: protocol/dsm2_cyrf6936.c:53
+msgid "F.Log filter"
+msgstr ""
+
+#: protocol/yd717_nrf24l01.c:109
+msgid "USE A.ACK"
+msgstr ""
+
+#: tests/test_language.c:23 tests/test_language.c:45
+msgid "ok1"
+msgstr ""
+
+#: tests/test_language.c:43
+msgid "test"
+msgstr ""
+
+#: tests/test_language.c:44
+msgid "ok"
+msgstr ""
+
+#: curves.c:221
+msgid "1-to-1"
+msgstr "1-tot-1"
+
+#: curves.c:222
+msgid "Fixed"
+msgstr "Vaste"
+
+#: curves.c:223
+msgid "Min/Max"
+msgstr "Min/Max"
+
+#: curves.c:224
+msgid "Zero/Max"
+msgstr "Zero/Max"
+
+#: curves.c:227
+msgid "ABSVAL"
+msgstr "AbsWrde"
+
+#: curves.c:228
+#, c-format
+msgid "EXPO %d"
+msgstr "Expo %d"
+
+#: curves.c:229
+msgid "Deadband"
+msgstr "Dooieband"
+
+#: curves.c:230
+msgid "3 Point"
+msgstr "3 Punt"
+
+#: curves.c:231
+msgid "5 Point"
+msgstr "5 Punt"
+
+#: curves.c:232
+msgid "7 Point"
+msgstr "7 Punt"
+
+#: curves.c:233
+msgid "9 Point"
+msgstr "9 Punt"
+
+#: curves.c:234
+msgid "11 Point"
+msgstr "11 Punt"
+
+#: curves.c:235
+msgid "13 Point"
+msgstr "13 Punt"
+
+#: curves.c:237 mixer.c:880 pages/common/_lang_select.c:29
+#: pages/common/_lang_select.c:59 pages/common/_model_loadsave.c:111
+#: pages/common/_model_loadsave.c:116 pages/common/_model_loadsave.c:123
+#: pages/320x240x16/rtc_config.c:163
+msgid "Unknown"
+msgstr "Onbekend"
+
+#: screen/text/lcd_gfx.c:234 screen/text/lcd_gfx.c:236
+msgid ""
+"Deviation\n"
+"   USB"
+msgstr ""
+
+#: rtc.c:303 pages/320x240x16/tx_configure.c:127
+msgid "Clock"
+msgstr "Horlosie"
+
+#: rtc.c:303
+msgid "Date"
+msgstr "Datum"
+
+#: gui/dialog.c:154 pages/320x240x16/pages.c:160
+msgid "Ok"
+msgstr "Ok"
+
+#: gui/dialog.c:160 pages/320x240x16/pages.c:160
+msgid "Cancel"
+msgstr "Kanselleer"
+
+#: telemetry.c:247
+msgid "Longitude"
+msgstr "Lengtegraad"
+
+#: telemetry.c:248
+msgid "Latitude"
+msgstr "Breedtegraad"
+
+#: telemetry.c:249
+msgid "Altitude"
+msgstr "Hoogte"
+
+#: telemetry.c:250 pages/320x240x16/advanced/mixer_limits.c:68
+#: pages/128x64x1/advanced/mixer_limits.c:99
+msgid "Speed"
+msgstr "Spoed"
+
+#: telemetry.c:251
+msgid "Time"
+msgstr "Tyd"
+
+#: telemetry.c:252
+msgid "SatCount"
+msgstr ""
+
+#: telemetry.c:253
+msgid "Heading"
+msgstr ""
+
+#: mixer.c:874
+msgid "Simple"
+msgstr "Eenvoudig"
+
+#: mixer.c:875
+msgid "Expo&DR"
+msgstr "Expo&DR"
+
+#: mixer.c:876
+msgid "Complex"
+msgstr "Kompleks"
+
+#: mixer.c:877
+msgid "Cyclic1"
+msgstr "Siklies1"
+
+#: mixer.c:878
+msgid "Cyclic2"
+msgstr "Siklies2"
+
+#: mixer.c:879
+msgid "Cyclic3"
+msgstr "Siklies3"
+
+#: timer.c:52
+msgid "Timer"
+msgstr "Tydhouer"
+
+#: mixer_standard.c:169
+msgid "Advanced"
+msgstr "Gevorderd"
+
+#: mixer_standard.c:169
+msgid "Standard"
+msgstr "Standaard"
+
+#: pages/common/_datalog_page.c:63 pages/common/_model_page.c:300
+#: pages/320x240x16/timer_page.c:60 pages/128x64x1/timer_page.c:62
+msgid "Reset"
+msgstr "Reset"
+
+#: pages/common/_main_layout.c:49 pages/common/_main_config.c:91
+#: pages/320x240x16/main_layout.c:290
+msgid "Model"
+msgstr "Model"
+
+#: pages/common/_pages.c:112
+msgid "is not supported"
+msgstr "word nie ondersteun nie"
+
+#: pages/common/_pages.c:119
+msgid "is turned off"
+msgstr "is afgeskakel"
+
+#: pages/common/_telemconfig_page.c:32
+msgid "Alarm"
+msgstr "Alarm"
+
+#: pages/common/_voiceconfig_page.c:64
+msgid "up"
+msgstr ""
+
+#: pages/common/_voiceconfig_page.c:69
+msgid "down"
+msgstr ""
+
+#: pages/common/_voiceconfig_page.c:74
+#, c-format
+msgid "Timer %d"
+msgstr ""
+
+#: pages/common/_voiceconfig_page.c:78
+#, c-format
+msgid "Telem %d"
+msgstr ""
+
+#: pages/common/_model_page.c:83
+msgid "Re-Init"
+msgstr "Her-ini"
+
+#: pages/common/_model_page.c:83
+msgid "Bind"
+msgstr "Bind"
+
+#: pages/common/_model_page.c:223
+#: pages/320x240x16/standard/gyrosense_page.c:64
+#: pages/128x64x1/standard/gyrosense_page.c:57
+msgid "Channel"
+msgstr "Kannaal"
+
+#: pages/common/_model_page.c:225
+msgid "Stick"
+msgstr "Stok"
+
+#: pages/common/_model_page.c:227
+msgid "Extend"
+msgstr "Bereik"
+
+#: pages/common/_model_page.c:294
+msgid "Load..."
+msgstr "Laai..."
+
+#: pages/common/_model_page.c:296
+msgid "Copy To..."
+msgstr "Kopieër na.."
+
+#: pages/common/_model_page.c:298
+msgid "Template.."
+msgstr "Voorbeeld.."
+
+#: pages/common/_chantest_page.c:36
+msgid "Touch to Unlock"
+msgstr "Raak om te ontsluit"
+
+#: pages/common/_chantest_page.c:38
+msgid "Touch to Lock"
+msgstr "Raak om te sluit"
+
+#: pages/common/_dialogs.c:78
+#, c-format
+msgid " is %d%%, safe value = %d%%\n"
+msgstr " %d%%, veilige waarde = %d%%\n"
+
+#: pages/common/_dialogs.c:80
+#, c-format
+msgid ""
+" is %d%%,\n"
+"safe value = %d%%"
+msgstr ""
+" %d%%,\n"
+"veilig waarde=%d%%"
+
+#: pages/common/_dialogs.c:131
+#, c-format
+msgid ""
+"Do you really want\n"
+"to reset the\n"
+" permanent timer %d?"
+msgstr ""
+"Wil jy regtig die\n"
+"permanente Tydteller %d\n"
+"nul maak?"
+
+#: pages/common/standard/_gyrosense_page.c:27
+#: pages/320x240x16/advanced/mixer_curves.c:51
+#: pages/128x64x1/advanced/mixer_curves.c:83
+msgid "Value"
+msgstr "Waarde"
+
+#: pages/common/standard/_drexp_page.c:89
+#, c-format
+msgid "Position %d"
+msgstr "Posisie %d"
+
+#: pages/common/standard/_drexp_page.c:106
+msgid "LIN"
+msgstr "LIN"
+
+#: pages/common/standard/_common_standard.c:40
+msgid "PIT"
+msgstr "PIT"
+
+#: pages/common/standard/_common_standard.c:69
+msgid "Idle Up 1"
+msgstr "Idle Up 1"
+
+#: pages/common/standard/_common_standard.c:72
+msgid "Idle Up 2"
+msgstr "Idle Up 2"
+
+#: pages/common/standard/_common_standard.c:74
+#: pages/320x240x16/standard/throhold_page.c:49
+#: pages/320x240x16/standard/switchassign_page.c:51
+#: pages/128x64x1/standard/throhold_page.c:41
+#: pages/128x64x1/standard/switchassign_page.c:45
+msgid "Thr hold"
+msgstr "THR Hou"
+
+#: pages/common/standard/_reverse_page.c:28
+#: pages/common/advanced/_mixer_limits.c:208
+msgid "Reversed"
+msgstr "Omgekeerd"
+
+#: pages/common/standard/_swash_page.c:41
+#: pages/common/standard/_swash_page.c:44
+#: pages/common/standard/_swash_page.c:47
+#: pages/common/standard/_swash_page.c:50
+#: pages/common/standard/_swash_page.c:53
+msgid "Servo"
+msgstr "Servo"
+
+#: pages/common/_timer_page.c:54
+msgid "Control"
+msgstr "Beheer"
+
+#: pages/common/_timer_page.c:56 pages/320x240x16/trim_page.c:113
+#: pages/320x240x16/standard/curves_page.c:57
+#: pages/320x240x16/advanced/mixer_setup.c:145 pages/128x64x1/trim_page.c:119
+#: pages/128x64x1/advanced/mixer_setup.c:149
+msgid "Switch"
+msgstr "Skakelaar"
+
+#: pages/common/_timer_page.c:74
+msgid "stopwatch"
+msgstr "Stophorlosie"
+
+#: pages/common/_timer_page.c:75
+msgid "stop-prop"
+msgstr "Stop-prop"
+
+#: pages/common/_timer_page.c:76
+msgid "countdown"
+msgstr "Afteller"
+
+#: pages/common/_timer_page.c:77
+msgid "cntdn-prop"
+msgstr "aftel-prop"
+
+#: pages/common/_timer_page.c:78
+msgid "permanent"
+msgstr "Permanent"
+
+#: pages/common/_timer_page.c:138
+#, c-format
+msgid "Timer%d"
+msgstr "Tydhouer%d"
+
+#: pages/common/_timer_page.c:192
+msgid "Set to"
+msgstr "Stel na"
+
+#: pages/common/_trim_page.c:102
+msgid "Momentary"
+msgstr "Moment"
+
+#: pages/common/_trim_page.c:105 pages/common/_main_config.c:87
+#: pages/128x64x1/main_config.c:96
+msgid "Toggle"
+msgstr "Skakel"
+
+#: pages/common/_trim_page.c:108
+msgid "On/Off"
+msgstr "Aan/Af"
+
+#: pages/common/_trim_page.c:111
+msgid "3 Pos"
+msgstr ""
+
+#: pages/common/advanced/_mixer_limits.c:133
+#: pages/common/advanced/_mixer_setup.c:596
+#, c-format
+msgid "Scale%s"
+msgstr "Skale%s"
+
+#: pages/common/advanced/_mixer_curves.c:137
+msgid "Symmetric"
+msgstr "Symmetries"
+
+#: pages/common/advanced/_mixer_curves.c:138
+msgid "Pos"
+msgstr "+"
+
+#: pages/common/advanced/_mixer_curves.c:139
+msgid "Neg"
+msgstr "Neg"
+
+#: pages/common/advanced/_mixer_setup.c:152 pages/common/_main_config.c:178
+#: pages/320x240x16/trim_page.c:86
+msgid "Trim"
+msgstr "Trim"
+
+#: pages/common/advanced/_mixer_setup.c:152
+msgid "No Trim"
+msgstr "Geen Trim"
+
+#: pages/common/advanced/_mixer_setup.c:188
+msgid "Mid-Rate"
+msgstr "Mid tempo"
+
+#: pages/common/advanced/_mixer_setup.c:188
+msgid "Low-Rate"
+msgstr "Lae Tempo"
+
+#: pages/common/advanced/_mixer_setup.c:341
+msgid "replace"
+msgstr "vervang"
+
+#: pages/common/advanced/_mixer_setup.c:342
+msgid "mult"
+msgstr "*"
+
+#: pages/common/advanced/_mixer_setup.c:343
+msgid "add"
+msgstr "+"
+
+#: pages/common/advanced/_mixer_setup.c:344
+msgid "max"
+msgstr "max"
+
+#: pages/common/advanced/_mixer_setup.c:345
+msgid "min"
+msgstr "min"
+
+#: pages/common/advanced/_mixer_setup.c:346
+msgid "delay"
+msgstr "Vertraging"
+
+#: pages/common/advanced/_mixer_setup.c:348
+msgid "beep"
+msgstr ""
+
+#: pages/common/advanced/_mixer_setup.c:349
+msgid "voice"
+msgstr ""
+
+#: pages/common/advanced/_mixer_setup.c:484
+#: pages/320x240x16/advanced/mixer_setup.c:101
+#: pages/320x240x16/advanced/mixer_setup.c:104
+msgid "Linked"
+msgstr "Verbind"
+
+#: pages/common/advanced/_mixer_setup.c:531
+msgid "New"
+msgstr "Nuwe"
+
+#: pages/common/advanced/_mixer_setup.c:532 pages/320x240x16/pagelist.h:41
+#: pages/128x64x1/pagelist.h:43
+msgid "Mixer"
+msgstr "Menger"
+
+#: pages/common/advanced/_mixer_page.c:63
+#: pages/common/advanced/_mixer_page.c:64
+#: pages/common/advanced/_mixer_page.c:65
+msgid "CYC"
+msgstr "CYC"
+
+#: pages/common/advanced/_mixer_page.c:65
+msgid "COL"
+msgstr "KOL"
+
+#: pages/common/_model_config.c:133
+#, c-format
+msgid "Ch%d"
+msgstr "Knl%d"
+
+#: pages/common/_model_config.c:186
+#, c-format
+msgid "PPM%d"
+msgstr "PPM%d"
+
+#: pages/common/_main_config.c:85
+msgid "Small-box"
+msgstr "Kleinboks"
+
+#: pages/common/_main_config.c:86
+msgid "Big-box"
+msgstr "Groot boks"
+
+#: pages/common/_main_config.c:88
+msgid "Bargraph"
+msgstr "Balkgrafiek"
+
+#: pages/common/_main_config.c:89
+msgid "V-trim"
+msgstr "V-trim"
+
+#: pages/common/_main_config.c:90
+msgid "H-trim"
+msgstr "H-trim"
+
+#: pages/common/_main_config.c:92
+msgid "Battery"
+msgstr "Battery"
+
+#: pages/common/_main_config.c:93
+msgid "TxPower"
+msgstr "Tx-krag"
+
+#: pages/common/_main_config.c:130 pages/common/_set_timer_page.c:52
+#: pages/128x64x1/set_timer_page.c:73
+msgid "Add"
+msgstr "voeg"
+
+#: pages/common/_main_config.c:130
+msgid "Load"
+msgstr "Laai"
+
+#: pages/common/_main_config.c:234
+msgid "Menu"
+msgstr "Menu"
+
+#: pages/common/_tx_configure.c:92
+msgid ""
+"Move sticks and knobs\n"
+"to max & min positions\n"
+"then press ENT"
+msgstr "Beweeg stokke en skakelaars na max & min/nDruk dan ENT"
+
+#: pages/common/_tx_configure.c:101
+msgid ""
+"Calibration done.\n"
+" \n"
+"Press ENT."
+msgstr ""
+
+#: pages/common/_tx_configure.c:123
+msgid ""
+"Center all \n"
+"sticks and knobs\n"
+"then press ENT"
+msgstr ""
+"Stokke in middel en\n"
+"knoppies af\n"
+"Druk dan ENT"
+
+#: pages/common/_tx_configure.c:166
+msgid "Calibrate"
+msgstr "Kalibreer"
+
+#: pages/common/_tx_configure.c:174 pages/common/_set_timer_page.c:54
+#: pages/128x64x1/set_timer_page.c:73
+msgid "Set"
+msgstr "Set"
+
+#: pages/common/_tx_configure.c:183
+#, c-format
+msgid "Mode %d"
+msgstr "Modus %d"
+
+#: pages/common/_tx_configure.c:336
+msgid "Change"
+msgstr "Verander"
+
+#: pages/common/_tx_configure.c:362
+msgid "Fahren"
+msgstr "Beweeg"
+
+#: pages/common/_tx_configure.c:362
+msgid "Celsius"
+msgstr "Celsius"
+
+#: pages/common/_tx_configure.c:364
+msgid "Foot"
+msgstr "Voet"
+
+#: pages/common/_tx_configure.c:364
+msgid "Meter"
+msgstr "Meter"
+
+#: pages/320x240x16/scanner_page.c:35
+msgid "Turn Off"
+msgstr "Sit Af"
+
+#: pages/320x240x16/scanner_page.c:35
+msgid "Turn On"
+msgstr "Sit Aan"
+
+#: pages/320x240x16/scanner_page.c:42 pages/128x64x1/scanner_page.c:36
+msgid "Average"
+msgstr ""
+
+#: pages/320x240x16/scanner_page.c:42 pages/128x64x1/scanner_page.c:36
+msgid "Peak"
+msgstr ""
+
+#: pages/320x240x16/scanner_page.c:49
+msgid "Att.: -20dB"
+msgstr ""
+
+#: pages/320x240x16/scanner_page.c:49
+msgid "Att.: 0dB"
+msgstr ""
+
+#: pages/320x240x16/trim_page.c:67 pages/320x240x16/trim_page.c:100
+#: pages/128x64x1/trim_page.c:70 pages/128x64x1/trim_page.c:103
+msgid "Input"
+msgstr "Inset"
+
+#: pages/320x240x16/trim_page.c:68 pages/320x240x16/trim_page.c:107
+#: pages/128x64x1/trim_page.c:107
+msgid "Trim -"
+msgstr "Trim -"
+
+#: pages/320x240x16/trim_page.c:69 pages/320x240x16/trim_page.c:110
+#: pages/128x64x1/trim_page.c:73 pages/128x64x1/trim_page.c:111
+msgid "Trim +"
+msgstr "Trim +"
+
+#: pages/320x240x16/trim_page.c:70 pages/320x240x16/trim_page.c:103
+#: pages/128x64x1/trim_page.c:115
+msgid "Trim Step"
+msgstr "Trim stap"
+
+#: pages/320x240x16/tx_configure.c:101 pages/128x64x1/tx_configure.c:94
+#: pages/128x64x1/tx_configure.c:101
+msgid "Generic settings"
+msgstr "Generiese Opstelling"
+
+#: pages/320x240x16/tx_configure.c:106 pages/128x64x1/tx_configure.c:95
+msgid "Language"
+msgstr "Taal"
+
+#: pages/320x240x16/tx_configure.c:112 pages/128x64x1/tx_configure.c:103
+msgid "Stick mode"
+msgstr "Stok mode"
+
+#: pages/320x240x16/tx_configure.c:117
+msgid "Touch screen"
+msgstr "Raakskerm"
+
+#: pages/320x240x16/tx_configure.c:122 pages/128x64x1/tx_configure.c:107
+msgid "Sticks"
+msgstr "Stokke"
+
+#: pages/320x240x16/tx_configure.c:138 pages/128x64x1/tx_configure.c:112
+msgid "Audio settings"
+msgstr ""
+
+#: pages/320x240x16/tx_configure.c:140
+msgid "Buzzer settings"
+msgstr "Beep verstellings"
+
+#: pages/320x240x16/tx_configure.c:144
+msgid "Power On alarm"
+msgstr "Krag aan alarm"
+
+#: pages/320x240x16/tx_configure.c:148
+msgid "Battery alarm"
+msgstr "Battery Alarm"
+
+#: pages/320x240x16/tx_configure.c:152
+msgid "Alarm interval"
+msgstr "Alarm interval"
+
+#: pages/320x240x16/tx_configure.c:156 pages/128x64x1/tx_configure.c:116
+msgid "Buzz volume"
+msgstr "Beep Volume"
+
+#: pages/320x240x16/tx_configure.c:161 pages/128x64x1/tx_configure.c:121
+msgid "Audio volume"
+msgstr ""
+
+#: pages/320x240x16/tx_configure.c:166
+msgid "Power-down alert"
+msgstr "Krag-af Waarskuwing"
+
+#: pages/320x240x16/tx_configure.c:174 pages/128x64x1/tx_configure.c:147
+#: pages/128x64x1/tx_configure.c:154
+msgid "LCD settings"
+msgstr "LCD Opstelling"
+
+#: pages/320x240x16/tx_configure.c:177 pages/128x64x1/tx_configure.c:148
+msgid "Backlight"
+msgstr "Skermlig"
+
+#: pages/320x240x16/tx_configure.c:181 pages/128x64x1/tx_configure.c:160
+msgid "Dimmer time"
+msgstr "Verdof tyd"
+
+#: pages/320x240x16/tx_configure.c:185 pages/128x64x1/tx_configure.c:164
+msgid "Dimmer target"
+msgstr "Verdof Teiken"
+
+#: pages/320x240x16/tx_configure.c:192 pages/128x64x1/tx_configure.c:168
+msgid "Timer settings"
+msgstr "Tydhoueropstelling"
+
+#: pages/320x240x16/tx_configure.c:195 pages/128x64x1/tx_configure.c:169
+msgid "Prealert time"
+msgstr "Voorwaarsku-tyd"
+
+#: pages/320x240x16/tx_configure.c:199
+msgid "Prealert interval"
+msgstr "Voorwaarsku periode"
+
+#: pages/320x240x16/tx_configure.c:204
+msgid "Timeup interval"
+msgstr "Tydaan periode"
+
+#: pages/320x240x16/tx_configure.c:209 pages/128x64x1/tx_configure.c:181
+msgid "Telemetry settings"
+msgstr "Telemetrie Opstelling"
+
+#: pages/320x240x16/tx_configure.c:212 pages/128x64x1/tx_configure.c:182
+msgid "Temperature"
+msgstr "Temperatuur"
+
+#: pages/320x240x16/tx_configure.c:216 pages/128x64x1/tx_configure.c:186
+msgid "Length"
+msgstr "Lengte"
+
+#: pages/320x240x16/tx_configure.c:220
+msgid "Alert interval"
+msgstr ""
+
+#: pages/320x240x16/tx_configure.c:227
+msgid "Vibration settings"
+msgstr ""
+
+#: pages/320x240x16/tx_configure.c:229
+msgid "Vibration:"
+msgstr ""
+
+#: pages/320x240x16/tx_configure.c:262
+#, c-format
+msgid "Touch target %d"
+msgstr "Raak teiken %d"
+
+#: pages/320x240x16/tx_configure.c:285
+msgid "Touch Calibrate"
+msgstr "Skerm kalibrasie"
+
+#: pages/320x240x16/set_timer_page.c:86
+msgid "actual value"
+msgstr "Regte waarde"
+
+#: pages/320x240x16/set_timer_page.c:90
+msgid "value to add or set"
+msgstr "Waarde om te stel of by-tel"
+
+#: pages/320x240x16/set_timer_page.c:94 pages/320x240x16/rtc_config.c:136
+#: pages/128x64x1/set_timer_page.c:48
+msgid "Hour"
+msgstr "Uur"
+
+#: pages/320x240x16/set_timer_page.c:96 pages/320x240x16/rtc_config.c:135
+#: pages/128x64x1/set_timer_page.c:46
+msgid "Minute"
+msgstr "Minuut"
+
+#: pages/320x240x16/set_timer_page.c:98 pages/320x240x16/rtc_config.c:134
+#: pages/128x64x1/set_timer_page.c:44
+msgid "Second"
+msgstr "Sekonde"
+
+#: pages/320x240x16/set_timer_page.c:106 pages/320x240x16/rtc_config.c:161
+msgid "resulting value"
+msgstr "Gevolglike waarde"
+
+#: pages/320x240x16/model_page.c:25 pages/320x240x16/model_config.c:38
+#: pages/128x64x1/model_config.c:96
+msgid "Helicopter"
+msgstr "Helikopter"
+
+#: pages/320x240x16/model_page.c:26 pages/320x240x16/model_config.c:38
+#: pages/128x64x1/model_config.c:97
+msgid "Airplane"
+msgstr "Vliegtuig"
+
+#: pages/320x240x16/model_page.c:27 pages/128x64x1/model_config.c:98
+msgid "Multirotor"
+msgstr ""
+
+#: pages/320x240x16/model_page.c:62 pages/128x64x1/model_page.c:85
+msgid "File"
+msgstr "Lêer"
+
+#: pages/320x240x16/model_page.c:67 pages/128x64x1/model_page.c:128
+msgid "Mixer GUI"
+msgstr "Menger GUI"
+
+#: pages/320x240x16/model_page.c:72 pages/128x64x1/model_page.c:89
+msgid "Model name"
+msgstr "Model naam"
+
+#: pages/320x240x16/model_page.c:74 pages/128x64x1/model_page.c:93
+msgid "Icon"
+msgstr "Ikoon"
+
+#: pages/320x240x16/model_page.c:77 pages/128x64x1/model_page.c:97
+msgid "Model type"
+msgstr "Model tipe"
+
+#: pages/320x240x16/model_page.c:81 pages/128x64x1/model_page.c:105
+msgid "PPM In"
+msgstr "PPM_In"
+
+#: pages/320x240x16/model_page.c:85
+msgid "Protocol"
+msgstr "Protokol"
+
+#: pages/320x240x16/model_page.c:89 pages/128x64x1/model_page.c:123
+msgid "# Channels"
+msgstr "Aantal Kanale"
+
+#: pages/320x240x16/model_page.c:94 pages/128x64x1/model_page.c:101
+msgid "Tx power"
+msgstr "Sendkrag"
+
+#: pages/320x240x16/model_page.c:102 pages/128x64x1/model_page.c:119
+msgid "Fixed ID"
+msgstr "Vaste ID"
+
+#: pages/320x240x16/toggle_select.c:86
+#: pages/320x240x16/advanced/mixer_limits.c:76
+#: pages/128x64x1/toggle_select.c:84 pages/128x64x1/advanced/mixer_limits.c:42
+msgid "Revert"
+msgstr "Verander terug"
+
+#: pages/320x240x16/toggle_select.c:116
+msgid "Pos 0"
+msgstr "Pos 0"
+
+#: pages/320x240x16/toggle_select.c:121
+msgid "Pos 1"
+msgstr "Pos 1"
+
+#: pages/320x240x16/toggle_select.c:126
+msgid "Pos 2"
+msgstr "Pos 2"
+
+#: pages/320x240x16/model_config.c:41
+#: pages/320x240x16/standard/swash_page.c:40 pages/128x64x1/model_config.c:57
+#: pages/128x64x1/standard/swash_page.c:41
+msgid "SwashType"
+msgstr "Swash Tipe"
+
+#: pages/320x240x16/model_config.c:44 pages/128x64x1/model_config.c:61
+msgid "ELE Inv"
+msgstr "ELE Inv"
+
+#: pages/320x240x16/model_config.c:47 pages/128x64x1/model_config.c:65
+msgid "AIL Inv"
+msgstr "AIL Omgekeerd"
+
+#: pages/320x240x16/model_config.c:53
+#: pages/320x240x16/standard/swash_page.c:45 pages/128x64x1/model_config.c:73
+#: pages/128x64x1/standard/swash_page.c:45
+msgid "ELE Mix"
+msgstr "ELE Meng"
+
+#: pages/320x240x16/model_config.c:56
+#: pages/320x240x16/standard/swash_page.c:50 pages/128x64x1/model_config.c:77
+#: pages/128x64x1/standard/swash_page.c:49
+msgid "AIL Mix"
+msgstr "AIL Meng"
+
+#: pages/320x240x16/model_config.c:59 pages/128x64x1/model_config.c:81
+msgid "COL Mix"
+msgstr "KOL Meng"
+
+#: pages/320x240x16/model_config.c:90 pages/128x64x1/model_config.c:240
+msgid "Trainer Cfg (Channel)"
+msgstr "Leerder Konf(Kanaal)"
+
+#: pages/320x240x16/model_config.c:92 pages/128x64x1/model_config.c:242
+msgid "Trainer Cfg (Stick)"
+msgstr "Leerder Konf(Stok )"
+
+#: pages/320x240x16/model_config.c:93 pages/128x64x1/model_config.c:243
+msgid "PPMIn Cfg (Extend)"
+msgstr "PPM_In Konf."
+
+#: pages/320x240x16/model_config.c:96 pages/128x64x1/model_config.c:148
+msgid "Trainer Sw"
+msgstr "Leerder Sk. "
+
+#: pages/320x240x16/model_config.c:99 pages/128x64x1/model_config.c:151
+msgid "Num Channels"
+msgstr "Aantal Kanale"
+
+#: pages/320x240x16/dialogs.c:49 pages/320x240x16/advanced/mixer_limits.c:41
+#: pages/128x64x1/advanced/mixer_limits.c:71
+msgid "Safety"
+msgstr "Veiligheid"
+
+#: pages/320x240x16/dialogs.c:63
+msgid ""
+"Binding is in progress...\n"
+"Make sure model is on!\n"
+"\n"
+"Pressing OK will NOT cancel binding procedure\n"
+"but will allow full control of Tx."
+msgstr ""
+"Bind in proses...\n"
+"Maak seker die model is aan!\n"
+"\n"
+" OK sal nie die proses stop nie,\n"
+"maar sal volle beheer toelaat."
+
+#: pages/320x240x16/dialogs.c:66
+#, c-format
+msgid ""
+"\n"
+"\n"
+"Binding will end in %d seconds..."
+msgstr ""
+"\n"
+"\n"
+"Bindproses eindig in %d sekonds..."
+
+#: pages/320x240x16/dialogs.c:93
+msgid "Binding"
+msgstr "Bind..."
+
+#: pages/320x240x16/dialogs.c:110
+msgid "Low Battery"
+msgstr "Battery pap"
+
+#: pages/320x240x16/dialogs.c:111
+msgid ""
+"Critical battery level detected.\n"
+"Settings have been saved.\n"
+"Any future configuration settings\n"
+"will NOT be saved.\n"
+"\n"
+"Change batteries now!"
+msgstr ""
+"Battery amper pap.\n"
+"Opstelling is gestoor.\n"
+"Alle vêrdere opstellings\n"
+"word nie gestoor nie.\n"
+"\n"
+"Laai battery nou!"
+
+#: pages/320x240x16/dialogs.c:122
+msgid ""
+"Model needs to be reset\n"
+"in order to switch to the standard mixer"
+msgstr ""
+"Model moet eers Reset\n"
+"om oor teskakel na die Standaard Menger"
+
+#: pages/320x240x16/dialogs.c:129
+msgid "Standard Mixer"
+msgstr "Standaard Menger"
+
+#: pages/320x240x16/dialogs.c:143
+msgid "Reset Permanent Timer?"
+msgstr "Zero Permanente Teller?"
+
+#: pages/320x240x16/dialogs.c:151 pages/128x64x1/dialogs.c:178
+msgid "Missing Modules:\n"
+msgstr ""
+
+#: pages/320x240x16/dialogs.c:157
+msgid "Module Error"
+msgstr ""
+
+#: pages/320x240x16/rtc_config.c:137
+msgid "Day"
+msgstr "Dag"
+
+#: pages/320x240x16/rtc_config.c:138
+msgid "Month"
+msgstr "Maand"
+
+#: pages/320x240x16/rtc_config.c:139
+msgid "Year"
+msgstr "Jaar"
+
+#: pages/320x240x16/rtc_config.c:156
+msgid "Set time"
+msgstr "Stel Tyd"
+
+#: pages/320x240x16/rtc_config.c:157
+msgid "Set date"
+msgstr "Stel Datum"
+
+#: pages/320x240x16/rtc_config.c:158
+msgid "Time format"
+msgstr "Tyd formaat"
+
+#: pages/320x240x16/rtc_config.c:159
+msgid "Date format"
+msgstr "Datum formaat"
+
+#: pages/320x240x16/rtc_config.c:160
+msgid "value to set"
+msgstr "Waarde om te stel"
+
+#: pages/320x240x16/reorder_list.c:28
+msgid "Move Up"
+msgstr "Beweeg Op"
+
+#: pages/320x240x16/reorder_list.c:29
+msgid "Move Down"
+msgstr "Beweeg Af"
+
+#: pages/320x240x16/reorder_list.c:30 pages/128x64x1/reorder_list.c:40
+msgid "Copy To"
+msgstr "Kopieër na"
+
+#: pages/320x240x16/reorder_list.c:31
+msgid "Insert"
+msgstr "Enter"
+
+#: pages/320x240x16/reorder_list.c:32
+msgid "Remove"
+msgstr "Verwyder"
+
+#: pages/320x240x16/reorder_list.c:33 pages/128x64x1/trim_page.c:137
+#: pages/128x64x1/reorder_list.c:94 pages/128x64x1/advanced/mixer_curves.c:62
+#: pages/128x64x1/advanced/mixer_setup.c:54
+msgid "Save"
+msgstr "Stoor"
+
+#: pages/320x240x16/timer_page.c:64 pages/128x64x1/timer_page.c:68
+msgid "Reset sw"
+msgstr "Reset sw"
+
+#: pages/320x240x16/timer_page.c:69 pages/128x64x1/timer_page.c:76
+msgid "Start"
+msgstr "Begin"
+
+#: pages/320x240x16/timer_page.c:156
+msgid "Date / Time"
+msgstr "Datum / Tyd"
+
+#: pages/320x240x16/model_loadsave.c:92
+msgid "Load Model"
+msgstr ""
+
+#: pages/320x240x16/model_loadsave.c:93
+msgid "Save Model as..."
+msgstr ""
+
+#: pages/320x240x16/model_loadsave.c:94
+msgid "Load Model Template"
+msgstr ""
+
+#: pages/320x240x16/model_loadsave.c:95
+msgid "Select Icon"
+msgstr ""
+
+#: pages/320x240x16/model_loadsave.c:96
+msgid "Load Layout"
+msgstr ""
+
+#: pages/320x240x16/standard/drexp_page.c:59
+#: pages/320x240x16/advanced/mixer_setup.c:59
+#: pages/320x240x16/advanced/mixer_setup.c:84
+#: pages/320x240x16/advanced/mixer_setup.c:151
+#: pages/128x64x1/advanced/mixer_setup.c:78
+#: pages/128x64x1/advanced/mixer_setup.c:157
+#: pages/128x64x1/advanced/mixer_setup.c:265
+msgid "Src"
+msgstr "Bron"
+
+#: pages/320x240x16/standard/throhold_page.c:52
+#: pages/128x64x1/standard/throhold_page.c:45
+msgid "Hold position"
+msgstr "Hou Posisie"
+
+#: pages/320x240x16/standard/switchassign_page.c:46
+#: pages/128x64x1/standard/switchassign_page.c:42
+msgid "Fly mode"
+msgstr "Vliegmode"
+
+#: pages/320x240x16/standard/switchassign_page.c:56
+#: pages/320x240x16/pagelist.h:50
+#: pages/128x64x1/standard/switchassign_page.c:48
+#: pages/128x64x1/standard/gyrosense_page.c:54 pages/128x64x1/pagelist.h:52
+msgid "Gyro sense"
+msgstr "Gyro Monitor"
+
+#: pages/320x240x16/standard/switchassign_page.c:59
+#: pages/128x64x1/standard/switchassign_page.c:51
+msgid "D/R&Exp -AIL"
+msgstr "D/R&Exp -AIL"
+
+#: pages/320x240x16/standard/switchassign_page.c:63
+#: pages/128x64x1/standard/switchassign_page.c:54
+msgid "D/R&Exp -ELE"
+msgstr "D/R&Exp -ELE"
+
+#: pages/320x240x16/standard/switchassign_page.c:67
+#: pages/128x64x1/standard/switchassign_page.c:58
+msgid "D/R&Exp -RUD"
+msgstr "D/R&Exp -RUD"
+
+#: pages/320x240x16/standard/curves_page.c:28
+msgid "L"
+msgstr "L"
+
+#: pages/320x240x16/standard/curves_page.c:28
+msgid "M"
+msgstr "M"
+
+#: pages/320x240x16/standard/curves_page.c:28
+msgid "H"
+msgstr "H"
+
+#: pages/320x240x16/standard/curves_page.c:35
+msgid "Manual"
+msgstr "Per hand"
+
+#: pages/320x240x16/standard/curves_page.c:35
+msgid "Auto"
+msgstr "Outo"
+
+#: pages/320x240x16/standard/curves_page.c:125
+#: pages/128x64x1/standard/curves_page.c:110
+msgid "Mode"
+msgstr "Modus"
+
+#: pages/320x240x16/standard/swash_page.c:55
+#: pages/128x64x1/standard/swash_page.c:53
+msgid "PIT Mix"
+msgstr "PIT Meng"
+
+#: pages/320x240x16/voiceconfig_page.c:52 pages/128x64x1/voiceconfig_page.c:60
+msgid ""
+"External voice\n"
+"currently not\n"
+"available"
+msgstr ""
+
+#: pages/320x240x16/datalog_page.c:61 pages/128x64x1/datalog_page.c:135
+#, c-format
+msgid "%d bytes left"
+msgstr "%d Bytes oor"
+
+#: pages/320x240x16/datalog_page.c:92 pages/128x64x1/datalog_page.c:79
+msgid "All"
+msgstr "Almal"
+
+#: pages/320x240x16/datalog_page.c:139 pages/128x64x1/datalog_page.c:96
+msgid "Enable"
+msgstr "Aktiveer"
+
+#: pages/320x240x16/datalog_page.c:146
+msgid "Sample Rate"
+msgstr "Monstertyd "
+
+#: pages/320x240x16/datalog_page.c:152 pages/128x64x1/datalog_page.c:105
+msgid "Select"
+msgstr "Selekteer"
+
+#: pages/320x240x16/main_layout.c:235 pages/320x240x16/main_layout.c:335
+msgid "Page Config"
+msgstr "Bladsy Konfig."
+
+#: pages/320x240x16/main_layout.c:240
+msgid "Type"
+msgstr "Tipe"
+
+#: pages/320x240x16/main_layout.c:254
+msgid "Template"
+msgstr "Voorbeeld"
+
+#: pages/320x240x16/main_layout.c:271 pages/128x64x1/trim_page.c:135
+msgid "Edit"
+msgstr "Edit"
+
+#: pages/320x240x16/main_layout.c:271 pages/128x64x1/main_config.c:134
+msgid "Delete"
+msgstr "Vee uit"
+
+#: pages/320x240x16/advanced/mixer_limits.c:33 pages/320x240x16/pagelist.h:43
+#: pages/128x64x1/standard/reverse_page.c:26
+#: pages/128x64x1/advanced/mixer_limits.c:63 pages/128x64x1/pagelist.h:45
+msgid "Reverse"
+msgstr "Omkeer"
+
+#: pages/320x240x16/advanced/mixer_limits.c:37 pages/320x240x16/pagelist.h:52
+#: pages/128x64x1/standard/failsafe_page.c:26
+#: pages/128x64x1/advanced/mixer_limits.c:67 pages/128x64x1/pagelist.h:54
+msgid "Fail-safe"
+msgstr "Falingveilig"
+
+#: pages/320x240x16/advanced/mixer_limits.c:45
+#: pages/128x64x1/advanced/mixer_limits.c:75
+msgid "Safe Val"
+msgstr "Veiligew"
+
+#: pages/320x240x16/advanced/mixer_limits.c:49
+#: pages/128x64x1/advanced/mixer_limits.c:79
+msgid "Min Limit"
+msgstr "Min Limiet"
+
+#: pages/320x240x16/advanced/mixer_limits.c:53
+#: pages/128x64x1/advanced/mixer_limits.c:83
+msgid "Max Limit"
+msgstr "Max limiet"
+
+#: pages/320x240x16/advanced/mixer_limits.c:64 pages/320x240x16/pagelist.h:45
+#: pages/128x64x1/standard/subtrim_page.c:25
+#: pages/128x64x1/advanced/mixer_limits.c:95 pages/128x64x1/pagelist.h:47
+msgid "Subtrim"
+msgstr "SubTrim"
+
+#: pages/320x240x16/advanced/mixer_curves.c:41
+#: pages/128x64x1/advanced/mixer_curves.c:71
+msgid "Smooth"
+msgstr "Glad"
+
+#: pages/320x240x16/advanced/mixer_curves.c:44
+#: pages/128x64x1/advanced/mixer_curves.c:74
+msgid "Point"
+msgstr "Punk"
+
+#: pages/320x240x16/advanced/mixer_curves.c:47
+#: pages/128x64x1/advanced/mixer_curves.c:77
+msgid "Pos/Neg"
+msgstr "+/-"
+
+#: pages/320x240x16/advanced/mixer_setup.c:63
+#: pages/320x240x16/advanced/mixer_setup.c:155
+#: pages/128x64x1/advanced/mixer_setup.c:82
+#: pages/128x64x1/advanced/mixer_setup.c:161
+msgid "Curve"
+msgstr "Kurwe"
+
+#: pages/320x240x16/advanced/mixer_setup.c:76
+#: pages/320x240x16/advanced/mixer_setup.c:161
+#: pages/128x64x1/advanced/mixer_setup.c:90
+#: pages/128x64x1/advanced/mixer_setup.c:169
+msgid "Offset"
+msgstr "Afset"
+
+#: pages/320x240x16/advanced/mixer_setup.c:85
+#: pages/128x64x1/advanced/mixer_setup.c:279
+msgid "Switch1"
+msgstr "Skakelaar1"
+
+#: pages/320x240x16/advanced/mixer_setup.c:86
+#: pages/128x64x1/advanced/mixer_setup.c:279
+msgid "Switch2"
+msgstr "Skakelaar2"
+
+#: pages/320x240x16/advanced/mixer_setup.c:95
+#: pages/128x64x1/advanced/mixer_setup.c:269
+msgid "High-Rate"
+msgstr "Hoë tempo"
+
+#: pages/320x240x16/advanced/mixer_setup.c:135
+#: pages/128x64x1/advanced/mixer_setup.c:141
+msgid "Mixers"
+msgstr "Mengers"
+
+#: pages/320x240x16/advanced/mixer_setup.c:137
+#: pages/128x64x1/advanced/mixer_setup.c:145
+msgid "Page"
+msgstr "Bladsy"
+
+#: pages/320x240x16/advanced/mixer_setup.c:148
+#: pages/128x64x1/advanced/mixer_setup.c:153
+msgid "Mux"
+msgstr "Mux"
+
+#: pages/320x240x16/pagelist.h:18 pages/128x64x1/pagelist.h:20
+msgid "Main page"
+msgstr "Hoofbladsy"
+
+#: pages/320x240x16/pagelist.h:19 pages/128x64x1/pagelist.h:21
+msgid "Main menu"
+msgstr "Hoof Menu"
+
+#: pages/320x240x16/pagelist.h:21 pages/128x64x1/pagelist.h:24
+msgid "Set permanent timer"
+msgstr "Stel Permanente Tydhouer"
+
+#: pages/320x240x16/pagelist.h:24
+msgid "Real Time Clock"
+msgstr "Waretyd Horlosie"
+
+#: pages/320x240x16/pagelist.h:27
+msgid "Touch Test"
+msgstr "Raakskerm toets"
+
+#: pages/320x240x16/pagelist.h:31 pages/128x64x1/pagelist.h:32
+msgid "Model menu"
+msgstr "Model Menu"
+
+#: pages/320x240x16/pagelist.h:32 pages/128x64x1/pagelist.h:33
+msgid "Transmitter menu"
+msgstr "Sender Menu"
+
+#: pages/320x240x16/pagelist.h:33 pages/128x64x1/pagelist.h:34
+#: pages/128x64x1/usb_page.c:35
+msgid "USB"
+msgstr "USB"
+
+#: pages/320x240x16/pagelist.h:35 pages/128x64x1/pagelist.h:36
+msgid "Debuglog"
+msgstr ""
+
+#: pages/320x240x16/pagelist.h:40 pages/128x64x1/model_page.c:155
+#: pages/128x64x1/pagelist.h:42
+msgid "Model setup"
+msgstr "Modelopstelling"
+
+#: pages/320x240x16/pagelist.h:44 pages/128x64x1/pagelist.h:46
+msgid "D/R & Exp"
+msgstr "D/R & Exp"
+
+#: pages/320x240x16/pagelist.h:46 pages/128x64x1/pagelist.h:48
+msgid "Travel adjust"
+msgstr "Maks Beweeging"
+
+#: pages/320x240x16/pagelist.h:47 pages/128x64x1/pagelist.h:49
+msgid "Throttle curves"
+msgstr "Throttle Kurwes"
+
+#: pages/320x240x16/pagelist.h:48 pages/128x64x1/pagelist.h:50
+msgid "Pitch curves"
+msgstr "PIT kurwes"
+
+#: pages/320x240x16/pagelist.h:49 pages/128x64x1/standard/throhold_page.c:38
+#: pages/128x64x1/pagelist.h:51
+msgid "Throttle hold"
+msgstr "Throttle Hou"
+
+#: pages/320x240x16/pagelist.h:51 pages/128x64x1/pagelist.h:53
+msgid "Swash"
+msgstr "Swash Tipe"
+
+#: pages/320x240x16/pagelist.h:53 pages/128x64x1/pagelist.h:55
+msgid "Switch assignment"
+msgstr "Skakelaar Toekening"
+
+#: pages/320x240x16/pagelist.h:55 pages/128x64x1/pagelist.h:57
+msgid "Timers"
+msgstr "Tydhouers"
+
+#: pages/320x240x16/pagelist.h:56 pages/128x64x1/telemconfig_page.c:83
+#: pages/128x64x1/pagelist.h:59
+msgid "Telemetry config"
+msgstr "Telemetrie Konfigurasie"
+
+#: pages/320x240x16/pagelist.h:57 pages/128x64x1/pagelist.h:61
+msgid "Trims"
+msgstr "Trims"
+
+#: pages/320x240x16/pagelist.h:59 pages/128x64x1/pagelist.h:63
+msgid "Datalog"
+msgstr "Datalog"
+
+#: pages/320x240x16/pagelist.h:61 pages/128x64x1/pagelist.h:65
+msgid "Main page config"
+msgstr "Hoofbladsy Opstelling"
+
+#: pages/320x240x16/pagelist.h:63 pages/128x64x1/pagelist.h:67
+msgid "Voice config"
+msgstr ""
+
+#: pages/320x240x16/pagelist.h:67 pages/128x64x1/pagelist.h:72
+msgid "Transmitter config"
+msgstr "Sender Opstelling"
+
+#: pages/320x240x16/pagelist.h:68 pages/128x64x1/pagelist.h:73
+msgid "Channel monitor"
+msgstr "Kanaal Monitor"
+
+#: pages/320x240x16/pagelist.h:69 pages/128x64x1/telemtest_page.c:412
+#: pages/128x64x1/pagelist.h:75
+msgid "Telemetry monitor"
+msgstr "Telemetrie Monitor"
+
+#: pages/320x240x16/pagelist.h:70 pages/128x64x1/pagelist.h:77
+msgid "Range Test"
+msgstr ""
+
+#: pages/320x240x16/pagelist.h:71
+msgid "Input monitor"
+msgstr "Inset Monitor"
+
+#: pages/320x240x16/pagelist.h:72
+msgid "Button monitor"
+msgstr "Knoppie Monitor"
+
+#: pages/320x240x16/pagelist.h:74 pages/128x64x1/pagelist.h:79
+msgid "Scanner"
+msgstr "Skandeer"
+
+#: pages/320x240x16/pagelist.h:78 pages/128x64x1/pagelist.h:91
+msgid "Welcome"
+msgstr "Welkom"
+
+#: pages/320x240x16/pagelist.h:84
+msgid "Select Language"
+msgstr ""
+
+#: pages/320x240x16/range_page.c:31
+msgid "Stop test"
+msgstr ""
+
+#: pages/320x240x16/range_page.c:31
+msgid "Start test"
+msgstr ""
+
+#: pages/320x240x16/range_page.c:40 pages/128x64x1/range_page.c:46
+msgid "No range test possible."
+msgstr ""
+
+#: pages/320x240x16/range_page.c:49 pages/128x64x1/range_page.c:51
+msgid "Power reduced to"
+msgstr ""
+
+#: pages/320x240x16/range_page.c:50 pages/128x64x1/range_page.c:52
+msgid "from"
+msgstr ""
+
+#: pages/320x240x16/usb_page.c:38 pages/128x64x1/about_page.c:38
+msgid "Deviation FW version:"
+msgstr "Deviation Sagteware:"
+
+#: pages/320x240x16/usb_page.c:39
+msgid "USB Filesystem is currently "
+msgstr "USB Leerstelsel is tans"
+
+#: pages/320x240x16/usb_page.c:40
+msgid "Press 'Ent' to turn USB Filesystem"
+msgstr "Druk 'ENT' om USB aan te skakel"
+
+#: pages/128x64x1/scanner_page.c:43
+msgid "-20dB"
+msgstr ""
+
+#: pages/128x64x1/scanner_page.c:43
+msgid "0dB"
+msgstr ""
+
+#: pages/128x64x1/chantest_page.c:111
+msgid "Stick input"
+msgstr "Stokinset"
+
+#: pages/128x64x1/chantest_page.c:111
+msgid "Mixer output"
+msgstr ""
+
+#: pages/128x64x1/trim_page.c:71
+msgid "Step"
+msgstr "Stap"
+
+#: pages/128x64x1/main_config.c:60
+msgid "Layout: Long-Press ENT"
+msgstr "Uitleg: Langdruk ENT"
+
+#: pages/128x64x1/main_config.c:86
+msgid "Trimbar"
+msgstr "Trimbalk"
+
+#: pages/128x64x1/main_config.c:90
+msgid "Box"
+msgstr "Boks"
+
+#: pages/128x64x1/main_config.c:93
+msgid "Bar"
+msgstr "Balk"
+
+#: pages/128x64x1/tx_configure.c:114
+msgid "Buzz settings"
+msgstr "Beep verstellings"
+
+#: pages/128x64x1/tx_configure.c:126
+msgid "Vibration"
+msgstr "Vibrasie"
+
+#: pages/128x64x1/tx_configure.c:130
+msgid "Batt alarm"
+msgstr "Bat Alarm"
+
+#: pages/128x64x1/tx_configure.c:134
+msgid "Alarm intvl"
+msgstr "Alarm interval"
+
+#: pages/128x64x1/tx_configure.c:138
+msgid "PwrOn alarm"
+msgstr "Krag-Aan Alarm"
+
+#: pages/128x64x1/tx_configure.c:142
+msgid "PwrDn alert"
+msgstr "Krag-af waarskuwing"
+
+#: pages/128x64x1/tx_configure.c:156 pages/128x64x1/model_config.c:187
+msgid "Contrast"
+msgstr "Kontras"
+
+#: pages/128x64x1/tx_configure.c:173
+msgid "Prealert intvl"
+msgstr "Voorwaarsku periode"
+
+#: pages/128x64x1/tx_configure.c:177
+msgid "Timeup intvl"
+msgstr "Tydaan periode"
+
+#: pages/128x64x1/tx_configure.c:190
+msgid "Alert intvl"
+msgstr ""
+
+#: pages/128x64x1/tx_configure.c:215
+msgid "Configure"
+msgstr "Konfigureer"
+
+#: pages/128x64x1/model_page.c:39
+msgid "Plane"
+msgstr "Vlak"
+
+#: pages/128x64x1/model_page.c:40
+msgid "Multi"
+msgstr ""
+
+#: pages/128x64x1/model_page.c:110 pages/128x64x1/model_config.c:205
+msgid "Video"
+msgstr ""
+
+#: pages/128x64x1/model_page.c:111
+msgid "Setup"
+msgstr ""
+
+#: pages/128x64x1/model_config.c:179
+msgid "Video Enable"
+msgstr ""
+
+#: pages/128x64x1/model_config.c:183
+msgid "Video Channel"
+msgstr ""
+
+#: pages/128x64x1/model_config.c:191
+msgid "Brightness"
+msgstr ""
+
+#: pages/128x64x1/dialogs.c:82
+#, c-format
+msgid ""
+"Binding %s...\n"
+"Press ENT to stop"
+msgstr ""
+"Bind %s...\n"
+"Druk ENT om te stop"
+
+#: pages/128x64x1/dialogs.c:85
+#, c-format
+msgid ""
+"\n"
+"%d seconds left"
+msgstr ""
+"\n"
+"%d sekondes links"
+
+#: pages/128x64x1/dialogs.c:132
+msgid ""
+"Battery too low,\n"
+"can't save!"
+msgstr ""
+"Battery pap,kan\n"
+"nie stoor nie!"
+
+#: pages/128x64x1/dialogs.c:139
+msgid ""
+"Model needs reset\n"
+"for standard mixer"
+msgstr ""
+"Model moet Reset \n"
+"vir die Standaard Menger"
+
+#: pages/128x64x1/dialogs.c:153
+msgid ""
+"Bad/missing\n"
+"protocol modules!"
+msgstr ""
+"Protokol modules\n"
+"is sleg of weg!"
+
+#: pages/128x64x1/reorder_list.c:39
+msgid "Dn"
+msgstr "Af"
+
+#: pages/128x64x1/lang_select.c:44
+#: pages/128x64x1/standard/switchassign_page.c:79
+msgid "Press ENT to change"
+msgstr "Druk ENT om te verander"
+
+#: pages/128x64x1/model_loadsave.c:69
+msgid "Press ENT to copy to"
+msgstr "Druk ENT om te kopieër na"
+
+#: pages/128x64x1/model_loadsave.c:71
+msgid "Press ENT to load"
+msgstr "Druk ENT om te laai"
+
+#: pages/128x64x1/telemtest_page.c:342
+msgid "GPS"
+msgstr "GPS"
+
+#: pages/128x64x1/telemtest_page.c:351
+msgid "RX"
+msgstr ""
+
+#: pages/128x64x1/telemtest_page.c:352
+msgid "TX"
+msgstr ""
+
+#: pages/128x64x1/datalog_page.c:102
+msgid "Rate"
+msgstr "Tempo"
+
+#: pages/128x64x1/advanced/mixer_page.c:44
+msgid "Mixer    Reorder:Hold R+"
+msgstr ""
+
+#: pages/128x64x1/advanced/mixer_setup.c:86
+#: pages/128x64x1/advanced/mixer_setup.c:165
+msgid "Scale"
+msgstr "Skaal"
+
+#: pages/128x64x1/pagelist.h:27
+msgid "Video setup"
+msgstr ""
+
+#: pages/128x64x1/pagelist.h:38
+msgid "About Deviation"
+msgstr "Deviation Info"
+
+#: pages/128x64x1/pagelist.h:86
+msgid "External OSD"
+msgstr ""
+
+#: pages/128x64x1/range_page.c:53
+msgid "Press ENT to stop test."
+msgstr ""
+
+#: pages/128x64x1/range_page.c:56
+msgid "Press ENT to start test."
+msgstr ""
+
+#: pages/128x64x1/usb_page.c:38
+msgid ""
+"Press ENT to turn \n"
+"USB drive"
+msgstr "Druk ENT vir USB aan"
+
+#: pages/text/splash_page.c:37
+msgid "Deviation"
+msgstr ""
+
+#: Model template
+msgid "4Ch w/ Dual-Rates"
+msgstr "4K met DR"
+
+#: Model template
+msgid "Simple 4 Channel"
+msgstr "Eenvdge 4 kanaal"
+
+#: Model template
+msgid "6Ch Helicopter"
+msgstr "6K Helikopter"
+
+#: Model template
+msgid "6Ch Airplane"
+msgstr "6K Vliegtuig"
+
+#: Model template
+msgid "Heli/Standard GUI"
+msgstr "Heli/Standaard GUI"
