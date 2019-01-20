@@ -31,9 +31,20 @@ LINT_RULES = (
 
 EXCLUDE_PATHS = ('libopencm3/', 'FatFs/')
 
+# Disregard specific messages in a class
+POST_FILTER = {
+    "whitespace/braces": [
+       '{ should almost always be at the end of the previous line',
+       ],
+    "whitespace/newline": [
+       'An else should appear on the same line as the preceding }',
+       ],
+    }
+
 UNMATCHED_LINT_ERROR = "Unmatched Lint Error(s):\n"
 LINT_ERROR = "Lint Error:\n"
 
+URL_CACHE = {}
 GITHUB_TOKEN = os.environ.get('GITHUB_TOKEN')
 TRAVIS = os.environ.get('TRAVIS')
 TRAVIS_PULL_REQUEST = os.environ.get('TRAVIS_PULL_REQUEST')
@@ -75,17 +86,52 @@ def main():
         if TRAVIS and not TRAVIS_PULL_REQUEST:
             # FIXME: This shouldn't be needed, but not sure why TRAVIS is so special
             return
-        check_depth()
-        changed = get_changed_lines()
+        if TRAVIS:
+            changed = get_changed_lines_from_pr()
+        else:
+            changed = get_changed_lines_from_git()
 
     paths = filter_paths(args.path, changed, pwd)
     violations = run_lint(paths, changed)
     if GITHUB_TOKEN and TRAVIS_PULL_REQUEST and not args.skip_github:
         update_github_status(violations)
 
-def get_changed_lines():
+def get_changed_lines_from_pr():
+    url = 'https://api.github.com/repos/{}/pulls/{}'.format(TRAVIS_REPO_SLUG, TRAVIS_PULL_REQUEST)
+    diff = get_url(url, {"Accept": "application/vnd.github.v3.diff"}).split('\n')
+    filename = None
     changed = {}
-    master = TRAVIS_BRANCH or "master"
+    file_pos = 0
+    for line in diff:
+        if line.startswith("diff "):
+            filename = line.split(" ")[-1][2:]
+            if filename not in changed:
+                changed[filename] = {}
+            file_pos = 0
+            continue
+        if any(line.startswith(pat) for pat in ["index", "---", "+++"]):
+            continue
+        if line.startswith("@@"):
+            match = re.search(" \+(\d+),(\d+) @@", line)
+            if match:
+                file_pos = int(match.group(1))
+            else:
+                logging.error("Found unparsable diff in %s: %s", filename, line)
+                file_pos = 0
+            continue
+        if file_pos <= 0 or line.startswith("-"):
+            continue
+        if line.startswith("+"):
+            changed[filename][file_pos] = 1
+        file_pos += 1
+    
+    for filename in sorted(changed.keys()):
+        logging.debug("%s: %s", filename, sorted(changed[filename].keys(), key=int))
+    return changed
+
+def get_changed_lines_from_git():
+    changed = {}
+    master = "master"
     base = system(["git", "merge-base", "HEAD", master]).rstrip()
     cmd = ["git", "diff", "--name-only", "--diff-filter", "AM", base]
     sha1s = ["000000000"];
@@ -104,7 +150,7 @@ def get_changed_lines():
             if not match:
                 continue
             changed[_file][int(match.group(1))] = 1
-        logging.debug("%s: %s", _file, sorted(changed[_file].keys()))
+        logging.debug("%s: %s", _file, sorted(changed[_file].keys(), key=int))
     return changed
 
 def filter_paths(paths, changed, pwd):
@@ -145,20 +191,24 @@ def run_lint(paths, changed):
     _p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
     for line in _p.stdout:
         line = line.rstrip()
-        match = re.search("(\S+):(\d+):\s.*\[(\S+)\]\s\[\d\]$", line)
+        match = re.search("(\S+):(\d+):\s+(.*\S)\s+\[(\S+)\]\s\[\d\]$", line)
         if match:
             filename = match.group(1)
             linenum = int(match.group(2))
-            violation = match.group(3)
+            errstr = match.group(3)
+            err_class = match.group(4)
+            if err_class in POST_FILTER and errstr in POST_FILTER[err_class]:
+                # Ignore this error
+                continue
             if not changed or linenum not in changed[filename]:
                 continue
             print line
             if filename not in errors:
                 errors[filename] = 0
             errors[filename] += 1
-            if violation not in count:
-                count[violation] = 0
-            count[violation] += 1
+            if err_class not in count:
+                count[err_class] = 0
+            count[err_class] += 1
             if filename not in violations:
                 violations[filename] = {}
             if linenum not in violations[filename]:
@@ -282,11 +332,14 @@ def get_url(url, headers=None):
     logging.debug("GET: " + url)
     if not headers:
         headers = {}
-    headers['Authorization'] = 'token ' + get_token()
-    request = urllib2.Request(url, None, headers)
-    res = urllib2.urlopen(request)
-    raise_for_status(url, res)
-    return res.read()
+    key = (url, json.dumps(headers))
+    if key not in URL_CACHE:
+        headers['Authorization'] = 'token ' + get_token()
+        request = urllib2.Request(url, None, headers)
+        res = urllib2.urlopen(request)
+        raise_for_status(url, res)
+        URL_CACHE[key] = res.read()
+    return URL_CACHE[key]
 
 def get_token():
     """Return github token"""
@@ -375,16 +428,6 @@ def system(cmd):
         return subprocess.check_output(cmd)
     else:
         return subprocess.check_output(cmd, shell=True)
-
-def check_depth():
-    if TRAVIS and TRAVIS_PULL_REQUEST_SHA:
-        with open(os.devnull, 'w') as devnull:
-            if subprocess.call(["git", "merge-base", TRAVIS_PULL_REQUEST_SHA, TRAVIS_BRANCH], stdout=devnull):
-                # Current depth is not deep enough
-                logging.debug(system(["git", "fetch", "--deepen", "100"]))
-                if subprocess.call(["git", "merge-base", TRAVIS_PULL_REQUEST_SHA, TRAVIS_BRANCH], stdout=devnull):
-                    logging.error("Can't find common base for comparison. Aborting")
-                    sys.exit(1)
 
 
 main()

@@ -39,8 +39,7 @@ language: minimal
 #compiler: gcc
 
 git:
-  #Use maximal depth to ensure linter can determine common merge-point
-  depth: 50
+  depth: 5
 
 before_install:
    - pip install --user cpp-coveralls cpplint
