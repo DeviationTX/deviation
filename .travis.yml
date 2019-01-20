@@ -2,6 +2,7 @@
 env:
 #Do not define 'global' env vars here.  They cannot be used with API builds
     matrix:
+      - MAKETARGET=lint
       - MAKETARGET=zip_devo8
       - MAKETARGET=zip_devo10
       - MAKETARGET=zip_devo12
@@ -41,7 +42,7 @@ git:
   depth: 5
 
 before_install:
-   - pip install --user cpp-coveralls
+   - pip install --user cpp-coveralls cpplint
    - if [ ! -d "$HOME/gcc-arm-none-eabi-4_8-2013q4/bin" ]; then
        pushd $HOME;
        curl --retry 10 --retry-max-time 120 -L "https://launchpad.net/gcc-arm-embedded/4.8/4.8-2013-q4-major/+download/gcc-arm-none-eabi-4_8-2013q4-20131204-linux.tar.bz2" | tar xfj -;

@@ -203,7 +203,7 @@ $(OBJS) $(PROTO_OBJS) ($PROTO_EXTRA_OBJS): Makefile target/$(TARGET)/Makefile.in
 ##################################################################################
 $(VERBOSE).SILENT:
 
-.PHONY: clean distclean language
+.PHONY: clean distclean language lint
 
 clean:
 	rm -f $(TARGET).$(EXEEXT) $(TARGET).exe $(TARGET).bin $(TARGET).dfu $(TARGET).list \
@@ -256,6 +256,10 @@ coverity:
 	cov-build --dir cov-int make TARGET=devo8
 	cov-build --dir cov-int make TARGET=devo10
 	tar -cvzf coverity-$(HGVERSION).tgz cov-int
+
+lint:
+	../utils/run_linter.py --diff --debug
+
 ##########################################
 #Ensure necessary directories are created#
 ##########################################
