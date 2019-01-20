@@ -265,6 +265,7 @@ sub parse_po_file {
     close($fh);
     while(@lines) {
         my($msgid, $msgstr) = parse_gettext(\@lines);
+        $msgstr =~ s/\\([^n])/$1/g; # Fix escaped characters
         next if(! $msgstr);
         if ($msgid eq "" && $msgstr =~ /(?:\b|\\n)Language:\s+(\S+?)(?:\b|\\n)/) {
             $ext = lc($1);
@@ -275,7 +276,8 @@ sub parse_po_file {
         }
         next if(! $msgid);
         if ($msgid eq $PO_LANGUAGE_STRING) {
-            $language = $msgstr . "\n";
+            # Add UTF-8 BOM
+            $language = chr(0xef) . chr(0xbb) . chr(0xbf) . $msgstr . "\n";
             next;
         }
         next if(! $uniq->{$msgid});
