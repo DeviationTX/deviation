@@ -237,7 +237,7 @@ static void add_dlg_cb(guiObject_t *obj, const void *data)
         ADD_LBL_X,
         ADD_DIALOG_Y + 30,
         ADD_TS_X - ADD_LBL_X, 0,
-        &LABEL_FONT, NULL, NULL, _tr("Type"));
+        &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Type"));
     GUI_CreateTextSelect(&gui->dlgts[0],
         ADD_TS_X,
         ADD_DIALOG_Y + 30,
@@ -251,7 +251,7 @@ static void add_dlg_cb(guiObject_t *obj, const void *data)
         ADD_LBL_X,
         ADD_DIALOG_Y + 60,
         ADD_BUT_X - ADD_LBL_X, 0,
-        &LABEL_FONT, NULL, NULL, _tr("Template"));
+        &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Template"));
     GUI_CreateButton(&gui->dlgbut[1],
         ADD_BUT_X,
         ADD_DIALOG_Y + 60,
@@ -287,7 +287,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     int del_x = X + 15 + 110;
     int num_objs = 2;
     if (type == ELEM_MODELICO) {
-        GUI_CreateLabelBox(&gui->dlglbl[relrow], X, y, 115, LAYDLG_TEXT_HEIGHT, &LABEL_FONT, NULL, NULL, _tr("Model"));
+        GUI_CreateLabelBox(&gui->dlglbl[relrow], X, y, 115, LAYDLG_TEXT_HEIGHT, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Model"));
     } else {
         GUI_CreateLabelBox(&gui->dlglbl[relrow], X, y, 10, 16, &LABEL_FONT, label_cb, NULL, (void *)(long)(absrow));
         GUI_CreateTextSelect(&gui->dlgts[relrow], X + 15, y, TEXTSELECT_96, NULL, dlgts_cb, (void *)elemidx);
