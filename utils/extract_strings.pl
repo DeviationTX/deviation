@@ -3,7 +3,6 @@ use strict;
 use warnings;
 
 use Getopt::Long;
-use Tie::IxHash;
 
 my @requested_targets;
 # The following are legal alternatives to the default string
