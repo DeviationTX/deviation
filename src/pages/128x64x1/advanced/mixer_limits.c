@@ -39,7 +39,7 @@ static void _show_titlerow()
 
     GUI_CreateLabelBox(&gui->title, TITLE_X, 0 , TITLE_W, HEADER_HEIGHT, &TITLE_FONT,
             MIXPAGE_ChanNameProtoCB, NULL, (void *)(long)mp->channel);
-    GUI_CreateButtonPlateText(&gui->revert, REVERT_X, 0, REVERT_W, HEADER_WIDGET_HEIGHT, &BUTTON_FONT, NULL, revert_cb, (void *)_tr("Revert"));
+    GUI_CreateButtonPlateText(&gui->revert, REVERT_X, 0, REVERT_W, HEADER_WIDGET_HEIGHT, &BUTTON_FONT, GUI_Localize, revert_cb, _tr_noop("Revert"));
 }
 
 static guiObject_t *getobj_cb(int relrow, int col, void *data)
@@ -53,34 +53,34 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
     void * tgl = NULL;
-    void * label_cb = NULL;
+    void * label_cb = GUI_Localize;
     const void * label = NULL;
     void * disp = NULL;
     void * input_disp = NULL;
     void * value = NULL;
     switch(absrow) {
         case ITEM_REVERSE:
-            label = _tr("Reverse");
+            label = _tr_noop("Reverse");
             tgl = toggle_reverse_cb; disp = reverse_cb; value = (void *)((long)mp->channel);
             break;
         case ITEM_FAILSAFE:
-            label = _tr("Fail-safe");
+            label = _tr_noop("Fail-safe");
             tgl = toggle_failsafe_cb; disp = set_failsafe_cb;
             break;
         case ITEM_SAFETY:
-            label = _tr("Safety");
+            label = _tr_noop("Safety");
             tgl = sourceselect_cb; disp = set_source_cb; value = &mp->limit->safetysw; input_disp = set_input_source_cb;
             break;
         case ITEM_SAFEVAL:
-            label = _tr("Safe Val");
+            label = _tr_noop("Safe Val");
             disp = set_safeval_cb;
             break;
         case ITEM_MINLIMIT:
-            label = _tr("Min Limit");
+            label = _tr_noop("Min Limit");
             disp = set_limits_cb; value = &mp->limit->min;
             break;
         case ITEM_MAXLIMIT:
-            label = _tr("Max Limit");        
+            label = _tr_noop("Max Limit");        
             disp = set_limits_cb; value = &mp->limit->max;
             break;
         case ITEM_SCALEPOS:
@@ -92,11 +92,11 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             disp = set_limitsscale_cb; value = &mp->limit->servoscale_neg;
             break;
         case ITEM_SUBTRIM:
-            label = _tr("Subtrim");
+            label = _tr_noop("Subtrim");
             disp = set_trimstep_cb; value = &mp->limit->subtrim;
             break;
         case ITEM_SPEED:
-            label = _tr("Speed");
+            label = _tr_noop("Speed");
             disp = set_limits_cb; value = &mp->limit->speed;
             break;
     }

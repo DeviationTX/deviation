@@ -58,8 +58,8 @@ void PAGE_TravelAdjInit(int page)
 {
     (void)page;
     PAGE_ShowHeader(("")); // draw a underline only
-    GUI_CreateLabelBox(&gui->dnlbl, HEADER1_X, 0, HEADER1_WIDTH, LINE_HEIGHT, &TITLE_FONT, NULL, NULL, _tr("Down"));
-    GUI_CreateLabelBox(&gui->uplbl, HEADER2_X, 0, HEADER2_WIDTH, LINE_HEIGHT, &TITLE_FONT, NULL, NULL, _tr("Up"));
+    GUI_CreateLabelBox(&gui->dnlbl, HEADER1_X, 0, HEADER1_WIDTH, LINE_HEIGHT, &TITLE_FONT, GUI_Localize, NULL, _tr_noop("Down"));
+    GUI_CreateLabelBox(&gui->uplbl, HEADER2_X, 0, HEADER2_WIDTH, LINE_HEIGHT, &TITLE_FONT, GUI_Localize, NULL, _tr_noop("Up"));
 
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                          LINE_SPACE, Model.num_channels, row_cb, NULL, NULL, NULL);
