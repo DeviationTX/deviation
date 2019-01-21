@@ -18,8 +18,8 @@
 #include "tx.h"
 #include "ini.h"
 
-#ifndef SUPPORT_LANG_V1
-#define SUPPORT_LANG_V1 1
+#ifndef SUPPORT_LANG_V2
+#define SUPPORT_LANG_V2 0
 #endif
 
 /* String long enough to hold every used string in the code
@@ -105,7 +105,6 @@ static unsigned fix_crlf(char *str)
     return len;
 }
 
-#if SUPPORT_LANG_V1
 static void ReadLangV1(FILE* fh)
 {
     struct str_map *lookup = lookupmap;
@@ -155,8 +154,8 @@ static void ReadLangV1(FILE* fh)
     }
     table_size = lookup - lookupmap;
 }
-#endif
 
+#if SUPPORT_LANG_V2
 static void ReadLangV2(FILE* fh)
 {
     u16 hash;
@@ -187,6 +186,7 @@ static void ReadLangV2(FILE* fh)
     }
     table_size = lookup - lookupmap;
 }
+#endif
 
 static int ReadLang(const char *file)
 {
@@ -199,7 +199,7 @@ static int ReadLang(const char *file)
     // first line of langauge name, ignore it
     fgets(tempstring, sizeof(tempstring), fh);
 
-#if SUPPORT_LANG_V1
+#if SUPPORT_LANG_V2
     // Try to detect the version
     if (fread(tempstring, 1, 1, fh) == 1)
     {
@@ -212,7 +212,7 @@ static int ReadLang(const char *file)
             ReadLangV2(fh);
     }
 #else
-    CONFIG_ReadLangV2(fh);
+    ReadLangV1(fh);
 #endif
 
     fclose(fh);
