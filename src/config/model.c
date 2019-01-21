@@ -59,7 +59,7 @@ const char * radio_tx_power_val(enum Radio radio, enum TxPower power) {
     case R9M:
         return r9m_powers[power];
     default:
-        return NULL; // never reached, silence warning
+        return NULL;    // never reached, silence warning
     }
 }
 
