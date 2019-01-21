@@ -47,7 +47,6 @@ void LCD_PrintCharXY(unsigned int x, unsigned int y, u32 c)
     c = TW8816_map_char(c);
 #if SUPPORT_MULTI_LANGUAGE
     if (c > 0x300) {
-
         if (height == 0) {
             open_font("12normal");
             height = get_height();
@@ -198,9 +197,9 @@ u16 load_char_font(u32 c)
         return (u16)'?';
     }
 
-    for(idx = 0; idx < CHAR_CACHE_SIZE; idx++)
+    for (idx = 0; idx < CHAR_CACHE_SIZE; idx++)
     {
-        if (loadedchars[idx] == 0) // empty slot
+        if (loadedchars[idx] == 0)  // empty slot
             break;
         if (loadedchars[idx] == (u16)c) {
             return 0x300 + 50 + idx;
@@ -229,15 +228,14 @@ u16 load_char_font(u32 c)
                 bit = 0;
             }
             if (*data & (1 << bit)) {
-                //there are 3 bytes across, contianing a total of 2 rows
+                // there are 3 bytes across, contianing a total of 2 rows
                 int byte = y / 2 * 3 + x / 4;
-                //each byte is  4pixels wide by 2 rows tall
+                // each byte is  4pixels wide by 2 rows tall
                 int bit = 4 * (y & 1) + 3 - (x & 0x3);
                 lcdfont[byte] |= 1 << bit;
             }
             bit++;
         }
-
     }
 
     // load into memory
