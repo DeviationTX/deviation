@@ -33,7 +33,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
         //Row 1
-        GUI_CreateLabelBox(&gui->name[relrow], COL1, y, COL2-COL1, 18, &LABEL_FONT,voiceconfig_str_cb, NULL, (void *)(long)absrow);
+        GUI_CreateLabelBox(&gui->name[relrow], COL1, y, COL2-COL1, 18, &LABEL_FONT, voiceconfig_str_cb, NULL, (void *)(long)absrow);
         GUI_CreateTextSelect(&gui->voiceidx[relrow],  COL2, y, TEXTSELECT_64, voice_test_cb, voiceid_cb, (void *)(long)absrow);
         GUI_CreateLabelBox(&gui->voicelbl[relrow], COL3, y, LCD_WIDTH - COL3 - ARROW_WIDTH, 18, &TINY_FONT, voicelbl_cb, NULL, (void *)(long)absrow);
     return 1;
