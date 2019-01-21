@@ -29,6 +29,7 @@
   * Reduce ROM size for AT9
   * Support of Beken BK2421 / BK2423 support is removed.
   * Fix USBHID under OSX
+  * Tx power setting shows power values of radio in use
 
 
 ## New protocols
