@@ -149,11 +149,11 @@ script:
 
 after_success:
   - |
-    if [[ "TRAVIS_BUILD_STAGE_NAME != "Deploy" ]]; then
+    if [[ $TRAVIS_BUILD_STAGE_NAME != "Deploy" ]]; then
         travis_terminate 0
     fi
   - |
-    if [[ "$TRAVIS_EVENT_TYPE" == "api" && $TRAVIS_BRANCH != "master" ]]; then
+    if [[ $TRAVIS_EVENT_TYPE == "api" && $TRAVIS_BRANCH != "master" ]]; then
         export RELEASE_VERSION=$(echo $TRAVIS_BRANCH | egrep -o '[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+');
         if [[ "$RELEASE_VERSION" != "" && "$TRAVIS_BRANCH" == "v$RELEASE_VERSION" ]]; then
             echo "Releasing $RELEASE_VERSION";
