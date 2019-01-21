@@ -830,6 +830,18 @@ void GUI_SelectionNotify(void (*notify_cb)(guiObject_t *obj))
 {
     select_notify = notify_cb;
 }
+
+guiObject_t *GUI_CreateLabel(guiLabel_t *obj, u16 x, u16 y,
+             const char *(*cb)(guiObject_t *, const void *),
+             const struct LabelDesc *desc,
+             const void *data) {
+    return GUI_CreateLabelBox(obj, x, y, 0, 0, desc, cb, NULL, data);
+}
+
+guiObject_t *GUI_CreateImage(guiImage_t *obj, u16 x, u16 y, u16 w, u16 h, const char *file) {
+    return GUI_CreateImageOffset(obj, x, y, w, h, 0, 0, file, NULL, NULL);
+}
+
 #if HAS_TOUCH
 void GUI_ChangeSelectionOnTouch(int enable)
 {

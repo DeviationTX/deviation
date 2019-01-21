@@ -216,15 +216,15 @@ const char *rtc_select_format_cb(guiObject_t *obj, int dir, void *data)
 
 void _show_page()
 {
-    GUI_CreateLabel(&gui->datelbl, XL(128), 40, rtc_text_cb, DEFAULT_FONT, (void *)DATELABEL);
-    GUI_CreateLabel(&gui->timelbl, XR(128), 40, rtc_text_cb, DEFAULT_FONT, (void *)TIMELABEL);
+    GUI_CreateLabel(&gui->datelbl, XL(128), 40, rtc_text_cb, &DEFAULT_FONT, (void *)DATELABEL);
+    GUI_CreateLabel(&gui->timelbl, XR(128), 40, rtc_text_cb, &DEFAULT_FONT, (void *)TIMELABEL);
     GUI_CreateTextSelect(&gui->dateformat, XL(128), 56, TEXTSELECT_128, NULL, rtc_select_format_cb, (void *)ACTDATE);
     GUI_CreateTextSelect(&gui->timeformat, XR(128), 56, TEXTSELECT_128, NULL, rtc_select_format_cb, (void *)ACTTIME);
 
     RTC_GetDateFormattedOrder((Transmitter.rtcflags & DATEFMT) >> 4, &order[0], &order[1], &order[2]); // initial ordering
 
     for (long i=0; i<6; i++) {
-        GUI_CreateLabel(&gui->label[i], X(i/3, 32) + ((i%3 == 2) ? 67 : 0) - ((i%3 == 0) ? 67 : 0), 84, rtc_text_cb, DEFAULT_FONT, (void *)i);
+        GUI_CreateLabel(&gui->label[i], X(i/3, 32) + ((i%3 == 2) ? 67 : 0) - ((i%3 == 0) ? 67 : 0), 84, rtc_text_cb, &DEFAULT_FONT, (void *)i);
         GUI_CreateTextSelect(&gui->select[i], X(i/3, 32) + ((i%3 == 2) ? 67 : 0) - ((i%3 == 0) ? 67 : 0), 100, TEXTSELECT_VERT_64, NULL, rtc_val_cb, (void *)i);
     }
 
@@ -232,7 +232,7 @@ void _show_page()
     u16 w, h;
     LCD_SetFont(DEFAULT_FONT.font);
     LCD_GetStringDimensions((u8 *)rtc_text_cb(NULL, (void *)SETLABEL), &w, &h);
-    GUI_CreateLabel(&gui->newlbl, XM(w), 168 - h / 2 , rtc_text_cb, DEFAULT_FONT, (void *)SETLABEL);
+    GUI_CreateLabel(&gui->newlbl, XM(w), 168 - h / 2 , rtc_text_cb, &DEFAULT_FONT, (void *)SETLABEL);
     GUI_CreateLabelBox(&gui->newdate, XL(DATEBOXWIDTH), 150, DATEBOXWIDTH, 32, &BIGBOX_FONT, rtc_text_cb, NULL, (void *)NEWDATE);
     GUI_CreateLabelBox(&gui->newtime, XR(DATEBOXWIDTH), 150, DATEBOXWIDTH, 32, &BIGBOX_FONT, rtc_text_cb, NULL, (void *)NEWTIME);
 
@@ -240,7 +240,7 @@ void _show_page()
     GUI_CreateButton(&gui->settime, XR(96), 184, BUTTON_96, rtc_text_cb, rtc_set_cb, (void *)TIMEBUTTON);
 
     LCD_GetStringDimensions((u8 *)rtc_text_cb(NULL, (void *)RESULTLABEL), &w, &h);
-    GUI_CreateLabel(&gui->actlbl, XM(w), 243 - h / 2 , rtc_text_cb, DEFAULT_FONT, (void *)RESULTLABEL);
+    GUI_CreateLabel(&gui->actlbl, XM(w), 243 - h / 2 , rtc_text_cb, &DEFAULT_FONT, (void *)RESULTLABEL);
     GUI_CreateLabelBox(&gui->actdate, XL(DATEBOXWIDTH), 225, DATEBOXWIDTH, 32, &BIGBOX_FONT, rtc_text_cb, NULL, (void *)ACTDATE);
     GUI_CreateLabelBox(&gui->acttime, XR(DATEBOXWIDTH), 225, DATEBOXWIDTH, 32, &BIGBOX_FONT, rtc_text_cb, NULL, (void *)ACTTIME);
 }
