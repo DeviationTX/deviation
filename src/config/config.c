@@ -106,8 +106,8 @@ int write_int(void* ptr, const struct struct_map *map, int map_size, FILE* fh) {
                     const char* const *list = (const char* const *)map[i].str;
                     u8 index = *((u8 *)((u8*)ptr + offset));
                     fprintf(fh, "%s=%s\n", map[i - 1].str, list[index]);
-                    continue;
                 }
+                continue;
         }
         fprintf(fh, "%s=%d\n", map[i].str, value);
     }
