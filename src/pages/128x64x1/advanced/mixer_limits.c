@@ -80,7 +80,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             disp = set_limits_cb; value = &mp->limit->min;
             break;
         case ITEM_MAXLIMIT:
-            label = _tr_noop("Max Limit");        
+            label = _tr_noop("Max Limit");
             disp = set_limits_cb; value = &mp->limit->max;
             break;
         case ITEM_SCALEPOS:
