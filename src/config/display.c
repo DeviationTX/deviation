@@ -15,6 +15,7 @@
 
 #include "common.h"
 #include "gui/gui.h"
+#include "config.h"
 #include "display.h"
 #include <stdlib.h>
 #include <string.h>
@@ -86,12 +87,11 @@ static const char * const ALIGN_VAL[] = {
 #define MATCH_START(x,y) strncasecmp(x, y, sizeof(y)-1) == 0
 #define MATCH_KEY(s)     strcasecmp(name,    s) == 0
 #define MATCH_VALUE(s)   strcasecmp(value,   s) == 0
-#define NUM_STR_ELEMS(s) (sizeof(s) / sizeof(char *))
 #define SET_FLAG(var, value, flag) ((value) ? ((var) | (flag)) : ((var) & ~(flag)))
 extern u8 FONT_GetFromString(const char *);
 struct display_settings Display;
 
-u16 get_color(const char *value) {
+static u16 get_color(const char *value) {
     u8 r, g, b;
     u32 color = strtol(value, NULL, 16);
     r = 0xff & (color >> 16);
@@ -100,118 +100,75 @@ u16 get_color(const char *value) {
     return RGB888_to_RGB565(r, g, b);
 }
 
-static int handle_label(struct LabelDesc *label, const char *name, const char *value)
+static const struct struct_map _seclabel[] =
 {
-    if(MATCH_KEY(FONT)) {
-        label->font = FONT_GetFromString(value);
-        return 1;
-    }
-    if(MATCH_KEY(FONT_COLOR)) {
-        label->font_color = get_color(value);
-        return 1;
-    }
-    if(MATCH_KEY(BG_COLOR)) {
-        label->fill_color = get_color(value);
-        return 1;
-    }
-    if(MATCH_KEY(OUTLINE_COLOR)) {
-        label->outline_color = get_color(value);
-        return 1;
-    }
-    if(MATCH_KEY(BOX)) {
-        u8 idx;
-        for (idx = 0; idx < NUM_STR_ELEMS(BOX_VAL); idx++) {
-            if(BOX_VAL[idx] && MATCH_VALUE(BOX_VAL[idx])) {
-                label->style = idx;
-                // For compatibility reasons,
-                // use the old alignment values as default
-                // if the new one is not yet set:
-                if(label->align == 0) {
-                    switch(idx) {
-                        case LABEL_CENTER: label->align = ALIGN_CENTER; break;
-                        case LABEL_LEFT:   label->align = ALIGN_LEFT;   break;
-                        case LABEL_RIGHT:  label->align = ALIGN_RIGHT;  break;
-                    }
-                }
-            }
-        }
-    }
-    if(MATCH_KEY(ALIGN)) {
-        u8 idx;
-        for (idx = 0; idx < NUM_STR_ELEMS(ALIGN_VAL); idx++) {
-            if(ALIGN_VAL[idx] && MATCH_VALUE(ALIGN_VAL[idx])) {
-                label->align = idx;
-            }
-        }
-    }
-    return 0;
-}
+    {FONT,                  OFFSET_FON(struct LabelDesc, font)},
+    {FONT_COLOR,            OFFSET_COL(struct LabelDesc, font_color)},
+    {BG_COLOR,              OFFSET_COL(struct LabelDesc, fill_color)},
+    {OUTLINE_COLOR,         OFFSET_COL(struct LabelDesc, outline_color)},
+    {ALIGN,                 OFFSET_STRLIST(struct LabelDesc, align, ALIGN_VAL, ARRAYSIZE(ALIGN_VAL))},
+    {BOX,                   OFFSET_STRLIST(struct LabelDesc, style, BOX_VAL, ARRAYSIZE(BOX_VAL))}
+};
 
-struct struct_map {const char *str;  u16 offset;};
-#define MAPSIZE(x)  (sizeof(x) / sizeof(struct struct_map))
-#define OFFSET(s,v) (((long)(&s.v) - (long)(&s)) | ((sizeof(s.v)-1) << 13))
-#define OFFSETS(s,v) (((long)(&s.v) - (long)(&s)) | ((sizeof(s.v)+3) << 13))
-#define OFFSET_COL(s,v) (((long)(&s.v) - (long)(&s)) | (2 << 13))
-#define OFFSET_FON(s,v) (((long)(&s.v) - (long)(&s)) | (6 << 13))
 static const struct struct_map _secgeneral[] =
 {
-    {"header_height",        OFFSET(Display.metrics, header_height)},
-    {"header_widget_height", OFFSET(Display.metrics, header_widget_height)},
-    {"line_height",          OFFSET(Display.metrics, line_height)},
-    {"line_space",           OFFSET(Display.metrics, line_space)},
+    {"header_height",        OFFSET(struct disp_metrics, header_height)},
+    {"header_widget_height", OFFSET(struct disp_metrics, header_widget_height)},
+    {"line_height",          OFFSET(struct disp_metrics, line_height)},
+    {"line_space",           OFFSET(struct disp_metrics, line_space)},
 };
 static const struct struct_map _secselect[] =
 {
-    {"width",                OFFSET(Display, select_width)},
-    {COLOR,                  OFFSET_COL(Display, select_color)},
+    {"width",                OFFSET(struct display_settings, select_width)},
+    {COLOR,                  OFFSET_COL(struct display_settings, select_color)},
 };
 static const struct struct_map _seckeybd[] =
 {
-    {FONT,                   OFFSET_FON(Display.keyboard, font)},
-    {"bg_key1",              OFFSET_COL(Display.keyboard, bg_key1)},
-    {"fg_key1",              OFFSET_COL(Display.keyboard, fg_key1)},
-    {"bg_key2",              OFFSET_COL(Display.keyboard, bg_key2)},
-    {"fg_key2",              OFFSET_COL(Display.keyboard, fg_key2)},
-    {"bg_key3",              OFFSET_COL(Display.keyboard, bg_key3)},
-    {"fg_key3",              OFFSET_COL(Display.keyboard, fg_key3)},
-    {BG_COLOR,               OFFSET_COL(Display.keyboard, fill_color)},
+    {FONT,                   OFFSET_FON(struct disp_keyboard, font)},
+    {"bg_key1",              OFFSET_COL(struct disp_keyboard, bg_key1)},
+    {"fg_key1",              OFFSET_COL(struct disp_keyboard, fg_key1)},
+    {"bg_key2",              OFFSET_COL(struct disp_keyboard, bg_key2)},
+    {"fg_key2",              OFFSET_COL(struct disp_keyboard, fg_key2)},
+    {"bg_key3",              OFFSET_COL(struct disp_keyboard, bg_key3)},
+    {"fg_key3",              OFFSET_COL(struct disp_keyboard, fg_key3)},
+    {BG_COLOR,               OFFSET_COL(struct disp_keyboard, fill_color)},
 };
 static const struct struct_map _seclistbox[] =
 {
-    {FONT,                   OFFSET_FON(Display.listbox, font)},
-    {BG_COLOR,               OFFSET_COL(Display.listbox, bg_color)},
-    {FG_COLOR,               OFFSET_COL(Display.listbox, fg_color)},
-    {"bg_select",            OFFSET_COL(Display.listbox, bg_select)},
-    {"fg_select",            OFFSET_COL(Display.listbox, fg_select)},
+    {FONT,                   OFFSET_FON(struct disp_listbox, font)},
+    {BG_COLOR,               OFFSET_COL(struct disp_listbox, bg_color)},
+    {FG_COLOR,               OFFSET_COL(struct disp_listbox, fg_color)},
+    {"bg_select",            OFFSET_COL(struct disp_listbox, bg_select)},
+    {"fg_select",            OFFSET_COL(struct disp_listbox, fg_select)},
 };
 static const struct struct_map _secscroll[] =
 {
-    {BG_COLOR,               OFFSET_COL(Display.scrollbar, bg_color)},
-    {FG_COLOR,               OFFSET_COL(Display.scrollbar, fg_color)},
+    {BG_COLOR,               OFFSET_COL(struct disp_scrollbar, bg_color)},
+    {FG_COLOR,               OFFSET_COL(struct disp_scrollbar, fg_color)},
 };
 static const struct struct_map _secxygraph[] =
 {
-    {BG_COLOR,               OFFSET_COL(Display.xygraph, bg_color)},
-    {FG_COLOR,               OFFSET_COL(Display.xygraph, fg_color)},
-    {XY_AXIS_COLOR,          OFFSET_COL(Display.xygraph, axis_color)},
-    {XY_GRID_COLOR,          OFFSET_COL(Display.xygraph, grid_color)},
-    {XY_POINT_COLOR,         OFFSET_COL(Display.xygraph, point_color)},
-    {OUTLINE_COLOR,          OFFSET_COL(Display.xygraph, outline_color)},
+    {BG_COLOR,               OFFSET_COL(struct disp_xygraph, bg_color)},
+    {FG_COLOR,               OFFSET_COL(struct disp_xygraph, fg_color)},
+    {XY_AXIS_COLOR,          OFFSET_COL(struct disp_xygraph, axis_color)},
+    {XY_GRID_COLOR,          OFFSET_COL(struct disp_xygraph, grid_color)},
+    {XY_POINT_COLOR,         OFFSET_COL(struct disp_xygraph, point_color)},
+    {OUTLINE_COLOR,          OFFSET_COL(struct disp_xygraph, outline_color)},
 };
 static const struct struct_map _secbargraph[] =
 {
-    {BG_COLOR,               OFFSET_COL(Display.bargraph, bg_color)},
-    {FG_COLOR_POS,           OFFSET_COL(Display.bargraph, fg_color_pos)},
-    {FG_COLOR_NEG,           OFFSET_COL(Display.bargraph, fg_color_neg)},
-    {FG_COLOR_ZERO,          OFFSET_COL(Display.bargraph, fg_color_zero)},
-    {OUTLINE_COLOR,          OFFSET_COL(Display.bargraph, outline_color)},
+    {BG_COLOR,               OFFSET_COL(struct disp_bargraph, bg_color)},
+    {FG_COLOR_POS,           OFFSET_COL(struct disp_bargraph, fg_color_pos)},
+    {FG_COLOR_NEG,           OFFSET_COL(struct disp_bargraph, fg_color_neg)},
+    {FG_COLOR_ZERO,          OFFSET_COL(struct disp_bargraph, fg_color_zero)},
+    {OUTLINE_COLOR,          OFFSET_COL(struct disp_bargraph, outline_color)},
 };
 #if (LCD_WIDTH == 480) || (LCD_WIDTH == 320)
 static const struct struct_map _secbackground[] =
 {
-    {"drawn_background",     OFFSET(Display.background, drawn_background)},
-    {"bg_color",             OFFSET_COL(Display.background, bg_color)},
-    {"hd_color",             OFFSET_COL(Display.background, hd_color)},
+    {"drawn_background",     OFFSET(struct disp_background, drawn_background)},
+    {"bg_color",             OFFSET_COL(struct disp_background, bg_color)},
+    {"hd_color",             OFFSET_COL(struct disp_background, hd_color)},
 };
 #endif
 
@@ -221,35 +178,10 @@ static int ini_handler(void* user, const char* section, const char* name, const 
     struct display_settings *d = (struct display_settings *)user;
     int value_int = atoi(value);
 
-    int assign_int(void* ptr, const struct struct_map *map, int map_size)
-    {
-        for(int i = 0; i < map_size; i++) {
-            if(MATCH_KEY(map[i].str)) {
-                int size = map[i].offset >> 13;
-                int offset = map[i].offset & 0x1FFF;
-                switch(size) {
-                    case 0:
-                        *((u8 *)((long)ptr + offset)) = value_int; break;
-                    case 1:
-                        *((u16 *)((long)ptr + offset)) = value_int; break;
-                    case 2:
-                        *((u16 *)((long)ptr + offset)) = get_color(value); break;
-                    case 3:
-                        *((u32 *)((long)ptr + offset)) = value_int; break;
-                    case 6:
-                        *((u8 *)((long)ptr + offset)) = FONT_GetFromString(value);
-                }
-                return 1;
-            }
-        }
-        return 0;
-    }
-
     if(MATCH_START(section, FONT) && strlen(section) > sizeof(FONT)) {
-        for (idx = 0; idx < NUM_STR_ELEMS(FONT_VAL); idx++) {
+        for (idx = 0; idx < ARRAYSIZE(FONT_VAL); idx++) {
             if (FONT_VAL[idx] && 0 == strcasecmp(section + sizeof(FONT), FONT_VAL[idx])) {
-                handle_label(&d->font[idx], name, value);
-                return 1;
+                return assign_int(&d->font[idx], _seclabel, ARRAYSIZE(_seclabel), name, value);
             }
         }
         printf("Couldn't parse font: %s\n", section);
@@ -266,36 +198,36 @@ static int ini_handler(void* user, const char* section, const char* name, const 
 #endif
             return 1;
         }
-        if(assign_int(&d->metrics, _secgeneral, MAPSIZE(_secgeneral)))
+        if (assign_int(&d->metrics, _secgeneral, ARRAYSIZE(_secgeneral), name, value))
             return 1;
     }
     if(MATCH_START(section, "select")) {
-        if(assign_int(d, _secselect, MAPSIZE(_secselect)))
+        if (assign_int(d, _secselect, ARRAYSIZE(_secselect), name, value))
             return 1;
     }
     if(MATCH_START(section, "keyboard")) {
-        if(assign_int(&d->keyboard, _seckeybd, MAPSIZE(_seckeybd)))
+        if (assign_int(&d->keyboard, _seckeybd, ARRAYSIZE(_seckeybd), name, value))
             return 1;
     }
     if(MATCH_START(section, "listbox")) {
-        if(assign_int(&d->listbox, _seclistbox, MAPSIZE(_seclistbox)))
+        if (assign_int(&d->listbox, _seclistbox, ARRAYSIZE(_seclistbox), name, value))
             return 1;
     }
     if(MATCH_START(section, "scrollbar")) {
-        if(assign_int(&d->scrollbar, _secscroll, MAPSIZE(_secscroll)))
+        if (assign_int(&d->scrollbar, _secscroll, ARRAYSIZE(_secscroll), name, value))
             return 1;
     }
     if(MATCH_SECTION("xygraph")) {
-        if(assign_int(&d->xygraph, _secxygraph, MAPSIZE(_secxygraph)))
+        if (assign_int(&d->xygraph, _secxygraph, ARRAYSIZE(_secxygraph), name, value))
             return 1;
     }
 #if (LCD_WIDTH == 480) || (LCD_WIDTH == 320)
     if(MATCH_SECTION("background")) {
-        if(assign_int(&d->background, _secbackground, MAPSIZE(_secbackground)))
+        if (assign_int(&d->background, _secbackground, ARRAYSIZE(_secbackground), name, value))
             return 1;
     }
 #endif
-    for (idx = 0; idx < NUM_STR_ELEMS(BARGRAPH_VAL); idx++) {
+    for (idx = 0; idx < ARRAYSIZE(BARGRAPH_VAL); idx++) {
         if(MATCH_SECTION(BARGRAPH_VAL[idx])) {
             struct disp_bargraph *graph;
             enum DispFlags flag;
@@ -314,7 +246,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
                 graph->fg_color_pos = graph->fg_color_neg = graph->fg_color_zero = get_color(value);
                 return 1;
             }
-            assign_int(graph, _secbargraph, MAPSIZE(_secbargraph));
+            assign_int(graph, _secbargraph, ARRAYSIZE(_secbargraph), name, value);
             return 1;
         }
     }
@@ -342,5 +274,24 @@ u8 CONFIG_ReadDisplay()
     #else
     char filename[] = "media/config.ini";
     #endif
-    return CONFIG_IniParse(filename, ini_handler, (void *)&Display);
+    if (CONFIG_IniParse(filename, ini_handler, (void *)&Display)) {
+        for (int i = 0; i < NUM_LABELS; i++) {
+            struct LabelDesc *label = &Display.font[i];
+            // For compatibility reasons,
+            // use the old alignment values as default
+            // if the new one is not yet set:
+            if (label->align == 0) {
+                switch (label->style) {
+                    case LABEL_CENTER: label->align = ALIGN_CENTER; break;
+                    case LABEL_LEFT:   label->align = ALIGN_LEFT;   break;
+                    case LABEL_RIGHT:  label->align = ALIGN_RIGHT;  break;
+                    default: break;
+                }
+            }
+        }
+
+        return 1;
+    }
+
+    return 0;
 }
