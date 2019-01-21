@@ -14,10 +14,16 @@ lines = [line.rstrip() for line in res.stdout]
 languages = {}
 
 pat = re.compile(r'locale/deviation\.(.+)\.po$')
+english = False
 for line in lines:
+    if re.search(r'deviation.po$', line):
+        english = True
     match = pat.search(line)
     if match:
         languages[match.group(1)] = 1
-if languages:
-    msg += " (Languages: " + " ".join(sorted(languages.keys())) + ")"
+lang = sorted(languages.keys())
+if english:
+    lang.insert(0, "en")
+if lang:
+    msg += " (Languages: " + " ".join(lang) + ")"
 print msg

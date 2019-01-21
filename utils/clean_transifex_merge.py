@@ -4,7 +4,7 @@ import os
 import subprocess
 import sys
 
-cmd = ['git', 'diff']
+cmd = ['git', 'diff', '--relative']
 if len(sys.argv) > 1:
     cmd += sys.argv[1:]
 
@@ -25,7 +25,7 @@ for line in lines:
         changes = 0
         filename = os.path.sep.join(line.split(" ")[-1].split(os.path.sep)[1:]) # FIXME: This is not x-platform clean
     if line.startswith(('-', '+')) and not line.startswith(('---', '+++')):
-        if '"POT-Creation-Date: ' not in line:
+        if not any(line[1:].startswith(x) for x in ['"POT-Creation-Date: ', '"Last-Translator: ', '#']):
             changes += 1
 
 
