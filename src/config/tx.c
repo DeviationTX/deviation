@@ -173,10 +173,12 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         if (assign_int(&t->calibration[idx], _seccalibrate, ARRAYSIZE(_seccalibrate), name, value))
             return 1;
     }
-    if (HAS_TOUCH && MATCH_SECTION(SECTION_TOUCH)) {
+#if HAS_TOUCH
+    if (MATCH_SECTION(SECTION_TOUCH)) {
         if (assign_int(&t->touch, _sectouch, ARRAYSIZE(_sectouch), name, value))
             return 1;
     }
+#endif
     if (MATCH_SECTION(SECTION_AUTODIMMER)) {
         if (assign_int(&t->auto_dimmer, _secautodimmer, ARRAYSIZE(_secautodimmer), name, value))
             return 1;
