@@ -350,7 +350,7 @@ void CONFIG_LoadTx()
     CONFIG_IniParse("tx.ini", ini_handler, (void *)&Transmitter);
     crc32 = Crc(&Transmitter, sizeof(Transmitter));
 #if HAS_EXTENDED_AUDIO
-    CONFIG_VoiceParse();
+    CONFIG_VoiceParse(MAX_VOICEMAP_ENTRIES);
 #endif
     return;
 }
