@@ -229,10 +229,11 @@ void CONFIG_WriteTx()
         write_int(&t->calibration[i], _seccalibrate, ARRAYSIZE(_seccalibrate), fh);
     }
 
-    if (HAS_TOUCH) {
-        fprintf(fh, "[%s]\n", SECTION_TOUCH);
-        write_int(&t->touch, _sectouch, ARRAYSIZE(_sectouch), fh);
-    }
+#if HAS_TOUCH
+    fprintf(fh, "[%s]\n", SECTION_TOUCH);
+    write_int(&t->touch, _sectouch, ARRAYSIZE(_sectouch), fh);
+#endif
+
     fprintf(fh, "[%s]\n", SECTION_AUTODIMMER);
     write_int(&t->auto_dimmer, _secautodimmer, ARRAYSIZE(_secautodimmer), fh);
 
