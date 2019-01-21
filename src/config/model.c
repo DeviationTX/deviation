@@ -29,9 +29,7 @@ struct Model Model;
 static u32 crc32;
 
 const char * const MODEL_TYPE_VAL[MODELTYPE_LAST] = { "heli", "plane", "multi" };
-
-
-const u8 RADIO_TX_POWER_COUNT[TX_MODULE_LAST] = {
+const u8 RADIO_TX_POWER_COUNT[TX_MODULE_LAST] = {  // number of power settings
      8,    //   CYRF6936,
      7,    //   A7105,
      8,    //   CC2500,
@@ -48,17 +46,20 @@ const char * radio_tx_power_val(enum Radio radio, enum TxPower power) {
     static const char * const r9m_powers[] = { "10/25mW", "100/25mW", "500/500", "Auto/200" };
 
     if (radio >= TX_MODULE_LAST) return NULL;
-    if (power > RADIO_TX_POWER_COUNT[radio]) power = RADIO_TX_POWER_COUNT[radio];
+    if (power >= RADIO_TX_POWER_COUNT[radio]) power = RADIO_TX_POWER_COUNT[radio]-1;
 
     switch (radio) {
     case CYRF6936:
     case CC2500:
     case A7105:
+    case MULTIMOD:
         return std_powers[power];
     case NRF24L01:
         return nrf_powers[power];
     case R9M:
         return r9m_powers[power];
+    default:
+        return NULL; // never reached, silence warning
     }
 }
 
