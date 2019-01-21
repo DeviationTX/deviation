@@ -50,7 +50,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
 #if HAS_MUSIC_CONFIG
     if ( k && (req_id != MAX_VOICEMAP_ENTRIES) && (req_id == id) ) {
         strlcpy(tempstring, value, k+1);
-        tempstring[MAX_VOICE_LABEL] = '\0'; // limit label length
+        tempstring[MAX_VOICE_LABEL] = '\0';  // limit label length
         return 1;
     }
 #endif
@@ -74,7 +74,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         printf("Unknown entry in voice.ini: %s\n", value);
         return 0;
     }
-    return 1; // voice label ignored
+    return 1;  // voice label ignored
 }
 
 const char* CONFIG_VoiceParse(unsigned id)
@@ -94,17 +94,17 @@ const char* CONFIG_VoiceParse(unsigned id)
     #else
     char filename[] = "media/voice.ini";
     #endif
-    if (id == MAX_VOICEMAP_ENTRIES) { // initial parse of voice.ini
-        voice_map_entries = CUSTOM_ALARM_ID; // Reserve space in map for global alerts
+    if (id == MAX_VOICEMAP_ENTRIES) {  // initial parse of voice.ini
+        voice_map_entries = CUSTOM_ALARM_ID;  // Reserve space in map for global alerts
         if (CONFIG_IniParse(filename, ini_handler, &id)) {
             printf("Failed to parse voice.ini\n");
-            Transmitter.audio_player = AUDIO_NONE; // disable external voice output
-            strcpy(tempstring, "");
+            Transmitter.audio_player = AUDIO_NONE;  // disable external voice output
+            tempstring[0] = '\0';
         }
     }
     if ( (id < MAX_VOICEMAP_ENTRIES) && (id >= CUSTOM_ALARM_ID) ) {
         if (CONFIG_IniParse(filename, ini_handler, &id)) {
-            //ini handler will return tempstring with label of id
+            // ini handler will return tempstring with label of id
         }
     }
     return tempstring;
