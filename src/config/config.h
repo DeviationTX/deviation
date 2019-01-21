@@ -46,5 +46,6 @@ struct struct_map {const char *str;  u16 offset;};
     (offsetof(s, v) | (TYPE_STR_LIST << 12)) }, { (const char*)StrList, StrListSize
 int assign_int(void* ptr, const struct struct_map *map, int map_size,
     const char* name, const char* value);
+int write_int(void* ptr, const struct struct_map *map, int map_size, FILE* fh);
 
 #endif

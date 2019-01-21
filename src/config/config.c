@@ -79,6 +79,43 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size, const char
     return 0;
 }
 
+int write_int(void* ptr, const struct struct_map *map, int map_size, FILE* fh) {
+    for (int i = 0; i < map_size; i++) {
+        int size = map[i].offset >> 12;
+        int offset = map[i].offset & 0xFFF;
+        int value;
+
+        switch (size) {
+            case TYPE_S8:
+                value = *((s8 *)((u8*)ptr + offset)); break;
+            case TYPE_S16:
+                value = *((s16 *)((u8*)ptr + offset)); break;
+            case TYPE_S32:
+                value = *((s32 *)((u8*)ptr + offset)); break;
+
+            case TYPE_U8:
+                value = *((u8 *)((u8*)ptr + offset)); break;
+            case TYPE_U16:
+                value = *((u16 *)((u8*)ptr + offset)); break;
+            case TYPE_U32:
+                value = *((u32 *)((u8*)ptr + offset)); break;
+            default:
+                if (size == TYPE_STR_LIST)
+                {
+                    i++;  // next entry is additional info for string list
+                    const char* const *list = (const char* const *)map[i].str;
+                    u8 index = *((u8 *)((u8*)ptr + offset));
+                    fprintf(fh, "%s=%s\n", map[i - 1].str, list[index]);
+                    continue;
+                }
+        }
+        fprintf(fh, "%s=%d\n", map[i].str, value);
+    }
+
+    return 1;
+}
+
+
 #define TESTNAME config
 #include "tests.h"
 
