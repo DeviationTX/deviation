@@ -46,8 +46,8 @@ static void _draw_page(int has_pa) {
                          (void *)(long)mp->testing);
         if (mp->testing) {
             snprintf(tempstring, sizeof(tempstring), "%s %s %s %s.",
-                     _tr("Power reduced to"), RADIO_TX_POWER_VAL[Model.radio][Model.tx_power],
-                     _tr("from"), RADIO_TX_POWER_VAL[Model.radio][mp->old_power]);
+                     _tr("Power reduced to"), radio_tx_power_val(Model.radio, Model.tx_power),
+                     _tr("from"), radio_tx_power_val(Model.radio, mp->old_power));
             GUI_CreateLabelBox(&gui->info, INFO_X, INFO_Y, 0, 0, &DEFAULT_FONT,
                                NULL, NULL, tempstring);
         }

@@ -181,7 +181,7 @@ static const char *powerselect_cb(guiObject_t *obj, int dir, void *data)
         return _tr("Default");
     Model.tx_power = GUI_TextSelectHelper(Model.tx_power, TXPOWER_100uW, RADIO_TX_POWER_COUNT[Model.radio]-1, dir, 1, 1, NULL);
     mp->last_txpower = Model.tx_power;
-    return RADIO_TX_POWER_VAL[Model.radio][Model.tx_power];
+    return radio_tx_power_val(Model.radio, Model.tx_power);
 }
 
 static const char *ppmin_select_cb(guiObject_t *obj, int dir, void *data)
