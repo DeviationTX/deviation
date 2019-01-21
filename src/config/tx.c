@@ -148,7 +148,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         if (assign_int(t, _secmodel, ARRAYSIZE(_secmodel), name, value))
             return 1;
     #if HAS_RTC
-        // TODO: no need to pack into 1 byte
+        // TODO(howard0su): no need to pack into 1 byte
         if (MATCH_KEY(TIME_FORMAT)) {
             t->rtc_timeformat = atoi(value);
             return 1;
