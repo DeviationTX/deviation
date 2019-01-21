@@ -52,10 +52,10 @@ char * radio_tx_power_val(enum Radio radio, enum TxPower power) {
     case CC2500:
     case A7105:
     case MULTIMOD:
-        sprintf(tempstring, "%d%cW", std_powers[power], (power < 2)?'u':'m');
+        snprintf(tempstring, TEMPSTRINGLENGTH, "%d%cW", std_powers[power], (power < 2)?'u':'m');
         break;
     case NRF24L01:
-        sprintf(tempstring, "%dmW", nrf_powers[power]);
+        snprintf(tempstring, TEMPSTRINGLENGTH, "%dmW", nrf_powers[power]);
         break;
     case R9M:
         return r9m_powers[power];
