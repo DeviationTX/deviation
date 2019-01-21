@@ -38,11 +38,12 @@ const u8 RADIO_TX_POWER_COUNT[TX_MODULE_LAST] = {  // number of power settings
      4,    //   R9M (FCC/EU),
 };
 
-char * radio_tx_power_val(enum Radio radio, enum TxPower power) {
+const char * radio_tx_power_val(enum Radio radio, enum TxPower power) {
     // entries in this list must match order in enum TxPower definition
-    static const u16 std_powers[TXPOWER_LAST] = { 100, 300, 1, 3, 10, 30, 100, 150};
-    static const u16 nrf_powers[] = { 1, 6, 25, 100};
-    static char * const r9m_powers[] = { "10/25mW", "100/25mW", "500/500", "Auto/200" };
+    static const char * const std_powers[TXPOWER_LAST] = {
+        "100uW", "300uW", "1mW", "3mW", "10mW", "30mW", "100mW", "150mW"};
+    static const char * const nrf_powers[] = { "1mW", "6mW", "25mW", "100mW"};
+    static const char * const r9m_powers[] = { "10/25mW", "100/25mW", "500/500", "Auto/200" };
 
     if (radio >= TX_MODULE_LAST) return NULL;
     if (power >= RADIO_TX_POWER_COUNT[radio]) power = RADIO_TX_POWER_COUNT[radio]-1;
@@ -52,17 +53,14 @@ char * radio_tx_power_val(enum Radio radio, enum TxPower power) {
     case CC2500:
     case A7105:
     case MULTIMOD:
-        snprintf(tempstring, TEMPSTRINGLENGTH, "%d%cW", std_powers[power], (power < 2)?'u':'m');
-        break;
+        return std_powers[power];
     case NRF24L01:
-        snprintf(tempstring, TEMPSTRINGLENGTH, "%dmW", nrf_powers[power]);
-        break;
+        return nrf_powers[power];
     case R9M:
         return r9m_powers[power];
     default:
-        return NULL;
+        return NULL; // never reached, silence warning
     }
-    return tempstring;
 }
 
 #define MATCH_SECTION(s) (strcasecmp(section, s) == 0)
