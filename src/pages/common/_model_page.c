@@ -179,9 +179,9 @@ static const char *powerselect_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     if(! PROTOCOL_HasPowerAmp(Model.protocol))
         return _tr("Default");
-    Model.tx_power = GUI_TextSelectHelper(Model.tx_power, TXPOWER_100uW, TXPOWER_LAST-1, dir, 1, 1, NULL);
+    Model.tx_power = GUI_TextSelectHelper(Model.tx_power, TXPOWER_100uW, RADIO_TX_POWER_COUNT[Model.radio]-1, dir, 1, 1, NULL);
     mp->last_txpower = Model.tx_power;
-    return RADIO_TX_POWER_VAL[Model.tx_power];
+    return radio_tx_power_val(Model.radio, Model.tx_power);
 }
 
 static const char *ppmin_select_cb(guiObject_t *obj, int dir, void *data)
@@ -249,12 +249,10 @@ static const char *protoselect_cb(guiObject_t *obj, int dir, void *data)
         PROTOCOL_DeInit();
         // Load() the new protocol
         Model.protocol = new_protocol;
+        Model.radio = PROTOCOL_GetRadio(new_protocol);
+        Model.tx_power = RADIO_TX_POWER_COUNT[Model.radio]-1;
         PROTOCOL_Load(1);
         Model.num_channels = PROTOCOL_DefaultNumChannels();
-        if (! PROTOCOL_HasPowerAmp(Model.protocol))
-            Model.tx_power = TXPOWER_150mW;
-        else
-            Model.tx_power = mp->last_txpower;
         memset(Model.proto_opts, 0, sizeof(Model.proto_opts));
         guiObject_t *obj = _get_obj(ITEM_NUMCHAN, 0);
         if (obj)

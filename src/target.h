@@ -37,12 +37,13 @@ enum {
 #define NUM_INPUTS (NUM_TX_INPUTS)
 #define NUM_TX_BUTTONS (BUT_LAST - 1)
 
-enum {
+enum Radio {
     CYRF6936,
     A7105,
     CC2500,
     NRF24L01,
     MULTIMOD,
+    R9M,
     TX_MODULE_LAST,
 };
 

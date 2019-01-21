@@ -37,6 +37,7 @@ struct Model {
     u16 ppmin_centerpw;
     u16 ppmin_deltapw;
     u8 train_sw;
+    enum Radio radio;
     enum TxPower tx_power;
     enum SwashType swash_type;
     u8 swash_invert;
@@ -78,7 +79,8 @@ struct Model {
 #endif
 };
 extern struct Model Model;
-extern const char * const RADIO_TX_POWER_VAL[TXPOWER_LAST];
+const char * radio_tx_power_val(enum Radio, enum TxPower);
+extern const u8 RADIO_TX_POWER_COUNT[TX_MODULE_LAST];
 
 u8 CONFIG_ReadModel(u8 model_num);
 u8 CONFIG_WriteModel(u8 model_num);
