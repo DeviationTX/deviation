@@ -59,13 +59,13 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     y += space;
     /*prem-timer reset */
     GUI_CreateLabelBox(&gui->resetpermlbl, LABEL_X, y,
-            LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, NULL, NULL, _tr("Reset"));
+            LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Reset"));
     GUI_CreateButtonPlateText(&gui->resetperm, RESET_X, y,
             RESET_WIDTH, LINE_HEIGHT, &BUTTON_FONT, show_timerperm_cb, reset_timerperm_cb,(void *)(long)absrow);
     if(Model.mixer_mode != MIXER_STANDARD) {
         /* or Reset switch */
     	GUI_CreateLabelBox(&gui->resetlbl, LABEL_X, y,
-            LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, NULL, NULL, _tr("Reset sw"));
+            LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Reset sw"));
     	GUI_CreateTextSourcePlate(&gui->resetsrc, TEXTSEL_X, y ,
             TEXTSEL_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT, toggle_resetsrc_cb, set_resetsrc_cb, set_input_rstsrc_cb, (void *)(long)absrow);
 	y += space;
@@ -73,7 +73,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     //Row 4
     GUI_CreateLabelBox(&gui->startlbl, LABEL_X, y,
             START_WIDTH, // bug fix: label width and height can't be 0, otherwise, the label couldn't be hidden dynamically
-            LINE_HEIGHT, &LABEL_FONT, NULL, NULL, _tr("Start"));
+            LINE_HEIGHT, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Start"));
     GUI_CreateTextSelectPlate(&gui->start, TEXTSEL_X, y,
             TEXTSEL_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT, NULL, set_start_cb, (void *)(long)absrow);
 // don't include this in Devo7e due to memory restrictions

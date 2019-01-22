@@ -122,9 +122,9 @@ static void show_page(CurvesMode _curve_mode, int page)
 
     set_cur_mixer();
     /* Row 1 */
-    GUI_CreateLabelBox(&gui->modelbl, COL_LBL, LINE1, COL_TEXT - COL_LBL, 16, &LABEL_FONT, NULL, NULL, _tr("Mode"));
+    GUI_CreateLabelBox(&gui->modelbl, COL_LBL, LINE1, COL_TEXT - COL_LBL, 16, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Mode"));
     GUI_CreateTextSelect(&gui->mode, COL_TEXT, LINE1-1, TEXTSELECT_128, NULL, set_mode_cb, (void *)(long)curve_mode);
-    GUI_CreateLabelBox(&gui->holdlbl, COL_LBL, LINE2, COL_TEXT - COL_LBL, 16, &LABEL_FONT, NULL, NULL, _tr("Enabled"));
+    GUI_CreateLabelBox(&gui->holdlbl, COL_LBL, LINE2, COL_TEXT - COL_LBL, 16, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Enabled"));
     GUI_CreateTextSelect(&gui->hold, COL_TEXT, LINE2-1, TEXTSELECT_64, NULL, set_holdstate_cb, NULL);
     GUI_CreateLabelBox(&gui->holdsw, COL_SWITCH, LINE2, LCD_WIDTH - COL_SWITCH, 16, &DEFAULT_FONT, holdsw_str_cb, NULL, NULL);
     if (pit_mode != PITTHROMODE_HOLD)

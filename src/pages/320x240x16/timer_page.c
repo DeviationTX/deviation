@@ -57,16 +57,16 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         //Row 3
         row+=20;
         /* Reset Perm timer*/
-        GUI_CreateLabelBox(&gui->resetpermlbl[i], COL1, row, COL2-COL1, 18, &LABEL_FONT, NULL, NULL, _tr("Reset"));
+        GUI_CreateLabelBox(&gui->resetpermlbl[i], COL1, row, COL2-COL1, 18, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Reset"));
         GUI_CreateButton(&gui->resetperm[i], COL2, row, BUTTON_96x16, show_timerperm_cb, reset_timerperm_cb, (void *)(long)timer_num);
         if(Model.mixer_mode != MIXER_STANDARD) {
             /* or Reset switch */
-            GUI_CreateLabelBox(&gui->resetlbl[i], COL1, row, COL2-COL1, 18, &LABEL_FONT, NULL, NULL, _tr("Reset sw"));
+            GUI_CreateLabelBox(&gui->resetlbl[i], COL1, row, COL2-COL1, 18, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Reset sw"));
             GUI_CreateTextSource(&gui->resetsrc[i],  COL2, row, TEXTSELECT_96, toggle_resetsrc_cb, set_resetsrc_cb, set_input_rstsrc_cb, (void *)(long)timer_num);
             row+=20;
         }
         //Row 4
-        GUI_CreateLabelBox(&gui->startlbl[i], COL1, row, COL2-COL1, 18, &LABEL_FONT, NULL, NULL, _tr("Start"));
+        GUI_CreateLabelBox(&gui->startlbl[i], COL1, row, COL2-COL1, 18, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Start"));
         GUI_CreateTextSelect(&gui->start[i], COL2, row, TEXTSELECT_96, NULL, set_start_cb, (void *)(long)timer_num);
         if(Model.mixer_mode == MIXER_STANDARD)
             row += 20;

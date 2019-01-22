@@ -61,7 +61,7 @@ void PAGE_GyroSenseInit(int page)
     gyro_output = mp->mixer_ptr[0]->dest;
     convert_output_to_percentile();
     /* Row 1 */
-    GUI_CreateLabelBox(&gui->chanlbl, COL1, ROW1, LABEL_WIDTH, 16, &LABEL_FONT, NULL, NULL, _tr("Channel"));
+    GUI_CreateLabelBox(&gui->chanlbl, COL1, ROW1, LABEL_WIDTH, 16, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Channel"));
     GUI_CreateTextSelect(&gui->chan, COL2, ROW1, TEXTSELECT_128, NULL, gyro_output_cb, NULL);
 
     /* Row 2 */

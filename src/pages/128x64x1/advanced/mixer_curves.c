@@ -59,7 +59,7 @@ void PAGE_EditCurvesInit(int page)
     edit->curve = *curve;
 
     GUI_CreateTextSelectPlate(&gui->name, NAME_X, 0, NAME_W, HEADER_HEIGHT, &TEXTSEL_FONT, NULL, set_curvename_cb, NULL);
-    GUI_CreateButtonPlateText(&gui->save, SAVE_X, 0, SAVE_W, HEADER_WIDGET_HEIGHT, &BUTTON_FONT , NULL, okcancel_cb, (void *)_tr("Save"));
+    GUI_CreateButtonPlateText(&gui->save, SAVE_X, 0, SAVE_W, HEADER_WIDGET_HEIGHT, &BUTTON_FONT , GUI_Localize, okcancel_cb, _tr_noop("Save"));
     // Draw a line
     if (UNDERLINE)
         GUI_CreateRect(&gui->rect, 0, HEADER_WIDGET_HEIGHT, LCD_WIDTH, 1, &DEFAULT_FONT);
@@ -68,19 +68,19 @@ void PAGE_EditCurvesInit(int page)
     u8 y = space;
 
     if (type >= CURVE_3POINT) {
-        GUI_CreateLabelBox(&gui->smoothlbl, LABEL_X, y, LABEL1_W, LINE_HEIGHT, &LABEL_FONT, NULL, NULL, _tr("Smooth"));
+        GUI_CreateLabelBox(&gui->smoothlbl, LABEL_X, y, LABEL1_W, LINE_HEIGHT, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Smooth"));
         GUI_CreateTextSelectPlate(&gui->smooth, TEXTSEL1_X, y, TEXTSEL1_W, LINE_HEIGHT, &TEXTSEL_FONT, NULL, set_smooth_cb, NULL);
         y += space;
-        GUI_CreateLabelBox(&gui->pointlbl, LABEL_X, y , LABEL2_W, LINE_HEIGHT, &LABEL_FONT, NULL, NULL, _tr("Point"));
+        GUI_CreateLabelBox(&gui->pointlbl, LABEL_X, y , LABEL2_W, LINE_HEIGHT, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Point"));
         GUI_CreateTextSelectPlate(&gui->point, TEXTSEL2_X, y, TEXTSEL2_W, LINE_HEIGHT, &TEXTSEL_FONT, NULL, set_pointnum_cb, NULL);
     } else if(type == CURVE_DEADBAND || type == CURVE_EXPO) {
-        GUI_CreateLabelBox(&gui->pointlbl, LABEL_X, y , LABEL_W, LINE_HEIGHT, &LABEL_FONT, NULL, NULL, _tr("Pos/Neg"));
+        GUI_CreateLabelBox(&gui->pointlbl, LABEL_X, y , LABEL_W, LINE_HEIGHT, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Pos/Neg"));
         y += space;
         GUI_CreateTextSelectPlate(&gui->point, LABEL_X, y, LABEL_W, LINE_HEIGHT, &TEXTSEL_FONT, NULL, set_expopoint_cb, NULL);
     }
 
     y += space;
-    GUI_CreateLabelBox(&gui->valuelbl, LABEL_X, y , LABEL_W, LINE_HEIGHT, &LABEL_FONT, NULL, NULL, _tr("Value"));
+    GUI_CreateLabelBox(&gui->valuelbl, LABEL_X, y , LABEL_W, LINE_HEIGHT, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Value"));
     y += VALUE_Y_OFFSET;
     GUI_CreateTextSelectPlate(&gui->value, VALUE_X, y, LABEL_W, LINE_HEIGHT, &TEXTSEL_FONT, NULL, set_value_cb, NULL);
 

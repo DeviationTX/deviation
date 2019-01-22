@@ -56,7 +56,7 @@ void PAGE_DrExpInit(int page)
         return;
     }
     /* Row 1 */
-    GUI_CreateLabelBox(&gui->srclbl, COL1, ROW1, COL2 - COL1, 16, &LABEL_FONT, NULL, NULL, _tr("Src"));
+    GUI_CreateLabelBox(&gui->srclbl, COL1, ROW1, COL2 - COL1, 16, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Src"));
     GUI_CreateTextSelect(&gui->src, COL2, ROW1, TEXTSELECT_64, NULL, set_type_cb, NULL);
     /* Row 2 */
     GUI_CreateLabelBox(&gui->mode[0], COL3, ROW2, 96, 16, &LABEL_FONT, NULL, NULL, STDMIX_ModeName(PITTHROMODE_NORMAL));

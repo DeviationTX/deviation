@@ -81,7 +81,7 @@ static void show_iconsel_page(int SelectedIcon) {
 
     //Header
     PAGE_ShowHeader(INPUT_SourceNameAbbrevSwitch(tempstring, toggleinput));
-    GUI_CreateButtonPlateText(&gui->revert, REVERT_X, 0, REVERT_W, HEADER_WIDGET_HEIGHT, &BUTTON_FONT, NULL, revert_cb, (void *)_tr("Revert"));
+    GUI_CreateButtonPlateText(&gui->revert, REVERT_X, 0, REVERT_W, HEADER_WIDGET_HEIGHT, &BUTTON_FONT, GUI_Localize, revert_cb, _tr_noop("Revert"));
 
 #if SEPARATOR
     GUI_CreateRect(&gui->separator, SEPARATOR_X, HEADER_WIDGET_HEIGHT, 1, LCD_HEIGHT-HEADER_HEIGHT, &DEFAULT_FONT);

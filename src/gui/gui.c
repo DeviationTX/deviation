@@ -830,6 +830,13 @@ void GUI_SelectionNotify(void (*notify_cb)(guiObject_t *obj))
 {
     select_notify = notify_cb;
 }
+
+const char* _GUI_Localize(struct guiObject *obj, const void* str)
+{
+    (void)obj;
+    return _tr((const char*)str);
+}
+
 #if HAS_TOUCH
 void GUI_ChangeSelectionOnTouch(int enable)
 {
