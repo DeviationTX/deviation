@@ -108,7 +108,7 @@ sub get_strings {
 }
 
 sub extract_all_strings {
-    my @lines = `/usr/bin/find . -name "*.[hc]" | grep -v libopencm3 | xargs xgettext -o - --omit-header -k --keyword=_tr --keyword=_tr_noop --no-wrap`;
+    my @lines = `/usr/bin/find . -name "*.[hc]" | grep -v libopencm3 | sort | xargs xgettext -o - --omit-header -k --keyword=_tr --keyword=_tr_noop --no-wrap`;
     my $idx = 0;
     my %strings = (__ORDER__ => [] );  # Crude Tie::IxHash implementation
     #Read all strings and put into a hash that maps the containing file to the string
