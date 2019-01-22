@@ -34,7 +34,7 @@ void PAGE_SplashInit(int page)
     }
     PAGE_SetActionCB(_action_cb);
 
-    GUI_CreateLabelBox(&gui->splash_text, 3*ITEM_SPACE, 4*LINE_HEIGHT, 0, 0, &MODELNAME_FONT, NULL, NULL, _tr("Deviation"));
+    GUI_CreateLabelBox(&gui->splash_text, 3*ITEM_SPACE, 4*LINE_HEIGHT, 0, 0, &MODELNAME_FONT, GUI_Localize, NULL, _tr_noop("Deviation"));
     GUI_CreateLabelBox(&gui->version, 0, 7*LINE_HEIGHT, 0, 0, &DEFAULT_FONT, NULL, NULL, DeviationVersion);
 }
 

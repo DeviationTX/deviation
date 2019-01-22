@@ -1,24 +1,30 @@
 # boards are ordered by priority so that when monitoring a build developers get feedback on the important ones first.
-env:
-#Do not define 'global' env vars here.  They cannot be used with API builds
-    matrix:
-      - MAKETARGET=lint
-      - MAKETARGET=zip_devo8
-      - MAKETARGET=zip_devo10
-      - MAKETARGET=zip_devo12
-      - MAKETARGET=zip_devo7e
-      - MAKETARGET=zip_devof12e
-      - MAKETARGET=zip_t8sg
-      - MAKETARGET=zip_at9
-      - MAKETARGET=zip_devof7
-      - MAKETARGET=zip_win_emu_devo8
-      - MAKETARGET=zip_emu_devo8
-      - MAKETARGET=test
-#      - COMPILER=latest TARGET=devo8
-
 matrix:
-  fast_finish: true
-  
+#Do not define 'global' env vars here.  They cannot be used with API builds
+    fast_finish: true
+    include:
+      - stage: deploy
+        env: MAKETARGET="zips winzips"
+      - stage: build
+        env: MAKETARGET=lint
+      - env: MAKETARGET=zip_devo8
+      - env: MAKETARGET=zip_devo10
+      - env: MAKETARGET=zip_devo12
+      - env: MAKETARGET=zip_devo7e
+      - env: MAKETARGET=zip_devof12e
+      - env: MAKETARGET=zip_t8sg
+      - env: MAKETARGET=zip_at9
+      - env: MAKETARGET=zip_devof7
+      - env: MAKETARGET=zip_win_emu_devo8
+      - env: MAKETARGET=zip_emu_devo8
+      - env: MAKETARGET=test
+
+stages:
+    - name: deploy
+      if: type IN (api, cron)
+    - name: build
+      if: type NOT IN (api, cron)
+
 dist: trusty
 
 addons:
@@ -32,119 +38,137 @@ addons:
       - mingw32-runtime
       - libfltk1.3-dev
       - gcovr
-#      - gcc-arm-none-eabi
 
-#Do NOT set these.  They set 'CC' which breaks the build
 language: minimal
+#Do NOT set these.  They set 'CC' which breaks the build
 #compiler: gcc
 
 git:
   depth: 5
 
 before_install:
-   - pip install --user cpp-coveralls cpplint
-   - if [ ! -d "$HOME/gcc-arm-none-eabi-8-2018-q4-major/bin" ]; then
-       pushd $HOME;
-       curl --retry 10 --retry-max-time 120 -L "https://developer.arm.com/-/media/Files/downloads/gnu-rm/8-2018q4/gcc-arm-none-eabi-8-2018-q4-major-linux.tar.bz2" | tar xfj -;
-       popd;
-     fi;
-   # don't build 'tests' because they don't work on a cross-compile, so we need to specify 'DIRS' explicitly
-   - if [ ! -d "$HOME/fltk-1.3.0-w32/bin" ]; then
-         mkdir $HOME/src;
-         mkdir $HOME/fltk-1.3.0-w32;
-         pushd $HOME/src;
-         curl --retry 10 --retry-max-time 120 -L "http://fltk.org/pub/fltk/1.3.0/fltk-1.3.0-source.tar.gz" | tar xzf -;
-         cd fltk-1.3.0;
-         ./configure --prefix=$HOME/fltk-1.3.0-w32 --enable-localzlib --enable-localpng --disable-gl --host=i586-mingw32msvc &&
-         make -j2 DIRS="jpeg zlib png src fluid" &&
-         make install DIRS="jpeg zlib png src fluid";
-         popd;
-      fi;
-   - if [ ! -d "$HOME/portaudio-w32/bin" ]; then
-         mkdir $HOME/src;
-         mkdir $HOME/portaudio-w32;
-         pushd $HOME/src;
-         curl --retry 10 --retry-max-time 120 -L "http://www.portaudio.com/archives/pa_stable_v19_20140130.tgz" | tar xzf -;
-         cd portaudio;
-         ./configure --prefix=$HOME/portaudio-w32 --host=i586-mingw32msvc &&
-         make -j2 install;
-         popd;
-      fi;
-   - if [ ! -d "$HOME/mpg123-w32/bin" ]; then
-         mkdir $HOME/src;
-         mkdir $HOME/mpg123-w32;
-         pushd $HOME/src;
-         curl --retry 10 --retry-max-time 120 -L "http://www.mpg123.de/download/mpg123-1.23.8.tar.bz2" | tar xjf -;
-         cd mpg123-1.23.8;
-         ./configure --prefix=$HOME/mpg123-w32 --host=i586-mingw32msvc --disable-shared && make;
-         make -j2 install;
-         strip --strip-unneeded $HOME/mpg123-w32/bin/mpg123.exe;
-         popd;
-      fi;
-   - openssl aes-256-cbc -K $encrypted_54cd4d6ff016_key -iv $encrypted_54cd4d6ff016_iv -in install_nightlies.tar.enc -out install_nightlies.tar -d;
-         tar -xf install_nightlies.tar;
-         rm -f install_nightlies.tar
+  # We'll put env variables global to all builds here
+  - export GITHUB_TOKEN='789c538d758e0a718c8ae537b7f6656776e20d768de18d546014e20876e1898933cd94648f75e06117e20000b71f080d'
+  # TRAVIS does not override the TRAVIS_COMMIT_MSG with the 'message' value passed via the API (travis issue #10184)
+  - source <(curl -s -L "https://api.travis-ci.org/repos/$TRAVIS_REPO_SLUG/builds/$TRAVIS_BUILD_ID" | python -c 'import sys, json; a = json.load(sys.stdin); print "export TRAVIS_COMMIT_MSG=\"" + a.get("message","").replace("\"", "\\\"") + "\""')
 
 install:
-  - export GITHUB_TOKEN='789c538d758e0a718c8ae537b7f6656776e20d768de18d546014e20876e1898933cd94648f75e06117e20000b71f080d'
-  - export PATH=$PATH:$HOME/gcc-arm-none-eabi-8-2018-q4-major/bin
-#  - "export TRAVIS_COMMIT_MSG=\"$(git log --format=%B --no-merges -n 1)\""a
-  - curl -s -L "https://api.travis-ci.org/repos/$TRAVIS_REPO_SLUG/builds/$TRAVIS_BUILD_ID" | python -c 'import sys, json; a = json.load(sys.stdin); print "export TRAVIS_EVENT_TYPE=" + a.get("event_type",""); print "export TRAVIS_COMMIT_MSG=\"" + a.get("message","").replace("\"", "\\\"") + "\""'
-  - source <(curl -s -L "https://api.travis-ci.org/repos/$TRAVIS_REPO_SLUG/builds/$TRAVIS_BUILD_ID" | python -c 'import sys, json; a = json.load(sys.stdin); print "export TRAVIS_EVENT_TYPE=" + a.get("event_type",""); print "export TRAVIS_COMMIT_MSG=\"" + a.get("message","").replace("\"", "\\\"") + "\""')
-  - if [[ "$MAKETARGET" == *"win"* ]]; then
-       export FLTK_DIR=$HOME/fltk-1.3.0-w32;
-       export PORTAUDIO_DIR=$HOME/portaudio-w32;
-       export MPG123_DIR=$HOME/mpg123-w32;
-    fi;
+   - |
+     export reqs=""
+     case $MAKETARGET in
+       test)  export reqs="$reqs test" ;;
+       lint)  export reqs="$reqs lint" ;;
+       *win*) export reqs="$reqs win" ;;&
+       *emu*) ;; # catch emulator builds that don't need arm
+       *)     export reqs="$reqs arm" ;;
+     esac
+     echo "Requirements: $reqs"
+   # These are separated to make it easier to visualize the build in the travis logs
+   - if [[ $reqs == *"test"* ]]; then pip install --user cpp-coveralls; fi
+   - if [[ $reqs == *"lint"* ]]; then pip install --user cpplint; fi
+   - |
+     if [[ $reqs == *"arm"* ]]; then
+       if [[ ! -d "$HOME/gcc-arm-none-eabi-8-2018-q4-major/bin" ]]; then
+         pushd $HOME
+         curl --retry 10 --retry-max-time 120 -L \
+             "https://developer.arm.com/-/media/Files/downloads/gnu-rm/8-2018q4/gcc-arm-none-eabi-8-2018-q4-major-linux.tar.bz2" | tar xfj -
+        popd;
+         popd
+       fi
+       export PATH=$PATH:$HOME/gcc-arm-none-eabi-8-2018-q4-major/bin
+     fi
+   - |
+     if [[ $reqs == *"win"* ]]; then
+       if [[ ! -d "$HOME/fltk-1.3.0-w32/bin" ]]; then
+         # don't build 'tests' because they don't work on a cross-compile, so we need to specify 'DIRS' explicitly
+         mkdir $HOME/src
+         mkdir $HOME/fltk-1.3.0-w32
+         pushd $HOME/src
+         curl --retry 10 --retry-max-time 120 -L "http://fltk.org/pub/fltk/1.3.0/fltk-1.3.0-source.tar.gz" | tar xzf -
+         cd fltk-1.3.0
+         ./configure --prefix=$HOME/fltk-1.3.0-w32 --enable-localzlib --enable-localpng --disable-gl --host=i586-mingw32msvc && \
+             make -j2 DIRS="jpeg zlib png src fluid" && \
+             make install DIRS="jpeg zlib png src fluid"
+         popd
+       fi
+       export FLTK_DIR=$HOME/fltk-1.3.0-w32
+     fi
+   - |
+     if [[ $reqs == *"win"* ]]; then
+       if [[ ! -d "$HOME/portaudio-w32/bin" ]]; then
+         mkdir $HOME/src
+         mkdir $HOME/portaudio-w32
+         pushd $HOME/src
+         curl --retry 10 --retry-max-time 120 -L "http://www.portaudio.com/archives/pa_stable_v19_20140130.tgz" | tar xzf -
+         cd portaudio
+         ./configure --prefix=$HOME/portaudio-w32 --host=i586-mingw32msvc && \
+             make -j2 install
+         popd
+       fi
+       export PORTAUDIO_DIR=$HOME/portaudio-w32
+     fi
+   - |
+     if [[ $reqs == *"win"* ]]; then
+       if [[ ! -d "$HOME/mpg123-w32/bin" ]]; then
+         mkdir $HOME/src
+         mkdir $HOME/mpg123-w32
+         pushd $HOME/src
+         curl --retry 10 --retry-max-time 120 -L "http://www.mpg123.de/download/mpg123-1.23.8.tar.bz2" | tar xjf -
+         cd mpg123-1.23.8
+         ./configure --prefix=$HOME/mpg123-w32 --host=i586-mingw32msvc --disable-shared && make && \
+             make -j2 install
+         strip --strip-unneeded $HOME/mpg123-w32/bin/mpg123.exe
+         popd
+       fi
+       export MPG123_DIR=$HOME/mpg123-w32
+     fi
+   - |
+     if [[ "$TRAVIS_EVENT_TYPE" == "api" || "$TRAVIS_EVENT_TYPE" == "cron" ]]; then
+         openssl aes-256-cbc -K $encrypted_54cd4d6ff016_key -iv $encrypted_54cd4d6ff016_iv -in install_nightlies.tar.enc -out install_nightlies.tar -d
+         tar -xf install_nightlies.tar;
+         rm -f install_nightlies.tar
+     fi
 
 before_script:
-  - echo $PATH
-  - echo $HOME
-  - arm-none-eabi-gcc --version
+  - env | sort
+  - arm-none-eabi-gcc --version 2> /dev/null | true
 
 script: 
-  - cd src;
-  - if [[ "$TRAVIS_EVENT_TYPE" == "cron" && "$MAKETARGET" == "zip_devo8" ]]; then
-        export MAKETARGET="zips winzips";
-        export FLTK_DIR=$HOME/fltk-1.3.0-w32;
-        export PORTAUDIO_DIR=$HOME/portaudio-w32;
-        export MPG123_DIR=$HOME/mpg123-w32;
-    fi;
-  - make -j2 $MAKETARGET;
-  - if [ "$MAKETARGET" == "test" ]; then
-        ./test.elf;
-    fi;
-  - ../utils/archive_build_size.py "$MAKETARGET" || /bin/true;
+  - cd src
+  - make -j2 $MAKETARGET
+  - |
+    if [[ "$TRAVIS_EVENT_TYPE" == "push" || "$TRAVIS_EVENT_TYPE" == "pull_request" ]]; then
+        ../utils/archive_build_size.py "$MAKETARGET" || /bin/true;
+    fi
+  - |
+    if [[ "$MAKETARGET" == "test" ]]; then
+        ./test.elf
+        ../utils/coverage-summary.sh;
+        coveralls -r . -b . --gcov-options '\-lp' -E '.*/tests/test_.*' -E '.*/objs/';
+    fi
 
 after_success:
-  - if [ "$TRAVIS_EVENT_TYPE" == "api" ]; then
-        export NIGHTLY_DATE=$(echo $TRAVIS_COMMIT_MSG | egrep -o '[[:digit:]]{4}-[[:digit:]]{2}-[[:digit:]]{2}');
-        if [[ "$TRAVIS_COMMIT_MSG" == "Nightly Build "* ]] && [ "$NIGHTLY_DATE" != "" ]; then
+  - |
+    if [[ $TRAVIS_BUILD_STAGE_NAME != "Deploy" ]]; then
+        travis_terminate 0
+    fi
+  - |
+    if [[ $TRAVIS_EVENT_TYPE == "api" && $TRAVIS_BRANCH != "master" ]]; then
+        export RELEASE_VERSION=$(echo $TRAVIS_BRANCH | egrep -o '[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+');
+        if [[ "$RELEASE_VERSION" != "" && "$TRAVIS_BRANCH" == "v$RELEASE_VERSION" ]]; then
+            echo "Releasing $RELEASE_VERSION";
+            ../utils/upload_test_build.pl -skip -release "$RELEASE_VERSION" -delete;
+            ../utils/upload_test_build.pl -skip -release "$RELEASE_VERSION" *.zip;
+        fi;
+    else
+        export NIGHTLY_DATE=$(date "+%Y-%m-%d");
+        if [[ "$NIGHTLY_DATE" != "" ]]; then
             echo "Uploading Nightly - $NIGHTLY_DATE";
             ../utils/upload_test_build.pl -skip -nightly "$NIGHTLY_DATE" -delete;
             ../utils/upload_test_build.pl -skip -nightly "$NIGHTLY_DATE" *.zip;
-        else
-            export RELEASE_VERSION=$(echo $TRAVIS_BRANCH | egrep -o '[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+');
-            if [ "$RELEASE_VERSION" != "" ] && [ "$TRAVIS_BRANCH" == "v$RELEASE_VERSION" ]; then
-                echo "Releasing $RELEASE_VERSION";
-                ../utils/upload_test_build.pl -skip -release "$RELEASE_VERSION" -delete;
-                ../utils/upload_test_build.pl -skip -release "$RELEASE_VERSION" *.zip;
-            fi;
-        fi;
-    fi;
-  - if [[ "$TRAVIS_EVENT_TYPE" == "cron" && "$MAKETARGET" == "zips winzips" ]]; then
-          export NIGHTLY_DATE=$(date "+%Y-%m-%d");
-        if [ "$NIGHTLY_DATE" != "" ]; then
-            echo "Uploading Nightly - $NIGHTLY_DATE";
-            ../utils/upload_test_build.pl -skip -nightly "$NIGHTLY_DATE" -delete;
-            ../utils/upload_test_build.pl -skip -nightly "$NIGHTLY_DATE" *.zip;
-        fi;
-    fi;
-  - if [ "$MAKETARGET" == "test" ]; then
-      ../utils/coverage-summary.sh;
-      coveralls -r . -b . --gcov-options '\-lp' -E '.*/tests/test_.*' -E '.*/objs/';
-    fi;
-       
+        fi
+    fi
+
 cache:
   apt: true
   directories:

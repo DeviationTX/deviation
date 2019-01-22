@@ -18,7 +18,7 @@ sub main {
     my $elffile;
     my $count;
     my $po;
-    my $format = "v2";
+    my $format = "v1";
 
     $ENV{CROSS} ||= "";
     GetOptions("update" => \$update, "language=s" => \$lang, "fs=s" => \$fs,

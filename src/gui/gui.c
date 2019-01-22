@@ -842,6 +842,12 @@ guiObject_t *GUI_CreateImage(guiImage_t *obj, u16 x, u16 y, u16 w, u16 h, const 
     return GUI_CreateImageOffset(obj, x, y, w, h, 0, 0, file, NULL, NULL);
 }
 
+const char* _GUI_Localize(struct guiObject *obj, const void* str)
+{
+    (void)obj;
+    return _tr((const char*)str);
+}
+
 #if HAS_TOUCH
 void GUI_ChangeSelectionOnTouch(int enable)
 {

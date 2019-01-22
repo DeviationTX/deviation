@@ -44,7 +44,12 @@ guiObject_t *GUI_CreateLabelBox(guiLabel_t *label, u16 x, u16 y, u16 width, u16 
     int underline = label->desc.style == LABEL_UNDERLINE;
     if ((width == 0 || height == 0) && ! underline)
         label->desc.style = LABEL_NO_BOX;
-    label->strCallback = strCallback;
+#if SUPPORT_MULTI_LANGUAGE
+    if (strCallback == GUI_Localize)
+        label->strCallback = _GUI_Localize;
+    else
+#endif
+        label->strCallback = strCallback;
     label->pressCallback = pressCallback;
     label->cb_data = data;
     if (! label->desc.font)

@@ -37,13 +37,9 @@ void TestV1Language(CuTest *t)
     fclose(fh);
 
     ReadLang(name);
-#if SUPPORT_LANG_V1
     CuAssertTrue(t, table_size > 0);
     CuAssertTrue(t, lookupmap[0].hash < lookupmap[1].hash);
     CuAssertStrEquals(t, "abcd", _tr("test"));
     CuAssertStrEquals(t, "ko", _tr("ok"));
     CuAssertStrEquals(t, "ok1", _tr("ok1"));
-#else
-    CuAssertTrue(t, table_size == 0);
-#endif
 }

@@ -27,13 +27,14 @@
 #if HAS_EXTENDED_AUDIO
 u16 voice_map_entries;
 struct VoiceMap voice_map[MAX_VOICEMAP_ENTRIES];
-
 u16 audio_queue[AUDIO_QUEUE_LENGTH];
 u8 next_audio;
 u8 num_audio;
 u32 audio_queue_time;
 
+#ifndef EMULATOR
 static u8 player_buffer[] = {0x7E, 0xFF, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xEF};
+#endif
 
 // Initialize UART for extended-audio
 void AUDIO_Init() {
@@ -103,12 +104,7 @@ int AUDIO_Play(u16 music) {
         printf("Voice: beep only\n");
         return 0;
     }
-
-#if HAS_MUSIC_CONFIG
-    printf("Voice: Playing mp3 #%d (%s)\n", voice_map[music].id, voice_map[music].label);
-#else
     printf("Voice: Playing mp3 #%d\n", voice_map[music].id);
-#endif
 
 #ifdef EMULATOR     // On emulators call mpg123 to play mp3s
     char cmd[70];

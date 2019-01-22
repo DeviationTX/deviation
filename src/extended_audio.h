@@ -1,7 +1,7 @@
 #ifndef _EXTENDED_AUDIO_H_
 #define _EXTENDED_AUDIO_H_
 
-#ifdef HAS_EXTENDED_AUDIO
+#if HAS_EXTENDED_AUDIO
 
 #define AUDIO_QUEUE_LENGTH 20 // arbitraty chosen, do we need more?
 

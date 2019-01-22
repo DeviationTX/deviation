@@ -1,2 +1,1 @@
-
-void CONFIG_VoiceParse();
+const char* CONFIG_VoiceParse();

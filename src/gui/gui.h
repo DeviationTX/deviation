@@ -483,4 +483,12 @@ void GUI_SelectionNotify(void (*notify_cb)(guiObject_t *obj));
 unsigned GUI_GetRemappedButtons();
 void GUI_ChangeSelectionOnTouch(int enable);
 int GUI_InTouch();
+
+#if SUPPORT_MULTI_LANGUAGE
+const char* _GUI_Localize(struct guiObject *obj, const void* str);
+#define GUI_Localize (void*)1
+#else
+#define GUI_Localize NULL
+#endif
+
 #endif /* GUI_H_ */
