@@ -1,9 +1,10 @@
 # Translators:
 # PhracturedBlue <rc2012@pblue.org>, 2019
+# vladislavy, 2019
 # 
 msgid ""
 msgstr ""
-"Last-Translator: PhracturedBlue <rc2012@pblue.org>, 2019\n"
+"Last-Translator: vladislavy, 2019\n"
 "Language-Team: Russian (https://www.transifex.com/deviationtx/teams/73329/ru/)\n"
 "Language: ru\n"
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
@@ -1209,11 +1210,11 @@ msgstr "задержка"
 
 #: pages/common/advanced/_mixer_setup.c:348
 msgid "beep"
-msgstr ""
+msgstr "сигнал"
 
 #: pages/common/advanced/_mixer_setup.c:349
 msgid "voice"
-msgstr ""
+msgstr "голос"
 
 #: pages/common/advanced/_mixer_setup.c:484
 #: pages/320x240x16/advanced/mixer_setup.c:101
@@ -1309,6 +1310,9 @@ msgid ""
 " \n"
 "Press ENT."
 msgstr ""
+"Калибровка завершена.\n"
+" \n"
+"Нажмите ENT."
 
 #: pages/common/_tx_configure.c:123
 msgid ""
@@ -1370,11 +1374,11 @@ msgstr "Включить"
 
 #: pages/320x240x16/scanner_page.c:42 pages/128x64x1/scanner_page.c:36
 msgid "Average"
-msgstr ""
+msgstr "Средний"
 
 #: pages/320x240x16/scanner_page.c:42 pages/128x64x1/scanner_page.c:36
 msgid "Peak"
-msgstr ""
+msgstr "Пиковый"
 
 #: pages/320x240x16/scanner_page.c:49
 msgid "Att.: -20dB"
@@ -1429,7 +1433,7 @@ msgstr "Стики"
 
 #: pages/320x240x16/tx_configure.c:138 pages/128x64x1/tx_configure.c:112
 msgid "Audio settings"
-msgstr ""
+msgstr "Настройки звука"
 
 #: pages/320x240x16/tx_configure.c:140
 msgid "Buzzer settings"
@@ -1449,11 +1453,11 @@ msgstr "Интервал"
 
 #: pages/320x240x16/tx_configure.c:156 pages/128x64x1/tx_configure.c:116
 msgid "Buzz volume"
-msgstr "Громкость"
+msgstr "Громкость сиг."
 
 #: pages/320x240x16/tx_configure.c:161 pages/128x64x1/tx_configure.c:121
 msgid "Audio volume"
-msgstr ""
+msgstr "Громкость зв."
 
 #: pages/320x240x16/tx_configure.c:166
 msgid "Power-down alert"
@@ -1512,11 +1516,11 @@ msgstr ""
 
 #: pages/320x240x16/tx_configure.c:227
 msgid "Vibration settings"
-msgstr ""
+msgstr "Настройки вибрации"
 
 #: pages/320x240x16/tx_configure.c:229
 msgid "Vibration:"
-msgstr ""
+msgstr "Вибрация:"
 
 #: pages/320x240x16/tx_configure.c:262
 #, c-format
@@ -1566,7 +1570,7 @@ msgstr "Самолет"
 
 #: pages/320x240x16/model_page.c:27 pages/128x64x1/model_config.c:98
 msgid "Multirotor"
-msgstr ""
+msgstr "Мультиротор"
 
 #: pages/320x240x16/model_page.c:62 pages/128x64x1/model_page.c:85
 msgid "File"
@@ -1766,11 +1770,11 @@ msgstr "Сбросить интегральный таймер?"
 
 #: pages/320x240x16/dialogs.c:151 pages/128x64x1/dialogs.c:178
 msgid "Missing Modules:\n"
-msgstr ""
+msgstr "Отсутств. модули:\n"
 
 #: pages/320x240x16/dialogs.c:157
 msgid "Module Error"
-msgstr ""
+msgstr "Ошибка модуля"
 
 #: pages/320x240x16/rtc_config.c:137
 msgid "Day"
@@ -2467,7 +2471,7 @@ msgstr "О программе"
 
 #: pages/128x64x1/pagelist.h:86
 msgid "External OSD"
-msgstr ""
+msgstr "Внешний OSD"
 
 #: pages/128x64x1/range_page.c:53
 msgid "Press ENT to stop test."
