@@ -280,9 +280,9 @@ ifdef LINKFILE #Create an empty 'obj/$(TARGET)/optimize.ld' just in case the lin
 	echo "" > objs/$(TARGET)/optimize.ld
 endif
 ifeq ("$(SRC_CXX)", " ")
-	$(CC) -o $@ $(OBJS) $(LIBOPENCM3) $(LFLAGS) $(LFLAGS2)
+	$(CC) -o $@ $(OBJS) $(LIBOPENCM3) $(LFLAGS) $(LFLAGS2) $(CFLAGS)
 else
-	$(CXX) -o $@ $(OBJS) $(LIBOPENCM3) $(LFLAGS) $(LFLAGS2)
+	$(CXX) -o $@ $(OBJS) $(LIBOPENCM3) $(LFLAGS) $(LFLAGS2) $(CFLAGS)
 endif
 
 #################
