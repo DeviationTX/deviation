@@ -104,6 +104,11 @@ static const struct struct_map _secmodel[] =
     {BATT_WARNING_INTERVAL,  OFFSET(struct Transmitter, batt_warning_interval)},
     {SPLASH_DELAY,           OFFSET(struct Transmitter, splash_delay)},
 
+#if HAS_RTC
+    {TIME_FORMAT,            OFFSET(struct Transmitter, rtc_timeformat)},
+    {DATE_FORMAT,            OFFSET(struct Transmitter, rtc_dateformat)},
+#endif
+
 #if HAS_EXTENDED_AUDIO
     {AUDIO_VOL,              OFFSET(struct Transmitter, audio_vol)},
 #endif
@@ -147,17 +152,6 @@ static int ini_handler(void* user, const char* section, const char* name, const 
     if (section[0] == '\0') {
         if (assign_int(t, _secmodel, ARRAYSIZE(_secmodel), name, value))
             return 1;
-    #if HAS_RTC
-        // TODO(howard0su): no need to pack into 1 byte
-        if (MATCH_KEY(TIME_FORMAT)) {
-            t->rtc_timeformat = atoi(value);
-            return 1;
-        }
-        if (MATCH_KEY(DATE_FORMAT)) {
-            t->rtc_dateformat = atoi(value);
-            return 1;
-        }
-    #endif
     }
     if(MATCH_START(section, SECTION_CALIBRATE) && strlen(section) >= sizeof(SECTION_CALIBRATE)) {
         u8 idx = atoi(section + sizeof(SECTION_CALIBRATE)-1);
@@ -219,10 +213,6 @@ void CONFIG_WriteTx()
     }
     CONFIG_EnableLanguage(0);
     write_int(&Transmitter, _secmodel, ARRAYSIZE(_secmodel), fh);
-#if HAS_RTC
-    fprintf(fh, "%s=%d\n", TIME_FORMAT, Transmitter.rtc_timeformat);
-    fprintf(fh, "%s=%d\n", DATE_FORMAT, Transmitter.rtc_dateformat);
-#endif
 
     for(i = 0; i < INP_HAS_CALIBRATION; i++) {
         fprintf(fh, "[%s%d]\n", SECTION_CALIBRATE, i+1);
