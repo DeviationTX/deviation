@@ -421,9 +421,11 @@ void GUI_TouchRelease()
         case Keyboard:
             GUI_TouchKeyboard(objTOUCHED, NULL, -1);
             break;
-        case Scrollbar:
+#if HAS_TOUCH
+        case Scrollbar:  // Scrollbar shouldn't capture events on non-touch Tx
             GUI_TouchScrollbar(objTOUCHED, NULL, -1);
             break;
+#endif
         default: break;
         }
 #if HAS_TOUCH
@@ -504,13 +506,15 @@ u8 _GUI_CheckTouch(struct touch *coords, u8 long_press, struct guiObject *headOb
                 objTOUCHED = obj;
                 return GUI_TouchKeyboard(obj, coords, long_press);
                 break;
-            case Scrollbar:
+            case Scrollbar:  // Scrollbar shouldn't capture events on non-touch Tx
+#if HAS_TOUCH
                 if(coords_in_box(&obj->box, coords)) {
                     if (objTOUCHED && objTOUCHED != obj)
                         return 0;
                     objTOUCHED = obj;
                     return GUI_TouchScrollbar(obj, coords, long_press);
                 }
+#endif
                 break;
             case Scrollable:
                if(coords_in_box(&obj->box, coords)) {
