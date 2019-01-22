@@ -221,7 +221,7 @@ void _show_page()
     GUI_CreateTextSelect(&gui->dateformat, XL(128), 56, TEXTSELECT_128, NULL, rtc_select_format_cb, (void *)ACTDATE);
     GUI_CreateTextSelect(&gui->timeformat, XR(128), 56, TEXTSELECT_128, NULL, rtc_select_format_cb, (void *)ACTTIME);
 
-    RTC_GetDateFormattedOrder(Transmitter.rtc_dateformat, &order[0], &order[1], &order[2]); // initial ordering
+    RTC_GetDateFormattedOrder(Transmitter.rtc_dateformat, &order[0], &order[1], &order[2]);  // initial ordering
 
     for (long i=0; i<6; i++) {
         GUI_CreateLabel(&gui->label[i], X(i/3, 32) + ((i%3 == 2) ? 67 : 0) - ((i%3 == 0) ? 67 : 0), 84, rtc_text_cb, DEFAULT_FONT, (void *)i);
