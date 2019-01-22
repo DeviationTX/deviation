@@ -49,7 +49,7 @@ void PAGE_GyroSenseInit(int page)
         GUI_CreateLabelBox(&gui->msg, 0, MESSAGE_Y, 0, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, "Invalid model ini!");// must be invalid model ini
         return;
     }
-    gyro_output = mp->mixer_ptr[0]->dest;
+    mp->gyro_output = mp->mixer_ptr[0]->dest;
     convert_output_to_percentile();
     PAGE_ShowHeader(_tr("Gyro sense"));
 

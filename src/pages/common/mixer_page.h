@@ -4,6 +4,8 @@
 #include "mixer.h"
 #include "gui/gui.h"
 #include "buttons.h"
+#include "mixer_standard.h"
+
 #define NUM_COMPLEX_MIXERS 10
 #define LONG_PRESS_STEP 5
 #define SUBTRIM_RANGE 500  // subtrim <100 is insufficient
@@ -29,6 +31,14 @@ struct mixer_failsafe_page
     struct Limit *limit;
     guiObject_t *firstObj;
     u8 max_scroll;
+};
+
+
+struct gyrosense_page {
+    GyroOutputChannel gyro_output;
+    u8 output[3] ; // use 0-100 instead of -100 to 100 for gyro    
+    struct Mixer mixer[NUM_COMPLEX_MIXERS];
+    struct Mixer *mixer_ptr[4];
 };
 
 struct mixer_page {
