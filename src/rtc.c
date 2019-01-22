@@ -82,7 +82,7 @@ int _RTC_GetMinute(u32 value)
 int _RTC_GetHour(u32 value)
 {
     value /= 3600;
-    if (Transmitter.rtcflags & CLOCK12HR) {
+    if (Transmitter.rtc_timeformat & CLOCK12HR) {
        value %= 12;
        if (value == 0)
            value = 12;
@@ -166,7 +166,7 @@ const char *timeformats[] = { /*"default",*/ "hh:mm:ss", "hh:mm:ss am/pm" };
 void RTC_GetTimeFormatted(char *str, u32 time)
 {
     // which format to use?
-    unsigned format = Transmitter.rtcflags & TIMEFMT;
+    unsigned format = Transmitter.rtc_timeformat;
     // make sure that the number is correct; use default otherwise
     if (format >= sizeof(timeformats) / sizeof(timeformats[0])) format = 0;
     switch (format) {
@@ -187,7 +187,7 @@ const char *dateformats[] = { "YYYY-MM-DD", "MM/DD/YYYY", "DD.MM.YYYY", "Mon DD 
 void RTC_GetDateFormatted(char *str, u32 date)
 {
     // which format to use?
-    unsigned format = (Transmitter.rtcflags & DATEFMT) >> 4;
+    unsigned format = Transmitter.rtc_dateformat;
     // make sure that the number is correct; use default otherwise
     if (format >= sizeof(dateformats) / sizeof(dateformats[0])) format = 0;
     _RTC_SetDayStart(date);
@@ -220,7 +220,7 @@ void RTC_GetDateFormatted(char *str, u32 date)
 void RTC_GetMonthFormatted(char *str, unsigned month)
 {
     // which format to use?
-    unsigned format = (Transmitter.rtcflags & DATEFMT) >> 4;
+    unsigned format = Transmitter.rtc_dateformat;
     // make sure that the number is correct; use default otherwise
     if (format >= sizeof(dateformats) / sizeof(dateformats[0])) format = 0;
     switch (format) {
