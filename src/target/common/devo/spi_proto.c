@@ -167,7 +167,7 @@ void SPI_ProtoInit()
             gpio_set(port->port, port->pin);
         }
     }
-#ifdef ENABLE_MODULAR
+#if defined(ENABLE_MODULAR) && !defined(ENABLE_LTO)
     PROTO_Stubs(0);
 #endif
 }
