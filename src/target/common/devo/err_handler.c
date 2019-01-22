@@ -25,7 +25,8 @@
  * The code bypasses the entire file I/O system, and writes directly
  * to the disk address.
  */
-extern int disk_writep (const u8*, u32);
+#include "petit_fat/petit_io.h"
+
 //Memory start is constant for all Tx
 #define MEMORY_START  ((unsigned int *)0x20000000)
 #define MEMORY_END    (&_stack)
