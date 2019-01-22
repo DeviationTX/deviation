@@ -153,11 +153,11 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         }
     #if HAS_RTC
         if (MATCH_KEY(TIME_FORMAT)) {
-            t->rtcflags = (t->rtcflags & ~TIMEFMT) | (atoi(value) & TIMEFMT);
+            t->rtc_timeformat = atoi(value);
             return 1;
         }
         if (MATCH_KEY(DATE_FORMAT)) {
-            t->rtcflags = (t->rtcflags & ~DATEFMT) | ((atoi(value) << 4) & DATEFMT);
+            t->rtc_dateformat = atoi(value);
             return 1;
         }
     #endif
@@ -278,8 +278,8 @@ void CONFIG_WriteTx()
     fprintf(fh, "%s=%d\n", BATT_WARNING_INTERVAL, Transmitter.batt_warning_interval);
     fprintf(fh, "%s=%d\n", SPLASH_DELAY, Transmitter.splash_delay);
 #if HAS_RTC
-    fprintf(fh, "%s=%d\n", TIME_FORMAT, Transmitter.rtcflags & TIMEFMT);
-    fprintf(fh, "%s=%d\n", DATE_FORMAT, (Transmitter.rtcflags & DATEFMT) >> 4);
+    fprintf(fh, "%s=%d\n", TIME_FORMAT, Transmitter.rtc_timeformat);
+    fprintf(fh, "%s=%d\n", DATE_FORMAT, Transmitter.rtc_dateformat);
 #endif
     for(i = 0; i < INP_HAS_CALIBRATION; i++) {
         fprintf(fh, "[%s%d]\n", SECTION_CALIBRATE, i+1);

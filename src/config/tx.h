@@ -46,8 +46,6 @@ enum ExtraHardware {
 
 // bitmap for rtcflags:
 #define CLOCK12HR 0x01  //0b00000001
-#define TIMEFMT   0x0F  //0b00001111
-#define DATEFMT   0xF0  //0b11110000
 
 struct Transmitter {
     u8 current_model;
@@ -74,9 +72,11 @@ struct Transmitter {
     u8 volume;
     u8 module_poweramp;
     u8 vibration_state; // for future vibration on/off support
-    u8 padding_1[1];
 #if HAS_RTC
-    u8 rtcflags;    // bit0: clock12hr, bit1-3: time format, bit4-7 date format (see pages/320x240x16/rtc_config.c)
+    u8 rtc_timeformat;    // bit0: clock12hr, bit1-3: time format
+    u8 rtc_dateformat;    // bit0-3 date format (see pages/320x240x16/rtc_config.c)
+#else
+    u8 padding_1[1];
 #endif
 
     #ifdef HAS_MORE_THAN_32_INPUTS

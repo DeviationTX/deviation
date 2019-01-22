@@ -95,7 +95,7 @@ const char *rtc_show_val_cb(guiObject_t *obj, const void *data)
             break;
         case HOUR: {
             u32 value = RTC_GetTimeValue(time) / 3600;
-            if (Transmitter.rtcflags & CLOCK12HR) {
+            if (Transmitter.rtc_timeformat & CLOCK12HR) {
                 u8 hour = value % 12;
                 if (hour == 0)
                     hour = 12;
@@ -179,11 +179,11 @@ const char *rtc_select_format_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     if ((long)data == ACTTIME) {
-        u8 index = Transmitter.rtcflags & TIMEFMT;
+        u8 index = Transmitter.rtc_timeformat;
         u8 changed;
         index = GUI_TextSelectHelper(index, 0, RTC_GetNumberTimeFormats() - 1, dir, 1, 1, &changed);
         if (changed) {
-            Transmitter.rtcflags = (Transmitter.rtcflags & (0xff ^ TIMEFMT)) | (index & TIMEFMT);
+            Transmitter.rtc_timeformat = index;
             GUI_Redraw(&gui->acttime);
             GUI_Redraw(&gui->newtime);
             for (u8 i=0; i<sizeof(order); i++)
@@ -195,11 +195,11 @@ const char *rtc_select_format_cb(guiObject_t *obj, int dir, void *data)
         return timeformats[index];
     }
     if ((long)data == ACTDATE) {
-        u8 index = (Transmitter.rtcflags & DATEFMT) >> 4;
+        u8 index = Transmitter.rtc_dateformat;
         u8 changed;
         index = GUI_TextSelectHelper(index, 0, RTC_GetNumberDateFormats() - 1, dir, 1, 1, &changed);
         if (changed) {
-            Transmitter.rtcflags = (Transmitter.rtcflags & (0xff ^ DATEFMT)) | ((index << 4) & DATEFMT);
+            Transmitter.rtc_dateformat = index;
             GUI_Redraw(&gui->actdate);
             GUI_Redraw(&gui->newdate);
             // reorder spinbuttons to date format
@@ -221,7 +221,7 @@ void _show_page()
     GUI_CreateTextSelect(&gui->dateformat, XL(128), 56, TEXTSELECT_128, NULL, rtc_select_format_cb, (void *)ACTDATE);
     GUI_CreateTextSelect(&gui->timeformat, XR(128), 56, TEXTSELECT_128, NULL, rtc_select_format_cb, (void *)ACTTIME);
 
-    RTC_GetDateFormattedOrder((Transmitter.rtcflags & DATEFMT) >> 4, &order[0], &order[1], &order[2]); // initial ordering
+    RTC_GetDateFormattedOrder(Transmitter.rtc_dateformat, &order[0], &order[1], &order[2]);  // initial ordering
 
     for (long i=0; i<6; i++) {
         GUI_CreateLabel(&gui->label[i], X(i/3, 32) + ((i%3 == 2) ? 67 : 0) - ((i%3 == 0) ? 67 : 0), 84, rtc_text_cb, DEFAULT_FONT, (void *)i);
@@ -274,7 +274,7 @@ static const char *rtc_val_cb(guiObject_t *obj, int dir, void *data)
             sprintf(tempstring, "%4d", Rtc.value[idx]);
         else if (idx == HOUR) {
             u8 tmp = Rtc.value[HOUR];
-            if (Transmitter.rtcflags & CLOCK12HR) {
+            if (Transmitter.rtc_timeformat & CLOCK12HR) {
                 tmp %= 12;
                 if (tmp == 0)
                     tmp = 12;
