@@ -39,7 +39,6 @@ addons:
     update: false
     packages:
       - build-essential
-      - libc6-i386
       - mingw32
       - mingw32-binutils
       - mingw32-runtime
