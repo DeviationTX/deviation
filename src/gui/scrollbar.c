@@ -27,6 +27,8 @@ static unsigned button_cb(u32 button, unsigned flags, void *data);
 #define RELEASE_DOWN 0x08
 #define LONGPRESS    0x80
 
+#define BAR_HEIGHT   ((ARROW_UP == NULL) ? 6 : 10)
+
 guiObject_t *GUI_CreateScrollbar(guiScrollbar_t *scrollbar, u16 x, u16 y, u16 height,
     u8 num_items, struct guiObject *parent,
     int (*press_cb)(struct guiObject *parent, u8 pos, s8 direction, void *data), void *data)
@@ -60,11 +62,10 @@ guiObject_t *GUI_CreateScrollbar(guiScrollbar_t *scrollbar, u16 x, u16 y, u16 he
 void GUI_DrawScrollbar(struct guiObject *obj)
 {
     struct guiScrollbar *scrollbar = (struct guiScrollbar *)obj;
-    u16 bar_height = 10;  // Bug fix: After the logic view is introduce , a coordinate can be larger than 10000
+    u16 bar_height = BAR_HEIGHT;  // Bug fix: After the logic view is introduce , a coordinate can be larger than 10000
     if (scrollbar->num_items <= 1)
         return;
     if (ARROW_UP == NULL) { // plate-text scroll bar for devo10
-        bar_height = 6;
         // Improve scroll bar apperance for devo10
         GUI_DrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
         LCD_DrawRect(obj->box.x, obj->box.y, obj->box.width, obj->box.height, 0xffff);
@@ -125,10 +126,12 @@ u8 GUI_TouchScrollbar(struct guiObject *obj, struct touch *coords, s8 press_type
         }
         return 0;
     }
+    unsigned bar_pos = scrollbar->cur_pos * (obj->box.height - 2 * ARROW_HEIGHT - BAR_HEIGHT) / (scrollbar->num_items -1)
+                       + BAR_HEIGHT / 2 + ARROW_HEIGHT;
     box.x = obj->box.x;
     box.y = obj->box.y;
     box.width = ARROW_WIDTH;
-    box.height = ARROW_HEIGHT;
+    box.height = bar_pos;
     if(coords_in_box(&box, coords)) {
         if(press_type) {
             dir = -2;
@@ -139,7 +142,8 @@ u8 GUI_TouchScrollbar(struct guiObject *obj, struct touch *coords, s8 press_type
             return 1;
         }
     } else {
-        box.y = obj->box.y + obj->box.height - ARROW_HEIGHT;
+        box.y = obj->box.y + bar_pos;
+        box.height = obj->box.height - bar_pos;
         if(coords_in_box(&box, coords)) {
             if(press_type) {
                 dir = 2;
