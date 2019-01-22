@@ -172,6 +172,10 @@ script:
         git add src/fs/language
         git commit -m "`utils/get_altered_languages.py 'Updating translations from Transifex'`"
         git push origin HEAD:$TRAVIS_BRANCH > /dev/null 2>&1 && echo "Successfully uploaded new translations to Github."
+        # check if we've already built a nightly from the current commit
+        if ! utils/needs_nightly_rebuild.py; then
+            travis_terminate 0
+        fi
     fi
   - cd src
   - make -j2 $MAKETARGET
