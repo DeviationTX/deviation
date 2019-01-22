@@ -36,7 +36,7 @@ struct mixer_failsafe_page
 
 struct gyrosense_page {
     GyroOutputChannel gyro_output;
-    u8 output[3] ; // use 0-100 instead of -100 to 100 for gyro    
+    u8 output[3];  // use 0-100 instead of -100 to 100 for gyro
     struct Mixer mixer[NUM_COMPLEX_MIXERS];
     struct Mixer *mixer_ptr[4];
 };
