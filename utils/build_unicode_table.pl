@@ -2,7 +2,11 @@
 use strict; 
 use warnings;
 
+use utf8;
 use Encode;
+
+binmode(STDOUT, ":utf8");
+
 my %chars;
 while(<>) {
     my $str = decode("UTF-8", $_);
