@@ -4,6 +4,8 @@
 #include "mixer.h"
 #include "gui/gui.h"
 #include "buttons.h"
+#include "mixer_standard.h"
+
 #define NUM_COMPLEX_MIXERS 10
 #define LONG_PRESS_STEP 5
 #define SUBTRIM_RANGE 500  // subtrim <100 is insufficient
@@ -29,6 +31,10 @@ struct mixer_failsafe_page
     struct Limit *limit;
     guiObject_t *firstObj;
     u8 max_scroll;
+};
+
+struct switchassign_page {
+    u8 switch_idx[SWITCHFUNC_LAST];
 };
 
 struct mixer_page {
