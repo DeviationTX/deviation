@@ -77,7 +77,7 @@ void PAGE_SwitchAssignInit(int page)
     PAGE_SetModal(0);
     refresh_switches();
 
-    PAGE_ShowHeader(_tr("Press ENT to change"));
+    PAGE_ShowHeader(_tr_noop("Press ENT to change"));
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                      LINE_SPACE, SWITCHFUNC_LAST, row_cb, NULL, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));

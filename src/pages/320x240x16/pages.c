@@ -120,7 +120,7 @@ void PAGE_ShowHeader(const char *title)
         GUI_SetSelectable(obj, 0);
     }
     if(title)
-        GUI_CreateLabelBox(&gui->title, 40, 10, LCD_WIDTH - 40, 0, &TITLE_FONT, NULL, NULL, (void *)title);
+        GUI_CreateLabelBox(&gui->title, 40, 10, LCD_WIDTH - 40, 0, &TITLE_FONT, GUI_Localize, NULL, (void *)title);
     //obj = GUI_CreateIcon(&gui->previco, LCD_WIDTH-64, 0, &icons[ICON_PREVPAGE], changepage_cb, (void *)-1);
     //GUI_SetSelectable(obj, 0);
     //obj = GUI_CreateIcon(&gui->nextico, LCD_WIDTH-32, 0, &icons[ICON_NEXTPAGE], changepage_cb, (void *)1);
@@ -137,7 +137,7 @@ void PAGE_ShowHeaderWithSize(const char *title, u16 width, u16 height)
         GUI_SetSelectable(obj, 0);
     }
     if(title)
-        GUI_CreateLabelBox(&gui->title, 40, 10, width, height, &TITLE_FONT, NULL, NULL, (void *)title);
+        GUI_CreateLabelBox(&gui->title, 40, 10, width, height, &TITLE_FONT, GUI_Localize, NULL, (void *)title);
     //obj = GUI_CreateIcon(&gui->previco, LCD_WIDTH-64, 0, &icons[ICON_PREVPAGE], changepage_cb, (void *)-1);
     //GUI_SetSelectable(obj, 0);
     //obj = GUI_CreateIcon(&gui->nextico, LCD_WIDTH-32, 0, &icons[ICON_NEXTPAGE], changepage_cb, (void *)1);

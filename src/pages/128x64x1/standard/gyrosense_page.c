@@ -52,7 +52,7 @@ void PAGE_GyroSenseInit(int page)
     }
     mp->gyro_output = mp->mixer_ptr[0]->dest;
     convert_output_to_percentile();
-    PAGE_ShowHeader(_tr("Gyro sense"));
+    PAGE_ShowHeader(_tr_noop("Gyro sense"));
 
     u8 y = HEADER_HEIGHT + HEADER_OFFSET;
     GUI_CreateLabelBox(&gui->chanlbl, LABEL_X, y, LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, NULL, NULL, _tr("Channel"));

@@ -93,9 +93,9 @@ void PAGE_ModelConfigInit(int page)
 {
     (void)page;
     switch (Model.type) {
-      case MODELTYPE_HELI: show_titlerow(_tr("Helicopter")); break; 
-      case MODELTYPE_PLANE: show_titlerow(_tr("Airplane")); break; 
-      case MODELTYPE_MULTI: show_titlerow(_tr("Multirotor")); break; 
+      case MODELTYPE_HELI: show_titlerow(_tr_noop("Helicopter")); break; 
+      case MODELTYPE_PLANE: show_titlerow(_tr_noop("Airplane")); break; 
+      case MODELTYPE_MULTI: show_titlerow(_tr_noop("Multirotor")); break; 
       }
 
     if (Model.type == MODELTYPE_HELI) {
@@ -202,7 +202,7 @@ static int row4_cb(int absrow, int relrow, int y, void *data)
 void PAGE_VideoSetupInit(int page)
 {
     (void)page;
-    show_titlerow(_tr("Video"));
+    show_titlerow(_tr_noop("Video"));
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                          LINE_SPACE, 4, row4_cb, NULL, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
@@ -237,10 +237,10 @@ void PAGE_TrainConfigInit(int page)
     (void)page;
     int mode = PPMin_Mode();
     show_titlerow(mode == PPM_IN_TRAIN1
-                  ? _tr("Trainer Cfg (Channel)")
+                  ? _tr_noop("Trainer Cfg (Channel)")
                   : mode == PPM_IN_TRAIN2
-                    ? _tr("Trainer Cfg (Stick)")
-                    : _tr("PPMIn Cfg (Extend)"));
+                    ? _tr_noop("Trainer Cfg (Stick)")
+                    : _tr_noop("PPMIn Cfg (Extend)"));
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                          LINE_SPACE, PPMin_Mode() == PPM_IN_SOURCE ? 3 : 3 + MAX_PPM_IN_CHANNELS,
                          row3_cb, NULL, NULL, NULL);

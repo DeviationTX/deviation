@@ -94,7 +94,7 @@ const char *STDMIX_TitleString(guiObject_t *obj, const void *data)
     (void)obj;
     int pageid = ((unsigned long)data) & 0xFFFF;
     int sw     = (((unsigned long)data) >> 16) & 0xFFFF;
-    sprintf(tempstring, "%s - ", PAGE_GetName(pageid));
+    sprintf(tempstring, "%s - ", _tr(PAGE_GetName(pageid)));
     INPUT_SourceNameAbbrevSwitch(tempstring+strlen(tempstring), mapped_std_channels.switches[sw]);
     return tempstring;
 }

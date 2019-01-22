@@ -66,9 +66,9 @@ void PAGE_LoadSaveInit(int page)
     num_models = mp->total_items; /* set by get_scroll_count */
 
     if (page == SAVE_MODEL) {
-        name = _tr("Press ENT to copy to");
+        name = _tr_noop("Press ENT to copy to");
     } else {
-        name = _tr("Press ENT to load");
+        name = _tr_noop("Press ENT to load");
     }
     if (page == LOAD_ICON) {
         width = SCROLL_W;

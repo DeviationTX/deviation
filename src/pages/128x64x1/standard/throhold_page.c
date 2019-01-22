@@ -37,7 +37,7 @@ void PAGE_ThroHoldInit(int page)
     (void)page;
     PAGE_SetModal(0);
 
-    PAGE_ShowHeader(_tr("Throttle hold"));
+    PAGE_ShowHeader(_tr_noop("Throttle hold"));
 
     u8 y = HEADER_HEIGHT + HEADER_OFFSET;
     GUI_CreateLabelBox(&gui->enlbl, LABEL_X, y, LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Thr hold"));

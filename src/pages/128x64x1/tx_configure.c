@@ -213,7 +213,7 @@ void PAGE_TxConfigureInit(int page)
     (void)page;
     cp->enable = CALIB_NONE;
     PAGE_SetModal(0);
-    PAGE_ShowHeader(_tr("Configure"));
+    PAGE_ShowHeader(_tr_noop("Configure"));
 
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                      LINE_SPACE, ITEM_LAST, row_cb, getobj_cb, size_cb, NULL);

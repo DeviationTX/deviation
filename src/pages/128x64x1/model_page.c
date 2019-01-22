@@ -153,7 +153,7 @@ void PAGE_ModelInit(int page)
     memset(gui, 0, sizeof(struct modelpage_obj));
     mp->file_state = 0;
     mp->last_txpower = Model.tx_power;
-    PAGE_ShowHeader(_tr("Model setup")); // using the same name as related menu item to reduce language strings
+    PAGE_ShowHeader(_tr_noop("Model setup")); // using the same name as related menu item to reduce language strings
 
     if(Model.fixed_id == 0)
         strlcpy(mp->fixed_id, _tr("None"), sizeof(mp->fixed_id));

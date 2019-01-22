@@ -89,11 +89,11 @@ void PAGE_LoadSaveInit(int page)
     selected = get_scroll_count(page);
 
     switch(menu_type) {
-      case LOAD_MODEL:      name = _tr("Load Model"); break;
-      case SAVE_MODEL:      name = _tr("Save Model as..."); break;
-      case LOAD_TEMPLATE:   name = _tr("Load Model Template"); break;
-      case LOAD_ICON:       name = _tr("Select Icon"); break;
-      case LOAD_LAYOUT:     name = _tr("Load Layout"); break;
+      case LOAD_MODEL:      name = _tr_noop("Load Model"); break;
+      case SAVE_MODEL:      name = _tr_noop("Save Model as..."); break;
+      case LOAD_TEMPLATE:   name = _tr_noop("Load Model Template"); break;
+      case LOAD_ICON:       name = _tr_noop("Select Icon"); break;
+      case LOAD_LAYOUT:     name = _tr_noop("Load Layout"); break;
     }
     //PAGE_ShowHeader(name);
 

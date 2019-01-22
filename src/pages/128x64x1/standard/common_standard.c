@@ -60,7 +60,7 @@ void STANDARD_Init(const struct page_defs *page_defs)
 {
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
-    PAGE_ShowHeader(_tr(page_defs->title));
+    PAGE_ShowHeader(page_defs->title);
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                      LINE_SPACE, Model.num_channels, row_cb, NULL, NULL, (void *)page_defs);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
