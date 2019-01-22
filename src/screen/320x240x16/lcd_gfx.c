@@ -422,9 +422,7 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
         h = img_h;
     LCD_DrawStart(x, y, x + w - 1, y + h -1, DRAW_NWSE);
     unsigned bytes = (img_w + 7) / 8;
-    for (unsigned i = 0; i < y_off; i++) {
-        fread(buf, bytes, 1, fh);
-    }
+    fseek(fh, bytes * y_off, SEEK_CUR);
     for (int i = 0; i < h; i++) {
         int ret = fread(buf, bytes, 1, fh);
         if (ret != 1) {
