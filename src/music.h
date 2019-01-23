@@ -121,7 +121,7 @@ void MUSIC_PlayValue(u16 music, s32 value, u8 unit, u8 prec);
 
 #endif //HAS_EXTENDED_AUDIO
 
-void MUSIC_Beep(char* note, u16 duration, u16 interval, u8 count);
+MODULE_CALLTYPE void MUSIC_Beep(char* note, u16 duration, u16 interval, u8 count);
 
 void MUSIC_Play(u16 music);
 
