@@ -42,8 +42,6 @@ enum {
 #if HAS_STANDARD_GUI
 #include "../../common/standard/_drexp_page.c"
 
-guiObject_t *scroll_bar;
-
 enum {
     ITEM_NORMAL,
     ITEM_IDLE1,
