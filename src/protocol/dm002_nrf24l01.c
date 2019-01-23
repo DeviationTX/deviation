@@ -204,7 +204,6 @@ static void DM002_init()
     NRF24L01_SetPower(Model.tx_power);
 }
 
-MODULE_CALLTYPE
 static u16 dm002_callback()
 {
     switch(phase) {

@@ -226,7 +226,6 @@ static void esky2_start_tx(BOOL bind_yes)
 //
 // For 7E, this module is loaded into RAM, we need to set __attribute__((__long_call__))
 //-------------------------------------------------------------------------------------------------
-MODULE_CALLTYPE
 static u16 esky2_tx_callback()
 {
 static s32 packet_sent = 0;

@@ -340,7 +340,6 @@ static void initialize_txid()
     channel_offset = (((checksum_offset & 0xf0)>>4) + (checksum_offset & 0x0f)) % 8;
 }
 
-MODULE_CALLTYPE
 static u16 mt99xx_callback()
 {
     switch (state) {

@@ -288,7 +288,6 @@ static void build_hk310_ch_data(u8 packet_type)
     }
 }
 
-MODULE_CALLTYPE
 static u16 hisky_cb()
 {
     counter1ms++;

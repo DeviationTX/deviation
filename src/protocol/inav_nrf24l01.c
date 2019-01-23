@@ -739,7 +739,6 @@ static void inav_init(init_bind_t bind)
     set_hopping_channels();
 }
 
-MODULE_CALLTYPE
 static u16 inav_callback()
 {
     static u16 bind_counter;

@@ -669,7 +669,6 @@ NO_INLINE static void parse_telemetry_packet()
 #ifndef MODULAR
 static u16 mixer_runtime;
 #endif
-MODULE_CALLTYPE
 static u16 dsm2_cb()
 {
 #define CH1_CH2_DELAY 4010  // Time between write of channel 1 and channel 2

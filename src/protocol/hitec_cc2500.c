@@ -594,7 +594,6 @@ static u16 initHITEC()
     return 10000;
 }
 
-MODULE_CALLTYPE
 static u16 hitec_cb() {
   return ReadHitec();
 }

@@ -340,7 +340,6 @@ static void cx10_init()
     NRF24L01_WriteReg(NRF24L01_1D_FEATURE, 0x00);     // Set feature bits on
 }
 
-MODULE_CALLTYPE
 static u16 cx10_callback()
 {
     switch (phase) {

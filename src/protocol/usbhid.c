@@ -69,7 +69,6 @@ static void build_data_pkt()
     packet[USBHID_ANALOG_CHANNELS] = digital;
 }
 
-MODULE_CALLTYPE
 static u16 usbhid_cb()
 {
     if(PrevXferComplete) {

@@ -368,8 +368,6 @@ static void mjxq_init2()
     }
 }
 
-
-MODULE_CALLTYPE
 static u16 mjxq_callback()
 {
     switch (phase) {

@@ -311,7 +311,6 @@ static u16 CORONA_build_packet(void) {
   return packet_period;
 }
 
-MODULE_CALLTYPE
 static u16 corona_cb() {
   // Tune frequency if it has been changed
   if (fine != (s8)Model.proto_opts[PROTO_OPTS_FREQFINE]) {

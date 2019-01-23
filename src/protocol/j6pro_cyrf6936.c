@@ -177,7 +177,6 @@ static void set_radio_channels()
     radio_ch[3] = radio_ch[0];
 }
 
-MODULE_CALLTYPE
 static u16 j6pro_cb()
 {
     switch(state) {

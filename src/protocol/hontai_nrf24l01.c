@@ -330,7 +330,6 @@ static void ht_init2()
     }
 }
 
-MODULE_CALLTYPE
 static u16 ht_callback()
 {
     switch (phase) {

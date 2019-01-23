@@ -225,7 +225,6 @@ static void update_telemetry()
     TELEMETRY_SetUpdated(TELEM_FRSKY_RSSI);
 }
 
-MODULE_CALLTYPE
 static u16 ncc1701_callback()
 {
     switch(phase)
