@@ -186,7 +186,7 @@ script:
     if [[ "$MAKETARGET" == "test" ]]; then
         ./test.elf
         ../utils/coverage-summary.sh;
-        coveralls -r . -b . --gcov-options '\-lp' -E '.*/tests/test_.*' -E '.*/objs/';
+        coveralls -r . -b . --gcov-options '\-lp' -E '.*/tests/test_.*' -E '.*/objs/' || true;
     fi
 
 after_success:
