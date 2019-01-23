@@ -109,38 +109,52 @@ static const char *reorder_text_cb(u8 idx)
     return MIXPAGE_ChanNameProtoCB(NULL, (void *)i);
 }
 
+static void reorder_mixers_by_list(u8 *list)
+{
+    u8 reorder[NUM_CHANNELS];
+    memset(reorder, 0xff, sizeof(reorder));
+    for (int newdest = 0; newdest < NUM_CHANNELS; newdest++) {
+        int olddest = list[newdest];
+        if (olddest) {
+            reorder[olddest-1] = newdest;
+        }
+    }
+    for (int i = 0; i < NUM_MIXERS; i++) {
+        int dest = Model.mixers[i].dest;
+        if (!Model.mixers[i].src)
+            break;
+        if (reorder[dest] != 0xff) {
+            Model.mixers[i].dest = reorder[dest];
+        }
+    }
+}
+
+static void reorder_limits_by_list(u8 *list)
+{
+    unsigned j;
+    struct Limit tmplimits[NUM_OUT_CHANNELS];
+    u8 tmptemplates[NUM_CHANNELS];
+    for (j = 0; j < NUM_CHANNELS; j++) {
+        if (j < NUM_OUT_CHANNELS) {
+           if (list[j]-1 < NUM_OUT_CHANNELS) {
+               tmplimits[j] = Model.limits[list[j]-1];
+           } else {
+               MIXER_SetDefaultLimit(&tmplimits[j]);
+           }
+        }
+        tmptemplates[j] = Model.templates[list[j]-1];
+    }
+    memcpy(Model.templates, tmptemplates, sizeof(Model.templates));
+    memcpy(Model.limits, tmplimits, sizeof(Model.limits));
+}
+
 static void reorder_return_cb(u8 *list)
 {
-    if (list) {
-        int i, j, k = 0;
-        struct Mixer tmpmix[NUM_MIXERS];
-        memset(tmpmix, 0, sizeof(tmpmix));
-        for(j = 0; j < NUM_CHANNELS; j++) {
-            for(i = 0; i <NUM_MIXERS; i++) {
-                if(Model.mixers[i].src && Model.mixers[i].dest == list[j]-1) {
-                    memcpy(&tmpmix[k], &Model.mixers[i], sizeof(struct Mixer));
-                    tmpmix[k].dest = j;
-                    k++;
-                }
-            }
-        }
-        memcpy(Model.mixers, tmpmix, sizeof(Model.mixers));
-        struct Limit tmplimits[NUM_OUT_CHANNELS];
-        u8 tmptemplates[NUM_CHANNELS];
-        for(j = 0; j < NUM_CHANNELS; j++) {
-            if(j < NUM_OUT_CHANNELS) {
-               if(list[j]-1 < NUM_OUT_CHANNELS) {
-                   tmplimits[j] = Model.limits[list[j]-1]; 
-               } else {
-                   MIXER_SetDefaultLimit(&tmplimits[j]);
-               }
-            }
-            tmptemplates[j] = Model.templates[list[j]-1];
-        }
-        memcpy(Model.templates, tmptemplates, sizeof(Model.templates));
-        memcpy(Model.limits, tmplimits, sizeof(Model.limits));
-        MIXER_SetMixers(NULL, 0);
-    }
+    if (!list)
+        return;
+    reorder_mixers_by_list(list);
+    reorder_limits_by_list(list);
+    MIXER_SetMixers(NULL, 0);
 }
 
 static void reorder_cb(guiObject_t *obj, const void *data)
@@ -231,3 +245,5 @@ void virtname_cb(guiObject_t *obj, const void *data)
     GUI_CreateKeyboard(&gui->keyboard, KEYBOARD_ALPHA, tempstring, sizeof(Model.virtname[ch])-1, _changename_done_cb, &callback_result);
 }
 
+#define TESTNAME pages_advanced_mixer
+#include <tests.h>

@@ -23,7 +23,7 @@
 // this timeout should be less than long press timeout, 100ms
 #define ROTARY_TIMEOUT 50
 
-static volatile int rotary = 0;
+volatile int rotary = 0;
 static u32 last_rotary_clock = 0;
 
 void Initialize_ButtonMatrix()
@@ -54,31 +54,6 @@ void Initialize_ButtonMatrix()
     exti_select_source(EXTI13 | EXTI14, GPIOC);
     exti_set_trigger(EXTI13 | EXTI14, EXTI_TRIGGER_BOTH);
     exti_enable_request(EXTI13 | EXTI14);
-}
-
-/* returns change in encoder state (-1,0,1) */
-int handle_rotary_encoder(unsigned val)
-{
-//  static const s8 enc_states[] = {0,-1,1,0,1,0,0,-1,-1,0,0,1,0,1,-1,0};
-  static const s8 enc_states[] = {0,0,0,0,0,0,0,-1,0,0,0,1,0,0,0,0};
-  static unsigned old_AB = 0;
-  /**/
-  old_AB <<= 2;                   //remember previous state
-  old_AB |= val & 0x03;  //add current state
-  return ( enc_states[( old_AB & 0x0f )]);
-}
-
-void exti15_10_isr()
-{
-    u32 button = gpio_port_read(GPIOC);
-    exti_reset_request(EXTI13 | EXTI14);
-    button = 0x03 & ((~button) >> 13);
-    int dir = handle_rotary_encoder(button);
-    if (button == 0) {
-        rotary = 0;
-    } else {
-        rotary = dir;
-    }
 }
 
 u32 ScanButtons()

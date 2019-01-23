@@ -13,10 +13,8 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-static struct mixer_page    * const mp  = &pagemem.u.mixer_page;
+static struct switchassign_page * const mp  = &pagemem.u.switchassign_page;
 static struct stdswitch_obj * const gui = &gui_objs.u.stdswitch;
-
-static u8 switch_idx[SWITCHFUNC_LAST];
 
 static int get_switch_idx(FunctionSwitch switch_type)
 {
@@ -28,14 +26,14 @@ static void refresh_switches()
     STDMIXER_InitSwitches();
     // initialize
     for (FunctionSwitch switch_type = SWITCHFUNC_FLYMODE; switch_type < SWITCHFUNC_LAST; switch_type++)
-        switch_idx[switch_type] = get_switch_idx(switch_type);
+        mp->switch_idx[switch_type] = get_switch_idx(switch_type);
 }
 
 // the only reason not to save changes in live is I don't want to change mixers' switch in the middle of changing options
 void save_changes()
 {
     for (FunctionSwitch switch_type = SWITCHFUNC_FLYMODE; switch_type < SWITCHFUNC_LAST; switch_type++)
-        mapped_std_channels.switches[switch_type] = switch_idx[switch_type];
+        mapped_std_channels.switches[switch_type] = mp->switch_idx[switch_type];
 
     if (Model.limits[mapped_std_channels.throttle].safetysw)
        Model.limits[mapped_std_channels.throttle].safetysw =
@@ -52,10 +50,10 @@ static const char *switch_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     FunctionSwitch switch_type = (long)data;
-    int sw = INPUT_SelectAbbrevSource(switch_idx[switch_type], dir);
+    int sw = INPUT_SelectAbbrevSource(mp->switch_idx[switch_type], dir);
     if (sw < INP_HAS_CALIBRATION+1)
         sw = INP_HAS_CALIBRATION+1;
-    switch_idx[switch_type] = sw;
-    return INPUT_SourceNameAbbrevSwitch(tempstring, switch_idx[switch_type]);
+    mp->switch_idx[switch_type] = sw;
+    return INPUT_SourceNameAbbrevSwitch(tempstring, mp->switch_idx[switch_type]);
 }
 

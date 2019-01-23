@@ -30,7 +30,7 @@ extern sser_callback_t *soft_rx_callback;
 
 #define SSER_BIT_TIME       1250   // 17.36 us at 72MHz
 // rising edge ISR
-void exti15_10_isr(void)
+void __attribute__((__used__)) exti15_10_isr(void)
 {
     exti_reset_request(EXTI10);
 
@@ -55,7 +55,7 @@ static void next_byte() {
 }
 
 // bit timer ISR
-void tim6_isr(void) {
+void __attribute__((__used__)) tim6_isr(void) {
     timer_clear_flag(TIM6, TIM_SR_UIF);
 
     u16 value = gpio_get(GPIOA, _USART_GPIO_USART_RX);

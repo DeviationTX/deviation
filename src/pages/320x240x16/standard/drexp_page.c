@@ -24,8 +24,6 @@
 #if HAS_STANDARD_GUI
 #include "../../common/standard/_drexp_page.c"
 
-guiObject_t *scroll_bar;
-
 void update_graph(int graph)
 {
     GUI_Redraw(&gui->graph[graph]);
