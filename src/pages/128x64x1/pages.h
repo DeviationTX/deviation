@@ -16,6 +16,7 @@ struct pagemem {
         struct timer_page timer_page;
         struct chantest_page chantest_page;
         struct range_page range_page;
+        struct switchassign_page switchassign_page;
 #if HAS_SCANNER
         struct scanner_page scanner_page;
 #endif
