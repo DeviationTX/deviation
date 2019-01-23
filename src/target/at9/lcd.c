@@ -129,7 +129,7 @@ void LCD_Init()
                   GPIO_CNF_OUTPUT_PUSHPULL, GPIO0);
 
     gpio_clear(GPIOE, GPIO0);
-    Delay(100); // must be iheld low for at least 10us
+    _usleep(10);  // must be held low for at least 10us
     gpio_set(GPIOE, GPIO0);
     _msleep(120); // must wait 120ms after reset
     while (lcd_detect() != LCDTYPE_ILI9341) {
