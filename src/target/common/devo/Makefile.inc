@@ -84,7 +84,8 @@ ifdef OPTIMIZE_DFU
 	$(CC) -o $< $(OBJS) $(LIBOPENCM3) $(LFLAGS) $(LFLAGS2OPT) $(CFLAGS)
 endif
 ifdef MODULAR # the following builds a symbol file with thumb addresses (address+1 for functions, address+0 for variables)
-	$(DUMP) -t $< | $(SDIR)/../utils/build_symbolfile.pl > $(SYMBOL_FILE)
+	grep -r -h --include=*.h MODULE_CALLTYPE * | awk -F"[: ()]" '{if ($$1 != "") print $$3}' > $(ODIR)/exports
+	$(DUMP) -t $< | $(SDIR)/../utils/build_symbolfile.pl -exports $(ODIR)/exports > $(SYMBOL_FILE)
 endif
 	$(CP) -O binary $< $@
 	$(DUMP) -S $< > $(TARGET).list
