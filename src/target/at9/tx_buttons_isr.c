@@ -37,7 +37,7 @@ static int handle_rotary_encoder(unsigned val)
   return 0;
 }
 
-void exti15_10_isr()
+void __attribute__((__used__)) exti15_10_isr()
 {
     u32 button = gpio_port_read(GPIOC);
     exti_reset_request(EXTI13 | EXTI14);
