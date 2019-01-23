@@ -21,7 +21,7 @@
     - RadioLink AT9
   * Introduce a new format of localiztion file to save Flash space and speed up UI rendering.
   * Scanner to check the RF enviroment around.
-  * Enhence telemetry support by adding some new fields.
+  * Enhance telemetry support by adding some new fields.
 
 
 ## Minor Features / Bug Fixes
@@ -30,6 +30,7 @@
   * Support of Beken BK2421 / BK2423 support is removed.
   * Fix USBHID under OSX
   * Tx power setting shows power values of radio in use
+  * Support Walkera QR-X350 telemetry format
 
 
 ## New protocols
