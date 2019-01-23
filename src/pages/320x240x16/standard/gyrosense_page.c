@@ -58,7 +58,7 @@ void PAGE_GyroSenseInit(int page)
         GUI_CreateLabelBox(&gui->msg, 0, 120, 240, 16, &NARROW_FONT, NULL, NULL, "Invalid model ini!");// must be invalid model ini
         return;
     }
-    gyro_output = mp->mixer_ptr[0]->dest;
+    mp->gyro_output = mp->mixer_ptr[0]->dest;
     convert_output_to_percentile();
     /* Row 1 */
     GUI_CreateLabelBox(&gui->chanlbl, COL1, ROW1, LABEL_WIDTH, 16, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Channel"));
