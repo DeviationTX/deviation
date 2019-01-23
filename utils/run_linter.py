@@ -269,15 +269,15 @@ def clean_old_comments():
     for comment in comments:
         if comment['body'].startswith(UNMATCHED_LINT_ERROR):
             delete_comment("issues", comment['id'])
-    
+
 def group_lines(line_err):
-    """Try to group into groups of 5 lines for github"""
+    """Try to group into groups of 4 lines for github"""
     linenums = sorted(line_err, key=int)
     groups = []
     group = {}
     startnum = -999
     for num in linenums:
-        if num - startnum > 5:
+        if num - startnum > 4:
             startnum = num
             group = {"start": num, "end": num, "msgs": []}
             groups.append(group)
@@ -300,7 +300,7 @@ def compute_offset(diff, filename, group):
             seen_at = False
             continue
         if in_file:
-            if any(line.startswith(pat) for pat in ["index", "---", "+++"]):
+            if any(line.startswith(pat) for pat in ["---", "+++"]):
                 continue
             if line.startswith("@@"):
                 if offset is not None:
@@ -312,7 +312,7 @@ def compute_offset(diff, filename, group):
                 if match:
                     file_pos = int(match.group(1))
                 continue
-            if line.startswith("-"):
+            if line[0] != '+' and line[0] != ' ':
                 continue
             if file_pos >= group['start'] and file_pos <= group['end']:
                 offset = pos
@@ -328,11 +328,16 @@ def raise_for_status(url, response):
         sys.stderr.write('\n')
         raise Exception('Request for %s failed: %s' % (url, response.getcode()))
 
-def get_url(url, headers=None):
-    logging.debug("GET: " + url)
+def get_cache_key(url, headers=None):
     if not headers:
         headers = {}
-    key = (url, json.dumps(headers))
+    return (url, json.dumps(headers))
+
+def get_url(url, headers=None):
+    logging.debug("GET: %s HEADERS: %s", url, headers)
+    if not headers:
+        headers = {}
+    key = get_cache_key(url, headers)
     if key not in URL_CACHE:
         headers['Authorization'] = 'token ' + get_token()
         request = urllib2.Request(url, None, headers)
