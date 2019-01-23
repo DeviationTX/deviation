@@ -87,9 +87,10 @@ void add_set_button_cb(struct guiObject *obj, void *data)
 
 static const char* _settimer_title(guiObject_t *obj, const void *data)
 {
-    u8 index = (u8)data;
+    (void)obj;
+    u8 index = (u8)(u32)data;
     snprintf(tempstring, sizeof(tempstring), "%s %d", _tr(PAGE_GetName(PAGEID_SETTIMER)), index + 1);
-    PAGE_ShowHeader(tempstring);
+    return tempstring;
 }
 
 static void _show_settimer_page(u8 index)
@@ -101,7 +102,7 @@ static void _show_settimer_page(u8 index)
     tp->addset = ADD_BUTTON;
     tp->hms = TIMER_HOURS;
 
-    PAGE_ShowHeader_SetLabel(_settimer_title, index);
+    PAGE_ShowHeader_SetLabel(_settimer_title, (void*)(u32)index);
 
     u8 space = LINE_HEIGHT;
     u8 y = LINE_HEIGHT; // under headline
