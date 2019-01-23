@@ -93,9 +93,9 @@ void PAGE_ModelConfigInit(int page)
 {
     (void)page;
     switch (Model.type) {
-      case MODELTYPE_HELI: show_titlerow(_tr_noop("Helicopter")); break; 
-      case MODELTYPE_PLANE: show_titlerow(_tr_noop("Airplane")); break; 
-      case MODELTYPE_MULTI: show_titlerow(_tr_noop("Multirotor")); break; 
+      case MODELTYPE_HELI: show_titlerow(_tr_noop("Helicopter")); break;
+      case MODELTYPE_PLANE: show_titlerow(_tr_noop("Airplane")); break;
+      case MODELTYPE_MULTI: show_titlerow(_tr_noop("Multirotor")); break;
       }
 
     if (Model.type == MODELTYPE_HELI) {
