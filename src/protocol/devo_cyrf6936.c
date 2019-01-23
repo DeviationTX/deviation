@@ -569,9 +569,18 @@ static void devo_bind()
     PROTOCOL_SetBindState(0x1388 * 2400 / 1000); //msecs
 }
 
-static void initialize()
+static void devo_start()
 {
     CLOCK_StopTimer();
+    if (Model.proto_opts[PROTOOPTS_TELEMETRY] != TELEM_OFF) {
+        CLOCK_StartTimer(2400, devo_telemetry_cb);
+    } else {
+        CLOCK_StartTimer(2400, devo_cb);
+    }
+}
+
+static void initialize()
+{
     CYRF_Reset();
     cyrf_init();
     CYRF_GetMfgData(cyrfmfg_id);
@@ -604,11 +613,8 @@ static void initialize()
         bind_counter = 0;
         cyrf_set_bound_sop_code();
     }
-    if (Model.proto_opts[PROTOOPTS_TELEMETRY] != TELEM_OFF) {
-        CLOCK_StartTimer(2400, devo_telemetry_cb);
-    } else {
-        CLOCK_StartTimer(2400, devo_cb);
-    }
+
+    devo_start();
 }
 
 const void *DEVO_Cmds(enum ProtoCmds cmd)
@@ -627,7 +633,7 @@ const void *DEVO_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_GETOPTIONS:
             return devo_opts;
         case PROTOCMD_SETOPTIONS:
-            PROTOCOL_Init(0);  // only 1 prot_ops item, it is to enable/disable telemetry
+            devo_start();  // only 1 prot_ops item, it is to enable/disable telemetry
             break;
         case PROTOCMD_TELEMETRYSTATE:
             return (void *)(Model.proto_opts[PROTOOPTS_TELEMETRY] != TELEM_OFF ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
