@@ -630,7 +630,7 @@ const void *DEVO_Cmds(enum ProtoCmds cmd)
             PROTOCOL_Init(0);  // only 1 prot_ops item, it is to enable/disable telemetry
             break;
         case PROTOCMD_TELEMETRYSTATE:
-            return (void *)(long)(Model.proto_opts[PROTOOPTS_TELEMETRY] != TELEM_OFF ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
+            return (void *)(Model.proto_opts[PROTOOPTS_TELEMETRY] != TELEM_OFF ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
         case PROTOCMD_TELEMETRYTYPE: 
             return (void *)(long) TELEM_DEVO;
         case PROTOCMD_CHANNELMAP:
