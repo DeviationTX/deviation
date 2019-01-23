@@ -72,16 +72,15 @@ enum A7105_MASK {
     A7105_MASK_VBCF = 1 << 3,
 };
 
-void A7105_Initialize();
-void A7105_WriteReg(u8 addr, u8 value);
-void A7105_WriteData(u8 *dpbuffer, u8 len, u8 channel);
-void A7105_ReadData(u8 *dpbuffer, u8 len);
-u8 A7105_ReadReg(u8 addr);
-int A7105_Reset();
-void A7105_WriteID(u32 id);
-void A7105_Strobe(enum A7105_State);
-void A7105_SetPower(int power);
-void A7105_SetTxRxMode(enum TXRX_State);
-void A7105_AdjustLOBaseFreq(s16 offset);
+MODULE_CALLTYPE void A7105_WriteReg(u8 addr, u8 value);
+MODULE_CALLTYPE void A7105_WriteData(u8 *dpbuffer, u8 len, u8 channel);
+MODULE_CALLTYPE void A7105_ReadData(u8 *dpbuffer, u8 len);
+MODULE_CALLTYPE u8 A7105_ReadReg(u8 addr);
+MODULE_CALLTYPE int A7105_Reset();
+MODULE_CALLTYPE void A7105_WriteID(u32 id);
+MODULE_CALLTYPE void A7105_Strobe(enum A7105_State);
+MODULE_CALLTYPE void A7105_SetPower(int power);
+MODULE_CALLTYPE void A7105_SetTxRxMode(enum TXRX_State);
+MODULE_CALLTYPE void A7105_AdjustLOBaseFreq(s16 offset);
 
 #endif
