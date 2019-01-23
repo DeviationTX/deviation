@@ -121,7 +121,7 @@ static void reorder_mixers_by_list(u8 *list)
     }
     for (int i = 0; i < NUM_MIXERS; i++) {
         int dest = Model.mixers[i].dest;
-        if (! Model.mixers[i].src)
+        if (!Model.mixers[i].src)
             break;
         if (reorder[dest] != 0xff) {
             Model.mixers[i].dest = reorder[dest];
@@ -134,10 +134,10 @@ static void reorder_limits_by_list(u8 *list)
     unsigned j;
     struct Limit tmplimits[NUM_OUT_CHANNELS];
     u8 tmptemplates[NUM_CHANNELS];
-    for(j = 0; j < NUM_CHANNELS; j++) {
-        if(j < NUM_OUT_CHANNELS) {
-           if(list[j]-1 < NUM_OUT_CHANNELS) {
-               tmplimits[j] = Model.limits[list[j]-1]; 
+    for (j = 0; j < NUM_CHANNELS; j++) {
+        if (j < NUM_OUT_CHANNELS) {
+           if (list[j]-1 < NUM_OUT_CHANNELS) {
+               tmplimits[j] = Model.limits[list[j]-1];
            } else {
                MIXER_SetDefaultLimit(&tmplimits[j]);
            }
@@ -150,7 +150,7 @@ static void reorder_limits_by_list(u8 *list)
 
 static void reorder_return_cb(u8 *list)
 {
-    if (! list)
+    if (!list)
         return;
     reorder_mixers_by_list(list);
     reorder_limits_by_list(list);
