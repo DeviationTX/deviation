@@ -111,66 +111,41 @@ static const char *reorder_text_cb(u8 idx)
 
 static void reorder_mixers_by_list(u8 *list)
 {
-    struct Mixer tmpmix;
-    int pos = 0;
-    for(int newdest = 0; newdest < NUM_CHANNELS; newdest++) {
-        int olddest = list[newdest]-1;
-        int match = pos;
-        while(match < NUM_MIXERS) {
-            if (Model.mixers[match].src && Model.mixers[match].dest == olddest) {
-                if (match != pos) {
-                    tmpmix = Model.mixers[match];
-                    memmove(&Model.mixers[pos+1], &Model.mixers[pos], sizeof(struct Mixer) * (match-pos));
-                    Model.mixers[pos] = tmpmix;
-                }
-                Model.mixers[pos].dest = newdest;
-                pos++;
-            }
-            match++;
+    u8 reorder[NUM_CHANNELS];
+    memset(reorder, 0xff, sizeof(reorder));
+    for (int newdest = 0; newdest < NUM_CHANNELS; newdest++) {
+        int olddest = list[newdest];
+        if (olddest) {
+            reorder[olddest-1] = newdest;
+        }
+    }
+    for (int i = 0; i < NUM_MIXERS; i++) {
+        int dest = Model.mixers[i].dest;
+        if (! Model.mixers[i].src)
+            break;
+        if (reorder[dest] != 0xff) {
+            Model.mixers[i].dest = reorder[dest];
         }
     }
 }
 
 static void reorder_limits_by_list(u8 *list)
 {
-    struct Limit tmplimit;
-    u8 tmptemplate;
-    u8 reorder[NUM_CHANNELS];
-    memset(reorder, 0xff, sizeof(reorder));
-    for(int j = 0; j < NUM_OUT_CHANNELS; j++) {
-        int prev = list[j] - 1;
-        int prevl = prev;
-        while (reorder[prevl] != 0xff)
-            prevl = reorder[prevl];
-        printf("%d => %d (%d)\n", j, prevl, prev);
-        if (j == prevl)
-            continue;
-        if(prevl < NUM_OUT_CHANNELS) {
-            tmplimit = Model.limits[j];
-            Model.limits[j] = Model.limits[prevl];
-            Model.limits[prevl] = tmplimit;
-            reorder[j] = prevl;
+    unsigned j;
+    struct Limit tmplimits[NUM_OUT_CHANNELS];
+    u8 tmptemplates[NUM_CHANNELS];
+    for(j = 0; j < NUM_CHANNELS; j++) {
+        if(j < NUM_OUT_CHANNELS) {
+           if(list[j]-1 < NUM_OUT_CHANNELS) {
+               tmplimits[j] = Model.limits[list[j]-1]; 
+           } else {
+               MIXER_SetDefaultLimit(&tmplimits[j]);
+           }
         }
+        tmptemplates[j] = Model.templates[list[j]-1];
     }
-    for(int j = 0; j < NUM_OUT_CHANNELS; j++) {
-        int prev = list[j] - 1;
-        if(prev >= NUM_OUT_CHANNELS)
-            MIXER_SetDefaultLimit(&Model.limits[j]);
-    }
-    memset(reorder, 0xff, sizeof(reorder));
-    for(int j = 0; j < NUM_CHANNELS; j++) {
-        int prev = list[j] - 1;
-        int prevl = prev;
-        while (reorder[prevl] != 0xff)
-            prevl = reorder[prevl];
-        printf("%d => %d (%d)\n", j, prevl, prev);
-        if (j == prevl)
-            continue;
-        tmptemplate = Model.templates[j];
-        Model.templates[j] = Model.templates[prevl];
-        Model.templates[prevl] = tmptemplate;
-        reorder[j] = prevl;
-    }
+    memcpy(Model.templates, tmptemplates, sizeof(Model.templates));
+    memcpy(Model.limits, tmplimits, sizeof(Model.limits));
 }
 
 static void reorder_return_cb(u8 *list)
