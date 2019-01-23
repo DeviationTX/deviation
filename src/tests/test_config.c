@@ -11,6 +11,7 @@ struct config_values {
 
     u16 color_val;
     u8 str_index_val;
+    u8 font_val;
 } TestConfig;
 
 enum {
@@ -34,7 +35,9 @@ static const struct struct_map _secgeneral[] =
     {"s8val",         OFFSETS(struct config_values, s8_val)},
     {"s16val",        OFFSETS(struct config_values, s16_val)},
     {"s32val",        OFFSETS(struct config_values, s32_val)},
-    {"index",         OFFSET_STRLIST(struct config_values, str_index_val, ALIGN_VAL, ARRAYSIZE(ALIGN_VAL))}
+    {"index",         OFFSET_STRLIST(struct config_values, str_index_val, ALIGN_VAL, ARRAYSIZE(ALIGN_VAL))},
+    {"color",         OFFSET_COL(struct config_values, color_val)},
+    {"font",          OFFSET_FON(struct config_values, font_val)},
 };
 
 
@@ -57,11 +60,33 @@ void TestConfigBasic(CuTest* t) {
     CuAssertIntEquals(t, -655350, TestConfig.s32_val);
 
     CuAssertTrue(t, !assign_int(&TestConfig, _secgeneral, ARRAYSIZE(_secgeneral), "notfound", "0"));
+
+    CuAssertTrue(t, assign_int(&TestConfig, _secgeneral, ARRAYSIZE(_secgeneral), "color", "000000"));
+    CuAssertIntEquals(t, 0, TestConfig.color_val);
+    CuAssertTrue(t, assign_int(&TestConfig, _secgeneral, ARRAYSIZE(_secgeneral), "color", "FEDCBA"));
+    CuAssertIntEquals(t, 0xfef7, TestConfig.color_val);
 }
 
-void TestConfigStringList(CuTest* t) {
-    memset(&TestConfig, 0, sizeof(TestConfig));
-
+void TestConfigStringList(CuTest* t)
+{
     CuAssertTrue(t, assign_int(&TestConfig, _secgeneral, ARRAYSIZE(_secgeneral), "index", "center"));
     CuAssertIntEquals(t, STR_CENTER, TestConfig.str_index_val);
+
+    CuAssertTrue(t, assign_int(&TestConfig, _secgeneral, ARRAYSIZE(_secgeneral), "index", "left"));
+    CuAssertIntEquals(t, STR_LEFT, TestConfig.str_index_val);
+
+    CuAssertTrue(t, assign_int(&TestConfig, _secgeneral, ARRAYSIZE(_secgeneral), "index", "right"));
+    CuAssertIntEquals(t, STR_RIGHT, TestConfig.str_index_val);
+
+    TestConfig.str_index_val = 254;
+    CuAssertTrue(t, assign_int(&TestConfig, _secgeneral, ARRAYSIZE(_secgeneral), "index", "invalid"));
+    CuAssertIntEquals(t, 254, TestConfig.str_index_val);
+}
+
+void TestConfigFont(CuTest* t)
+{
+    int fontindex = FONT_GetFromString("font1");
+
+    CuAssertTrue(t, assign_int(&TestConfig, _secgeneral, ARRAYSIZE(_secgeneral), "font", "font1"));
+    CuAssertIntEquals(t, fontindex, TestConfig.font_val);
 }
