@@ -77,7 +77,7 @@ static const char *gyro_val_cb(guiObject_t *obj, int dir, void *data)
     if (changed) {
         mp->mixer_ptr[i]->scalar = mp->output[i] * 2 - 100;
     }
-    snprintf(tempstring, sizeof(tempstring), "%d%%", mp->output[i]);
+    sprintf(tempstring, "%d%%", mp->output[i]);
     return tempstring;
 }
 
