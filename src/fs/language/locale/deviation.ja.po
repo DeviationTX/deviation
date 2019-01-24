@@ -1477,7 +1477,7 @@ msgstr "温度"
 
 #: pages/320x240x16/tx_configure.c:216 pages/128x64x1/tx_configure.c:186
 msgid "Length"
-msgstr "幅"
+msgstr "距離"
 
 #: pages/320x240x16/tx_configure.c:220
 msgid "Alert interval"

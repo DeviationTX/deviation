@@ -1,9 +1,10 @@
 # Translators:
 # PhracturedBlue <rc2012@pblue.org>, 2019
+# TheRealMoeder, 2019
 # 
 msgid ""
 msgstr ""
-"Last-Translator: PhracturedBlue <rc2012@pblue.org>, 2019\n"
+"Last-Translator: TheRealMoeder, 2019\n"
 "Language-Team: German (https://www.transifex.com/deviationtx/teams/73329/de/)\n"
 "Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -85,43 +86,43 @@ msgstr "FMODE"
 
 #: inputs.c:64 inputs.c:65
 msgid "HOLD"
-msgstr ""
+msgstr "HOLD"
 
 #: inputs.c:66 inputs.c:67
 msgid "TRN"
-msgstr ""
+msgstr "TRN"
 
 #: inputs.c:68 inputs.c:69 inputs.c:70
 msgid "SW A"
-msgstr ""
+msgstr "SW A"
 
 #: inputs.c:71 inputs.c:72 inputs.c:73
 msgid "SW B"
-msgstr ""
+msgstr "SW B"
 
 #: inputs.c:74 inputs.c:75 inputs.c:76
 msgid "SW C"
-msgstr ""
+msgstr "SW C"
 
 #: inputs.c:77 inputs.c:78 inputs.c:79
 msgid "SW D"
-msgstr ""
+msgstr "SW D"
 
 #: inputs.c:80 inputs.c:81 inputs.c:82
 msgid "SW E"
-msgstr ""
+msgstr "SW E"
 
 #: inputs.c:83 inputs.c:84
 msgid "SW F"
-msgstr ""
+msgstr "SW F"
 
 #: inputs.c:85 inputs.c:86 inputs.c:87
 msgid "SW G"
-msgstr ""
+msgstr "SW G"
 
 #: inputs.c:88 inputs.c:89
 msgid "SW H"
-msgstr ""
+msgstr "SW H"
 
 #: inputs.c:95
 msgid "TRIMLV-"
@@ -241,7 +242,7 @@ msgstr "Virt"
 
 #: inputs.c:163
 msgid "PPM"
-msgstr ""
+msgstr "PPM"
 
 #: telemetry/telem_crsf.c:81
 msgid "tx SNR"

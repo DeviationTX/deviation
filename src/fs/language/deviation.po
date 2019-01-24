@@ -127,7 +127,7 @@ msgstr ""
 msgid "RUD"
 msgstr ""
 
-#: inputs.c:39 pages/common/standard/_gyrosense_page.c:61
+#: inputs.c:39 pages/common/standard/_gyrosense_page.c:59
 msgid "AUX2"
 msgstr ""
 
@@ -169,7 +169,7 @@ msgstr ""
 
 #: inputs.c:56 inputs.c:57 inputs.c:91 inputs.c:92 inputs.c:93
 #: pages/common/standard/_common_standard.c:38
-#: pages/common/standard/_gyrosense_page.c:59
+#: pages/common/standard/_gyrosense_page.c:57
 msgid "GEAR"
 msgstr ""
 
@@ -328,8 +328,8 @@ msgstr ""
 msgid "None"
 msgstr ""
 
-#: inputs.c:154 pages/common/standard/_gyrosense_page.c:59
-#: pages/common/standard/_gyrosense_page.c:61
+#: inputs.c:154 pages/common/standard/_gyrosense_page.c:57
+#: pages/common/standard/_gyrosense_page.c:59
 msgid "Ch"
 msgstr ""
 
@@ -400,7 +400,7 @@ msgstr ""
 
 #: pages/128x64x1/advanced/mixer_curves.c:83
 #: pages/320x240x16/advanced/mixer_curves.c:51
-#: pages/common/standard/_gyrosense_page.c:27
+#: pages/common/standard/_gyrosense_page.c:25
 msgid "Value"
 msgstr ""
 
@@ -463,7 +463,7 @@ msgstr ""
 #: pages/320x240x16/advanced/mixer_setup.c:59
 #: pages/320x240x16/advanced/mixer_setup.c:84
 #: pages/320x240x16/advanced/mixer_setup.c:151
-#: pages/320x240x16/standard/drexp_page.c:59
+#: pages/320x240x16/standard/drexp_page.c:57
 msgid "Src"
 msgstr ""
 
@@ -537,12 +537,12 @@ msgstr ""
 #: pages/common/standard/_curves_page.c:109
 #: pages/common/standard/_throhold_page.c:40 pages/common/_tx_configure.c:376
 #: protocol/bayang_nrf24l01.c:100 protocol/cg023_nrf24l01.c:60
-#: protocol/devo_cyrf6936.c:54 protocol/dsm2_cyrf6936.c:49
-#: protocol/dsm2_cyrf6936.c:52 protocol/dsm2_cyrf6936.c:53
-#: protocol/frsky2way_cc2500.c:40 protocol/fy326_nrf24l01.c:59
-#: protocol/hubsan_a7105.c:126 protocol/inav_nrf24l01.c:182
-#: protocol/kn_nrf24l01.c:172 protocol/symax_nrf24l01.c:109
-#: protocol/yd717_nrf24l01.c:111 telemetry/telem_dsm.c:147
+#: protocol/dsm2_cyrf6936.c:49 protocol/dsm2_cyrf6936.c:52
+#: protocol/dsm2_cyrf6936.c:53 protocol/frsky2way_cc2500.c:40
+#: protocol/fy326_nrf24l01.c:59 protocol/hubsan_a7105.c:126
+#: protocol/inav_nrf24l01.c:182 protocol/kn_nrf24l01.c:172
+#: protocol/symax_nrf24l01.c:109 protocol/yd717_nrf24l01.c:111
+#: telemetry/telem_dsm.c:147
 msgid "On"
 msgstr ""
 
@@ -2013,6 +2013,14 @@ msgstr ""
 
 #: protocol/cx10_nrf24l01.c:69
 msgid "Blue-A"
+msgstr ""
+
+#: protocol/devo_cyrf6936.c:54
+msgid "Std"
+msgstr ""
+
+#: protocol/devo_cyrf6936.c:54
+msgid "X350"
 msgstr ""
 
 #: protocol/dsm2_cyrf6936.c:50

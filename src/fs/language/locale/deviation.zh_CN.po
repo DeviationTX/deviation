@@ -1,10 +1,11 @@
 # Translators:
 # PhracturedBlue <rc2012@pblue.org>, 2019
 # Howard Su <howard0su@gmail.com>, 2019
+# 螺丝刀 <996371375@qq.com>, 2019
 # 
 msgid ""
 msgstr ""
-"Last-Translator: Howard Su <howard0su@gmail.com>, 2019\n"
+"Last-Translator: 螺丝刀 <996371375@qq.com>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/deviationtx/teams/73329/zh_CN/)\n"
 "Language: zh_CN\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -32,49 +33,49 @@ msgstr "方向"
 
 #: inputs.c:39 pages/common/standard/_gyrosense_page.c:61
 msgid "AUX2"
-msgstr ""
+msgstr "辅助2"
 
 #: inputs.c:40
 msgid "AUX3"
-msgstr ""
+msgstr "辅助3"
 
 #: inputs.c:41
 msgid "AUX4"
-msgstr ""
+msgstr "辅助4"
 
 #: inputs.c:42
 msgid "AUX5"
-msgstr ""
+msgstr "辅助5"
 
 #: inputs.c:43
 msgid "AUX6"
-msgstr ""
+msgstr "辅助6"
 
 #: inputs.c:44
 msgid "AUX7"
-msgstr ""
+msgstr "辅助7"
 
 #: inputs.c:45 inputs.c:46
 msgid "DR"
-msgstr "舵量"
+msgstr "大小舵"
 
 #: inputs.c:47 inputs.c:48 inputs.c:49
 msgid "RUD DR"
-msgstr "方向舵量"
+msgstr "方向大小舵"
 
 #: inputs.c:50 inputs.c:51 inputs.c:52
 msgid "ELE DR"
-msgstr "升降舵量"
+msgstr "升降大小舵"
 
 #: inputs.c:53 inputs.c:54 inputs.c:55
 msgid "AIL DR"
-msgstr "副翼舵量"
+msgstr "副翼大小舵"
 
 #: inputs.c:56 inputs.c:57 inputs.c:91 inputs.c:92 inputs.c:93
 #: pages/common/standard/_gyrosense_page.c:59
 #: pages/common/standard/_common_standard.c:38
 msgid "GEAR"
-msgstr "尾舵"
+msgstr "起落架"
 
 #: inputs.c:58 inputs.c:59 inputs.c:60
 msgid "MIX"
@@ -94,35 +95,35 @@ msgstr ""
 
 #: inputs.c:68 inputs.c:69 inputs.c:70
 msgid "SW A"
-msgstr ""
+msgstr "开关A"
 
 #: inputs.c:71 inputs.c:72 inputs.c:73
 msgid "SW B"
-msgstr ""
+msgstr "开关B"
 
 #: inputs.c:74 inputs.c:75 inputs.c:76
 msgid "SW C"
-msgstr ""
+msgstr "开关C"
 
 #: inputs.c:77 inputs.c:78 inputs.c:79
 msgid "SW D"
-msgstr ""
+msgstr "开关D"
 
 #: inputs.c:80 inputs.c:81 inputs.c:82
 msgid "SW E"
-msgstr ""
+msgstr "开关E"
 
 #: inputs.c:83 inputs.c:84
 msgid "SW F"
-msgstr ""
+msgstr "开关F"
 
 #: inputs.c:85 inputs.c:86 inputs.c:87
 msgid "SW G"
-msgstr ""
+msgstr "开关G"
 
 #: inputs.c:88 inputs.c:89
 msgid "SW H"
-msgstr ""
+msgstr "开关H"
 
 #: inputs.c:95
 msgid "TRIMLV-"
@@ -316,7 +317,7 @@ msgstr ""
 
 #: telemetry/telem_crsf.c:108
 msgid "Antenna"
-msgstr ""
+msgstr "天线"
 
 #: telemetry/telem_crsf.c:109
 msgid "rx Quality"
@@ -536,7 +537,7 @@ msgstr "关闭"
 #: protocol/bugs3_a7105.c:244 protocol/hubsan_a7105.c:127
 #: protocol/flysky_afhds2a_a7105.c:80 protocol/joysway_a7105.c:55
 msgid "Freq Tune"
-msgstr ""
+msgstr "频率调整"
 
 #: protocol/bayang_nrf24l01.c:101
 msgid "regular"
@@ -568,7 +569,7 @@ msgstr ""
 #: protocol/esky150_nrf24l01.c:150 protocol/yd717_nrf24l01.c:109
 #: pages/common/advanced/_mixer_curves.c:157
 msgid "No"
-msgstr ""
+msgstr "否"
 
 #: protocol/v202_nrf24l01.c:128 protocol/v202_nrf24l01.c:129
 #: protocol/v202_nrf24l01.c:131 protocol/kn_nrf24l01.c:169
@@ -576,7 +577,7 @@ msgstr ""
 #: protocol/esky150_nrf24l01.c:150 protocol/yd717_nrf24l01.c:109
 #: pages/common/advanced/_mixer_curves.c:157
 msgid "Yes"
-msgstr ""
+msgstr "是"
 
 #: protocol/v202_nrf24l01.c:129
 msgid "250kbps"
@@ -746,7 +747,7 @@ msgstr ""
 
 #: protocol/dsm2_cyrf6936.c:52
 msgid "HighSpeed"
-msgstr ""
+msgstr "高速"
 
 #: protocol/dsm2_cyrf6936.c:53
 msgid "F.Log filter"
@@ -836,11 +837,11 @@ msgstr ""
 
 #: rtc.c:303 pages/320x240x16/tx_configure.c:127
 msgid "Clock"
-msgstr ""
+msgstr "时钟"
 
 #: rtc.c:303
 msgid "Date"
-msgstr ""
+msgstr "日期"
 
 #: gui/dialog.c:154 pages/320x240x16/pages.c:160
 msgid "Ok"
@@ -909,11 +910,11 @@ msgstr "定时器"
 
 #: mixer_standard.c:169
 msgid "Advanced"
-msgstr "高级模式1"
+msgstr "高级模式"
 
 #: mixer_standard.c:169
 msgid "Standard"
-msgstr ""
+msgstr "标准模式"
 
 #: pages/common/_datalog_page.c:63 pages/common/_model_page.c:300
 #: pages/320x240x16/timer_page.c:60 pages/128x64x1/timer_page.c:62
@@ -939,11 +940,11 @@ msgstr "报警"
 
 #: pages/common/_voiceconfig_page.c:64
 msgid "up"
-msgstr ""
+msgstr "上"
 
 #: pages/common/_voiceconfig_page.c:69
 msgid "down"
-msgstr ""
+msgstr "下"
 
 #: pages/common/_voiceconfig_page.c:74
 #, c-format
@@ -1087,7 +1088,7 @@ msgstr "秒表"
 
 #: pages/common/_timer_page.c:75
 msgid "stop-prop"
-msgstr ""
+msgstr "比例秒表"
 
 #: pages/common/_timer_page.c:76
 msgid "countdown"
@@ -1095,7 +1096,7 @@ msgstr "倒计时"
 
 #: pages/common/_timer_page.c:77
 msgid "cntdn-prop"
-msgstr ""
+msgstr "比例倒计时"
 
 #: pages/common/_timer_page.c:78
 msgid "permanent"
@@ -1108,7 +1109,7 @@ msgstr "定时器%d"
 
 #: pages/common/_timer_page.c:192
 msgid "Set to"
-msgstr ""
+msgstr "设为"
 
 #: pages/common/_trim_page.c:102
 msgid "Momentary"
@@ -1125,7 +1126,7 @@ msgstr "开/关"
 
 #: pages/common/_trim_page.c:111
 msgid "3 Pos"
-msgstr ""
+msgstr "3段"
 
 #: pages/common/advanced/_mixer_limits.c:133
 #: pages/common/advanced/_mixer_setup.c:596
@@ -1152,15 +1153,15 @@ msgstr "微调"
 
 #: pages/common/advanced/_mixer_setup.c:152
 msgid "No Trim"
-msgstr "无"
+msgstr "无微调"
 
 #: pages/common/advanced/_mixer_setup.c:188
 msgid "Mid-Rate"
-msgstr "3D飞行1"
+msgstr "中等比例"
 
 #: pages/common/advanced/_mixer_setup.c:188
 msgid "Low-Rate"
-msgstr "3D飞行2"
+msgstr "低比例"
 
 #: pages/common/advanced/_mixer_setup.c:341
 msgid "replace"
@@ -1168,7 +1169,7 @@ msgstr "替换"
 
 #: pages/common/advanced/_mixer_setup.c:342
 msgid "mult"
-msgstr "叠加"
+msgstr "相乘"
 
 #: pages/common/advanced/_mixer_setup.c:343
 msgid "add"
@@ -1188,11 +1189,11 @@ msgstr "延迟"
 
 #: pages/common/advanced/_mixer_setup.c:348
 msgid "beep"
-msgstr ""
+msgstr "蜂鸣器"
 
 #: pages/common/advanced/_mixer_setup.c:349
 msgid "voice"
-msgstr ""
+msgstr "语音"
 
 #: pages/common/advanced/_mixer_setup.c:484
 #: pages/320x240x16/advanced/mixer_setup.c:101
@@ -1251,11 +1252,11 @@ msgstr ""
 
 #: pages/common/_main_config.c:92
 msgid "Battery"
-msgstr ""
+msgstr "电量"
 
 #: pages/common/_main_config.c:93
 msgid "TxPower"
-msgstr ""
+msgstr "发射功率"
 
 #: pages/common/_main_config.c:130 pages/common/_set_timer_page.c:52
 #: pages/128x64x1/set_timer_page.c:73
@@ -1268,7 +1269,7 @@ msgstr "读取"
 
 #: pages/common/_main_config.c:234
 msgid "Menu"
-msgstr "快捷菜单"
+msgstr "菜单"
 
 #: pages/common/_tx_configure.c:92
 msgid ""
@@ -1286,6 +1287,9 @@ msgid ""
 " \n"
 "Press ENT."
 msgstr ""
+"校准结束。\n"
+"\n"
+"按ENT键。"
 
 #: pages/common/_tx_configure.c:123
 msgid ""
@@ -1304,7 +1308,7 @@ msgstr "校准"
 #: pages/common/_tx_configure.c:174 pages/common/_set_timer_page.c:54
 #: pages/128x64x1/set_timer_page.c:73
 msgid "Set"
-msgstr ""
+msgstr "设"
 
 #: pages/common/_tx_configure.c:183
 #, c-format
@@ -1341,11 +1345,11 @@ msgstr "开启"
 
 #: pages/320x240x16/scanner_page.c:42 pages/128x64x1/scanner_page.c:36
 msgid "Average"
-msgstr ""
+msgstr "平均"
 
 #: pages/320x240x16/scanner_page.c:42 pages/128x64x1/scanner_page.c:36
 msgid "Peak"
-msgstr ""
+msgstr "顶点"
 
 #: pages/320x240x16/scanner_page.c:49
 msgid "Att.: -20dB"
@@ -1394,11 +1398,11 @@ msgstr "触摸屏"
 
 #: pages/320x240x16/tx_configure.c:122 pages/128x64x1/tx_configure.c:107
 msgid "Sticks"
-msgstr "摇杆/旋钮"
+msgstr "摇杆"
 
 #: pages/320x240x16/tx_configure.c:138 pages/128x64x1/tx_configure.c:112
 msgid "Audio settings"
-msgstr ""
+msgstr "声音设定"
 
 #: pages/320x240x16/tx_configure.c:140
 msgid "Buzzer settings"
@@ -1406,7 +1410,7 @@ msgstr "报警设置"
 
 #: pages/320x240x16/tx_configure.c:144
 msgid "Power On alarm"
-msgstr ""
+msgstr "开机告警"
 
 #: pages/320x240x16/tx_configure.c:148
 msgid "Battery alarm"
@@ -1418,15 +1422,15 @@ msgstr "报警间隔"
 
 #: pages/320x240x16/tx_configure.c:156 pages/128x64x1/tx_configure.c:116
 msgid "Buzz volume"
-msgstr "音量"
+msgstr "蜂鸣音量"
 
 #: pages/320x240x16/tx_configure.c:161 pages/128x64x1/tx_configure.c:121
 msgid "Audio volume"
-msgstr ""
+msgstr "声音音量"
 
 #: pages/320x240x16/tx_configure.c:166
 msgid "Power-down alert"
-msgstr ""
+msgstr "关机报警"
 
 #: pages/320x240x16/tx_configure.c:174 pages/128x64x1/tx_configure.c:147
 #: pages/128x64x1/tx_configure.c:154
@@ -1479,11 +1483,11 @@ msgstr ""
 
 #: pages/320x240x16/tx_configure.c:227
 msgid "Vibration settings"
-msgstr ""
+msgstr "振动设置"
 
 #: pages/320x240x16/tx_configure.c:229
 msgid "Vibration:"
-msgstr ""
+msgstr "振动:"
 
 #: pages/320x240x16/tx_configure.c:262
 #, c-format
@@ -1505,7 +1509,7 @@ msgstr ""
 #: pages/320x240x16/set_timer_page.c:94 pages/320x240x16/rtc_config.c:136
 #: pages/128x64x1/set_timer_page.c:48
 msgid "Hour"
-msgstr ""
+msgstr "时"
 
 #: pages/320x240x16/set_timer_page.c:96 pages/320x240x16/rtc_config.c:135
 #: pages/128x64x1/set_timer_page.c:46
@@ -1533,7 +1537,7 @@ msgstr "固定翼"
 
 #: pages/320x240x16/model_page.c:27 pages/128x64x1/model_config.c:98
 msgid "Multirotor"
-msgstr ""
+msgstr "多轴"
 
 #: pages/320x240x16/model_page.c:62 pages/128x64x1/model_page.c:85
 msgid "File"
@@ -1557,7 +1561,7 @@ msgstr "模型类型"
 
 #: pages/320x240x16/model_page.c:81 pages/128x64x1/model_page.c:105
 msgid "PPM In"
-msgstr ""
+msgstr "PPM输入"
 
 #: pages/320x240x16/model_page.c:85
 msgid "Protocol"
@@ -1579,7 +1583,7 @@ msgstr "固定ID码"
 #: pages/320x240x16/advanced/mixer_limits.c:76
 #: pages/128x64x1/toggle_select.c:84 pages/128x64x1/advanced/mixer_limits.c:42
 msgid "Revert"
-msgstr "回滚修改"
+msgstr "回滚"
 
 #: pages/320x240x16/toggle_select.c:116
 msgid "Pos 0"
@@ -1625,19 +1629,19 @@ msgstr "螺距"
 
 #: pages/320x240x16/model_config.c:90 pages/128x64x1/model_config.c:240
 msgid "Trainer Cfg (Channel)"
-msgstr ""
+msgstr "教练设置（通道）"
 
 #: pages/320x240x16/model_config.c:92 pages/128x64x1/model_config.c:242
 msgid "Trainer Cfg (Stick)"
-msgstr ""
+msgstr "教练设置（摇杆）"
 
 #: pages/320x240x16/model_config.c:93 pages/128x64x1/model_config.c:243
 msgid "PPMIn Cfg (Extend)"
-msgstr ""
+msgstr "PPM输入设置（扩展）"
 
 #: pages/320x240x16/model_config.c:96 pages/128x64x1/model_config.c:148
 msgid "Trainer Sw"
-msgstr ""
+msgstr "教练开关"
 
 #: pages/320x240x16/model_config.c:99 pages/128x64x1/model_config.c:151
 msgid "Num Channels"
@@ -1716,15 +1720,15 @@ msgstr ""
 
 #: pages/320x240x16/dialogs.c:151 pages/128x64x1/dialogs.c:178
 msgid "Missing Modules:\n"
-msgstr ""
+msgstr "缺失模块:\n"
 
 #: pages/320x240x16/dialogs.c:157
 msgid "Module Error"
-msgstr ""
+msgstr "模块错误："
 
 #: pages/320x240x16/rtc_config.c:137
 msgid "Day"
-msgstr ""
+msgstr "天"
 
 #: pages/320x240x16/rtc_config.c:138
 msgid "Month"
@@ -1736,11 +1740,11 @@ msgstr "年"
 
 #: pages/320x240x16/rtc_config.c:156
 msgid "Set time"
-msgstr ""
+msgstr "设时间"
 
 #: pages/320x240x16/rtc_config.c:157
 msgid "Set date"
-msgstr ""
+msgstr "设日期"
 
 #: pages/320x240x16/rtc_config.c:158
 msgid "Time format"
@@ -1790,23 +1794,23 @@ msgstr "开始时间"
 
 #: pages/320x240x16/timer_page.c:156
 msgid "Date / Time"
-msgstr ""
+msgstr "日期/时间"
 
 #: pages/320x240x16/model_loadsave.c:92
 msgid "Load Model"
-msgstr ""
+msgstr "读取模型"
 
 #: pages/320x240x16/model_loadsave.c:93
 msgid "Save Model as..."
-msgstr ""
+msgstr "保存模型到..."
 
 #: pages/320x240x16/model_loadsave.c:94
 msgid "Load Model Template"
-msgstr ""
+msgstr "读取模板"
 
 #: pages/320x240x16/model_loadsave.c:95
 msgid "Select Icon"
-msgstr ""
+msgstr "选择图标"
 
 #: pages/320x240x16/model_loadsave.c:96
 msgid "Load Layout"
@@ -1914,11 +1918,11 @@ msgstr "选择"
 
 #: pages/320x240x16/main_layout.c:235 pages/320x240x16/main_layout.c:335
 msgid "Page Config"
-msgstr ""
+msgstr "页面设置"
 
 #: pages/320x240x16/main_layout.c:240
 msgid "Type"
-msgstr ""
+msgstr "类型"
 
 #: pages/320x240x16/main_layout.c:254
 msgid "Template"
@@ -2155,15 +2159,15 @@ msgstr "欢迎"
 
 #: pages/320x240x16/pagelist.h:84
 msgid "Select Language"
-msgstr ""
+msgstr "选择语言"
 
 #: pages/320x240x16/range_page.c:31
 msgid "Stop test"
-msgstr ""
+msgstr "停止测试"
 
 #: pages/320x240x16/range_page.c:31
 msgid "Start test"
-msgstr ""
+msgstr "开始测试"
 
 #: pages/320x240x16/range_page.c:40 pages/128x64x1/range_page.c:46
 msgid "No range test possible."
@@ -2171,11 +2175,11 @@ msgstr ""
 
 #: pages/320x240x16/range_page.c:49 pages/128x64x1/range_page.c:51
 msgid "Power reduced to"
-msgstr ""
+msgstr "功率降低到"
 
 #: pages/320x240x16/range_page.c:50 pages/128x64x1/range_page.c:52
 msgid "from"
-msgstr ""
+msgstr "从"
 
 #: pages/320x240x16/usb_page.c:38 pages/128x64x1/about_page.c:38
 msgid "Deviation FW version:"
@@ -2203,7 +2207,7 @@ msgstr "摇杆输入"
 
 #: pages/128x64x1/chantest_page.c:111
 msgid "Mixer output"
-msgstr ""
+msgstr "混控输出"
 
 #: pages/128x64x1/trim_page.c:71
 msgid "Step"
@@ -2393,11 +2397,11 @@ msgstr ""
 
 #: pages/128x64x1/range_page.c:53
 msgid "Press ENT to stop test."
-msgstr ""
+msgstr "按ENT停止测试"
 
 #: pages/128x64x1/range_page.c:56
 msgid "Press ENT to start test."
-msgstr ""
+msgstr "按ENT开始测试"
 
 #: pages/128x64x1/usb_page.c:38
 msgid ""
