@@ -57,6 +57,8 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 void PAGE_TravelAdjInit(int page)
 {
     (void)page;
+    PAGE_SetModal(0);
+
     PAGE_ShowHeader(("")); // draw a underline only
     GUI_CreateLabelBox(&gui->dnlbl, HEADER1_X, 0, HEADER1_WIDTH, LINE_HEIGHT, &TITLE_FONT, GUI_Localize, NULL, _tr_noop("Down"));
     GUI_CreateLabelBox(&gui->uplbl, HEADER2_X, 0, HEADER2_WIDTH, LINE_HEIGHT, &TITLE_FONT, GUI_Localize, NULL, _tr_noop("Up"));

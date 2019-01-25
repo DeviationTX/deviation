@@ -32,6 +32,7 @@ void RANGE_test(int start) {
 
 void PAGE_RangeInit(int page) {
     (void)page;
+    PAGE_SetModal(0);
     memset(mp, 0, sizeof(&mp));
     mp->old_power = Model.tx_power;
     _draw_page(PROTOCOL_HasPowerAmp(Model.protocol) 

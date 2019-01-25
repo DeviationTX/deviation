@@ -35,6 +35,8 @@ enum {
 void PAGE_ThroHoldInit(int page)
 {
     (void)page;
+    PAGE_SetModal(0);
+
     PAGE_ShowHeader(_tr("Throttle hold"));
 
     u8 y = HEADER_HEIGHT + HEADER_OFFSET;
