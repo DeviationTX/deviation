@@ -145,7 +145,9 @@ void SCSI_ReadCapacity10_Cmd(uint8_t lun)
 void SCSI_ModeSense6_Cmd (uint8_t lun)
 {
   (void)lun;
-  Transfer_Data_Request(Mode_Sense6_data, MODE_SENSE6_DATA_LEN);
+  memset(Bulk_Data_Buff, 0, MODE_SENSE6_DATA_LEN);
+  Bulk_Data_Buff[0] = 0x03;
+  Transfer_Data_Request(Bulk_Data_Buff, MODE_SENSE6_DATA_LEN);
 }
 
 /*******************************************************************************
@@ -158,7 +160,9 @@ void SCSI_ModeSense6_Cmd (uint8_t lun)
 void SCSI_ModeSense10_Cmd (uint8_t lun)
 {
   (void)lun;
-  Transfer_Data_Request(Mode_Sense10_data, MODE_SENSE10_DATA_LEN);
+  memset(Bulk_Data_Buff, 0, MODE_SENSE10_DATA_LEN);
+  Bulk_Data_Buff[2] = 0x06;
+  Transfer_Data_Request(Bulk_Data_Buff, MODE_SENSE10_DATA_LEN);
 }
 
 /*******************************************************************************

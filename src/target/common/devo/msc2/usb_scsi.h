@@ -93,11 +93,7 @@
 #define BLKVFY                                      0x04
 
 extern const uint8_t Standard_Inquiry_Data[];
-extern const uint8_t Mode_Sense6_data[];
-extern const uint8_t Mode_Sense10_data[];
 extern  uint8_t Scsi_Sense_Data[];
-extern  uint8_t ReadCapacity10_Data[];
-extern  uint8_t ReadFormatCapacity_Data [];
 
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
