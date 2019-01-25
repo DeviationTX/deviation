@@ -783,7 +783,6 @@ static void update_telemetry_ackpkt()
     }
 }
 
-MODULE_CALLTYPE
 static u16 cflie_callback()
 {
     switch (phase) {

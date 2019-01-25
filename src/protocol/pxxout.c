@@ -251,7 +251,6 @@ static enum {
 
 static u16 mixer_runtime;
 
-MODULE_CALLTYPE
 static u16 pxxout_cb()
 {
     switch (state) {

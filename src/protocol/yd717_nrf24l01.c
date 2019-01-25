@@ -376,8 +376,6 @@ static void update_telemetry() {
 }
 #endif
 
-
-MODULE_CALLTYPE
 static u16 yd717_callback()
 {
     switch (phase) {

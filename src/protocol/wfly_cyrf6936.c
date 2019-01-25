@@ -189,7 +189,6 @@ static u16 WFLY_send_data_packet()
     return 1093;    // case 3
 }
 
-MODULE_CALLTYPE
 static u16 WFLY_callback()
 {
     u8 status,len,sum=0,check=0;

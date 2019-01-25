@@ -383,7 +383,7 @@ static void bay_init()
 
 
 
-MODULE_CALLTYPE static u16 bay_callback()
+static u16 bay_callback()
 {
     switch (phase) {
     case Bayang_INIT1:

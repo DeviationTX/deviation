@@ -442,7 +442,6 @@ static void symax_init2()
     packet_counter = 0;
 }
 
-MODULE_CALLTYPE
 static u16 symax_callback()
 {
     switch (phase) {

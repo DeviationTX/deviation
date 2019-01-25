@@ -433,7 +433,6 @@ static void q303_init()
     NRF24L01_Activate(0x73);
 }
 
-MODULE_CALLTYPE
 static u16 q303_callback()
 {
     switch (phase) {

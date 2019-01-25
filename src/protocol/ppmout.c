@@ -65,7 +65,6 @@ static void build_data_pkt()
     pulses[Model.num_channels] = 50000;
 }
 
-MODULE_CALLTYPE
 static u16 ppmout_cb()
 {
     build_data_pkt();

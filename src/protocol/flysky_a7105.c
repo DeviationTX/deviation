@@ -334,7 +334,6 @@ static void flysky_build_packet(u8 init)
     flysky_apply_extension_flags();
 }
 
-MODULE_CALLTYPE
 static u16 flysky_cb()
 {
     if (counter) {

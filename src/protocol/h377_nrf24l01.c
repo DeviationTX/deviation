@@ -210,7 +210,6 @@ static void build_ch_data()
 
 }
 
-MODULE_CALLTYPE
 static u16 h377_cb()
 {    
     counter1ms++;

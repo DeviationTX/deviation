@@ -386,7 +386,6 @@ void checkTxPower()
 #define SLT_V1_TIMING_BIND2     1000
 #define SLT_V2_TIMING_BIND1     6507
 #define SLT_V2_TIMING_BIND2     2112
-MODULE_CALLTYPE
 static u16 SLT_callback()
 {
     switch (phase)

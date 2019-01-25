@@ -386,7 +386,6 @@ static void h8_3d_init()
     NRF24L01_Activate(0x73);
 }
 
-MODULE_CALLTYPE
 static u16 h8_3d_callback()
 {
     switch (phase) {

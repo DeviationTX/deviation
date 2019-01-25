@@ -213,7 +213,6 @@ static void send_packet(u8 bind)
     }
 }
 
-MODULE_CALLTYPE
 static u16 e015_callback()
 {
     switch (phase) {

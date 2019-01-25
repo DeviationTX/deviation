@@ -161,7 +161,6 @@ static void build_ch_data()
 #endif
 }
 
-MODULE_CALLTYPE
 static u16 bluefly_cb()
 {
     switch(counter1ms++) {

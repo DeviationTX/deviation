@@ -52,7 +52,6 @@ ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 static unsigned char packet[16];
 #define BV(bit) (1 << bit)
 
-MODULE_CALLTYPE
 static u16 testrf_cb()
 {
     packet[0]++;

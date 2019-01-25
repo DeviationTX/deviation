@@ -172,7 +172,6 @@ static void flysky_build_packet()
     packet[15] = value;
 }
 
-MODULE_CALLTYPE
 static u16 joysway_cb()
 {
     u8 ch;

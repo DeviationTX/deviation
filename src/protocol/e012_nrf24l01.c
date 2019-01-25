@@ -212,7 +212,6 @@ static void initialize_txid()
     }
 }
 
-MODULE_CALLTYPE
 static u16 e012_callback()
 {
     switch (phase) {

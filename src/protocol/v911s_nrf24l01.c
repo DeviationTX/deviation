@@ -223,7 +223,6 @@ static void V911S_initialize_txid()
     rf_ch_num=rand32(0xfefefefe)&0x03;          // 0-3
 }
 
-MODULE_CALLTYPE
 static u16 V911S_callback()
 {
     switch(phase) {

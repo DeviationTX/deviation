@@ -202,7 +202,6 @@ static void GD00X_initialize_txid()
     #endif
 }
 
-MODULE_CALLTYPE
 static u16 GD00X_callback()
 {
     if(phase == GD00X_BIND) {

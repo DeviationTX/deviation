@@ -549,7 +549,7 @@ static void increment_counts() {
 // FIFO config is one less than desired value
 #define FIFO_SIZE_RX      15
 #define FIFO_SIZE_TX      21
-MODULE_CALLTYPE
+
 static u16 bugs3_cb() {
     u16 packet_period = 0;
     u8 mode;

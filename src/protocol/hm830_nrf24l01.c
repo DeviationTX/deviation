@@ -322,9 +322,6 @@ static u16 handle_data()
     return 20000;
 }
 
-
-
-MODULE_CALLTYPE
 static u16 HM830_callback()
 {
     if ((phase & 0x7F) < HM830_DATA1)

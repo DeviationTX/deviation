@@ -456,7 +456,6 @@ void DEVO_BuildPacket()
         pkt_num = 0;
 }
 
-MODULE_CALLTYPE
 static u16 devo_telemetry_cb()
 {
     int delay;
@@ -531,7 +530,6 @@ static u16 devo_telemetry_cb()
     return delay;
 }
 
-MODULE_CALLTYPE
 static u16 devo_cb()
 {
     if (txState == 0) {

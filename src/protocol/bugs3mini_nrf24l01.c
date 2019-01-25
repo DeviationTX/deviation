@@ -345,7 +345,6 @@ static void update_telemetry() {
     }
 }
 
-MODULE_CALLTYPE
 static u16 bugs3mini_callback()
 {
     switch(phase) {

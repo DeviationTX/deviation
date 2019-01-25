@@ -464,7 +464,6 @@ static void hubsan_update_telemetry()
     }
 }
 
-MODULE_CALLTYPE
 static u16 hubsan_cb()
 {
     static u8 txState = 0;

@@ -221,7 +221,6 @@ static void fy326_init()
     NRF24L01_WriteReg(NRF24L01_1D_FEATURE, 0x07);
 }
 
-MODULE_CALLTYPE
 static u16 fy326_callback()
 {
     u8 i;

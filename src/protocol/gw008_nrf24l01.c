@@ -194,7 +194,6 @@ static void initialize_txid()
     txid[1] = lfsr >> 8;
 }
 
-MODULE_CALLTYPE
 static u16 gw008_callback()
 {
     switch(phase) {
