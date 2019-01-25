@@ -30,7 +30,7 @@ void Set_System(void);
 void Set_USBClock(void);
 void Enter_LowPowerMode(void);
 void Leave_LowPowerMode(void);
-void USB_Cable_Config (uint8_t enable);
+void USB_Cable_Config(uint8_t enable);
 
 void Get_SerialNum(void);
 
