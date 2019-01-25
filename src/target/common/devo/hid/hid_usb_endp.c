@@ -24,7 +24,6 @@
 #endif /* STM32L1XX_MD */
 
 #include "usb_lib.h"
-#include "hid_usb_istr.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -34,20 +33,6 @@ extern __IO uint8_t PrevXferComplete;
 
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
-/*******************************************************************************
-* Function Name  : EP1_OUT_Callback.
-* Description    : EP1 OUT Callback Routine.
-* Input          : None.
-* Output         : None.
-* Return         : None.
-*******************************************************************************/
-void HID_EP1_IN_Callback(void)
-{
-  /* Set the transfer complete token to inform upper layer that the current 
-  transfer has been complete */
-  //printf("Completed\n");
-  PrevXferComplete = 1; 
-}
 
 /******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
 

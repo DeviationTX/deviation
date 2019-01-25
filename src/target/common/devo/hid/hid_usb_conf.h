@@ -161,24 +161,6 @@
 
 #endif /* STM32F10X_CL */
 
-/* CTR service routines */
-/* associated to defined endpoints */
-/* #define  EP1_IN_Callback   NOP_Process*/
-#define  HID_EP2_IN_Callback   NOP_Process
-#define  HID_EP3_IN_Callback   NOP_Process
-#define  HID_EP4_IN_Callback   NOP_Process
-#define  HID_EP5_IN_Callback   NOP_Process
-#define  HID_EP6_IN_Callback   NOP_Process
-#define  HID_EP7_IN_Callback   NOP_Process
-
-#define  HID_EP1_OUT_Callback   NOP_Process
-#define  HID_EP2_OUT_Callback   NOP_Process
-#define  HID_EP3_OUT_Callback   NOP_Process
-#define  HID_EP4_OUT_Callback   NOP_Process
-#define  HID_EP5_OUT_Callback   NOP_Process
-#define  HID_EP6_OUT_Callback   NOP_Process
-#define  HID_EP7_OUT_Callback   NOP_Process
-
 #endif /*__HID_USB_CONF_H*/
 
 /******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/

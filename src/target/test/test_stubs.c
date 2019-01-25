@@ -103,7 +103,7 @@ void TxName(u8 *var, int len) {
     memcpy(var, model, len - 1);
     var[len-1] = 0;
 }
-void USB_Enable(unsigned type, unsigned use_interrupt) {
+void USB_Enable(unsigned use_interrupt) {
     (void) type;
     (void)use_interrupt;
 }

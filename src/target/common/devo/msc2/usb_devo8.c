@@ -24,6 +24,7 @@
 
 #define __IO volatile
 #include "usb_core.h"
+#include "usb_bot.h"
 #define LE_WORD(x)		((x)&0xFF),((x)>>8)
 
 void USB_Init();
@@ -34,49 +35,32 @@ void (*pEpInt_OUT[7])(void) = {};
 const DEVICE_PROP *Device_Property;
 const USER_STANDARD_REQUESTS *User_Standard_Requests;
 
-extern void (*MSC_pEpInt_IN[7])(void);
-extern void (*MSC_pEpInt_OUT[7])(void);
 extern const DEVICE_PROP MSC_Device_Property;
 extern const USER_STANDARD_REQUESTS MSC_User_Standard_Requests;
 
-extern void (*HID_pEpInt_IN[7])(void);
-extern void (*HID_pEpInt_OUT[7])(void);
-extern const DEVICE_PROP HID_Device_Property;
-extern const USER_STANDARD_REQUESTS HID_User_Standard_Requests;
+void EP1_IN_Callback(void)
+{
+  Mass_Storage_In();
+}
+
+void EP2_OUT_Callback(void)
+{
+  Mass_Storage_Out();
+}
 
 void MSC_Init() {
-    memcpy(pEpInt_IN, MSC_pEpInt_IN, sizeof(pEpInt_IN));
-    memcpy(pEpInt_OUT, MSC_pEpInt_OUT, sizeof(pEpInt_OUT));
+    for (int i = 0; i < 7; i++) {
+        pEpInt_IN[i] = pEpInt_OUT[i] = NOP_Process;
+    }
+    pEpInt_IN[0] = EP1_IN_Callback;
+    pEpInt_OUT[1] = EP2_OUT_Callback;
+
     Device_Property = &MSC_Device_Property;
     User_Standard_Requests = &MSC_User_Standard_Requests;
 }
 
-#ifdef ENABLE_MODULAR
-void (*_HID_Init)() = NULL;
-#else
-extern void HID_Init();
-#endif
-#if 0
-void HID_Init() {
-    memcpy(pEpInt_IN, HID_pEpInt_IN, sizeof(pEpInt_IN));
-    memcpy(pEpInt_OUT, HID_pEpInt_OUT, sizeof(pEpInt_OUT));
-    Device_Property = &HID_Device_Property;
-    User_Standard_Requests = &HID_User_Standard_Requests;
-}
-#endif
-void USB_Enable(unsigned type, unsigned use_interrupt)
+void USB_Enable(unsigned use_interrupt)
 {
-    if (type == 0) {
-        //Mass Storage
-        MSC_Init();
-    } else if (type == 1) {
-#ifndef ENABLE_MODULAR
-        HID_Init();
-#else
-        if(_HID_Init)
-            _HID_Init();
-#endif
-    }
     gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
         GPIO_CNF_OUTPUT_PUSHPULL, GPIO10);
         gpio_set(GPIOB, GPIO10);
@@ -97,6 +81,17 @@ void USB_Disable()
 void USB_HandleISR()
 {
     USB_Istr();
+}
+
+void MSC_Enable()
+{
+    MSC_Init();
+    USB_Enable(1);
+}
+
+void MSC_Disable()
+{
+    USB_Disable();
 }
 
 /*

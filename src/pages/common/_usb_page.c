@@ -28,11 +28,11 @@ unsigned usb_cb(u32 button, unsigned flags, void *data)
         _draw_page(1);
         GUI_RefreshScreen();
         CONFIG_SaveModelIfNeeded();
-        USB_Enable(0, 1);
+        MSC_Enable();
         wait_release();
         wait_press();
         wait_release();
-        USB_Disable();
+        MSC_Disable();
         CONFIG_ReadModel(Transmitter.current_model);
         _draw_page(0);
     }
