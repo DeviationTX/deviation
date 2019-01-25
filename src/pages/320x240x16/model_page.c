@@ -115,6 +115,7 @@ static void _changename_done_cb(guiObject_t *obj, void *data)
         //Save model info here so it shows up on the model page
         CONFIG_SaveModelIfNeeded();
     }
+    PAGE_SetModal(0);
     PAGE_ModelInit(0);
 }
 

@@ -94,6 +94,7 @@ static void fixedid_done_cb(guiObject_t *obj, void *data)
         Model.fixed_id = atoi(mp->fixed_id);
     }
     GUI_RemoveObj(obj);
+    PAGE_SetModal(0);
     PAGE_ModelInit(-1); // must be -1 for devo10 to get back to correct page
 }
 static void fixedid_cb(guiObject_t *obj, const void *data)
