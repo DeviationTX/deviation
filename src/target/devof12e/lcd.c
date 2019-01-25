@@ -26,6 +26,9 @@
 u16 loadedchars[CHAR_CACHE_SIZE];
 static u8 height;
 static u16 load_char_font(u32 c);
+
+#define FONT_NAME_LEN 9
+char FontName[FONT_NAME_LEN];
 #endif
 
 void LCD_Init()
@@ -48,7 +51,7 @@ void LCD_PrintCharXY(unsigned int x, unsigned int y, u32 c)
 #if SUPPORT_MULTI_LANGUAGE
     if (c > 0x300) {
         if (height == 0) {
-            open_font("12normal");
+            open_font(FontName);
             height = get_height();
         }
 
@@ -75,6 +78,12 @@ u8 LCD_SetFont(unsigned int idx)
 u8 FONT_GetFromString(const char *value)
 {
     (void)value;
+#if SUPPORT_MULTI_LANGUAGE
+    // We take the first font as the font name from display.ini
+    if (value[0] != '\0') {
+        strlcpy(FontName, value, sizeof(FontName));
+    }
+#endif
     return 1;
 }
 
