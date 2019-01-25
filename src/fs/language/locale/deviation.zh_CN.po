@@ -469,7 +469,7 @@ msgstr "30秒"
 
 #: datalog.c:61
 msgid "60 sec"
-msgstr ""
+msgstr "60秒"
 
 #: datalog.c:70
 msgid "RTC Time"
@@ -477,19 +477,19 @@ msgstr "时间"
 
 #: datalog.c:74
 msgid "GPS Time"
-msgstr ""
+msgstr "GPS时间"
 
 #: datalog.c:76
 msgid "GPS Coords"
-msgstr ""
+msgstr "GPS坐标"
 
 #: datalog.c:78
 msgid "GPS Alt."
-msgstr ""
+msgstr "GPS高"
 
 #: datalog.c:80
 msgid "GPS Speed"
-msgstr ""
+msgstr "GPS速度"
 
 #: protocol/h8_3d_nrf24l01.c:63 protocol/mt99xx_nrf24l01.c:127
 #: protocol/bayang_nrf24l01.c:101 protocol/v202_nrf24l01.c:127
@@ -731,7 +731,7 @@ msgstr ""
 
 #: protocol/pxxout.c:49
 msgid "Country"
-msgstr ""
+msgstr "地区"
 
 #: protocol/pxxout.c:50
 msgid "Rx PWM out"
@@ -743,7 +743,7 @@ msgstr ""
 
 #: protocol/dsm2_cyrf6936.c:50
 msgid "OrangeRx"
-msgstr ""
+msgstr "橙子接收机"
 
 #: protocol/dsm2_cyrf6936.c:52
 msgid "HighSpeed"
@@ -2139,7 +2139,7 @@ msgstr "双向回传监控"
 
 #: pages/320x240x16/pagelist.h:70 pages/128x64x1/pagelist.h:77
 msgid "Range Test"
-msgstr "拉距测试"
+msgstr "距离检测"
 
 #: pages/320x240x16/pagelist.h:71
 msgid "Input monitor"
@@ -2171,7 +2171,7 @@ msgstr "开始测试"
 
 #: pages/320x240x16/range_page.c:40 pages/128x64x1/range_page.c:46
 msgid "No range test possible."
-msgstr ""
+msgstr "不可进行距离检测"
 
 #: pages/320x240x16/range_page.c:49 pages/128x64x1/range_page.c:51
 msgid "Power reduced to"
@@ -2376,7 +2376,7 @@ msgstr ""
 
 #: pages/128x64x1/advanced/mixer_page.c:44
 msgid "Mixer    Reorder:Hold R+"
-msgstr ""
+msgstr "混控排序：长按R+"
 
 #: pages/128x64x1/advanced/mixer_setup.c:86
 #: pages/128x64x1/advanced/mixer_setup.c:165
@@ -2431,4 +2431,4 @@ msgstr "6通直升机"
 
 #: Model template
 msgid "Heli/Standard GUI"
-msgstr ""
+msgstr "直升机模式"
