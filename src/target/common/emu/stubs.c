@@ -34,10 +34,8 @@ void TxName(u8 *var, int len) {
     memcpy(var, model, len - 1);
     var[len-1] = 0;
 }
-void USB_Enable(unsigned use_interrupt) {
-    (void)use_interrupt;
-}
-void USB_Disable() {}
+void MSC_Enable() {}
+void MSC_Disable() {}
 void HID_Enable() {}
 void HID_Disable() {}
 void HID_Write(s8 *pkt, u8 size) {
