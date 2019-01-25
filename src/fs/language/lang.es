@@ -131,8 +131,6 @@ Paso Mez
 Cíclico
 :Calibrate
 Calibración
-<:Calibration done.
-<Calibración hecha.
 >:Calibration done.\n \nPress ENT.
 :Cancel
 Cancelar
@@ -152,8 +150,6 @@ Cambiar
 >:Channel
 :Channel monitor
 Monitor canales
-<:Channel output
-<Salida de canales
 >:Clock
 :Complex
 Complejo
@@ -700,6 +696,7 @@ Virt
 :Volt
 Volt
 >:Welcome
+>:X350
 >:Year
 >:Yes
 :Zero/Max

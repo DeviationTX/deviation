@@ -932,6 +932,7 @@ USB
 Вольт
 :Welcome
 Привет
+>:X350
 :Year
 Год
 :Yes

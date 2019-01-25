@@ -132,8 +132,6 @@
 CYC
 :Calibrate
 校准
-<:Calibration done.
-<校准完成.
 >:Calibration done.\n \nPress ENT.
 :Cancel
 取消
@@ -154,8 +152,6 @@ CYC
 通道
 :Channel monitor
 通道监控
-<:Channel output
-<通道输出
 >:Clock
 :Complex
 多段式
@@ -729,6 +725,7 @@ LCD设置
 :Volt
 电压
 >:Welcome
+>:X350
 >:Year
 >:Yes
 :Zero/Max

@@ -131,8 +131,6 @@
 >:CYC
 :Calibrate
 校正
-<:Calibration done.
-<校正完成
 >:Calibration done.\n \nPress ENT.
 :Cancel
 取消
@@ -153,8 +151,6 @@
 通道
 :Channel monitor
 通道內容檢視
-<:Channel output
-<輸出通道
 >:Clock
 :Complex
 多段式
@@ -728,6 +724,7 @@ PPM週期
 :Volt
 電壓
 >:Welcome
+>:X350
 >:Year
 >:Yes
 :Zero/Max

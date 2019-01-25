@@ -137,8 +137,6 @@ Mix. PAS
 CYC
 :Calibrate
 Calibrer
-<:Calibration done.
-<Calibration terminée.\nAppuyer sur ENT\n pour continuer.
 >:Calibration done.\n \nPress ENT.
 :Cancel
 Annuler
@@ -159,8 +157,6 @@ Changer
 Canaux
 :Channel monitor
 Ctrl. des Canaux
-<:Channel output
-<Sorties canaux
 >:Clock
 :Complex
 Complexe
@@ -733,6 +729,7 @@ Virt
 :Volt
 Volt
 >:Welcome
+>:X350
 >:Year
 >:Yes
 :Zero/Max

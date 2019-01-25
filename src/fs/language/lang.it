@@ -141,8 +141,6 @@ Limite Collet.
 Ciclico
 :Calibrate
 Calibrazione
-<:Calibration done.
-<Calibrazione completata.
 >:Calibration done.\n \nPress ENT.
 :Cancel
 Cancella
@@ -163,8 +161,6 @@ Cambia
 Canale
 :Channel monitor
 Monitor di Canale
-<:Channel output
-<Canale di uscita
 >:Clock
 :Complex
 Complesso
@@ -757,6 +753,7 @@ Virt
 :Volt
 Volt
 >:Welcome
+>:X350
 >:Year
 >:Yes
 :Zero/Max

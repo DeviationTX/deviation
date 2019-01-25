@@ -157,8 +157,6 @@ Koll. mix
 CYC
 :Calibrate
 Kalibrálás
-<:Calibration done.
-<Kalibrálás kész.
 >:Calibration done.\n \nPress ENT.
 :Cancel
 Mégsem
@@ -182,8 +180,6 @@ Váltás
 Csatorna
 :Channel monitor
 Csatornák
-<:Channel output
-<Csatornák
 :Clock
 Óra
 :Complex
@@ -862,6 +858,7 @@ Virt.
 Fesz.
 :Welcome
 Üdvözlet
+>:X350
 :Year
 Év
 :Yes
@@ -896,8 +893,6 @@ max
 min
 :mult
 szoroz
-<:n is %d%%,\nsafe value = %d%%
-< = %d%%,\nbiztonságos = %d%%\n
 :permanent
 Üzemidő
 >:regular

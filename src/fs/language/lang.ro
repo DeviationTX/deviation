@@ -154,8 +154,6 @@ COL Mix
 CYC
 :Calibrate
 Calibrare
-<:Calibration done.
-<Calibrare efectuată.
 >:Calibration done.\n \nPress ENT.
 :Cancel
 Anulează
@@ -177,8 +175,6 @@ Modifică
 Canal
 :Channel monitor
 Monitor canale
-<:Channel output
-<Canale
 :Clock
 Ceas
 :Complex
@@ -833,6 +829,7 @@ Virt.
 Volt
 :Welcome
 Bine ați venit
+>:X350
 :Year
 An
 :Yes

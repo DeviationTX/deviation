@@ -155,8 +155,6 @@ KOL Meng
 CYC
 :Calibrate
 Kalibreer
-<:Calibration done.
-<Kalibrasie Voltooi.
 >:Calibration done.\n \nPress ENT.
 :Cancel
 Kanselleer
@@ -178,8 +176,6 @@ Verander
 Kannaal
 :Channel monitor
 Kanaal Monitor
-<:Channel output
-<Kanaal Uitset
 :Clock
 Horlosie
 :Complex
@@ -843,6 +839,7 @@ Virt
 Volt
 :Welcome
 Welkom
+>:X350
 :Year
 Jaar
 :Yes
