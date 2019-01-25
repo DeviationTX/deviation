@@ -63,7 +63,7 @@ uint32_t USB_SIL_Init(void)
 * Output         : None.
 * Return         : Status.
 *******************************************************************************/
-uint32_t USB_SIL_Write(uint8_t bEpAddr, uint8_t* pBufferPointer, uint32_t wBufferSize)
+uint32_t USB_SIL_Write(uint8_t bEpAddr, const uint8_t* pBufferPointer, uint32_t wBufferSize)
 {
 #ifndef STM32F10X_CL
 

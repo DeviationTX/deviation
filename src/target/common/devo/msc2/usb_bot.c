@@ -305,7 +305,7 @@ void CBW_Decode(void)
 * Output         : None.
 * Return         : None.
 *******************************************************************************/
-void Transfer_Data_Request(uint8_t* Data_Pointer, uint16_t Data_Len)
+void Transfer_Data_Request(const uint8_t* Data_Pointer, uint16_t Data_Len)
 {
   USB_SIL_Write(EP1_IN, Data_Pointer, Data_Len);
 

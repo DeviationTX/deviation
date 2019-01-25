@@ -22,6 +22,8 @@
 #include "memory.h"
 #include "usb_lib.h"
 
+#include <string.h>
+
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
@@ -50,28 +52,24 @@ void SCSI_Inquiry_Cmd(uint8_t lun)
   uint8_t* Inquiry_Data;
   uint16_t Inquiry_Data_Length;
 
+  Inquiry_Data = Bulk_Data_Buff;
   if (CBW.CB[1] & 0x01)/*Evpd is set*/
   {
-    Inquiry_Data = Page00_Inquiry_Data;
     Inquiry_Data_Length = 5;
+    memset(Inquiry_Data, 0, Inquiry_Data_Length);
   }
   else
   {
-
-    if ( lun == 0)
-    {
-      Inquiry_Data = Standard_Inquiry_Data;
-    }
-    else
-    {
-      Inquiry_Data = Standard_Inquiry_Data2;
-    }
-
     if (CBW.CB[4] <= STANDARD_INQUIRY_DATA_LEN)
       Inquiry_Data_Length = CBW.CB[4];
     else
       Inquiry_Data_Length = STANDARD_INQUIRY_DATA_LEN;
 
+    memcpy(Inquiry_Data, Standard_Inquiry_Data, Inquiry_Data_Length);
+    if (lun == 1 && Inquiry_Data_Length > 16)
+    {
+      Inquiry_Data[16] = 'N';
+    }
   }
   Transfer_Data_Request(Inquiry_Data, Inquiry_Data_Length);
 }
@@ -93,15 +91,18 @@ void SCSI_ReadFormatCapacity_Cmd(uint8_t lun)
     Bot_Abort(DIR_IN);
     return;
   }
-  ReadFormatCapacity_Data[4] = (uint8_t)(Mass_Block_Count[lun] >> 24);
-  ReadFormatCapacity_Data[5] = (uint8_t)(Mass_Block_Count[lun] >> 16);
-  ReadFormatCapacity_Data[6] = (uint8_t)(Mass_Block_Count[lun] >>  8);
-  ReadFormatCapacity_Data[7] = (uint8_t)(Mass_Block_Count[lun]);
 
-  ReadFormatCapacity_Data[9] = (uint8_t)(Mass_Block_Size[lun] >>  16);
-  ReadFormatCapacity_Data[10] = (uint8_t)(Mass_Block_Size[lun] >>  8);
-  ReadFormatCapacity_Data[11] = (uint8_t)(Mass_Block_Size[lun]);
-  Transfer_Data_Request(ReadFormatCapacity_Data, READ_FORMAT_CAPACITY_DATA_LEN);
+  Bulk_Data_Buff[0] = Bulk_Data_Buff[1] = Bulk_Data_Buff[2] = 0;
+  Bulk_Data_Buff[3] = 0x08;  // Capacity List Length
+  Bulk_Data_Buff[4] = (uint8_t)(Mass_Block_Count[lun] >> 24);
+  Bulk_Data_Buff[5] = (uint8_t)(Mass_Block_Count[lun] >> 16);
+  Bulk_Data_Buff[6] = (uint8_t)(Mass_Block_Count[lun] >>  8);
+  Bulk_Data_Buff[7] = (uint8_t)(Mass_Block_Count[lun]);
+  Bulk_Data_Buff[8] = 0x02;  // Descriptor Code: Formatted Media
+  Bulk_Data_Buff[9] = (uint8_t)(Mass_Block_Size[lun] >>  16);
+  Bulk_Data_Buff[10] = (uint8_t)(Mass_Block_Size[lun] >>  8);
+  Bulk_Data_Buff[11] = (uint8_t)(Mass_Block_Size[lun]);
+  Transfer_Data_Request(Bulk_Data_Buff, READ_FORMAT_CAPACITY_DATA_LEN);
 }
 
 /*******************************************************************************
@@ -122,16 +123,16 @@ void SCSI_ReadCapacity10_Cmd(uint8_t lun)
     return;
   }
 
-  ReadCapacity10_Data[0] = (uint8_t)((Mass_Block_Count[lun] - 1) >> 24);
-  ReadCapacity10_Data[1] = (uint8_t)((Mass_Block_Count[lun] - 1) >> 16);
-  ReadCapacity10_Data[2] = (uint8_t)((Mass_Block_Count[lun] - 1) >>  8);
-  ReadCapacity10_Data[3] = (uint8_t)(Mass_Block_Count[lun] - 1);
+  Bulk_Data_Buff[0] = (uint8_t)((Mass_Block_Count[lun] - 1) >> 24);
+  Bulk_Data_Buff[1] = (uint8_t)((Mass_Block_Count[lun] - 1) >> 16);
+  Bulk_Data_Buff[2] = (uint8_t)((Mass_Block_Count[lun] - 1) >>  8);
+  Bulk_Data_Buff[3] = (uint8_t)(Mass_Block_Count[lun] - 1);
 
-  ReadCapacity10_Data[4] = (uint8_t)(Mass_Block_Size[lun] >>  24);
-  ReadCapacity10_Data[5] = (uint8_t)(Mass_Block_Size[lun] >>  16);
-  ReadCapacity10_Data[6] = (uint8_t)(Mass_Block_Size[lun] >>  8);
-  ReadCapacity10_Data[7] = (uint8_t)(Mass_Block_Size[lun]);
-  Transfer_Data_Request(ReadCapacity10_Data, READ_CAPACITY10_DATA_LEN);
+  Bulk_Data_Buff[4] = (uint8_t)(Mass_Block_Size[lun] >>  24);
+  Bulk_Data_Buff[5] = (uint8_t)(Mass_Block_Size[lun] >>  16);
+  Bulk_Data_Buff[6] = (uint8_t)(Mass_Block_Size[lun] >>  8);
+  Bulk_Data_Buff[7] = (uint8_t)(Mass_Block_Size[lun]);
+  Transfer_Data_Request(Bulk_Data_Buff, READ_CAPACITY10_DATA_LEN);
 }
 
 /*******************************************************************************
