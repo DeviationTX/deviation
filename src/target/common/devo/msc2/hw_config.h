@@ -16,13 +16,13 @@
 #ifndef __HW_CONFIG_H
 #define __HW_CONFIG_H
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f10x.h"
+#include <stdint.h>
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 /* Flash memory address from where user application will be loaded */
 #define ApplicationAddress 0x08003000
 #define USB_DISCONNECT     GPIOB
-#define USB_DISCONNECT_PIN GPIO_Pin_10
+#define USB_DISCONNECT_PIN GPIO10
 #define BULK_MAX_PACKET_SIZE  0x00000040
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
@@ -30,17 +30,8 @@ void Set_System(void);
 void Set_USBClock(void);
 void Enter_LowPowerMode(void);
 void Leave_LowPowerMode(void);
-void USB_Cable_Config (u8 enable);
-void USB_Interrupts_Config(void);
+void USB_Cable_Config (uint8_t enable);
 
-void DFU_Button_Config(void);
-uint8_t  DFU_Button_Read(void);
-
-void Reset_Device(void);
-void SMI_FLASH_Init(void);
-void SMI_FLASH_SectorErase(uint32_t Address);
-void SMI_FLASH_WordWrite(uint32_t Address, uint32_t Data);
-void SMI_FLASH_PageWrite(uint32_t Address, uint32_t* wBuffer);
 void Get_SerialNum(void);
 
 /* External variables --------------------------------------------------------*/

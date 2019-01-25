@@ -15,7 +15,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 
-#include <stm32f10x.h>
 #include "usb_desc.h"
 
 const uint8_t MASS_DeviceDescriptor[MASS_SIZ_DEVICE_DESC] =

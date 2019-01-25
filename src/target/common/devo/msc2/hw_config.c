@@ -14,10 +14,9 @@
 *******************************************************************************/
 
 /* Includes ------------------------------------------------------------------*/
-#include <stm32f10x.h>
-#include <stm32f10x_rcc.h>
-#include <stm32f10x_gpio.h>
-#include <stm32f10x_misc.h>
+#include <libopencm3/stm32/gpio.h>
+#include <libopencm3/stm32/rcc.h>
+#include <libopencm3/cm3/scb.h>
 
 #include "hw_config.h"
 #include "mass_mal.h"
@@ -90,51 +89,12 @@ void USB_Cable_Config (FunctionalState NewState)
 {
   if (NewState != DISABLE)
   {
-    GPIO_ResetBits(USB_DISCONNECT, USB_DISCONNECT_PIN);
+    gpio_clear(USB_DISCONNECT, USB_DISCONNECT_PIN);
   }
   else
   {
-    GPIO_SetBits(USB_DISCONNECT, USB_DISCONNECT_PIN);
+    gpio_set(USB_DISCONNECT, USB_DISCONNECT_PIN);
   }
-}
-
-/*******************************************************************************
-* Function Name  : USB_Interrupts_Config.
-* Description    : Configures the USB interrupts.
-* Input          : None.
-* Output         : None.
-* Return         : None.
-*******************************************************************************/
-void USB_Interrupts_Config(void)
-{
-  NVIC_InitTypeDef NVIC_InitStructure;
-
-  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
-
-  NVIC_InitStructure.NVIC_IRQChannel = USB_LP_CAN1_RX0_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  NVIC_Init(&NVIC_InitStructure);
-
-  NVIC_InitStructure.NVIC_IRQChannel = USB_HP_CAN1_TX_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  NVIC_Init(&NVIC_InitStructure);
-}
-
-/*******************************************************************************
-* Function Name  : Reset_Device.
-* Description    : Reset the device.
-* Input          : None.
-* Output         : None.
-* Return         : None.
-*******************************************************************************/
-void Reset_Device(void)
-{
-  USB_Cable_Config(DISABLE);
-  NVIC_SystemReset();
 }
 
 /*******************************************************************************

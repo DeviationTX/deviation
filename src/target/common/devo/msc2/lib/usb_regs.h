@@ -17,6 +17,7 @@
 #ifndef __USB_REGS_H
 #define __USB_REGS_H
 
+#include "usb_lib.h"
 #ifndef STM32F10X_CL
 
 /* Includes ------------------------------------------------------------------*/

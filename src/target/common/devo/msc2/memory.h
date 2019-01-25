@@ -18,12 +18,8 @@
 #define __memory_H
 
 /* Includes ------------------------------------------------------------------*/
-#ifdef STM32L1XX_MD
- #include "stm32l1xx.h"
-#else
- #include "stm32f10x.h"
-#endif /* STM32L1XX_MD */
- 
+#include <stdint.h>
+
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 #define TXFR_IDLE     0
