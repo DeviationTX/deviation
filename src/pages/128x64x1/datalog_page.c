@@ -114,7 +114,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         but_press = checkbut_press_cb; but_txt = checkbut_txt_cb;
         but_data = (void *)row;
     }
-    if (lbl_data || lbl_cb) {
+    if (lbl_data || lbl_cb != GUI_Localize) {
         GUI_CreateLabelBox(&gui->label[relrow], LABEL_X, y,
             LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, lbl_cb, NULL, lbl_data);
     }
