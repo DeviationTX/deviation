@@ -1,28 +1,15 @@
 Instructions for building Fonts
 
-Deviation fonts are built from BDF font files.  BDF files are bitmapped fonts that used to be commonly used by X11.  In the past Deviation fonts were built with the 'GLCD Font Creator' from MikroElectonica (for Windows).
+Deviation fonts are built from BDF font files.  BDF files are bitmapped fonts that used to be commonly used by X11.
 
-The BDF files that ship with Deviation are built from TrueType fonts.
-specificlaly the following fonts are used:
-Ubuntu-Condensed
-FireflySung
-WenQuanYiZenHei-Mono
+All data needed to rebuild the BDF files can be found on the 'deviation-fonts' project on github:
+https://github.com/DeviationTX/deviation-fonts
 
-To build a new font:
-1) Get the required inputs.  On linux, the libfreetype2 library is used
-   to convert truetype to BDF.  It also requires Python and the freetype-py library:
-   http://code.google.com/p/freetype-py
-2) Build the BDF file:
-   Here is an example for a 15px font:
-   utils/font/build_bdf.py --size 15 --ascent 12 -b font15.bdf --ttf Ubuntu-C.ttf --ttf FireflySung.ttf --space 4
-   And here is an example for a 12px font:
-   utils/font/build_bdf.py --space 3 -s 12 -a 10 -b font12.bdf -t AR-PL-New-Sung.ttf:11 -t Ubuntu-C.ttf:11 -t fireflysung.ttf:12
-   utils/font/build_bdf.py --space 3 -s 12 -a 10 -b font12.bdf -t Firefly-Latin.ttf:11 -t fireflysung.ttf:12
-   (note that Firefly-Latin.ttf is a subset of firflysung.ttf contating glyphs < 0x4E00.  It has been hand optimized for 11px bitmapped glyphs)
-   Here is an example for the 24bold font:
-   utils/font/build_bdf.py -s 23 -a 23 -b test.bdf -r 32-32,37-37,42-58,60-62,65-90 -d -p 6 -t trebucbd.ttf:31
+For instance (from the deviation-fonts repo):
+./utils/build_bdf.py -cfg config/12normal.json  <-- Build default font for 128x64 displays (devo10, 7e, etc)
+./utils/build_bdf.py -cfg config/15normal.json  <-- Build default font for 320x240 or larger screen (devo8, 12, etc)
 
-3) Convert the BDF file to a Deviuation FON file:
-   utils/font/bdf_to_font.pl -maxsize 15 -mode bin font15.bdf -out font15 -minspace 8
-   utils/font/bdf_to_font.pl -maxsize 12 -mode bin font12.bdf -out font12 -minspace 8
+The BDF files are converted to the internal FON files via the 'make' process, however, the parameters for each font need to be tuned:
+   utils/font/bdf_to_font.pl -maxsize 15 -mode bin 15normal.bdf -out 15normal -minspace 8
+   utils/font/bdf_to_font.pl -maxsize 12 -mode bin 12normal.bdf -out 12normal -minspace 8
    Note that 'minspace' should be tuned so that the reported # of ranges < 20
