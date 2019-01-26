@@ -1022,7 +1022,7 @@ msgid ""
 " permanent timer %d?"
 msgstr ""
 "本当にタイマーを\n"
-"リセットしますか？\n"
+"リセットしますか?\n"
 " Permanentタイマー %d"
 
 #: pages/common/standard/_gyrosense_page.c:27
@@ -1280,8 +1280,8 @@ msgid ""
 "then press ENT"
 msgstr ""
 "スティックとノブを\n"
-"最大 / 最小位置に動かし、\n"
-"ENTを押して下さい。"
+"最大 / 最小位置に動かし,\n"
+"ENTを押して下さい"
 
 #: pages/common/_tx_configure.c:101
 msgid ""
@@ -1289,9 +1289,9 @@ msgid ""
 " \n"
 "Press ENT."
 msgstr ""
-"キャリブレーション完了。\n"
+"キャリブレーション完了\n"
 "\n"
-"ENTを押して下さい。"
+"ENTを押して下さい"
 
 #: pages/common/_tx_configure.c:123
 msgid ""
@@ -1300,8 +1300,8 @@ msgid ""
 "then press ENT"
 msgstr ""
 "2本のスティックと\n"
-"ノブを中央に合わせ、\n"
-"ENTを押して下さい。"
+"ノブを中央に合わせ,\n"
+"ENTを押して下さい"
 
 #: pages/common/_tx_configure.c:166
 msgid "Calibrate"
@@ -1663,9 +1663,9 @@ msgid ""
 "but will allow full control of Tx."
 msgstr ""
 "バインド中です...\n"
-"機体が電源ONかどうか確認ください。\n"
-"OKを押してもキャンセルはされません。\n"
-"ですがTXフルコントロールとなります。"
+"機体が電源ONかどうか確認ください\n"
+"OKを押してもキャンセルはされません\n"
+"ですがTXフルコントロールとなります"
 
 #: pages/320x240x16/dialogs.c:66
 #, c-format
@@ -1695,11 +1695,11 @@ msgid ""
 "\n"
 "Change batteries now!"
 msgstr ""
-"バッテリー切れを検出しました。\n"
-"現在の設定が保存されました。\n"
-"今後の設定は保存されません。\n"
+"バッテリー切れを検出しました\n"
+"現在の設定が保存されました\n"
+"今後の設定は保存されません\n"
 "\n"
-"今すぐバッテリーを交換してください！"
+"今すぐバッテリーを交換してください!"
 
 #: pages/320x240x16/dialogs.c:122
 msgid ""
@@ -1715,7 +1715,7 @@ msgstr "標準ミキサー"
 
 #: pages/320x240x16/dialogs.c:143
 msgid "Reset Permanent Timer?"
-msgstr "Permanentタイマーをリセットしますか？"
+msgstr "Permanentタイマーをリセットしますか?"
 
 #: pages/320x240x16/dialogs.c:151 pages/128x64x1/dialogs.c:178
 msgid "Missing Modules:\n"
@@ -2172,7 +2172,7 @@ msgstr "テスト開始"
 
 #: pages/320x240x16/range_page.c:40 pages/128x64x1/range_page.c:46
 msgid "No range test possible."
-msgstr "レンジテストはできません。"
+msgstr "レンジテストはできません"
 
 #: pages/320x240x16/range_page.c:49 pages/128x64x1/range_page.c:51
 msgid "Power reduced to"
@@ -2325,8 +2325,8 @@ msgid ""
 "Battery too low,\n"
 "can't save!"
 msgstr ""
-"バッテリーが低すぎます。\n"
-"保存できません。"
+"バッテリーが低すぎます\n"
+"保存できません"
 
 #: pages/128x64x1/dialogs.c:139
 msgid ""
@@ -2342,7 +2342,7 @@ msgid ""
 "protocol modules!"
 msgstr ""
 "プロトコルモジュールの\n"
-"不良 / 不具合です！"
+"不良 / 不具合です!"
 
 #: pages/128x64x1/reorder_list.c:39
 msgid "Dn"

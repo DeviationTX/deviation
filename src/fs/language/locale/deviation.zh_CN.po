@@ -1,6 +1,6 @@
 # Translators:
-# PhracturedBlue <rc2012@pblue.org>, 2019
 # Howard Su <howard0su@gmail.com>, 2019
+# PhracturedBlue <rc2012@pblue.org>, 2019
 # 螺丝刀 <996371375@qq.com>, 2019
 # 
 msgid ""
@@ -1287,9 +1287,9 @@ msgid ""
 " \n"
 "Press ENT."
 msgstr ""
-"校准结束。\n"
+"校准结束\n"
 "\n"
-"按ENT键。"
+"按ENT键"
 
 #: pages/common/_tx_configure.c:123
 msgid ""
@@ -1629,15 +1629,15 @@ msgstr "螺距"
 
 #: pages/320x240x16/model_config.c:90 pages/128x64x1/model_config.c:240
 msgid "Trainer Cfg (Channel)"
-msgstr "教练设置（通道）"
+msgstr "教练设置(通道)"
 
 #: pages/320x240x16/model_config.c:92 pages/128x64x1/model_config.c:242
 msgid "Trainer Cfg (Stick)"
-msgstr "教练设置（摇杆）"
+msgstr "教练设置(摇杆)"
 
 #: pages/320x240x16/model_config.c:93 pages/128x64x1/model_config.c:243
 msgid "PPMIn Cfg (Extend)"
-msgstr "PPM输入设置（扩展）"
+msgstr "PPM输入设置(扩展)"
 
 #: pages/320x240x16/model_config.c:96 pages/128x64x1/model_config.c:148
 msgid "Trainer Sw"
@@ -1698,7 +1698,7 @@ msgstr ""
 "当前设置已经存盘.\n"
 "以后的设置将无法存盘.\n"
 "\n"
-"请立即更换电池！"
+"请立即更换电池!"
 
 #: pages/320x240x16/dialogs.c:122
 msgid ""
@@ -1724,7 +1724,7 @@ msgstr "缺失模块:\n"
 
 #: pages/320x240x16/dialogs.c:157
 msgid "Module Error"
-msgstr "模块错误："
+msgstr "模块错误:"
 
 #: pages/320x240x16/rtc_config.c:137
 msgid "Day"
@@ -2376,7 +2376,7 @@ msgstr ""
 
 #: pages/128x64x1/advanced/mixer_page.c:44
 msgid "Mixer    Reorder:Hold R+"
-msgstr "混控排序：长按R+"
+msgstr "混控排序:长按R+"
 
 #: pages/128x64x1/advanced/mixer_setup.c:86
 #: pages/128x64x1/advanced/mixer_setup.c:165

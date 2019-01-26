@@ -1687,12 +1687,12 @@ msgid ""
 "\n"
 "Change batteries now!"
 msgstr ""
-"電池電壓不足！\n"
+"電池電壓不足!\n"
 "\n"
 "使用中的設定已儲存.\n"
 "未來更動將不再儲存.\n"
 "\n"
-"請即更換電池！"
+"請即更換電池!"
 
 #: pages/320x240x16/dialogs.c:122
 msgid ""
@@ -2015,7 +2015,7 @@ msgstr "段數"
 #: pages/320x240x16/advanced/mixer_setup.c:137
 #: pages/128x64x1/advanced/mixer_setup.c:145
 msgid "Page"
-msgstr "頁碼："
+msgstr "頁碼:"
 
 #: pages/320x240x16/advanced/mixer_setup.c:148
 #: pages/128x64x1/advanced/mixer_setup.c:153
@@ -2185,7 +2185,7 @@ msgstr ""
 
 #: pages/320x240x16/usb_page.c:40
 msgid "Press 'Ent' to turn USB Filesystem"
-msgstr "按 ENT 讓 USB 傳輸："
+msgstr "按 ENT 讓 USB 傳輸:"
 
 #: pages/128x64x1/scanner_page.c:43
 msgid "-20dB"
@@ -2346,7 +2346,7 @@ msgstr "按 ENT 變更"
 
 #: pages/128x64x1/model_loadsave.c:69
 msgid "Press ENT to copy to"
-msgstr "按 ENT 複製到："
+msgstr "按 ENT 複製到:"
 
 #: pages/128x64x1/model_loadsave.c:71
 msgid "Press ENT to load"
@@ -2401,7 +2401,7 @@ msgstr ""
 msgid ""
 "Press ENT to turn \n"
 "USB drive"
-msgstr "按 ENT 讓 USB："
+msgstr "按 ENT 讓 USB:"
 
 #: pages/text/splash_page.c:37
 msgid "Deviation"
