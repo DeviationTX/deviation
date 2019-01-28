@@ -1,7 +1,8 @@
 FILESYSTEMS := common text text_gfx
 SCREENSIZE  := text
 DFU_ARGS    := -c 12 -b 0x08004000
-LANGUAGE   := devo10
+LANGUAGE    := devo10
+FONTS        = filesystem/$(FILESYSTEM)/media/12normal.fon
 
 OPTIMIZE_DFU := 1
 
@@ -17,12 +18,4 @@ SRC_C   += $(SDIR)/target/devof12e/backlight.c \
            $(SDIR)/target/devof12e/tw8816.c \
            $(SDIR)/target/devof12e/tw8816_map.c \
            $(SDIR)/target/devof12e/tx_buttons.c
-
-else
-
-$(TARGET).fs_wrapper: $(LAST_MODEL)
-	rm -f filesystem/$(FILESYSTEM)/language/lang.cn
-	rm -f filesystem/$(FILESYSTEM)/language/lang.ru
-	rm -f filesystem/$(FILESYSTEM)/language/lang.tw
-
 endif
