@@ -68,7 +68,7 @@ msgstr "ELE DR"
 
 #: inputs.c:53 inputs.c:54 inputs.c:55
 msgid "AIL DR"
-msgstr "ALAB DR"
+msgstr "AIL DR"
 
 #: inputs.c:56 inputs.c:57 inputs.c:91 inputs.c:92 inputs.c:93
 #: pages/common/standard/_gyrosense_page.c:59
@@ -86,7 +86,7 @@ msgstr "MODOF"
 
 #: inputs.c:64 inputs.c:65
 msgid "HOLD"
-msgstr "HOILD"
+msgstr "HOLD"
 
 #: inputs.c:66 inputs.c:67
 msgid "TRN"
@@ -126,43 +126,43 @@ msgstr "CH H"
 
 #: inputs.c:95
 msgid "TRIMLV-"
-msgstr "TRIMSV-"
+msgstr "TRIMLV-"
 
 #: inputs.c:96
 msgid "TRIMLV+"
-msgstr "TRIMSV+"
+msgstr "TRIMLV+"
 
 #: inputs.c:97
 msgid "TRIMRV-"
-msgstr "TRIMDV-"
+msgstr "TRIMRV-"
 
 #: inputs.c:98
 msgid "TRIMRV+"
-msgstr "TRIMDV+"
+msgstr "TRIMRV+"
 
 #: inputs.c:99
 msgid "TRIMLH-"
-msgstr "TRIMSO-"
+msgstr "TRIMLH-"
 
 #: inputs.c:100
 msgid "TRIMLH+"
-msgstr "TRIMSO+"
+msgstr "TRIMLH+"
 
 #: inputs.c:101
 msgid "TRIMRH-"
-msgstr "TRIMDO-"
+msgstr "TRIMRH-"
 
 #: inputs.c:102
 msgid "TRIMRH+"
-msgstr "TRIMDO+"
+msgstr "TRIMRH+"
 
 #: inputs.c:103
 msgid "TRIM_L-"
-msgstr "TRIM_S-"
+msgstr "TRIM_L-"
 
 #: inputs.c:104
 msgid "TRIM_L+"
-msgstr "TRIM_S+"
+msgstr "TRIM_L+"
 
 #: inputs.c:105
 msgid "TRIM_R-"
@@ -189,11 +189,11 @@ msgstr "Desce"
 #: pages/128x64x1/reorder_list.c:38
 #: pages/128x64x1/standard/traveladj_page.c:62
 msgid "Up"
-msgstr "Para Cima"
+msgstr "Sobe"
 
 #: inputs.c:111
 msgid "Enter"
-msgstr "Entrar"
+msgstr "Enter"
 
 #: inputs.c:112
 msgid "Exit"
@@ -288,7 +288,7 @@ msgstr "Volt"
 
 #: telemetry/telem_crsf.c:93
 msgid "Curr"
-msgstr "Curr"
+msgstr "Corr"
 
 #: telemetry/telem_crsf.c:94
 msgid "Cap"
@@ -428,7 +428,7 @@ msgstr "Loss"
 
 #: telemetry/telem_dsm.c:200
 msgid "Holds"
-msgstr "olds"
+msgstr "Holds"
 
 #: telemetry/telem_dsm.c:202
 msgid "AirSpd"
@@ -436,7 +436,7 @@ msgstr "VelAr"
 
 #: telemetry/telem_dsm.c:203
 msgid "Alt."
-msgstr "t"
+msgstr "Alt."
 
 #: telemetry/telem_dsm.c:204
 msgid "Alt.max"
@@ -444,7 +444,7 @@ msgstr "Alt.max"
 
 #: telemetry/telem_dsm.c:262
 msgid "RxV"
-msgstr "xV"
+msgstr "RxV"
 
 #: telemetry/telem_dsm.c:263
 msgid "Bat"
@@ -500,7 +500,7 @@ msgstr "Vel GPS"
 #: protocol/kn_nrf24l01.c:171 protocol/corona_cc2500.c:41
 #: protocol/mjxq_nrf24l01.c:60 protocol/yd717_nrf24l01.c:108
 msgid "Format"
-msgstr "rmato"
+msgstr "Formato"
 
 #: protocol/devo_cyrf6936.c:54 protocol/bayang_nrf24l01.c:100
 #: protocol/inav_nrf24l01.c:182 protocol/cflie_nrf24l01.c:200
@@ -584,7 +584,7 @@ msgstr "250kbps"
 
 #: protocol/v202_nrf24l01.c:131
 msgid "Blink"
-msgstr "Piscar"
+msgstr "Blink"
 
 #: protocol/fy326_nrf24l01.c:59
 msgid "Expert"
@@ -617,11 +617,11 @@ msgstr "Default"
 
 #: protocol/sbus_uart.c:36
 msgid "Period (ms)"
-msgstr "Pedioso (ms)"
+msgstr "Período (ms)"
 
 #: protocol/cx10_nrf24l01.c:69
 msgid "Green"
-msgstr "Ferde"
+msgstr " Verde"
 
 #: protocol/cx10_nrf24l01.c:69
 msgid "Blue-A"
@@ -646,7 +646,7 @@ msgstr "6+1"
 #: protocol/wk2x01.c:80 pages/320x240x16/model_config.c:50
 #: pages/128x64x1/model_config.c:69
 msgid "COL Inv"
-msgstr "PASSO Inv"
+msgstr "COL Inv"
 
 #: protocol/wk2x01.c:80 pages/common/standard/_common_standard.c:67
 #: pages/common/standard/_reverse_page.c:28
@@ -660,7 +660,7 @@ msgstr "Invertido"
 
 #: protocol/wk2x01.c:81
 msgid "COL Limit"
-msgstr "PASSO limite\t"
+msgstr "COL limite\t"
 
 #: protocol/hubsan_a7105.c:125
 msgid "vTX MHz"
@@ -722,7 +722,7 @@ msgstr "Taman. frame"
 
 #: protocol/kn_nrf24l01.c:170
 msgid "1Mbps"
-msgstr "Mbps"
+msgstr "1Mbps"
 
 #: protocol/kn_nrf24l01.c:172
 msgid "DynTrim"
@@ -770,7 +770,7 @@ msgstr "ok"
 
 #: curves.c:221
 msgid "1-to-1"
-msgstr "1 a 1"
+msgstr "1 -to-1"
 
 #: curves.c:222
 msgid "Fixed"
@@ -950,7 +950,7 @@ msgstr "desce"
 #: pages/common/_voiceconfig_page.c:74
 #, c-format
 msgid "Timer %d"
-msgstr ""
+msgstr "Timer 1%d"
 
 #: pages/common/_voiceconfig_page.c:78
 #, c-format
@@ -985,7 +985,7 @@ msgstr "Ler..."
 
 #: pages/common/_model_page.c:296
 msgid "Copy To..."
-msgstr "Copiar..."
+msgstr "Copiar para..."
 
 #: pages/common/_model_page.c:298
 msgid "Template.."
@@ -993,11 +993,11 @@ msgstr "Template.."
 
 #: pages/common/_chantest_page.c:36
 msgid "Touch to Unlock"
-msgstr "Tocar para desbloquear"
+msgstr "Toque para desbloquear"
 
 #: pages/common/_chantest_page.c:38
 msgid "Touch to Lock"
-msgstr "Tocar para bloquear"
+msgstr "Toque para bloquear"
 
 #: pages/common/_dialogs.c:78
 #, c-format
@@ -1045,11 +1045,11 @@ msgstr "PIT"
 
 #: pages/common/standard/_common_standard.c:69
 msgid "Idle Up 1"
-msgstr "Vazio sobe 1"
+msgstr "Idle Up 1"
 
 #: pages/common/standard/_common_standard.c:72
 msgid "Idle Up 2"
-msgstr "zio sobe 2"
+msgstr "Idle Up 2"
 
 #: pages/common/standard/_common_standard.c:74
 #: pages/320x240x16/standard/throhold_page.c:49
@@ -1057,12 +1057,12 @@ msgstr "zio sobe 2"
 #: pages/128x64x1/standard/throhold_page.c:41
 #: pages/128x64x1/standard/switchassign_page.c:45
 msgid "Thr hold"
-msgstr "Trava Thr"
+msgstr "Travar Thr"
 
 #: pages/common/standard/_reverse_page.c:28
 #: pages/common/advanced/_mixer_limits.c:208
 msgid "Reversed"
-msgstr "Invertido"
+msgstr "Reverso"
 
 #: pages/common/standard/_swash_page.c:41
 #: pages/common/standard/_swash_page.c:44
@@ -1070,7 +1070,7 @@ msgstr "Invertido"
 #: pages/common/standard/_swash_page.c:50
 #: pages/common/standard/_swash_page.c:53
 msgid "Servo"
-msgstr "ervo"
+msgstr "Servo"
 
 #: pages/common/_timer_page.c:54
 msgid "Control"
@@ -1089,7 +1089,7 @@ msgstr "cronometro"
 
 #: pages/common/_timer_page.c:75
 msgid "stop-prop"
-msgstr "para-helices"
+msgstr "parar-helices"
 
 #: pages/common/_timer_page.c:76
 msgid "countdown"
@@ -1114,12 +1114,12 @@ msgstr "Setar"
 
 #: pages/common/_trim_page.c:102
 msgid "Momentary"
-msgstr "Momeneo"
+msgstr "Momentaneo"
 
 #: pages/common/_trim_page.c:105 pages/common/_main_config.c:87
 #: pages/128x64x1/main_config.c:96
 msgid "Toggle"
-msgstr "alterna"
+msgstr "Alterna"
 
 #: pages/common/_trim_page.c:108
 msgid "On/Off"
@@ -1127,7 +1127,7 @@ msgstr "Liga/Desliga"
 
 #: pages/common/_trim_page.c:111
 msgid "3 Pos"
-msgstr "3 pos"
+msgstr "3 Pos"
 
 #: pages/common/advanced/_mixer_limits.c:133
 #: pages/common/advanced/_mixer_setup.c:596
@@ -1215,7 +1215,7 @@ msgstr "Mixer"
 #: pages/common/advanced/_mixer_page.c:64
 #: pages/common/advanced/_mixer_page.c:65
 msgid "CYC"
-msgstr "Cíclico"
+msgstr "Cíclo"
 
 #: pages/common/advanced/_mixer_page.c:65
 msgid "COL"
@@ -1253,7 +1253,7 @@ msgstr "H-trim"
 
 #: pages/common/_main_config.c:92
 msgid "Battery"
-msgstr "ateria"
+msgstr "Bateria"
 
 #: pages/common/_main_config.c:93
 msgid "TxPower"
@@ -1266,7 +1266,7 @@ msgstr "Adiciona"
 
 #: pages/common/_main_config.c:130
 msgid "Load"
-msgstr "Ler..."
+msgstr "Ler"
 
 #: pages/common/_main_config.c:234
 msgid "Menu"
@@ -1280,7 +1280,7 @@ msgid ""
 msgstr ""
 "Mova sticks e knobs\n"
 "para as posições max e min\n"
-"e tecle ENT"
+"e pressione ENT"
 
 #: pages/common/_tx_configure.c:101
 msgid ""
@@ -1299,7 +1299,7 @@ msgid ""
 msgstr ""
 "Centralizar todos\n"
 "sticks e knobs\n"
-"só então teclar ENT"
+"só então pressione ENT"
 
 #: pages/common/_tx_configure.c:166
 msgid "Calibrate"
@@ -1483,7 +1483,7 @@ msgstr "Intervalo alerta"
 
 #: pages/320x240x16/tx_configure.c:227
 msgid "Vibration settings"
-msgstr "Definição vidrador"
+msgstr "Definir vibração"
 
 #: pages/320x240x16/tx_configure.c:229
 msgid "Vibration:"
@@ -1492,7 +1492,7 @@ msgstr "Vibração:"
 #: pages/320x240x16/tx_configure.c:262
 #, c-format
 msgid "Touch target %d"
-msgstr "Tocar %d"
+msgstr "Toque em %d"
 
 #: pages/320x240x16/tx_configure.c:285
 msgid "Touch Calibrate"
@@ -1645,7 +1645,7 @@ msgstr "Ch Treino"
 
 #: pages/320x240x16/model_config.c:99 pages/128x64x1/model_config.c:151
 msgid "Num Channels"
-msgstr "Numero Canais"
+msgstr "Numero de Canais"
 
 #: pages/320x240x16/dialogs.c:49 pages/320x240x16/advanced/mixer_limits.c:41
 #: pages/128x64x1/advanced/mixer_limits.c:71
@@ -1715,7 +1715,7 @@ msgstr "Mixer Padrão"
 
 #: pages/320x240x16/dialogs.c:143
 msgid "Reset Permanent Timer?"
-msgstr "Reseta tempo de forma permanente?"
+msgstr "Reset tempo de forma permanente?"
 
 #: pages/320x240x16/dialogs.c:151 pages/128x64x1/dialogs.c:178
 msgid "Missing Modules:\n"
@@ -1759,29 +1759,29 @@ msgstr "Valor para setar"
 
 #: pages/320x240x16/reorder_list.c:28
 msgid "Move Up"
-msgstr "Subir"
+msgstr "Sube"
 
 #: pages/320x240x16/reorder_list.c:29
 msgid "Move Down"
-msgstr "Descer"
+msgstr "Desce"
 
 #: pages/320x240x16/reorder_list.c:30 pages/128x64x1/reorder_list.c:40
 msgid "Copy To"
-msgstr "Copiar para"
+msgstr "Copia para"
 
 #: pages/320x240x16/reorder_list.c:31
 msgid "Insert"
-msgstr "Inserir"
+msgstr "Insere"
 
 #: pages/320x240x16/reorder_list.c:32
 msgid "Remove"
-msgstr "Remover"
+msgstr "Remove"
 
 #: pages/320x240x16/reorder_list.c:33 pages/128x64x1/trim_page.c:137
 #: pages/128x64x1/reorder_list.c:94 pages/128x64x1/advanced/mixer_curves.c:62
 #: pages/128x64x1/advanced/mixer_setup.c:54
 msgid "Save"
-msgstr "Save"
+msgstr "Salva"
 
 #: pages/320x240x16/timer_page.c:64 pages/128x64x1/timer_page.c:68
 msgid "Reset sw"
@@ -1797,15 +1797,15 @@ msgstr "Data / Hora"
 
 #: pages/320x240x16/model_loadsave.c:92
 msgid "Load Model"
-msgstr "Ler Modelo"
+msgstr "Le Modelo"
 
 #: pages/320x240x16/model_loadsave.c:93
 msgid "Save Model as..."
-msgstr "Salvar Modelo como..."
+msgstr "Salva Modelo como..."
 
 #: pages/320x240x16/model_loadsave.c:94
 msgid "Load Model Template"
-msgstr "Ler template do Modelo"
+msgstr "Le template do Modelo"
 
 #: pages/320x240x16/model_loadsave.c:95
 msgid "Select Icon"
@@ -1813,7 +1813,7 @@ msgstr "Seleciona Ícone"
 
 #: pages/320x240x16/model_loadsave.c:96
 msgid "Load Layout"
-msgstr "Ler Layout"
+msgstr "Le Layout"
 
 #: pages/320x240x16/standard/drexp_page.c:59
 #: pages/320x240x16/advanced/mixer_setup.c:59
@@ -1828,64 +1828,64 @@ msgstr "Origem"
 #: pages/320x240x16/standard/throhold_page.c:52
 #: pages/128x64x1/standard/throhold_page.c:45
 msgid "Hold position"
-msgstr ""
+msgstr "Posição fixa"
 
 #: pages/320x240x16/standard/switchassign_page.c:46
 #: pages/128x64x1/standard/switchassign_page.c:42
 msgid "Fly mode"
-msgstr ""
+msgstr "Modo de voo"
 
 #: pages/320x240x16/standard/switchassign_page.c:56
 #: pages/320x240x16/pagelist.h:50
 #: pages/128x64x1/standard/switchassign_page.c:48
 #: pages/128x64x1/standard/gyrosense_page.c:54 pages/128x64x1/pagelist.h:52
 msgid "Gyro sense"
-msgstr ""
+msgstr "Sensor giroscopio"
 
 #: pages/320x240x16/standard/switchassign_page.c:59
 #: pages/128x64x1/standard/switchassign_page.c:51
 msgid "D/R&Exp -AIL"
-msgstr ""
+msgstr "D/R&Exp -AIL"
 
 #: pages/320x240x16/standard/switchassign_page.c:63
 #: pages/128x64x1/standard/switchassign_page.c:54
 msgid "D/R&Exp -ELE"
-msgstr ""
+msgstr "D/R&Exp -ELE"
 
 #: pages/320x240x16/standard/switchassign_page.c:67
 #: pages/128x64x1/standard/switchassign_page.c:58
 msgid "D/R&Exp -RUD"
-msgstr ""
+msgstr "D/R&Exp -RUD"
 
 #: pages/320x240x16/standard/curves_page.c:28
 msgid "L"
-msgstr ""
+msgstr "L"
 
 #: pages/320x240x16/standard/curves_page.c:28
 msgid "M"
-msgstr ""
+msgstr "M"
 
 #: pages/320x240x16/standard/curves_page.c:28
 msgid "H"
-msgstr ""
+msgstr "H"
 
 #: pages/320x240x16/standard/curves_page.c:35
 msgid "Manual"
-msgstr ""
+msgstr "Manual"
 
 #: pages/320x240x16/standard/curves_page.c:35
 msgid "Auto"
-msgstr ""
+msgstr "Auto"
 
 #: pages/320x240x16/standard/curves_page.c:125
 #: pages/128x64x1/standard/curves_page.c:110
 msgid "Mode"
-msgstr ""
+msgstr "Modo"
 
 #: pages/320x240x16/standard/swash_page.c:55
 #: pages/128x64x1/standard/swash_page.c:53
 msgid "PIT Mix"
-msgstr ""
+msgstr "PIT Mix"
 
 #: pages/320x240x16/voiceconfig_page.c:52 pages/128x64x1/voiceconfig_page.c:60
 msgid ""
@@ -1893,47 +1893,50 @@ msgid ""
 "currently not\n"
 "available"
 msgstr ""
+"Voz externa \n"
+"não está \n"
+"disponível"
 
 #: pages/320x240x16/datalog_page.c:61 pages/128x64x1/datalog_page.c:135
 #, c-format
 msgid "%d bytes left"
-msgstr ""
+msgstr "%d bytes restantes"
 
 #: pages/320x240x16/datalog_page.c:92 pages/128x64x1/datalog_page.c:79
 msgid "All"
-msgstr ""
+msgstr "Todos"
 
 #: pages/320x240x16/datalog_page.c:139 pages/128x64x1/datalog_page.c:96
 msgid "Enable"
-msgstr ""
+msgstr "Habilitado"
 
 #: pages/320x240x16/datalog_page.c:146
 msgid "Sample Rate"
-msgstr ""
+msgstr "Taxa de amostragem"
 
 #: pages/320x240x16/datalog_page.c:152 pages/128x64x1/datalog_page.c:105
 msgid "Select"
-msgstr ""
+msgstr "Selecione"
 
 #: pages/320x240x16/main_layout.c:235 pages/320x240x16/main_layout.c:335
 msgid "Page Config"
-msgstr ""
+msgstr "Config de página"
 
 #: pages/320x240x16/main_layout.c:240
 msgid "Type"
-msgstr ""
+msgstr "ipo"
 
 #: pages/320x240x16/main_layout.c:254
 msgid "Template"
-msgstr ""
+msgstr "Template"
 
 #: pages/320x240x16/main_layout.c:271 pages/128x64x1/trim_page.c:135
 msgid "Edit"
-msgstr ""
+msgstr "Edita"
 
 #: pages/320x240x16/main_layout.c:271 pages/128x64x1/main_config.c:134
 msgid "Delete"
-msgstr ""
+msgstr "Deleta"
 
 #: pages/320x240x16/advanced/mixer_limits.c:33 pages/320x240x16/pagelist.h:43
 #: pages/128x64x1/standard/reverse_page.c:26
@@ -1971,7 +1974,7 @@ msgstr "Subtrim"
 #: pages/320x240x16/advanced/mixer_curves.c:41
 #: pages/128x64x1/advanced/mixer_curves.c:71
 msgid "Smooth"
-msgstr ""
+msgstr "Suaviza"
 
 #: pages/320x240x16/advanced/mixer_curves.c:44
 #: pages/128x64x1/advanced/mixer_curves.c:74
@@ -2037,11 +2040,11 @@ msgstr "Menu principal"
 
 #: pages/320x240x16/pagelist.h:21 pages/128x64x1/pagelist.h:24
 msgid "Set permanent timer"
-msgstr ""
+msgstr "Seta tempo permanente"
 
 #: pages/320x240x16/pagelist.h:24
 msgid "Real Time Clock"
-msgstr ""
+msgstr "Relógio tempo real"
 
 #: pages/320x240x16/pagelist.h:27
 msgid "Touch Test"
@@ -2062,7 +2065,7 @@ msgstr "USB"
 
 #: pages/320x240x16/pagelist.h:35 pages/128x64x1/pagelist.h:36
 msgid "Debuglog"
-msgstr ""
+msgstr "Log para debug"
 
 #: pages/320x240x16/pagelist.h:40 pages/128x64x1/model_page.c:155
 #: pages/128x64x1/pagelist.h:42
@@ -2071,32 +2074,32 @@ msgstr "Configura modelo"
 
 #: pages/320x240x16/pagelist.h:44 pages/128x64x1/pagelist.h:46
 msgid "D/R & Exp"
-msgstr ""
+msgstr "D/R & Exp"
 
 #: pages/320x240x16/pagelist.h:46 pages/128x64x1/pagelist.h:48
 msgid "Travel adjust"
-msgstr ""
+msgstr "Ajuste de percurso"
 
 #: pages/320x240x16/pagelist.h:47 pages/128x64x1/pagelist.h:49
 msgid "Throttle curves"
-msgstr ""
+msgstr "Curvas do Throttle"
 
 #: pages/320x240x16/pagelist.h:48 pages/128x64x1/pagelist.h:50
 msgid "Pitch curves"
-msgstr ""
+msgstr "Curvas do Pitch"
 
 #: pages/320x240x16/pagelist.h:49 pages/128x64x1/standard/throhold_page.c:38
 #: pages/128x64x1/pagelist.h:51
 msgid "Throttle hold"
-msgstr ""
+msgstr "Trava throttle"
 
 #: pages/320x240x16/pagelist.h:51 pages/128x64x1/pagelist.h:53
 msgid "Swash"
-msgstr ""
+msgstr "Swash"
 
 #: pages/320x240x16/pagelist.h:53 pages/128x64x1/pagelist.h:55
 msgid "Switch assignment"
-msgstr ""
+msgstr "Atribuição de switch"
 
 #: pages/320x240x16/pagelist.h:55 pages/128x64x1/pagelist.h:57
 msgid "Timers"
@@ -2113,7 +2116,7 @@ msgstr "Trims"
 
 #: pages/320x240x16/pagelist.h:59 pages/128x64x1/pagelist.h:63
 msgid "Datalog"
-msgstr ""
+msgstr "Datalog"
 
 #: pages/320x240x16/pagelist.h:61 pages/128x64x1/pagelist.h:65
 msgid "Main page config"
@@ -2121,7 +2124,7 @@ msgstr "Personaliza menu"
 
 #: pages/320x240x16/pagelist.h:63 pages/128x64x1/pagelist.h:67
 msgid "Voice config"
-msgstr ""
+msgstr "Config de voz"
 
 #: pages/320x240x16/pagelist.h:67 pages/128x64x1/pagelist.h:72
 msgid "Transmitter config"
@@ -2138,7 +2141,7 @@ msgstr "Monitor telemetria"
 
 #: pages/320x240x16/pagelist.h:70 pages/128x64x1/pagelist.h:77
 msgid "Range Test"
-msgstr ""
+msgstr "Teste de Alcance"
 
 #: pages/320x240x16/pagelist.h:71
 msgid "Input monitor"
@@ -2154,31 +2157,31 @@ msgstr "Scanner"
 
 #: pages/320x240x16/pagelist.h:78 pages/128x64x1/pagelist.h:91
 msgid "Welcome"
-msgstr ""
+msgstr "Bem Vindo"
 
 #: pages/320x240x16/pagelist.h:84
 msgid "Select Language"
-msgstr ""
+msgstr "Selecione a Língua"
 
 #: pages/320x240x16/range_page.c:31
 msgid "Stop test"
-msgstr ""
+msgstr "Para o Teste"
 
 #: pages/320x240x16/range_page.c:31
 msgid "Start test"
-msgstr ""
+msgstr "Inicia o Teste"
 
 #: pages/320x240x16/range_page.c:40 pages/128x64x1/range_page.c:46
 msgid "No range test possible."
-msgstr ""
+msgstr "Não é possível realizar o teste de alcance"
 
 #: pages/320x240x16/range_page.c:49 pages/128x64x1/range_page.c:51
 msgid "Power reduced to"
-msgstr ""
+msgstr "Potencia reduzida para "
 
 #: pages/320x240x16/range_page.c:50 pages/128x64x1/range_page.c:52
 msgid "from"
-msgstr ""
+msgstr "de"
 
 #: pages/320x240x16/usb_page.c:38 pages/128x64x1/about_page.c:38
 msgid "Deviation FW version:"
@@ -2186,7 +2189,7 @@ msgstr "Versão FW Deviation:"
 
 #: pages/320x240x16/usb_page.c:39
 msgid "USB Filesystem is currently "
-msgstr ""
+msgstr "O sistema de arquivos USB está atualmente"
 
 #: pages/320x240x16/usb_page.c:40
 msgid "Press 'Ent' to turn USB Filesystem"
@@ -2194,11 +2197,11 @@ msgstr "Tecle 'Ent' p/arquivos via USB"
 
 #: pages/128x64x1/scanner_page.c:43
 msgid "-20dB"
-msgstr ""
+msgstr "-20dB"
 
 #: pages/128x64x1/scanner_page.c:43
 msgid "0dB"
-msgstr ""
+msgstr "0dB"
 
 #: pages/128x64x1/chantest_page.c:111
 msgid "Stick input"
@@ -2206,7 +2209,7 @@ msgstr "Posição dos sticks"
 
 #: pages/128x64x1/chantest_page.c:111
 msgid "Mixer output"
-msgstr ""
+msgstr "Saída do mixer"
 
 #: pages/128x64x1/trim_page.c:71
 msgid "Step"
@@ -2214,23 +2217,23 @@ msgstr "Passo"
 
 #: pages/128x64x1/main_config.c:60
 msgid "Layout: Long-Press ENT"
-msgstr ""
+msgstr "Layout: Long-Press ENT"
 
 #: pages/128x64x1/main_config.c:86
 msgid "Trimbar"
-msgstr ""
+msgstr "Barra de trim"
 
 #: pages/128x64x1/main_config.c:90
 msgid "Box"
-msgstr ""
+msgstr "Box"
 
 #: pages/128x64x1/main_config.c:93
 msgid "Bar"
-msgstr ""
+msgstr "Barras"
 
 #: pages/128x64x1/tx_configure.c:114
 msgid "Buzz settings"
-msgstr ""
+msgstr "Configurações de buzzer"
 
 #: pages/128x64x1/tx_configure.c:126
 msgid "Vibration"
@@ -2242,15 +2245,15 @@ msgstr "Alarme bat"
 
 #: pages/128x64x1/tx_configure.c:134
 msgid "Alarm intvl"
-msgstr ""
+msgstr "Intervalo Alarme"
 
 #: pages/128x64x1/tx_configure.c:138
 msgid "PwrOn alarm"
-msgstr ""
+msgstr "Alarme PowOn"
 
 #: pages/128x64x1/tx_configure.c:142
 msgid "PwrDn alert"
-msgstr ""
+msgstr "Alerta PwrDn"
 
 #: pages/128x64x1/tx_configure.c:156 pages/128x64x1/model_config.c:187
 msgid "Contrast"
@@ -2266,7 +2269,7 @@ msgstr "Duração"
 
 #: pages/128x64x1/tx_configure.c:190
 msgid "Alert intvl"
-msgstr ""
+msgstr "Intervalo de Alerta"
 
 #: pages/128x64x1/tx_configure.c:215
 msgid "Configure"
@@ -2278,27 +2281,27 @@ msgstr "Aeroplano"
 
 #: pages/128x64x1/model_page.c:40
 msgid "Multi"
-msgstr ""
+msgstr "lti"
 
 #: pages/128x64x1/model_page.c:110 pages/128x64x1/model_config.c:205
 msgid "Video"
-msgstr ""
+msgstr "ideo"
 
 #: pages/128x64x1/model_page.c:111
 msgid "Setup"
-msgstr ""
+msgstr "Configuração"
 
 #: pages/128x64x1/model_config.c:179
 msgid "Video Enable"
-msgstr ""
+msgstr "Habilitar vídeo"
 
 #: pages/128x64x1/model_config.c:183
 msgid "Video Channel"
-msgstr ""
+msgstr "Canal de vídeo"
 
 #: pages/128x64x1/model_config.c:191
 msgid "Brightness"
-msgstr ""
+msgstr "Brilho"
 
 #: pages/128x64x1/dialogs.c:82
 #, c-format
@@ -2331,12 +2334,16 @@ msgid ""
 "Model needs reset\n"
 "for standard mixer"
 msgstr ""
+"Modelo precisa de reset\n"
+"para o mixer padrão"
 
 #: pages/128x64x1/dialogs.c:153
 msgid ""
 "Bad/missing\n"
 "protocol modules!"
 msgstr ""
+"Módulo de protocolo\n"
+"em falta ou danificado"
 
 #: pages/128x64x1/reorder_list.c:39
 msgid "Dn"
@@ -2361,28 +2368,28 @@ msgstr "GPS"
 
 #: pages/128x64x1/telemtest_page.c:351
 msgid "RX"
-msgstr ""
+msgstr "RX"
 
 #: pages/128x64x1/telemtest_page.c:352
 msgid "TX"
-msgstr ""
+msgstr "TX"
 
 #: pages/128x64x1/datalog_page.c:102
 msgid "Rate"
-msgstr ""
+msgstr "Taxa"
 
 #: pages/128x64x1/advanced/mixer_page.c:44
 msgid "Mixer    Reorder:Hold R+"
-msgstr ""
+msgstr "Mixer Reorder:Hold R+"
 
 #: pages/128x64x1/advanced/mixer_setup.c:86
 #: pages/128x64x1/advanced/mixer_setup.c:165
 msgid "Scale"
-msgstr ""
+msgstr "cala"
 
 #: pages/128x64x1/pagelist.h:27
 msgid "Video setup"
-msgstr ""
+msgstr "Configuração de vídeo"
 
 #: pages/128x64x1/pagelist.h:38
 msgid "About Deviation"
@@ -2390,15 +2397,15 @@ msgstr "Sobre o Deviation"
 
 #: pages/128x64x1/pagelist.h:86
 msgid "External OSD"
-msgstr ""
+msgstr "OSD Externo"
 
 #: pages/128x64x1/range_page.c:53
 msgid "Press ENT to stop test."
-msgstr ""
+msgstr "Tecle ENT para parar o teste"
 
 #: pages/128x64x1/range_page.c:56
 msgid "Press ENT to start test."
-msgstr ""
+msgstr "Tecle ENT para iniciar o teste"
 
 #: pages/128x64x1/usb_page.c:38
 msgid ""
@@ -2408,7 +2415,7 @@ msgstr "Tecle ENT p/ativar USB"
 
 #: pages/text/splash_page.c:37
 msgid "Deviation"
-msgstr ""
+msgstr "Deviation"
 
 #: Model template
 msgid "4Ch w/ Dual-Rates"
@@ -2428,4 +2435,4 @@ msgstr "Aeroplano 6Ch"
 
 #: Model template
 msgid "Heli/Standard GUI"
-msgstr ""
+msgstr "Heli/Standard GUI"
