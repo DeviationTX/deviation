@@ -49,7 +49,7 @@ void LCD_PrintCharXY(unsigned int x, unsigned int y, u32 c)
 {
     c = TW8816_map_char(c);
 #if SUPPORT_MULTI_LANGUAGE
-    if (c > 0x300) {
+    if (c > 0x300 + LOC_CHAR_STARTS) {
         if (height == 0) {
             open_font(FontName);
             height = get_height();
