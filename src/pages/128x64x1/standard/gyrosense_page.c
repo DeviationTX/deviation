@@ -39,6 +39,7 @@ enum {
 void PAGE_GyroSenseInit(int page)
 {
     (void)page;
+    PAGE_SetModal(0);
     memset(mp, 0, sizeof(*mp));
     int expected = INPUT_NumSwitchPos(mapped_std_channels.switches[SWITCHFUNC_GYROSENSE]);
     int count = STDMIX_GetMixers(mp->mixer_ptr, mapped_std_channels.aux2, GYROMIXER_COUNT);

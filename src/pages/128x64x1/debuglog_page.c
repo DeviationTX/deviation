@@ -33,6 +33,7 @@ void PAGE_DebuglogInit(int page)
 {
     (void)page;
     PAGE_ShowHeader(PAGE_GetName(PAGEID_DEBUGLOG));
+    PAGE_SetModal(0);
 
     find_line_ends();
     GUI_CreateScrollable(&gui->scrollable,

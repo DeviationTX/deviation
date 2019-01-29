@@ -240,6 +240,7 @@ void PAGE_TxConfigureInit(int page)
 {
     (void)page;
     cp->enable = CALIB_NONE;
+    PAGE_SetModal(0);
     PAGE_ShowHeader(PAGE_GetName(PAGEID_TXCFG));
     GUI_CreateScrollable(&gui->scrollable, 0, 32, LCD_WIDTH, LCD_HEIGHT-32,
                      LCD_HEIGHT-32, MAX_PAGE+1, row_cb, NULL, NULL, NULL);

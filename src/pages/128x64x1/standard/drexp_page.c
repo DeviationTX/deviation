@@ -73,6 +73,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 void PAGE_DrExpInit(int page)
 {
     (void)page;
+    PAGE_SetModal(0);
     // draw a underline only:
     GUI_CreateRect(&gui->rect, 0, HEADER_WIDGET_HEIGHT, LCD_WIDTH, 1, &DEFAULT_FONT);
     memset(mp, 0, sizeof(*mp));

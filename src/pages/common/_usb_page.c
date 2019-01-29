@@ -42,6 +42,7 @@ unsigned usb_cb(u32 button, unsigned flags, void *data)
 void PAGE_USBInit(int page)
 {
     (void)page;
+    PAGE_SetModal(0);
     _draw_page(0);
     BUTTON_RegisterCallback(&up->action, CHAN_ButtonMask(BUT_ENTER), BUTTON_PRESS | BUTTON_RELEASE | BUTTON_PRIORITY, usb_cb, NULL);
 }

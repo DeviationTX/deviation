@@ -442,6 +442,7 @@ void PAGE_ShowTelemetryAlarm()
 void PAGE_TelemtestInit(int page)
 {
     (void)page;
+    PAGE_SetModal(0);
     PAGE_SetActionCB(_action_cb);
     if (telem_state_check() == 0) {
         current_page = telemetry_off;

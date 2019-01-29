@@ -50,6 +50,7 @@ void PAGE_MainInit(int page)
     (void)page;
     memset(mp, 0, sizeof(struct main_page));
     memset(gui, 0, sizeof(*gui));
+    PAGE_SetModal(0);
     BUTTON_RegisterCallback(&mp->action,
           CHAN_ButtonMask(BUT_ENTER)
           | CHAN_ButtonMask(BUT_EXIT)
