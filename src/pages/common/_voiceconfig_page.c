@@ -123,25 +123,25 @@ static const char *voicelbl_cb(guiObject_t *obj, const void *data)
     switch (voiceconfig_getsrctype(idx)) {
         case VOICE_SRC_SWITCH:
             if (Model.voice.switches[idx - VOICE_SRC_SWITCH].music)
-                return CONFIG_VoiceParse(voice_map[Model.voice.switches[idx - VOICE_SRC_SWITCH].music].id);
+                return CONFIG_VoiceParse(Model.voice.switches[idx - VOICE_SRC_SWITCH].music);
             break;
 #if NUM_AUX_KNOBS
         case VOICE_SRC_AUX:
-            if(Model.voice.aux[idx - VOICE_SRC_AUX].music)
-                return CONFIG_VoiceParse(voice_map[Model.voice.aux[idx - VOICE_SRC_AUX].music].id);
+            if (Model.voice.aux[idx - VOICE_SRC_AUX].music)
+                return CONFIG_VoiceParse(Model.voice.aux[idx - VOICE_SRC_AUX].music);
             break;
 #endif
         case VOICE_SRC_TIMER:
             if (Model.voice.timer[idx - VOICE_SRC_TIMER].music)
-                return CONFIG_VoiceParse(voice_map[Model.voice.timer[idx - VOICE_SRC_TIMER].music].id);
+                return CONFIG_VoiceParse(Model.voice.timer[idx - VOICE_SRC_TIMER].music);
             break;
         case VOICE_SRC_TELEMETRY:
             if (Model.voice.telemetry[idx - VOICE_SRC_TELEMETRY].music)
-                return CONFIG_VoiceParse(voice_map[Model.voice.telemetry[idx - VOICE_SRC_TELEMETRY].music].id);
+                return CONFIG_VoiceParse(Model.voice.telemetry[idx - VOICE_SRC_TELEMETRY].music);
             break;
         case VOICE_SRC_MIXER:
             if (Model.voice.mixer[idx - VOICE_SRC_MIXER].music)
-                return CONFIG_VoiceParse(voice_map[Model.voice.mixer[idx - VOICE_SRC_MIXER].music].id);
+                return CONFIG_VoiceParse(Model.voice.mixer[idx - VOICE_SRC_MIXER].music);
             break;
     }
     return strcpy(tempstring, "");
@@ -185,7 +185,7 @@ static const char *voiceid_cb(guiObject_t *obj, int dir, void *data)
         return strcpy(tempstring, _tr("None"));
     }
     vpt->music = GUI_TextSelectHelper(vpt->music - CUSTOM_ALARM_ID + 1, //Relabling so voice in menu starts with 1
-        1, voice_map_entries - CUSTOM_ALARM_ID, dir, 1, 10, NULL) + CUSTOM_ALARM_ID - 1;
+        1, voice_map_entries, dir, 1, 10, NULL) + CUSTOM_ALARM_ID - 1;
     snprintf(tempstring, 5, "%d", vpt->music - CUSTOM_ALARM_ID + 1);
     GUI_Redraw(&gui->voicelbl[cur_row]);
     return tempstring;

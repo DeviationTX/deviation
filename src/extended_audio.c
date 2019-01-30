@@ -17,6 +17,7 @@
 #include "music.h"
 #include "config/tx.h"
 #include "config/model.h"
+#include "config/voice.h"
 #include "extended_audio.h"
 #include "stdlib.h"
 
@@ -26,8 +27,9 @@
 
 #if HAS_EXTENDED_AUDIO
 u16 voice_map_entries;
-struct VoiceMap voice_map[MAX_VOICEMAP_ENTRIES];
-u16 audio_queue[AUDIO_QUEUE_LENGTH];
+//struct VoiceMap voice_map[MAX_VOICEMAP_ENTRIES];
+struct VoiceMap current_voice_mapping;
+struct AudioQueue audio_queue[AUDIO_QUEUE_LENGTH];
 u8 next_audio;
 u8 num_audio;
 u32 audio_queue_time;
@@ -97,22 +99,21 @@ u16 AUDIO_CalculateChecksum(u8 *buffer) {
 }
 
 // Generate a string to play.
-int AUDIO_Play(u16 music) {
-
+int AUDIO_Play(u16 id) {
     // If we are just playing beeps....
-    if (music == MUSIC_KEY_PRESSING || music == MUSIC_MAXLEN) {
+    if (id == MUSIC_KEY_PRESSING || id == MUSIC_MAXLEN) {
         printf("Voice: beep only\n");
         return 0;
     }
-    printf("Voice: Playing mp3 #%d\n", voice_map[music].id);
+    printf("Voice: Playing mp3 #%d\n", id);
 
 #ifdef EMULATOR     // On emulators call mpg123 to play mp3s
     char cmd[70];
     u16 vol_val = Transmitter.audio_vol * 32786/10;
 #ifdef _WIN32
-    sprintf(cmd, "start /B ..\\..\\mpg123 -f %d -q ..\\..\\mp3\\%04d*.mp3 > nul 2>&1", vol_val, voice_map[music].id);
+    sprintf(cmd, "start /B ..\\..\\mpg123 -f %d -q ..\\..\\mp3\\%04d*.mp3 > nul 2>&1", vol_val, id);
 #else
-    sprintf(cmd, "mpg123 -f %d -q ../../mp3/%04d*.mp3 > /dev/null 2>&1 &", vol_val, voice_map[music].id);
+    sprintf(cmd, "mpg123 -f %d -q ../../mp3/%04d*.mp3 > /dev/null 2>&1 &", vol_val, id);
 #endif // _WIN32
     system(cmd);
     return 1;
@@ -125,14 +126,14 @@ int AUDIO_Play(u16 music) {
     case AUDIO_NONE: return 0;	// Play beeps...
     case AUDIO_AUDIOFX: {
       char buffer[5];
-      snprintf(buffer, sizeof(buffer), "#%d\n", voice_map[music].id);
+      snprintf(buffer, sizeof(buffer), "#%d\n", id);
       AUDIO_Print(buffer);
       break;
     }
     case AUDIO_DF_PLAYER:
         // Fill in track number and checksum
         player_buffer[3] = 0x12;
-        u16ToArray(voice_map[music].id, player_buffer+5);
+        u16ToArray(id, player_buffer+5);
         u16ToArray(AUDIO_CalculateChecksum(player_buffer), player_buffer+7);
         AUDIO_Send(player_buffer, sizeof(player_buffer));
         break;
@@ -176,8 +177,8 @@ void AUDIO_CheckQueue() {
     u32 t = CLOCK_getms();
     if (next_audio < num_audio) {
         if (t > audio_queue_time) {
-            AUDIO_Play(audio_queue[next_audio]);
-            audio_queue_time = CLOCK_getms() + voice_map[audio_queue[next_audio]].duration;
+            AUDIO_Play(audio_queue[next_audio].id);
+            audio_queue_time = CLOCK_getms() + audio_queue[next_audio].duration;
             next_audio++;
         }
     } else if (num_audio && t > audio_queue_time) {
@@ -216,12 +217,14 @@ int AUDIO_AddQueue(u16 music) {
         printf("Voice: Queue full, cannot add new mp3 #%d\n",music);
         return 0;
     }
-    if (!voice_map[music].duration) {
+    CONFIG_VoiceParse(music);
+    if (!current_voice_mapping.duration) {
         printf("Voice: mp3 length is zero\n");
         return 0;
     }
-
-    audio_queue[num_audio++] = music;
+    audio_queue[num_audio].duration = current_voice_mapping.duration;
+    audio_queue[num_audio].id = music;
+    num_audio++;
     return 1;
 }
 
