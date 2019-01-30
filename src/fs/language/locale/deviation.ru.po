@@ -1622,7 +1622,7 @@ msgstr ""
 #: pages/320x240x16/advanced/mixer_limits.c:76
 #: pages/128x64x1/toggle_select.c:84 pages/128x64x1/advanced/mixer_limits.c:42
 msgid "Revert"
-msgstr "Отменить"
+msgstr "Отмена"
 
 #: pages/320x240x16/toggle_select.c:116
 msgid "Pos 0"
