@@ -330,6 +330,10 @@ filesystem/$(FILESYSTEM)/media/15normal.fon: fonts/15normal.bdf
 	mkdir -p filesystem/$(FILESYSTEM)/media/
 	../utils/font/bdf_to_font.pl -maxsize 15 -mode bin $< -out $@ -minspace 8
 
+filesystem/$(FILESYSTEM)/media/18bold.fon: fonts/18bold.bdf
+	mkdir -p filesystem/$(FILESYSTEM)/media/
+	../utils/font/bdf_to_font.pl -maxsize 18 -mode bin $< -out $@ -minspace 8
+
 filesystem/$(FILESYSTEM)/media/12ascii.fon: fonts/12normal.bdf
 	mkdir -p filesystem/$(FILESYSTEM)/media/
 	../utils/font/bdf_to_font.pl -maxsize 12 -mode bin $< -out $@ -minspace 10 -ascii

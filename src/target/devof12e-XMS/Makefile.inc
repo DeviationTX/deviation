@@ -2,7 +2,7 @@ FILESYSTEMS := common text text_gfx
 SCREENSIZE  := text
 DFU_ARGS    := -c 12 -b 0x08004000
 LANGUAGE    := devo10
-FONTS        = filesystem/$(FILESYSTEM)/media/12normal.fon
+FONTS        = filesystem/$(FILESYSTEM)/media/18bold.fon
 
 OPTIMIZE_DFU := 1
 

@@ -230,7 +230,7 @@ u16 load_char_font(u32 c)
         const u8 *data = offset++;
         u8 bit = 0;
         // Data is right aligned, drawn top to bottom
-        for (int y = 3; y < height + 3; ++y)
+        for (int y = (CHAR_HEIGHT - height) >= 0 ? (CHAR_HEIGHT - height) : 0; y < CHAR_HEIGHT; y++)
         {
             if (bit == 8) {
                 data = offset++;
