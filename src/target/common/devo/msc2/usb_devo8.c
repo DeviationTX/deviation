@@ -95,7 +95,7 @@ void MSC_Disable()
 * Output         : None.
 * Return         : None.
 *******************************************************************************/
-void USB_Cable_Config (u8 NewState)
+void USB_Cable_Config(u8 NewState)
 {
   if (NewState != DISABLE)
   {
