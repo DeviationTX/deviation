@@ -199,3 +199,6 @@ void PAGE_SaveCurrentPos()
         *current_selected = GUI_ScrollableGetObjRowOffset(page_scrollable, GUI_GetSelected());
     }
 }
+
+#define TESTNAME pages
+#include "tests.h"

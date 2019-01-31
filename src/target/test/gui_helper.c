@@ -36,7 +36,7 @@ void AssertScreenshot(CuTest* t, const char* filename)
 
     if (png_open_file_read(&png, filepath) != PNG_NO_ERROR)
     {
-        printf("==Missing validation picture. ==\nPlease add %s to git.\n", filepath);
+        printf("Missing expected screenshot. Please add %s to git repo.", filepath);
         WriteScreen(filepath);
     }
     else
@@ -52,8 +52,9 @@ void AssertScreenshot(CuTest* t, const char* filename)
         if (memcmp(buf, img, IMAGE_X * IMAGE_Y * 3) != 0)
         {
             char buf[100];
-            sprintf(buf, "Screenshot %s content mismatch", filename);
-            WriteScreen(filename);
+            snprintf(buf, sizeof(buf), "Screenshot %s content mismatch! Check filesystem/test/ for actual content.\n", filename);
+            snprintf(filepath, sizeof(filepath), "%s.png", filename);
+            WriteScreen(filepath);
             CuFail(t, buf);
         }
     }
