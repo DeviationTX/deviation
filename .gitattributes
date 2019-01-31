@@ -3,4 +3,5 @@ src/libopencm3/scripts/* eol=lf
 *.pl eol=lf
 *.py eol=lf
 *.ini eol=lf
+*.png binary
 src/fs/language/* eol=lf

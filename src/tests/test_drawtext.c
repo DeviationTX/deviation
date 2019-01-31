@@ -24,5 +24,5 @@ void TestFontRender(CuTest* t)
     LCD_PrintStringXY(5, 20, "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG");
     LCD_PrintStringXY(15, 40, "0123456789)!@#$%^&*(");
 
-    AssertScreenshot(t, "font.bmp");
+    AssertScreenshot(t, "font");
 }
