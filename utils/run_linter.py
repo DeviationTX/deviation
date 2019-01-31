@@ -29,7 +29,7 @@ LINT_RULES = (
     '-build/include_subdir',
     '-readability/casting')
 
-EXCLUDE_PATHS = ('libopencm3/', 'FatFs/')
+EXCLUDE_PATHS = ('libopencm3/', 'FatFs/', 'pnglite')
 
 # Disregard specific messages in a class
 POST_FILTER = {
@@ -167,7 +167,7 @@ def filter_paths(paths, changed, pwd):
         return sorted(changed.keys())
     cmd = "find {} -type f".format(" ".join(paths))
     if EXCLUDE_PATHS:
-        cmd += " | grep -v -E '({})'".format(" ".join(EXCLUDE_PATHS))
+        cmd += " | grep -v -E '({})'".format("|".join(EXCLUDE_PATHS))
     logging.debug("Running: " + " ".join(cmd))
     _p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
     for line in _p.stdout:
@@ -185,7 +185,7 @@ def run_lint(paths, changed):
     
     cmd = 'find {} -name "*.[ch]"'.format(" ".join(paths))
     if EXCLUDE_PATHS:
-        cmd += " | grep -v -E '({})'".format(" ".join(EXCLUDE_PATHS))
+        cmd += " | grep -v -E '({})'".format("|".join(EXCLUDE_PATHS))
     cmd += " | xargs cpplint --extensions=c,h --filter={} 2>&1".format(",".join(LINT_RULES))
     logging.debug("Running: " + cmd)
     _p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
