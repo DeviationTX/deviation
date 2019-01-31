@@ -31,9 +31,8 @@ void AssertScreenshot(CuTest* t, const char* filename)
 
     png_init(NULL, NULL);
 
-    char filepath[100] = "../../tests/320x240x16/";
-    strcat(filepath, filename);
-    strcat(filepath, ".png");
+    char filepath[100];
+    snprintf(filepath, sizeof(filepath), "../../tests/320x240x16/%s.png", filename);
 
     if (png_open_file_read(&png, filepath) != PNG_NO_ERROR)
     {
