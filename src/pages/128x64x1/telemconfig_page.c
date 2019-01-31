@@ -81,7 +81,7 @@ void PAGE_TelemconfigInit(int page)
         return;
     }
 
-    PAGE_ShowHeader(_tr("Telemetry config")); // using the same name as related menu item to reduce language strings
+    PAGE_ShowHeader(_tr_noop("Telemetry config"));  // using the same name as related menu item to reduce language strings
 
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                          LINE_SPACE, TELEM_NUM_ALARMS, row_cb, getobj_cb, NULL, NULL);

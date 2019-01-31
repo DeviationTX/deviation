@@ -108,7 +108,7 @@ void PAGE_ChantestInit(int page)
 {
     (void)page;
     PAGE_SetActionCB(_action_cb);
-    PAGE_ShowHeader(cp->type == MONITOR_RAWINPUT ? _tr("Stick input") : _tr("Mixer output"));
+    PAGE_ShowHeader(cp->type == MONITOR_RAWINPUT ? _tr_noop("Stick input") : _tr_noop("Mixer output"));
     if (cp->type != MONITOR_RAWINPUT )
         cp->type = MONITOR_MIXEROUTPUT;// cp->type may not be initialized yet, so do it here
     _show_bar_page(0);

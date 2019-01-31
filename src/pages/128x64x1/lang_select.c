@@ -41,7 +41,7 @@ void PAGE_LanguageInit(int page)
 {
     (void)page;
     int num_lang = count_num_languages();
-    PAGE_ShowHeader(_tr("Press ENT to change"));
+    PAGE_ShowHeader(_tr_noop("Press ENT to change"));
 
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                      LINE_SPACE, num_lang, row_cb, NULL, NULL, NULL);

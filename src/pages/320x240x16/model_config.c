@@ -35,7 +35,7 @@ enum {
 void PAGE_ModelConfigInit(int page)
 {
     (void)page;
-    PAGE_ShowHeader(Model.type == 0 ? _tr("Helicopter") : _tr("Airplane"));
+    PAGE_ShowHeader(Model.type == 0 ? _tr_noop("Helicopter") : _tr_noop("Airplane"));
     if (Model.type == 0) {
         u8 i = ROW1;
         GUI_CreateLabelBox(&gui->swashlbl, COL1, i, LABEL_WIDTH, 0, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("SwashType"));
@@ -87,10 +87,10 @@ void PAGE_TrainConfigInit(int page)
     (void)page;
     int mode = PPMin_Mode();
     PAGE_ShowHeader(mode == PPM_IN_TRAIN1
-                  ? _tr("Trainer Cfg (Channel)")
+                  ? _tr_noop("Trainer Cfg (Channel)")
                   : mode == PPM_IN_TRAIN2
-                    ? _tr("Trainer Cfg (Stick)")
-                    : _tr("PPMIn Cfg (Extend)"));
+                    ? _tr_noop("Trainer Cfg (Stick)")
+                    : _tr_noop("PPMIn Cfg (Extend)"));
     int row = ROW1;
     if (PPMin_Mode() != PPM_IN_SOURCE) {
         GUI_CreateLabelBox(&gui->trainswlbl, COL1, row, LABEL_WIDTH, 0, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Trainer Sw"));

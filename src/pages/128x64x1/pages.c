@@ -71,12 +71,14 @@ void PAGE_ChangeByID(enum PageID id, s8 menuPage)
 static guiLabel_t headerLabel;
 void PAGE_ShowHeader(const char *title)
 {
-    GUI_CreateLabelBox(&headerLabel, 0, 0, LCD_WIDTH, HEADER_HEIGHT, &TITLE_FONT, NULL, NULL, title);
+    if (title)
+        GUI_CreateLabelBox(&headerLabel, 0, 0, LCD_WIDTH, HEADER_HEIGHT, &TITLE_FONT, GUI_Localize, NULL, title);
 }
 
 void PAGE_ShowHeaderWithSize(const char *title, u16 width, u16 height)
 {
-    GUI_CreateLabelBox(&headerLabel, 0, 0, width, height, &TITLE_FONT, NULL, NULL, title);
+    if (title)
+        GUI_CreateLabelBox(&headerLabel, 0, 0, width, height, &TITLE_FONT, GUI_Localize, NULL, title);
 }
 
 void PAGE_ShowHeader_SetLabel(const char *(*label_cb)(guiObject_t *obj, const void *data), void *data)

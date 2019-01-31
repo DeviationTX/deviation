@@ -82,7 +82,7 @@ void PAGE_TrimEditInit(int page)
     tp->index = page;
     tp->trim = trim[tp->index];
 
-    //PAGE_ShowHeader(_tr("Trim"));
+    // PAGE_ShowHeader(_tr_noop("Trim"));
     PAGE_ShowHeaderWithSize(_tr("Trim"), LCD_WIDTH - 96, 0);
     PAGE_CreateOkButton(LCD_WIDTH-56, 4, okcancel_cb);
 

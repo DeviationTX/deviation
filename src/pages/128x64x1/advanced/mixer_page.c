@@ -41,7 +41,7 @@ static void _show_title()
 
 static void _show_page()
 {
-    PAGE_ShowHeader(_tr("Mixer    Reorder:Hold R+"));
+    PAGE_ShowHeader(_tr_noop("Mixer    Reorder:Hold R+"));
     memset(gui, 0, sizeof(*gui));
     
     u8 channel_count = Model.num_channels + NUM_VIRT_CHANNELS;

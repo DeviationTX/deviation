@@ -149,8 +149,8 @@ int PAGE_IsValidQuickPage(int page) {
 const char *PAGE_GetName(int i)
 {
     if(i == 0)
-        return _tr("None");
-    return _tr(pages[i].pageName);
+        return _tr_noop("None");
+    return pages[i].pageName;
 }
 
 int PAGE_GetNumPages()

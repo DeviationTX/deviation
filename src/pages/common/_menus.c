@@ -87,7 +87,7 @@ const char *menu_name_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     long i = (long)data;
-    return PAGE_GetName(i);
+    return _tr(PAGE_GetName(i));
 }
 
 const char *idx_string_cb(guiObject_t *obj, const void *data)

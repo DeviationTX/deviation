@@ -32,7 +32,7 @@ static struct usb_obj * const gui = &gui_objs.u.usb;
 
 static void _draw_page(u8 enable)
 {
-    PAGE_ShowHeader(_tr("USB"));
+    PAGE_ShowHeader(_tr_noop("USB"));
 
     snprintf(tempstring, sizeof(tempstring), "%s %s",
             _tr("Press ENT to turn \nUSB drive"),

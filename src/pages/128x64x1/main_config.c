@@ -57,7 +57,7 @@ void PAGE_MainLayoutInit(int page)
 {
     (void)page;
 #if HAS_LAYOUT_EDITOR
-    PAGE_ShowHeader(_tr("Layout: Long-Press ENT"));
+    PAGE_ShowHeader(_tr_noop("Layout: Long-Press ENT"));
     PAGE_SetActionCB(_action_cb);
 #else
     PAGE_ShowHeader(PAGE_GetName(PAGEID_MAINCFG));

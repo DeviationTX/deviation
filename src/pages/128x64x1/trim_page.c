@@ -66,7 +66,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 
 static void _show_page()
 {
-    //PAGE_ShowHeader(_tr("Trim")); // no title for devo10
+    // PAGE_ShowHeader(_tr_noop("Trim"));  // no title for devo10
     GUI_CreateLabelBox(&gui->inputlbl, 0, 0, TEXTSEL_X, HEADER_HEIGHT, &TITLE_FONT, GUI_Localize, NULL, _tr_noop("Input"));
     GUI_CreateLabelBox(&gui->steplbl, TEXTSEL_X, STEP_Y, TRIMPOS_X - TEXTSEL_X, LINE_HEIGHT, &TITLE_FONT, GUI_Localize, NULL, _tr_noop("Step"));
     // no enought space in Devo10, so just display trim + in the 1st page
