@@ -80,25 +80,6 @@ void Leave_LowPowerMode(void)
 }
 
 /*******************************************************************************
-* Function Name  : USB_Cable_Config.
-* Description    : Software Connection/Disconnection of USB Cable.
-* Input          : NewState: new state.
-* Output         : None.
-* Return         : None.
-*******************************************************************************/
-void USB_Cable_Config (FunctionalState NewState)
-{
-  if (NewState != DISABLE)
-  {
-    GPIO_ResetBits(USB_DISCONNECT, USB_DISCONNECT_PIN);
-  }
-  else
-  {
-    GPIO_SetBits(USB_DISCONNECT, USB_DISCONNECT_PIN);
-  }
-}
-
-/*******************************************************************************
 * Function Name  : USB_Interrupts_Config.
 * Description    : Configures the USB interrupts.
 * Input          : None.

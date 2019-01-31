@@ -26,10 +26,14 @@
 #include "usb_core.h"
 #include "usb_bot.h"
 #include "usb_istr.h"
+#include "usb_pwr.h"
 #define LE_WORD(x)		((x)&0xFF),((x)>>8)
 
 void USB_Init();
 void USB_Istr(void);
+
+#define USB_DISCONNECT     GPIOB
+#define USB_DISCONNECT_PIN GPIO10
 
 void (*pEpInt_IN[7])(void) = {};
 void (*pEpInt_OUT[7])(void) = {};
@@ -54,7 +58,6 @@ void USB_Enable(unsigned use_interrupt)
 {
     gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
         GPIO_CNF_OUTPUT_PUSHPULL, GPIO10);
-        gpio_set(GPIOB, GPIO10);
     //rcc_set_usbpre(RCC_CFGR_USBPRE_PLL_CLK_DIV1_5);
     rcc_peripheral_enable_clock(&RCC_APB1ENR, RCC_APB1ENR_USBEN);
     USB_Init();
@@ -65,7 +68,7 @@ void USB_Enable(unsigned use_interrupt)
 
 void USB_Disable()
 {
-    gpio_set(GPIOB, GPIO10);
+    PowerOff();
     nvic_disable_irq(NVIC_USB_LP_CAN_RX0_IRQ);
 }
 
@@ -83,6 +86,25 @@ void MSC_Enable()
 void MSC_Disable()
 {
     USB_Disable();
+}
+
+/*******************************************************************************
+* Function Name  : USB_Cable_Config.
+* Description    : Software Connection/Disconnection of USB Cable.
+* Input          : NewState: new state.
+* Output         : None.
+* Return         : None.
+*******************************************************************************/
+void USB_Cable_Config (u8 NewState)
+{
+  if (NewState != DISABLE)
+  {
+    gpio_clear(USB_DISCONNECT, USB_DISCONNECT_PIN);
+  }
+  else
+  {
+    gpio_set(USB_DISCONNECT, USB_DISCONNECT_PIN);
+  }
 }
 
 /*

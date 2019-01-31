@@ -21,8 +21,6 @@
 /* Exported constants --------------------------------------------------------*/
 /* Flash memory address from where user application will be loaded */
 #define ApplicationAddress 0x08003000
-#define USB_DISCONNECT     GPIOB
-#define USB_DISCONNECT_PIN GPIO_Pin_10
 #define BULK_MAX_PACKET_SIZE  0x00000040
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
