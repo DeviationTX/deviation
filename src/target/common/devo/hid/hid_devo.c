@@ -22,15 +22,15 @@
 #include <string.h>
 #include "usb_lib.h"
 #include "usb_pwr.h"
+#include "hid_usb_istr.h"
 
 /* These are mostly defined in usb_devo8.c */
 extern void (*pEpInt_IN[7])(void);
 extern void (*pEpInt_OUT[7])(void);
-extern void (* const HID_pEpInt_IN[7])(void);
-extern void (* const HID_pEpInt_OUT[7])(void);
+
 extern const DEVICE_PROP HID_Device_Property;
 extern const USER_STANDARD_REQUESTS HID_User_Standard_Requests;
-extern void USB_Enable(unsigned type, unsigned use_interrupt);
+extern void USB_Enable(unsigned use_interrupt);
 extern void USB_Disable();
 
 extern volatile u8 PrevXferComplete;
@@ -45,23 +45,20 @@ void HID_Write(s8 *packet, u8 num_channels)
 }
 
 void HID_Init() {
-    memcpy(pEpInt_IN, HID_pEpInt_IN, sizeof(pEpInt_IN));
-    memcpy(pEpInt_OUT, HID_pEpInt_OUT, sizeof(pEpInt_OUT));
+    for (int i = 0; i < 7; i++) {
+        pEpInt_IN[i] = pEpInt_OUT[i] = NOP_Process;
+    }
+    pEpInt_IN[0] = HID_EP1_IN_Callback;
+
     Device_Property = &HID_Device_Property;
     User_Standard_Requests = &HID_User_Standard_Requests;
 }
 
-extern void (*_HID_Init)();
 void HID_Enable() {
-#ifdef MODULAR
-     _HID_Init = HID_Init;
-#endif
-    USB_Enable(1, 1);
+    HID_Init();
+    USB_Enable(1);
 }
 
 void HID_Disable() {
-#ifdef MODULAR
-    _HID_Init = NULL;
-#endif
     USB_Disable();
 }
