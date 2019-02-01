@@ -13,24 +13,24 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
- #ifdef MODULAR
-  //Allows the linker to properly relocate
-  #define LOLI_Cmds PROTO_Cmds
-  #pragma long_calls
+#ifdef MODULAR
+    // Allows the linker to properly relocate
+    #define LOLI_Cmds PROTO_Cmds
+    #pragma long_calls
 #endif
+
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
 #include "config/model.h"
-#include "config/tx.h" // for Transmitter
+#include "config/tx.h"  // for Transmitter
 
 #ifdef MODULAR
-  //Some versions of gcc apply this to definitions, others to calls
-  //So just use long_calls everywhere
-  //#pragma long_calls_off
-  extern unsigned _data_loadaddr;
-  const unsigned long protocol_type = (unsigned long)&_data_loadaddr;
+    // Some versions of gcc apply this to definitions, others to calls
+    // So just use long_calls everywhere
+    // #pragma long_calls_off
+    extern unsigned _data_loadaddr;
+    const u32 protocol_type = (u32)&_data_loadaddr;
 #endif
 
 #ifdef PROTO_HAS_NRF24L01
@@ -48,7 +48,7 @@ static u8 hopping_frequency[LOLI_NUM_CHANNELS];
 static u8 rx_tx_addr[5];
 static u8 hopping_frequency_no;
 static u8 binding_count;
-static const u8 bind_address[5] = {'L','O','V','E','!'};
+static const u8 bind_address[5] = {'L', 'O', 'V', 'E', '!'};
 
 enum{
     BIND1,
@@ -66,12 +66,12 @@ static void init_RF()
     NRF24L01_Initialize();
     NRF24L01_FlushTx();
     NRF24L01_FlushRx();
-    NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);    // Clear data ready, data sent, and retransmit
-    NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);     // No Auto Acknowldgement on all data pipes
-    NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x01); // enable rx data pipe 0
+    NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);     // Clear data ready, data sent, and retransmit
+    NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);      // No Auto Acknowldgement on all data pipes
+    NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x01);  // enable rx data pipe 0
     NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0x00);    // No retransmit
     NRF24L01_WriteReg(NRF24L01_05_RF_CH, 66);   // start frequency
-    NRF24L01_WriteReg(NRF24L01_11_RX_PW_P0, LOLI_PACKET_SIZE); // RX FIFO size
+    NRF24L01_WriteReg(NRF24L01_11_RX_PW_P0, LOLI_PACKET_SIZE);  // RX FIFO size
     tx_power = Model.tx_power;
     NRF24L01_SetPower(tx_power);
     NRF24L01_SetTxRxMode(TX_EN);
@@ -93,12 +93,11 @@ static u16 scale_channel(u8 ch, u16 destMin, u16 destMax)
 static void send_packet(u8 bind)
 {
     u16 val;
-    if(bind) {
+    if (bind) {
         packet[0] = 0xa0;
         memcpy(&packet[1], hopping_frequency, 5);
         memcpy(&packet[6], rx_tx_addr, 5);
-    }
-    else {
+    } else {
         packet[0] = 0xa1;
         val = scale_channel(0, 0, 1023);
         packet[1] = val >> 2;
@@ -125,15 +124,15 @@ static void send_packet(u8 bind)
         packet[9]|= val >> 8;
         packet[10]= val & 0xff;
         NRF24L01_WriteReg(NRF24L01_05_RF_CH, hopping_frequency[hopping_frequency_no]);
-        if(++hopping_frequency_no > LOLI_NUM_CHANNELS-1)
+        if (++hopping_frequency_no > LOLI_NUM_CHANNELS-1)
             hopping_frequency_no = 0;
     }
-    
+
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
     NRF24L01_FlushTx();
     NRF24L01_WritePayload(packet, LOLI_PACKET_SIZE);
-    
-    //Keep transmit power updated
+
+    // Keep transmit power updated
     if (tx_power != Model.tx_power) {
         tx_power = Model.tx_power;
         NRF24L01_SetPower(tx_power);
@@ -144,16 +143,16 @@ static void update_telemetry()
 {
     Telemetry.value[TELEM_FRSKY_RSSI] = packet[0]*2;
     TELEMETRY_SetUpdated(TELEM_FRSKY_RSSI);
-    Telemetry.value[TELEM_FRSKY_VOLT1] = (packet[1]<<8) | packet[2];
+    Telemetry.value[TELEM_FRSKY_VOLT1] = (packet[1] << 8) | packet[2];
     TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT1);
-    Telemetry.value[TELEM_FRSKY_VOLT2] = (packet[3]<<8) | packet[4];
+    Telemetry.value[TELEM_FRSKY_VOLT2] = (packet[3] << 8) | packet[4];
     TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT2);
 }
 
 static u16 LOLI_callback()
 {
     u16 delay = 0;
-    switch(phase) {
+    switch (phase) {
         case BIND1:
             NRF24L01_SetTxRxMode(TXRX_OFF);
             NRF24L01_SetTxRxMode(TX_EN);
@@ -174,9 +173,9 @@ static u16 LOLI_callback()
             break;
         case BIND3:
             // got bind response ?
-            if(NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR)) {
+            if (NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR)) {
                 NRF24L01_ReadPayload(packet, LOLI_PACKET_SIZE);
-                if(packet[0]=='O' && packet[1]=='K') {
+                if (packet[0] == 'O' && packet[1] == 'K') {
                     NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, rx_tx_addr, 5);
                     NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, rx_tx_addr, 5);
                     PROTOCOL_SetBindState(0);
@@ -197,7 +196,7 @@ static u16 LOLI_callback()
             NRF24L01_SetTxRxMode(TXRX_OFF);
             NRF24L01_SetTxRxMode(TX_EN);
             // got a telemetry packet ?
-            if(NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR)) { // RX fifo data ready
+            if (NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR)) {  // RX fifo data ready
                 NRF24L01_ReadPayload(packet, LOLI_PACKET_SIZE);
                 update_telemetry();
             }
@@ -234,7 +233,7 @@ static void init_txid()
     }
     // Pump zero bytes for LFSR to diverge more
     for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
-    
+
     // tx id
     rx_tx_addr[0] = (lfsr >> 24) & 0xFF;
     rx_tx_addr[1] = ((lfsr >> 16) & 0xFF) % 0x30;
@@ -242,11 +241,11 @@ static void init_txid()
     rx_tx_addr[3] = lfsr & 0xFF;
     rand32_r(&lfsr, 0);
     rx_tx_addr[4] = (lfsr >> 24) & 0xFF;
-    
+
     // rf channels for data phase (manually set on "original" TX ?)
-    for(u8 i=0; i<LOLI_NUM_CHANNELS; i++) {
+    for (u8 i=0; i < LOLI_NUM_CHANNELS; i++) {
         rand32_r(&lfsr, 0);
-        hopping_frequency[i] = (lfsr & 0xff) % 84; // 2400-2483 MHz
+        hopping_frequency[i] = (lfsr & 0xff) % 84;  // 2400-2483 MHz
     }
 }
 
@@ -255,14 +254,13 @@ static void initialize(u8 bind)
     CLOCK_StopTimer();
     init_txid();
     init_RF();
-    if(bind) {
+    if (bind) {
         phase = BIND1;
         NRF24L01_WriteReg(NRF24L01_05_RF_CH, LOLI_BIND_CHANNEL);
         NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, bind_address, 5);
         NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, bind_address, 5);
         PROTOCOL_SetBindState(0xFFFFFFFF);
-    }
-    else {
+    } else {
         NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, rx_tx_addr, 5);
         NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, rx_tx_addr, 5);
         phase = DATA1;
@@ -272,7 +270,7 @@ static void initialize(u8 bind)
 
 const void *LOLI_Cmds(enum ProtoCmds cmd)
 {
-    switch(cmd) {
+    switch (cmd) {
         case PROTOCMD_INIT:  initialize(0); return 0;
         case PROTOCMD_DEINIT:
         case PROTOCMD_RESET:
@@ -282,10 +280,10 @@ const void *LOLI_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_BIND:  initialize(1); return (void*)0L;
         case PROTOCMD_NUMCHAN: return (void *) 8L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
-        case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
+        case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((u32)Model.fixed_id) : 0;
         case PROTOCMD_GETOPTIONS: return (void*)0L;
         case PROTOCMD_TELEMETRYSTATE: return (void *)PROTO_TELEM_ON;
-        case PROTOCMD_TELEMETRYTYPE: return (void *)(long) TELEM_FRSKY;
+        case PROTOCMD_TELEMETRYTYPE: return (void *)(u32)TELEM_FRSKY;
         case PROTOCMD_CHANNELMAP: return AETRG;
         default: break;
     }
