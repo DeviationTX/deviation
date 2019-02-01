@@ -156,7 +156,6 @@ static u16 LOLI_callback()
         case BIND1:
             NRF24L01_SetTxRxMode(TXRX_OFF);
             NRF24L01_SetTxRxMode(TX_EN);
-
             // send bind packet
             send_packet(1);
             phase = BIND2;
@@ -179,6 +178,7 @@ static u16 LOLI_callback()
                     NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, rx_tx_addr, 5);
                     NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, rx_tx_addr, 5);
                     PROTOCOL_SetBindState(0);
+                    NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
                     NRF24L01_FlushRx();
                     phase = DATA1;
                     hopping_frequency_no = 0;
@@ -193,13 +193,13 @@ static u16 LOLI_callback()
             }
             break;
         case DATA1:
-            NRF24L01_SetTxRxMode(TXRX_OFF);
-            NRF24L01_SetTxRxMode(TX_EN);
             // got a telemetry packet ?
             if (NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR)) {  // RX fifo data ready
                 NRF24L01_ReadPayload(packet, LOLI_PACKET_SIZE);
                 update_telemetry();
             }
+            NRF24L01_SetTxRxMode(TXRX_OFF);
+            NRF24L01_SetTxRxMode(TX_EN);
             // send data packet
             send_packet(0);
             phase = DATA2;
