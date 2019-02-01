@@ -16,7 +16,7 @@
  
  #ifdef MODULAR
   //Allows the linker to properly relocate
-  #define LORI_Cmds PROTO_Cmds
+  #define LOLI_Cmds PROTO_Cmds
   #pragma long_calls
 #endif
 #include "common.h"
@@ -37,14 +37,14 @@
 
 #include "iface_nrf24l01.h"
 
-#define LORI_PACKET_SIZE    11
-#define LORI_BIND_CHANNEL   33
-#define LORI_NUM_CHANNELS   5
+#define LOLI_PACKET_SIZE    11
+#define LOLI_BIND_CHANNEL   33
+#define LOLI_NUM_CHANNELS   5
 
-static u8 packet[LORI_PACKET_SIZE];
+static u8 packet[LOLI_PACKET_SIZE];
 static u8 phase;
 static u8 tx_power;
-static u8 hopping_frequency[LORI_NUM_CHANNELS];
+static u8 hopping_frequency[LOLI_NUM_CHANNELS];
 static u8 rx_tx_addr[5];
 static u8 hopping_frequency_no;
 static u8 binding_count;
@@ -71,7 +71,7 @@ static void init_RF()
     NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x01); // enable rx data pipe 0
     NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0x00);    // No retransmit
     NRF24L01_WriteReg(NRF24L01_05_RF_CH, 66);   // start frequency
-    NRF24L01_WriteReg(NRF24L01_11_RX_PW_P0, LORI_PACKET_SIZE); // RX FIFO size
+    NRF24L01_WriteReg(NRF24L01_11_RX_PW_P0, LOLI_PACKET_SIZE); // RX FIFO size
     tx_power = Model.tx_power;
     NRF24L01_SetPower(tx_power);
     NRF24L01_SetTxRxMode(TX_EN);
@@ -124,14 +124,14 @@ static void send_packet(u8 bind)
         val = scale_channel(7, 0, 1023);
         packet[9]|= val >> 8;
         packet[10]= val & 0xff;
-        if(++hopping_frequency_no > LORI_NUM_CHANNELS-1)
+        if(++hopping_frequency_no > LOLI_NUM_CHANNELS-1)
             hopping_frequency_no = 0;
         NRF24L01_WriteReg(NRF24L01_05_RF_CH, hopping_frequency[hopping_frequency_no]);
     }
     
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
     NRF24L01_FlushTx();
-    NRF24L01_WritePayload(packet, LORI_PACKET_SIZE);
+    NRF24L01_WritePayload(packet, LOLI_PACKET_SIZE);
     
     //Keep transmit power updated
     if (tx_power != Model.tx_power) {
@@ -150,7 +150,7 @@ static void update_telemetry()
     TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT2);
 }
 
-static u16 LORI_callback()
+static u16 LOLI_callback()
 {
     u16 delay = 0;
     switch(phase) {
@@ -175,7 +175,7 @@ static u16 LORI_callback()
         case BIND3:
             // got bind response ?
             if(NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR)) {
-                NRF24L01_ReadPayload(packet, LORI_PACKET_SIZE);
+                NRF24L01_ReadPayload(packet, LOLI_PACKET_SIZE);
                 if(packet[0]=='O' && packet[1]=='K') {
                     NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, rx_tx_addr, 5);
                     NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, rx_tx_addr, 5);
@@ -197,7 +197,7 @@ static u16 LORI_callback()
             NRF24L01_SetTxRxMode(TX_EN);
             // got a telemetry packet ?
             if(NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR)) { // RX fifo data ready
-                NRF24L01_ReadPayload(packet, LORI_PACKET_SIZE);
+                NRF24L01_ReadPayload(packet, LOLI_PACKET_SIZE);
                 update_telemetry();
             }
             // send data packet
@@ -243,7 +243,7 @@ static void init_txid()
     rx_tx_addr[4] = (lfsr >> 24) & 0xFF;
     
     // rf channels for data phase (manually set on "original" TX ?)
-    for(u8 i=0; i<LORI_NUM_CHANNELS; i++) {
+    for(u8 i=0; i<LOLI_NUM_CHANNELS; i++) {
         rand32_r(&lfsr, 0);
         hopping_frequency[i] = (lfsr & 0xff) % 84; // 2400-2483 MHz
     }
@@ -256,7 +256,7 @@ static void initialize(u8 bind)
     init_RF();
     if(bind) {
         phase = BIND1;
-        NRF24L01_WriteReg(NRF24L01_05_RF_CH, LORI_BIND_CHANNEL);
+        NRF24L01_WriteReg(NRF24L01_05_RF_CH, LOLI_BIND_CHANNEL);
         NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, bind_address, 5);
         NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, bind_address, 5);
         PROTOCOL_SetBindState(0xFFFFFFFF);
@@ -266,10 +266,10 @@ static void initialize(u8 bind)
         NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, rx_tx_addr, 5);
         phase = DATA1;
     }
-    CLOCK_StartTimer(500, LORI_callback);
+    CLOCK_StartTimer(500, LOLI_callback);
 }
 
-const void *LORI_Cmds(enum ProtoCmds cmd)
+const void *LOLI_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(0); return 0;
