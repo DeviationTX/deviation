@@ -1,11 +1,11 @@
 # Translators:
-# Howard Su <howard0su@gmail.com>, 2019
 # PhracturedBlue <rc2012@pblue.org>, 2019
 # 螺丝刀 <996371375@qq.com>, 2019
+# Howard Su <howard0su@gmail.com>, 2019
 # 
 msgid ""
 msgstr ""
-"Last-Translator: 螺丝刀 <996371375@qq.com>, 2019\n"
+"Last-Translator: Howard Su <howard0su@gmail.com>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/deviationtx/teams/73329/zh_CN/)\n"
 "Language: zh_CN\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -297,19 +297,19 @@ msgstr ""
 
 #: telemetry/telem_crsf.c:95
 msgid "Pitch"
-msgstr ""
+msgstr "俯仰"
 
 #: telemetry/telem_crsf.c:96
 msgid "Roll"
-msgstr ""
+msgstr "横滚"
 
 #: telemetry/telem_crsf.c:97
 msgid "Yaw"
-msgstr ""
+msgstr "偏航"
 
 #: telemetry/telem_crsf.c:106
 msgid "Flight Mode"
-msgstr ""
+msgstr "飞行模式"
 
 #: telemetry/telem_crsf.c:107
 msgid "RF Mode"
@@ -2283,7 +2283,7 @@ msgstr ""
 
 #: pages/128x64x1/model_page.c:110 pages/128x64x1/model_config.c:205
 msgid "Video"
-msgstr ""
+msgstr "视频"
 
 #: pages/128x64x1/model_page.c:111
 msgid "Setup"
@@ -2291,15 +2291,15 @@ msgstr ""
 
 #: pages/128x64x1/model_config.c:179
 msgid "Video Enable"
-msgstr ""
+msgstr "打开视频"
 
 #: pages/128x64x1/model_config.c:183
 msgid "Video Channel"
-msgstr ""
+msgstr "视频通道"
 
 #: pages/128x64x1/model_config.c:191
 msgid "Brightness"
-msgstr ""
+msgstr "亮度"
 
 #: pages/128x64x1/dialogs.c:82
 #, c-format
@@ -2339,7 +2339,7 @@ msgstr ""
 msgid ""
 "Bad/missing\n"
 "protocol modules!"
-msgstr ""
+msgstr "协议模块错误!"
 
 #: pages/128x64x1/reorder_list.c:39
 msgid "Dn"
@@ -2385,7 +2385,7 @@ msgstr "比例"
 
 #: pages/128x64x1/pagelist.h:27
 msgid "Video setup"
-msgstr ""
+msgstr "视频设置"
 
 #: pages/128x64x1/pagelist.h:38
 msgid "About Deviation"
