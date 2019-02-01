@@ -72,7 +72,7 @@ static void init_RF()
     NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0x00);    // No retransmit
     NRF24L01_WriteReg(NRF24L01_05_RF_CH, 66);   // start frequency
     NRF24L01_WriteReg(NRF24L01_11_RX_PW_P0, LOLI_PACKET_SIZE);  // RX FIFO size
-    NRF24L01_SetBitrate(NRF24L01_BR_2M);
+    NRF24L01_SetBitrate(NRF24L01_BR_250K);
     tx_power = Model.tx_power;
     NRF24L01_SetPower(tx_power);
     NRF24L01_SetTxRxMode(TX_EN);
