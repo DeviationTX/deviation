@@ -124,9 +124,9 @@ static void send_packet(u8 bind)
         val = scale_channel(7, 0, 1023);
         packet[9]|= val >> 8;
         packet[10]= val & 0xff;
-        NRF24L01_WriteReg(NRF24L01_05_RF_CH, hopping_frequency[hopping_frequency_no]);
         if (++hopping_frequency_no > LOLI_NUM_CHANNELS-1)
             hopping_frequency_no = 0;
+        NRF24L01_WriteReg(NRF24L01_05_RF_CH, hopping_frequency[hopping_frequency_no]);
     }
 
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
@@ -182,7 +182,6 @@ static u16 LOLI_callback()
                     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
                     NRF24L01_FlushRx();
                     phase = DATA1;
-                    hopping_frequency_no = 0;
                     break;
                 }
             }
