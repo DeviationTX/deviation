@@ -47,11 +47,13 @@ static u8 tx_power;
 static u8 hopping_frequency[LORI_NUM_CHANNELS];
 static u8 rx_tx_addr[5];
 static u8 hopping_frequency_no;
+static u8 binding_count;
 static const u8 bind_address[5] = {'L','O','V','E','!'};
 
 enum{
     BIND1,
     BIND2,
+    BIND3,
     DATA1,
     DATA2
 };
@@ -155,6 +157,22 @@ static u16 LORI_callback()
         case BIND1:
             NRF24L01_SetTxRxMode(TXRX_OFF);
             NRF24L01_SetTxRxMode(TX_EN);
+
+            // send bind packet
+            send_packet(1);
+            phase = BIND2;
+            delay = 1000;
+            break;
+        case BIND2:
+            // switch to RX mode
+            NRF24L01_SetTxRxMode(TXRX_OFF);
+            NRF24L01_FlushRx();
+            NRF24L01_SetTxRxMode(RX_EN);
+            phase = BIND3;
+            binding_count = 0;
+            delay = 1000;
+            break;
+        case BIND3:
             // got bind response ?
             if(NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR)) {
                 NRF24L01_ReadPayload(packet, LORI_PACKET_SIZE);
@@ -167,18 +185,12 @@ static u16 LORI_callback()
                     break;
                 }
             }
-            // send bind packet
-            send_packet(1);
-            phase = BIND2;
-            delay = 1000;
-            break;
-        case BIND2:
-            // switch to RX mode
-            NRF24L01_SetTxRxMode(TXRX_OFF);
-            NRF24L01_FlushRx();
-            NRF24L01_SetTxRxMode(RX_EN);
-            phase = BIND1;
-            delay = 50000;
+            binding_count++;
+            if (binding_count > 50) {
+                phase = BIND1;
+            } else {
+                delay = 1000;
+            }
             break;
         case DATA1:
             NRF24L01_SetTxRxMode(TXRX_OFF);
