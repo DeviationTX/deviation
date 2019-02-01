@@ -19,6 +19,7 @@ CFLAGS = -DEMULATOR=USE_NATIVE_FS
 endif
 
 CFLAGS += -I$(SDIR)/target/common/filesystems
+LFLAGS += -lz
 
 ALL = $(TARGET).$(EXEEXT)
 

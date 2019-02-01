@@ -21,5 +21,5 @@ void TestLabel(CuTest* t)
         NULL, NULL, "TestLabel");
 
     GUI_DrawObject(&label);
-    AssertScreenshot(t, "label.bmp");
+    AssertScreenshot(t, "label");
 }
