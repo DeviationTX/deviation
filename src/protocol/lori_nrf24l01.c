@@ -162,6 +162,7 @@ static u16 LORI_callback()
                     NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, rx_tx_addr, 5);
                     NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, rx_tx_addr, 5);
                     PROTOCOL_SetBindState(0);
+                    NRF24L01_FlushRx();
                     phase = DATA1;
                     break;
                 }
