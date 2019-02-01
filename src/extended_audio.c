@@ -110,9 +110,9 @@ int AUDIO_Play(u16 id) {
     char cmd[70];
     u16 vol_val = Transmitter.audio_vol * 32786/10;
 #ifdef _WIN32
-    sprintf(cmd, "start /B ..\\..\\mpg123 -f %d -q ..\\..\\mp3\\%04d*.mp3 > nul 2>&1", vol_val, id);
+    snprintf(cmd, sizeof(cmd), "start /B ..\\..\\mpg123 -f %d -q ..\\..\\mp3\\%04d*.mp3 > nul 2>&1", vol_val, id);
 #else
-    sprintf(cmd, "mpg123 -f %d -q ../../mp3/%04d*.mp3 > /dev/null 2>&1 &", vol_val, id);
+    snprintf(cmd, sizeof(cmd), "mpg123 -f %d -q ../../mp3/%04d*.mp3 > /dev/null 2>&1 &", vol_val, id);
 #endif // _WIN32
     system(cmd);
     return 1;

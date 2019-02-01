@@ -51,17 +51,18 @@ static int ini_handler(void* user, const char* section, const char* name, const 
 #if HAS_MUSIC_CONFIG
         strlcpy(tempstring, value, k+1);  // return a requested mp3 label passed at *user to tempstring
 #endif
-//        printf("returning for id %d:duration %d, label %s\n", id, current_voice_mapping.duration, current_voice_mapping.label);
         return 1;
     }
+#if HAS_MUSIC_CONFIG
     if ( req_id == MAX_VOICEMAP_ENTRIES ) {
         if (MATCH_SECTION(SECTION_VOICE_CUSTOM)) {
-            //Initiai count of custom voicemap entries
+            // Initial count of custom voicemap entries
             voice_map_entries++;
             return 1;
         }
         return 0;
     }
+#endif
     return 1;  // voice label ignored
 }
 
@@ -83,16 +84,18 @@ const char* CONFIG_VoiceParse(unsigned id)
     char filename[] = "media/voice.ini";
     #endif
     if (id == MAX_VOICEMAP_ENTRIES) {  // initial parse of voice.ini
+#if HAS_MUSIC_CONFIG
         voice_map_entries = CUSTOM_ALARM_ID;  // Reserve space in map for global alerts
+#endif
         if (CONFIG_IniParse(filename, ini_handler, &id)) {
             printf("Failed to parse voice.ini\n");
-            //Transmitter.audio_player = AUDIO_NONE;  // disable external voice output
+            // Transmitter.audio_player = AUDIO_NONE;  // disable external voice output
             tempstring[0] = '\0';
         }
     }
     if ( (id < MAX_VOICEMAP_ENTRIES) ) {
         if (CONFIG_IniParse(filename, ini_handler, &id)) {
-            // ini handler will return tempstring with label of id
+            // ini handler will return tempstring with label of id and fill current_voice_mapping
         }
     }
     return tempstring;

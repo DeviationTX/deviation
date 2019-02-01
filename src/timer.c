@@ -229,7 +229,7 @@ void TIMER_Update()
                     if (timer_val[i] > warn_time && (timer_val[i] - delta) <= warn_time) {
 #if HAS_EXTENDED_AUDIO
                         MUSIC_PlayValue(MUSIC_GetTimerAlarm(MUSIC_ALARM1 + i),
-                            (timer_val[i]-Model.timer[MUSIC_ALARM1 + i].duration)/-1000+1,VOICE_UNIT_TIME,0);
+                            (timer_val[i]-Model.timer[MUSIC_ALARM1 + i].duration)/-1000+1, VOICE_UNIT_TIME, 0);
 #else
                         MUSIC_Play(MUSIC_ALARM1 + i + 2);
 #endif

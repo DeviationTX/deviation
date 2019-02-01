@@ -1078,7 +1078,7 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
     if (MATCH_SECTION(SECTION_VOICE)) {
         u16 val = atoi(value);
         CONFIG_VoiceParse(val);
-        if(current_voice_mapping.duration == 0 || val < CUSTOM_ALARM_ID) {
+        if (current_voice_mapping.duration == 0 || val < CUSTOM_ALARM_ID) {
             printf("%s: Music %s not found in voice.ini or below ID %d\n", section, value, CUSTOM_ALARM_ID);
             return 0;
         }
