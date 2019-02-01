@@ -24,6 +24,9 @@ struct Timer {
     u8 resetsrc;
     u16 timer;
     u32 val;
+#if HAS_EXTENDED_AUDIO
+    u16 duration;
+#endif
     enum TimerType type;
     u8 padding_1[3];  //Needed to ensure structure is word aligned
 };

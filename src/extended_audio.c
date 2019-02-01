@@ -27,7 +27,6 @@
 
 #if HAS_EXTENDED_AUDIO
 u16 voice_map_entries;
-//struct VoiceMap voice_map[MAX_VOICEMAP_ENTRIES];
 struct VoiceMap current_voice_mapping;
 struct AudioQueue audio_queue[AUDIO_QUEUE_LENGTH];
 u8 next_audio;

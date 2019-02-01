@@ -174,18 +174,27 @@ static const char *voiceid_cb(guiObject_t *obj, int dir, void *data)
             vpt = &Model.voice.mixer[idx - VOICE_SRC_MIXER];
             break;
     }
-    if (dir == -1 && vpt->music == CUSTOM_ALARM_ID) // set to none below 1
+    if (dir == -1 && vpt->music == CUSTOM_ALARM_ID)  // set to none below 1
         vpt->music = 0;
-    if (dir == 1 && vpt->music == 0) // set to CUSTOM_ALARM_ID when currently none
+    if (dir == 1 && vpt->music == 0)  // set to CUSTOM_ALARM_ID when currently none
         vpt->music = CUSTOM_ALARM_ID - 1;
     GUI_TextSelectEnablePress((guiTextSelect_t *)obj, vpt->music);
 
     if (vpt->music == 0) {
         GUI_Redraw(&gui->voicelbl[cur_row]);
+        if (voiceconfig_getsrctype(idx) == VOICE_SRC_TIMER) {  // Setting duration to global alarm value for timers
+            CONFIG_VoiceParse(idx - VOICE_SRC_TIMER + MUSIC_ALARM1);
+            Model.timer[idx - VOICE_SRC_TIMER].duration = current_voice_mapping.duration;
+        }
         return strcpy(tempstring, _tr("None"));
     }
-    vpt->music = GUI_TextSelectHelper(vpt->music - CUSTOM_ALARM_ID + 1, //Relabling so voice in menu starts with 1
+    vpt->music = GUI_TextSelectHelper(vpt->music - CUSTOM_ALARM_ID + 1,  // Relabling so voice in menu starts with 1
         1, voice_map_entries, dir, 1, 10, NULL) + CUSTOM_ALARM_ID - 1;
+
+    if (voiceconfig_getsrctype(idx) == VOICE_SRC_TIMER) {  // Setting duration for custom timer alarms
+        CONFIG_VoiceParse(vpt->music);
+        Model.timer[idx - VOICE_SRC_TIMER].duration = current_voice_mapping.duration;
+    }
     snprintf(tempstring, 5, "%d", vpt->music - CUSTOM_ALARM_ID + 1);
     GUI_Redraw(&gui->voicelbl[cur_row]);
     return tempstring;
