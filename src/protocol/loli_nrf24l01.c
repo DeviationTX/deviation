@@ -160,7 +160,7 @@ static u16 LOLI_callback()
             // send bind packet
             send_packet(1);
             phase = BIND2;
-            delay = 1000;
+            delay = 800;
             break;
         case BIND2:
             // switch to RX mode
@@ -169,7 +169,6 @@ static u16 LOLI_callback()
             NRF24L01_SetTxRxMode(RX_EN);
             phase = BIND3;
             binding_count = 0;
-            delay = 1000;
             break;
         case BIND3:
             // got bind response ?
