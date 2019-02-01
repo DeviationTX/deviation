@@ -76,6 +76,7 @@ static void init_RF()
     tx_power = Model.tx_power;
     NRF24L01_SetPower(tx_power);
     NRF24L01_SetTxRxMode(TX_EN);
+    NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x0a); // 8bit CRC, TX
 }
 
 #define CHAN_RANGE (CHAN_MAX_VALUE - CHAN_MIN_VALUE)
@@ -157,6 +158,7 @@ static u16 LOLI_callback()
         case BIND1:
             NRF24L01_SetTxRxMode(TXRX_OFF);
             NRF24L01_SetTxRxMode(TX_EN);
+            NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x0a); // 8bit CRC, TX
             // send bind packet
             send_packet(1);
             phase = BIND2;
@@ -167,6 +169,7 @@ static u16 LOLI_callback()
             NRF24L01_SetTxRxMode(TXRX_OFF);
             NRF24L01_FlushRx();
             NRF24L01_SetTxRxMode(RX_EN);
+            NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x3b); // 8bit CRC, RX
             phase = BIND3;
             binding_count = 0;
             delay = 1000;
@@ -200,6 +203,7 @@ static u16 LOLI_callback()
             }
             NRF24L01_SetTxRxMode(TXRX_OFF);
             NRF24L01_SetTxRxMode(TX_EN);
+            NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x0a); // 8bit CRC, TX
             // send data packet
             send_packet(0);
             phase = DATA2;
@@ -210,6 +214,7 @@ static u16 LOLI_callback()
             NRF24L01_SetTxRxMode(TXRX_OFF);
             NRF24L01_FlushRx();
             NRF24L01_SetTxRxMode(RX_EN);
+            NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x3b); // 8bit CRC, RX
             phase = DATA1;
             delay = 18000;
             break;
