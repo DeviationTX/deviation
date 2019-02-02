@@ -61,6 +61,7 @@ static s32 get_trim(unsigned src);
 // for calculation of MUX_DELAY and ApplyLimits
 // Period depends on protocol for protocols that run mixer manually
 static u32 mixer_period;
+static u32 prev_calcchannels_ms;
 
 static void MIXER_CreateCyclicOutput(volatile s32 *raw, s32 *cyclic);
 
@@ -175,10 +176,9 @@ int MIXER_GetCachedInputs(s32 *cache, unsigned threshold)
 
 void MIXER_CalcChannels()
 {
-    static u32 prev_run;
     u32 now = CLOCK_getms();
-    mixer_period = now - prev_run;
-    prev_run = now;
+    mixer_period = now - prev_calcchannels_ms;
+    prev_calcchannels_ms = now;
 
     //We retain this array so that we can refer to the prevous values in the next iteration
     int i;

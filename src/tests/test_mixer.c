@@ -136,6 +136,10 @@ void TestCalcChannels(CuTest *t)
 {
     memset(&Model, 0, sizeof(Model));
     memset((s32 *)raw, 0, sizeof(raw));
+    Transmitter.mode = MODE_4;
+    for (int i = 1; i <= NUM_TX_INPUTS; i++) {
+        TEST_CHAN_SetChannelValue(i, (i + 1) * 200);
+    }
     for (int i = 0; i < 4; i++) {
         TEST_CHAN_SetChannelValue(i, (i + 1) * 200);
         Model.mixers[i].src = i + 1;
