@@ -299,9 +299,9 @@ static void TW8816_Init_Ports()
 static void TW8816_Reset()
 {
     gpio_clear(GPIOE, GPIO7);
-    _msleep(250);
+    _msleep(10);
     gpio_set(GPIOE, GPIO7);
-    _msleep(100);
+    _msleep(10);
 }
 
 static void TW8816_ResetLoop()
@@ -315,7 +315,7 @@ static void TW8816_ResetLoop()
             break;
         count++;
         if (count < 250) {
-            Delay(0x800);
+            usleep(100);
         } else {
             count = 0;
             TW8816_Reset();
@@ -329,7 +329,7 @@ static void TW8816_ReinitPixelClock()
     u8 reg2 = LCD_ReadReg(0xB2);
     LCD_WriteReg(0xB6, reg1 | 0x80);
     LCD_WriteReg(0xB2, reg2);
-    Delay(0x60000);
+    usleep(10);
     LCD_WriteReg(0xB6, reg1 & 0x7F);
     LCD_WriteReg(0xB2, reg2);
 }
