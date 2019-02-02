@@ -5,7 +5,7 @@
 # Prints to stdout.
 # Author: Asim Jalis
 # Date: 01/08/2003
-FILES=`find tests/ -name '*.c'`
+FILES=`find tests/ -name '*.c' | sort`
 echo '
 
 /* This is auto-generated code. Edit at your own peril. */
@@ -17,7 +17,7 @@ echo '
 
 '
 
-cat $FILES | grep '^void Test' | sort |
+cat $FILES | grep '^void Test' |
     sed -e 's/(.*$//' \
         -e 's/$/(CuTest*);/' \
         -e 's/^/extern /'
@@ -31,7 +31,7 @@ int RunAllTests(void)
     CuSuite* suite = CuSuiteNew();
 
 '
-cat $FILES | grep '^void Test' | sort |
+cat $FILES | grep '^void Test' |
     sed -e 's/^void //' \
         -e 's/(.*$//' \
         -e 's/^/    SUITE_ADD_TEST(suite, /' \
