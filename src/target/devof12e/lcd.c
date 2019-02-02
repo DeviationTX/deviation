@@ -28,7 +28,7 @@ static u8 height;
 static u16 load_char_font(u32 c);
 
 #define FONT_NAME_LEN 9
-char FontName[FONT_NAME_LEN];
+char FontName[FONT_NAME_LEN] = {0};
 #endif
 
 void LCD_Init()
@@ -51,11 +51,15 @@ void LCD_PrintCharXY(unsigned int x, unsigned int y, u32 c)
 #if SUPPORT_MULTI_LANGUAGE
     if (c > 0x300 + LOC_CHAR_STARTS) {
         if (height == 0) {
-            open_font(FontName);
-            height = get_height();
+            int ok = open_font(FontName);
+            if (ok) {
+                height = get_height();
+            }
         }
-
-        c = load_char_font(c);
+        if (height)
+            c = load_char_font(c);
+        else
+            c = '?';
     }
 #endif
     if (x >= LCD_WIDTH)
@@ -80,7 +84,7 @@ u8 FONT_GetFromString(const char *value)
     (void)value;
 #if SUPPORT_MULTI_LANGUAGE
     // We take the first font as the font name from display.ini
-    if (value[0] != '\0') {
+    if (value[0] != '\0' && FontName[0] == '\0') {
         strlcpy(FontName, value, sizeof(FontName));
     }
 #endif
@@ -224,13 +228,23 @@ u16 load_char_font(u32 c)
 
     u8 *offset = &font[0];
 
+    int start, end;
+
+    if (height >= CHAR_HEIGHT) {
+        start = 0;
+        end = CHAR_HEIGHT;
+    } else {
+        start = CHAR_HEIGHT - height;
+        end = start + height;
+    }
+
     // convert font to tw8816 format
     for (int x = 0; x < width; x++)
     {
         const u8 *data = offset++;
         u8 bit = 0;
         // Data is right aligned, drawn top to bottom
-        for (int y = 3; y < height + 3; ++y)
+        for (int y = start; y < end; y++)
         {
             if (bit == 8) {
                 data = offset++;
