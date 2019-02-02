@@ -2,7 +2,7 @@
 
 void TestLanguage(CuTest *t)
 {
-    static const char input[] = "Configure";
+    static const char input[] = "Airplane";
     const char *loc;
 
     // for default language, input == loc
