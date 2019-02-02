@@ -28,12 +28,11 @@ static u8 height;
 static u16 load_char_font(u32 c);
 
 #define FONT_NAME_LEN 9
-char FontName[FONT_NAME_LEN];
+char FontName[FONT_NAME_LEN] = {0};
 #endif
 
 void LCD_Init()
 {
-    FontName[0] = '\0';
     TW8816_Init();
 }
 
