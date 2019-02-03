@@ -55,7 +55,71 @@ enum{
     BIND2,
     BIND3,
     DATA1,
-    DATA2
+    DATA2,
+    SET_RX_CONFIG
+};
+
+static const char * const loli_opts[] = {
+    "SBUS", _tr_noop("Off"), _tr_noop("On"), NULL,
+    "PPM", _tr_noop("Off"), _tr_noop("On"), NULL,
+    _tr_noop("Chan 1"), "PWM", "SW", NULL,
+    _tr_noop("Chan 2"), "PWM", "SW", NULL,
+    _tr_noop("Chan 3"), "PWM", "SW", NULL,
+    _tr_noop("Chan 4"), "PWM", "SW", NULL,
+    _tr_noop("Chan 5"), "PWM", "SW", NULL,
+    _tr_noop("Chan 6"), "PWM", "SW", NULL,
+    _tr_noop("Chan 7"), "PWM", "SW", NULL,
+    _tr_noop("Chan 8"), "PWM", "SW", NULL,
+    NULL
+};
+
+#define OPT_OFF 0
+#define OPT_ON  1
+#define OPT_PWM 0
+#define OPT_SW  1
+
+enum {
+    PROTOOPTS_SBUS = 0,
+    PROTOOPTS_PPM,
+    PROTOOPTS_CH1,
+    PROTOOPTS_CH2,
+    PROTOOPTS_CH3,
+    PROTOOPTS_CH4,
+    PROTOOPTS_CH5,
+    PROTOOPTS_CH6,
+    PROTOOPTS_CH7,
+    PROTOOPTS_CH8,
+    LAST_PROTO_OPT,
+};
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
+
+// flags going to packet[1] for packet type 0xa2 (Rx config)
+#define FLAG_PWM7   0x02  // why only PWM1,2 & 7 ?
+#define FLAG_PWM2   0x04
+#define FLAG_PWM1   0x08
+#define FLAG_SBUS   0x40
+#define FLAG_PPM    0x80
+
+// flags going to packet[2] for packet type 0xa2 (Rx config)
+#define FLAG_SW8    0x01
+#define FLAG_SW7    0x02
+#define FLAG_SW6    0x04
+#define FLAG_SW5    0x08
+#define FLAG_SW4    0x10
+#define FLAG_SW3    0x20
+#define FLAG_SW2    0x40
+#define FLAG_SW1    0x80
+
+// For code readability
+enum {
+    CHANNEL1 = 0,
+    CHANNEL2,
+    CHANNEL3,
+    CHANNEL4,
+    CHANNEL5,
+    CHANNEL6,
+    CHANNEL7,
+    CHANNEL8,
 };
 
 // Bit vector from bit position
@@ -90,6 +154,21 @@ static u16 scale_channel(u8 ch, u16 destMin, u16 destMax)
     else if (chanval > CHAN_MAX_VALUE)
         chanval = CHAN_MAX_VALUE;
     return (range * (chanval - CHAN_MIN_VALUE)) / CHAN_RANGE + destMin;
+}
+
+static void send_rx_config()
+{
+    packet[0] = 0xa2;
+    // TODO
+    packet[1] = 0;
+    packet[2] = 0;
+    
+    if (++hopping_frequency_no > LOLI_NUM_CHANNELS-1)
+        hopping_frequency_no = 0;
+    NRF24L01_WriteReg(NRF24L01_05_RF_CH, hopping_frequency[hopping_frequency_no]);
+    NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
+    NRF24L01_FlushTx();
+    NRF24L01_WritePayload(packet, LOLI_PACKET_SIZE);
 }
 
 static void send_packet(u8 bind)
@@ -217,6 +296,15 @@ static u16 LOLI_callback()
             phase = DATA1;
             delay = 18000;
             break;
+        case SET_RX_CONFIG:
+            // TODO: detect config change, send this packet a few times
+            // then fall back to DATA1:
+            NRF24L01_SetTxRxMode(TXRX_OFF);
+            NRF24L01_SetTxRxMode(TX_EN);
+            NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x0a);  // 8bit CRC, TX
+            send_rx_config();
+            delay=20000;
+            break;
     }
     return delay;
 }
@@ -285,7 +373,7 @@ const void *LOLI_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_NUMCHAN: return (void *) 8L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((u32)Model.fixed_id) : 0;
-        case PROTOCMD_GETOPTIONS: return (void*)0L;
+        case PROTOCMD_GETOPTIONS: return loli_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)PROTO_TELEM_ON;
         case PROTOCMD_TELEMETRYTYPE: return (void *)(u32)TELEM_FRSKY;
         case PROTOCMD_CHANNELMAP: return AETRG;
