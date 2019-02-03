@@ -2,9 +2,6 @@ A.	Voice Feedback on the following are supported.  For additional details, refer
 	- Changing Switch Positions.
 	- Turning of Auxiliary Knobs.
 	  Different voice files can be specified for turning up & turning down of knobs.
-	- Trim buttons as virtual switches.
-	  Different voice files can be specified for the same trim button when used as
-          Momentary or Toggle switch.
 
 B.	Following options have been added to media/sound.ini file.
 1)	Specify a different playback device for each alert message.

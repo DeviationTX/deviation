@@ -85,11 +85,7 @@ enum {
     VOICE_UNIT_TOTAL
 };
 
-struct ButtonVoice {
-    u16 on;             // Music to be played when button is On
-    u16 off;
-    u16 music;            // Music to be played when button is Off
-};
+
 
 struct CustomVoice {
     u16 music;
@@ -100,7 +96,6 @@ struct Voice {
     struct CustomVoice telemetry[TELEM_NUM_ALARMS]; //Telemetry Alarm array to point to music file number
     struct CustomVoice timer[NUM_TIMERS]; //Timer Alarm array to point to music file number
     struct CustomVoice mixer[NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS];
-    struct ButtonVoice buttons[NUM_TX_BUTTONS];	//Button array to point to music file number
 #if NUM_AUX_KNOBS
     struct CustomVoice aux[NUM_AUX_KNOBS * 2]; //two per knob for up and down
 #endif

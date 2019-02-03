@@ -33,8 +33,6 @@ static u8 voiceconfig_getsrctype (u8 idx)
 {
     if (idx < NUM_SWITCHES)
         return VOICE_SRC_SWITCH;
-/*    if (idx < NUM_INPUTS - INP_HAS_CALIBRATION + NUM_TX_BUTTONS)
-        return VOICE_SRC_BUTTON;*/
 #if NUM_AUX_KNOBS
     if (idx < NUM_SWITCHES + NUM_AUX_KNOBS * 2)
         return VOICE_SRC_AUX;
