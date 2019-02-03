@@ -486,10 +486,9 @@ void TELEMETRY_Alarm()
                     case TELEM_CRSF_RX_RSSI2: telem_unit = VOICE_UNIT_DB; break;
                 }
                 break;
-        }
 #endif //HAS_EXTENDED_TELEMETRY
-        MUSIC_PlayValue(telem_music, telem_value, telem_unit, telem_prec);
         }
+        MUSIC_PlayValue(telem_music, telem_value, telem_unit, telem_prec);
 #else
         MUSIC_Play(MUSIC_TELEMALARM1 + telem_idx);
 #endif //HAS_EXTENDED_AUDIO
