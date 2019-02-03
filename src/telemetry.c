@@ -443,7 +443,6 @@ void TELEMETRY_Alarm()
 #if HAS_EXTENDED_TELEMETRY
                 case TELEM_DSM_FLOG_RSSI_DBM: telem_unit = VOICE_UNIT_DB; break;
 #endif
-                //default: telem_unit = VOICE_UNIT_NONE,0);
           }
         }
 
@@ -465,14 +464,13 @@ void TELEMETRY_Alarm()
                 case TELEM_FRSKY_VOLT2: telem_unit = VOICE_UNIT_VOLT; telem_prec = 2; break;
 #if HAS_EXTENDED_TELEMETRY
                 case TELEM_FRSKY_TEMP1:
-                case TELEM_FRSKY_TEMP2: telem_value -=20; telem_unit = VOICE_UNIT_TEMP; break;
+                case TELEM_FRSKY_TEMP2: telem_value -= 20; telem_unit = VOICE_UNIT_TEMP; break;
                 case TELEM_FRSKY_RPM: telem_unit = VOICE_UNIT_RPM; break;
                 case TELEM_FRSKY_CURRENT: telem_unit = VOICE_UNIT_AMPS; telem_prec = 2; break;
                 case TELEM_FRSKY_ALTITUDE: telem_unit = VOICE_UNIT_ALTITUDE; telem_prec = 2; break;
 #endif
                 case TELEM_FRSKY_LRSSI:
                 case TELEM_FRSKY_RSSI: telem_unit = VOICE_UNIT_DB; break;
-                //default: telem_unit = VOICE_UNIT_NONE,0);
             }
         }
 
@@ -487,7 +485,6 @@ void TELEMETRY_Alarm()
                 case TELEM_CRSF_RX_SNR:
                 case TELEM_CRSF_RX_RSSI1:
                 case TELEM_CRSF_RX_RSSI2: telem_unit = VOICE_UNIT_DB; break;
-                //default: telem_unit = VOICE_UNIT_NONE,0);
             }
         }
 #endif //HAS_EXTENDED_TELEMETRY
