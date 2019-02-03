@@ -319,6 +319,9 @@ void MIXER_ApplyMixer(struct Mixer *mixer, volatile s32 *raw, s32 *orig_value)
 
     //4th: multiplex result
     s32 scaled_value = raw[mixer->dest + NUM_INPUTS + 1];
+#if HAS_EXTENDED_AUDIO
+    u16 diff_value = abs(value-scaled_value);
+#endif
     switch(MIXER_MUX(mixer)) {
     case MUX_REPLACE:
         break;
@@ -360,12 +363,12 @@ void MIXER_ApplyMixer(struct Mixer *mixer, volatile s32 *raw, s32 *orig_value)
 #if HAS_EXTENDED_AUDIO
     case MUX_BEEP:
         if (orig_value) {
-            if (abs(value - scaled_value) > 100)
+            if (diff_value  > 100)
                 MIXER_SET_BEEP_LOCK(mixer, 0);
             if (! MIXER_BEEP_LOCK(mixer)) {
                 if ((value > *orig_value && value < scaled_value) ||
                     (value < *orig_value && value > scaled_value) ||
-                    (abs(value - scaled_value) <= 10)) {
+                    (diff_value <= 10)) {
                     MIXER_SET_BEEP_LOCK(mixer, 1);
                     MUSIC_Play(MUSIC_MAXLEN);
                 }
@@ -375,12 +378,12 @@ void MIXER_ApplyMixer(struct Mixer *mixer, volatile s32 *raw, s32 *orig_value)
         break;
     case MUX_VOICE:
         if (orig_value) {
-            if (abs(value - scaled_value) > 100)
+            if (diff_value > 100)
                 MIXER_SET_VOICE_LOCK(mixer, 0);
             if (! MIXER_VOICE_LOCK(mixer)) {
                 if ((value > *orig_value && value < scaled_value) ||
                     (value < *orig_value && value > scaled_value) ||
-                    (abs(value - scaled_value) <= 10)) {
+                    (diff_value <= 10)) {
                     MIXER_SET_VOICE_LOCK(mixer, 1);
                     if (Model.voice.mixer[mixer->dest].music)
                         MUSIC_Play(Model.voice.mixer[mixer->dest].music);
