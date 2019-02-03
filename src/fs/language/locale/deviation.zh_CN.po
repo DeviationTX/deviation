@@ -1,11 +1,11 @@
 # Translators:
 # PhracturedBlue <rc2012@pblue.org>, 2019
-# 螺丝刀 <996371375@qq.com>, 2019
 # Howard Su <howard0su@gmail.com>, 2019
+# Screwdriver_Plus <996371375@qq.com>, 2019
 # 
 msgid ""
 msgstr ""
-"Last-Translator: Howard Su <howard0su@gmail.com>, 2019\n"
+"Last-Translator: Screwdriver_Plus <996371375@qq.com>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/deviationtx/teams/73329/zh_CN/)\n"
 "Language: zh_CN\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -57,41 +57,41 @@ msgstr "辅助7"
 
 #: inputs.c:45 inputs.c:46
 msgid "DR"
-msgstr "大小舵"
+msgstr "DR"
 
 #: inputs.c:47 inputs.c:48 inputs.c:49
 msgid "RUD DR"
-msgstr "方向大小舵"
+msgstr "RUD DR"
 
 #: inputs.c:50 inputs.c:51 inputs.c:52
 msgid "ELE DR"
-msgstr "升降大小舵"
+msgstr "ELE DR"
 
 #: inputs.c:53 inputs.c:54 inputs.c:55
 msgid "AIL DR"
-msgstr "副翼大小舵"
+msgstr "AIL DR"
 
 #: inputs.c:56 inputs.c:57 inputs.c:91 inputs.c:92 inputs.c:93
 #: pages/common/standard/_gyrosense_page.c:59
 #: pages/common/standard/_common_standard.c:38
 msgid "GEAR"
-msgstr "起落架"
+msgstr "GEAR"
 
 #: inputs.c:58 inputs.c:59 inputs.c:60
 msgid "MIX"
-msgstr "混控"
+msgstr "MIX"
 
 #: inputs.c:61 inputs.c:62 inputs.c:63
 msgid "FMODE"
-msgstr "模式"
+msgstr "FMODE"
 
 #: inputs.c:64 inputs.c:65
 msgid "HOLD"
-msgstr ""
+msgstr "HOLD"
 
 #: inputs.c:66 inputs.c:67
 msgid "TRN"
-msgstr ""
+msgstr "TRN"
 
 #: inputs.c:68 inputs.c:69 inputs.c:70
 msgid "SW A"
@@ -243,7 +243,7 @@ msgstr "虚拟"
 
 #: inputs.c:163
 msgid "PPM"
-msgstr ""
+msgstr "PPM"
 
 #: telemetry/telem_crsf.c:81
 msgid "tx SNR"
@@ -259,27 +259,27 @@ msgstr ""
 
 #: telemetry/telem_crsf.c:86
 msgid "FMode"
-msgstr ""
+msgstr "模式"
 
 #: telemetry/telem_crsf.c:87
 msgid "RFMode"
-msgstr ""
+msgstr "RF模式"
 
 #: telemetry/telem_crsf.c:88
 msgid "ANT"
-msgstr ""
+msgstr "天线"
 
 #: telemetry/telem_crsf.c:89
 msgid "Power"
-msgstr ""
+msgstr "功率"
 
 #: telemetry/telem_crsf.c:90
 msgid "rxQual"
-msgstr ""
+msgstr "RX质量"
 
 #: telemetry/telem_crsf.c:91
 msgid "txQual"
-msgstr ""
+msgstr "TX质量"
 
 #: telemetry/telem_crsf.c:92 telemetry/telem_frsky.c:64
 #: telemetry/telem_frsky.c:70 telemetry/telem_dsm.c:192
@@ -289,11 +289,11 @@ msgstr "电压"
 
 #: telemetry/telem_crsf.c:93
 msgid "Curr"
-msgstr ""
+msgstr "电流"
 
 #: telemetry/telem_crsf.c:94
 msgid "Cap"
-msgstr ""
+msgstr "容量"
 
 #: telemetry/telem_crsf.c:95
 msgid "Pitch"
@@ -313,7 +313,7 @@ msgstr "飞行模式"
 
 #: telemetry/telem_crsf.c:107
 msgid "RF Mode"
-msgstr ""
+msgstr "RF模式"
 
 #: telemetry/telem_crsf.c:108
 msgid "Antenna"
@@ -321,40 +321,40 @@ msgstr "天线"
 
 #: telemetry/telem_crsf.c:109
 msgid "rx Quality"
-msgstr ""
+msgstr "RX质量"
 
 #: telemetry/telem_crsf.c:110
 msgid "tx Quality"
-msgstr ""
+msgstr "TX质量"
 
 #: telemetry/telem_crsf.c:111
 msgid "Capacity"
-msgstr ""
+msgstr "容量"
 
 #: telemetry/telem_frsky.c:66 telemetry/telem_dsm.c:213
 msgid "RSSI"
-msgstr ""
+msgstr "RSSI"
 
 #: telemetry/telem_frsky.c:67
 msgid "LRSSI"
-msgstr ""
+msgstr "LRSSI"
 
 #: telemetry/telem_frsky.c:68
 msgid "LQI"
-msgstr ""
+msgstr "LQI"
 
 #: telemetry/telem_frsky.c:70 telemetry/telem_frsky.c:83
 #: telemetry/telem_dsm.c:201
 msgid "Amps"
-msgstr ""
+msgstr "安培"
 
 #: telemetry/telem_frsky.c:71
 msgid "MinCell"
-msgstr ""
+msgstr "最低电芯"
 
 #: telemetry/telem_frsky.c:72
 msgid "AllCell"
-msgstr ""
+msgstr "总电芯"
 
 #: telemetry/telem_frsky.c:79 telemetry/telem_dsm.c:194
 #: telemetry/telem_devo.c:81 pages/128x64x1/telemtest_page.c:341
@@ -368,19 +368,19 @@ msgstr "温度"
 
 #: telemetry/telem_frsky.c:82
 msgid "Fuel"
-msgstr ""
+msgstr "燃料"
 
 #: telemetry/telem_frsky.c:84
 msgid "Alt"
-msgstr ""
+msgstr "高度"
 
 #: telemetry/telem_frsky.c:85
 msgid "VSI"
-msgstr ""
+msgstr "VSI"
 
 #: telemetry/telem_frsky.c:86
 msgid "DIS"
-msgstr ""
+msgstr "放电"
 
 #: telemetry/telem_frsky.c:101 telemetry/telem_frsky.c:108
 #: telemetry/telem_devo.c:55
@@ -389,11 +389,11 @@ msgstr "电压"
 
 #: telemetry/telem_frsky.c:104
 msgid "TelemRSSI"
-msgstr ""
+msgstr "回传RSSI"
 
 #: telemetry/telem_frsky.c:108
 msgid "Amp"
-msgstr ""
+msgstr "安培"
 
 #: telemetry/telem_frsky.c:112 telemetry/telem_devo.c:61
 msgid "TelemT"
@@ -425,7 +425,7 @@ msgstr ""
 
 #: telemetry/telem_dsm.c:199
 msgid "Loss"
-msgstr ""
+msgstr "丢帧"
 
 #: telemetry/telem_dsm.c:200
 msgid "Holds"
@@ -433,23 +433,23 @@ msgstr ""
 
 #: telemetry/telem_dsm.c:202
 msgid "AirSpd"
-msgstr ""
+msgstr "空速"
 
 #: telemetry/telem_dsm.c:203
 msgid "Alt."
-msgstr ""
+msgstr "高度"
 
 #: telemetry/telem_dsm.c:204
 msgid "Alt.max"
-msgstr ""
+msgstr "最高"
 
 #: telemetry/telem_dsm.c:262
 msgid "RxV"
-msgstr ""
+msgstr "电压"
 
 #: telemetry/telem_dsm.c:263
 msgid "Bat"
-msgstr ""
+msgstr "电池"
 
 #: datalog.c:57
 msgid "1 sec"
@@ -551,12 +551,12 @@ msgstr ""
 #: protocol/hitec_cc2500.c:63 protocol/corona_cc2500.c:42
 #: protocol/sfhss_cc2500.c:42 protocol/frsky2way_cc2500.c:41
 msgid "Freq-Fine"
-msgstr ""
+msgstr "频率微调"
 
 #: protocol/frsky1way_cc2500.c:41 protocol/sfhss_cc2500.c:43
 #: protocol/frsky2way_cc2500.c:42
 msgid "Freq-Coarse"
-msgstr ""
+msgstr "频率粗调"
 
 #: protocol/v202_nrf24l01.c:128 protocol/kn_nrf24l01.c:169
 #: protocol/esky150_nrf24l01.c:150
@@ -581,7 +581,7 @@ msgstr "是"
 
 #: protocol/v202_nrf24l01.c:129
 msgid "250kbps"
-msgstr ""
+msgstr "250kbps"
 
 #: protocol/v202_nrf24l01.c:131
 msgid "Blink"
@@ -618,7 +618,7 @@ msgstr "缺省"
 
 #: protocol/sbus_uart.c:36
 msgid "Period (ms)"
-msgstr ""
+msgstr "周期(ms)"
 
 #: protocol/cx10_nrf24l01.c:69
 msgid "Green"
@@ -634,7 +634,7 @@ msgstr "通道模式"
 
 #: protocol/wk2x01.c:79
 msgid "5+1"
-msgstr ""
+msgstr "5+1"
 
 #: protocol/wk2x01.c:79 pages/128x64x1/model_page.c:38
 msgid "Heli"
@@ -642,7 +642,7 @@ msgstr "直升机"
 
 #: protocol/wk2x01.c:79
 msgid "6+1"
-msgstr ""
+msgstr "6+1"
 
 #: protocol/wk2x01.c:80 pages/320x240x16/model_config.c:50
 #: pages/128x64x1/model_config.c:69
@@ -669,39 +669,39 @@ msgstr ""
 
 #: protocol/flysky_afhds2a_a7105.c:77
 msgid "Outputs"
-msgstr ""
+msgstr "输出"
 
 #: protocol/flysky_afhds2a_a7105.c:78
 msgid "Servo Hz"
-msgstr ""
+msgstr "舵机频率"
 
 #: protocol/flysky_afhds2a_a7105.c:79
 msgid "LQI output"
-msgstr ""
+msgstr "LQI输出"
 
 #: protocol/frskyx_cc2500.c:42 protocol/pxxout.c:48
 msgid "Failsafe"
-msgstr ""
+msgstr "失控保护"
 
 #: protocol/frskyx_cc2500.c:43 protocol/frsky2way_cc2500.c:43
 msgid "AD2GAIN"
-msgstr ""
+msgstr "AD2增益"
 
 #: protocol/frskyx_cc2500.c:46 protocol/frsky2way_cc2500.c:44
 msgid "RSSIChan"
-msgstr ""
+msgstr "RSSI通道"
 
 #: protocol/frskyx_cc2500.c:47
 msgid "S.PORT Out"
-msgstr ""
+msgstr "S.PORT输出"
 
 #: protocol/frskyx_cc2500.c:47
 msgid "Disabled"
-msgstr ""
+msgstr "关闭"
 
 #: protocol/frskyx_cc2500.c:47 pages/320x240x16/standard/curves_page.c:127
 msgid "Enabled"
-msgstr "打开的"
+msgstr "开启"
 
 #: protocol/ppmout.c:39 pages/320x240x16/model_config.c:103
 #: pages/128x64x1/model_config.c:139
@@ -723,7 +723,7 @@ msgstr "总脉宽"
 
 #: protocol/kn_nrf24l01.c:170
 msgid "1Mbps"
-msgstr ""
+msgstr "1Mbps"
 
 #: protocol/kn_nrf24l01.c:172
 msgid "DynTrim"
@@ -751,7 +751,7 @@ msgstr "高速"
 
 #: protocol/dsm2_cyrf6936.c:53
 msgid "F.Log filter"
-msgstr ""
+msgstr "F.Log过滤"
 
 #: protocol/yd717_nrf24l01.c:109
 msgid "USE A.ACK"
@@ -759,15 +759,15 @@ msgstr ""
 
 #: tests/test_language.c:23 tests/test_language.c:45
 msgid "ok1"
-msgstr ""
+msgstr "ok1"
 
 #: tests/test_language.c:43
 msgid "test"
-msgstr ""
+msgstr "test"
 
 #: tests/test_language.c:44
 msgid "ok"
-msgstr ""
+msgstr "ok"
 
 #: curves.c:221
 msgid "1-to-1"
@@ -827,13 +827,15 @@ msgstr "13点曲线"
 #: pages/common/_model_loadsave.c:116 pages/common/_model_loadsave.c:123
 #: pages/320x240x16/rtc_config.c:163
 msgid "Unknown"
-msgstr ""
+msgstr "Unknown"
 
 #: screen/text/lcd_gfx.c:234 screen/text/lcd_gfx.c:236
 msgid ""
 "Deviation\n"
 "   USB"
 msgstr ""
+"Deviation\n"
+" USB"
 
 #: rtc.c:303 pages/320x240x16/tx_configure.c:127
 msgid "Clock"
@@ -874,11 +876,11 @@ msgstr "时间"
 
 #: telemetry.c:252
 msgid "SatCount"
-msgstr ""
+msgstr "星数"
 
 #: telemetry.c:253
 msgid "Heading"
-msgstr ""
+msgstr "航向"
 
 #: mixer.c:874
 msgid "Simple"
@@ -949,12 +951,12 @@ msgstr "下"
 #: pages/common/_voiceconfig_page.c:74
 #, c-format
 msgid "Timer %d"
-msgstr ""
+msgstr "定时器%d"
 
 #: pages/common/_voiceconfig_page.c:78
 #, c-format
 msgid "Telem %d"
-msgstr ""
+msgstr "回传%d"
 
 #: pages/common/_model_page.c:83
 msgid "Re-Init"
@@ -976,7 +978,7 @@ msgstr "摇杆"
 
 #: pages/common/_model_page.c:227
 msgid "Extend"
-msgstr ""
+msgstr "扩展"
 
 #: pages/common/_model_page.c:294
 msgid "Load..."
@@ -1044,11 +1046,11 @@ msgstr "螺距"
 
 #: pages/common/standard/_common_standard.c:69
 msgid "Idle Up 1"
-msgstr ""
+msgstr "高速模式1"
 
 #: pages/common/standard/_common_standard.c:72
 msgid "Idle Up 2"
-msgstr ""
+msgstr "高速模式2"
 
 #: pages/common/standard/_common_standard.c:74
 #: pages/320x240x16/standard/throhold_page.c:49
@@ -1056,7 +1058,7 @@ msgstr ""
 #: pages/128x64x1/standard/throhold_page.c:41
 #: pages/128x64x1/standard/switchassign_page.c:45
 msgid "Thr hold"
-msgstr "油门熄火"
+msgstr "油门锁定"
 
 #: pages/common/standard/_reverse_page.c:28
 #: pages/common/advanced/_mixer_limits.c:208
@@ -1073,7 +1075,7 @@ msgstr "舵机"
 
 #: pages/common/_timer_page.c:54
 msgid "Control"
-msgstr ""
+msgstr "控制"
 
 #: pages/common/_timer_page.c:56 pages/320x240x16/trim_page.c:113
 #: pages/320x240x16/standard/curves_page.c:57
@@ -1223,12 +1225,12 @@ msgstr "螺距"
 #: pages/common/_model_config.c:133
 #, c-format
 msgid "Ch%d"
-msgstr ""
+msgstr "Ch%d"
 
 #: pages/common/_model_config.c:186
 #, c-format
 msgid "PPM%d"
-msgstr ""
+msgstr "PPM%d"
 
 #: pages/common/_main_config.c:85
 msgid "Small-box"
@@ -1261,7 +1263,7 @@ msgstr "发射功率"
 #: pages/common/_main_config.c:130 pages/common/_set_timer_page.c:52
 #: pages/128x64x1/set_timer_page.c:73
 msgid "Add"
-msgstr ""
+msgstr "增加"
 
 #: pages/common/_main_config.c:130
 msgid "Load"
@@ -1308,7 +1310,7 @@ msgstr "校准"
 #: pages/common/_tx_configure.c:174 pages/common/_set_timer_page.c:54
 #: pages/128x64x1/set_timer_page.c:73
 msgid "Set"
-msgstr "设"
+msgstr "设置"
 
 #: pages/common/_tx_configure.c:183
 #, c-format
@@ -1353,11 +1355,11 @@ msgstr "顶点"
 
 #: pages/320x240x16/scanner_page.c:49
 msgid "Att.: -20dB"
-msgstr ""
+msgstr "衰减: -20dB"
 
 #: pages/320x240x16/scanner_page.c:49
 msgid "Att.: 0dB"
-msgstr ""
+msgstr "衰减: 0dB"
 
 #: pages/320x240x16/trim_page.c:67 pages/320x240x16/trim_page.c:100
 #: pages/128x64x1/trim_page.c:70 pages/128x64x1/trim_page.c:103
@@ -1479,7 +1481,7 @@ msgstr "距离"
 
 #: pages/320x240x16/tx_configure.c:220
 msgid "Alert interval"
-msgstr ""
+msgstr "报警间隔"
 
 #: pages/320x240x16/tx_configure.c:227
 msgid "Vibration settings"
@@ -1500,11 +1502,11 @@ msgstr "触摸屏校准"
 
 #: pages/320x240x16/set_timer_page.c:86
 msgid "actual value"
-msgstr ""
+msgstr "当前数值"
 
 #: pages/320x240x16/set_timer_page.c:90
 msgid "value to add or set"
-msgstr ""
+msgstr "要增加或设置的数值"
 
 #: pages/320x240x16/set_timer_page.c:94 pages/320x240x16/rtc_config.c:136
 #: pages/128x64x1/set_timer_page.c:48
@@ -1523,7 +1525,7 @@ msgstr "秒"
 
 #: pages/320x240x16/set_timer_page.c:106 pages/320x240x16/rtc_config.c:161
 msgid "resulting value"
-msgstr ""
+msgstr "结果数值"
 
 #: pages/320x240x16/model_page.c:25 pages/320x240x16/model_config.c:38
 #: pages/128x64x1/model_config.c:96
@@ -1615,17 +1617,17 @@ msgstr "副翼方向"
 #: pages/320x240x16/standard/swash_page.c:45 pages/128x64x1/model_config.c:73
 #: pages/128x64x1/standard/swash_page.c:45
 msgid "ELE Mix"
-msgstr "升降螺距"
+msgstr "升降混控"
 
 #: pages/320x240x16/model_config.c:56
 #: pages/320x240x16/standard/swash_page.c:50 pages/128x64x1/model_config.c:77
 #: pages/128x64x1/standard/swash_page.c:49
 msgid "AIL Mix"
-msgstr "副翼螺距"
+msgstr "副翼混控"
 
 #: pages/320x240x16/model_config.c:59 pages/128x64x1/model_config.c:81
 msgid "COL Mix"
-msgstr "螺距"
+msgstr "螺距混控"
 
 #: pages/320x240x16/model_config.c:90 pages/128x64x1/model_config.c:240
 msgid "Trainer Cfg (Channel)"
@@ -1756,7 +1758,7 @@ msgstr "日期格式"
 
 #: pages/320x240x16/rtc_config.c:160
 msgid "value to set"
-msgstr ""
+msgstr "设置数值"
 
 #: pages/320x240x16/reorder_list.c:28
 msgid "Move Up"
@@ -1814,7 +1816,7 @@ msgstr "选择图标"
 
 #: pages/320x240x16/model_loadsave.c:96
 msgid "Load Layout"
-msgstr ""
+msgstr "读取布局"
 
 #: pages/320x240x16/standard/drexp_page.c:59
 #: pages/320x240x16/advanced/mixer_setup.c:59
@@ -1829,7 +1831,7 @@ msgstr "输入"
 #: pages/320x240x16/standard/throhold_page.c:52
 #: pages/128x64x1/standard/throhold_page.c:45
 msgid "Hold position"
-msgstr "熄火油门值"
+msgstr "油门锁定值"
 
 #: pages/320x240x16/standard/switchassign_page.c:46
 #: pages/128x64x1/standard/switchassign_page.c:42
@@ -1886,7 +1888,7 @@ msgstr "模式"
 #: pages/320x240x16/standard/swash_page.c:55
 #: pages/128x64x1/standard/swash_page.c:53
 msgid "PIT Mix"
-msgstr ""
+msgstr "螺距混控"
 
 #: pages/320x240x16/voiceconfig_page.c:52 pages/128x64x1/voiceconfig_page.c:60
 msgid ""
@@ -1894,6 +1896,8 @@ msgid ""
 "currently not\n"
 "available"
 msgstr ""
+"外部语音模块\n"
+"不可用"
 
 #: pages/320x240x16/datalog_page.c:61 pages/128x64x1/datalog_page.c:135
 #, c-format
@@ -1902,7 +1906,7 @@ msgstr "%d字节剩余"
 
 #: pages/320x240x16/datalog_page.c:92 pages/128x64x1/datalog_page.c:79
 msgid "All"
-msgstr ""
+msgstr "全部"
 
 #: pages/320x240x16/datalog_page.c:139 pages/128x64x1/datalog_page.c:96
 msgid "Enable"
@@ -2038,7 +2042,7 @@ msgstr "主菜单"
 
 #: pages/320x240x16/pagelist.h:21 pages/128x64x1/pagelist.h:24
 msgid "Set permanent timer"
-msgstr ""
+msgstr "设置持续计时器"
 
 #: pages/320x240x16/pagelist.h:24
 msgid "Real Time Clock"
@@ -2059,7 +2063,7 @@ msgstr "遥控设置"
 #: pages/320x240x16/pagelist.h:33 pages/128x64x1/pagelist.h:34
 #: pages/128x64x1/usb_page.c:35
 msgid "USB"
-msgstr ""
+msgstr "USB"
 
 #: pages/320x240x16/pagelist.h:35 pages/128x64x1/pagelist.h:36
 msgid "Debuglog"
@@ -2089,7 +2093,7 @@ msgstr "螺距曲线"
 #: pages/320x240x16/pagelist.h:49 pages/128x64x1/standard/throhold_page.c:38
 #: pages/128x64x1/pagelist.h:51
 msgid "Throttle hold"
-msgstr "油门熄火"
+msgstr "油门锁定"
 
 #: pages/320x240x16/pagelist.h:51 pages/128x64x1/pagelist.h:53
 msgid "Swash"
@@ -2187,7 +2191,7 @@ msgstr "Deviation固件版本:"
 
 #: pages/320x240x16/usb_page.c:39
 msgid "USB Filesystem is currently "
-msgstr ""
+msgstr "USB文件模式"
 
 #: pages/320x240x16/usb_page.c:40
 msgid "Press 'Ent' to turn USB Filesystem"
@@ -2195,11 +2199,11 @@ msgstr "按ENT改变USB盘状态"
 
 #: pages/128x64x1/scanner_page.c:43
 msgid "-20dB"
-msgstr ""
+msgstr "-20dB"
 
 #: pages/128x64x1/scanner_page.c:43
 msgid "0dB"
-msgstr ""
+msgstr "0dB"
 
 #: pages/128x64x1/chantest_page.c:111
 msgid "Stick input"
@@ -2215,7 +2219,7 @@ msgstr "幅度"
 
 #: pages/128x64x1/main_config.c:60
 msgid "Layout: Long-Press ENT"
-msgstr ""
+msgstr "布局:长按ENT"
 
 #: pages/128x64x1/main_config.c:86
 msgid "Trimbar"
@@ -2267,7 +2271,7 @@ msgstr "超时报警间隔"
 
 #: pages/128x64x1/tx_configure.c:190
 msgid "Alert intvl"
-msgstr ""
+msgstr "报警间隔"
 
 #: pages/128x64x1/tx_configure.c:215
 msgid "Configure"
@@ -2279,7 +2283,7 @@ msgstr "固定翼"
 
 #: pages/128x64x1/model_page.c:40
 msgid "Multi"
-msgstr ""
+msgstr "多轴"
 
 #: pages/128x64x1/model_page.c:110 pages/128x64x1/model_config.c:205
 msgid "Video"
@@ -2287,7 +2291,7 @@ msgstr "视频"
 
 #: pages/128x64x1/model_page.c:111
 msgid "Setup"
-msgstr ""
+msgstr "设置"
 
 #: pages/128x64x1/model_config.c:179
 msgid "Video Enable"
@@ -2360,19 +2364,19 @@ msgstr "按ENT读取"
 
 #: pages/128x64x1/telemtest_page.c:342
 msgid "GPS"
-msgstr ""
+msgstr "GPS"
 
 #: pages/128x64x1/telemtest_page.c:351
 msgid "RX"
-msgstr ""
+msgstr "RX"
 
 #: pages/128x64x1/telemtest_page.c:352
 msgid "TX"
-msgstr ""
+msgstr "TX"
 
 #: pages/128x64x1/datalog_page.c:102
 msgid "Rate"
-msgstr ""
+msgstr "采样率"
 
 #: pages/128x64x1/advanced/mixer_page.c:44
 msgid "Mixer    Reorder:Hold R+"
@@ -2393,7 +2397,7 @@ msgstr "关于Deviation"
 
 #: pages/128x64x1/pagelist.h:86
 msgid "External OSD"
-msgstr ""
+msgstr "外部OSD"
 
 #: pages/128x64x1/range_page.c:53
 msgid "Press ENT to stop test."
@@ -2411,7 +2415,7 @@ msgstr "按ENT使U盘"
 
 #: pages/text/splash_page.c:37
 msgid "Deviation"
-msgstr ""
+msgstr "Deviation"
 
 #: Model template
 msgid "4Ch w/ Dual-Rates"
@@ -2423,11 +2427,11 @@ msgstr "4通道"
 
 #: Model template
 msgid "6Ch Helicopter"
-msgstr "6通固定翼"
+msgstr "6通直升机"
 
 #: Model template
 msgid "6Ch Airplane"
-msgstr "6通直升机"
+msgstr "6通固定翼"
 
 #: Model template
 msgid "Heli/Standard GUI"

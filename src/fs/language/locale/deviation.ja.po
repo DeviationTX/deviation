@@ -364,7 +364,7 @@ msgstr "RPM"
 #: telemetry/telem_frsky.c:81 telemetry/telem_dsm.c:193
 #: telemetry/telem_devo.c:85 pages/128x64x1/telemtest_page.c:339
 msgid "Temp"
-msgstr "Temp"
+msgstr "温度"
 
 #: telemetry/telem_frsky.c:82
 msgid "Fuel"
@@ -775,7 +775,7 @@ msgstr "1-to-1"
 
 #: curves.c:222
 msgid "Fixed"
-msgstr "Fixed"
+msgstr "固定"
 
 #: curves.c:223
 msgid "Min/Max"
@@ -982,7 +982,7 @@ msgstr "拡張"
 
 #: pages/common/_model_page.c:294
 msgid "Load..."
-msgstr "ロード..."
+msgstr "選択..."
 
 #: pages/common/_model_page.c:296
 msgid "Copy To..."
@@ -1003,7 +1003,7 @@ msgstr "Touchロック"
 #: pages/common/_dialogs.c:78
 #, c-format
 msgid " is %d%%, safe value = %d%%\n"
-msgstr " %d%%, 安全値 = %d%%\n"
+msgstr " %d%%, セーフティ値 = %d%%\n"
 
 #: pages/common/_dialogs.c:80
 #, c-format
@@ -1011,8 +1011,9 @@ msgid ""
 " is %d%%,\n"
 "safe value = %d%%"
 msgstr ""
-" %d%%,\n"
-"安全値 = %d%%"
+"   %d%%,\n"
+" セーフティ値\n"
+"= %d%%"
 
 #: pages/common/_dialogs.c:131
 #, c-format
@@ -1082,7 +1083,7 @@ msgstr "Control"
 #: pages/320x240x16/advanced/mixer_setup.c:145 pages/128x64x1/trim_page.c:119
 #: pages/128x64x1/advanced/mixer_setup.c:149
 msgid "Switch"
-msgstr "Switch"
+msgstr "スイッチ"
 
 #: pages/common/_timer_page.c:74
 msgid "stopwatch"
@@ -1134,7 +1135,7 @@ msgstr "3 Pos"
 #: pages/common/advanced/_mixer_setup.c:596
 #, c-format
 msgid "Scale%s"
-msgstr "Scale%s"
+msgstr "スケール%s"
 
 #: pages/common/advanced/_mixer_curves.c:137
 msgid "Symmetric"
@@ -1171,11 +1172,11 @@ msgstr "置換"
 
 #: pages/common/advanced/_mixer_setup.c:342
 msgid "mult"
-msgstr "乗算"
+msgstr "掛け算"
 
 #: pages/common/advanced/_mixer_setup.c:343
 msgid "add"
-msgstr "加算"
+msgstr "足し算"
 
 #: pages/common/advanced/_mixer_setup.c:344
 msgid "max"
@@ -1230,7 +1231,7 @@ msgstr "Ch%d"
 #: pages/common/_model_config.c:186
 #, c-format
 msgid "PPM%d"
-msgstr "PPM%d"
+msgstr "PPM %d"
 
 #: pages/common/_main_config.c:85
 msgid "Small-box"
@@ -1267,7 +1268,7 @@ msgstr "追加"
 
 #: pages/common/_main_config.c:130
 msgid "Load"
-msgstr "ロード"
+msgstr "選択"
 
 #: pages/common/_main_config.c:234
 msgid "Menu"
@@ -1445,11 +1446,11 @@ msgstr "バックライト"
 
 #: pages/320x240x16/tx_configure.c:181 pages/128x64x1/tx_configure.c:160
 msgid "Dimmer time"
-msgstr "調光時間"
+msgstr "Screenセーバ"
 
 #: pages/320x240x16/tx_configure.c:185 pages/128x64x1/tx_configure.c:164
 msgid "Dimmer target"
-msgstr "調光レベル"
+msgstr "SS調光レベル"
 
 #: pages/320x240x16/tx_configure.c:192 pages/128x64x1/tx_configure.c:168
 msgid "Timer settings"
@@ -1530,7 +1531,7 @@ msgstr "リザルト値"
 #: pages/320x240x16/model_page.c:25 pages/320x240x16/model_config.c:38
 #: pages/128x64x1/model_config.c:96
 msgid "Helicopter"
-msgstr "ヘリ"
+msgstr "ヘリコプター"
 
 #: pages/320x240x16/model_page.c:26 pages/320x240x16/model_config.c:38
 #: pages/128x64x1/model_config.c:97
@@ -1607,27 +1608,27 @@ msgstr "SwashType"
 
 #: pages/320x240x16/model_config.c:44 pages/128x64x1/model_config.c:61
 msgid "ELE Inv"
-msgstr "ELE Inv"
+msgstr "ELEサーボ"
 
 #: pages/320x240x16/model_config.c:47 pages/128x64x1/model_config.c:65
 msgid "AIL Inv"
-msgstr "AIL Inv"
+msgstr "AILサーボ"
 
 #: pages/320x240x16/model_config.c:53
 #: pages/320x240x16/standard/swash_page.c:45 pages/128x64x1/model_config.c:73
 #: pages/128x64x1/standard/swash_page.c:45
 msgid "ELE Mix"
-msgstr "ELE Mix"
+msgstr "ELE Mixing"
 
 #: pages/320x240x16/model_config.c:56
 #: pages/320x240x16/standard/swash_page.c:50 pages/128x64x1/model_config.c:77
 #: pages/128x64x1/standard/swash_page.c:49
 msgid "AIL Mix"
-msgstr "AIL Mix"
+msgstr "AIL Mixing"
 
 #: pages/320x240x16/model_config.c:59 pages/128x64x1/model_config.c:81
 msgid "COL Mix"
-msgstr "COL Mix"
+msgstr "COL Mixing"
 
 #: pages/320x240x16/model_config.c:90 pages/128x64x1/model_config.c:240
 msgid "Trainer Cfg (Channel)"
@@ -1652,7 +1653,7 @@ msgstr "Channel番号"
 #: pages/320x240x16/dialogs.c:49 pages/320x240x16/advanced/mixer_limits.c:41
 #: pages/128x64x1/advanced/mixer_limits.c:71
 msgid "Safety"
-msgstr "セーフティ"
+msgstr "セーフティSW"
 
 #: pages/320x240x16/dialogs.c:63
 msgid ""
@@ -1827,7 +1828,7 @@ msgstr "レイアウト ロード"
 #: pages/128x64x1/advanced/mixer_setup.c:157
 #: pages/128x64x1/advanced/mixer_setup.c:265
 msgid "Src"
-msgstr "Src"
+msgstr "ソース"
 
 #: pages/320x240x16/standard/throhold_page.c:52
 #: pages/128x64x1/standard/throhold_page.c:45
@@ -1889,7 +1890,7 @@ msgstr "Mode"
 #: pages/320x240x16/standard/swash_page.c:55
 #: pages/128x64x1/standard/swash_page.c:53
 msgid "PIT Mix"
-msgstr "PIT Mix"
+msgstr "PIT Mixing"
 
 #: pages/320x240x16/voiceconfig_page.c:52 pages/128x64x1/voiceconfig_page.c:60
 msgid ""
@@ -1911,7 +1912,7 @@ msgstr "All"
 
 #: pages/320x240x16/datalog_page.c:139 pages/128x64x1/datalog_page.c:96
 msgid "Enable"
-msgstr "有効"
+msgstr "ログ有効"
 
 #: pages/320x240x16/datalog_page.c:146
 msgid "Sample Rate"
@@ -1919,7 +1920,7 @@ msgstr "基本レート"
 
 #: pages/320x240x16/datalog_page.c:152 pages/128x64x1/datalog_page.c:105
 msgid "Select"
-msgstr "選択"
+msgstr "ログ項目"
 
 #: pages/320x240x16/main_layout.c:235 pages/320x240x16/main_layout.c:335
 msgid "Page Config"
@@ -1956,7 +1957,7 @@ msgstr "Fail-Safe"
 #: pages/320x240x16/advanced/mixer_limits.c:45
 #: pages/128x64x1/advanced/mixer_limits.c:75
 msgid "Safe Val"
-msgstr "安全値"
+msgstr "セーフティ値"
 
 #: pages/320x240x16/advanced/mixer_limits.c:49
 #: pages/128x64x1/advanced/mixer_limits.c:79
@@ -2006,12 +2007,12 @@ msgstr "オフセット"
 #: pages/320x240x16/advanced/mixer_setup.c:85
 #: pages/128x64x1/advanced/mixer_setup.c:279
 msgid "Switch1"
-msgstr "Switch1"
+msgstr "スイッチ1"
 
 #: pages/320x240x16/advanced/mixer_setup.c:86
 #: pages/128x64x1/advanced/mixer_setup.c:279
 msgid "Switch2"
-msgstr "Switch2"
+msgstr "スイッチ2"
 
 #: pages/320x240x16/advanced/mixer_setup.c:95
 #: pages/128x64x1/advanced/mixer_setup.c:269
@@ -2031,7 +2032,7 @@ msgstr "ページ"
 #: pages/320x240x16/advanced/mixer_setup.c:148
 #: pages/128x64x1/advanced/mixer_setup.c:153
 msgid "Mux"
-msgstr "Mux"
+msgstr "合成波"
 
 #: pages/320x240x16/pagelist.h:18 pages/128x64x1/pagelist.h:20
 msgid "Main page"
@@ -2064,7 +2065,7 @@ msgstr "送信機メニュー"
 #: pages/320x240x16/pagelist.h:33 pages/128x64x1/pagelist.h:34
 #: pages/128x64x1/usb_page.c:35
 msgid "USB"
-msgstr "USB"
+msgstr "USB接続"
 
 #: pages/320x240x16/pagelist.h:35 pages/128x64x1/pagelist.h:36
 msgid "Debuglog"
@@ -2119,7 +2120,7 @@ msgstr "トリム"
 
 #: pages/320x240x16/pagelist.h:59 pages/128x64x1/pagelist.h:63
 msgid "Datalog"
-msgstr "ログ"
+msgstr "ログ設定"
 
 #: pages/320x240x16/pagelist.h:61 pages/128x64x1/pagelist.h:65
 msgid "Main page config"
@@ -2156,7 +2157,7 @@ msgstr "ボタン モニタ"
 
 #: pages/320x240x16/pagelist.h:74 pages/128x64x1/pagelist.h:79
 msgid "Scanner"
-msgstr "スキャナ"
+msgstr "スキャン設定"
 
 #: pages/320x240x16/pagelist.h:78 pages/128x64x1/pagelist.h:91
 msgid "Welcome"
@@ -2192,7 +2193,7 @@ msgstr "Deviation FW Version:"
 
 #: pages/320x240x16/usb_page.c:39
 msgid "USB Filesystem is currently "
-msgstr "USB接続後の保存場所"
+msgstr "USB接続時フォルダ場所"
 
 #: pages/320x240x16/usb_page.c:40
 msgid "Press 'Ent' to turn USB Filesystem"
@@ -2210,11 +2211,11 @@ msgstr "0dB"
 
 #: pages/128x64x1/chantest_page.c:111
 msgid "Stick input"
-msgstr "Stick 入力"
+msgstr "スティック入力"
 
 #: pages/128x64x1/chantest_page.c:111
 msgid "Mixer output"
-msgstr "Mixer 出力"
+msgstr "ミキサー出力"
 
 #: pages/128x64x1/trim_page.c:71
 msgid "Step"
@@ -2367,7 +2368,7 @@ msgstr "ENTを押してコピーします"
 
 #: pages/128x64x1/model_loadsave.c:71
 msgid "Press ENT to load"
-msgstr "ENTを押してロードします"
+msgstr "ENTを押して選択します"
 
 #: pages/128x64x1/telemtest_page.c:342
 msgid "GPS"
@@ -2383,16 +2384,16 @@ msgstr "TX"
 
 #: pages/128x64x1/datalog_page.c:102
 msgid "Rate"
-msgstr "レート"
+msgstr "ログ速度"
 
 #: pages/128x64x1/advanced/mixer_page.c:44
 msgid "Mixer    Reorder:Hold R+"
-msgstr " Mixer パターン R+"
+msgstr "ミキサー パターン　R+"
 
 #: pages/128x64x1/advanced/mixer_setup.c:86
 #: pages/128x64x1/advanced/mixer_setup.c:165
 msgid "Scale"
-msgstr "Scale"
+msgstr "スケール"
 
 #: pages/128x64x1/pagelist.h:27
 msgid "Video setup"
