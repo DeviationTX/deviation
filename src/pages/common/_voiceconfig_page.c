@@ -47,7 +47,7 @@ static u8 voiceconfig_getsrctype (u8 idx)
 }
 
 static struct CustomVoice *voiceconfig_setsrcptr(u8 idx) {
-    switch(voiceconfig_getsrctype(idx)) {
+    switch (voiceconfig_getsrctype(idx)) {
         case VOICE_SRC_SWITCH:
             return &Model.voice.switches[idx - VOICE_SRC_SWITCH];
             break;
