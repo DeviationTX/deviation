@@ -144,7 +144,8 @@ static const char *voicelbl_cb(guiObject_t *obj, const void *data)
                 return CONFIG_VoiceParse(Model.voice.mixer[idx - VOICE_SRC_MIXER].music);
             break;
     }
-    return strcpy(tempstring, "");
+    tempstring[0] = '\0';
+    return tempstring;
 }
 
 static const char *voiceid_cb(guiObject_t *obj, int dir, void *data)
