@@ -32,9 +32,7 @@ const char SECTION_VOICE_CUSTOM[] = "custom";
 
 static int ini_handler(void* user, const char* section, const char* name, const char* value)
 {
-#if !HAS_MUSIC_CONFIG
     (void) section;
-#endif
     u16 req_id = *((long*)user);
     u16 id = atoi(name);
     const char* ptr = value;
