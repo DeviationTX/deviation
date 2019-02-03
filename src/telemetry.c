@@ -489,10 +489,10 @@ void TELEMETRY_Alarm()
         }
 #endif //HAS_EXTENDED_TELEMETRY
         MUSIC_PlayValue(telem_music, telem_value, telem_unit, telem_prec);
+        }
 #else
         MUSIC_Play(MUSIC_TELEMALARM1 + telem_idx);
 #endif //HAS_EXTENDED_AUDIO
-
     }
 }
 
