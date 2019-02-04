@@ -82,7 +82,7 @@ static void AUDIO_Print(char *string) {
 }
 #endif // EMULATOR
 
-static void u16ToArray(u16 value, u8 *array){
+static void u16ToArray(u16 value, u8 *array) {
     *array = (u8)(value>>8);
     *(array+1) = (u8)value;
 }
