@@ -246,15 +246,15 @@ msgstr "PPM"
 
 #: telemetry/telem_crsf.c:81
 msgid "tx SNR"
-msgstr ""
+msgstr "tx SNR"
 
 #: telemetry/telem_crsf.c:82
 msgid "txRSSI"
-msgstr ""
+msgstr "txRSSI"
 
 #: telemetry/telem_crsf.c:83
 msgid "rx SNR"
-msgstr ""
+msgstr "rx SNR"
 
 #: telemetry/telem_crsf.c:86
 msgid "FMode"
@@ -332,15 +332,15 @@ msgstr ""
 
 #: telemetry/telem_frsky.c:66 telemetry/telem_dsm.c:213
 msgid "RSSI"
-msgstr ""
+msgstr "RSSI"
 
 #: telemetry/telem_frsky.c:67
 msgid "LRSSI"
-msgstr ""
+msgstr "LRSSI"
 
 #: telemetry/telem_frsky.c:68
 msgid "LQI"
-msgstr ""
+msgstr "LQI"
 
 #: telemetry/telem_frsky.c:70 telemetry/telem_frsky.c:83
 #: telemetry/telem_dsm.c:201
@@ -388,7 +388,7 @@ msgstr "TelemV"
 
 #: telemetry/telem_frsky.c:104
 msgid "TelemRSSI"
-msgstr ""
+msgstr "TelemRSSI"
 
 #: telemetry/telem_frsky.c:108
 msgid "Amp"
@@ -668,7 +668,7 @@ msgstr "COL Limit"
 
 #: protocol/hubsan_a7105.c:125
 msgid "vTX MHz"
-msgstr ""
+msgstr "vTX MHz"
 
 #: protocol/flysky_afhds2a_a7105.c:77
 msgid "Outputs"
@@ -1255,7 +1255,7 @@ msgstr "K%d"
 #: pages/common/_model_config.c:186
 #, c-format
 msgid "PPM%d"
-msgstr ""
+msgstr "PPM%d"
 
 #: pages/common/_main_config.c:85
 msgid "Small-box"
@@ -1275,7 +1275,7 @@ msgstr ""
 
 #: pages/common/_main_config.c:90
 msgid "H-trim"
-msgstr ""
+msgstr "H-trim"
 
 #: pages/common/_main_config.c:92
 msgid "Battery"
@@ -1315,6 +1315,9 @@ msgid ""
 " \n"
 "Press ENT."
 msgstr ""
+"Kalibration fertig.\n"
+" \n"
+"Drücke ENT."
 
 #: pages/common/_tx_configure.c:123
 msgid ""
@@ -1956,6 +1959,9 @@ msgid ""
 "currently not\n"
 "available"
 msgstr ""
+"Externe Sprachausgabe‭\n"
+"aktuell\n"
+"nicht verfügbar "
 
 #: pages/320x240x16/datalog_page.c:61 pages/128x64x1/datalog_page.c:135
 #, c-format
@@ -2129,7 +2135,7 @@ msgstr "USB"
 
 #: pages/320x240x16/pagelist.h:35 pages/128x64x1/pagelist.h:36
 msgid "Debuglog"
-msgstr ""
+msgstr "Debuglog"
 
 #: pages/320x240x16/pagelist.h:40 pages/128x64x1/model_page.c:155
 #: pages/128x64x1/pagelist.h:42
@@ -2192,7 +2198,7 @@ msgstr ""
 
 #: pages/320x240x16/pagelist.h:63 pages/128x64x1/pagelist.h:67
 msgid "Voice config"
-msgstr ""
+msgstr "Sprachausgabe konf."
 
 #: pages/320x240x16/pagelist.h:67 pages/128x64x1/pagelist.h:72
 msgid "Transmitter config"
@@ -2229,7 +2235,7 @@ msgstr "Willkommen"
 
 #: pages/320x240x16/pagelist.h:84
 msgid "Select Language"
-msgstr ""
+msgstr "Sprache wählen"
 
 #: pages/320x240x16/range_page.c:31
 msgid "Stop test"
@@ -2245,11 +2251,11 @@ msgstr ""
 
 #: pages/320x240x16/range_page.c:49 pages/128x64x1/range_page.c:51
 msgid "Power reduced to"
-msgstr ""
+msgstr "Leistung reduziert auf"
 
 #: pages/320x240x16/range_page.c:50 pages/128x64x1/range_page.c:52
 msgid "from"
-msgstr ""
+msgstr "von"
 
 #: pages/320x240x16/usb_page.c:38 pages/128x64x1/about_page.c:38
 msgid "Deviation FW version:"
@@ -2265,11 +2271,11 @@ msgstr "ENT schaltet das USB Filesystem"
 
 #: pages/128x64x1/scanner_page.c:43
 msgid "-20dB"
-msgstr ""
+msgstr "-20dB"
 
 #: pages/128x64x1/scanner_page.c:43
 msgid "0dB"
-msgstr ""
+msgstr "0dB"
 
 #: pages/128x64x1/chantest_page.c:111
 msgid "Stick input"
@@ -2355,7 +2361,7 @@ msgstr ""
 
 #: pages/128x64x1/model_page.c:110 pages/128x64x1/model_config.c:205
 msgid "Video"
-msgstr ""
+msgstr "Video"
 
 #: pages/128x64x1/model_page.c:111
 msgid "Setup"
@@ -2367,11 +2373,11 @@ msgstr ""
 
 #: pages/128x64x1/model_config.c:183
 msgid "Video Channel"
-msgstr ""
+msgstr "Videokanal"
 
 #: pages/128x64x1/model_config.c:191
 msgid "Brightness"
-msgstr ""
+msgstr "Helligkeit"
 
 #: pages/128x64x1/dialogs.c:82
 #, c-format
@@ -2439,15 +2445,15 @@ msgstr "GPS"
 
 #: pages/128x64x1/telemtest_page.c:351
 msgid "RX"
-msgstr ""
+msgstr "RX"
 
 #: pages/128x64x1/telemtest_page.c:352
 msgid "TX"
-msgstr ""
+msgstr "TX"
 
 #: pages/128x64x1/datalog_page.c:102
 msgid "Rate"
-msgstr ""
+msgstr "Rate"
 
 #: pages/128x64x1/advanced/mixer_page.c:44
 msgid "Mixer    Reorder:Hold R+"
@@ -2468,15 +2474,15 @@ msgstr "über Deviation"
 
 #: pages/128x64x1/pagelist.h:86
 msgid "External OSD"
-msgstr ""
+msgstr "Externes OSD"
 
 #: pages/128x64x1/range_page.c:53
 msgid "Press ENT to stop test."
-msgstr ""
+msgstr "Drücke ENT zum Stoppen"
 
 #: pages/128x64x1/range_page.c:56
 msgid "Press ENT to start test."
-msgstr ""
+msgstr "Drücke ENT zum Starten"
 
 #: pages/128x64x1/usb_page.c:38
 msgid ""
@@ -2488,7 +2494,7 @@ msgstr ""
 
 #: pages/text/splash_page.c:37
 msgid "Deviation"
-msgstr ""
+msgstr "Deviation"
 
 #: Model template
 msgid "4Ch w/ Dual-Rates"
