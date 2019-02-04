@@ -6,7 +6,6 @@
 #define AUDIO_QUEUE_LENGTH 20 // arbitraty chosen, do we need more?
 
 void AUDIO_Init();
-int AUDIO_Play(u16 music);
 void AUDIO_SetVolume();
 void AUDIO_CheckQueue();
 int AUDIO_AddQueue(u16 music);

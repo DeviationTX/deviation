@@ -69,8 +69,7 @@ void AUDIO_Init() {
 
 #ifndef EMULATOR
 // Send a block of len bytes to the Audio device.
-void
-AUDIO_Send(u8 *data, int len) {
+static void AUDIO_Send(u8 *data, int len) {
   void AUDIO_send_char(char c);
   for (u16 iter = 0; iter < len; iter += 1) {
     AUDIO_send_char(data[iter]);
@@ -78,19 +77,18 @@ AUDIO_Send(u8 *data, int len) {
 }
 
 // Send a string  to the Audio device.
-void
-AUDIO_Print(char *string) {
+static void AUDIO_Print(char *string) {
   AUDIO_Send((u8 *)string, strlen(string));
 }
 #endif // EMULATOR
 
-void u16ToArray(u16 value, u8 *array){
+static void u16ToArray(u16 value, u8 *array){
     *array = (u8)(value>>8);
     *(array+1) = (u8)value;
 }
 
 // generate Checksum for DFPlyer commands
-u16 AUDIO_CalculateChecksum(u8 *buffer) {
+static u16 AUDIO_CalculateChecksum(u8 *buffer) {
     u16 sum = 0;
     for (int i=1; i < 7; i += 1)
         sum += buffer[i];
@@ -98,7 +96,7 @@ u16 AUDIO_CalculateChecksum(u8 *buffer) {
 }
 
 // Generate a string to play.
-int AUDIO_Play(u16 id) {
+static int AUDIO_Play(u16 id) {
     // If we are just playing beeps....
     if (id == MUSIC_KEY_PRESSING || id == MUSIC_MAXLEN) {
         printf("Voice: beep only\n");
@@ -171,6 +169,10 @@ void AUDIO_SetVolume() {
     }
 #endif
 }
+static void AUDIO_ResetQueue() {
+    num_audio = 0;
+    next_audio = 0;
+}
 
 void AUDIO_CheckQueue() {
     u32 t = CLOCK_getms();
@@ -182,8 +184,7 @@ void AUDIO_CheckQueue() {
         }
     } else if (num_audio && t > audio_queue_time) {
         printf("Voice: Queue finished, resetting.\n");
-        num_audio = 0;
-        next_audio = 0;
+        AUDIO_ResetQueue();
         AUDIO_SetVolume();
     }
 }
@@ -196,15 +197,13 @@ int AUDIO_VoiceAvailable() {
     if ( PPMin_Mode() || Model.protocol == PROTOCOL_PPM ) { // don't send play command when using PPM port
 #endif
         printf("Voice: PPM port in use\n");
-        num_audio = 0; // Reset queue when audio not available
-        next_audio = 0;
+        AUDIO_ResetQueue();
         return 0;
     }
 #endif // _DEVO12_TARGET_H_
 
     if ( (Transmitter.audio_player == AUDIO_NONE) || (Transmitter.audio_player == AUDIO_DISABLED) || !Transmitter.audio_vol ) {
-        num_audio = 0; // Reset queue when audio not available
-        next_audio = 0;
+        AUDIO_ResetQueue();
         return 0;
     }
 
