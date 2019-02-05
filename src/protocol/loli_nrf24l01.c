@@ -47,7 +47,8 @@ static u8 tx_power;
 static u8 hopping_frequency[LOLI_NUM_CHANNELS];
 static u8 rx_tx_addr[5];
 static u8 hopping_frequency_no;
-static u8 binding_count;
+static u8 count;
+static u16 rx_config;
 static const u8 bind_address[5] = {'L', 'O', 'V', 'E', '!'};
 
 enum{
@@ -60,28 +61,25 @@ enum{
 };
 
 static const char * const loli_opts[] = {
-    "SBUS", _tr_noop("Off"), _tr_noop("On"), NULL,
-    "PPM", _tr_noop("Off"), _tr_noop("On"), NULL,
-    _tr_noop("Chan 1"), "PWM", "SW", NULL,
-    _tr_noop("Chan 2"), "PWM", "SW", NULL,
-    _tr_noop("Chan 3"), "PWM", "SW", NULL,
-    _tr_noop("Chan 4"), "PWM", "SW", NULL,
-    _tr_noop("Chan 5"), "PWM", "SW", NULL,
-    _tr_noop("Chan 6"), "PWM", "SW", NULL,
-    _tr_noop("Chan 7"), "PWM", "SW", NULL,
-    _tr_noop("Chan 8"), "PWM", "SW", NULL,
+    _tr_noop("Chan 1"), "Servo", "SW", "PWM","PPM", NULL,
+    _tr_noop("Chan 2"), "Servo", "SW", "PWM", NULL,
+    _tr_noop("Chan 3"), "Servo", "SW", NULL,
+    _tr_noop("Chan 4"), "Servo", "SW", NULL,
+    _tr_noop("Chan 5"), "Servo", "SW", "SBUS", NULL,
+    _tr_noop("Chan 6"), "Servo", "SW", NULL,
+    _tr_noop("Chan 7"), "Servo", "SW", "PWM", NULL,
+    _tr_noop("Chan 8"), "Servo", "SW", NULL,
     NULL
 };
 
-#define OPT_OFF 0
-#define OPT_ON  1
-#define OPT_PWM 0
-#define OPT_SW  1
+#define OPT_SERVO   0
+#define OPT_SW      1
+#define OPT_PWM     2
+#define OPT_SBUS    2
+#define OPT_PPM     3
 
 enum {
-    PROTOOPTS_SBUS = 0,
-    PROTOOPTS_PPM,
-    PROTOOPTS_CH1,
+    PROTOOPTS_CH1 = 0,
     PROTOOPTS_CH2,
     PROTOOPTS_CH3,
     PROTOOPTS_CH4,
@@ -94,7 +92,7 @@ enum {
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 // flags going to packet[1] for packet type 0xa2 (Rx config)
-#define FLAG_PWM7   0x02  // why only PWM1,2 & 7 ?
+#define FLAG_PWM7   0x02
 #define FLAG_PWM2   0x04
 #define FLAG_PWM1   0x08
 #define FLAG_SBUS   0x40
@@ -156,12 +154,43 @@ static u16 scale_channel(u8 ch, u16 destMin, u16 destMax)
     return (range * (chanval - CHAN_MIN_VALUE)) / CHAN_RANGE + destMin;
 }
 
+static bool rxConfigChanged()
+{
+    u16 temp = 0;
+    for (u8 i=0; i<8; i++)
+        temp += Model.proto_opts[PROTOOPTS_CH1 + i];
+    if (temp != rx_config) {
+        rx_config = temp;
+        return true;
+    }
+    return false;
+}
+
 static void send_rx_config()
 {
     packet[0] = 0xa2;
-    // TODO
+    // default = set all outputs to servo mode
     packet[1] = 0;
     packet[2] = 0;
+    // Rx Output #1 PPM or PWM
+    if (Model.proto_opts[PROTOOPTS_CH1] == OPT_PPM)
+        packet[1] |= FLAG_PPM;
+    else if (Model.proto_opts[PROTOOPTS_CH1] == OPT_PWM)
+        packet[1] |= FLAG_PWM1;
+    // Rx Output #2 PWM
+    if (Model.proto_opts[PROTOOPTS_CH2] == OPT_PWM)
+        packet[1] |= FLAG_PWM2;
+    // Rx Output #5 SBUS
+    if (Model.proto_opts[PROTOOPTS_CH5] == OPT_SBUS)
+        packet[1] |= FLAG_SBUS;
+    // Rx Output #7 PWM
+    if (Model.proto_opts[PROTOOPTS_CH7] == OPT_PWM)
+        packet[1] |= FLAG_PWM7;
+    // Rx Output X "Switch" mode
+    for (u8 i=0; i<8; i++) {
+        if (Model.proto_opts[PROTOOPTS_CH1 + i] == OPT_SW)
+            packet[2] |= 1 << (7-i);
+    }
     
     if (++hopping_frequency_no > LOLI_NUM_CHANNELS-1)
         hopping_frequency_no = 0;
@@ -250,7 +279,7 @@ static u16 LOLI_callback()
             NRF24L01_SetTxRxMode(RX_EN);
             NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x3b);  // 8bit CRC, RX
             phase = BIND3;
-            binding_count = 0;
+            count = 0;
             break;
         case BIND3:
             // got bind response ?
@@ -266,8 +295,8 @@ static u16 LOLI_callback()
                     break;
                 }
             }
-            binding_count++;
-            if (binding_count > 50) {
+            count++;
+            if (count > 50) {
                 phase = BIND1;
             } else {
                 delay = 1000;
@@ -278,6 +307,11 @@ static u16 LOLI_callback()
             if (NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR)) {  // RX fifo data ready
                 NRF24L01_ReadPayload(packet, LOLI_PACKET_SIZE);
                 update_telemetry();
+            }
+            if (rxConfigChanged()) {
+                count = 0;
+                phase = SET_RX_CONFIG;
+                break;
             }
             NRF24L01_SetTxRxMode(TXRX_OFF);
             NRF24L01_SetTxRxMode(TX_EN);
@@ -297,12 +331,13 @@ static u16 LOLI_callback()
             delay = 18000;
             break;
         case SET_RX_CONFIG:
-            // TODO: detect config change, send this packet a few times
-            // then fall back to DATA1:
             NRF24L01_SetTxRxMode(TXRX_OFF);
             NRF24L01_SetTxRxMode(TX_EN);
             NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x0a);  // 8bit CRC, TX
             send_rx_config();
+            if (++count >= 15) {
+                phase = DATA1;
+            }
             delay=20000;
             break;
     }
@@ -346,6 +381,7 @@ static void initialize(u8 bind)
     CLOCK_StopTimer();
     init_txid();
     init_RF();
+    rx_config = 0;
     if (bind) {
         phase = BIND1;
         NRF24L01_WriteReg(NRF24L01_05_RF_CH, LOLI_BIND_CHANNEL);
