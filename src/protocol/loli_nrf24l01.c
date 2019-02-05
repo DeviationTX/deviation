@@ -154,16 +154,16 @@ static u16 scale_channel(u8 ch, u16 destMin, u16 destMax)
     return (range * (chanval - CHAN_MIN_VALUE)) / CHAN_RANGE + destMin;
 }
 
-static bool rxConfigChanged()
+static u8 rxConfigChanged()
 {
     u16 temp = 0;
     for (u8 i=0; i < 8; i++)
         temp += Model.proto_opts[PROTOOPTS_CH1 + i];
     if (temp != rx_config) {
         rx_config = temp;
-        return true;
+        return 1;
     }
-    return false;
+    return 0;
 }
 
 static void send_rx_config()
