@@ -44,6 +44,9 @@ struct struct_map {const char *str;  u16 offset;};
 #define OFFSET_FON(s, v) (offsetof(s, v) | (TYPE_FONT << 12))
 #define OFFSET_STRLIST(s, v, StrList, StrListSize) \
     (offsetof(s, v) | (TYPE_STR_LIST << 12)) }, { (const char*)StrList, StrListSize
+#define OFFSET_SRC(s, v) (offsetof(s, v) | (TYPE_SOURCE << 12))
+#define OFFSET_BUT(s, v) (offsetof(s, v) | (TYPE_BUTTON << 12))
+
 int assign_int(void* ptr, const struct struct_map *map, int map_size,
     const char* name, const char* value);
 int write_int(void* ptr, const struct struct_map *map, int map_size, FILE* fh);

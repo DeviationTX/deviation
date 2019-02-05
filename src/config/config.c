@@ -17,6 +17,8 @@
 #include "gui/gui.h"
 #include "config.h"
 #include "display.h"
+#include "mixer.h"
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -32,6 +34,76 @@ static u16 get_color(const char *value) {
     g = 0xff & (color >> 8);
     b = 0xff & (color >> 0);
     return RGB888_to_RGB565(r, g, b);
+}
+
+static u8 get_button(const char *value)
+{
+    u8 i;
+    for (i = 0; i <= NUM_TX_BUTTONS; i++) {
+        if (strcasecmp(INPUT_ButtonName(i), value) == 0) {
+            return i;
+        }
+    }
+    printf("Could not parse Button %s\n", value);
+    return 0;
+}
+
+
+static s8 mapstrcasecmp(const char *s1, const char *s2)
+{
+    int i = 0;
+    while (1) {
+        if (s1[i] == s2[i]
+           || (s2[i] >= 'a' && s1[i] + ('a'-'A') == s2[i])
+           || (s1[i] >= 'a' && s2[i] + ('a'-'A') == s1[i])
+           || (s2[i] == ' ' && s1[i] == '_')
+           || (s1[i] == ' ' && s2[i] == '_'))
+        {
+            if (s1[i] == '\0')
+                return 0;
+            i++;
+            continue;
+        }
+        return (s1[i] < s2[i] ? -1 : 1);
+    }
+}
+
+u8 get_source(const char *value)
+{
+    unsigned i;
+    unsigned val;
+    const char *ptr = (value[0] == '!') ? value + 1 : value;
+    const char *tmp;
+    char cmp[10];
+    for (i = 0; i <= NUM_SOURCES; i++) {
+        if (mapstrcasecmp(INPUT_SourceNameReal(cmp, i), ptr) == 0) {
+            #if defined(HAS_SWITCHES_NOSTOCK) && HAS_SWITCHES_NOSTOCK
+            #define SWITCH_NOSTOCK ((1 << INP_HOLD0) | (1 << INP_HOLD1) | \
+                                    (1 << INP_FMOD0) | (1 << INP_FMOD1))
+            if ((Transmitter.ignore_src & SWITCH_NOSTOCK) == SWITCH_NOSTOCK) {
+                if (mapstrcasecmp("FMODE0", ptr) == 0 ||
+                    mapstrcasecmp("FMODE1", ptr) == 0 ||
+                    mapstrcasecmp("HOLD0", ptr) == 0 ||
+                    mapstrcasecmp("HOLD1", ptr) == 0)
+                    break;
+            }
+            #endif  // HAS_SWITCHES_NOSTOCK
+            return ((ptr == value) ? 0 : 0x80) | i;
+        }
+    }
+    for (i = 0; i < 4; i++) {
+        if (mapstrcasecmp(tx_stick_names[i], ptr) == 0) {
+            return ((ptr == value) ? 0 : 0x80) | (i + 1);
+        }
+    }
+    i = 0;
+    while ((tmp = INPUT_MapSourceName(i++, &val))) {
+        if (mapstrcasecmp(tmp, ptr) == 0) {
+            return ((ptr == value) ? 0 : 0x80) | val;
+        }
+    }
+    printf("Could not parse Source %s\n", value);
+    return 0;
 }
 
 int assign_int(void* ptr, const struct struct_map *map, int map_size, const char* name, const char* value) {
@@ -58,6 +130,10 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size, const char
                     *((u16 *)((u8*)ptr + offset)) = get_color(value); break;
                 case TYPE_FONT:
                     *((u8 *)((u8*)ptr + offset)) = FONT_GetFromString(value); break;
+                case TYPE_BUTTON:
+                    *((u8 *)((u8*)ptr + offset)) = get_button(value); break;
+                case TYPE_SOURCE:
+                    *((u8 *)((u8*)ptr + offset)) = get_source(value); break;
 
                 case TYPE_STR_LIST: {
                     // get the list
