@@ -61,7 +61,7 @@ enum{
 };
 
 static const char * const loli_opts[] = {
-    _tr_noop("Chan 1"), "Servo", "SW", "PWM","PPM", NULL,
+    _tr_noop("Chan 1"), "Servo", "SW", "PWM", "PPM", NULL,
     _tr_noop("Chan 2"), "Servo", "SW", "PWM", NULL,
     _tr_noop("Chan 3"), "Servo", "SW", NULL,
     _tr_noop("Chan 4"), "Servo", "SW", NULL,
@@ -157,7 +157,7 @@ static u16 scale_channel(u8 ch, u16 destMin, u16 destMax)
 static bool rxConfigChanged()
 {
     u16 temp = 0;
-    for (u8 i=0; i<8; i++)
+    for (u8 i=0; i < 8; i++)
         temp += Model.proto_opts[PROTOOPTS_CH1 + i];
     if (temp != rx_config) {
         rx_config = temp;
@@ -187,11 +187,11 @@ static void send_rx_config()
     if (Model.proto_opts[PROTOOPTS_CH7] == OPT_PWM)
         packet[1] |= FLAG_PWM7;
     // Rx Output X "Switch" mode
-    for (u8 i=0; i<8; i++) {
+    for (u8 i=0; i < 8; i++) {
         if (Model.proto_opts[PROTOOPTS_CH1 + i] == OPT_SW)
             packet[2] |= 1 << (7-i);
     }
-    
+
     if (++hopping_frequency_no > LOLI_NUM_CHANNELS-1)
         hopping_frequency_no = 0;
     NRF24L01_WriteReg(NRF24L01_05_RF_CH, hopping_frequency[hopping_frequency_no]);
@@ -338,7 +338,7 @@ static u16 LOLI_callback()
             if (++count >= 15) {
                 phase = DATA1;
             }
-            delay=20000;
+            delay = 20000;
             break;
     }
     return delay;
