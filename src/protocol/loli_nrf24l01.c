@@ -261,7 +261,7 @@ static void update_telemetry()
 
 static u16 LOLI_callback()
 {
-    u16 delay = 0;
+    u16 delay = 1;
     switch (phase) {
         case BIND1:
             NRF24L01_SetTxRxMode(TXRX_OFF);
@@ -270,7 +270,7 @@ static u16 LOLI_callback()
             // send bind packet
             send_packet(1);
             phase = BIND2;
-            delay = 800;
+            delay = 2000;
             break;
         case BIND2:
             // switch to RX mode
@@ -298,9 +298,8 @@ static u16 LOLI_callback()
             count++;
             if (count > 50) {
                 phase = BIND1;
-            } else {
-                delay = 1000;
             }
+            delay = 1000;
             break;
         case DATA1:
             // got a telemetry packet ?
