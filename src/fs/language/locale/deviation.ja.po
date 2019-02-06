@@ -982,11 +982,11 @@ msgstr "拡張"
 
 #: pages/common/_model_page.c:294
 msgid "Load..."
-msgstr "選択..."
+msgstr "ロード..."
 
 #: pages/common/_model_page.c:296
 msgid "Copy To..."
-msgstr "コピー..."
+msgstr "セーブ..."
 
 #: pages/common/_model_page.c:298
 msgid "Template.."
@@ -1226,7 +1226,7 @@ msgstr "COL"
 #: pages/common/_model_config.c:133
 #, c-format
 msgid "Ch%d"
-msgstr "Ch%d"
+msgstr "Ch %d"
 
 #: pages/common/_model_config.c:186
 #, c-format
@@ -1268,7 +1268,7 @@ msgstr "追加"
 
 #: pages/common/_main_config.c:130
 msgid "Load"
-msgstr "選択"
+msgstr "ロード"
 
 #: pages/common/_main_config.c:234
 msgid "Menu"
@@ -1507,7 +1507,7 @@ msgstr "実績値"
 
 #: pages/320x240x16/set_timer_page.c:90
 msgid "value to add or set"
-msgstr "追加値 or 設定値"
+msgstr "値の追加 or 設定"
 
 #: pages/320x240x16/set_timer_page.c:94 pages/320x240x16/rtc_config.c:136
 #: pages/128x64x1/set_timer_page.c:48
@@ -1572,7 +1572,7 @@ msgstr "プロトコル"
 
 #: pages/320x240x16/model_page.c:89 pages/128x64x1/model_page.c:123
 msgid "# Channels"
-msgstr "# Channels"
+msgstr "チャンネル数"
 
 #: pages/320x240x16/model_page.c:94 pages/128x64x1/model_page.c:101
 msgid "Tx power"
@@ -1806,7 +1806,7 @@ msgstr "機体モデル ロード"
 
 #: pages/320x240x16/model_loadsave.c:93
 msgid "Save Model as..."
-msgstr "モデルを保存..."
+msgstr "モデルをセーブ..."
 
 #: pages/320x240x16/model_loadsave.c:94
 msgid "Load Model Template"
@@ -1828,7 +1828,7 @@ msgstr "レイアウト ロード"
 #: pages/128x64x1/advanced/mixer_setup.c:157
 #: pages/128x64x1/advanced/mixer_setup.c:265
 msgid "Src"
-msgstr "ソース"
+msgstr "ソース:入力"
 
 #: pages/320x240x16/standard/throhold_page.c:52
 #: pages/128x64x1/standard/throhold_page.c:45
@@ -2090,7 +2090,7 @@ msgstr "Throttleカーブ"
 
 #: pages/320x240x16/pagelist.h:48 pages/128x64x1/pagelist.h:50
 msgid "Pitch curves"
-msgstr "Pitchカーブ"
+msgstr "ピッチカーブ"
 
 #: pages/320x240x16/pagelist.h:49 pages/128x64x1/standard/throhold_page.c:38
 #: pages/128x64x1/pagelist.h:51
@@ -2393,7 +2393,7 @@ msgstr "ミキサー パターン　R+"
 #: pages/128x64x1/advanced/mixer_setup.c:86
 #: pages/128x64x1/advanced/mixer_setup.c:165
 msgid "Scale"
-msgstr "スケール"
+msgstr "スケール:幅"
 
 #: pages/128x64x1/pagelist.h:27
 msgid "Video setup"
