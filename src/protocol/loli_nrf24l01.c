@@ -158,7 +158,7 @@ static u8 rxConfigChanged()
 {
     u16 temp = 0;
     for (u8 i=0; i < 8; i++)
-        temp += Model.proto_opts[PROTOOPTS_CH1 + i];
+        crc16_update(temp, Model.proto_opts[PROTOOPTS_CH1 + i], 8);
     if (temp != rx_config) {
         rx_config = temp;
         return 1;
