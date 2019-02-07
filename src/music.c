@@ -272,9 +272,8 @@ void MUSIC_PlayValue(u16 music, s32 value, u8 unit, u8 prec)
         }
     }
 
-    if (!AUDIO_AddQueue(music)) {
-        if (music < MUSIC_TOTAL)
-            MUSIC_Play(music);
+    if ( !AUDIO_AddQueue(music) && (music < MUSIC_TOTAL) ) {
+        MUSIC_Play(music);
         return;
     }
 
@@ -282,15 +281,15 @@ void MUSIC_PlayValue(u16 music, s32 value, u8 unit, u8 prec)
     if (unit == VOICE_UNIT_TIME) {
         if (value >= 3600) {
             i = value / 3600;
+            value %= 3600;
             AUDIO_AddQueue(i + MUSIC_TOTAL);
             AUDIO_AddQueue(VOICE_UNIT_HOURS + VOICE_UNIT_OFFSET);
-            value %= 3600;
         }
         if (value >= 60) {
             i = value / 60;
+            value %= 60;
             AUDIO_AddQueue(i + MUSIC_TOTAL);
             AUDIO_AddQueue(VOICE_UNIT_MINUTES + VOICE_UNIT_OFFSET);
-            value %= 60;
         }
         if (value > 0) {
             AUDIO_AddQueue(value + MUSIC_TOTAL);
@@ -302,7 +301,7 @@ void MUSIC_PlayValue(u16 music, s32 value, u8 unit, u8 prec)
     // Add minus sign for negative number
     if (value < 0) {
         AUDIO_AddQueue(VOICE_UNIT_MINUS + VOICE_UNIT_OFFSET);
-        value *= -1;
+        value = -value;
     }
 
     //Add precision digits
@@ -315,31 +314,31 @@ void MUSIC_PlayValue(u16 music, s32 value, u8 unit, u8 prec)
         digits[digit_count++] = VOICE_DEC_SEP;
     }
 
-    // Special case value == 0 and not playing TIME
-    if (value == 0 && unit != VOICE_UNIT_TIME)
+    // Special case value == 0
+    if (value == 0)
         digits[digit_count++] = 0;
     // Get single digits from remaining value
     while (value > 0) {
-        if(value > 999) {
+        if (value > 999) {
             thousands = value / 1000;
             value %= 1000;
         }
-        if(value > 100) {
+        if (value > 100) {
             digits[digit_count++] = value % 100;
             value /= 100;
             digits[digit_count++] = value + 99;
-            if (thousands){
-              digits[digit_count++] = 109; // MP3 for "thousands"
-              digits[digit_count++] = thousands;
+            if (thousands) {
+                digits[digit_count++] = 109; // MP3 for "thousands"
+                digits[digit_count++] = thousands;
             }
             break;
         }
-        if(value < 101 && value > 0) {
+        if (value < 101 && value > 0) {
             digits[digit_count++] = value;
             break;
         }
         else {
-            if (thousands){
+            if (thousands) {
                 digits[digit_count++] = 109; // MP3 for "thousands"
                 digits[digit_count++] = thousands;
             }
