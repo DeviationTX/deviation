@@ -9,7 +9,6 @@ void AUDIO_Init();
 void AUDIO_SetVolume();
 void AUDIO_CheckQueue();
 int AUDIO_AddQueue(u16 music);
-int AUDIO_VoiceAvailable();
 
 extern struct AudioQueue audio_queue[AUDIO_QUEUE_LENGTH];
 extern struct VoiceMap current_voice_mapping;

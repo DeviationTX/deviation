@@ -189,7 +189,7 @@ void AUDIO_CheckQueue() {
     }
 }
 
-int AUDIO_VoiceAvailable() {
+static int AUDIO_VoiceAvailable() {
 #ifndef _DEVO12_TARGET_H_
 #if HAS_AUDIO_UART
     if ( !Transmitter.audio_uart && (PPMin_Mode() || Model.protocol == PROTOCOL_PPM) ) {  // don't send play command when using PPM port
@@ -211,8 +211,8 @@ int AUDIO_VoiceAvailable() {
 }
 
 int AUDIO_AddQueue(u16 music) {
-    if (num_audio == AUDIO_QUEUE_LENGTH) {
-        printf("Voice: Queue full, cannot add new mp3 #%d\n",music);
+    if (!AUDIO_VoiceAvailable() || num_audio == AUDIO_QUEUE_LENGTH) {
+        printf("Voice: queue full or voice not available, cannot add new mp3 #%d\n",music);
         return 0;
     }
     CONFIG_VoiceParse(music);

@@ -213,7 +213,6 @@ void MUSIC_Play(u16 music)
 #if HAS_EXTENDED_AUDIO
     // Play audio for switch
     if ( music > MUSIC_TOTAL ) {
-        if (AUDIO_VoiceAvailable())
             AUDIO_AddQueue(music);
         return;
     }
@@ -229,7 +228,7 @@ void MUSIC_Play(u16 music)
 
 #if HAS_EXTENDED_AUDIO
     if ( !(playback_device == AUDDEV_BUZZER) ) {
-        if (  AUDIO_VoiceAvailable() && AUDIO_AddQueue(music) ) {
+        if (AUDIO_AddQueue(music)) {
             if ((playback_device == AUDDEV_EXTAUDIO) || (playback_device == AUDDEV_UNDEF)) {
                 Volume = 0;
                 return;
@@ -273,7 +272,7 @@ void MUSIC_PlayValue(u16 music, s32 value, u8 unit, u8 prec)
         }
     }
 
-    if ( !AUDIO_VoiceAvailable() || !AUDIO_AddQueue(music)) {
+    if (!AUDIO_AddQueue(music)) {
         if (music < MUSIC_TOTAL)
             MUSIC_Play(music);
         return;

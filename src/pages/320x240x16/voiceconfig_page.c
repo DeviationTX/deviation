@@ -46,7 +46,7 @@ void PAGE_VoiceconfigInit(int page)
     PAGE_SetModal(0);
     PAGE_ShowHeader(PAGE_GetName(PAGEID_VOICECFG));
 
-    if ( !AUDIO_VoiceAvailable() ) {
+    if ( !AUDIO_AddQueue(MUSIC_KEY_PRESSING) ) {   // MUSIC_KEY_PRESSING is empty by default
         GUI_CreateLabelBox(&gui->msg, 20, 80, 280, 100, &NARROW_FONT, GUI_Localize, NULL,
             _tr_noop("External voice\ncurrently not\navailable"));
         return;
