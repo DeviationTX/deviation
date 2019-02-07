@@ -145,7 +145,7 @@ static u16 scale_channel(s32 chanval, s32 inMin, s32 inMax, u16 destMin, u16 des
 {
     s32 range = (s32)destMax - (s32)destMin;
     s32 chanrange = inMax - inMin;
-    
+
     if (chanval < inMin)
         chanval = inMin;
     else if (chanval > inMax)
@@ -385,7 +385,7 @@ static u16 LOLI_callback()
             NRF24L01_SetTxRxMode(TX_EN);
             NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x0a);  // 8bit CRC, TX
             send_fs_config();
-            if(count++ >= 10)
+            if (count++ >= 10)
                 phase = DATA1;
             delay = 20000;
             break;
@@ -422,7 +422,7 @@ static void init_txid()
     for (u8 i=0; i < LOLI_NUM_CHANNELS; i++) {
         rand32_r(&lfsr, 0);
         hopping_frequency[i] = (17 * i) + (lfsr % 17);  // 2400-2485 MHz
-        if(hopping_frequency[i] == LOLI_BIND_CHANNEL)
+        if (hopping_frequency[i] == LOLI_BIND_CHANNEL)
             hopping_frequency[i]++;
     }
 }
