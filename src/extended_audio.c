@@ -172,6 +172,7 @@ void AUDIO_SetVolume() {
 static void AUDIO_ResetQueue() {
     num_audio = 0;
     next_audio = 0;
+    printf("Voice: Queue finished, resetting.\n");
 }
 
 void AUDIO_CheckQueue() {
@@ -183,7 +184,6 @@ void AUDIO_CheckQueue() {
             next_audio++;
         }
     } else if (num_audio && t > audio_queue_time) {
-        printf("Voice: Queue finished, resetting.\n");
         AUDIO_ResetQueue();
         AUDIO_SetVolume();
     }
@@ -222,6 +222,7 @@ int AUDIO_AddQueue(u16 music) {
     }
     audio_queue[num_audio].duration = current_voice_mapping.duration;
     audio_queue[num_audio].id = music;
+    printf("Voice: added ID %d with duration %d to queue position %d.\n", music, current_voice_mapping.duration, num_audio);
     num_audio++;
     return 1;
 }
