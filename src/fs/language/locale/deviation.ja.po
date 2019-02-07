@@ -127,35 +127,35 @@ msgstr "SW H"
 
 #: inputs.c:95
 msgid "TRIMLV-"
-msgstr "Trm左縦-"
+msgstr "Trm左V-"
 
 #: inputs.c:96
 msgid "TRIMLV+"
-msgstr "Trm左縦+"
+msgstr "Trm左V+"
 
 #: inputs.c:97
 msgid "TRIMRV-"
-msgstr "Trm右縦-"
+msgstr "Trm右V-"
 
 #: inputs.c:98
 msgid "TRIMRV+"
-msgstr "Trm右縦+"
+msgstr "Trm右V+"
 
 #: inputs.c:99
 msgid "TRIMLH-"
-msgstr "Trm左横-"
+msgstr "Trm左H-"
 
 #: inputs.c:100
 msgid "TRIMLH+"
-msgstr "Trm左横+"
+msgstr "Trm左H+"
 
 #: inputs.c:101
 msgid "TRIMRH-"
-msgstr "Trm右横-"
+msgstr "Trm右H-"
 
 #: inputs.c:102
 msgid "TRIMRH+"
-msgstr "Trm右横+"
+msgstr "Trm右H+"
 
 #: inputs.c:103
 msgid "TRIM_L-"
@@ -202,19 +202,19 @@ msgstr "Exit"
 
 #: inputs.c:115
 msgid "RIGHT_H"
-msgstr "右_横"
+msgstr "右_H"
 
 #: inputs.c:116
 msgid "LEFT_V"
-msgstr "左_縦"
+msgstr "左_V"
 
 #: inputs.c:117
 msgid "RIGHT_V"
-msgstr "右_縦"
+msgstr "右_V"
 
 #: inputs.c:118
 msgid "LEFT_H"
-msgstr "左_横"
+msgstr "左_H"
 
 #: inputs.c:144 inputs.c:257 telemetry/telem_crsf.c:80
 #: telemetry/telem_frsky.c:58 telemetry/telem_dsm.c:261
@@ -385,7 +385,7 @@ msgstr "DIS"
 #: telemetry/telem_frsky.c:101 telemetry/telem_frsky.c:108
 #: telemetry/telem_devo.c:55
 msgid "TelemV"
-msgstr "Telem電圧"
+msgstr "TelemV"
 
 #: telemetry/telem_frsky.c:104
 msgid "TelemRSSI"
@@ -537,7 +537,7 @@ msgstr "OFF"
 #: protocol/bugs3_a7105.c:244 protocol/hubsan_a7105.c:127
 #: protocol/flysky_afhds2a_a7105.c:80 protocol/joysway_a7105.c:55
 msgid "Freq Tune"
-msgstr "Freq 調整"
+msgstr "周波数調整"
 
 #: protocol/bayang_nrf24l01.c:101
 msgid "regular"
@@ -551,12 +551,12 @@ msgstr "RX Id"
 #: protocol/hitec_cc2500.c:63 protocol/corona_cc2500.c:42
 #: protocol/sfhss_cc2500.c:42 protocol/frsky2way_cc2500.c:41
 msgid "Freq-Fine"
-msgstr "Freq-良好"
+msgstr "周波数微調"
 
 #: protocol/frsky1way_cc2500.c:41 protocol/sfhss_cc2500.c:43
 #: protocol/frsky2way_cc2500.c:42
 msgid "Freq-Coarse"
-msgstr "Freq-不良"
+msgstr "周波数粗調"
 
 #: protocol/v202_nrf24l01.c:128 protocol/kn_nrf24l01.c:169
 #: protocol/esky150_nrf24l01.c:150
@@ -647,7 +647,7 @@ msgstr "6+1"
 #: protocol/wk2x01.c:80 pages/320x240x16/model_config.c:50
 #: pages/128x64x1/model_config.c:69
 msgid "COL Inv"
-msgstr "COL Inv"
+msgstr "COL サーボ"
 
 #: protocol/wk2x01.c:80 pages/common/standard/_common_standard.c:67
 #: pages/common/standard/_reverse_page.c:28
@@ -1243,15 +1243,15 @@ msgstr "大BOX"
 
 #: pages/common/_main_config.c:88
 msgid "Bargraph"
-msgstr "グラフ"
+msgstr "Barグラフ"
 
 #: pages/common/_main_config.c:89
 msgid "V-trim"
-msgstr "縦-Trim"
+msgstr "V-Trim"
 
 #: pages/common/_main_config.c:90
 msgid "H-trim"
-msgstr "横-Trim"
+msgstr "H-Trim"
 
 #: pages/common/_main_config.c:92
 msgid "Battery"
@@ -1450,7 +1450,7 @@ msgstr "Screenセーバ"
 
 #: pages/320x240x16/tx_configure.c:185 pages/128x64x1/tx_configure.c:164
 msgid "Dimmer target"
-msgstr "SS調光レベル"
+msgstr "Scr調光レベル"
 
 #: pages/320x240x16/tx_configure.c:192 pages/128x64x1/tx_configure.c:168
 msgid "Timer settings"
@@ -1572,7 +1572,7 @@ msgstr "プロトコル"
 
 #: pages/320x240x16/model_page.c:89 pages/128x64x1/model_page.c:123
 msgid "# Channels"
-msgstr "チャンネル数"
+msgstr "使用Ch数"
 
 #: pages/320x240x16/model_page.c:94 pages/128x64x1/model_page.c:101
 msgid "Tx power"
@@ -1608,11 +1608,11 @@ msgstr "SwashType"
 
 #: pages/320x240x16/model_config.c:44 pages/128x64x1/model_config.c:61
 msgid "ELE Inv"
-msgstr "ELEサーボ"
+msgstr "ELE サーボ"
 
 #: pages/320x240x16/model_config.c:47 pages/128x64x1/model_config.c:65
 msgid "AIL Inv"
-msgstr "AILサーボ"
+msgstr "AIL サーボ"
 
 #: pages/320x240x16/model_config.c:53
 #: pages/320x240x16/standard/swash_page.c:45 pages/128x64x1/model_config.c:73
@@ -1995,7 +1995,7 @@ msgstr "ポジ/ネガ"
 #: pages/128x64x1/advanced/mixer_setup.c:82
 #: pages/128x64x1/advanced/mixer_setup.c:161
 msgid "Curve"
-msgstr "カーブ"
+msgstr "カーブ:形状"
 
 #: pages/320x240x16/advanced/mixer_setup.c:76
 #: pages/320x240x16/advanced/mixer_setup.c:161
@@ -2227,7 +2227,7 @@ msgstr "レイアウト : ENT長押し"
 
 #: pages/128x64x1/main_config.c:86
 msgid "Trimbar"
-msgstr "Trimバー"
+msgstr "TrimBar"
 
 #: pages/128x64x1/main_config.c:90
 msgid "Box"
@@ -2235,7 +2235,7 @@ msgstr "BOX"
 
 #: pages/128x64x1/main_config.c:93
 msgid "Bar"
-msgstr "バー"
+msgstr "Barグラフ"
 
 #: pages/128x64x1/tx_configure.c:114
 msgid "Buzz settings"
