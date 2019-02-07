@@ -250,12 +250,6 @@ u16 MUSIC_GetTelemetryAlarm(enum Music music) {
     return music;
 }
 
-u16 MUSIC_GetTimerAlarm(enum Music music) {
-    if ( Model.voice.timer[music - MUSIC_ALARM1].music > 0 )
-        return Model.voice.timer[music - MUSIC_ALARM1].music;
-    return music;
-}
-
 void MUSIC_PlayValue(u16 music, s32 value, u8 unit, u8 prec)
 {
     u32 i;

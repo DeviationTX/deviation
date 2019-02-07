@@ -175,7 +175,9 @@ void TIMER_Update()
         }
         if (timer_state[i]) {
 #if HAS_EXTENDED_AUDIO
-            unsigned timer_music = MUSIC_GetTimerAlarm(MUSIC_ALARM1 + i);
+            unsigned timer_music = MUSIC_ALARM1 + i;
+            if (Model.voice.timer[i].music)
+                timer_music = Model.voice.timer[i].music;
 #endif
             s32 delta = t - last_time[i];
             s32 warn_time;

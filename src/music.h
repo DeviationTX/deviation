@@ -114,7 +114,6 @@ struct AudioQueue {
 };
 
 u16 MUSIC_GetTelemetryAlarm(enum Music music);
-u16 MUSIC_GetTimerAlarm(enum Music music);
 void MUSIC_PlayValue(u16 music, s32 value, u8 unit, u8 prec);
 
 #endif //HAS_EXTENDED_AUDIO
