@@ -48,8 +48,8 @@ static u8 hopping_frequency[LOLI_NUM_CHANNELS];
 static u8 rx_tx_addr[5];
 static u8 hopping_frequency_no;
 static u8 count;
-static u16 rx_config;
-static const u8 bind_address[5] = {'L', 'O', 'V', 'E', '!'};
+static u8 rxConfigChanged;
+static u16 fs_config;
 
 enum{
     BIND1,
@@ -57,7 +57,8 @@ enum{
     BIND3,
     DATA1,
     DATA2,
-    SET_RX_CONFIG
+    SET_RX_CONFIG,
+    SET_FAILSAFE
 };
 
 static const char * const loli_opts[] = {
@@ -132,7 +133,6 @@ static void init_RF()
     NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);      // No Auto Acknowldgement on all data pipes
     NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x01);  // enable rx data pipe 0
     NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0x00);    // No retransmit
-    NRF24L01_WriteReg(NRF24L01_05_RF_CH, 66);   // start frequency
     NRF24L01_WriteReg(NRF24L01_11_RX_PW_P0, LOLI_PACKET_SIZE);  // RX FIFO size
     NRF24L01_SetBitrate(NRF24L01_BR_250K);
     tx_power = Model.tx_power;
@@ -141,29 +141,64 @@ static void init_RF()
     NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x0a);  // 8bit CRC, TX
 }
 
-#define CHAN_RANGE (CHAN_MAX_VALUE - CHAN_MIN_VALUE)
-static u16 scale_channel(u8 ch, u16 destMin, u16 destMax)
+static u16 scale_channel(s32 chanval, s32 inMin, s32 inMax, u16 destMin, u16 destMax)
 {
-    s32 chanval = Channels[ch];
-    s32 range = (s32) destMax - (s32) destMin;
-
-    if (chanval < CHAN_MIN_VALUE)
-        chanval = CHAN_MIN_VALUE;
-    else if (chanval > CHAN_MAX_VALUE)
-        chanval = CHAN_MAX_VALUE;
-    return (range * (chanval - CHAN_MIN_VALUE)) / CHAN_RANGE + destMin;
+    s32 range = (s32)destMax - (s32)destMin;
+    s32 chanrange = inMax - inMin;
+    
+    if (chanval < inMin)
+        chanval = inMin;
+    else if (chanval > inMax)
+        chanval = inMax;
+    return (range * (chanval - inMin)) / chanrange + destMin;
 }
 
-static u8 rxConfigChanged()
+static u8 fsConfigChanged()
 {
     u16 temp = 0;
     for (u8 i=0; i < 8; i++)
-        crc16_update(temp, Model.proto_opts[PROTOOPTS_CH1 + i], 8);
-    if (temp != rx_config) {
-        rx_config = temp;
+        temp = crc16_update(temp, Model.limits[i].failsafe, 8);
+    if (temp != fs_config) {
+        fs_config = temp;
         return 1;
     }
     return 0;
+}
+
+static void send_fs_config()
+{
+    u16 val;
+    packet[0] = 0xa0;
+    val = scale_channel(Model.limits[CHANNEL1].failsafe, -100, 100, 0, 1023);
+    packet[1] = val >> 2;
+    packet[2] = val << 6;
+    val = scale_channel(Model.limits[CHANNEL2].failsafe, -100, 100, 0, 1023);
+    packet[2]|= val >> 4;
+    packet[3] = val << 4;
+    val = scale_channel(Model.limits[CHANNEL3].failsafe, -100, 100, 0, 1023);
+    packet[3]|= val >> 6;
+    packet[4] = val << 2;
+    val = scale_channel(Model.limits[CHANNEL4].failsafe, -100, 100, 0, 1023);
+    packet[4]|= val >> 8;
+    packet[5] = val & 0xff;
+    val = scale_channel(Model.limits[CHANNEL5].failsafe, -100, 100, 0, 1023);
+    packet[6] = val >> 2;
+    packet[7] = val << 6;
+    val = scale_channel(Model.limits[CHANNEL6].failsafe, -100, 100, 0, 1023);
+    packet[7]|= val >> 4;
+    packet[8] = val << 4;
+    val = scale_channel(Model.limits[CHANNEL7].failsafe, -100, 100, 0, 1023);
+    packet[8]|= val >> 6;
+    packet[9] = val << 2;
+    val = scale_channel(Model.limits[CHANNEL8].failsafe, -100, 100, 0, 1023);
+    packet[9]|= val >> 8;
+    packet[10]= val & 0xff;
+    if (++hopping_frequency_no > LOLI_NUM_CHANNELS-1)
+        hopping_frequency_no = 0;
+    NRF24L01_WriteReg(NRF24L01_05_RF_CH, hopping_frequency[hopping_frequency_no]);
+    NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
+    NRF24L01_FlushTx();
+    NRF24L01_WritePayload(packet, LOLI_PACKET_SIZE);
 }
 
 static void send_rx_config()
@@ -207,30 +242,31 @@ static void send_packet(u8 bind)
         packet[0] = 0xa0;
         memcpy(&packet[1], hopping_frequency, 5);
         memcpy(&packet[6], rx_tx_addr, 5);
+        NRF24L01_WriteReg(NRF24L01_05_RF_CH, LOLI_BIND_CHANNEL);
     } else {
         packet[0] = 0xa1;
-        val = scale_channel(0, 0, 1023);
+        val = scale_channel(Channels[CHANNEL1], CHAN_MIN_VALUE, CHAN_MAX_VALUE, 0, 1023);
         packet[1] = val >> 2;
         packet[2] = val << 6;
-        val = scale_channel(1, 0, 1023);
+        val = scale_channel(Channels[CHANNEL2], CHAN_MIN_VALUE, CHAN_MAX_VALUE, 0, 1023);
         packet[2]|= val >> 4;
         packet[3] = val << 4;
-        val = scale_channel(2, 0, 1023);
+        val = scale_channel(Channels[CHANNEL3], CHAN_MIN_VALUE, CHAN_MAX_VALUE, 0, 1023);
         packet[3]|= val >> 6;
         packet[4] = val << 2;
-        val = scale_channel(3, 0, 1023);
+        val = scale_channel(Channels[CHANNEL4], CHAN_MIN_VALUE, CHAN_MAX_VALUE, 0, 1023);
         packet[4]|= val >> 8;
         packet[5] = val & 0xff;
-        val = scale_channel(4, 0, 1023);
+        val = scale_channel(Channels[CHANNEL5], CHAN_MIN_VALUE, CHAN_MAX_VALUE, 0, 1023);
         packet[6] = val >> 2;
         packet[7] = val << 6;
-        val = scale_channel(5, 0, 1023);
+        val = scale_channel(Channels[CHANNEL6], CHAN_MIN_VALUE, CHAN_MAX_VALUE, 0, 1023);
         packet[7]|= val >> 4;
         packet[8] = val << 4;
-        val = scale_channel(6, 0, 1023);
+        val = scale_channel(Channels[CHANNEL7], CHAN_MIN_VALUE, CHAN_MAX_VALUE, 0, 1023);
         packet[8]|= val >> 6;
         packet[9] = val << 2;
-        val = scale_channel(7, 0, 1023);
+        val = scale_channel(Channels[CHANNEL8], CHAN_MIN_VALUE, CHAN_MAX_VALUE, 0, 1023);
         packet[9]|= val >> 8;
         packet[10]= val & 0xff;
         if (++hopping_frequency_no > LOLI_NUM_CHANNELS-1)
@@ -307,7 +343,13 @@ static u16 LOLI_callback()
                 NRF24L01_ReadPayload(packet, LOLI_PACKET_SIZE);
                 update_telemetry();
             }
-            if (rxConfigChanged()) {
+            if (fsConfigChanged()) {
+                count = 0;
+                phase = SET_FAILSAFE;
+                break;
+            }
+            if (rxConfigChanged) {
+                rxConfigChanged = 0;
                 count = 0;
                 phase = SET_RX_CONFIG;
                 break;
@@ -334,9 +376,17 @@ static u16 LOLI_callback()
             NRF24L01_SetTxRxMode(TX_EN);
             NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x0a);  // 8bit CRC, TX
             send_rx_config();
-            if (++count >= 15) {
+            if (++count >= 10)
                 phase = DATA1;
-            }
+            delay = 20000;
+            break;
+        case SET_FAILSAFE:
+            NRF24L01_SetTxRxMode(TXRX_OFF);
+            NRF24L01_SetTxRxMode(TX_EN);
+            NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x0a);  // 8bit CRC, TX
+            send_fs_config();
+            if(count++ >= 10)
+                phase = DATA1;
             delay = 20000;
             break;
     }
@@ -368,22 +418,25 @@ static void init_txid()
     rand32_r(&lfsr, 0);
     rx_tx_addr[4] = (lfsr >> 24) & 0xFF;
 
-    // rf channels for data phase (manually set on "original" TX ?)
+    // rf channels for data phase
     for (u8 i=0; i < LOLI_NUM_CHANNELS; i++) {
         rand32_r(&lfsr, 0);
-        hopping_frequency[i] = (lfsr & 0xff) % 84;  // 2400-2483 MHz
+        hopping_frequency[i] = (17 * i) + (lfsr % 17);  // 2400-2485 MHz
+        if(hopping_frequency[i] == LOLI_BIND_CHANNEL)
+            hopping_frequency[i]++;
     }
 }
 
 static void initialize(u8 bind)
 {
+    static const u8 bind_address[5] = {'L', 'O', 'V', 'E', '!'};
     CLOCK_StopTimer();
     init_txid();
     init_RF();
-    rx_config = 0;
+    fs_config = 0;
+    rxConfigChanged = 1;
     if (bind) {
         phase = BIND1;
-        NRF24L01_WriteReg(NRF24L01_05_RF_CH, LOLI_BIND_CHANNEL);
         NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, bind_address, 5);
         NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, bind_address, 5);
         PROTOCOL_SetBindState(0xFFFFFFFF);
@@ -409,6 +462,7 @@ const void *LOLI_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((u32)Model.fixed_id) : 0;
         case PROTOCMD_GETOPTIONS: return loli_opts;
+        case PROTOCMD_SETOPTIONS: rxConfigChanged = 1; return (void*)0L;
         case PROTOCMD_TELEMETRYSTATE: return (void *)PROTO_TELEM_ON;
         case PROTOCMD_TELEMETRYTYPE: return (void *)(u32)TELEM_FRSKY;
         case PROTOCMD_CHANNELMAP: return AETRG;
