@@ -322,7 +322,7 @@ void MUSIC_PlayValue(u16 music, s32 value, u8 unit, u8 prec)
             value /= 100;
             digits[digit_count++] = value + 99;
             if (thousands) {
-                digits[digit_count++] = 109; // MP3 for "thousands"
+                digits[digit_count++] = 109;  // MP3 for "thousands"
                 digits[digit_count++] = thousands;
             }
             break;
@@ -333,7 +333,7 @@ void MUSIC_PlayValue(u16 music, s32 value, u8 unit, u8 prec)
         }
         else {
             if (thousands) {
-                digits[digit_count++] = 109; // MP3 for "thousands"
+                digits[digit_count++] = 109;  // MP3 for "thousands"
                 digits[digit_count++] = thousands;
             }
         }
