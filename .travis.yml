@@ -27,8 +27,9 @@ stages:
     - name: nightly
       if: type IN (api, cron) and branch = "master"
     - name: build
-      if: type NOT IN (api, cron) AND NOT commit_message =~ /^Updating translations from Transifex \(Languages:/
-      # Do not rebuild if last commit was from Transifex...we already built in the previous commit
+      if: type NOT IN (api, cron)
+      # if: type NOT IN (api, cron) AND NOT commit_message =~ /^Updating translations from Transifex \(Languages:/
+      # We still need to rebuild even if the last commit was from transifex to calculate rom size and verify string lengths
 
 
 
@@ -163,7 +164,7 @@ script:
             echo "Only comment-changes found in deviation.po.  Ignoring"
             git checkout -- src/fs/language/
         else
-        #    tx push -s
+            tx push -s
             git diff
         fi
         tx pull -f -a
