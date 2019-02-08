@@ -183,6 +183,9 @@ int write_int2(void* ptr, const struct struct_map *map, u16* defaults, int map_s
             case TYPE_BUTTON:
             case TYPE_SOURCE:
                 value = *((u8 *)((u8*)ptr + offset)); break;
+
+            default:
+                continue;  // unsupported type
         }
 
         if (defaults == DEFAULTS_ZERO) {
