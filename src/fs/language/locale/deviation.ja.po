@@ -1280,7 +1280,7 @@ msgid ""
 "to max & min positions\n"
 "then press ENT"
 msgstr ""
-"スティック、ノブを\n"
+"スティック,ノブを\n"
 "最大 / 最小位置に動かし\n"
 "ENTを押して下さい"
 
@@ -1664,10 +1664,10 @@ msgid ""
 "but will allow full control of Tx."
 msgstr ""
 "バインド中です...\n"
-"機体が電源ONか確認ください。\n"
+"機体が電源ONか確認ください.\n"
 "\n"
-"OKを押してもキャンセルされません。\n"
-"送信機は全操作可能となります。"
+"OKを押してもキャンセルされません.\n"
+"送信機は全操作可能となります."
 
 #: pages/320x240x16/dialogs.c:66
 #, c-format
@@ -1697,11 +1697,11 @@ msgid ""
 "\n"
 "Change batteries now!"
 msgstr ""
-"バッテリー切れを検出。\n"
-"現在の設定が保存されます。\n"
-"今後は保存されません。\n"
+"バッテリー切れを検出.\n"
+"現在の設定が保存されます.\n"
+"今後は保存されません.\n"
 "\n"
-"すぐバッテリー交換を！"
+"すぐバッテリー交換を!"
 
 #: pages/320x240x16/dialogs.c:122
 msgid ""
@@ -1710,7 +1710,7 @@ msgid ""
 msgstr ""
 "標準ミキサーに変更するには\n"
 "機体モデルをリセットする\n"
-"必要があります。"
+"必要があります."
 
 #: pages/320x240x16/dialogs.c:129
 msgid "Standard Mixer"
@@ -2333,8 +2333,8 @@ msgid ""
 "can't save!"
 msgstr ""
 "バッテリーが\n"
-"低すぎます。\n"
-"保存できません！"
+"低すぎます.\n"
+"保存できません!"
 
 #: pages/128x64x1/dialogs.c:139
 msgid ""
@@ -2343,7 +2343,7 @@ msgid ""
 msgstr ""
 "標準ミキサー向けに\n"
 "モデルをリセットする\n"
-"必要があります。"
+"必要があります."
 
 #: pages/128x64x1/dialogs.c:153
 msgid ""
@@ -2388,7 +2388,7 @@ msgstr "ログ速度"
 
 #: pages/128x64x1/advanced/mixer_page.c:44
 msgid "Mixer    Reorder:Hold R+"
-msgstr "ミキサー パターン　R+"
+msgstr "ミキサー パターン R+"
 
 #: pages/128x64x1/advanced/mixer_setup.c:86
 #: pages/128x64x1/advanced/mixer_setup.c:165
@@ -2422,7 +2422,7 @@ msgid ""
 msgstr ""
 "ENTを押して\n"
 "USBドライブに\n"
-"切替えます。"
+"切替えます."
 
 #: pages/text/splash_page.c:37
 msgid "Deviation"

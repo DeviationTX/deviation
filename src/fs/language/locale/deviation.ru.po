@@ -2205,7 +2205,7 @@ msgstr "Монитор телеметрии"
 
 #: pages/320x240x16/pagelist.h:70 pages/128x64x1/pagelist.h:77
 msgid "Range Test"
-msgstr ""
+msgstr "Тест дальности"
 
 #: pages/320x240x16/pagelist.h:71
 msgid "Input monitor"
@@ -2225,27 +2225,27 @@ msgstr "Привет"
 
 #: pages/320x240x16/pagelist.h:84
 msgid "Select Language"
-msgstr ""
+msgstr "Выбор языка"
 
 #: pages/320x240x16/range_page.c:31
 msgid "Stop test"
-msgstr ""
+msgstr "Стоп тест"
 
 #: pages/320x240x16/range_page.c:31
 msgid "Start test"
-msgstr ""
+msgstr "Старт тест"
 
 #: pages/320x240x16/range_page.c:40 pages/128x64x1/range_page.c:46
 msgid "No range test possible."
-msgstr ""
+msgstr "Тест дальности недоступен."
 
 #: pages/320x240x16/range_page.c:49 pages/128x64x1/range_page.c:51
 msgid "Power reduced to"
-msgstr ""
+msgstr "Мощность снижена до"
 
 #: pages/320x240x16/range_page.c:50 pages/128x64x1/range_page.c:52
 msgid "from"
-msgstr ""
+msgstr "от"
 
 #: pages/320x240x16/usb_page.c:38 pages/128x64x1/about_page.c:38
 msgid "Deviation FW version:"
@@ -2275,7 +2275,7 @@ msgstr "Вводы"
 
 #: pages/128x64x1/chantest_page.c:111
 msgid "Mixer output"
-msgstr ""
+msgstr "Выход микшера"
 
 #: pages/128x64x1/trim_page.c:71
 msgid "Step"
@@ -2353,23 +2353,23 @@ msgstr ""
 
 #: pages/128x64x1/model_page.c:110 pages/128x64x1/model_config.c:205
 msgid "Video"
-msgstr ""
+msgstr "Видео"
 
 #: pages/128x64x1/model_page.c:111
 msgid "Setup"
-msgstr ""
+msgstr "Настройка"
 
 #: pages/128x64x1/model_config.c:179
 msgid "Video Enable"
-msgstr ""
+msgstr "Вкл. видео"
 
 #: pages/128x64x1/model_config.c:183
 msgid "Video Channel"
-msgstr ""
+msgstr "Видео канал"
 
 #: pages/128x64x1/model_config.c:191
 msgid "Brightness"
-msgstr ""
+msgstr "Яркость"
 
 #: pages/128x64x1/dialogs.c:82
 #, c-format
@@ -2463,7 +2463,7 @@ msgstr "Масшт."
 
 #: pages/128x64x1/pagelist.h:27
 msgid "Video setup"
-msgstr ""
+msgstr "Настройка видео"
 
 #: pages/128x64x1/pagelist.h:38
 msgid "About Deviation"
@@ -2475,11 +2475,11 @@ msgstr "Внешний OSD"
 
 #: pages/128x64x1/range_page.c:53
 msgid "Press ENT to stop test."
-msgstr ""
+msgstr "Нажмите ENT для остановки."
 
 #: pages/128x64x1/range_page.c:56
 msgid "Press ENT to start test."
-msgstr ""
+msgstr "Нажмите ENT для запуска."
 
 #: pages/128x64x1/usb_page.c:38
 msgid ""

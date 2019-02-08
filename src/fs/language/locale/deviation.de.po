@@ -1,10 +1,10 @@
 # Translators:
-# PhracturedBlue <rc2012@pblue.org>, 2019
 # TheRealMoeder, 2019
+# PhracturedBlue <rc2012@pblue.org>, 2019
 # 
 msgid ""
 msgstr ""
-"Last-Translator: TheRealMoeder, 2019\n"
+"Last-Translator: PhracturedBlue <rc2012@pblue.org>, 2019\n"
 "Language-Team: German (https://www.transifex.com/deviationtx/teams/73329/de/)\n"
 "Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -1959,7 +1959,7 @@ msgid ""
 "currently not\n"
 "available"
 msgstr ""
-"Externe Sprachausgabe‭\n"
+"Externe Sprachausgabe\n"
 "aktuell\n"
 "nicht verfügbar "
 
