@@ -49,21 +49,20 @@ static int ini_handler(void* user, const char* section, const char* name, const 
 
     if ( k && (req_id != MAX_VOICEMAP_ENTRIES) && (req_id == id) ) {
         current_voice_mapping.duration = duration;
-#if HAS_MUSIC_CONFIG
-        strlcpy(tempstring, value, k+1);  // return a requested mp3 label passed at *user to tempstring
-#endif
+        if (HAS_MUSIC_CONFIG)
+            strlcpy(tempstring, value, k+1);  // return a requested mp3 label passed at *user to tempstring
         return 1;
     }
-#if HAS_MUSIC_CONFIG
-    if ( req_id == MAX_VOICEMAP_ENTRIES ) {
-        if (MATCH_SECTION(SECTION_VOICE_CUSTOM)) {
-            // Initial count of custom voicemap entries
-            voice_map_entries++;
-            return 1;
+    if (HAS_MUSIC_CONFIG) {
+        if ( req_id == MAX_VOICEMAP_ENTRIES ) {
+            if (MATCH_SECTION(SECTION_VOICE_CUSTOM)) {
+                // Initial count of custom voicemap entries
+                voice_map_entries++;
+                return 1;
+            }
+            return 0;
         }
-        return 0;
     }
-#endif
     return 1;  // voice label ignored
 }
 
