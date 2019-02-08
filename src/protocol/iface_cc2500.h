@@ -125,14 +125,14 @@ enum {
 #define CC2500_LQI_CRC_OK_BM                   0x80
 #define CC2500_LQI_EST_BM                      0x7F
 
-MODULE_CALLTYPE void CC2500_WriteReg(u8 addr, u8 data);
-MODULE_CALLTYPE u8 CC2500_ReadReg(u8 addr);
-MODULE_CALLTYPE int CC2500_Reset();
-MODULE_CALLTYPE void CC2500_Strobe(u8 cmd);
-MODULE_CALLTYPE void CC2500_WriteRegisterMulti(u8 address, const u8 data[], u8 length);
-MODULE_CALLTYPE void CC2500_ReadRegisterMulti(u8 address, u8 data[], u8 length);
-MODULE_CALLTYPE void CC2500_WriteData(u8 *packet, u8 length);
-MODULE_CALLTYPE void CC2500_ReadData(u8 *dpbuffer, int len);
-MODULE_CALLTYPE void CC2500_SetTxRxMode(enum TXRX_State);
-MODULE_CALLTYPE void CC2500_SetPower(int power);
+void CC2500_WriteReg(u8 addr, u8 data);
+u8 CC2500_ReadReg(u8 addr);
+int CC2500_Reset();
+void CC2500_Strobe(u8 cmd);
+void CC2500_WriteRegisterMulti(u8 address, const u8 data[], u8 length);
+void CC2500_ReadRegisterMulti(u8 address, u8 data[], u8 length);
+void CC2500_WriteData(u8 *packet, u8 length);
+void CC2500_ReadData(u8 *dpbuffer, int len);
+void CC2500_SetTxRxMode(enum TXRX_State);
+void CC2500_SetPower(int power);
 #endif

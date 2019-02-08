@@ -68,6 +68,8 @@ endif
 
 ALL = $(LIBOPENCM3) $(TARGET).dfu
 
+SRC_C += objs/$(TARGET)/proto_stubs.c
+
 else #BUILD_TARGET
 
 ifeq ($(OS),Windows_NT)
@@ -106,5 +108,8 @@ $(ODIR)/%.bin: $(ODIR)/%.o_ $(PROTO_LINKFILE) $(PROTO_EXTRA_OBJS) $(TARGET).bin
 		--cref -T$(PROTO_LINKFILE) --just-symbols=$(SYMBOL_FILE)
 	$(DUMP) -t $(@:.bin=.elf) | grep -q _from_thumb; if [ $$? -eq 0 ]; then echo "ERROR: Bad address found"; false; else true; fi
 	$(CP) -O binary  $(@:.bin=.elf) $@
+
+objs/$(TARGET)/proto_stubs.c: target/common/devo/make-stubs.sh
+	sh target/common/devo/make-stubs.sh > $@
 
 endif #BUILD_TARGET
