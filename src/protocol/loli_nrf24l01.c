@@ -421,7 +421,7 @@ static void init_txid()
     // rf channels for data phase
     for (u8 i=0; i < LOLI_NUM_CHANNELS; i++) {
         rand32_r(&lfsr, 0);
-        hopping_frequency[i] = (17 * i) + (lfsr % 17);  // 2400-2485 MHz
+        hopping_frequency[i] = (17 * i) + (lfsr % 18);  // 2400-2485 MHz
         if (hopping_frequency[i] == LOLI_BIND_CHANNEL)
             hopping_frequency[i]++;
     }
