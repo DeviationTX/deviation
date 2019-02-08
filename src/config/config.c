@@ -23,7 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define DEFAULTS_ZERO (u16*)0x01
+#define DEFAULTS_ZERO (const u16*)0x01
 
 #define MATCH_KEY(s)     strcasecmp(name,    s) == 0
 #define MATCH_VALUE(s)   strcasecmp(value,   s) == 0
@@ -158,7 +158,7 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size, const char
     return 0;
 }
 
-int write_int2(void* ptr, const struct struct_map *map, u16* defaults, int map_size, FILE* fh) {
+int write_int2(void* ptr, const struct struct_map *map, const u16* defaults, int map_size, FILE* fh) {
     for (int i = 0; i < map_size; i++) {
         int size = map[i].offset >> 12;
         int offset = map[i].offset & 0xFFF;
