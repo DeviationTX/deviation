@@ -343,6 +343,9 @@ static u16 LOLI_callback()
                 NRF24L01_ReadPayload(packet, LOLI_PACKET_SIZE);
                 update_telemetry();
             }
+            NRF24L01_SetTxRxMode(TXRX_OFF);
+            NRF24L01_SetTxRxMode(TX_EN);
+            NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x0a);  // 8bit CRC, TX
             if (fsConfigChanged()) {
                 count = 0;
                 phase = SET_FAILSAFE;
@@ -354,9 +357,6 @@ static u16 LOLI_callback()
                 phase = SET_RX_CONFIG;
                 break;
             }
-            NRF24L01_SetTxRxMode(TXRX_OFF);
-            NRF24L01_SetTxRxMode(TX_EN);
-            NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x0a);  // 8bit CRC, TX
             // send data packet
             send_packet(0);
             phase = DATA2;
@@ -372,18 +372,12 @@ static u16 LOLI_callback()
             delay = 18000;
             break;
         case SET_RX_CONFIG:
-            NRF24L01_SetTxRxMode(TXRX_OFF);
-            NRF24L01_SetTxRxMode(TX_EN);
-            NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x0a);  // 8bit CRC, TX
             send_rx_config();
             if (++count >= 10)
                 phase = DATA1;
             delay = 20000;
             break;
         case SET_FAILSAFE:
-            NRF24L01_SetTxRxMode(TXRX_OFF);
-            NRF24L01_SetTxRxMode(TX_EN);
-            NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x0a);  // 8bit CRC, TX
             send_fs_config();
             if (count++ >= 10)
                 phase = DATA1;
