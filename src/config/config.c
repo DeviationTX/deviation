@@ -18,6 +18,7 @@
 #include "config.h"
 #include "display.h"
 #include "mixer.h"
+#include "tx.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -175,6 +176,7 @@ int write_int(void* ptr, const struct struct_map *map, int map_size, FILE* fh) {
                 value = *((u16 *)((u8*)ptr + offset)); break;
             case TYPE_U32:
                 value = *((u32 *)((u8*)ptr + offset)); break;
+
             default:
                 if (size == TYPE_STR_LIST)
                 {
@@ -182,6 +184,13 @@ int write_int(void* ptr, const struct struct_map *map, int map_size, FILE* fh) {
                     const char* const *list = (const char* const *)map[i].str;
                     u8 index = *((u8 *)((u8*)ptr + offset));
                     fprintf(fh, "%s=%s\n", map[i - 1].str, list[index]);
+                } else if (size == TYPE_BUTTON) {
+                    value = *((u8 *)((u8*)ptr + offset));
+                    fprintf(fh, "%s=%s\n", map[i].str, INPUT_ButtonName(value));
+                } else if (size == TYPE_SOURCE) {
+                    char tmpstr[20];
+                    value = *((u8 *)((u8*)ptr + offset));
+                    fprintf(fh, "%s=%s\n", map[i].str, INPUT_SourceNameReal(tmpstr, value));
                 }
                 continue;
         }
