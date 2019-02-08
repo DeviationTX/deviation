@@ -532,6 +532,9 @@ static const struct struct_map _secmixer[] = {
     {MIXER_SCALAR, OFFSETS(struct Mixer, scalar)},
     {MIXER_OFFSET, OFFSETS(struct Mixer, offset)},
 };
+static const u16 _secmixer_defaults[] = {
+    0, 100, 0
+};
 static const struct struct_map _seclimit[] = {
     {CHAN_LIMIT_SAFETYSW,  OFFSET_SRC(struct Limit, safetysw)},
     {CHAN_LIMIT_SAFETYVAL, OFFSETS(struct Limit, safetyval)},
@@ -542,10 +545,16 @@ static const struct struct_map _seclimit[] = {
     {CHAN_SUBTRIM,         OFFSETS(struct Limit, subtrim)},
     {CHAN_DISPLAY_SCALE,   OFFSETS(struct Limit, displayscale)},
 };
+static const u16 _seclimit_defaults[] = {
+    0, 0, DEFAULT_SERVO_LIMIT, 0, 100, 0, 0, DEFAULT_DISPLAY_SCALE
+};
 static const struct struct_map _sectrim[] = {
     {TRIM_POS,    OFFSET_BUT(struct Trim, pos)},
     {TRIM_NEG,    OFFSET_BUT(struct Trim, neg)},
     {TRIM_STEP,   OFFSET(struct Trim, step)},
+};
+static const u16 _sectrim_defaults[] = {
+    0, 0, 1
 };
 static const struct struct_map _sectrim_rdonly[] = {
     {TRIM_SOURCE, OFFSET_SRC(struct Trim, src)},
@@ -1078,7 +1087,7 @@ static u8 write_mixer(FILE *fh, struct Model *m, u8 channel)
         fprintf(fh, "[%s]\n", SECTION_MIXER);
         fprintf(fh, "%s=%s\n", MIXER_SOURCE, INPUT_SourceNameReal(tmpstr, m->mixers[idx].src));
         fprintf(fh, "%s=%s\n", MIXER_DEST, INPUT_SourceNameReal(tmpstr, m->mixers[idx].dest + NUM_INPUTS + 1));
-        write_int(&m->mixers[idx], _secmixer, ARRAYSIZE(_secmixer), fh);
+        write_int2(&m->mixers[idx], _secmixer, _secmixer_defaults, ARRAYSIZE(_secmixer), fh);
         if(WRITE_FULL_MODEL || ! MIXER_APPLY_TRIM(&m->mixers[idx]))
             fprintf(fh, "%s=%d\n", MIXER_USETRIM, MIXER_APPLY_TRIM(&m->mixers[idx]) ? 1 : 0);
         if(WRITE_FULL_MODEL || MIXER_MUX(&m->mixers[idx]))
@@ -1172,7 +1181,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
         fprintf(fh, "[%s%d]\n", SECTION_CHANNEL, idx+1);
         if(WRITE_FULL_MODEL || (m->limits[idx].flags & CH_REVERSE))
             fprintf(fh, "%s=%d\n", CHAN_LIMIT_REVERSE, (m->limits[idx].flags & CH_REVERSE) ? 1 : 0);
-        write_int(&m->limits[idx], _seclimit, ARRAYSIZE(_seclimit), fh);
+        write_int2(&m->limits[idx], _seclimit, _seclimit_defaults, ARRAYSIZE(_seclimit), fh);
         if(WRITE_FULL_MODEL || (m->limits[idx].flags & CH_FAILSAFE_EN)) {
             if(m->limits[idx].flags & CH_FAILSAFE_EN) {
                 fprintf(fh, "%s=%d\n", CHAN_LIMIT_FAILSAFE, m->limits[idx].failsafe);
@@ -1228,7 +1237,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
              m->trims[idx].src >= 1 && m->trims[idx].src <= 4
              ? tx_stick_names[m->trims[idx].src-1]
              : INPUT_SourceNameReal(file, m->trims[idx].src));
-        write_int(&m->trims[idx], _sectrim, ARRAYSIZE(_sectrim), fh);
+        write_int2(&m->trims[idx], _sectrim, _sectrim_defaults, ARRAYSIZE(_sectrim), fh);
         if(WRITE_FULL_MODEL || m->trims[idx].sw)
             fprintf(fh, "%s=%s\n", TRIM_SWITCH, INPUT_SourceNameAbbrevSwitchReal(file, m->trims[idx].sw));
         if(WRITE_FULL_MODEL || m->trims[idx].value[0] || m->trims[idx].value[1] || m->trims[idx].value[2]

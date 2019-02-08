@@ -51,4 +51,6 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size,
     const char* name, const char* value);
 int write_int(void* ptr, const struct struct_map *map, int map_size, FILE* fh);
 
+int write_int2(void* ptr, const struct struct_map *map, u16* defaults, int map_size, FILE* fh);
+
 #endif
