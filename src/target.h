@@ -231,12 +231,16 @@ void SSER_Initialize();
 void SSER_Stop();
 
 /* USB*/
-void USB_Enable(unsigned type, unsigned use_interrupt);
+void USB_Enable(unsigned use_interrupt);
 void USB_Disable();
 void USB_HandleISR();
 void USB_Connect();
+
 void HID_Enable();
 void HID_Disable();
+
+void MSC_Enable();
+void MSC_Disable();
 
 /* Filesystem */
 int FS_Mount(void *FAT, const char *drive);

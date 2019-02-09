@@ -183,7 +183,7 @@ void wait_release()
 
 void USB_Connect()
 {
-    USB_Enable(0, 1);
+    MSC_Enable();
     //Disable USB Exit
     while(1) {
         if(PWR_CheckPowerSwitch())
@@ -192,6 +192,6 @@ void USB_Connect()
     wait_release();
     wait_press();
     wait_release();
-    USB_Disable();
+    MSC_Disable();
 }
 
