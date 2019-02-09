@@ -57,7 +57,6 @@ enum CYRF_PWR {
 };
 
 /* SPI CYRF6936 */
-void CYRF_Initialize();
 int CYRF_Reset();
 void CYRF_GetMfgData(u8 data[]);
 
@@ -69,7 +68,7 @@ void CYRF_StartReceive();
 void CYRF_ConfigSOPCode(const u8 *sopcodes);
 void CYRF_ConfigDataCode(const u8 *datacodes, u8 len);
 u8 CYRF_ReadRSSI(u32 dodummyread);
-void CYRF_ReadDataPacketLen(u8 dpbuffer[], u8 length); 
+void CYRF_ReadDataPacketLen(u8 dpbuffer[], u8 length);
 void CYRF_WriteDataPacket(const u8 dpbuffer[]);
 void CYRF_WriteDataPacketLen(const u8 dpbuffer[], u8 len);
 void CYRF_WriteRegister(u8 address, u8 data);
