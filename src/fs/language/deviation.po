@@ -54,7 +54,7 @@ msgstr ""
 msgid "13 Point"
 msgstr ""
 
-#: curves.c:237 mixer.c:880 pages/320x240x16/rtc_config.c:163
+#: curves.c:237 mixer.c:880 pages/320x240x16/rtc_config.c:164
 #: pages/common/_lang_select.c:29 pages/common/_lang_select.c:59
 #: pages/common/_model_loadsave.c:111 pages/common/_model_loadsave.c:116
 #: pages/common/_model_loadsave.c:123
@@ -101,11 +101,11 @@ msgstr ""
 msgid "GPS Speed"
 msgstr ""
 
-#: gui/dialog.c:154 pages/320x240x16/pages.c:160
+#: gui/dialog.c:154 pages/320x240x16/pages.c:159
 msgid "Ok"
 msgstr ""
 
-#: gui/dialog.c:160 pages/320x240x16/pages.c:160
+#: gui/dialog.c:160 pages/320x240x16/pages.c:159
 msgid "Cancel"
 msgstr ""
 
@@ -277,13 +277,13 @@ msgstr ""
 msgid "Right"
 msgstr ""
 
-#: inputs.c:109 pages/128x64x1/standard/traveladj_page.c:61
+#: inputs.c:109 pages/128x64x1/standard/traveladj_page.c:63
 #: pages/320x240x16/standard/traveladj_page.c:68
 msgid "Down"
 msgstr ""
 
 #: inputs.c:110 pages/128x64x1/reorder_list.c:38
-#: pages/128x64x1/standard/traveladj_page.c:62
+#: pages/128x64x1/standard/traveladj_page.c:64
 #: pages/320x240x16/standard/traveladj_page.c:69
 msgid "Up"
 msgstr ""
@@ -313,8 +313,8 @@ msgid "LEFT_H"
 msgstr ""
 
 #: inputs.c:144 inputs.c:257 mixer.c:873 mixer.c:887
-#: pages/128x64x1/datalog_page.c:79 pages/128x64x1/model_page.c:158
-#: pages/320x240x16/datalog_page.c:92 pages/320x240x16/model_page.c:99
+#: pages/128x64x1/datalog_page.c:79 pages/128x64x1/model_page.c:159
+#: pages/320x240x16/datalog_page.c:92 pages/320x240x16/model_page.c:100
 #: pages/320x240x16/trim_page.c:46 pages/common/advanced/_mixer_setup.c:400
 #: pages/common/_main_config.c:177 pages/common/_main_config.c:181
 #: pages/common/_model_config.c:132 pages/common/_model_page.c:221
@@ -532,7 +532,7 @@ msgid "Mixer output"
 msgstr ""
 
 #: pages/128x64x1/datalog_page.c:56 pages/128x64x1/scanner_page.c:29
-#: pages/128x64x1/tx_configure.c:248 pages/128x64x1/usb_page.c:39
+#: pages/128x64x1/tx_configure.c:249 pages/128x64x1/usb_page.c:39
 #: pages/320x240x16/usb_page.c:39 pages/320x240x16/usb_page.c:41
 #: pages/common/standard/_curves_page.c:109
 #: pages/common/standard/_throhold_page.c:40 pages/common/_tx_configure.c:376
@@ -547,7 +547,7 @@ msgid "On"
 msgstr ""
 
 #: pages/128x64x1/datalog_page.c:57 pages/128x64x1/scanner_page.c:29
-#: pages/128x64x1/tx_configure.c:236 pages/128x64x1/tx_configure.c:246
+#: pages/128x64x1/tx_configure.c:237 pages/128x64x1/tx_configure.c:247
 #: pages/128x64x1/usb_page.c:39 pages/320x240x16/usb_page.c:39
 #: pages/320x240x16/usb_page.c:41 pages/common/advanced/_mixer_limits.c:189
 #: pages/common/standard/_curves_page.c:111
@@ -627,7 +627,7 @@ msgid "Missing Modules:\n"
 msgstr ""
 
 #: pages/128x64x1/lang_select.c:44
-#: pages/128x64x1/standard/switchassign_page.c:79
+#: pages/128x64x1/standard/switchassign_page.c:80
 msgid "Press ENT to change"
 msgstr ""
 
@@ -656,7 +656,7 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
-#: pages/128x64x1/model_config.c:57 pages/128x64x1/standard/swash_page.c:41
+#: pages/128x64x1/model_config.c:57 pages/128x64x1/standard/swash_page.c:42
 #: pages/320x240x16/model_config.c:41
 #: pages/320x240x16/standard/swash_page.c:40
 msgid "SwashType"
@@ -675,13 +675,13 @@ msgstr ""
 msgid "COL Inv"
 msgstr ""
 
-#: pages/128x64x1/model_config.c:73 pages/128x64x1/standard/swash_page.c:45
+#: pages/128x64x1/model_config.c:73 pages/128x64x1/standard/swash_page.c:46
 #: pages/320x240x16/model_config.c:53
 #: pages/320x240x16/standard/swash_page.c:45
 msgid "ELE Mix"
 msgstr ""
 
-#: pages/128x64x1/model_config.c:77 pages/128x64x1/standard/swash_page.c:49
+#: pages/128x64x1/model_config.c:77 pages/128x64x1/standard/swash_page.c:50
 #: pages/320x240x16/model_config.c:56
 #: pages/320x240x16/standard/swash_page.c:50
 msgid "AIL Mix"
@@ -780,27 +780,27 @@ msgstr ""
 msgid "Default"
 msgstr ""
 
-#: pages/128x64x1/model_page.c:85 pages/320x240x16/model_page.c:62
+#: pages/128x64x1/model_page.c:85 pages/320x240x16/model_page.c:63
 msgid "File"
 msgstr ""
 
-#: pages/128x64x1/model_page.c:89 pages/320x240x16/model_page.c:72
+#: pages/128x64x1/model_page.c:89 pages/320x240x16/model_page.c:73
 msgid "Model name"
 msgstr ""
 
-#: pages/128x64x1/model_page.c:93 pages/320x240x16/model_page.c:74
+#: pages/128x64x1/model_page.c:93 pages/320x240x16/model_page.c:75
 msgid "Icon"
 msgstr ""
 
-#: pages/128x64x1/model_page.c:97 pages/320x240x16/model_page.c:77
+#: pages/128x64x1/model_page.c:97 pages/320x240x16/model_page.c:78
 msgid "Model type"
 msgstr ""
 
-#: pages/128x64x1/model_page.c:101 pages/320x240x16/model_page.c:94
+#: pages/128x64x1/model_page.c:101 pages/320x240x16/model_page.c:95
 msgid "Tx power"
 msgstr ""
 
-#: pages/128x64x1/model_page.c:105 pages/320x240x16/model_page.c:81
+#: pages/128x64x1/model_page.c:105 pages/320x240x16/model_page.c:82
 msgid "PPM In"
 msgstr ""
 
@@ -808,19 +808,19 @@ msgstr ""
 msgid "Setup"
 msgstr ""
 
-#: pages/128x64x1/model_page.c:119 pages/320x240x16/model_page.c:102
+#: pages/128x64x1/model_page.c:119 pages/320x240x16/model_page.c:103
 msgid "Fixed ID"
 msgstr ""
 
-#: pages/128x64x1/model_page.c:123 pages/320x240x16/model_page.c:89
+#: pages/128x64x1/model_page.c:123 pages/320x240x16/model_page.c:90
 msgid "# Channels"
 msgstr ""
 
-#: pages/128x64x1/model_page.c:128 pages/320x240x16/model_page.c:67
+#: pages/128x64x1/model_page.c:128 pages/320x240x16/model_page.c:68
 msgid "Mixer GUI"
 msgstr ""
 
-#: pages/128x64x1/model_page.c:155 pages/128x64x1/pagelist.h:42
+#: pages/128x64x1/model_page.c:156 pages/128x64x1/pagelist.h:42
 #: pages/320x240x16/pagelist.h:40
 msgid "Model setup"
 msgstr ""
@@ -883,12 +883,12 @@ msgstr ""
 msgid "Pitch curves"
 msgstr ""
 
-#: pages/128x64x1/pagelist.h:51 pages/128x64x1/standard/throhold_page.c:38
+#: pages/128x64x1/pagelist.h:51 pages/128x64x1/standard/throhold_page.c:40
 #: pages/320x240x16/pagelist.h:49
 msgid "Throttle hold"
 msgstr ""
 
-#: pages/128x64x1/pagelist.h:52 pages/128x64x1/standard/gyrosense_page.c:54
+#: pages/128x64x1/pagelist.h:52 pages/128x64x1/standard/gyrosense_page.c:55
 #: pages/128x64x1/standard/switchassign_page.c:48
 #: pages/320x240x16/pagelist.h:50
 #: pages/320x240x16/standard/switchassign_page.c:56
@@ -907,7 +907,7 @@ msgstr ""
 msgid "Timers"
 msgstr ""
 
-#: pages/128x64x1/pagelist.h:59 pages/128x64x1/telemconfig_page.c:83
+#: pages/128x64x1/pagelist.h:59 pages/128x64x1/telemconfig_page.c:84
 #: pages/320x240x16/pagelist.h:56
 msgid "Telemetry config"
 msgstr ""
@@ -1001,17 +1001,17 @@ msgstr ""
 msgid "0dB"
 msgstr ""
 
-#: pages/128x64x1/set_timer_page.c:44 pages/320x240x16/rtc_config.c:134
+#: pages/128x64x1/set_timer_page.c:44 pages/320x240x16/rtc_config.c:135
 #: pages/320x240x16/set_timer_page.c:98
 msgid "Second"
 msgstr ""
 
-#: pages/128x64x1/set_timer_page.c:46 pages/320x240x16/rtc_config.c:135
+#: pages/128x64x1/set_timer_page.c:46 pages/320x240x16/rtc_config.c:136
 #: pages/320x240x16/set_timer_page.c:96
 msgid "Minute"
 msgstr ""
 
-#: pages/128x64x1/set_timer_page.c:48 pages/320x240x16/rtc_config.c:136
+#: pages/128x64x1/set_timer_page.c:48 pages/320x240x16/rtc_config.c:137
 #: pages/320x240x16/set_timer_page.c:94
 msgid "Hour"
 msgstr ""
@@ -1026,18 +1026,18 @@ msgstr ""
 msgid "Add"
 msgstr ""
 
-#: pages/128x64x1/standard/curves_page.c:110
+#: pages/128x64x1/standard/curves_page.c:111
 #: pages/320x240x16/standard/curves_page.c:125
 msgid "Mode"
 msgstr ""
 
-#: pages/128x64x1/standard/gyrosense_page.c:57
+#: pages/128x64x1/standard/gyrosense_page.c:58
 #: pages/320x240x16/standard/gyrosense_page.c:64
 #: pages/common/_model_page.c:223
 msgid "Channel"
 msgstr ""
 
-#: pages/128x64x1/standard/swash_page.c:53
+#: pages/128x64x1/standard/swash_page.c:54
 #: pages/320x240x16/standard/swash_page.c:55
 msgid "PIT Mix"
 msgstr ""
@@ -1048,7 +1048,7 @@ msgid "Fly mode"
 msgstr ""
 
 #: pages/128x64x1/standard/switchassign_page.c:45
-#: pages/128x64x1/standard/throhold_page.c:41
+#: pages/128x64x1/standard/throhold_page.c:43
 #: pages/320x240x16/standard/switchassign_page.c:51
 #: pages/320x240x16/standard/throhold_page.c:49
 #: pages/common/standard/_common_standard.c:74
@@ -1070,7 +1070,7 @@ msgstr ""
 msgid "D/R&Exp -RUD"
 msgstr ""
 
-#: pages/128x64x1/standard/throhold_page.c:45
+#: pages/128x64x1/standard/throhold_page.c:47
 #: pages/320x240x16/standard/throhold_page.c:52
 msgid "Hold position"
 msgstr ""
@@ -1246,7 +1246,7 @@ msgstr ""
 msgid "Alert intvl"
 msgstr ""
 
-#: pages/128x64x1/tx_configure.c:215
+#: pages/128x64x1/tx_configure.c:216
 msgid "Configure"
 msgstr ""
 
@@ -1256,7 +1256,7 @@ msgid ""
 "USB drive"
 msgstr ""
 
-#: pages/128x64x1/voiceconfig_page.c:60 pages/320x240x16/voiceconfig_page.c:50
+#: pages/128x64x1/voiceconfig_page.c:61 pages/320x240x16/voiceconfig_page.c:51
 msgid ""
 "External voice\n"
 "currently not\n"
@@ -1363,7 +1363,7 @@ msgstr ""
 msgid "Load Layout"
 msgstr ""
 
-#: pages/320x240x16/model_page.c:85
+#: pages/320x240x16/model_page.c:86
 msgid "Protocol"
 msgstr ""
 
@@ -1411,39 +1411,39 @@ msgstr ""
 msgid "Remove"
 msgstr ""
 
-#: pages/320x240x16/rtc_config.c:137
+#: pages/320x240x16/rtc_config.c:138
 msgid "Day"
 msgstr ""
 
-#: pages/320x240x16/rtc_config.c:138
+#: pages/320x240x16/rtc_config.c:139
 msgid "Month"
 msgstr ""
 
-#: pages/320x240x16/rtc_config.c:139
+#: pages/320x240x16/rtc_config.c:140
 msgid "Year"
 msgstr ""
 
-#: pages/320x240x16/rtc_config.c:156
+#: pages/320x240x16/rtc_config.c:157
 msgid "Set time"
 msgstr ""
 
-#: pages/320x240x16/rtc_config.c:157
+#: pages/320x240x16/rtc_config.c:158
 msgid "Set date"
 msgstr ""
 
-#: pages/320x240x16/rtc_config.c:158
+#: pages/320x240x16/rtc_config.c:159
 msgid "Time format"
 msgstr ""
 
-#: pages/320x240x16/rtc_config.c:159
+#: pages/320x240x16/rtc_config.c:160
 msgid "Date format"
 msgstr ""
 
-#: pages/320x240x16/rtc_config.c:160
+#: pages/320x240x16/rtc_config.c:161
 msgid "value to set"
 msgstr ""
 
-#: pages/320x240x16/rtc_config.c:161 pages/320x240x16/set_timer_page.c:106
+#: pages/320x240x16/rtc_config.c:162 pages/320x240x16/set_timer_page.c:106
 msgid "resulting value"
 msgstr ""
 
@@ -1564,12 +1564,12 @@ msgstr ""
 msgid "Vibration:"
 msgstr ""
 
-#: pages/320x240x16/tx_configure.c:262
+#: pages/320x240x16/tx_configure.c:263
 #, c-format
 msgid "Touch target %d"
 msgstr ""
 
-#: pages/320x240x16/tx_configure.c:285
+#: pages/320x240x16/tx_configure.c:286
 msgid "Touch Calibrate"
 msgstr ""
 
@@ -2091,6 +2091,38 @@ msgstr ""
 
 #: protocol/kn_nrf24l01.c:172
 msgid "DynTrim"
+msgstr ""
+
+#: protocol/loli_nrf24l01.c:65
+msgid "Chan 1"
+msgstr ""
+
+#: protocol/loli_nrf24l01.c:66
+msgid "Chan 2"
+msgstr ""
+
+#: protocol/loli_nrf24l01.c:67
+msgid "Chan 3"
+msgstr ""
+
+#: protocol/loli_nrf24l01.c:68
+msgid "Chan 4"
+msgstr ""
+
+#: protocol/loli_nrf24l01.c:69
+msgid "Chan 5"
+msgstr ""
+
+#: protocol/loli_nrf24l01.c:70
+msgid "Chan 6"
+msgstr ""
+
+#: protocol/loli_nrf24l01.c:71
+msgid "Chan 7"
+msgstr ""
+
+#: protocol/loli_nrf24l01.c:72
+msgid "Chan 8"
 msgstr ""
 
 #: protocol/ppmout.c:41

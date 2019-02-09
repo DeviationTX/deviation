@@ -11,13 +11,121 @@ msgstr ""
 msgid "->Translated Language Name<-"
 msgstr "Română"
 
-#: inputs.c:35 pages/common/standard/_drexp_page.c:57
-#: pages/common/advanced/_mixer_page.c:63
+#: curves.c:221
+msgid "1-to-1"
+msgstr "1 la 1"
+
+#: curves.c:222
+msgid "Fixed"
+msgstr "Fix"
+
+#: curves.c:223
+msgid "Min/Max"
+msgstr "Min/Max"
+
+#: curves.c:224
+msgid "Zero/Max"
+msgstr "Zero/Max"
+
+#: curves.c:227
+msgid "ABSVAL"
+msgstr "VAL ABS"
+
+#: curves.c:228
+#, c-format
+msgid "EXPO %d"
+msgstr "EXP. %d"
+
+#: curves.c:229
+msgid "Deadband"
+msgstr "Bandă moartă"
+
+#: curves.c:230
+msgid "3 Point"
+msgstr "3 puncte"
+
+#: curves.c:231
+msgid "5 Point"
+msgstr "5 puncte"
+
+#: curves.c:232
+msgid "7 Point"
+msgstr "7 puncte"
+
+#: curves.c:233
+msgid "9 Point"
+msgstr "9 puncte"
+
+#: curves.c:234
+msgid "11 Point"
+msgstr "11 puncte"
+
+#: curves.c:235
+msgid "13 Point"
+msgstr "13 puncte"
+
+#: curves.c:237 mixer.c:880 pages/320x240x16/rtc_config.c:164
+#: pages/common/_lang_select.c:29 pages/common/_lang_select.c:59
+#: pages/common/_model_loadsave.c:111 pages/common/_model_loadsave.c:116
+#: pages/common/_model_loadsave.c:123
+msgid "Unknown"
+msgstr "Necunoscut"
+
+#: datalog.c:57
+msgid "1 sec"
+msgstr "1 sec"
+
+#: datalog.c:58
+msgid "5 sec"
+msgstr "5 sec"
+
+#: datalog.c:59
+msgid "10 sec"
+msgstr "10 sec"
+
+#: datalog.c:60
+msgid "30 sec"
+msgstr "30 sec"
+
+#: datalog.c:61
+msgid "60 sec"
+msgstr "60 sec"
+
+#: datalog.c:70
+msgid "RTC Time"
+msgstr "Timp RTC"
+
+#: datalog.c:74
+msgid "GPS Time"
+msgstr "Oră GPS"
+
+#: datalog.c:76
+msgid "GPS Coords"
+msgstr "Coord GPS"
+
+#: datalog.c:78
+msgid "GPS Alt."
+msgstr "Alt. GPS"
+
+#: datalog.c:80
+msgid "GPS Speed"
+msgstr "Viteză GPS"
+
+#: gui/dialog.c:154 pages/320x240x16/pages.c:159
+msgid "Ok"
+msgstr "Ok"
+
+#: gui/dialog.c:160 pages/320x240x16/pages.c:159
+msgid "Cancel"
+msgstr "Anulează"
+
+#: inputs.c:35 pages/common/advanced/_mixer_page.c:63
+#: pages/common/standard/_drexp_page.c:57
 msgid "AIL"
 msgstr "AIL"
 
-#: inputs.c:36 pages/common/standard/_drexp_page.c:60
-#: pages/common/advanced/_mixer_page.c:64
+#: inputs.c:36 pages/common/advanced/_mixer_page.c:64
+#: pages/common/standard/_drexp_page.c:60
 msgid "ELE"
 msgstr "ELE"
 
@@ -29,7 +137,7 @@ msgstr "THR"
 msgid "RUD"
 msgstr "RUD"
 
-#: inputs.c:39 pages/common/standard/_gyrosense_page.c:61
+#: inputs.c:39 pages/common/standard/_gyrosense_page.c:59
 msgid "AUX2"
 msgstr "AUX2"
 
@@ -70,8 +178,8 @@ msgid "AIL DR"
 msgstr "AIL DR"
 
 #: inputs.c:56 inputs.c:57 inputs.c:91 inputs.c:92 inputs.c:93
-#: pages/common/standard/_gyrosense_page.c:59
 #: pages/common/standard/_common_standard.c:38
+#: pages/common/standard/_gyrosense_page.c:57
 msgid "GEAR"
 msgstr "GEAR"
 
@@ -179,14 +287,14 @@ msgstr "Stânga"
 msgid "Right"
 msgstr "Dreapta"
 
-#: inputs.c:109 pages/320x240x16/standard/traveladj_page.c:68
-#: pages/128x64x1/standard/traveladj_page.c:61
+#: inputs.c:109 pages/128x64x1/standard/traveladj_page.c:63
+#: pages/320x240x16/standard/traveladj_page.c:68
 msgid "Down"
 msgstr "Jos"
 
-#: inputs.c:110 pages/320x240x16/standard/traveladj_page.c:69
-#: pages/128x64x1/reorder_list.c:38
-#: pages/128x64x1/standard/traveladj_page.c:62
+#: inputs.c:110 pages/128x64x1/reorder_list.c:38
+#: pages/128x64x1/standard/traveladj_page.c:64
+#: pages/320x240x16/standard/traveladj_page.c:69
 msgid "Up"
 msgstr "Sus"
 
@@ -214,24 +322,24 @@ msgstr "DREAPTA_F"
 msgid "LEFT_H"
 msgstr "STÂNGA_H"
 
-#: inputs.c:144 inputs.c:257 telemetry/telem_crsf.c:80
-#: telemetry/telem_frsky.c:58 telemetry/telem_dsm.c:261
-#: telemetry/telem_devo.c:76 protocol/protocol.c:89 mixer.c:873 mixer.c:887
-#: pages/common/_pages.c:152 pages/common/_voiceconfig_page.c:185
-#: pages/common/_model_page.c:221 pages/common/_model_page.c:274
+#: inputs.c:144 inputs.c:257 mixer.c:873 mixer.c:887
+#: pages/128x64x1/datalog_page.c:79 pages/128x64x1/model_page.c:159
+#: pages/320x240x16/datalog_page.c:92 pages/320x240x16/model_page.c:100
+#: pages/320x240x16/trim_page.c:46 pages/common/advanced/_mixer_setup.c:400
+#: pages/common/_main_config.c:177 pages/common/_main_config.c:181
+#: pages/common/_model_config.c:132 pages/common/_model_page.c:221
+#: pages/common/_model_page.c:272 pages/common/_pages.c:152
 #: pages/common/standard/_failsafe_page.c:33
 #: pages/common/standard/_reverse_page.c:21
 #: pages/common/standard/_swash_page.c:65 pages/common/_trim_page.c:56
-#: pages/common/_trim_page.c:74 pages/common/advanced/_mixer_setup.c:400
-#: pages/common/_model_config.c:132 pages/common/_main_config.c:177
-#: pages/common/_main_config.c:181 pages/320x240x16/trim_page.c:46
-#: pages/320x240x16/model_page.c:99 pages/320x240x16/datalog_page.c:92
-#: pages/128x64x1/model_page.c:158 pages/128x64x1/datalog_page.c:79
+#: pages/common/_trim_page.c:74 pages/common/_voiceconfig_page.c:185
+#: protocol/protocol.c:89 telemetry/telem_crsf.c:80 telemetry/telem_devo.c:76
+#: telemetry/telem_dsm.c:261 telemetry/telem_frsky.c:58
 msgid "None"
 msgstr "nimic"
 
-#: inputs.c:154 pages/common/standard/_gyrosense_page.c:59
-#: pages/common/standard/_gyrosense_page.c:61
+#: inputs.c:154 pages/common/standard/_gyrosense_page.c:57
+#: pages/common/standard/_gyrosense_page.c:59
 msgid "Ch"
 msgstr "Ch"
 
@@ -242,641 +350,6 @@ msgstr "Virt."
 #: inputs.c:163
 msgid "PPM"
 msgstr "PPM"
-
-#: telemetry/telem_crsf.c:81
-msgid "tx SNR"
-msgstr ""
-
-#: telemetry/telem_crsf.c:82
-msgid "txRSSI"
-msgstr ""
-
-#: telemetry/telem_crsf.c:83
-msgid "rx SNR"
-msgstr ""
-
-#: telemetry/telem_crsf.c:86
-msgid "FMode"
-msgstr ""
-
-#: telemetry/telem_crsf.c:87
-msgid "RFMode"
-msgstr ""
-
-#: telemetry/telem_crsf.c:88
-msgid "ANT"
-msgstr ""
-
-#: telemetry/telem_crsf.c:89
-msgid "Power"
-msgstr ""
-
-#: telemetry/telem_crsf.c:90
-msgid "rxQual"
-msgstr ""
-
-#: telemetry/telem_crsf.c:91
-msgid "txQual"
-msgstr ""
-
-#: telemetry/telem_crsf.c:92 telemetry/telem_frsky.c:64
-#: telemetry/telem_frsky.c:70 telemetry/telem_dsm.c:192
-#: telemetry/telem_devo.c:79 pages/128x64x1/telemtest_page.c:340
-msgid "Volt"
-msgstr "Volt"
-
-#: telemetry/telem_crsf.c:93
-msgid "Curr"
-msgstr ""
-
-#: telemetry/telem_crsf.c:94
-msgid "Cap"
-msgstr ""
-
-#: telemetry/telem_crsf.c:95
-msgid "Pitch"
-msgstr ""
-
-#: telemetry/telem_crsf.c:96
-msgid "Roll"
-msgstr ""
-
-#: telemetry/telem_crsf.c:97
-msgid "Yaw"
-msgstr ""
-
-#: telemetry/telem_crsf.c:106
-msgid "Flight Mode"
-msgstr ""
-
-#: telemetry/telem_crsf.c:107
-msgid "RF Mode"
-msgstr ""
-
-#: telemetry/telem_crsf.c:108
-msgid "Antenna"
-msgstr ""
-
-#: telemetry/telem_crsf.c:109
-msgid "rx Quality"
-msgstr ""
-
-#: telemetry/telem_crsf.c:110
-msgid "tx Quality"
-msgstr ""
-
-#: telemetry/telem_crsf.c:111
-msgid "Capacity"
-msgstr ""
-
-#: telemetry/telem_frsky.c:66 telemetry/telem_dsm.c:213
-msgid "RSSI"
-msgstr ""
-
-#: telemetry/telem_frsky.c:67
-msgid "LRSSI"
-msgstr ""
-
-#: telemetry/telem_frsky.c:68
-msgid "LQI"
-msgstr ""
-
-#: telemetry/telem_frsky.c:70 telemetry/telem_frsky.c:83
-#: telemetry/telem_dsm.c:201
-msgid "Amps"
-msgstr ""
-
-#: telemetry/telem_frsky.c:71
-msgid "MinCell"
-msgstr ""
-
-#: telemetry/telem_frsky.c:72
-msgid "AllCell"
-msgstr ""
-
-#: telemetry/telem_frsky.c:79 telemetry/telem_dsm.c:194
-#: telemetry/telem_devo.c:81 pages/128x64x1/telemtest_page.c:341
-msgid "RPM"
-msgstr "RPM"
-
-#: telemetry/telem_frsky.c:81 telemetry/telem_dsm.c:193
-#: telemetry/telem_devo.c:85 pages/128x64x1/telemtest_page.c:339
-msgid "Temp"
-msgstr "Temp"
-
-#: telemetry/telem_frsky.c:82
-msgid "Fuel"
-msgstr ""
-
-#: telemetry/telem_frsky.c:84
-msgid "Alt"
-msgstr ""
-
-#: telemetry/telem_frsky.c:85
-msgid "VSI"
-msgstr ""
-
-#: telemetry/telem_frsky.c:86
-msgid "DIS"
-msgstr ""
-
-#: telemetry/telem_frsky.c:101 telemetry/telem_frsky.c:108
-#: telemetry/telem_devo.c:55
-msgid "TelemV"
-msgstr "TelemV"
-
-#: telemetry/telem_frsky.c:104
-msgid "TelemRSSI"
-msgstr ""
-
-#: telemetry/telem_frsky.c:108
-msgid "Amp"
-msgstr ""
-
-#: telemetry/telem_frsky.c:112 telemetry/telem_devo.c:61
-msgid "TelemT"
-msgstr "TelemT"
-
-#: telemetry/telem_frsky.c:115 telemetry/telem_devo.c:65
-msgid "TelemRPM"
-msgstr "TelemRPM"
-
-#: telemetry/telem_dsm.c:147 protocol/devo_cyrf6936.c:54
-#: protocol/cg023_nrf24l01.c:60 protocol/bayang_nrf24l01.c:100
-#: protocol/inav_nrf24l01.c:182 protocol/fy326_nrf24l01.c:59
-#: protocol/hubsan_a7105.c:126 protocol/kn_nrf24l01.c:172
-#: protocol/dsm2_cyrf6936.c:49 protocol/dsm2_cyrf6936.c:52
-#: protocol/dsm2_cyrf6936.c:53 protocol/symax_nrf24l01.c:109
-#: protocol/frsky2way_cc2500.c:40 protocol/yd717_nrf24l01.c:111
-#: pages/common/standard/_curves_page.c:109
-#: pages/common/standard/_throhold_page.c:40 pages/common/_tx_configure.c:376
-#: pages/320x240x16/usb_page.c:39 pages/320x240x16/usb_page.c:41
-#: pages/128x64x1/scanner_page.c:29 pages/128x64x1/tx_configure.c:248
-#: pages/128x64x1/datalog_page.c:56 pages/128x64x1/usb_page.c:39
-msgid "On"
-msgstr "Pornit"
-
-#: telemetry/telem_dsm.c:195 telemetry/telem_dsm.c:196
-#: telemetry/telem_dsm.c:197 telemetry/telem_dsm.c:198
-msgid "Fades"
-msgstr "Atenuări"
-
-#: telemetry/telem_dsm.c:199
-msgid "Loss"
-msgstr "Pierderi"
-
-#: telemetry/telem_dsm.c:200
-msgid "Holds"
-msgstr "Blocări"
-
-#: telemetry/telem_dsm.c:202
-msgid "AirSpd"
-msgstr ""
-
-#: telemetry/telem_dsm.c:203
-msgid "Alt."
-msgstr ""
-
-#: telemetry/telem_dsm.c:204
-msgid "Alt.max"
-msgstr ""
-
-#: telemetry/telem_dsm.c:262
-msgid "RxV"
-msgstr ""
-
-#: telemetry/telem_dsm.c:263
-msgid "Bat"
-msgstr ""
-
-#: datalog.c:57
-msgid "1 sec"
-msgstr "1 sec"
-
-#: datalog.c:58
-msgid "5 sec"
-msgstr "5 sec"
-
-#: datalog.c:59
-msgid "10 sec"
-msgstr "10 sec"
-
-#: datalog.c:60
-msgid "30 sec"
-msgstr "30 sec"
-
-#: datalog.c:61
-msgid "60 sec"
-msgstr "60 sec"
-
-#: datalog.c:70
-msgid "RTC Time"
-msgstr "Timp RTC"
-
-#: datalog.c:74
-msgid "GPS Time"
-msgstr "Oră GPS"
-
-#: datalog.c:76
-msgid "GPS Coords"
-msgstr "Coord GPS"
-
-#: datalog.c:78
-msgid "GPS Alt."
-msgstr "Alt. GPS"
-
-#: datalog.c:80
-msgid "GPS Speed"
-msgstr "Viteză GPS"
-
-#: protocol/h8_3d_nrf24l01.c:63 protocol/mt99xx_nrf24l01.c:127
-#: protocol/bayang_nrf24l01.c:101 protocol/v202_nrf24l01.c:127
-#: protocol/fy326_nrf24l01.c:58 protocol/hisky_nrf24l01.c:73
-#: protocol/fq777_nrf24l01.c:83 protocol/cx10_nrf24l01.c:69
-#: protocol/slt_nrf24l01.c:85 protocol/hontai_nrf24l01.c:62
-#: protocol/hubsan_a7105.c:124 protocol/q303_nrf24l01.c:76
-#: protocol/frskyx_cc2500.c:45 protocol/hitec_cc2500.c:62
-#: protocol/kn_nrf24l01.c:171 protocol/corona_cc2500.c:41
-#: protocol/mjxq_nrf24l01.c:60 protocol/yd717_nrf24l01.c:108
-msgid "Format"
-msgstr ""
-
-#: protocol/devo_cyrf6936.c:54 protocol/bayang_nrf24l01.c:100
-#: protocol/inav_nrf24l01.c:182 protocol/cflie_nrf24l01.c:200
-#: protocol/hubsan_a7105.c:126 protocol/dsm2_cyrf6936.c:49
-#: protocol/frsky2way_cc2500.c:40 protocol/yd717_nrf24l01.c:111
-#: pages/common/_pages.c:110 pages/common/_pages.c:117
-msgid "Telemetry"
-msgstr "Telemetrie"
-
-#: protocol/devo_cyrf6936.c:54 protocol/cg023_nrf24l01.c:60
-#: protocol/bayang_nrf24l01.c:100 protocol/inav_nrf24l01.c:182
-#: protocol/flysky_a7105.c:48 protocol/fy326_nrf24l01.c:59
-#: protocol/cflie_nrf24l01.c:200 protocol/hubsan_a7105.c:126
-#: protocol/kn_nrf24l01.c:172 protocol/dsm2_cyrf6936.c:49
-#: protocol/dsm2_cyrf6936.c:52 protocol/dsm2_cyrf6936.c:53
-#: protocol/symax_nrf24l01.c:109 protocol/frsky2way_cc2500.c:40
-#: protocol/yd717_nrf24l01.c:111 pages/common/standard/_failsafe_page.c:36
-#: pages/common/standard/_curves_page.c:111
-#: pages/common/standard/_throhold_page.c:44
-#: pages/common/standard/_throhold_page.c:55
-#: pages/common/advanced/_mixer_limits.c:189 pages/common/_tx_configure.c:198
-#: pages/common/_tx_configure.c:212 pages/common/_tx_configure.c:231
-#: pages/common/_tx_configure.c:250 pages/common/_tx_configure.c:265
-#: pages/common/_tx_configure.c:278 pages/common/_tx_configure.c:305
-#: pages/common/_tx_configure.c:374 pages/common/_tx_configure.c:390
-#: pages/common/_tx_configure.c:412 pages/320x240x16/usb_page.c:39
-#: pages/320x240x16/usb_page.c:41 pages/128x64x1/scanner_page.c:29
-#: pages/128x64x1/tx_configure.c:236 pages/128x64x1/tx_configure.c:246
-#: pages/128x64x1/datalog_page.c:57 pages/128x64x1/usb_page.c:39
-msgid "Off"
-msgstr "Oprit"
-
-#: protocol/bugs3_a7105.c:244 protocol/hubsan_a7105.c:127
-#: protocol/flysky_afhds2a_a7105.c:80 protocol/joysway_a7105.c:55
-msgid "Freq Tune"
-msgstr ""
-
-#: protocol/bayang_nrf24l01.c:101
-msgid "regular"
-msgstr ""
-
-#: protocol/bugs3mini_nrf24l01.c:133
-msgid "RX Id"
-msgstr ""
-
-#: protocol/frsky1way_cc2500.c:40 protocol/frskyx_cc2500.c:44
-#: protocol/hitec_cc2500.c:63 protocol/corona_cc2500.c:42
-#: protocol/sfhss_cc2500.c:42 protocol/frsky2way_cc2500.c:41
-msgid "Freq-Fine"
-msgstr ""
-
-#: protocol/frsky1way_cc2500.c:41 protocol/sfhss_cc2500.c:43
-#: protocol/frsky2way_cc2500.c:42
-msgid "Freq-Coarse"
-msgstr ""
-
-#: protocol/v202_nrf24l01.c:128 protocol/kn_nrf24l01.c:169
-#: protocol/esky150_nrf24l01.c:150
-msgid "Re-bind"
-msgstr ""
-
-#: protocol/v202_nrf24l01.c:128 protocol/v202_nrf24l01.c:129
-#: protocol/v202_nrf24l01.c:131 protocol/kn_nrf24l01.c:169
-#: protocol/kn_nrf24l01.c:170 protocol/dsm2_cyrf6936.c:50
-#: protocol/esky150_nrf24l01.c:150 protocol/yd717_nrf24l01.c:109
-#: pages/common/advanced/_mixer_curves.c:157
-msgid "No"
-msgstr "Nu"
-
-#: protocol/v202_nrf24l01.c:128 protocol/v202_nrf24l01.c:129
-#: protocol/v202_nrf24l01.c:131 protocol/kn_nrf24l01.c:169
-#: protocol/kn_nrf24l01.c:170 protocol/dsm2_cyrf6936.c:50
-#: protocol/esky150_nrf24l01.c:150 protocol/yd717_nrf24l01.c:109
-#: pages/common/advanced/_mixer_curves.c:157
-msgid "Yes"
-msgstr "Da"
-
-#: protocol/v202_nrf24l01.c:129
-msgid "250kbps"
-msgstr ""
-
-#: protocol/v202_nrf24l01.c:131
-msgid "Blink"
-msgstr ""
-
-#: protocol/fy326_nrf24l01.c:59
-msgid "Expert"
-msgstr ""
-
-#: protocol/cflie_nrf24l01.c:200
-msgid "ACKPKT"
-msgstr ""
-
-#: protocol/cflie_nrf24l01.c:200
-msgid "CRTPLOG"
-msgstr ""
-
-#: protocol/cflie_nrf24l01.c:201
-msgid "CRTP Mode"
-msgstr ""
-
-#: protocol/cflie_nrf24l01.c:201
-msgid "RPYT"
-msgstr ""
-
-#: protocol/cflie_nrf24l01.c:201
-msgid "CPPM"
-msgstr ""
-
-#: protocol/hisky_nrf24l01.c:73 pages/common/_model_page.c:181
-#: pages/common/_model_loadsave.c:114 pages/128x64x1/model_page.c:51
-msgid "Default"
-msgstr "Default"
-
-#: protocol/sbus_uart.c:36
-msgid "Period (ms)"
-msgstr ""
-
-#: protocol/cx10_nrf24l01.c:69
-msgid "Green"
-msgstr ""
-
-#: protocol/cx10_nrf24l01.c:69
-msgid "Blue-A"
-msgstr ""
-
-#: protocol/wk2x01.c:79
-msgid "Chan mode"
-msgstr "Mod canale"
-
-#: protocol/wk2x01.c:79
-msgid "5+1"
-msgstr "5+1"
-
-#: protocol/wk2x01.c:79 pages/128x64x1/model_page.c:38
-msgid "Heli"
-msgstr "Elic."
-
-#: protocol/wk2x01.c:79
-msgid "6+1"
-msgstr "6+1"
-
-#: protocol/wk2x01.c:80 pages/320x240x16/model_config.c:50
-#: pages/128x64x1/model_config.c:69
-msgid "COL Inv"
-msgstr "Colectiv inv."
-
-#: protocol/wk2x01.c:80 pages/common/standard/_common_standard.c:67
-#: pages/common/standard/_reverse_page.c:28
-#: pages/common/advanced/_mixer_limits.c:208 pages/common/_model_config.c:36
-msgid "Normal"
-msgstr "Normal"
-
-#: protocol/wk2x01.c:80 pages/common/_model_config.c:37
-msgid "Inverted"
-msgstr "Inversat"
-
-#: protocol/wk2x01.c:81
-msgid "COL Limit"
-msgstr "COL Limită"
-
-#: protocol/hubsan_a7105.c:125
-msgid "vTX MHz"
-msgstr ""
-
-#: protocol/flysky_afhds2a_a7105.c:77
-msgid "Outputs"
-msgstr ""
-
-#: protocol/flysky_afhds2a_a7105.c:78
-msgid "Servo Hz"
-msgstr ""
-
-#: protocol/flysky_afhds2a_a7105.c:79
-msgid "LQI output"
-msgstr ""
-
-#: protocol/frskyx_cc2500.c:42 protocol/pxxout.c:48
-msgid "Failsafe"
-msgstr ""
-
-#: protocol/frskyx_cc2500.c:43 protocol/frsky2way_cc2500.c:43
-msgid "AD2GAIN"
-msgstr ""
-
-#: protocol/frskyx_cc2500.c:46 protocol/frsky2way_cc2500.c:44
-msgid "RSSIChan"
-msgstr ""
-
-#: protocol/frskyx_cc2500.c:47
-msgid "S.PORT Out"
-msgstr ""
-
-#: protocol/frskyx_cc2500.c:47
-msgid "Disabled"
-msgstr ""
-
-#: protocol/frskyx_cc2500.c:47 pages/320x240x16/standard/curves_page.c:127
-msgid "Enabled"
-msgstr "Activat"
-
-#: protocol/ppmout.c:39 pages/320x240x16/model_config.c:103
-#: pages/128x64x1/model_config.c:139
-msgid "Center PW"
-msgstr "Centru PW"
-
-#: protocol/ppmout.c:40 pages/320x240x16/model_config.c:106
-#: pages/128x64x1/model_config.c:143
-msgid "Delta PW"
-msgstr "Delta PW"
-
-#: protocol/ppmout.c:41
-msgid "Notch PW"
-msgstr "Depres. PW"
-
-#: protocol/ppmout.c:42
-msgid "Frame Size"
-msgstr "Dim. pachet"
-
-#: protocol/kn_nrf24l01.c:170
-msgid "1Mbps"
-msgstr ""
-
-#: protocol/kn_nrf24l01.c:172
-msgid "DynTrim"
-msgstr ""
-
-#: protocol/pxxout.c:49
-msgid "Country"
-msgstr ""
-
-#: protocol/pxxout.c:50
-msgid "Rx PWM out"
-msgstr ""
-
-#: protocol/pxxout.c:51
-msgid "Rx Telem"
-msgstr ""
-
-#: protocol/dsm2_cyrf6936.c:50
-msgid "OrangeRx"
-msgstr ""
-
-#: protocol/dsm2_cyrf6936.c:52
-msgid "HighSpeed"
-msgstr ""
-
-#: protocol/dsm2_cyrf6936.c:53
-msgid "F.Log filter"
-msgstr ""
-
-#: protocol/yd717_nrf24l01.c:109
-msgid "USE A.ACK"
-msgstr ""
-
-#: tests/test_language.c:23 tests/test_language.c:45
-msgid "ok1"
-msgstr ""
-
-#: tests/test_language.c:43
-msgid "test"
-msgstr ""
-
-#: tests/test_language.c:44
-msgid "ok"
-msgstr ""
-
-#: curves.c:221
-msgid "1-to-1"
-msgstr "1 la 1"
-
-#: curves.c:222
-msgid "Fixed"
-msgstr "Fix"
-
-#: curves.c:223
-msgid "Min/Max"
-msgstr "Min/Max"
-
-#: curves.c:224
-msgid "Zero/Max"
-msgstr "Zero/Max"
-
-#: curves.c:227
-msgid "ABSVAL"
-msgstr "VAL ABS"
-
-#: curves.c:228
-#, c-format
-msgid "EXPO %d"
-msgstr "EXP. %d"
-
-#: curves.c:229
-msgid "Deadband"
-msgstr "Bandă moartă"
-
-#: curves.c:230
-msgid "3 Point"
-msgstr "3 puncte"
-
-#: curves.c:231
-msgid "5 Point"
-msgstr "5 puncte"
-
-#: curves.c:232
-msgid "7 Point"
-msgstr "7 puncte"
-
-#: curves.c:233
-msgid "9 Point"
-msgstr "9 puncte"
-
-#: curves.c:234
-msgid "11 Point"
-msgstr "11 puncte"
-
-#: curves.c:235
-msgid "13 Point"
-msgstr "13 puncte"
-
-#: curves.c:237 mixer.c:880 pages/common/_lang_select.c:29
-#: pages/common/_lang_select.c:59 pages/common/_model_loadsave.c:111
-#: pages/common/_model_loadsave.c:116 pages/common/_model_loadsave.c:123
-#: pages/320x240x16/rtc_config.c:163
-msgid "Unknown"
-msgstr "Necunoscut"
-
-#: screen/text/lcd_gfx.c:234 screen/text/lcd_gfx.c:236
-msgid ""
-"Deviation\n"
-"   USB"
-msgstr ""
-
-#: rtc.c:303 pages/320x240x16/tx_configure.c:127
-msgid "Clock"
-msgstr "Ceas"
-
-#: rtc.c:303
-msgid "Date"
-msgstr "Dată"
-
-#: gui/dialog.c:154 pages/320x240x16/pages.c:160
-msgid "Ok"
-msgstr "Ok"
-
-#: gui/dialog.c:160 pages/320x240x16/pages.c:160
-msgid "Cancel"
-msgstr "Anulează"
-
-#: telemetry.c:247
-msgid "Longitude"
-msgstr "Longitudine"
-
-#: telemetry.c:248
-msgid "Latitude"
-msgstr "Latitudine"
-
-#: telemetry.c:249
-msgid "Altitude"
-msgstr "Altitudine"
-
-#: telemetry.c:250 pages/320x240x16/advanced/mixer_limits.c:68
-#: pages/128x64x1/advanced/mixer_limits.c:99
-msgid "Speed"
-msgstr "Viteză"
-
-#: telemetry.c:251
-msgid "Time"
-msgstr "Timp"
-
-#: telemetry.c:252
-msgid "SatCount"
-msgstr ""
-
-#: telemetry.c:253
-msgid "Heading"
-msgstr ""
 
 #: mixer.c:874
 msgid "Simple"
@@ -902,10 +375,6 @@ msgstr "Ciclic2"
 msgid "Cyclic3"
 msgstr "Ciclic3"
 
-#: timer.c:52
-msgid "Timer"
-msgstr "Timer"
-
 #: mixer_standard.c:169
 msgid "Advanced"
 msgstr "Avansat"
@@ -914,737 +383,917 @@ msgstr "Avansat"
 msgid "Standard"
 msgstr "Standard"
 
-#: pages/common/_datalog_page.c:63 pages/common/_model_page.c:300
-#: pages/320x240x16/timer_page.c:60 pages/128x64x1/timer_page.c:62
-msgid "Reset"
-msgstr "Reset"
+#: pages/128x64x1/about_page.c:39 pages/320x240x16/usb_page.c:38
+msgid "Deviation FW version:"
+msgstr "Deviation fw. versiune:"
 
-#: pages/common/_main_layout.c:49 pages/common/_main_config.c:91
-#: pages/320x240x16/main_layout.c:290
-msgid "Model"
-msgstr "Model"
+#: pages/128x64x1/advanced/mixer_curves.c:62
+#: pages/128x64x1/advanced/mixer_setup.c:54 pages/128x64x1/reorder_list.c:94
+#: pages/128x64x1/trim_page.c:137 pages/320x240x16/reorder_list.c:33
+msgid "Save"
+msgstr "Salv."
 
-#: pages/common/_pages.c:112
-msgid "is not supported"
-msgstr "nu este suportat(ă)"
+#: pages/128x64x1/advanced/mixer_curves.c:71
+#: pages/320x240x16/advanced/mixer_curves.c:41
+msgid "Smooth"
+msgstr "Smooth"
 
-#: pages/common/_pages.c:119
-msgid "is turned off"
-msgstr "este oprit(ă)"
+#: pages/128x64x1/advanced/mixer_curves.c:74
+#: pages/320x240x16/advanced/mixer_curves.c:44
+msgid "Point"
+msgstr "Punct"
 
-#: pages/common/_telemconfig_page.c:32
-msgid "Alarm"
-msgstr "Alarmă"
+#: pages/128x64x1/advanced/mixer_curves.c:77
+#: pages/320x240x16/advanced/mixer_curves.c:47
+msgid "Pos/Neg"
+msgstr "Poz/Neg"
 
-#: pages/common/_voiceconfig_page.c:64
-msgid "up"
-msgstr ""
-
-#: pages/common/_voiceconfig_page.c:69
-msgid "down"
-msgstr ""
-
-#: pages/common/_voiceconfig_page.c:74
-#, c-format
-msgid "Timer %d"
-msgstr ""
-
-#: pages/common/_voiceconfig_page.c:78
-#, c-format
-msgid "Telem %d"
-msgstr ""
-
-#: pages/common/_model_page.c:83
-msgid "Re-Init"
-msgstr "Re-init"
-
-#: pages/common/_model_page.c:83
-msgid "Bind"
-msgstr "Bind"
-
-#: pages/common/_model_page.c:223
-#: pages/320x240x16/standard/gyrosense_page.c:64
-#: pages/128x64x1/standard/gyrosense_page.c:57
-msgid "Channel"
-msgstr "Canal"
-
-#: pages/common/_model_page.c:225
-msgid "Stick"
-msgstr "Stick"
-
-#: pages/common/_model_page.c:227
-msgid "Extend"
-msgstr "Extinde"
-
-#: pages/common/_model_page.c:294
-msgid "Load..."
-msgstr "Încarcă..."
-
-#: pages/common/_model_page.c:296
-msgid "Copy To..."
-msgstr "Copiază..."
-
-#: pages/common/_model_page.c:298
-msgid "Template.."
-msgstr "Șablon..."
-
-#: pages/common/_chantest_page.c:36
-msgid "Touch to Unlock"
-msgstr "Apasă pentru a descuia"
-
-#: pages/common/_chantest_page.c:38
-msgid "Touch to Lock"
-msgstr "Apasă pentru a încuia"
-
-#: pages/common/_dialogs.c:78
-#, c-format
-msgid " is %d%%, safe value = %d%%\n"
-msgstr " = %d%%, valoare de siguranță = %d%%\n"
-
-#: pages/common/_dialogs.c:80
-#, c-format
-msgid ""
-" is %d%%,\n"
-"safe value = %d%%"
-msgstr ""
-" = %d%%,\n"
-"valoare sigur=%d%%\n"
-
-#: pages/common/_dialogs.c:131
-#, c-format
-msgid ""
-"Do you really want\n"
-"to reset the\n"
-" permanent timer %d?"
-msgstr ""
-"Sigur doriți să\\resetați\n"
-"timerul permanent %d?"
-
-#: pages/common/standard/_gyrosense_page.c:27
-#: pages/320x240x16/advanced/mixer_curves.c:51
 #: pages/128x64x1/advanced/mixer_curves.c:83
+#: pages/320x240x16/advanced/mixer_curves.c:51
+#: pages/common/standard/_gyrosense_page.c:25
 msgid "Value"
 msgstr "Valoare"
 
-#: pages/common/standard/_drexp_page.c:89
-#, c-format
-msgid "Position %d"
-msgstr "Poziția %d"
-
-#: pages/common/standard/_drexp_page.c:106
-msgid "LIN"
-msgstr "LIN"
-
-#: pages/common/standard/_common_standard.c:40
-msgid "PIT"
-msgstr "PIT"
-
-#: pages/common/standard/_common_standard.c:69
-msgid "Idle Up 1"
-msgstr "Idle Up 1"
-
-#: pages/common/standard/_common_standard.c:72
-msgid "Idle Up 2"
-msgstr "Idle Up 2"
-
-#: pages/common/standard/_common_standard.c:74
-#: pages/320x240x16/standard/throhold_page.c:49
-#: pages/320x240x16/standard/switchassign_page.c:51
-#: pages/128x64x1/standard/throhold_page.c:41
-#: pages/128x64x1/standard/switchassign_page.c:45
-msgid "Thr hold"
-msgstr "Thr hold"
-
-#: pages/common/standard/_reverse_page.c:28
-#: pages/common/advanced/_mixer_limits.c:208
-msgid "Reversed"
-msgstr "Inversat"
-
-#: pages/common/standard/_swash_page.c:41
-#: pages/common/standard/_swash_page.c:44
-#: pages/common/standard/_swash_page.c:47
-#: pages/common/standard/_swash_page.c:50
-#: pages/common/standard/_swash_page.c:53
-msgid "Servo"
-msgstr "Servo"
-
-#: pages/common/_timer_page.c:54
-msgid "Control"
-msgstr "Control"
-
-#: pages/common/_timer_page.c:56 pages/320x240x16/trim_page.c:113
-#: pages/320x240x16/standard/curves_page.c:57
-#: pages/320x240x16/advanced/mixer_setup.c:145 pages/128x64x1/trim_page.c:119
-#: pages/128x64x1/advanced/mixer_setup.c:149
-msgid "Switch"
-msgstr "Activator"
-
-#: pages/common/_timer_page.c:74
-msgid "stopwatch"
-msgstr "crono"
-
-#: pages/common/_timer_page.c:75
-msgid "stop-prop"
-msgstr "stop-prop"
-
-#: pages/common/_timer_page.c:76
-msgid "countdown"
-msgstr "countdown"
-
-#: pages/common/_timer_page.c:77
-msgid "cntdn-prop"
-msgstr "cntdn-prop"
-
-#: pages/common/_timer_page.c:78
-msgid "permanent"
-msgstr "permanent"
-
-#: pages/common/_timer_page.c:138
-#, c-format
-msgid "Timer%d"
-msgstr "Timer%d"
-
-#: pages/common/_timer_page.c:192
-msgid "Set to"
-msgstr "Setează"
-
-#: pages/common/_trim_page.c:102
-msgid "Momentary"
-msgstr "Momentan"
-
-#: pages/common/_trim_page.c:105 pages/common/_main_config.c:87
-#: pages/128x64x1/main_config.c:96
-msgid "Toggle"
-msgstr "Comutator"
-
-#: pages/common/_trim_page.c:108
-msgid "On/Off"
-msgstr "Pornit/Oprit"
-
-#: pages/common/_trim_page.c:111
-msgid "3 Pos"
-msgstr ""
-
-#: pages/common/advanced/_mixer_limits.c:133
-#: pages/common/advanced/_mixer_setup.c:596
-#, c-format
-msgid "Scale%s"
-msgstr "Scară%s"
-
-#: pages/common/advanced/_mixer_curves.c:137
-msgid "Symmetric"
-msgstr "Simetric."
-
-#: pages/common/advanced/_mixer_curves.c:138
-msgid "Pos"
-msgstr "Poz."
-
-#: pages/common/advanced/_mixer_curves.c:139
-msgid "Neg"
-msgstr "Neg."
-
-#: pages/common/advanced/_mixer_setup.c:152 pages/common/_main_config.c:178
-#: pages/320x240x16/trim_page.c:86
-msgid "Trim"
-msgstr "Trim"
-
-#: pages/common/advanced/_mixer_setup.c:152
-msgid "No Trim"
-msgstr "nimic"
-
-#: pages/common/advanced/_mixer_setup.c:188
-msgid "Mid-Rate"
-msgstr "Pos1"
-
-#: pages/common/advanced/_mixer_setup.c:188
-msgid "Low-Rate"
-msgstr "Pos2"
-
-#: pages/common/advanced/_mixer_setup.c:341
-msgid "replace"
-msgstr "înloc."
-
-#: pages/common/advanced/_mixer_setup.c:342
-msgid "mult"
-msgstr "mult."
-
-#: pages/common/advanced/_mixer_setup.c:343
-msgid "add"
-msgstr "aditiv"
-
-#: pages/common/advanced/_mixer_setup.c:344
-msgid "max"
-msgstr "max"
-
-#: pages/common/advanced/_mixer_setup.c:345
-msgid "min"
-msgstr "min"
-
-#: pages/common/advanced/_mixer_setup.c:346
-msgid "delay"
-msgstr "delay"
-
-#: pages/common/advanced/_mixer_setup.c:348
-msgid "beep"
-msgstr ""
-
-#: pages/common/advanced/_mixer_setup.c:349
-msgid "voice"
-msgstr ""
-
-#: pages/common/advanced/_mixer_setup.c:484
-#: pages/320x240x16/advanced/mixer_setup.c:101
-#: pages/320x240x16/advanced/mixer_setup.c:104
-msgid "Linked"
-msgstr "Legat"
-
-#: pages/common/advanced/_mixer_setup.c:531
-msgid "New"
-msgstr "Now"
-
-#: pages/common/advanced/_mixer_setup.c:532 pages/320x240x16/pagelist.h:41
-#: pages/128x64x1/pagelist.h:43
-msgid "Mixer"
-msgstr "Configurare mixer"
-
-#: pages/common/advanced/_mixer_page.c:63
-#: pages/common/advanced/_mixer_page.c:64
-#: pages/common/advanced/_mixer_page.c:65
-msgid "CYC"
-msgstr "CYC"
-
-#: pages/common/advanced/_mixer_page.c:65
-msgid "COL"
-msgstr "Colectiv"
-
-#: pages/common/_model_config.c:133
-#, c-format
-msgid "Ch%d"
-msgstr "Can%d"
-
-#: pages/common/_model_config.c:186
-#, c-format
-msgid "PPM%d"
-msgstr "PPM%d"
-
-#: pages/common/_main_config.c:85
-msgid "Small-box"
-msgstr "Box mic"
-
-#: pages/common/_main_config.c:86
-msgid "Big-box"
-msgstr "Box mare"
-
-#: pages/common/_main_config.c:88
-msgid "Bargraph"
-msgstr "Bară"
-
-#: pages/common/_main_config.c:89
-msgid "V-trim"
-msgstr "V-Trim"
-
-#: pages/common/_main_config.c:90
-msgid "H-trim"
-msgstr "H-Trim"
-
-#: pages/common/_main_config.c:92
-msgid "Battery"
-msgstr ""
-
-#: pages/common/_main_config.c:93
-msgid "TxPower"
-msgstr ""
-
-#: pages/common/_main_config.c:130 pages/common/_set_timer_page.c:52
-#: pages/128x64x1/set_timer_page.c:73
-msgid "Add"
-msgstr "Adaugă"
-
-#: pages/common/_main_config.c:130
-msgid "Load"
-msgstr "Încarcă"
-
-#: pages/common/_main_config.c:234
-msgid "Menu"
-msgstr "Meniu"
-
-#: pages/common/_tx_configure.c:92
-msgid ""
-"Move sticks and knobs\n"
-"to max & min positions\n"
-"then press ENT"
-msgstr ""
-"Mută stick-urile și potențiometrele\n"
-"la MAX și MIN\n"
-"după care apasă ENT"
-
-#: pages/common/_tx_configure.c:101
-msgid ""
-"Calibration done.\n"
-" \n"
-"Press ENT."
-msgstr ""
-
-#: pages/common/_tx_configure.c:123
-msgid ""
-"Center all \n"
-"sticks and knobs\n"
-"then press ENT"
-msgstr ""
-"Centrați toate stickuri-le\n"
-"și potențiometrele\n"
-"și apăsați ENT"
-
-#: pages/common/_tx_configure.c:166
-msgid "Calibrate"
-msgstr "Calibrare"
-
-#: pages/common/_tx_configure.c:174 pages/common/_set_timer_page.c:54
-#: pages/128x64x1/set_timer_page.c:73
-msgid "Set"
-msgstr "Setează"
-
-#: pages/common/_tx_configure.c:183
-#, c-format
-msgid "Mode %d"
-msgstr "Mod %d"
-
-#: pages/common/_tx_configure.c:336
-msgid "Change"
-msgstr "Modifică"
-
-#: pages/common/_tx_configure.c:362
-msgid "Fahren"
-msgstr "F°"
-
-#: pages/common/_tx_configure.c:362
-msgid "Celsius"
-msgstr "C°"
-
-#: pages/common/_tx_configure.c:364
-msgid "Foot"
-msgstr "Picior"
-
-#: pages/common/_tx_configure.c:364
-msgid "Meter"
-msgstr "Metru"
-
-#: pages/320x240x16/scanner_page.c:35
-msgid "Turn Off"
-msgstr "Oprește"
-
-#: pages/320x240x16/scanner_page.c:35
-msgid "Turn On"
-msgstr "Pornește"
-
-#: pages/320x240x16/scanner_page.c:42 pages/128x64x1/scanner_page.c:36
-msgid "Average"
-msgstr ""
-
-#: pages/320x240x16/scanner_page.c:42 pages/128x64x1/scanner_page.c:36
-msgid "Peak"
-msgstr ""
-
-#: pages/320x240x16/scanner_page.c:49
-msgid "Att.: -20dB"
-msgstr ""
-
-#: pages/320x240x16/scanner_page.c:49
-msgid "Att.: 0dB"
-msgstr ""
-
-#: pages/320x240x16/trim_page.c:67 pages/320x240x16/trim_page.c:100
-#: pages/128x64x1/trim_page.c:70 pages/128x64x1/trim_page.c:103
-msgid "Input"
-msgstr "Intrare"
-
-#: pages/320x240x16/trim_page.c:68 pages/320x240x16/trim_page.c:107
-#: pages/128x64x1/trim_page.c:107
-msgid "Trim -"
-msgstr "Trim -"
-
-#: pages/320x240x16/trim_page.c:69 pages/320x240x16/trim_page.c:110
-#: pages/128x64x1/trim_page.c:73 pages/128x64x1/trim_page.c:111
-msgid "Trim +"
-msgstr "Trim +"
-
-#: pages/320x240x16/trim_page.c:70 pages/320x240x16/trim_page.c:103
-#: pages/128x64x1/trim_page.c:115
-msgid "Trim Step"
-msgstr "Pas trim"
-
-#: pages/320x240x16/tx_configure.c:101 pages/128x64x1/tx_configure.c:94
-#: pages/128x64x1/tx_configure.c:101
-msgid "Generic settings"
-msgstr "Setări generale"
-
-#: pages/320x240x16/tx_configure.c:106 pages/128x64x1/tx_configure.c:95
-msgid "Language"
-msgstr "Limbă"
-
-#: pages/320x240x16/tx_configure.c:112 pages/128x64x1/tx_configure.c:103
-msgid "Stick mode"
-msgstr "Mod"
-
-#: pages/320x240x16/tx_configure.c:117
-msgid "Touch screen"
-msgstr "Ecran tactil"
-
-#: pages/320x240x16/tx_configure.c:122 pages/128x64x1/tx_configure.c:107
-msgid "Sticks"
-msgstr "Stick-uri"
-
-#: pages/320x240x16/tx_configure.c:138 pages/128x64x1/tx_configure.c:112
-msgid "Audio settings"
-msgstr ""
-
-#: pages/320x240x16/tx_configure.c:140
-msgid "Buzzer settings"
-msgstr "Setări sunet"
-
-#: pages/320x240x16/tx_configure.c:144
-msgid "Power On alarm"
-msgstr "Ton pornire"
-
-#: pages/320x240x16/tx_configure.c:148
-msgid "Battery alarm"
-msgstr "Alarmă baterie"
-
-#: pages/320x240x16/tx_configure.c:152
-msgid "Alarm interval"
-msgstr "Int. alarmă"
-
-#: pages/320x240x16/tx_configure.c:156 pages/128x64x1/tx_configure.c:116
-msgid "Buzz volume"
-msgstr "Volum"
-
-#: pages/320x240x16/tx_configure.c:161 pages/128x64x1/tx_configure.c:121
-msgid "Audio volume"
-msgstr ""
-
-#: pages/320x240x16/tx_configure.c:166
-msgid "Power-down alert"
-msgstr "Ton oprire"
-
-#: pages/320x240x16/tx_configure.c:174 pages/128x64x1/tx_configure.c:147
-#: pages/128x64x1/tx_configure.c:154
-msgid "LCD settings"
-msgstr "Setări ecran"
-
-#: pages/320x240x16/tx_configure.c:177 pages/128x64x1/tx_configure.c:148
-msgid "Backlight"
-msgstr "Iluminare"
-
-#: pages/320x240x16/tx_configure.c:181 pages/128x64x1/tx_configure.c:160
-msgid "Dimmer time"
-msgstr "Timp auto"
-
-#: pages/320x240x16/tx_configure.c:185 pages/128x64x1/tx_configure.c:164
-msgid "Dimmer target"
-msgstr "Nivel auto"
-
-#: pages/320x240x16/tx_configure.c:192 pages/128x64x1/tx_configure.c:168
-msgid "Timer settings"
-msgstr "Setări crono"
-
-#: pages/320x240x16/tx_configure.c:195 pages/128x64x1/tx_configure.c:169
-msgid "Prealert time"
-msgstr "Prealertă"
-
-#: pages/320x240x16/tx_configure.c:199
-msgid "Prealert interval"
-msgstr "Interval"
-
-#: pages/320x240x16/tx_configure.c:204
-msgid "Timeup interval"
-msgstr "Expirare"
-
-#: pages/320x240x16/tx_configure.c:209 pages/128x64x1/tx_configure.c:181
-msgid "Telemetry settings"
-msgstr "Setări telemetrie"
-
-#: pages/320x240x16/tx_configure.c:212 pages/128x64x1/tx_configure.c:182
-msgid "Temperature"
-msgstr "Temperatură"
-
-#: pages/320x240x16/tx_configure.c:216 pages/128x64x1/tx_configure.c:186
-msgid "Length"
-msgstr "Distanță"
-
-#: pages/320x240x16/tx_configure.c:220
-msgid "Alert interval"
-msgstr ""
-
-#: pages/320x240x16/tx_configure.c:227
-msgid "Vibration settings"
-msgstr ""
-
-#: pages/320x240x16/tx_configure.c:229
-msgid "Vibration:"
-msgstr ""
-
-#: pages/320x240x16/tx_configure.c:262
-#, c-format
-msgid "Touch target %d"
-msgstr "Atinge punctul %d"
-
-#: pages/320x240x16/tx_configure.c:285
-msgid "Touch Calibrate"
-msgstr "Calibrare ecran"
-
-#: pages/320x240x16/set_timer_page.c:86
-msgid "actual value"
-msgstr "valoare reală"
-
-#: pages/320x240x16/set_timer_page.c:90
-msgid "value to add or set"
-msgstr "valoare de adăugat sau setat"
-
-#: pages/320x240x16/set_timer_page.c:94 pages/320x240x16/rtc_config.c:136
-#: pages/128x64x1/set_timer_page.c:48
-msgid "Hour"
-msgstr "Oră"
-
-#: pages/320x240x16/set_timer_page.c:96 pages/320x240x16/rtc_config.c:135
-#: pages/128x64x1/set_timer_page.c:46
-msgid "Minute"
-msgstr "Minut"
-
-#: pages/320x240x16/set_timer_page.c:98 pages/320x240x16/rtc_config.c:134
-#: pages/128x64x1/set_timer_page.c:44
-msgid "Second"
-msgstr "Secundă"
-
-#: pages/320x240x16/set_timer_page.c:106 pages/320x240x16/rtc_config.c:161
-msgid "resulting value"
-msgstr "valoare"
-
-#: pages/320x240x16/model_page.c:25 pages/320x240x16/model_config.c:38
-#: pages/128x64x1/model_config.c:96
-msgid "Helicopter"
-msgstr "Elicopter"
-
-#: pages/320x240x16/model_page.c:26 pages/320x240x16/model_config.c:38
-#: pages/128x64x1/model_config.c:97
-msgid "Airplane"
-msgstr "Avion"
-
-#: pages/320x240x16/model_page.c:27 pages/128x64x1/model_config.c:98
-msgid "Multirotor"
-msgstr ""
-
-#: pages/320x240x16/model_page.c:62 pages/128x64x1/model_page.c:85
-msgid "File"
-msgstr "Fișier"
-
-#: pages/320x240x16/model_page.c:67 pages/128x64x1/model_page.c:128
-msgid "Mixer GUI"
-msgstr "GUI mixer"
-
-#: pages/320x240x16/model_page.c:72 pages/128x64x1/model_page.c:89
-msgid "Model name"
-msgstr "Nume model"
-
-#: pages/320x240x16/model_page.c:74 pages/128x64x1/model_page.c:93
-msgid "Icon"
-msgstr "Icon"
-
-#: pages/320x240x16/model_page.c:77 pages/128x64x1/model_page.c:97
-msgid "Model type"
-msgstr "Tip model"
-
-#: pages/320x240x16/model_page.c:81 pages/128x64x1/model_page.c:105
-msgid "PPM In"
-msgstr "Intrare PPM"
-
-#: pages/320x240x16/model_page.c:85
-msgid "Protocol"
-msgstr "Protocol"
-
-#: pages/320x240x16/model_page.c:89 pages/128x64x1/model_page.c:123
-msgid "# Channels"
-msgstr "Canale"
-
-#: pages/320x240x16/model_page.c:94 pages/128x64x1/model_page.c:101
-msgid "Tx power"
-msgstr "Putere tx"
-
-#: pages/320x240x16/model_page.c:102 pages/128x64x1/model_page.c:119
-msgid "Fixed ID"
-msgstr "ID Fix"
-
+#: pages/128x64x1/advanced/mixer_limits.c:42 pages/128x64x1/toggle_select.c:84
+#: pages/320x240x16/advanced/mixer_limits.c:81
 #: pages/320x240x16/toggle_select.c:86
-#: pages/320x240x16/advanced/mixer_limits.c:76
-#: pages/128x64x1/toggle_select.c:84 pages/128x64x1/advanced/mixer_limits.c:42
 msgid "Revert"
 msgstr "Inversează"
 
-#: pages/320x240x16/toggle_select.c:116
-msgid "Pos 0"
-msgstr "Pos 0"
+#: pages/128x64x1/advanced/mixer_limits.c:63 pages/128x64x1/pagelist.h:45
+#: pages/128x64x1/standard/reverse_page.c:26
+#: pages/320x240x16/advanced/mixer_limits.c:33 pages/320x240x16/pagelist.h:43
+msgid "Reverse"
+msgstr "Invers"
 
-#: pages/320x240x16/toggle_select.c:121
-msgid "Pos 1"
-msgstr "Pos 1"
+#: pages/128x64x1/advanced/mixer_limits.c:67 pages/128x64x1/pagelist.h:54
+#: pages/128x64x1/standard/failsafe_page.c:26
+#: pages/320x240x16/advanced/mixer_limits.c:37 pages/320x240x16/pagelist.h:52
+msgid "Fail-safe"
+msgstr "Fail-safe"
 
-#: pages/320x240x16/toggle_select.c:126
-msgid "Pos 2"
-msgstr "Pos 2"
+#: pages/128x64x1/advanced/mixer_limits.c:71
+#: pages/320x240x16/advanced/mixer_limits.c:41 pages/320x240x16/dialogs.c:49
+msgid "Safety"
+msgstr "Siguranță"
 
+#: pages/128x64x1/advanced/mixer_limits.c:75
+#: pages/320x240x16/advanced/mixer_limits.c:45
+msgid "Safe Val"
+msgstr "Valoare sig."
+
+#: pages/128x64x1/advanced/mixer_limits.c:79
+#: pages/320x240x16/advanced/mixer_limits.c:49
+msgid "Min Limit"
+msgstr "Limită min"
+
+#: pages/128x64x1/advanced/mixer_limits.c:83
+#: pages/320x240x16/advanced/mixer_limits.c:53
+msgid "Max Limit"
+msgstr "Limită max"
+
+#: pages/128x64x1/advanced/mixer_limits.c:95 pages/128x64x1/pagelist.h:47
+#: pages/128x64x1/standard/subtrim_page.c:25
+#: pages/320x240x16/advanced/mixer_limits.c:64 pages/320x240x16/pagelist.h:45
+msgid "Subtrim"
+msgstr "Subtrim"
+
+#: pages/128x64x1/advanced/mixer_limits.c:99
+#: pages/320x240x16/advanced/mixer_limits.c:68 telemetry.c:250
+msgid "Speed"
+msgstr "Viteză"
+
+#: pages/128x64x1/advanced/mixer_page.c:44
+msgid "Mixer    Reorder:Hold R+"
+msgstr ""
+
+#: pages/128x64x1/advanced/mixer_setup.c:78
+#: pages/128x64x1/advanced/mixer_setup.c:157
+#: pages/128x64x1/advanced/mixer_setup.c:265
+#: pages/320x240x16/advanced/mixer_setup.c:59
+#: pages/320x240x16/advanced/mixer_setup.c:84
+#: pages/320x240x16/advanced/mixer_setup.c:151
+#: pages/320x240x16/standard/drexp_page.c:57
+msgid "Src"
+msgstr "Sursă"
+
+#: pages/128x64x1/advanced/mixer_setup.c:82
+#: pages/128x64x1/advanced/mixer_setup.c:161
+#: pages/320x240x16/advanced/mixer_setup.c:63
+#: pages/320x240x16/advanced/mixer_setup.c:155
+msgid "Curve"
+msgstr "Curbă"
+
+#: pages/128x64x1/advanced/mixer_setup.c:86
+#: pages/128x64x1/advanced/mixer_setup.c:165
+msgid "Scale"
+msgstr "Scara"
+
+#: pages/128x64x1/advanced/mixer_setup.c:90
+#: pages/128x64x1/advanced/mixer_setup.c:169
+#: pages/320x240x16/advanced/mixer_setup.c:76
+#: pages/320x240x16/advanced/mixer_setup.c:161
+msgid "Offset"
+msgstr "Offset"
+
+#: pages/128x64x1/advanced/mixer_setup.c:141
+#: pages/320x240x16/advanced/mixer_setup.c:135
+msgid "Mixers"
+msgstr "Mixere"
+
+#: pages/128x64x1/advanced/mixer_setup.c:145
+#: pages/320x240x16/advanced/mixer_setup.c:137
+msgid "Page"
+msgstr "Pagină"
+
+#: pages/128x64x1/advanced/mixer_setup.c:149 pages/128x64x1/trim_page.c:119
+#: pages/320x240x16/advanced/mixer_setup.c:145
+#: pages/320x240x16/standard/curves_page.c:57 pages/320x240x16/trim_page.c:113
+#: pages/common/_timer_page.c:56
+msgid "Switch"
+msgstr "Activator"
+
+#: pages/128x64x1/advanced/mixer_setup.c:153
+#: pages/320x240x16/advanced/mixer_setup.c:148
+msgid "Mux"
+msgstr "Mux"
+
+#: pages/128x64x1/advanced/mixer_setup.c:269
+#: pages/320x240x16/advanced/mixer_setup.c:95
+msgid "High-Rate"
+msgstr "Pos0"
+
+#: pages/128x64x1/advanced/mixer_setup.c:279
+#: pages/320x240x16/advanced/mixer_setup.c:85
+msgid "Switch1"
+msgstr "Act1"
+
+#: pages/128x64x1/advanced/mixer_setup.c:279
+#: pages/320x240x16/advanced/mixer_setup.c:86
+msgid "Switch2"
+msgstr "Act2"
+
+#: pages/128x64x1/chantest_page.c:111
+msgid "Stick input"
+msgstr "Intrări"
+
+#: pages/128x64x1/chantest_page.c:111
+msgid "Mixer output"
+msgstr ""
+
+#: pages/128x64x1/datalog_page.c:56 pages/128x64x1/scanner_page.c:29
+#: pages/128x64x1/tx_configure.c:249 pages/128x64x1/usb_page.c:39
+#: pages/320x240x16/usb_page.c:39 pages/320x240x16/usb_page.c:41
+#: pages/common/standard/_curves_page.c:109
+#: pages/common/standard/_throhold_page.c:40 pages/common/_tx_configure.c:376
+#: protocol/bayang_nrf24l01.c:100 protocol/cg023_nrf24l01.c:60
+#: protocol/dsm2_cyrf6936.c:49 protocol/dsm2_cyrf6936.c:52
+#: protocol/dsm2_cyrf6936.c:53 protocol/frsky2way_cc2500.c:40
+#: protocol/fy326_nrf24l01.c:59 protocol/hubsan_a7105.c:126
+#: protocol/inav_nrf24l01.c:182 protocol/kn_nrf24l01.c:172
+#: protocol/symax_nrf24l01.c:109 protocol/yd717_nrf24l01.c:111
+#: telemetry/telem_dsm.c:147
+msgid "On"
+msgstr "Pornit"
+
+#: pages/128x64x1/datalog_page.c:57 pages/128x64x1/scanner_page.c:29
+#: pages/128x64x1/tx_configure.c:237 pages/128x64x1/tx_configure.c:247
+#: pages/128x64x1/usb_page.c:39 pages/320x240x16/usb_page.c:39
+#: pages/320x240x16/usb_page.c:41 pages/common/advanced/_mixer_limits.c:189
+#: pages/common/standard/_curves_page.c:111
+#: pages/common/standard/_failsafe_page.c:36
+#: pages/common/standard/_throhold_page.c:44
+#: pages/common/standard/_throhold_page.c:55 pages/common/_tx_configure.c:198
+#: pages/common/_tx_configure.c:212 pages/common/_tx_configure.c:231
+#: pages/common/_tx_configure.c:250 pages/common/_tx_configure.c:265
+#: pages/common/_tx_configure.c:278 pages/common/_tx_configure.c:305
+#: pages/common/_tx_configure.c:374 pages/common/_tx_configure.c:390
+#: pages/common/_tx_configure.c:412 protocol/bayang_nrf24l01.c:100
+#: protocol/cflie_nrf24l01.c:200 protocol/cg023_nrf24l01.c:60
+#: protocol/devo_cyrf6936.c:54 protocol/dsm2_cyrf6936.c:49
+#: protocol/dsm2_cyrf6936.c:52 protocol/dsm2_cyrf6936.c:53
+#: protocol/flysky_a7105.c:48 protocol/frsky2way_cc2500.c:40
+#: protocol/fy326_nrf24l01.c:59 protocol/hubsan_a7105.c:126
+#: protocol/inav_nrf24l01.c:182 protocol/kn_nrf24l01.c:172
+#: protocol/symax_nrf24l01.c:109 protocol/yd717_nrf24l01.c:111
+msgid "Off"
+msgstr "Oprit"
+
+#: pages/128x64x1/datalog_page.c:79 pages/320x240x16/datalog_page.c:92
+msgid "All"
+msgstr "Toate"
+
+#: pages/128x64x1/datalog_page.c:96 pages/320x240x16/datalog_page.c:139
+msgid "Enable"
+msgstr "Activează"
+
+#: pages/128x64x1/datalog_page.c:102
+msgid "Rate"
+msgstr "Rată"
+
+#: pages/128x64x1/datalog_page.c:105 pages/320x240x16/datalog_page.c:152
+msgid "Select"
+msgstr "Selectează"
+
+#: pages/128x64x1/datalog_page.c:135 pages/320x240x16/datalog_page.c:61
+#, c-format
+msgid "%d bytes left"
+msgstr "%d octeți liberi"
+
+#: pages/128x64x1/dialogs.c:82
+#, c-format
+msgid ""
+"Binding %s...\n"
+"Press ENT to stop"
+msgstr ""
+"Conectare %s...\n"
+"Apăsați ENT pentru a opri"
+
+#: pages/128x64x1/dialogs.c:85
+#, c-format
+msgid ""
+"\n"
+"%d seconds left"
+msgstr ""
+"\n"
+"%d secunde stânga"
+
+#: pages/128x64x1/dialogs.c:132
+msgid ""
+"Battery too low,\n"
+"can't save!"
+msgstr ""
+"Nivel baterie scăzut,\n"
+"nu pot salva!"
+
+#: pages/128x64x1/dialogs.c:139
+msgid ""
+"Model needs reset\n"
+"for standard mixer"
+msgstr ""
+"Modelul trebuie să fie\n"
+" resetat pentru mixerul standard"
+
+#: pages/128x64x1/dialogs.c:153
+msgid ""
+"Bad/missing\n"
+"protocol modules!"
+msgstr ""
+"Module protocol\n"
+"lipsă sau corupte!"
+
+#: pages/128x64x1/dialogs.c:178 pages/320x240x16/dialogs.c:151
+msgid "Missing Modules:\n"
+msgstr ""
+
+#: pages/128x64x1/lang_select.c:44
+#: pages/128x64x1/standard/switchassign_page.c:80
+msgid "Press ENT to change"
+msgstr "Apasaă ENT pentru schimbare"
+
+#: pages/128x64x1/main_config.c:60
+msgid "Layout: Long-Press ENT"
+msgstr "Aranjament: ENT lung"
+
+#: pages/128x64x1/main_config.c:86
+msgid "Trimbar"
+msgstr "Bară trim"
+
+#: pages/128x64x1/main_config.c:90
+msgid "Box"
+msgstr "Box"
+
+#: pages/128x64x1/main_config.c:93
+msgid "Bar"
+msgstr "Bară"
+
+#: pages/128x64x1/main_config.c:96 pages/common/_main_config.c:87
+#: pages/common/_trim_page.c:105
+msgid "Toggle"
+msgstr "Comutator"
+
+#: pages/128x64x1/main_config.c:134 pages/320x240x16/main_layout.c:271
+msgid "Delete"
+msgstr "Șterge"
+
+#: pages/128x64x1/model_config.c:57 pages/128x64x1/standard/swash_page.c:42
 #: pages/320x240x16/model_config.c:41
-#: pages/320x240x16/standard/swash_page.c:40 pages/128x64x1/model_config.c:57
-#: pages/128x64x1/standard/swash_page.c:41
+#: pages/320x240x16/standard/swash_page.c:40
 msgid "SwashType"
 msgstr "Tip platou"
 
-#: pages/320x240x16/model_config.c:44 pages/128x64x1/model_config.c:61
+#: pages/128x64x1/model_config.c:61 pages/320x240x16/model_config.c:44
 msgid "ELE Inv"
 msgstr "ELE inv."
 
-#: pages/320x240x16/model_config.c:47 pages/128x64x1/model_config.c:65
+#: pages/128x64x1/model_config.c:65 pages/320x240x16/model_config.c:47
 msgid "AIL Inv"
 msgstr "AIL Inv."
 
+#: pages/128x64x1/model_config.c:69 pages/320x240x16/model_config.c:50
+#: protocol/wk2x01.c:80
+msgid "COL Inv"
+msgstr "Colectiv inv."
+
+#: pages/128x64x1/model_config.c:73 pages/128x64x1/standard/swash_page.c:46
 #: pages/320x240x16/model_config.c:53
-#: pages/320x240x16/standard/swash_page.c:45 pages/128x64x1/model_config.c:73
-#: pages/128x64x1/standard/swash_page.c:45
+#: pages/320x240x16/standard/swash_page.c:45
 msgid "ELE Mix"
 msgstr "ELE Mix"
 
+#: pages/128x64x1/model_config.c:77 pages/128x64x1/standard/swash_page.c:50
 #: pages/320x240x16/model_config.c:56
-#: pages/320x240x16/standard/swash_page.c:50 pages/128x64x1/model_config.c:77
-#: pages/128x64x1/standard/swash_page.c:49
+#: pages/320x240x16/standard/swash_page.c:50
 msgid "AIL Mix"
 msgstr "AIL Mix"
 
-#: pages/320x240x16/model_config.c:59 pages/128x64x1/model_config.c:81
+#: pages/128x64x1/model_config.c:81 pages/320x240x16/model_config.c:59
 msgid "COL Mix"
 msgstr "COL Mix"
 
-#: pages/320x240x16/model_config.c:90 pages/128x64x1/model_config.c:240
-msgid "Trainer Cfg (Channel)"
-msgstr "Conf trainer (Canal)"
+#: pages/128x64x1/model_config.c:96 pages/320x240x16/model_config.c:38
+#: pages/320x240x16/model_page.c:25
+msgid "Helicopter"
+msgstr "Elicopter"
 
-#: pages/320x240x16/model_config.c:92 pages/128x64x1/model_config.c:242
-msgid "Trainer Cfg (Stick)"
-msgstr "Conf trainer (Stick)"
+#: pages/128x64x1/model_config.c:97 pages/320x240x16/model_config.c:38
+#: pages/320x240x16/model_page.c:26
+msgid "Airplane"
+msgstr "Avion"
 
-#: pages/320x240x16/model_config.c:93 pages/128x64x1/model_config.c:243
-msgid "PPMIn Cfg (Extend)"
-msgstr "Config PPM (Extinde)"
+#: pages/128x64x1/model_config.c:98 pages/320x240x16/model_page.c:27
+msgid "Multirotor"
+msgstr ""
 
-#: pages/320x240x16/model_config.c:96 pages/128x64x1/model_config.c:148
+#: pages/128x64x1/model_config.c:139 pages/320x240x16/model_config.c:103
+#: protocol/ppmout.c:39
+msgid "Center PW"
+msgstr "Centru PW"
+
+#: pages/128x64x1/model_config.c:143 pages/320x240x16/model_config.c:106
+#: protocol/ppmout.c:40
+msgid "Delta PW"
+msgstr "Delta PW"
+
+#: pages/128x64x1/model_config.c:148 pages/320x240x16/model_config.c:96
 msgid "Trainer Sw"
 msgstr "Sw trainer"
 
-#: pages/320x240x16/model_config.c:99 pages/128x64x1/model_config.c:151
+#: pages/128x64x1/model_config.c:151 pages/320x240x16/model_config.c:99
 msgid "Num Channels"
 msgstr "Num Canale"
 
-#: pages/320x240x16/dialogs.c:49 pages/320x240x16/advanced/mixer_limits.c:41
-#: pages/128x64x1/advanced/mixer_limits.c:71
-msgid "Safety"
-msgstr "Siguranță"
+#: pages/128x64x1/model_config.c:179
+msgid "Video Enable"
+msgstr ""
+
+#: pages/128x64x1/model_config.c:183
+msgid "Video Channel"
+msgstr ""
+
+#: pages/128x64x1/model_config.c:187 pages/128x64x1/tx_configure.c:156
+msgid "Contrast"
+msgstr "Contrast"
+
+#: pages/128x64x1/model_config.c:191
+msgid "Brightness"
+msgstr ""
+
+#: pages/128x64x1/model_config.c:205 pages/128x64x1/model_page.c:110
+msgid "Video"
+msgstr ""
+
+#: pages/128x64x1/model_config.c:240 pages/320x240x16/model_config.c:90
+msgid "Trainer Cfg (Channel)"
+msgstr "Conf trainer (Canal)"
+
+#: pages/128x64x1/model_config.c:242 pages/320x240x16/model_config.c:92
+msgid "Trainer Cfg (Stick)"
+msgstr "Conf trainer (Stick)"
+
+#: pages/128x64x1/model_config.c:243 pages/320x240x16/model_config.c:93
+msgid "PPMIn Cfg (Extend)"
+msgstr "Config PPM (Extinde)"
+
+#: pages/128x64x1/model_loadsave.c:69
+msgid "Press ENT to copy to"
+msgstr "Apasa ENT pentru copiere"
+
+#: pages/128x64x1/model_loadsave.c:71
+msgid "Press ENT to load"
+msgstr "Apasă ENT pentru incarcare"
+
+#: pages/128x64x1/model_page.c:38 protocol/wk2x01.c:79
+msgid "Heli"
+msgstr "Elic."
+
+#: pages/128x64x1/model_page.c:39
+msgid "Plane"
+msgstr "Avion"
+
+#: pages/128x64x1/model_page.c:40
+msgid "Multi"
+msgstr ""
+
+#: pages/128x64x1/model_page.c:51 pages/common/_model_loadsave.c:114
+#: pages/common/_model_page.c:181 protocol/hisky_nrf24l01.c:73
+msgid "Default"
+msgstr "Default"
+
+#: pages/128x64x1/model_page.c:85 pages/320x240x16/model_page.c:63
+msgid "File"
+msgstr "Fișier"
+
+#: pages/128x64x1/model_page.c:89 pages/320x240x16/model_page.c:73
+msgid "Model name"
+msgstr "Nume model"
+
+#: pages/128x64x1/model_page.c:93 pages/320x240x16/model_page.c:75
+msgid "Icon"
+msgstr "Icon"
+
+#: pages/128x64x1/model_page.c:97 pages/320x240x16/model_page.c:78
+msgid "Model type"
+msgstr "Tip model"
+
+#: pages/128x64x1/model_page.c:101 pages/320x240x16/model_page.c:95
+msgid "Tx power"
+msgstr "Putere tx"
+
+#: pages/128x64x1/model_page.c:105 pages/320x240x16/model_page.c:82
+msgid "PPM In"
+msgstr "Intrare PPM"
+
+#: pages/128x64x1/model_page.c:111
+msgid "Setup"
+msgstr ""
+
+#: pages/128x64x1/model_page.c:119 pages/320x240x16/model_page.c:103
+msgid "Fixed ID"
+msgstr "ID Fix"
+
+#: pages/128x64x1/model_page.c:123 pages/320x240x16/model_page.c:90
+msgid "# Channels"
+msgstr "Canale"
+
+#: pages/128x64x1/model_page.c:128 pages/320x240x16/model_page.c:68
+msgid "Mixer GUI"
+msgstr "GUI mixer"
+
+#: pages/128x64x1/model_page.c:156 pages/128x64x1/pagelist.h:42
+#: pages/320x240x16/pagelist.h:40
+msgid "Model setup"
+msgstr "Profil model"
+
+#: pages/128x64x1/pagelist.h:20 pages/320x240x16/pagelist.h:18
+msgid "Main page"
+msgstr "Pagina principală"
+
+#: pages/128x64x1/pagelist.h:21 pages/320x240x16/pagelist.h:19
+msgid "Main menu"
+msgstr "Meniu principal"
+
+#: pages/128x64x1/pagelist.h:24 pages/320x240x16/pagelist.h:21
+msgid "Set permanent timer"
+msgstr "Setează timer permanent"
+
+#: pages/128x64x1/pagelist.h:27
+msgid "Video setup"
+msgstr ""
+
+#: pages/128x64x1/pagelist.h:32 pages/320x240x16/pagelist.h:31
+msgid "Model menu"
+msgstr "Meniu model"
+
+#: pages/128x64x1/pagelist.h:33 pages/320x240x16/pagelist.h:32
+msgid "Transmitter menu"
+msgstr "Meniu radio"
+
+#: pages/128x64x1/pagelist.h:34 pages/128x64x1/usb_page.c:35
+#: pages/320x240x16/pagelist.h:33
+msgid "USB"
+msgstr "USB"
+
+#: pages/128x64x1/pagelist.h:36 pages/320x240x16/pagelist.h:35
+msgid "Debuglog"
+msgstr ""
+
+#: pages/128x64x1/pagelist.h:38
+msgid "About Deviation"
+msgstr "Despre Deviation"
+
+#: pages/128x64x1/pagelist.h:43 pages/320x240x16/pagelist.h:41
+#: pages/common/advanced/_mixer_setup.c:532
+msgid "Mixer"
+msgstr "Configurare mixer"
+
+#: pages/128x64x1/pagelist.h:46 pages/320x240x16/pagelist.h:44
+msgid "D/R & Exp"
+msgstr "DR și Expo"
+
+#: pages/128x64x1/pagelist.h:48 pages/320x240x16/pagelist.h:46
+msgid "Travel adjust"
+msgstr "Ajustare curse"
+
+#: pages/128x64x1/pagelist.h:49 pages/320x240x16/pagelist.h:47
+msgid "Throttle curves"
+msgstr "Curba putere"
+
+#: pages/128x64x1/pagelist.h:50 pages/320x240x16/pagelist.h:48
+msgid "Pitch curves"
+msgstr "Curbe pitch"
+
+#: pages/128x64x1/pagelist.h:51 pages/128x64x1/standard/throhold_page.c:40
+#: pages/320x240x16/pagelist.h:49
+msgid "Throttle hold"
+msgstr "Throttle hold"
+
+#: pages/128x64x1/pagelist.h:52 pages/128x64x1/standard/gyrosense_page.c:55
+#: pages/128x64x1/standard/switchassign_page.c:48
+#: pages/320x240x16/pagelist.h:50
+#: pages/320x240x16/standard/switchassign_page.c:56
+msgid "Gyro sense"
+msgstr "Sens giro"
+
+#: pages/128x64x1/pagelist.h:53 pages/320x240x16/pagelist.h:51
+msgid "Swash"
+msgstr "Platou"
+
+#: pages/128x64x1/pagelist.h:55 pages/320x240x16/pagelist.h:53
+msgid "Switch assignment"
+msgstr "Asignare act."
+
+#: pages/128x64x1/pagelist.h:57 pages/320x240x16/pagelist.h:55
+msgid "Timers"
+msgstr "Timere"
+
+#: pages/128x64x1/pagelist.h:59 pages/128x64x1/telemconfig_page.c:84
+#: pages/320x240x16/pagelist.h:56
+msgid "Telemetry config"
+msgstr "Telemetrie"
+
+#: pages/128x64x1/pagelist.h:61 pages/320x240x16/pagelist.h:57
+msgid "Trims"
+msgstr "Trim-uri"
+
+#: pages/128x64x1/pagelist.h:63 pages/320x240x16/pagelist.h:59
+msgid "Datalog"
+msgstr "Log date"
+
+#: pages/128x64x1/pagelist.h:65 pages/320x240x16/pagelist.h:61
+msgid "Main page config"
+msgstr "Ecran principal"
+
+#: pages/128x64x1/pagelist.h:67 pages/320x240x16/pagelist.h:63
+msgid "Voice config"
+msgstr ""
+
+#: pages/128x64x1/pagelist.h:72 pages/320x240x16/pagelist.h:67
+msgid "Transmitter config"
+msgstr "Configurare radio"
+
+#: pages/128x64x1/pagelist.h:73 pages/320x240x16/pagelist.h:68
+msgid "Channel monitor"
+msgstr "Monitor canale"
+
+#: pages/128x64x1/pagelist.h:75 pages/128x64x1/telemtest_page.c:412
+#: pages/320x240x16/pagelist.h:69
+msgid "Telemetry monitor"
+msgstr "Monitor telemetrie"
+
+#: pages/128x64x1/pagelist.h:77 pages/320x240x16/pagelist.h:70
+msgid "Range Test"
+msgstr ""
+
+#: pages/128x64x1/pagelist.h:79 pages/320x240x16/pagelist.h:74
+msgid "Scanner"
+msgstr "Scaner"
+
+#: pages/128x64x1/pagelist.h:86
+msgid "External OSD"
+msgstr ""
+
+#: pages/128x64x1/pagelist.h:91 pages/320x240x16/pagelist.h:78
+msgid "Welcome"
+msgstr "Bine ați venit"
+
+#: pages/128x64x1/range_page.c:46 pages/320x240x16/range_page.c:40
+msgid "No range test possible."
+msgstr ""
+
+#: pages/128x64x1/range_page.c:51 pages/320x240x16/range_page.c:49
+msgid "Power reduced to"
+msgstr ""
+
+#: pages/128x64x1/range_page.c:52 pages/320x240x16/range_page.c:50
+msgid "from"
+msgstr ""
+
+#: pages/128x64x1/range_page.c:53
+msgid "Press ENT to stop test."
+msgstr ""
+
+#: pages/128x64x1/range_page.c:56
+msgid "Press ENT to start test."
+msgstr ""
+
+#: pages/128x64x1/reorder_list.c:39
+msgid "Dn"
+msgstr "Jos"
+
+#: pages/128x64x1/reorder_list.c:40 pages/320x240x16/reorder_list.c:30
+msgid "Copy To"
+msgstr "Copiază"
+
+#: pages/128x64x1/scanner_page.c:36 pages/320x240x16/scanner_page.c:42
+msgid "Average"
+msgstr ""
+
+#: pages/128x64x1/scanner_page.c:36 pages/320x240x16/scanner_page.c:42
+msgid "Peak"
+msgstr ""
+
+#: pages/128x64x1/scanner_page.c:43
+msgid "-20dB"
+msgstr ""
+
+#: pages/128x64x1/scanner_page.c:43
+msgid "0dB"
+msgstr ""
+
+#: pages/128x64x1/set_timer_page.c:44 pages/320x240x16/rtc_config.c:135
+#: pages/320x240x16/set_timer_page.c:98
+msgid "Second"
+msgstr "Secundă"
+
+#: pages/128x64x1/set_timer_page.c:46 pages/320x240x16/rtc_config.c:136
+#: pages/320x240x16/set_timer_page.c:96
+msgid "Minute"
+msgstr "Minut"
+
+#: pages/128x64x1/set_timer_page.c:48 pages/320x240x16/rtc_config.c:137
+#: pages/320x240x16/set_timer_page.c:94
+msgid "Hour"
+msgstr "Oră"
+
+#: pages/128x64x1/set_timer_page.c:73 pages/common/_set_timer_page.c:54
+#: pages/common/_tx_configure.c:174
+msgid "Set"
+msgstr "Setează"
+
+#: pages/128x64x1/set_timer_page.c:73 pages/common/_main_config.c:130
+#: pages/common/_set_timer_page.c:52
+msgid "Add"
+msgstr "Adaugă"
+
+#: pages/128x64x1/standard/curves_page.c:111
+#: pages/320x240x16/standard/curves_page.c:125
+msgid "Mode"
+msgstr "Mod"
+
+#: pages/128x64x1/standard/gyrosense_page.c:58
+#: pages/320x240x16/standard/gyrosense_page.c:64
+#: pages/common/_model_page.c:223
+msgid "Channel"
+msgstr "Canal"
+
+#: pages/128x64x1/standard/swash_page.c:54
+#: pages/320x240x16/standard/swash_page.c:55
+msgid "PIT Mix"
+msgstr "Mix PIT"
+
+#: pages/128x64x1/standard/switchassign_page.c:42
+#: pages/320x240x16/standard/switchassign_page.c:46
+msgid "Fly mode"
+msgstr "Mod zbor"
+
+#: pages/128x64x1/standard/switchassign_page.c:45
+#: pages/128x64x1/standard/throhold_page.c:43
+#: pages/320x240x16/standard/switchassign_page.c:51
+#: pages/320x240x16/standard/throhold_page.c:49
+#: pages/common/standard/_common_standard.c:74
+msgid "Thr hold"
+msgstr "Thr hold"
+
+#: pages/128x64x1/standard/switchassign_page.c:51
+#: pages/320x240x16/standard/switchassign_page.c:59
+msgid "D/R&Exp -AIL"
+msgstr "D/R&Exp -AIL"
+
+#: pages/128x64x1/standard/switchassign_page.c:54
+#: pages/320x240x16/standard/switchassign_page.c:63
+msgid "D/R&Exp -ELE"
+msgstr "D/R&Exp - ELE"
+
+#: pages/128x64x1/standard/switchassign_page.c:58
+#: pages/320x240x16/standard/switchassign_page.c:67
+msgid "D/R&Exp -RUD"
+msgstr "D/R&Exp -RUD"
+
+#: pages/128x64x1/standard/throhold_page.c:47
+#: pages/320x240x16/standard/throhold_page.c:52
+msgid "Hold position"
+msgstr "Poziție fixă"
+
+#: pages/128x64x1/telemtest_page.c:339 telemetry/telem_devo.c:85
+#: telemetry/telem_dsm.c:193 telemetry/telem_frsky.c:81
+msgid "Temp"
+msgstr "Temp"
+
+#: pages/128x64x1/telemtest_page.c:340 telemetry/telem_crsf.c:92
+#: telemetry/telem_devo.c:79 telemetry/telem_dsm.c:192
+#: telemetry/telem_frsky.c:64 telemetry/telem_frsky.c:70
+msgid "Volt"
+msgstr "Volt"
+
+#: pages/128x64x1/telemtest_page.c:341 telemetry/telem_devo.c:81
+#: telemetry/telem_dsm.c:194 telemetry/telem_frsky.c:79
+msgid "RPM"
+msgstr "RPM"
+
+#: pages/128x64x1/telemtest_page.c:342
+msgid "GPS"
+msgstr "GPS"
+
+#: pages/128x64x1/telemtest_page.c:351
+msgid "RX"
+msgstr ""
+
+#: pages/128x64x1/telemtest_page.c:352
+msgid "TX"
+msgstr ""
+
+#: pages/128x64x1/timer_page.c:62 pages/320x240x16/timer_page.c:60
+#: pages/common/_datalog_page.c:63 pages/common/_model_page.c:298
+msgid "Reset"
+msgstr "Reset"
+
+#: pages/128x64x1/timer_page.c:68 pages/320x240x16/timer_page.c:64
+msgid "Reset sw"
+msgstr "Sw reset"
+
+#: pages/128x64x1/timer_page.c:76 pages/320x240x16/timer_page.c:69
+msgid "Start"
+msgstr "Start"
+
+#: pages/128x64x1/trim_page.c:70 pages/128x64x1/trim_page.c:103
+#: pages/320x240x16/trim_page.c:67 pages/320x240x16/trim_page.c:100
+msgid "Input"
+msgstr "Intrare"
+
+#: pages/128x64x1/trim_page.c:71
+msgid "Step"
+msgstr "Pas"
+
+#: pages/128x64x1/trim_page.c:73 pages/128x64x1/trim_page.c:111
+#: pages/320x240x16/trim_page.c:69 pages/320x240x16/trim_page.c:110
+msgid "Trim +"
+msgstr "Trim +"
+
+#: pages/128x64x1/trim_page.c:107 pages/320x240x16/trim_page.c:68
+#: pages/320x240x16/trim_page.c:107
+msgid "Trim -"
+msgstr "Trim -"
+
+#: pages/128x64x1/trim_page.c:115 pages/320x240x16/trim_page.c:70
+#: pages/320x240x16/trim_page.c:103
+msgid "Trim Step"
+msgstr "Pas trim"
+
+#: pages/128x64x1/trim_page.c:135 pages/320x240x16/main_layout.c:271
+msgid "Edit"
+msgstr "Editează"
+
+#: pages/128x64x1/tx_configure.c:94 pages/128x64x1/tx_configure.c:101
+#: pages/320x240x16/tx_configure.c:101
+msgid "Generic settings"
+msgstr "Setări generale"
+
+#: pages/128x64x1/tx_configure.c:95 pages/320x240x16/tx_configure.c:106
+msgid "Language"
+msgstr "Limbă"
+
+#: pages/128x64x1/tx_configure.c:103 pages/320x240x16/tx_configure.c:112
+msgid "Stick mode"
+msgstr "Mod"
+
+#: pages/128x64x1/tx_configure.c:107 pages/320x240x16/tx_configure.c:122
+msgid "Sticks"
+msgstr "Stick-uri"
+
+#: pages/128x64x1/tx_configure.c:112 pages/320x240x16/tx_configure.c:138
+msgid "Audio settings"
+msgstr ""
+
+#: pages/128x64x1/tx_configure.c:114
+msgid "Buzz settings"
+msgstr "Setări sunet"
+
+#: pages/128x64x1/tx_configure.c:116 pages/320x240x16/tx_configure.c:156
+msgid "Buzz volume"
+msgstr "Volum"
+
+#: pages/128x64x1/tx_configure.c:121 pages/320x240x16/tx_configure.c:161
+msgid "Audio volume"
+msgstr ""
+
+#: pages/128x64x1/tx_configure.c:126
+msgid "Vibration"
+msgstr "Vibrație"
+
+#: pages/128x64x1/tx_configure.c:130
+msgid "Batt alarm"
+msgstr "Alarmă bat."
+
+#: pages/128x64x1/tx_configure.c:134
+msgid "Alarm intvl"
+msgstr "Int. alarmă"
+
+#: pages/128x64x1/tx_configure.c:138
+msgid "PwrOn alarm"
+msgstr "Ton pornire"
+
+#: pages/128x64x1/tx_configure.c:142
+msgid "PwrDn alert"
+msgstr "Alertă opr."
+
+#: pages/128x64x1/tx_configure.c:147 pages/128x64x1/tx_configure.c:154
+#: pages/320x240x16/tx_configure.c:174
+msgid "LCD settings"
+msgstr "Setări ecran"
+
+#: pages/128x64x1/tx_configure.c:148 pages/320x240x16/tx_configure.c:177
+msgid "Backlight"
+msgstr "Iluminare"
+
+#: pages/128x64x1/tx_configure.c:160 pages/320x240x16/tx_configure.c:181
+msgid "Dimmer time"
+msgstr "Timp auto"
+
+#: pages/128x64x1/tx_configure.c:164 pages/320x240x16/tx_configure.c:185
+msgid "Dimmer target"
+msgstr "Nivel auto"
+
+#: pages/128x64x1/tx_configure.c:168 pages/320x240x16/tx_configure.c:192
+msgid "Timer settings"
+msgstr "Setări crono"
+
+#: pages/128x64x1/tx_configure.c:169 pages/320x240x16/tx_configure.c:195
+msgid "Prealert time"
+msgstr "Prealertă"
+
+#: pages/128x64x1/tx_configure.c:173
+msgid "Prealert intvl"
+msgstr "Interval"
+
+#: pages/128x64x1/tx_configure.c:177
+msgid "Timeup intvl"
+msgstr "Expirare"
+
+#: pages/128x64x1/tx_configure.c:181 pages/320x240x16/tx_configure.c:209
+msgid "Telemetry settings"
+msgstr "Setări telemetrie"
+
+#: pages/128x64x1/tx_configure.c:182 pages/320x240x16/tx_configure.c:212
+msgid "Temperature"
+msgstr "Temperatură"
+
+#: pages/128x64x1/tx_configure.c:186 pages/320x240x16/tx_configure.c:216
+msgid "Length"
+msgstr "Distanță"
+
+#: pages/128x64x1/tx_configure.c:190
+msgid "Alert intvl"
+msgstr ""
+
+#: pages/128x64x1/tx_configure.c:216
+msgid "Configure"
+msgstr "Configurează"
+
+#: pages/128x64x1/usb_page.c:38
+msgid ""
+"Press ENT to turn \n"
+"USB drive"
+msgstr ""
+"Apasă ENT pentru a seta\n"
+"modul USB"
+
+#: pages/128x64x1/voiceconfig_page.c:61 pages/320x240x16/voiceconfig_page.c:51
+msgid ""
+"External voice\n"
+"currently not\n"
+"available"
+msgstr ""
+
+#: pages/320x240x16/advanced/mixer_setup.c:101
+#: pages/320x240x16/advanced/mixer_setup.c:104
+#: pages/common/advanced/_mixer_setup.c:484
+msgid "Linked"
+msgstr "Legat"
+
+#: pages/320x240x16/datalog_page.c:146
+msgid "Sample Rate"
+msgstr "Rată eșantion"
 
 #: pages/320x240x16/dialogs.c:63
 msgid ""
@@ -1709,83 +1358,26 @@ msgstr "Mixer standard"
 msgid "Reset Permanent Timer?"
 msgstr "Reset Timer Permanent?"
 
-#: pages/320x240x16/dialogs.c:151 pages/128x64x1/dialogs.c:178
-msgid "Missing Modules:\n"
-msgstr ""
-
 #: pages/320x240x16/dialogs.c:157
 msgid "Module Error"
 msgstr ""
 
-#: pages/320x240x16/rtc_config.c:137
-msgid "Day"
-msgstr "Zi"
+#: pages/320x240x16/main_layout.c:235 pages/320x240x16/main_layout.c:335
+msgid "Page Config"
+msgstr "Config pagină"
 
-#: pages/320x240x16/rtc_config.c:138
-msgid "Month"
-msgstr "Lună"
+#: pages/320x240x16/main_layout.c:240
+msgid "Type"
+msgstr "Tip"
 
-#: pages/320x240x16/rtc_config.c:139
-msgid "Year"
-msgstr "An"
+#: pages/320x240x16/main_layout.c:254
+msgid "Template"
+msgstr "Șablon"
 
-#: pages/320x240x16/rtc_config.c:156
-msgid "Set time"
-msgstr "Setează oră"
-
-#: pages/320x240x16/rtc_config.c:157
-msgid "Set date"
-msgstr "Setează dată"
-
-#: pages/320x240x16/rtc_config.c:158
-msgid "Time format"
-msgstr "Format oră"
-
-#: pages/320x240x16/rtc_config.c:159
-msgid "Date format"
-msgstr "Format dată"
-
-#: pages/320x240x16/rtc_config.c:160
-msgid "value to set"
-msgstr "valoare de setat"
-
-#: pages/320x240x16/reorder_list.c:28
-msgid "Move Up"
-msgstr "Mișcă în sus"
-
-#: pages/320x240x16/reorder_list.c:29
-msgid "Move Down"
-msgstr "Mișcă în jos"
-
-#: pages/320x240x16/reorder_list.c:30 pages/128x64x1/reorder_list.c:40
-msgid "Copy To"
-msgstr "Copiază"
-
-#: pages/320x240x16/reorder_list.c:31
-msgid "Insert"
-msgstr "Inserare"
-
-#: pages/320x240x16/reorder_list.c:32
-msgid "Remove"
-msgstr "Șterge"
-
-#: pages/320x240x16/reorder_list.c:33 pages/128x64x1/trim_page.c:137
-#: pages/128x64x1/reorder_list.c:94 pages/128x64x1/advanced/mixer_curves.c:62
-#: pages/128x64x1/advanced/mixer_setup.c:54
-msgid "Save"
-msgstr "Salv."
-
-#: pages/320x240x16/timer_page.c:64 pages/128x64x1/timer_page.c:68
-msgid "Reset sw"
-msgstr "Sw reset"
-
-#: pages/320x240x16/timer_page.c:69 pages/128x64x1/timer_page.c:76
-msgid "Start"
-msgstr "Start"
-
-#: pages/320x240x16/timer_page.c:156
-msgid "Date / Time"
-msgstr "Dată / Oră"
+#: pages/320x240x16/main_layout.c:290 pages/common/_main_config.c:91
+#: pages/common/_main_layout.c:49
+msgid "Model"
+msgstr "Model"
 
 #: pages/320x240x16/model_loadsave.c:92
 msgid "Load Model"
@@ -1807,47 +1399,113 @@ msgstr ""
 msgid "Load Layout"
 msgstr ""
 
-#: pages/320x240x16/standard/drexp_page.c:59
-#: pages/320x240x16/advanced/mixer_setup.c:59
-#: pages/320x240x16/advanced/mixer_setup.c:84
-#: pages/320x240x16/advanced/mixer_setup.c:151
-#: pages/128x64x1/advanced/mixer_setup.c:78
-#: pages/128x64x1/advanced/mixer_setup.c:157
-#: pages/128x64x1/advanced/mixer_setup.c:265
-msgid "Src"
-msgstr "Sursă"
+#: pages/320x240x16/model_page.c:86
+msgid "Protocol"
+msgstr "Protocol"
 
-#: pages/320x240x16/standard/throhold_page.c:52
-#: pages/128x64x1/standard/throhold_page.c:45
-msgid "Hold position"
-msgstr "Poziție fixă"
+#: pages/320x240x16/pagelist.h:24
+msgid "Real Time Clock"
+msgstr "Ceas timp real"
 
-#: pages/320x240x16/standard/switchassign_page.c:46
-#: pages/128x64x1/standard/switchassign_page.c:42
-msgid "Fly mode"
-msgstr "Mod zbor"
+#: pages/320x240x16/pagelist.h:27
+msgid "Touch Test"
+msgstr "Test tactil"
 
-#: pages/320x240x16/standard/switchassign_page.c:56
-#: pages/320x240x16/pagelist.h:50
-#: pages/128x64x1/standard/switchassign_page.c:48
-#: pages/128x64x1/standard/gyrosense_page.c:54 pages/128x64x1/pagelist.h:52
-msgid "Gyro sense"
-msgstr "Sens giro"
+#: pages/320x240x16/pagelist.h:71
+msgid "Input monitor"
+msgstr "Monitor intrări"
 
-#: pages/320x240x16/standard/switchassign_page.c:59
-#: pages/128x64x1/standard/switchassign_page.c:51
-msgid "D/R&Exp -AIL"
-msgstr "D/R&Exp -AIL"
+#: pages/320x240x16/pagelist.h:72
+msgid "Button monitor"
+msgstr "Monitor butoane"
 
-#: pages/320x240x16/standard/switchassign_page.c:63
-#: pages/128x64x1/standard/switchassign_page.c:54
-msgid "D/R&Exp -ELE"
-msgstr "D/R&Exp - ELE"
+#: pages/320x240x16/pagelist.h:84
+msgid "Select Language"
+msgstr ""
 
-#: pages/320x240x16/standard/switchassign_page.c:67
-#: pages/128x64x1/standard/switchassign_page.c:58
-msgid "D/R&Exp -RUD"
-msgstr "D/R&Exp -RUD"
+#: pages/320x240x16/range_page.c:31
+msgid "Stop test"
+msgstr ""
+
+#: pages/320x240x16/range_page.c:31
+msgid "Start test"
+msgstr ""
+
+#: pages/320x240x16/reorder_list.c:28
+msgid "Move Up"
+msgstr "Mișcă în sus"
+
+#: pages/320x240x16/reorder_list.c:29
+msgid "Move Down"
+msgstr "Mișcă în jos"
+
+#: pages/320x240x16/reorder_list.c:31
+msgid "Insert"
+msgstr "Inserare"
+
+#: pages/320x240x16/reorder_list.c:32
+msgid "Remove"
+msgstr "Șterge"
+
+#: pages/320x240x16/rtc_config.c:138
+msgid "Day"
+msgstr "Zi"
+
+#: pages/320x240x16/rtc_config.c:139
+msgid "Month"
+msgstr "Lună"
+
+#: pages/320x240x16/rtc_config.c:140
+msgid "Year"
+msgstr "An"
+
+#: pages/320x240x16/rtc_config.c:157
+msgid "Set time"
+msgstr "Setează oră"
+
+#: pages/320x240x16/rtc_config.c:158
+msgid "Set date"
+msgstr "Setează dată"
+
+#: pages/320x240x16/rtc_config.c:159
+msgid "Time format"
+msgstr "Format oră"
+
+#: pages/320x240x16/rtc_config.c:160
+msgid "Date format"
+msgstr "Format dată"
+
+#: pages/320x240x16/rtc_config.c:161
+msgid "value to set"
+msgstr "valoare de setat"
+
+#: pages/320x240x16/rtc_config.c:162 pages/320x240x16/set_timer_page.c:106
+msgid "resulting value"
+msgstr "valoare"
+
+#: pages/320x240x16/scanner_page.c:35
+msgid "Turn Off"
+msgstr "Oprește"
+
+#: pages/320x240x16/scanner_page.c:35
+msgid "Turn On"
+msgstr "Pornește"
+
+#: pages/320x240x16/scanner_page.c:49
+msgid "Att.: -20dB"
+msgstr ""
+
+#: pages/320x240x16/scanner_page.c:49
+msgid "Att.: 0dB"
+msgstr ""
+
+#: pages/320x240x16/set_timer_page.c:86
+msgid "actual value"
+msgstr "valoare reală"
+
+#: pages/320x240x16/set_timer_page.c:90
+msgid "value to add or set"
+msgstr "valoare de adăugat sau setat"
 
 #: pages/320x240x16/standard/curves_page.c:28
 msgid "L"
@@ -1869,312 +1527,87 @@ msgstr "Manual"
 msgid "Auto"
 msgstr "Auto"
 
-#: pages/320x240x16/standard/curves_page.c:125
-#: pages/128x64x1/standard/curves_page.c:110
-msgid "Mode"
-msgstr "Mod"
+#: pages/320x240x16/standard/curves_page.c:127 protocol/frskyx_cc2500.c:47
+msgid "Enabled"
+msgstr "Activat"
 
-#: pages/320x240x16/standard/swash_page.c:55
-#: pages/128x64x1/standard/swash_page.c:53
-msgid "PIT Mix"
-msgstr "Mix PIT"
+#: pages/320x240x16/timer_page.c:156
+msgid "Date / Time"
+msgstr "Dată / Oră"
 
-#: pages/320x240x16/voiceconfig_page.c:52 pages/128x64x1/voiceconfig_page.c:60
-msgid ""
-"External voice\n"
-"currently not\n"
-"available"
+#: pages/320x240x16/toggle_select.c:116
+msgid "Pos 0"
+msgstr "Pos 0"
+
+#: pages/320x240x16/toggle_select.c:121
+msgid "Pos 1"
+msgstr "Pos 1"
+
+#: pages/320x240x16/toggle_select.c:126
+msgid "Pos 2"
+msgstr "Pos 2"
+
+#: pages/320x240x16/trim_page.c:86 pages/common/advanced/_mixer_setup.c:152
+#: pages/common/_main_config.c:178
+msgid "Trim"
+msgstr "Trim"
+
+#: pages/320x240x16/tx_configure.c:117
+msgid "Touch screen"
+msgstr "Ecran tactil"
+
+#: pages/320x240x16/tx_configure.c:127 rtc.c:303
+msgid "Clock"
+msgstr "Ceas"
+
+#: pages/320x240x16/tx_configure.c:140
+msgid "Buzzer settings"
+msgstr "Setări sunet"
+
+#: pages/320x240x16/tx_configure.c:144
+msgid "Power On alarm"
+msgstr "Ton pornire"
+
+#: pages/320x240x16/tx_configure.c:148
+msgid "Battery alarm"
+msgstr "Alarmă baterie"
+
+#: pages/320x240x16/tx_configure.c:152
+msgid "Alarm interval"
+msgstr "Int. alarmă"
+
+#: pages/320x240x16/tx_configure.c:166
+msgid "Power-down alert"
+msgstr "Ton oprire"
+
+#: pages/320x240x16/tx_configure.c:199
+msgid "Prealert interval"
+msgstr "Interval"
+
+#: pages/320x240x16/tx_configure.c:204
+msgid "Timeup interval"
+msgstr "Expirare"
+
+#: pages/320x240x16/tx_configure.c:220
+msgid "Alert interval"
 msgstr ""
 
-#: pages/320x240x16/datalog_page.c:61 pages/128x64x1/datalog_page.c:135
+#: pages/320x240x16/tx_configure.c:227
+msgid "Vibration settings"
+msgstr ""
+
+#: pages/320x240x16/tx_configure.c:229
+msgid "Vibration:"
+msgstr ""
+
+#: pages/320x240x16/tx_configure.c:263
 #, c-format
-msgid "%d bytes left"
-msgstr "%d octeți liberi"
-
-#: pages/320x240x16/datalog_page.c:92 pages/128x64x1/datalog_page.c:79
-msgid "All"
-msgstr "Toate"
-
-#: pages/320x240x16/datalog_page.c:139 pages/128x64x1/datalog_page.c:96
-msgid "Enable"
-msgstr "Activează"
-
-#: pages/320x240x16/datalog_page.c:146
-msgid "Sample Rate"
-msgstr "Rată eșantion"
-
-#: pages/320x240x16/datalog_page.c:152 pages/128x64x1/datalog_page.c:105
-msgid "Select"
-msgstr "Selectează"
-
-#: pages/320x240x16/main_layout.c:235 pages/320x240x16/main_layout.c:335
-msgid "Page Config"
-msgstr "Config pagină"
-
-#: pages/320x240x16/main_layout.c:240
-msgid "Type"
-msgstr "Tip"
-
-#: pages/320x240x16/main_layout.c:254
-msgid "Template"
-msgstr "Șablon"
-
-#: pages/320x240x16/main_layout.c:271 pages/128x64x1/trim_page.c:135
-msgid "Edit"
-msgstr "Editează"
-
-#: pages/320x240x16/main_layout.c:271 pages/128x64x1/main_config.c:134
-msgid "Delete"
-msgstr "Șterge"
-
-#: pages/320x240x16/advanced/mixer_limits.c:33 pages/320x240x16/pagelist.h:43
-#: pages/128x64x1/standard/reverse_page.c:26
-#: pages/128x64x1/advanced/mixer_limits.c:63 pages/128x64x1/pagelist.h:45
-msgid "Reverse"
-msgstr "Invers"
-
-#: pages/320x240x16/advanced/mixer_limits.c:37 pages/320x240x16/pagelist.h:52
-#: pages/128x64x1/standard/failsafe_page.c:26
-#: pages/128x64x1/advanced/mixer_limits.c:67 pages/128x64x1/pagelist.h:54
-msgid "Fail-safe"
-msgstr "Fail-safe"
-
-#: pages/320x240x16/advanced/mixer_limits.c:45
-#: pages/128x64x1/advanced/mixer_limits.c:75
-msgid "Safe Val"
-msgstr "Valoare sig."
-
-#: pages/320x240x16/advanced/mixer_limits.c:49
-#: pages/128x64x1/advanced/mixer_limits.c:79
-msgid "Min Limit"
-msgstr "Limită min"
-
-#: pages/320x240x16/advanced/mixer_limits.c:53
-#: pages/128x64x1/advanced/mixer_limits.c:83
-msgid "Max Limit"
-msgstr "Limită max"
-
-#: pages/320x240x16/advanced/mixer_limits.c:64 pages/320x240x16/pagelist.h:45
-#: pages/128x64x1/standard/subtrim_page.c:25
-#: pages/128x64x1/advanced/mixer_limits.c:95 pages/128x64x1/pagelist.h:47
-msgid "Subtrim"
-msgstr "Subtrim"
-
-#: pages/320x240x16/advanced/mixer_curves.c:41
-#: pages/128x64x1/advanced/mixer_curves.c:71
-msgid "Smooth"
-msgstr "Smooth"
-
-#: pages/320x240x16/advanced/mixer_curves.c:44
-#: pages/128x64x1/advanced/mixer_curves.c:74
-msgid "Point"
-msgstr "Punct"
-
-#: pages/320x240x16/advanced/mixer_curves.c:47
-#: pages/128x64x1/advanced/mixer_curves.c:77
-msgid "Pos/Neg"
-msgstr "Poz/Neg"
-
-#: pages/320x240x16/advanced/mixer_setup.c:63
-#: pages/320x240x16/advanced/mixer_setup.c:155
-#: pages/128x64x1/advanced/mixer_setup.c:82
-#: pages/128x64x1/advanced/mixer_setup.c:161
-msgid "Curve"
-msgstr "Curbă"
-
-#: pages/320x240x16/advanced/mixer_setup.c:76
-#: pages/320x240x16/advanced/mixer_setup.c:161
-#: pages/128x64x1/advanced/mixer_setup.c:90
-#: pages/128x64x1/advanced/mixer_setup.c:169
-msgid "Offset"
-msgstr "Offset"
-
-#: pages/320x240x16/advanced/mixer_setup.c:85
-#: pages/128x64x1/advanced/mixer_setup.c:279
-msgid "Switch1"
-msgstr "Act1"
-
-#: pages/320x240x16/advanced/mixer_setup.c:86
-#: pages/128x64x1/advanced/mixer_setup.c:279
-msgid "Switch2"
-msgstr "Act2"
-
-#: pages/320x240x16/advanced/mixer_setup.c:95
-#: pages/128x64x1/advanced/mixer_setup.c:269
-msgid "High-Rate"
-msgstr "Pos0"
-
-#: pages/320x240x16/advanced/mixer_setup.c:135
-#: pages/128x64x1/advanced/mixer_setup.c:141
-msgid "Mixers"
-msgstr "Mixere"
-
-#: pages/320x240x16/advanced/mixer_setup.c:137
-#: pages/128x64x1/advanced/mixer_setup.c:145
-msgid "Page"
-msgstr "Pagină"
-
-#: pages/320x240x16/advanced/mixer_setup.c:148
-#: pages/128x64x1/advanced/mixer_setup.c:153
-msgid "Mux"
-msgstr "Mux"
-
-#: pages/320x240x16/pagelist.h:18 pages/128x64x1/pagelist.h:20
-msgid "Main page"
-msgstr "Pagina principală"
-
-#: pages/320x240x16/pagelist.h:19 pages/128x64x1/pagelist.h:21
-msgid "Main menu"
-msgstr "Meniu principal"
-
-#: pages/320x240x16/pagelist.h:21 pages/128x64x1/pagelist.h:24
-msgid "Set permanent timer"
-msgstr "Setează timer permanent"
-
-#: pages/320x240x16/pagelist.h:24
-msgid "Real Time Clock"
-msgstr "Ceas timp real"
-
-#: pages/320x240x16/pagelist.h:27
-msgid "Touch Test"
-msgstr "Test tactil"
-
-#: pages/320x240x16/pagelist.h:31 pages/128x64x1/pagelist.h:32
-msgid "Model menu"
-msgstr "Meniu model"
-
-#: pages/320x240x16/pagelist.h:32 pages/128x64x1/pagelist.h:33
-msgid "Transmitter menu"
-msgstr "Meniu radio"
-
-#: pages/320x240x16/pagelist.h:33 pages/128x64x1/pagelist.h:34
-#: pages/128x64x1/usb_page.c:35
-msgid "USB"
-msgstr "USB"
-
-#: pages/320x240x16/pagelist.h:35 pages/128x64x1/pagelist.h:36
-msgid "Debuglog"
-msgstr ""
-
-#: pages/320x240x16/pagelist.h:40 pages/128x64x1/model_page.c:155
-#: pages/128x64x1/pagelist.h:42
-msgid "Model setup"
-msgstr "Profil model"
-
-#: pages/320x240x16/pagelist.h:44 pages/128x64x1/pagelist.h:46
-msgid "D/R & Exp"
-msgstr "DR și Expo"
-
-#: pages/320x240x16/pagelist.h:46 pages/128x64x1/pagelist.h:48
-msgid "Travel adjust"
-msgstr "Ajustare curse"
-
-#: pages/320x240x16/pagelist.h:47 pages/128x64x1/pagelist.h:49
-msgid "Throttle curves"
-msgstr "Curba putere"
-
-#: pages/320x240x16/pagelist.h:48 pages/128x64x1/pagelist.h:50
-msgid "Pitch curves"
-msgstr "Curbe pitch"
-
-#: pages/320x240x16/pagelist.h:49 pages/128x64x1/standard/throhold_page.c:38
-#: pages/128x64x1/pagelist.h:51
-msgid "Throttle hold"
-msgstr "Throttle hold"
-
-#: pages/320x240x16/pagelist.h:51 pages/128x64x1/pagelist.h:53
-msgid "Swash"
-msgstr "Platou"
-
-#: pages/320x240x16/pagelist.h:53 pages/128x64x1/pagelist.h:55
-msgid "Switch assignment"
-msgstr "Asignare act."
-
-#: pages/320x240x16/pagelist.h:55 pages/128x64x1/pagelist.h:57
-msgid "Timers"
-msgstr "Timere"
-
-#: pages/320x240x16/pagelist.h:56 pages/128x64x1/telemconfig_page.c:83
-#: pages/128x64x1/pagelist.h:59
-msgid "Telemetry config"
-msgstr "Telemetrie"
-
-#: pages/320x240x16/pagelist.h:57 pages/128x64x1/pagelist.h:61
-msgid "Trims"
-msgstr "Trim-uri"
-
-#: pages/320x240x16/pagelist.h:59 pages/128x64x1/pagelist.h:63
-msgid "Datalog"
-msgstr "Log date"
-
-#: pages/320x240x16/pagelist.h:61 pages/128x64x1/pagelist.h:65
-msgid "Main page config"
-msgstr "Ecran principal"
-
-#: pages/320x240x16/pagelist.h:63 pages/128x64x1/pagelist.h:67
-msgid "Voice config"
-msgstr ""
-
-#: pages/320x240x16/pagelist.h:67 pages/128x64x1/pagelist.h:72
-msgid "Transmitter config"
-msgstr "Configurare radio"
-
-#: pages/320x240x16/pagelist.h:68 pages/128x64x1/pagelist.h:73
-msgid "Channel monitor"
-msgstr "Monitor canale"
-
-#: pages/320x240x16/pagelist.h:69 pages/128x64x1/telemtest_page.c:412
-#: pages/128x64x1/pagelist.h:75
-msgid "Telemetry monitor"
-msgstr "Monitor telemetrie"
-
-#: pages/320x240x16/pagelist.h:70 pages/128x64x1/pagelist.h:77
-msgid "Range Test"
-msgstr ""
-
-#: pages/320x240x16/pagelist.h:71
-msgid "Input monitor"
-msgstr "Monitor intrări"
-
-#: pages/320x240x16/pagelist.h:72
-msgid "Button monitor"
-msgstr "Monitor butoane"
-
-#: pages/320x240x16/pagelist.h:74 pages/128x64x1/pagelist.h:79
-msgid "Scanner"
-msgstr "Scaner"
-
-#: pages/320x240x16/pagelist.h:78 pages/128x64x1/pagelist.h:91
-msgid "Welcome"
-msgstr "Bine ați venit"
-
-#: pages/320x240x16/pagelist.h:84
-msgid "Select Language"
-msgstr ""
-
-#: pages/320x240x16/range_page.c:31
-msgid "Stop test"
-msgstr ""
-
-#: pages/320x240x16/range_page.c:31
-msgid "Start test"
-msgstr ""
-
-#: pages/320x240x16/range_page.c:40 pages/128x64x1/range_page.c:46
-msgid "No range test possible."
-msgstr ""
-
-#: pages/320x240x16/range_page.c:49 pages/128x64x1/range_page.c:51
-msgid "Power reduced to"
-msgstr ""
-
-#: pages/320x240x16/range_page.c:50 pages/128x64x1/range_page.c:52
-msgid "from"
-msgstr ""
-
-#: pages/320x240x16/usb_page.c:38 pages/128x64x1/about_page.c:38
-msgid "Deviation FW version:"
-msgstr "Deviation fw. versiune:"
+msgid "Touch target %d"
+msgstr "Atinge punctul %d"
+
+#: pages/320x240x16/tx_configure.c:286
+msgid "Touch Calibrate"
+msgstr "Calibrare ecran"
 
 #: pages/320x240x16/usb_page.c:39
 msgid "USB Filesystem is currently "
@@ -2186,229 +1619,836 @@ msgstr ""
 "\n"
 "Apasă ENT pentru a seta modul USB"
 
-#: pages/128x64x1/scanner_page.c:43
-msgid "-20dB"
+#: pages/common/advanced/_mixer_curves.c:137
+msgid "Symmetric"
+msgstr "Simetric."
+
+#: pages/common/advanced/_mixer_curves.c:138
+msgid "Pos"
+msgstr "Poz."
+
+#: pages/common/advanced/_mixer_curves.c:139
+msgid "Neg"
+msgstr "Neg."
+
+#: pages/common/advanced/_mixer_curves.c:157 protocol/dsm2_cyrf6936.c:50
+#: protocol/esky150_nrf24l01.c:150 protocol/kn_nrf24l01.c:169
+#: protocol/kn_nrf24l01.c:170 protocol/v202_nrf24l01.c:128
+#: protocol/v202_nrf24l01.c:129 protocol/v202_nrf24l01.c:131
+#: protocol/yd717_nrf24l01.c:109
+msgid "Yes"
+msgstr "Da"
+
+#: pages/common/advanced/_mixer_curves.c:157 protocol/dsm2_cyrf6936.c:50
+#: protocol/esky150_nrf24l01.c:150 protocol/kn_nrf24l01.c:169
+#: protocol/kn_nrf24l01.c:170 protocol/v202_nrf24l01.c:128
+#: protocol/v202_nrf24l01.c:129 protocol/v202_nrf24l01.c:131
+#: protocol/yd717_nrf24l01.c:109
+msgid "No"
+msgstr "Nu"
+
+#: pages/common/advanced/_mixer_limits.c:133
+#: pages/common/advanced/_mixer_setup.c:596
+#, c-format
+msgid "Scale%s"
+msgstr "Scară%s"
+
+#: pages/common/advanced/_mixer_limits.c:208
+#: pages/common/standard/_reverse_page.c:28
+msgid "Reversed"
+msgstr "Inversat"
+
+#: pages/common/advanced/_mixer_limits.c:208 pages/common/_model_config.c:36
+#: pages/common/standard/_common_standard.c:67
+#: pages/common/standard/_reverse_page.c:28 protocol/wk2x01.c:80
+msgid "Normal"
+msgstr "Normal"
+
+#: pages/common/advanced/_mixer_page.c:63
+#: pages/common/advanced/_mixer_page.c:64
+#: pages/common/advanced/_mixer_page.c:65
+msgid "CYC"
+msgstr "CYC"
+
+#: pages/common/advanced/_mixer_page.c:65
+msgid "COL"
+msgstr "Colectiv"
+
+#: pages/common/advanced/_mixer_setup.c:152
+msgid "No Trim"
+msgstr "nimic"
+
+#: pages/common/advanced/_mixer_setup.c:188
+msgid "Mid-Rate"
+msgstr "Pos1"
+
+#: pages/common/advanced/_mixer_setup.c:188
+msgid "Low-Rate"
+msgstr "Pos2"
+
+#: pages/common/advanced/_mixer_setup.c:341
+msgid "replace"
+msgstr "înloc."
+
+#: pages/common/advanced/_mixer_setup.c:342
+msgid "mult"
+msgstr "mult."
+
+#: pages/common/advanced/_mixer_setup.c:343
+msgid "add"
+msgstr "aditiv"
+
+#: pages/common/advanced/_mixer_setup.c:344
+msgid "max"
+msgstr "max"
+
+#: pages/common/advanced/_mixer_setup.c:345
+msgid "min"
+msgstr "min"
+
+#: pages/common/advanced/_mixer_setup.c:346
+msgid "delay"
+msgstr "delay"
+
+#: pages/common/advanced/_mixer_setup.c:348
+msgid "beep"
 msgstr ""
 
-#: pages/128x64x1/scanner_page.c:43
-msgid "0dB"
+#: pages/common/advanced/_mixer_setup.c:349
+msgid "voice"
 msgstr ""
 
-#: pages/128x64x1/chantest_page.c:111
-msgid "Stick input"
-msgstr "Intrări"
+#: pages/common/advanced/_mixer_setup.c:531
+msgid "New"
+msgstr "Now"
 
-#: pages/128x64x1/chantest_page.c:111
-msgid "Mixer output"
+#: pages/common/_chantest_page.c:36
+msgid "Touch to Unlock"
+msgstr "Apasă pentru a descuia"
+
+#: pages/common/_chantest_page.c:38
+msgid "Touch to Lock"
+msgstr "Apasă pentru a încuia"
+
+#: pages/common/_dialogs.c:78
+#, c-format
+msgid " is %d%%, safe value = %d%%\n"
+msgstr " = %d%%, valoare de siguranță = %d%%\n"
+
+#: pages/common/_dialogs.c:80
+#, c-format
+msgid ""
+" is %d%%,\n"
+"safe value = %d%%"
 msgstr ""
+" = %d%%,\n"
+"valoare sigur=%d%%\n"
 
-#: pages/128x64x1/trim_page.c:71
-msgid "Step"
-msgstr "Pas"
+#: pages/common/_dialogs.c:131
+#, c-format
+msgid ""
+"Do you really want\n"
+"to reset the\n"
+" permanent timer %d?"
+msgstr ""
+"Sigur doriți să\\resetați\n"
+"timerul permanent %d?"
 
-#: pages/128x64x1/main_config.c:60
-msgid "Layout: Long-Press ENT"
-msgstr "Aranjament: ENT lung"
+#: pages/common/_main_config.c:85
+msgid "Small-box"
+msgstr "Box mic"
 
-#: pages/128x64x1/main_config.c:86
-msgid "Trimbar"
-msgstr "Bară trim"
+#: pages/common/_main_config.c:86
+msgid "Big-box"
+msgstr "Box mare"
 
-#: pages/128x64x1/main_config.c:90
-msgid "Box"
-msgstr "Box"
-
-#: pages/128x64x1/main_config.c:93
-msgid "Bar"
+#: pages/common/_main_config.c:88
+msgid "Bargraph"
 msgstr "Bară"
 
-#: pages/128x64x1/tx_configure.c:114
-msgid "Buzz settings"
-msgstr "Setări sunet"
+#: pages/common/_main_config.c:89
+msgid "V-trim"
+msgstr "V-Trim"
 
-#: pages/128x64x1/tx_configure.c:126
-msgid "Vibration"
-msgstr "Vibrație"
+#: pages/common/_main_config.c:90
+msgid "H-trim"
+msgstr "H-Trim"
 
-#: pages/128x64x1/tx_configure.c:130
-msgid "Batt alarm"
-msgstr "Alarmă bat."
-
-#: pages/128x64x1/tx_configure.c:134
-msgid "Alarm intvl"
-msgstr "Int. alarmă"
-
-#: pages/128x64x1/tx_configure.c:138
-msgid "PwrOn alarm"
-msgstr "Ton pornire"
-
-#: pages/128x64x1/tx_configure.c:142
-msgid "PwrDn alert"
-msgstr "Alertă opr."
-
-#: pages/128x64x1/tx_configure.c:156 pages/128x64x1/model_config.c:187
-msgid "Contrast"
-msgstr "Contrast"
-
-#: pages/128x64x1/tx_configure.c:173
-msgid "Prealert intvl"
-msgstr "Interval"
-
-#: pages/128x64x1/tx_configure.c:177
-msgid "Timeup intvl"
-msgstr "Expirare"
-
-#: pages/128x64x1/tx_configure.c:190
-msgid "Alert intvl"
+#: pages/common/_main_config.c:92
+msgid "Battery"
 msgstr ""
 
-#: pages/128x64x1/tx_configure.c:215
-msgid "Configure"
-msgstr "Configurează"
-
-#: pages/128x64x1/model_page.c:39
-msgid "Plane"
-msgstr "Avion"
-
-#: pages/128x64x1/model_page.c:40
-msgid "Multi"
+#: pages/common/_main_config.c:93
+msgid "TxPower"
 msgstr ""
 
-#: pages/128x64x1/model_page.c:110 pages/128x64x1/model_config.c:205
-msgid "Video"
-msgstr ""
+#: pages/common/_main_config.c:130
+msgid "Load"
+msgstr "Încarcă"
 
-#: pages/128x64x1/model_page.c:111
-msgid "Setup"
-msgstr ""
+#: pages/common/_main_config.c:234
+msgid "Menu"
+msgstr "Meniu"
 
-#: pages/128x64x1/model_config.c:179
-msgid "Video Enable"
-msgstr ""
+#: pages/common/_model_config.c:37 protocol/wk2x01.c:80
+msgid "Inverted"
+msgstr "Inversat"
 
-#: pages/128x64x1/model_config.c:183
-msgid "Video Channel"
-msgstr ""
-
-#: pages/128x64x1/model_config.c:191
-msgid "Brightness"
-msgstr ""
-
-#: pages/128x64x1/dialogs.c:82
+#: pages/common/_model_config.c:133
 #, c-format
-msgid ""
-"Binding %s...\n"
-"Press ENT to stop"
-msgstr ""
-"Conectare %s...\n"
-"Apăsați ENT pentru a opri"
+msgid "Ch%d"
+msgstr "Can%d"
 
-#: pages/128x64x1/dialogs.c:85
+#: pages/common/_model_config.c:186
 #, c-format
+msgid "PPM%d"
+msgstr "PPM%d"
+
+#: pages/common/_model_page.c:83
+msgid "Re-Init"
+msgstr "Re-init"
+
+#: pages/common/_model_page.c:83
+msgid "Bind"
+msgstr "Bind"
+
+#: pages/common/_model_page.c:225
+msgid "Stick"
+msgstr "Stick"
+
+#: pages/common/_model_page.c:227
+msgid "Extend"
+msgstr "Extinde"
+
+#: pages/common/_model_page.c:292
+msgid "Load..."
+msgstr "Încarcă..."
+
+#: pages/common/_model_page.c:294
+msgid "Copy To..."
+msgstr "Copiază..."
+
+#: pages/common/_model_page.c:296
+msgid "Template.."
+msgstr "Șablon..."
+
+#: pages/common/_pages.c:110 pages/common/_pages.c:117
+#: protocol/bayang_nrf24l01.c:100 protocol/cflie_nrf24l01.c:200
+#: protocol/devo_cyrf6936.c:54 protocol/dsm2_cyrf6936.c:49
+#: protocol/frsky2way_cc2500.c:40 protocol/hubsan_a7105.c:126
+#: protocol/inav_nrf24l01.c:182 protocol/yd717_nrf24l01.c:111
+msgid "Telemetry"
+msgstr "Telemetrie"
+
+#: pages/common/_pages.c:112
+msgid "is not supported"
+msgstr "nu este suportat(ă)"
+
+#: pages/common/_pages.c:119
+msgid "is turned off"
+msgstr "este oprit(ă)"
+
+#: pages/common/standard/_common_standard.c:40
+msgid "PIT"
+msgstr "PIT"
+
+#: pages/common/standard/_common_standard.c:69
+msgid "Idle Up 1"
+msgstr "Idle Up 1"
+
+#: pages/common/standard/_common_standard.c:72
+msgid "Idle Up 2"
+msgstr "Idle Up 2"
+
+#: pages/common/standard/_drexp_page.c:89
+#, c-format
+msgid "Position %d"
+msgstr "Poziția %d"
+
+#: pages/common/standard/_drexp_page.c:106
+msgid "LIN"
+msgstr "LIN"
+
+#: pages/common/standard/_swash_page.c:41
+#: pages/common/standard/_swash_page.c:44
+#: pages/common/standard/_swash_page.c:47
+#: pages/common/standard/_swash_page.c:50
+#: pages/common/standard/_swash_page.c:53
+msgid "Servo"
+msgstr "Servo"
+
+#: pages/common/_telemconfig_page.c:32
+msgid "Alarm"
+msgstr "Alarmă"
+
+#: pages/common/_timer_page.c:54
+msgid "Control"
+msgstr "Control"
+
+#: pages/common/_timer_page.c:74
+msgid "stopwatch"
+msgstr "crono"
+
+#: pages/common/_timer_page.c:75
+msgid "stop-prop"
+msgstr "stop-prop"
+
+#: pages/common/_timer_page.c:76
+msgid "countdown"
+msgstr "countdown"
+
+#: pages/common/_timer_page.c:77
+msgid "cntdn-prop"
+msgstr "cntdn-prop"
+
+#: pages/common/_timer_page.c:78
+msgid "permanent"
+msgstr "permanent"
+
+#: pages/common/_timer_page.c:138
+#, c-format
+msgid "Timer%d"
+msgstr "Timer%d"
+
+#: pages/common/_timer_page.c:192
+msgid "Set to"
+msgstr "Setează"
+
+#: pages/common/_trim_page.c:102
+msgid "Momentary"
+msgstr "Momentan"
+
+#: pages/common/_trim_page.c:108
+msgid "On/Off"
+msgstr "Pornit/Oprit"
+
+#: pages/common/_trim_page.c:111
+msgid "3 Pos"
+msgstr ""
+
+#: pages/common/_tx_configure.c:92
 msgid ""
-"\n"
-"%d seconds left"
+"Move sticks and knobs\n"
+"to max & min positions\n"
+"then press ENT"
 msgstr ""
-"\n"
-"%d secunde stânga"
+"Mută stick-urile și potențiometrele\n"
+"la MAX și MIN\n"
+"după care apasă ENT"
 
-#: pages/128x64x1/dialogs.c:132
+#: pages/common/_tx_configure.c:101
 msgid ""
-"Battery too low,\n"
-"can't save!"
+"Calibration done.\n"
+" \n"
+"Press ENT."
 msgstr ""
-"Nivel baterie scăzut,\n"
-"nu pot salva!"
 
-#: pages/128x64x1/dialogs.c:139
+#: pages/common/_tx_configure.c:123
 msgid ""
-"Model needs reset\n"
-"for standard mixer"
+"Center all \n"
+"sticks and knobs\n"
+"then press ENT"
 msgstr ""
-"Modelul trebuie să fie\n"
-" resetat pentru mixerul standard"
+"Centrați toate stickuri-le\n"
+"și potențiometrele\n"
+"și apăsați ENT"
 
-#: pages/128x64x1/dialogs.c:153
-msgid ""
-"Bad/missing\n"
-"protocol modules!"
-msgstr ""
-"Module protocol\n"
-"lipsă sau corupte!"
+#: pages/common/_tx_configure.c:166
+msgid "Calibrate"
+msgstr "Calibrare"
 
-#: pages/128x64x1/reorder_list.c:39
-msgid "Dn"
-msgstr "Jos"
+#: pages/common/_tx_configure.c:183
+#, c-format
+msgid "Mode %d"
+msgstr "Mod %d"
 
-#: pages/128x64x1/lang_select.c:44
-#: pages/128x64x1/standard/switchassign_page.c:79
-msgid "Press ENT to change"
-msgstr "Apasaă ENT pentru schimbare"
+#: pages/common/_tx_configure.c:336
+msgid "Change"
+msgstr "Modifică"
 
-#: pages/128x64x1/model_loadsave.c:69
-msgid "Press ENT to copy to"
-msgstr "Apasa ENT pentru copiere"
+#: pages/common/_tx_configure.c:362
+msgid "Fahren"
+msgstr "F°"
 
-#: pages/128x64x1/model_loadsave.c:71
-msgid "Press ENT to load"
-msgstr "Apasă ENT pentru incarcare"
+#: pages/common/_tx_configure.c:362
+msgid "Celsius"
+msgstr "C°"
 
-#: pages/128x64x1/telemtest_page.c:342
-msgid "GPS"
-msgstr "GPS"
+#: pages/common/_tx_configure.c:364
+msgid "Foot"
+msgstr "Picior"
 
-#: pages/128x64x1/telemtest_page.c:351
-msgid "RX"
-msgstr ""
+#: pages/common/_tx_configure.c:364
+msgid "Meter"
+msgstr "Metru"
 
-#: pages/128x64x1/telemtest_page.c:352
-msgid "TX"
+#: pages/common/_voiceconfig_page.c:64
+msgid "up"
 msgstr ""
 
-#: pages/128x64x1/datalog_page.c:102
-msgid "Rate"
-msgstr "Rată"
-
-#: pages/128x64x1/advanced/mixer_page.c:44
-msgid "Mixer    Reorder:Hold R+"
+#: pages/common/_voiceconfig_page.c:69
+msgid "down"
 msgstr ""
 
-#: pages/128x64x1/advanced/mixer_setup.c:86
-#: pages/128x64x1/advanced/mixer_setup.c:165
-msgid "Scale"
-msgstr "Scara"
-
-#: pages/128x64x1/pagelist.h:27
-msgid "Video setup"
+#: pages/common/_voiceconfig_page.c:74
+#, c-format
+msgid "Timer %d"
 msgstr ""
 
-#: pages/128x64x1/pagelist.h:38
-msgid "About Deviation"
-msgstr "Despre Deviation"
-
-#: pages/128x64x1/pagelist.h:86
-msgid "External OSD"
+#: pages/common/_voiceconfig_page.c:78
+#, c-format
+msgid "Telem %d"
 msgstr ""
-
-#: pages/128x64x1/range_page.c:53
-msgid "Press ENT to stop test."
-msgstr ""
-
-#: pages/128x64x1/range_page.c:56
-msgid "Press ENT to start test."
-msgstr ""
-
-#: pages/128x64x1/usb_page.c:38
-msgid ""
-"Press ENT to turn \n"
-"USB drive"
-msgstr ""
-"Apasă ENT pentru a seta\n"
-"modul USB"
 
 #: pages/text/splash_page.c:37
 msgid "Deviation"
 msgstr ""
+
+#: protocol/bayang_nrf24l01.c:101 protocol/corona_cc2500.c:41
+#: protocol/cx10_nrf24l01.c:69 protocol/fq777_nrf24l01.c:83
+#: protocol/frskyx_cc2500.c:45 protocol/fy326_nrf24l01.c:58
+#: protocol/h8_3d_nrf24l01.c:63 protocol/hisky_nrf24l01.c:73
+#: protocol/hitec_cc2500.c:62 protocol/hontai_nrf24l01.c:62
+#: protocol/hubsan_a7105.c:124 protocol/kn_nrf24l01.c:171
+#: protocol/mjxq_nrf24l01.c:60 protocol/mt99xx_nrf24l01.c:127
+#: protocol/q303_nrf24l01.c:76 protocol/slt_nrf24l01.c:85
+#: protocol/v202_nrf24l01.c:127 protocol/yd717_nrf24l01.c:108
+msgid "Format"
+msgstr ""
+
+#: protocol/bayang_nrf24l01.c:101
+msgid "regular"
+msgstr ""
+
+#: protocol/bugs3_a7105.c:244 protocol/flysky_afhds2a_a7105.c:80
+#: protocol/hubsan_a7105.c:127 protocol/joysway_a7105.c:55
+msgid "Freq Tune"
+msgstr ""
+
+#: protocol/bugs3mini_nrf24l01.c:133
+msgid "RX Id"
+msgstr ""
+
+#: protocol/cflie_nrf24l01.c:200
+msgid "ACKPKT"
+msgstr ""
+
+#: protocol/cflie_nrf24l01.c:200
+msgid "CRTPLOG"
+msgstr ""
+
+#: protocol/cflie_nrf24l01.c:201
+msgid "CRTP Mode"
+msgstr ""
+
+#: protocol/cflie_nrf24l01.c:201
+msgid "RPYT"
+msgstr ""
+
+#: protocol/cflie_nrf24l01.c:201
+msgid "CPPM"
+msgstr ""
+
+#: protocol/corona_cc2500.c:42 protocol/frsky1way_cc2500.c:40
+#: protocol/frsky2way_cc2500.c:41 protocol/frskyx_cc2500.c:44
+#: protocol/hitec_cc2500.c:63 protocol/sfhss_cc2500.c:42
+msgid "Freq-Fine"
+msgstr ""
+
+#: protocol/cx10_nrf24l01.c:69
+msgid "Green"
+msgstr ""
+
+#: protocol/cx10_nrf24l01.c:69
+msgid "Blue-A"
+msgstr ""
+
+#: protocol/devo_cyrf6936.c:54
+msgid "Std"
+msgstr ""
+
+#: protocol/devo_cyrf6936.c:54
+msgid "X350"
+msgstr ""
+
+#: protocol/dsm2_cyrf6936.c:50
+msgid "OrangeRx"
+msgstr ""
+
+#: protocol/dsm2_cyrf6936.c:52
+msgid "HighSpeed"
+msgstr ""
+
+#: protocol/dsm2_cyrf6936.c:53
+msgid "F.Log filter"
+msgstr ""
+
+#: protocol/esky150_nrf24l01.c:150 protocol/kn_nrf24l01.c:169
+#: protocol/v202_nrf24l01.c:128
+msgid "Re-bind"
+msgstr ""
+
+#: protocol/flysky_afhds2a_a7105.c:77
+msgid "Outputs"
+msgstr ""
+
+#: protocol/flysky_afhds2a_a7105.c:78
+msgid "Servo Hz"
+msgstr ""
+
+#: protocol/flysky_afhds2a_a7105.c:79
+msgid "LQI output"
+msgstr ""
+
+#: protocol/frsky1way_cc2500.c:41 protocol/frsky2way_cc2500.c:42
+#: protocol/sfhss_cc2500.c:43
+msgid "Freq-Coarse"
+msgstr ""
+
+#: protocol/frsky2way_cc2500.c:43 protocol/frskyx_cc2500.c:43
+msgid "AD2GAIN"
+msgstr ""
+
+#: protocol/frsky2way_cc2500.c:44 protocol/frskyx_cc2500.c:46
+msgid "RSSIChan"
+msgstr ""
+
+#: protocol/frskyx_cc2500.c:42 protocol/pxxout.c:48
+msgid "Failsafe"
+msgstr ""
+
+#: protocol/frskyx_cc2500.c:47
+msgid "S.PORT Out"
+msgstr ""
+
+#: protocol/frskyx_cc2500.c:47
+msgid "Disabled"
+msgstr ""
+
+#: protocol/fy326_nrf24l01.c:59
+msgid "Expert"
+msgstr ""
+
+#: protocol/hubsan_a7105.c:125
+msgid "vTX MHz"
+msgstr ""
+
+#: protocol/kn_nrf24l01.c:170
+msgid "1Mbps"
+msgstr ""
+
+#: protocol/kn_nrf24l01.c:172
+msgid "DynTrim"
+msgstr ""
+
+#: protocol/loli_nrf24l01.c:65
+msgid "Chan 1"
+msgstr ""
+
+#: protocol/loli_nrf24l01.c:66
+msgid "Chan 2"
+msgstr ""
+
+#: protocol/loli_nrf24l01.c:67
+msgid "Chan 3"
+msgstr ""
+
+#: protocol/loli_nrf24l01.c:68
+msgid "Chan 4"
+msgstr ""
+
+#: protocol/loli_nrf24l01.c:69
+msgid "Chan 5"
+msgstr ""
+
+#: protocol/loli_nrf24l01.c:70
+msgid "Chan 6"
+msgstr ""
+
+#: protocol/loli_nrf24l01.c:71
+msgid "Chan 7"
+msgstr ""
+
+#: protocol/loli_nrf24l01.c:72
+msgid "Chan 8"
+msgstr ""
+
+#: protocol/ppmout.c:41
+msgid "Notch PW"
+msgstr "Depres. PW"
+
+#: protocol/ppmout.c:42
+msgid "Frame Size"
+msgstr "Dim. pachet"
+
+#: protocol/pxxout.c:49
+msgid "Country"
+msgstr ""
+
+#: protocol/pxxout.c:50
+msgid "Rx PWM out"
+msgstr ""
+
+#: protocol/pxxout.c:51
+msgid "Rx Telem"
+msgstr ""
+
+#: protocol/sbus_uart.c:36
+msgid "Period (ms)"
+msgstr ""
+
+#: protocol/v202_nrf24l01.c:129
+msgid "250kbps"
+msgstr ""
+
+#: protocol/v202_nrf24l01.c:131
+msgid "Blink"
+msgstr ""
+
+#: protocol/wk2x01.c:79
+msgid "Chan mode"
+msgstr "Mod canale"
+
+#: protocol/wk2x01.c:79
+msgid "5+1"
+msgstr "5+1"
+
+#: protocol/wk2x01.c:79
+msgid "6+1"
+msgstr "6+1"
+
+#: protocol/wk2x01.c:81
+msgid "COL Limit"
+msgstr "COL Limită"
+
+#: protocol/yd717_nrf24l01.c:109
+msgid "USE A.ACK"
+msgstr ""
+
+#: rtc.c:303
+msgid "Date"
+msgstr "Dată"
+
+#: screen/text/lcd_gfx.c:234 screen/text/lcd_gfx.c:236
+msgid ""
+"Deviation\n"
+"   USB"
+msgstr ""
+
+#: telemetry.c:247
+msgid "Longitude"
+msgstr "Longitudine"
+
+#: telemetry.c:248
+msgid "Latitude"
+msgstr "Latitudine"
+
+#: telemetry.c:249
+msgid "Altitude"
+msgstr "Altitudine"
+
+#: telemetry.c:251
+msgid "Time"
+msgstr "Timp"
+
+#: telemetry.c:252
+msgid "SatCount"
+msgstr ""
+
+#: telemetry.c:253
+msgid "Heading"
+msgstr ""
+
+#: telemetry/telem_crsf.c:81
+msgid "tx SNR"
+msgstr ""
+
+#: telemetry/telem_crsf.c:82
+msgid "txRSSI"
+msgstr ""
+
+#: telemetry/telem_crsf.c:83
+msgid "rx SNR"
+msgstr ""
+
+#: telemetry/telem_crsf.c:86
+msgid "FMode"
+msgstr ""
+
+#: telemetry/telem_crsf.c:87
+msgid "RFMode"
+msgstr ""
+
+#: telemetry/telem_crsf.c:88
+msgid "ANT"
+msgstr ""
+
+#: telemetry/telem_crsf.c:89
+msgid "Power"
+msgstr ""
+
+#: telemetry/telem_crsf.c:90
+msgid "rxQual"
+msgstr ""
+
+#: telemetry/telem_crsf.c:91
+msgid "txQual"
+msgstr ""
+
+#: telemetry/telem_crsf.c:93
+msgid "Curr"
+msgstr ""
+
+#: telemetry/telem_crsf.c:94
+msgid "Cap"
+msgstr ""
+
+#: telemetry/telem_crsf.c:95
+msgid "Pitch"
+msgstr ""
+
+#: telemetry/telem_crsf.c:96
+msgid "Roll"
+msgstr ""
+
+#: telemetry/telem_crsf.c:97
+msgid "Yaw"
+msgstr ""
+
+#: telemetry/telem_crsf.c:106
+msgid "Flight Mode"
+msgstr ""
+
+#: telemetry/telem_crsf.c:107
+msgid "RF Mode"
+msgstr ""
+
+#: telemetry/telem_crsf.c:108
+msgid "Antenna"
+msgstr ""
+
+#: telemetry/telem_crsf.c:109
+msgid "rx Quality"
+msgstr ""
+
+#: telemetry/telem_crsf.c:110
+msgid "tx Quality"
+msgstr ""
+
+#: telemetry/telem_crsf.c:111
+msgid "Capacity"
+msgstr ""
+
+#: telemetry/telem_devo.c:55 telemetry/telem_frsky.c:101
+#: telemetry/telem_frsky.c:108
+msgid "TelemV"
+msgstr "TelemV"
+
+#: telemetry/telem_devo.c:61 telemetry/telem_frsky.c:112
+msgid "TelemT"
+msgstr "TelemT"
+
+#: telemetry/telem_devo.c:65 telemetry/telem_frsky.c:115
+msgid "TelemRPM"
+msgstr "TelemRPM"
+
+#: telemetry/telem_dsm.c:195 telemetry/telem_dsm.c:196
+#: telemetry/telem_dsm.c:197 telemetry/telem_dsm.c:198
+msgid "Fades"
+msgstr "Atenuări"
+
+#: telemetry/telem_dsm.c:199
+msgid "Loss"
+msgstr "Pierderi"
+
+#: telemetry/telem_dsm.c:200
+msgid "Holds"
+msgstr "Blocări"
+
+#: telemetry/telem_dsm.c:201 telemetry/telem_frsky.c:70
+#: telemetry/telem_frsky.c:83
+msgid "Amps"
+msgstr ""
+
+#: telemetry/telem_dsm.c:202
+msgid "AirSpd"
+msgstr ""
+
+#: telemetry/telem_dsm.c:203
+msgid "Alt."
+msgstr ""
+
+#: telemetry/telem_dsm.c:204
+msgid "Alt.max"
+msgstr ""
+
+#: telemetry/telem_dsm.c:213 telemetry/telem_frsky.c:66
+msgid "RSSI"
+msgstr ""
+
+#: telemetry/telem_dsm.c:262
+msgid "RxV"
+msgstr ""
+
+#: telemetry/telem_dsm.c:263
+msgid "Bat"
+msgstr ""
+
+#: telemetry/telem_frsky.c:67
+msgid "LRSSI"
+msgstr ""
+
+#: telemetry/telem_frsky.c:68
+msgid "LQI"
+msgstr ""
+
+#: telemetry/telem_frsky.c:71
+msgid "MinCell"
+msgstr ""
+
+#: telemetry/telem_frsky.c:72
+msgid "AllCell"
+msgstr ""
+
+#: telemetry/telem_frsky.c:82
+msgid "Fuel"
+msgstr ""
+
+#: telemetry/telem_frsky.c:84
+msgid "Alt"
+msgstr ""
+
+#: telemetry/telem_frsky.c:85
+msgid "VSI"
+msgstr ""
+
+#: telemetry/telem_frsky.c:86
+msgid "DIS"
+msgstr ""
+
+#: telemetry/telem_frsky.c:104
+msgid "TelemRSSI"
+msgstr ""
+
+#: telemetry/telem_frsky.c:108
+msgid "Amp"
+msgstr ""
+
+#: tests/test_language.c:23 tests/test_language.c:44
+msgid "ok1"
+msgstr ""
+
+#: tests/test_language.c:42
+msgid "test"
+msgstr ""
+
+#: tests/test_language.c:43
+msgid "ok"
+msgstr ""
+
+#: timer.c:52
+msgid "Timer"
+msgstr "Timer"
 
 #: Model template
 msgid "4Ch w/ Dual-Rates"
