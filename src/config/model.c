@@ -528,12 +528,12 @@ static const struct struct_map _secradio[] = {
 #endif
 };
 static const struct struct_map _secmixer[] = {
-    {MIXER_SWITCH, OFFSET_SRC(struct Mixer, sw)},
     {MIXER_SCALAR, OFFSETS(struct Mixer, scalar)},
+    {MIXER_SWITCH, OFFSET_SRC(struct Mixer, sw)},
     {MIXER_OFFSET, OFFSETS(struct Mixer, offset)},
 };
 static const u16 _secmixer_defaults[] = {
-    0, 100, 0
+    100
 };
 static const struct struct_map _seclimit[] = {
     {CHAN_LIMIT_SAFETYSW,  OFFSET_SRC(struct Limit, safetysw)},
@@ -549,12 +549,12 @@ static const u16 _seclimit_defaults[] = {
     0, 0, DEFAULT_SERVO_LIMIT, 0, 100, 0, 0, DEFAULT_DISPLAY_SCALE
 };
 static const struct struct_map _sectrim[] = {
+    {TRIM_STEP,   OFFSET(struct Trim, step)},
     {TRIM_POS,    OFFSET_BUT(struct Trim, pos)},
     {TRIM_NEG,    OFFSET_BUT(struct Trim, neg)},
-    {TRIM_STEP,   OFFSET(struct Trim, step)},
 };
 static const u16 _sectrim_defaults[] = {
-    0, 0, 1
+    1
 };
 static const struct struct_map _sectrim_rdonly[] = {
     {TRIM_SOURCE, OFFSET_SRC(struct Trim, src)},
@@ -565,9 +565,14 @@ static const struct struct_map _secswash[] = {
     {SWASH_ELEMIX, OFFSET(struct Model, swashmix[1])},
     {SWASH_COLMIX, OFFSET(struct Model, swashmix[2])},
 };
+static const u16 _secswash_defaults[] = {
+    60, 60, 60
+};
+
 static const struct struct_map _sectimer[] = {
     {TIMER_SOURCE,   OFFSET_SRC(struct Timer, src)},
     {TIMER_RESETSRC, OFFSET_SRC(struct Timer, resetsrc)},
+    {TIMER_TYPE, OFFSET_STRLIST(struct Timer, type, TIMER_TYPE_VAL, ARRAYSIZE(TIMER_TYPE_VAL))}
 };
 static const struct struct_map _sectimer_rdonly[] = {
     {TIMER_TIME,     OFFSET(struct Timer, timer)},
@@ -1087,7 +1092,8 @@ static u8 write_mixer(FILE *fh, struct Model *m, u8 channel)
         fprintf(fh, "[%s]\n", SECTION_MIXER);
         fprintf(fh, "%s=%s\n", MIXER_SOURCE, INPUT_SourceNameReal(tmpstr, m->mixers[idx].src));
         fprintf(fh, "%s=%s\n", MIXER_DEST, INPUT_SourceNameReal(tmpstr, m->mixers[idx].dest + NUM_INPUTS + 1));
-        write_int2(&m->mixers[idx], _secmixer, _secmixer_defaults, ARRAYSIZE(_secmixer), fh);
+        write_int2(&m->mixers[idx], _secmixer, ARRAYSIZE(_secmixer),
+            _secmixer_defaults, ARRAYSIZE(_secmixer_defaults), fh);
         if(WRITE_FULL_MODEL || ! MIXER_APPLY_TRIM(&m->mixers[idx]))
             fprintf(fh, "%s=%d\n", MIXER_USETRIM, MIXER_APPLY_TRIM(&m->mixers[idx]) ? 1 : 0);
         if(WRITE_FULL_MODEL || MIXER_MUX(&m->mixers[idx]))
@@ -1153,7 +1159,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
     CONFIG_EnableLanguage(0);
     fprintf(fh, "%s=%s\n", MODEL_NAME, m->name);
 #if HAS_PERMANENT_TIMER
-    write_int(m, _secnone, ARRAYSIZE(_secnone), fh);
+    write_int2(m, _secnone, ARRAYSIZE(_secnone), DEFAULTS_ZERO, 0, fh);
 #endif
     fprintf(fh, "%s=%s\n", MODEL_MIXERMODE, STDMIXER_ModeName(m->mixer_mode));
     if(m->icon[0] != 0)
@@ -1162,7 +1168,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
         fprintf(fh, "%s=%s\n", MODEL_TYPE, MODEL_TYPE_VAL[m->type]);
     fprintf(fh, "[%s]\n", SECTION_RADIO);
     fprintf(fh, "%s=%s\n", RADIO_PROTOCOL, PROTOCOL_GetName(m->protocol));
-    write_int(m, _secradio, ARRAYSIZE(_secradio), fh);
+    write_int2(m, _secradio, ARRAYSIZE(_secradio), DEFAULTS_ZERO, 0, fh);
     fprintf(fh, "%s=%s\n", RADIO_TX_POWER, radio_tx_power_val(m->radio, m->tx_power));
     fprintf(fh, "\n");
     write_proto_opts(fh, m);
@@ -1181,7 +1187,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
         fprintf(fh, "[%s%d]\n", SECTION_CHANNEL, idx+1);
         if(WRITE_FULL_MODEL || (m->limits[idx].flags & CH_REVERSE))
             fprintf(fh, "%s=%d\n", CHAN_LIMIT_REVERSE, (m->limits[idx].flags & CH_REVERSE) ? 1 : 0);
-        write_int2(&m->limits[idx], _seclimit, _seclimit_defaults, ARRAYSIZE(_seclimit), fh);
+        write_int2(&m->limits[idx], _seclimit, ARRAYSIZE(_seclimit),  _seclimit_defaults, ARRAYSIZE(_seclimit_defaults), fh);
         if(WRITE_FULL_MODEL || (m->limits[idx].flags & CH_FAILSAFE_EN)) {
             if(m->limits[idx].flags & CH_FAILSAFE_EN) {
                 fprintf(fh, "%s=%d\n", CHAN_LIMIT_FAILSAFE, m->limits[idx].failsafe);
@@ -1216,7 +1222,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
         if (PPMin_Mode() != PPM_IN_SOURCE) {
             fprintf(fh, "%s=%s\n", PPMIN_SWITCH, INPUT_SourceNameReal(file, m->train_sw));
         }
-        write_int(m, _secppm, ARRAYSIZE(_secppm), fh);
+        write_int2(m, _secppm, ARRAYSIZE(_secppm), DEFAULTS_ZERO, 0, fh);
         //fprintf(fh, "%s=%d\n", PPMIN_CENTERPW, m->ppmin_centerpw);
         //fprintf(fh, "%s=%d\n", PPMIN_DELTAPW, m->ppmin_deltapw);
         if (PPMin_Mode() != PPM_IN_SOURCE) {
@@ -1237,7 +1243,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
              m->trims[idx].src >= 1 && m->trims[idx].src <= 4
              ? tx_stick_names[m->trims[idx].src-1]
              : INPUT_SourceNameReal(file, m->trims[idx].src));
-        write_int2(&m->trims[idx], _sectrim, _sectrim_defaults, ARRAYSIZE(_sectrim), fh);
+        write_int2(&m->trims[idx], _sectrim, ARRAYSIZE(_sectrim), _sectrim_defaults, ARRAYSIZE(_sectrim_defaults), fh);
         if(WRITE_FULL_MODEL || m->trims[idx].sw)
             fprintf(fh, "%s=%s\n", TRIM_SWITCH, INPUT_SourceNameAbbrevSwitchReal(file, m->trims[idx].sw));
         if(WRITE_FULL_MODEL || m->trims[idx].value[0] || m->trims[idx].value[1] || m->trims[idx].value[2]
@@ -1255,14 +1261,12 @@ u8 CONFIG_WriteModel(u8 model_num) {
             fprintf(fh, "%s=1\n", SWASH_AIL_INV);
         if (WRITE_FULL_MODEL || m->swash_invert & 0x04)
             fprintf(fh, "%s=1\n", SWASH_COL_INV);
-        write_int(m, _secswash, ARRAYSIZE(_secswash), fh);
+        write_int2(m, _secswash, ARRAYSIZE(_secswash), _secswash_defaults, ARRAYSIZE(_secswash_defaults), fh);
     }
     for(idx = 0; idx < NUM_TIMERS; idx++) {
         if (! WRITE_FULL_MODEL && m->timer[idx].src == 0 && m->timer[idx].type == TIMER_STOPWATCH)
             continue;
         fprintf(fh, "[%s%d]\n", SECTION_TIMER, idx+1);
-        if (WRITE_FULL_MODEL || m->timer[idx].type != TIMER_STOPWATCH)
-            fprintf(fh, "%s=%s\n", TIMER_TYPE, TIMER_TYPE_VAL[m->timer[idx].type]);
         write_int(&m->timer[idx], _sectimer, ARRAYSIZE(_sectimer), fh);
         if (WRITE_FULL_MODEL || ((m->timer[idx].type == TIMER_COUNTDOWN || m->timer[idx].type == TIMER_COUNTDOWN_PROP) && m->timer[idx].timer))
             fprintf(fh, "%s=%d\n", TIMER_TIME, m->timer[idx].timer);

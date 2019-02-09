@@ -23,8 +23,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define DEFAULTS_ZERO (const u16*)0x01
-
 #define MATCH_KEY(s)     strcasecmp(name,    s) == 0
 #define MATCH_VALUE(s)   strcasecmp(value,   s) == 0
 
@@ -158,7 +156,8 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size, const char
     return 0;
 }
 
-int write_int2(void* ptr, const struct struct_map *map, const u16* defaults, int map_size, FILE* fh) {
+int write_int2(void* ptr, const struct struct_map *map, int map_size,
+    const u16* defaults, int defaults_size, FILE* fh) {
     for (int i = 0; i < map_size; i++) {
         int size = map[i].offset >> 12;
         int offset = map[i].offset & 0xFFF;
@@ -190,26 +189,28 @@ int write_int2(void* ptr, const struct struct_map *map, const u16* defaults, int
 
         if (defaults == DEFAULTS_ZERO) {
             if (value == 0) continue;
+        } else if (defaults == DEFAULTS_ALWAYS) {
+            // always write out
         } else if (defaults != NULL) {
-            if (value == defaults[i]) continue;
+            if (i < defaults_size && value == defaults[i]) continue;
         }
 
         switch (size)
         {
-                case TYPE_STR_LIST: {
-                    i++;  // next entry is additional info for string list
-                    const char* const *list = (const char* const *)map[i].str;
-                    fprintf(fh, "%s=%s\n", map[i - 1].str, list[value]);
-                    break;
-                }
-                case TYPE_BUTTON:
-                    fprintf(fh, "%s=%s\n", map[i].str, INPUT_ButtonName(value));
-                    break;
-                case TYPE_SOURCE: {
-                    char tmpstr[20];
-                    fprintf(fh, "%s=%s\n", map[i].str, INPUT_SourceNameReal(tmpstr, value));
-                    break;
-                }
+            case TYPE_STR_LIST: {
+                i++;  // next entry is additional info for string list
+                const char* const *list = (const char* const *)map[i].str;
+                fprintf(fh, "%s=%s\n", map[i - 1].str, list[value]);
+                break;
+            }
+            case TYPE_BUTTON:
+                fprintf(fh, "%s=%s\n", map[i].str, INPUT_ButtonName(value));
+                break;
+            case TYPE_SOURCE: {
+                char tmpstr[20];
+                fprintf(fh, "%s=%s\n", map[i].str, INPUT_SourceNameReal(tmpstr, value));
+                break;
+            }
             default:
                 fprintf(fh, "%s=%d\n", map[i].str, value);
         }
@@ -219,7 +220,7 @@ int write_int2(void* ptr, const struct struct_map *map, const u16* defaults, int
 }
 
 int write_int(void* ptr, const struct struct_map *map, int map_size, FILE* fh) {
-    return write_int2(ptr, map, DEFAULTS_ZERO, map_size, fh);
+    return write_int2(ptr, map, map_size, DEFAULTS_ALWAYS, 0, fh);
 }
 
 #define TESTNAME config
