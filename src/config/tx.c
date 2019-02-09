@@ -211,7 +211,7 @@ void CONFIG_WriteTx()
         printf("Couldn't open tx.ini\n");
         return;
     }
-    CONFIG_EnableLanguage(0);
+
     write_int(&Transmitter, _secmodel, ARRAYSIZE(_secmodel), fh);
 
     for(i = 0; i < INP_HAS_CALIBRATION; i++) {
@@ -235,7 +235,6 @@ void CONFIG_WriteTx()
     fprintf(fh, "%s=%s\n", TELEM_LENGTH, TELEM_LENGTH_VAL[(t->telem & TELEMUNIT_FEET) ? 1 : 0]);
     fprintf(fh, "%s=%u\n", TELEM_ALERT_INTERVAL, t->telem_alert_interval);
 
-    CONFIG_EnableLanguage(1);
     fclose(fh);
 }
 
