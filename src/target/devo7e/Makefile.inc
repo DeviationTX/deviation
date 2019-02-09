@@ -7,6 +7,8 @@ OPTIMIZE_DFU     := 1
 MODULAR          := 0x20004000
 DFU_ARGS         := -c 7 -b 0x08003000
 
+ENABLE_LTO       = 1
+
 include $(SDIR)/target/common/devo/Makefile.inc
 
 ifdef BUILD_TARGET
