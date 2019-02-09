@@ -20,14 +20,23 @@ void TestAllPages(CuTest* t)
 
     PAGE_Init();
     for (int i = 0; i < PAGEID_LAST; i++) {
-        if (page_attr[i] & MIXER_STANDARD) {
-            Model.mixer_mode = MIXER_STANDARD;
+        if ((page_attr[i] & (MIXER_STANDARD | MIXER_ADVANCED))
+                != (MIXER_STANDARD | MIXER_ADVANCED)) {
+            // If this is a mixer specific page
+            if (page_attr[i] & MIXER_STANDARD) {
+                Model.mixer_mode = MIXER_STANDARD;
+            } else {
+                Model.mixer_mode = MIXER_ADVANCED;
+            }
         } else {
             Model.mixer_mode = MIXER_ADVANCED;
         }
 
         // Skip the pages which are not consistent across tests run
-        if (i == PAGEID_DEBUGLOG || i == PAGEID_USB || i == PAGEID_SPLASH)
+        if (i == PAGEID_DEBUGLOG ||
+            i == PAGEID_USB ||
+            i == PAGEID_SPLASH ||
+            i == PAGEID_LANGUAGE)
             continue;
 
         if (pages[i].pageName == NULL || pages[i].pageName[0] == '\0')
