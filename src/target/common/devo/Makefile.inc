@@ -69,22 +69,7 @@ endif
 
 ALL = $(LIBOPENCM3) $(TARGET).dfu
 
-ifdef ENABLE_LTO
-CFLAGS  += -flto -ffat-lto-objects -fwhole-program -DENABLE_LTO
-MODULE_FLAGS += -fno-lto
-endif
-
 else #BUILD_TARGET
-
-ifdef ENABLE_LTO
-CFLAGS_pwm_isr = -fno-lto
-CFLAGS_err_isr = -fno-lto
-CFLAGS_clock_isr = -fno-lto
-CFLAGS_usb_isr = -fno-lto
-CFLAGS_ppmin_isr = -fno-lto
-CFLAGS_uart_isr = -fno-lto
-CFLAGS_soft_serial_isr = -fno-lto
-endif
 
 ifeq ($(OS),Windows_NT)
 	FLOCKS =
