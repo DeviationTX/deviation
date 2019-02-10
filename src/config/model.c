@@ -207,7 +207,7 @@ static const char SECTION_TELEMALARM[] = "telemalarm";
 static const char TELEM_SRC[] = "source";
 static const char TELEM_ABOVE[] =  "above";
 static const char TELEM_VALUE[] = "value";
-static const char TELEM_TH[] ="threshold";
+static const char TELEM_THRESHOLD[] ="threshold";
 
 #if HAS_DATALOG
 /* Section: Datalog */
@@ -959,13 +959,14 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
             printf("%s: Only %d timers are supported\n", section, TELEM_NUM_ALARMS);
             return 1;
         }
+        struct TelemetryAlarm *alarm = &Model.alarms[idx];
         idx--;
         if (MATCH_KEY(TELEM_SRC)) {
             char str[20];
             unsigned last = TELEMETRY_GetNumTelemSrc();
             for(i = 1; i <= last; i++) {
                 if (strcasecmp(TELEMETRY_ShortName(str, i), value) == 0) {
-                    m->telem_alarm[idx] = i;
+                    alarm->src = i;
                     return 1;
                 }
             }
@@ -974,17 +975,17 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
         }
         if (MATCH_KEY(TELEM_ABOVE)) {
             if (atoi(value))
-                m->telem_flags |= 1 << idx;
+                alarm->above = 1;
             else
-                m->telem_flags &= ~(1 << idx);
+                alarm->above = 0;
             return 1;
         }
         if (MATCH_KEY(TELEM_VALUE)) {
-            m->telem_alarm_val[idx] = atoi(value);
+            alarm->value = atoi(value);
             return 1;
         }
-        if (MATCH_KEY(TELEM_TH)) {
-            m->telem_alarm_th[idx] = atoi(value);
+        if (MATCH_KEY(TELEM_THRESHOLD)) {
+            alarm->threshold = atoi(value);
         }
     }
 #if HAS_DATALOG
@@ -1354,14 +1355,15 @@ u8 CONFIG_WriteModel(u8 model_num) {
             fprintf(fh, "%s=%d\n", TIMER_VAL, m->timer[idx].val);
     }
     for(idx = 0; idx < TELEM_NUM_ALARMS; idx++) {
-        if (! WRITE_FULL_MODEL && ! m->telem_alarm[idx])
+        struct TelemetryAlarm *alarm = &m->alarms[idx];
+        if (!WRITE_FULL_MODEL && !alarm->src)
             continue;
         fprintf(fh, "[%s%d]\n", SECTION_TELEMALARM, idx+1);
-        fprintf(fh, "%s=%s\n", TELEM_SRC, TELEMETRY_ShortName(file, m->telem_alarm[idx]));
-        if(WRITE_FULL_MODEL || (m->telem_flags & (1 << idx)))
-            fprintf(fh, "%s=%d\n", TELEM_ABOVE, (m->telem_flags & (1 << idx)) ? 1 : 0);
-        fprintf(fh, "%s=%d\n", TELEM_VALUE, m->telem_alarm_val[idx]);
-        fprintf(fh, "%s=%d\n", TELEM_TH, m->telem_alarm_th[idx]);
+        fprintf(fh, "%s=%s\n", TELEM_SRC, TELEMETRY_ShortName(file, alarm->src));
+        if (WRITE_FULL_MODEL || alarm->above)
+            fprintf(fh, "%s=%d\n", TELEM_ABOVE, alarm->above);
+        fprintf(fh, "%s=%d\n", TELEM_VALUE, alarm->value);
+        fprintf(fh, "%s=%d\n", TELEM_THRESHOLD, alarm->threshold);
     }
 #if HAS_DATALOG
     fprintf(fh, "[%s]\n", SECTION_DATALOG);

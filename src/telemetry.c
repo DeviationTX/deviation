@@ -35,13 +35,9 @@ static void _get_altitude_str(char *str, s32 value, u8 decimals, char units);
 
 struct Telemetry Telemetry;
 static u8 k = 0; // telem_idx
-static u8 alarm_state[TELEM_NUM_ALARMS] = {0};  // 3 states: 0 = off, 1 = on, 2 = mute
-static s32 mute_value[TELEM_NUM_ALARMS] = {0};
-static u32 alarm_time[TELEM_NUM_ALARMS] = {0};
 static u32 last_updated[TELEM_UPDATE_SIZE] = {0};
 static u32 music_time = 0;
 static u32 error_time = 0;
-static u32 limit_th_time[TELEM_NUM_ALARMS] ={0};
 #define CHECK_DURATION 500
 
 void _get_value_str(char *str, s32 value, u8 decimals, char units)
@@ -345,33 +341,37 @@ void TELEMETRY_Alarm()
     // don't need to check all the 6 telem-configs at one time, this is not a critical and urgent task
     // instead, check 1 of them at a time
     k = (k + 1) % TELEM_NUM_ALARMS;
-    if (current_time >= alarm_time[k]) {
-        alarm_time[k] = current_time + CHECK_DURATION;
-        if (! TELEMETRY_IsUpdated(Model.telem_alarm[k])) {
+    struct TelemetryAlarm *alarm = &Model.alarms[k];
+
+    if (current_time >= alarm->alarm_time) {
+        alarm->alarm_time = current_time + CHECK_DURATION;
+        if (!TELEMETRY_IsUpdated(alarm->src)) {
             TELEMETRY_ResetAlarm(k);
-        } else if ((TELEMETRY_GetValue( Model.telem_alarm[k] ) - mute_value[k] <=
-                                        Model.telem_alarm_val[k]) == ((Model.telem_flags >> k) & 1)) {
-            if (!alarm_state[k]) {
-                alarm_state[k]++;
-                limit_th_time[k] = current_time + (Model.telem_alarm_th[k] * 1000);
+        } else if ((TELEMETRY_GetValue( alarm->src ) - alarm->mute_value <=
+                                        alarm->value) == alarm->above) {
+            if (!alarm->state) {
+                alarm->state++;
+                alarm->limit_threshold_time = current_time + (alarm->threshold * 1000);
 #ifdef DEBUG_TELEMALARM
                 printf("set: 0x%x\n\n", k);
 #endif
             }
-        } else if (alarm_state[k]) {
-            alarm_state[k] = 0;
-            limit_th_time[k] = 0;
+        } else if (alarm->state) {
+            alarm->state = 0;
+            alarm->limit_threshold_time = 0;
 #ifdef DEBUG_TELEMALARM
             printf("clear: 0x%x\n\n", k);
 #endif
         }
     }
 
-    if (alarm_state[k]==1 && current_time >= music_time && current_time >= limit_th_time[k]) {
+    if (alarm->state == 1 &&
+        current_time >= music_time &&
+        current_time >= alarm->limit_threshold_time) {
         music_time = current_time + Transmitter.telem_alert_interval*1000;
         // K > 2 is exclude first 3 alarms from jump action (interim solution)
         // <= (9 + type) is limit jump action to only visible telemetry monitor values
-        if (k > 2 && Model.telem_alarm[k] <= (9 + TELEMETRY_Type()))
+        if (k > 2 && alarm->src <= (9 + TELEMETRY_Type()))
             PAGE_ShowTelemetryAlarm();
 #ifdef DEBUG_TELEMALARM
         printf("beep: %d\n\n", k);
@@ -379,9 +379,9 @@ void TELEMETRY_Alarm()
 
 #if HAS_EXTENDED_AUDIO
         u16 telem_music = MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + k);
-        s32 telem_value = TELEMETRY_GetValue(Model.telem_alarm[k]);
+        s32 telem_value = TELEMETRY_GetValue(alarm->src);
         if (TELEMETRY_Type() == TELEM_DEVO) {
-            switch(Model.telem_alarm[k]) {
+            switch (alarm->src) {
                 case TELEM_DEVO_VOLT1:
                 case TELEM_DEVO_VOLT2:
                 case TELEM_DEVO_VOLT3: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_VOLT,1); break;
@@ -391,7 +391,7 @@ void TELEMETRY_Alarm()
             }
         }
         if (TELEMETRY_Type() == TELEM_DSM) {
-            switch(Model.telem_alarm[k]) {
+            switch (alarm->src) {
 #if HAS_EXTENDED_TELEMETRY
                 case TELEM_DSM_JETCAT_RPM:
                 case TELEM_DSM_ESC_RPM:
@@ -446,7 +446,7 @@ void TELEMETRY_Alarm()
         }
 
         if (TELEMETRY_Type() == TELEM_FRSKY) {
-            switch(Model.telem_alarm[k]) {
+            switch (alarm->src) {
 #if HAS_EXTENDED_TELEMETRY
                 case TELEM_FRSKY_VOLT3:
                 case TELEM_FRSKY_VOLTA:
@@ -476,7 +476,7 @@ void TELEMETRY_Alarm()
 
 #if HAS_EXTENDED_TELEMETRY
         if (TELEMETRY_Type() == TELEM_CRSF) {
-            switch(Model.telem_alarm[k]) {
+            switch (alarm->src) {
                 case TELEM_CRSF_BATT_VOLTAGE:
                     MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_VOLT,2); break;
                 case TELEM_CRSF_BATT_CURRENT: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_AMPS,2); break;
@@ -500,8 +500,9 @@ void TELEMETRY_Alarm()
 
 void TELEMETRY_ResetAlarm(int i)
 {
-    alarm_state[i] = 0;
-    mute_value[i] = 0;
+    struct TelemetryAlarm *alarm = &Model.alarms[i];
+    alarm->state = 0;
+    alarm->mute_value = 0;
 }
 
 void TELEMETRY_ResetValues(void)
@@ -513,18 +514,22 @@ void TELEMETRY_ResetValues(void)
 
 void TELEMETRY_MuteAlarm()
 {
-    for(int i = 0; i < TELEM_NUM_ALARMS; i++) {
-        if (alarm_state[i]==1) {
-            mute_value[i] = TELEMETRY_GetValue( Model.telem_alarm[i] ) - (((Model.telem_flags >> k) & 1) << 8);
-            alarm_state[i]++;
+    for (int i = 0; i < TELEM_NUM_ALARMS; i++) {
+        struct TelemetryAlarm *alarm = &Model.alarms[i];
+        if (alarm->state == 1) {
+            alarm->mute_value = TELEMETRY_GetValue(alarm->src) - (alarm->above << 8);
+            alarm->state++;
         }
     }
 }
 
 int TELEMETRY_HasAlarm(int src)
 {
-    for(int i = 0; i < TELEM_NUM_ALARMS; i++)
-        if(Model.telem_alarm[i] == src)
-            return (alarm_state[i]==1);
+    for (int i = 0; i < TELEM_NUM_ALARMS; i++) {
+        struct TelemetryAlarm *alarm = &Model.alarms[i];
+        if (alarm->src == src)
+            return (alarm->state == 1);
+    }
+
     return 0;
 }

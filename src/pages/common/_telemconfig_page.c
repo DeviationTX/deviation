@@ -37,7 +37,8 @@ static const char *telem_name_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     int val = (long)data;
-    int telem_idx = Model.telem_alarm[val];
+    struct TelemetryAlarm *alarm = &Model.alarms[val];
+    int telem_idx = alarm->src;
     int last = TELEMETRY_GetNumTelemSrc();
     u8 changed;
     //skip over (don't allow selection of) telemetry src's with max=0 (eg. JETCAT_STATUS, JETCAT_OFFCOND)
@@ -48,27 +49,28 @@ static const char *telem_name_cb(guiObject_t *obj, int dir, void *data)
         if (telem_idx == last)
             dir = -1;
     }
-    Model.telem_alarm[val] = telem_idx;
+    alarm->src = telem_idx;
     if (changed) {
         guiObject_t *valObj = _get_obj(val, 2);
         if (valObj)
             GUI_Redraw(valObj);
     }
-    return TELEMETRY_ShortName(tempstring, Model.telem_alarm[val]);
+    return TELEMETRY_ShortName(tempstring, alarm->src);
 }
 
 static const char *gtlt_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     int val = (long)data;
+    struct TelemetryAlarm *alarm = &Model.alarms[val];
     u8 changed;
-    u8 type = ((Model.telem_flags >> val) & 1);
+    u8 type = alarm->above;
     type = GUI_TextSelectHelper(type, 0, 1, -dir, 1, 1, &changed);
     if (changed) {
         if (type) {
-            Model.telem_flags |= 1 << val;
+            alarm->above = 1;
         } else {
-            Model.telem_flags &= ~(1 << val);
+            alarm->above = 0;
         }
         TELEMETRY_ResetAlarm(val);
     }
@@ -79,13 +81,14 @@ static const char *limit_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     int idx = (long)data;
-    u8 telem_idx = Model.telem_alarm[idx];
+    struct TelemetryAlarm *alarm = &Model.alarms[idx];
+    u8 telem_idx = alarm->src;
     if (telem_idx == 0) {
         return "----";
     }
     s32 min = TELEMETRY_GetMinValue(telem_idx);
     s32 max = TELEMETRY_GetMaxValue(telem_idx);
-    s32 value = Model.telem_alarm_val[idx];
+    s32 value = alarm->value;
 
     u32 small_step = 1;
     u32 big_step = 10;
@@ -106,12 +109,13 @@ static const char *limit_cb(guiObject_t *obj, int dir, void *data)
         big_step = 100;
     }
 
-    Model.telem_alarm_val[idx] = GUI_TextSelectHelper(value, min, max, dir, small_step, big_step, NULL);
-    TELEMETRY_GetValueStrByValue(tempstring, telem_idx, Model.telem_alarm_val[idx]);
-    if (Model.telem_alarm_th[idx] > 0) {
+    alarm->value = GUI_TextSelectHelper(value, min, max, dir, small_step, big_step, NULL);
+    TELEMETRY_GetValueStrByValue(tempstring, telem_idx, alarm->value);
+    if (alarm->threshold > 0) {
         char tmpstr[sizeof(tempstring)];
         strlcpy(tmpstr, tempstring, sizeof(tmpstr));
-        snprintf(tempstring,sizeof(tempstring),"%ds%s%s",Model.telem_alarm_th[idx],ALARM_TH_SPACER,tmpstr);
+        snprintf(tempstring, sizeof(tempstring),
+            "%ds%s%s", alarm->threshold, ALARM_TH_SPACER, tmpstr);
     }
     return tempstring;
 }
@@ -120,10 +124,11 @@ static void limit_th_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
     int idx = (long)data;
-    if (Model.telem_alarm_th[idx] < 9) {
-        Model.telem_alarm_th[idx]++;
+    struct TelemetryAlarm *alarm = &Model.alarms[idx];
+    if (alarm->threshold < 9) {
+        alarm->threshold++;
     } else {
-        Model.telem_alarm_th[idx] = 0;
+        alarm->threshold = 0;
     }
 }
 
