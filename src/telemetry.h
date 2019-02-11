@@ -326,6 +326,17 @@ enum {
 #define XJT_VERSION_ID            0xf106
 
 /************************************************************************/
+struct TelemetryAlarm {
+    u8 src;
+    u8 threshold;
+    u8 above;
+
+    u8 state;  // 3 states: 0 = off, 1 = on, 2 = mute
+    s32 value;
+    s32 mute_value;
+    u32 alarm_time;
+    u32 limit_threshold_time;
+};
 
 extern struct Telemetry Telemetry;
 s32 TELEMETRY_GetValue(int idx);

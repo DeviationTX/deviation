@@ -47,10 +47,6 @@ struct Model {
     char virtname[NUM_VIRT_CHANNELS][VIRT_NAME_LEN];
     u8 templates[NUM_CHANNELS];
     u8 safety[NUM_SOURCES+1];
-    u8 telem_alarm[TELEM_NUM_ALARMS];
-    s32 telem_alarm_val[TELEM_NUM_ALARMS];
-    u8 telem_alarm_th[TELEM_NUM_ALARMS];
-    u8 telem_flags;
     MixerMode mixer_mode;
     s8 ppm_map[MAX_PPM_IN_CHANNELS];
     u8 padding_1[2];
@@ -63,6 +59,7 @@ struct Model {
     s8 video_contrast;
     s8 video_brightness;
 #endif
+    struct TelemetryAlarm alarms[TELEM_NUM_ALARMS];
     struct Trim trims[NUM_TRIMS];
     struct Mixer mixers[NUM_MIXERS];
     struct Limit limits[NUM_OUT_CHANNELS];
