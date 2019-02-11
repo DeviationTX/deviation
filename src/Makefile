@@ -155,14 +155,14 @@ HGTEST := $(shell mkdir -p $(ODIR); \
 #This section contains switches used for building#
 ##################################################
 ifeq "$(TYPE)" "dev"
-  CFLAGS   := $(CFLAGS) -g -DBUILDTYPE_DEV
+  CFLAGS   := $(CFLAGS) -DBUILDTYPE_DEV
 endif
 ifdef MODULAR
 EXTRA_CFLAGS   :=  -DMODULAR=$(MODULAR)
 CFLAGS   +=  -DENABLE_MODULAR=$(MODULAR)
 endif
 
-CFLAGS   := $(CFLAGS) -Wall -Wextra -Werror=undef -I. -D$(PROGMODE) -std=gnu99 -Itarget/$(TARGET) -Igui/$(SCREENSIZE) \
+CFLAGS   := $(CFLAGS) -g -Wall -Wextra -Werror=undef -I. -D$(PROGMODE) -std=gnu99 -Itarget/$(TARGET) -Igui/$(SCREENSIZE) \
             -Ipages/$(SCREENSIZE) \
             -DHGVERSION="\"${HGVERSION}\""
 CXXFLAGS := $(CXXFLAGS) $(patsubst -std=gnu99,,$(CFLAGS))
