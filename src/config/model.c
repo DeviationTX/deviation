@@ -959,8 +959,7 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
             printf("%s: Only %d timers are supported\n", section, TELEM_NUM_ALARMS);
             return 1;
         }
-        struct TelemetryAlarm *alarm = &Model.alarms[idx];
-        idx--;
+        struct TelemetryAlarm *alarm = &Model.alarms[idx - 1];  // idx is 1 based
         if (MATCH_KEY(TELEM_SRC)) {
             char str[20];
             unsigned last = TELEMETRY_GetNumTelemSrc();
