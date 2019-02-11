@@ -97,7 +97,7 @@ void STANDARD_DrawCurvePoints(guiLabel_t vallbl[], guiTextSelect_t val[],
     while (i < 8) {
         if  (i == 4)
             i++;  // lbl/selection 4 is used for center value
-        switch(i) {
+        switch (i) {
             case 1: lbl_nr = "2"; x = 0; break;
             case 2: lbl_nr = "3"; x += w2 + WIDTH2_ADD; break;
             case 3: lbl_nr = "4"; x = 0; y += height + LINE_H_OFFS; break;
