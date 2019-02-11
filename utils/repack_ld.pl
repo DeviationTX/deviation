@@ -28,7 +28,7 @@ sub fix_obj_name {
 sub repack_obj {
     my @sorted  = sort {$map{$b} <=> $map{$a}} keys(%map);
     foreach (@sorted) {
-        if($free >= $map{$_}) {
+        if($free >= $map{$_} + 2) {
             $free -= $map{$_};
             printf "\t%-32s (.text*) /* 0x%x */\n", fix_obj_name($_), $map{$_};
         }
