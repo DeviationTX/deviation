@@ -226,3 +226,21 @@ u32 RTC_GetValue()
     return value;
 }
 
+void _usleep(u32 x)
+{
+# if ((FREQ_MHz % 3) != 0)
+    #error Frequency is not a multiple of 3 - need custom usleep
+# else
+    #define COUNT (FREQ_MHz / 3)
+#endif
+    asm volatile("mul %0, %0, %1;"
+         "b.n _delaycmp;"
+         "_delayloop:"
+         "subs %0, %0, #1;"
+         "_delaycmp:;"
+         "cmp %0, #0;"
+         "bne.n _delayloop;"
+         :
+         : "r" (x), "r" (COUNT)
+         );
+}
