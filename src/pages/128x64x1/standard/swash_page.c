@@ -44,7 +44,7 @@ void PAGE_SwashInit(int page)
 
     u8 y = HEADER_HEIGHT + 1;
     const void * swashlbl = _tr("ELE Mix");
-    for (int i=0; i<3; i++) {
+    for (int i = 0; i < 3; i++) {
         if (i == 1)
             swashlbl = _tr("AIL Mix");
         if (i == 2)
@@ -53,7 +53,7 @@ void PAGE_SwashInit(int page)
         GUI_CreateTextSelectPlate(&gui->mix[i], FIELD_X, y, FIELD_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT, NULL, swashmix_val_cb, (void *)(long)i);
         y += LINE_SPACE;
     }
-    
+
     update_swashmixes();
     GUI_Select1stSelectableObj();
 }
