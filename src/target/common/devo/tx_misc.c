@@ -17,3 +17,4 @@ void TxName(u8 *var, int len)
     memcpy(var, pBLString, len - 1);
     var[len - 1] = 0;
 }
+

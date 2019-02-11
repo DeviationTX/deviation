@@ -233,8 +233,7 @@ void _usleep(u32 x)
 #else
     #error Need define the count for usleep
 #endif
-    asm volatile
-        ("mul %0, %0, %1;"
+    asm volatile("mul %0, %0, %1;"
          "b.n _delaycmp;"
          "_delayloop:"
          "subs %0, %0, #1;"
