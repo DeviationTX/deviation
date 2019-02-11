@@ -985,6 +985,7 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
         }
         if (MATCH_KEY(TELEM_THRESHOLD)) {
             alarm->threshold = atoi(value);
+            return 1;
         }
     }
 #if HAS_DATALOG
