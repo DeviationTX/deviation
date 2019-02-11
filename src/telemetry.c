@@ -34,7 +34,7 @@ static void _get_altitude_str(char *str, s32 value, u8 decimals, char units);
 #define CAP_TYPEMASK 0x07
 
 struct Telemetry Telemetry;
-static u8 k = 0; // telem_idx
+static u8 telem_idx = 0;
 static u32 last_updated[TELEM_UPDATE_SIZE] = {0};
 static u32 music_time = 0;
 static u32 error_time = 0;
@@ -340,27 +340,27 @@ void TELEMETRY_Alarm()
     }
     // don't need to check all the 6 telem-configs at one time, this is not a critical and urgent task
     // instead, check 1 of them at a time
-    k = (k + 1) % TELEM_NUM_ALARMS;
-    struct TelemetryAlarm *alarm = &Model.alarms[k];
+    telem_idx = (telem_idx + 1) % TELEM_NUM_ALARMS;
+    struct TelemetryAlarm *alarm = &Model.alarms[telem_idx];
 
     if (current_time >= alarm->alarm_time) {
         alarm->alarm_time = current_time + CHECK_DURATION;
         if (!TELEMETRY_IsUpdated(alarm->src)) {
-            TELEMETRY_ResetAlarm(k);
+            TELEMETRY_ResetAlarm(telem_idx);
         } else if ((TELEMETRY_GetValue( alarm->src ) - alarm->mute_value <=
                                         alarm->value) == alarm->above) {
             if (!alarm->state) {
                 alarm->state++;
                 alarm->limit_threshold_time = current_time + (alarm->threshold * 1000);
 #ifdef DEBUG_TELEMALARM
-                printf("set: 0x%x\n\n", k);
+                printf("set: 0x%x\n\n", telem_idx);
 #endif
             }
         } else if (alarm->state) {
             alarm->state = 0;
             alarm->limit_threshold_time = 0;
 #ifdef DEBUG_TELEMALARM
-            printf("clear: 0x%x\n\n", k);
+            printf("clear: 0x%x\n\n", telem_idx);
 #endif
         }
     }
@@ -369,16 +369,16 @@ void TELEMETRY_Alarm()
         current_time >= music_time &&
         current_time >= alarm->limit_threshold_time) {
         music_time = current_time + Transmitter.telem_alert_interval*1000;
-        // K > 2 is exclude first 3 alarms from jump action (interim solution)
+        // telem_idx > 2 is exclude first 3 alarms from jump action (interim solution)
         // <= (9 + type) is limit jump action to only visible telemetry monitor values
-        if (k > 2 && alarm->src <= (9 + TELEMETRY_Type()))
+        if (telem_idx > 2 && alarm->src <= (9 + TELEMETRY_Type()))
             PAGE_ShowTelemetryAlarm();
 #ifdef DEBUG_TELEMALARM
-        printf("beep: %d\n\n", k);
+        printf("beep: %d\n\n", telem_idx);
 #endif
 
 #if HAS_EXTENDED_AUDIO
-        u16 telem_music = MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + k);
+        u16 telem_music = MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + telem_idx);
         s32 telem_value = TELEMETRY_GetValue(alarm->src);
         if (TELEMETRY_Type() == TELEM_DEVO) {
             switch (alarm->src) {
@@ -492,7 +492,7 @@ void TELEMETRY_Alarm()
 #endif //HAS_EXTENDED_TELEMETRY
 
 #else
-        MUSIC_Play(MUSIC_TELEMALARM1 + k);
+        MUSIC_Play(MUSIC_TELEMALARM1 + telem_idx);
 #endif //HAS_EXTENDED_AUDIO
 
     }
