@@ -62,7 +62,6 @@ void PAGE_GyroSenseInit(int page)
         y += LINE_SPACE;
         GUI_CreateLabelBox(&gui->gyrolbl[i], LABEL_X, y, LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, label_cb, NULL, (void *)(long)i);
         GUI_CreateTextSelectPlate(&gui->gyro[i], FIELD_X, y, FIELD_WIDTH2, LINE_HEIGHT, &TEXTSEL_FONT, NULL, gyro_val_cb, (void *)(long)i);
-
     }
 
     GUI_Select1stSelectableObj();
