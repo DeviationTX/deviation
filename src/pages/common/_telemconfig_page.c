@@ -38,18 +38,18 @@ static const char *telem_name_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     int val = (long)data;
     struct TelemetryAlarm *alarm = &Model.alarms[val];
-    int telem_idx = alarm->src;
+    int telem_src = alarm->src;
     int last = TELEMETRY_GetNumTelemSrc();
     u8 changed;
     //skip over (don't allow selection of) telemetry src's with max=0 (eg. JETCAT_STATUS, JETCAT_OFFCOND)
     while (1) {
-        telem_idx = GUI_TextSelectHelper(telem_idx, 0, last, dir, 1, 1, &changed);
-        if (telem_idx == 0 || TELEMETRY_GetMaxValue(telem_idx))
+        telem_src = GUI_TextSelectHelper(telem_src, 0, last, dir, 1, 1, &changed);
+        if (telem_src == 0 || TELEMETRY_GetMaxValue(telem_src))
             break;
-        if (telem_idx == last)
+        if (telem_src == last)
             dir = -1;
     }
-    alarm->src = telem_idx;
+    alarm->src = telem_src;
     if (changed) {
         guiObject_t *valObj = _get_obj(val, 2);
         if (valObj)
@@ -82,12 +82,12 @@ static const char *limit_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     int idx = (long)data;
     struct TelemetryAlarm *alarm = &Model.alarms[idx];
-    u8 telem_idx = alarm->src;
-    if (telem_idx == 0) {
+    u8 telem_src = alarm->src;
+    if (telem_src == 0) {
         return "----";
     }
-    s32 min = TELEMETRY_GetMinValue(telem_idx);
-    s32 max = TELEMETRY_GetMaxValue(telem_idx);
+    s32 min = TELEMETRY_GetMinValue(telem_src);
+    s32 max = TELEMETRY_GetMaxValue(telem_src);
     s32 value = alarm->value;
 
     u32 small_step = 1;
@@ -110,7 +110,7 @@ static const char *limit_cb(guiObject_t *obj, int dir, void *data)
     }
 
     alarm->value = GUI_TextSelectHelper(value, min, max, dir, small_step, big_step, NULL);
-    TELEMETRY_GetValueStrByValue(tempstring, telem_idx, alarm->value);
+    TELEMETRY_GetValueStrByValue(tempstring, telem_src, alarm->value);
     if (alarm->threshold > 0) {
         char tmpstr[sizeof(tempstring)];
         strlcpy(tmpstr, tempstring, sizeof(tmpstr));
