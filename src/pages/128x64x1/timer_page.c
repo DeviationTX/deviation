@@ -43,37 +43,65 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     (void)data;
     (void)relrow;
     u8 space = LINE_SPACE;
-    //Row 1
-    GUI_CreateLabelBox(&gui->name, LABEL_X, y,
-            LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, timer_str_cb, NULL, (void *)(long)absrow);
+    int y_top = y;
+    void * lbl_str = NULL;
+    void * lbl_data = NULL;
+    void * lbl_obj = NULL;
+    int w = LABEL_WIDTH;
+
+    // Col 1
+    for (int i = 0; i < 4; i++) {
+        switch(i) {
+            case 0:
+                lbl_obj = &gui->name;
+                lbl_str = timer_str_cb; lbl_data = (void *)(long)absrow;
+                break;
+            case 1:
+                lbl_obj = &gui->switchlbl;
+                lbl_str = switch_str_cb; lbl_data = (void *)(long)absrow;
+                break;
+            case 2:
+                lbl_obj = &gui->resetpermlbl;
+                lbl_str = GUI_Localize;
+                lbl_data = _tr_noop("Reset");
+                if (Model.mixer_mode != MIXER_STANDARD) {
+                    lbl_obj = &gui->resetlbl; lbl_data = _tr_noop("Reset sw");
+                }
+                break;
+            case 3:
+                w = START_WIDTH; //  bug fix: label width and height can't be 0, otherwise, the label couldn't be hidden dynamically
+                lbl_obj = &gui->startlbl;
+                lbl_str = GUI_Localize;
+                lbl_data = _tr_noop("Start");
+                break;
+        }
+        GUI_CreateLabelBox(lbl_obj, LABEL_X, y, w, LINE_HEIGHT, &LABEL_FONT, lbl_str, NULL, lbl_data);
+        y += space;
+        if ((i == 2) && (Model.mixer_mode == MIXER_STANDARD))
+            y -= space;
+    }
+    y = y_top;
+
+    // Col 2
+    // Row 1
     GUI_CreateTextSelectPlate(&gui->type, TEXTSEL_X, y,
             TEXTSEL_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT, NULL, set_timertype_cb, (void *)(long)absrow);
-
-    //Row 2
+    // Row 2
     y += space;
-    GUI_CreateLabelBox(&gui->switchlbl, LABEL_X, y,
-            LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, switch_str_cb, NULL, (void *)(long)absrow);
     GUI_CreateTextSourcePlate(&gui->src, TEXTSEL_X, y,
             TEXTSEL_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT, toggle_source_cb, set_source_cb, set_input_source_cb, (void *)(long)absrow);
-    //Row 3
+    // Row 3
     y += space;
     /*prem-timer reset */
-    GUI_CreateLabelBox(&gui->resetpermlbl, LABEL_X, y,
-            LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Reset"));
     GUI_CreateButtonPlateText(&gui->resetperm, RESET_X, y,
             RESET_WIDTH, LINE_HEIGHT, &BUTTON_FONT, show_timerperm_cb, reset_timerperm_cb,(void *)(long)absrow);
     if(Model.mixer_mode != MIXER_STANDARD) {
         /* or Reset switch */
-    	GUI_CreateLabelBox(&gui->resetlbl, LABEL_X, y,
-            LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Reset sw"));
     	GUI_CreateTextSourcePlate(&gui->resetsrc, TEXTSEL_X, y ,
             TEXTSEL_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT, toggle_resetsrc_cb, set_resetsrc_cb, set_input_rstsrc_cb, (void *)(long)absrow);
 	y += space;
     }
-    //Row 4
-    GUI_CreateLabelBox(&gui->startlbl, LABEL_X, y,
-            START_WIDTH, // bug fix: label width and height can't be 0, otherwise, the label couldn't be hidden dynamically
-            LINE_HEIGHT, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Start"));
+    // Row 4
     GUI_CreateTextSelectPlate(&gui->start, TEXTSEL_X, y,
             TEXTSEL_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT, NULL, set_start_cb, (void *)(long)absrow);
 // don't include this in Devo7e due to memory restrictions
