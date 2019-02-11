@@ -51,7 +51,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 
     // Col 1
     for (int i = 0; i < 4; i++) {
-        switch(i) {
+        switch (i) {
             case 0:
                 lbl_obj = &gui->name;
                 lbl_str = timer_str_cb; lbl_data = (void *)(long)absrow;
@@ -69,7 +69,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
                 }
                 break;
             case 3:
-                w = START_WIDTH; //  bug fix: label width and height can't be 0, otherwise, the label couldn't be hidden dynamically
+                w = START_WIDTH;  // bug fix: label width and height can't be 0, otherwise, the label couldn't be hidden dynamically
                 lbl_obj = &gui->startlbl;
                 lbl_str = GUI_Localize;
                 lbl_data = _tr_noop("Start");
