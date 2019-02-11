@@ -13,7 +13,6 @@ CFLAGS = -DEMULATOR=USE_NATIVE_FS
 endif
 
 CFLAGS += -Itarget/common/emu -I$(SDIR)/target/common/filesystems
-LFLAGS = -lfltk
 
 ALL = $(TARGET).$(EXEEXT)
 
@@ -32,13 +31,13 @@ ifdef WINDOWS
         PORTAUDIO_DIR ?= /usr/local
         LFLAGS += -static-libgcc -static-libstdc++
     endif
-    LFLAGS := -L$(FLTK_DIR)/lib -L$(PORTAUDIO_DIR)/lib $(LFLAGS) -lole32 -luuid -lcomctl32 -lwsock32 -lgdi32 -lcomdlg32 -lportaudio
+    LFLAGS := -L$(FLTK_DIR)/lib -L$(PORTAUDIO_DIR)/lib $(LFLAGS) -lfltk -lole32 -luuid -lcomctl32 -lwsock32 -lgdi32 -lcomdlg32 -lportaudio
     CFLAGS += -I$(FLTK_DIR)/include -I$(PORTAUDIO_DIR)/include -DWIN32
     EXEEXT = exe
     ODIREXT = -w32
 else
-    CFLAGS := $(CFLAGS) `fltk-config --cflags`
-    LFLAGS := $(LFLAGS) `fltk-config --ldflags`
+    CFLAGS := $(CFLAGS) $(shell fltk-config --cflags)
+    LFLAGS := $(LFLAGS) $(shell fltk-config --ldflags)
     ifndef SOUND
         CFLAGS += -DNO_SOUND
     else
