@@ -2082,11 +2082,11 @@ msgstr "青-A"
 
 #: protocol/devo_cyrf6936.c:54
 msgid "Std"
-msgstr ""
+msgstr "標準"
 
 #: protocol/devo_cyrf6936.c:54
 msgid "X350"
-msgstr ""
+msgstr "X350"
 
 #: protocol/dsm2_cyrf6936.c:50
 msgid "OrangeRx"
@@ -2160,35 +2160,35 @@ msgstr "DynTrim"
 
 #: protocol/loli_nrf24l01.c:65
 msgid "Chan 1"
-msgstr ""
+msgstr "Ch 1"
 
 #: protocol/loli_nrf24l01.c:66
 msgid "Chan 2"
-msgstr ""
+msgstr "Ch 2"
 
 #: protocol/loli_nrf24l01.c:67
 msgid "Chan 3"
-msgstr ""
+msgstr "Ch 3"
 
 #: protocol/loli_nrf24l01.c:68
 msgid "Chan 4"
-msgstr ""
+msgstr "Ch 4"
 
 #: protocol/loli_nrf24l01.c:69
 msgid "Chan 5"
-msgstr ""
+msgstr "Ch 5"
 
 #: protocol/loli_nrf24l01.c:70
 msgid "Chan 6"
-msgstr ""
+msgstr "Ch 6"
 
 #: protocol/loli_nrf24l01.c:71
 msgid "Chan 7"
-msgstr ""
+msgstr "Ch 7"
 
 #: protocol/loli_nrf24l01.c:72
 msgid "Chan 8"
-msgstr ""
+msgstr "Ch 8"
 
 #: protocol/ppmout.c:41
 msgid "Notch PW"
