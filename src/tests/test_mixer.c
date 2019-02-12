@@ -155,10 +155,13 @@ void TestCalcChannels(CuTest *t)
     Model.templates[5] = MIXERTEMPLATE_CYC1;
     Model.templates[6] = MIXERTEMPLATE_CYC2;
     Model.templates[7] = MIXERTEMPLATE_CYC3;
-    MIXER_CalcChannels();
     s32 expected[NUM_OUT_CHANNELS] = {0, 0, 0, 0, 0, 1000, 800, 600, 0, 0, 0, 0, 0, 0, 0, 0};
-    for (int i = 0; i < NUM_OUT_CHANNELS; i++) {
-        CuAssertIntEquals(t, expected[i], Channels[i]);
+    for (int channels = 4; channels <= NUM_OUT_CHANNELS; channels++) {
+        Model.num_channels = channels;
+        MIXER_CalcChannels();
+        for (int i = 0; i < channels; i++) {
+            CuAssertIntEquals(t, expected[i], Channels[i]);
+        }
     }
 }
 

@@ -80,7 +80,7 @@ void MIXER_EvalMixers(volatile s32 *raw)
     int i;
     s32 orig_value[NUM_CHANNELS];
     //3rd step: apply mixers
-    for (i = 0; i < NUM_CHANNELS; i++) {
+    for (i = 0; i < Model.num_channels; i++) {
         orig_value[i] = raw[i + NUM_INPUTS + 1];
     }
     for (i = 0; i < NUM_MIXERS; i++) {
@@ -190,7 +190,7 @@ void MIXER_CalcChannels()
     //4th step: apply auto-templates
     s32 cyclic[3];
     MIXER_CreateCyclicOutput(raw, cyclic);
-    for (i = 0; i < NUM_OUT_CHANNELS; i++) {
+    for (i = 0; i < Model.num_channels; i++) {
         switch(Model.templates[i]) {
             case MIXERTEMPLATE_CYC1:
             case MIXERTEMPLATE_CYC2:
@@ -200,7 +200,7 @@ void MIXER_CalcChannels()
         }
     }
     //5th step: apply limits
-    for (i = 0; i < NUM_OUT_CHANNELS; i++) {
+    for (i = 0; i < Model.num_channels; i++) {
         Channels[i] = MIXER_GetChannel(i, APPLY_ALL);
     }
 }
