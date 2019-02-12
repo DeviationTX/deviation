@@ -88,17 +88,8 @@ static const char * const ALIGN_VAL[] = {
 #define MATCH_KEY(s)     strcasecmp(name,    s) == 0
 #define MATCH_VALUE(s)   strcasecmp(value,   s) == 0
 #define SET_FLAG(var, value, flag) ((value) ? ((var) | (flag)) : ((var) & ~(flag)))
-extern u8 FONT_GetFromString(const char *);
-struct display_settings Display;
 
-static u16 get_color(const char *value) {
-    u8 r, g, b;
-    u32 color = strtol(value, NULL, 16);
-    r = 0xff & (color >> 16);
-    g = 0xff & (color >> 8);
-    b = 0xff & (color >> 0);
-    return RGB888_to_RGB565(r, g, b);
-}
+struct display_settings Display;
 
 static const struct struct_map _seclabel[] =
 {
@@ -162,6 +153,10 @@ static const struct struct_map _secbargraph[] =
     {FG_COLOR_NEG,           OFFSET_COL(struct disp_bargraph, fg_color_neg)},
     {FG_COLOR_ZERO,          OFFSET_COL(struct disp_bargraph, fg_color_zero)},
     {OUTLINE_COLOR,          OFFSET_COL(struct disp_bargraph, outline_color)},
+};
+static const struct struct_map _secbargraph_old[] =
+{
+    {FG_COLOR,           OFFSET_COL(struct disp_bargraph, fg_color_pos)},
 };
 #if (LCD_WIDTH == 480) || (LCD_WIDTH == 320)
 static const struct struct_map _secbackground[] =
@@ -242,11 +237,15 @@ static int ini_handler(void* user, const char* section, const char* name, const 
                 d->flags = SET_FLAG(d->flags, value_int, flag);
                 return 1;
             }
-            if(MATCH_KEY(FG_COLOR)) {
-                graph->fg_color_pos = graph->fg_color_neg = graph->fg_color_zero = get_color(value);
+
+            if (assign_int(graph, _secbargraph, ARRAYSIZE(_secbargraph), name, value))
+                return 1;
+
+            if (assign_int(graph, _secbargraph_old, ARRAYSIZE(_secbargraph_old), name, value)) {
+                graph->fg_color_neg = graph->fg_color_zero = graph->fg_color_pos;
                 return 1;
             }
-            assign_int(graph, _secbargraph, ARRAYSIZE(_secbargraph), name, value);
+
             return 1;
         }
     }
