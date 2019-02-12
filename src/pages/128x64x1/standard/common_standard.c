@@ -93,8 +93,7 @@ void STANDARD_DrawCurvePoints(guiLabel_t vallbl[], guiTextSelect_t val[],
     GUI_CreateTextSelectPlate(&val[4], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)4);
 
     y += height + LINE_H_OFFS + M_LEBEL_Y_OFFS;
-    int i = 1;
-    while (i < 8) {
+    for (int i = 1; i < 8; i++) {
         if  (i == 4)
             i++;  // lbl/selection 4 is used for center value
         switch (i) {
@@ -108,7 +107,6 @@ void STANDARD_DrawCurvePoints(guiLabel_t vallbl[], guiTextSelect_t val[],
         GUI_CreateLabelBox(&vallbl[i], x, y,  w1, height, &TINY_FONT, NULL, NULL, lbl_nr);
         x += w1;
         GUI_CreateTextSelectPlate(&val[i], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)i);
-        i++;
     }
 
     //update_textsel_state();
