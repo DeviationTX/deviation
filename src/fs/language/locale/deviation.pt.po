@@ -2070,11 +2070,11 @@ msgstr "Azul-A"
 
 #: protocol/devo_cyrf6936.c:54
 msgid "Std"
-msgstr ""
+msgstr "Std"
 
 #: protocol/devo_cyrf6936.c:54
 msgid "X350"
-msgstr ""
+msgstr "X350"
 
 #: protocol/dsm2_cyrf6936.c:50
 msgid "OrangeRx"
@@ -2148,35 +2148,35 @@ msgstr "DynTrim"
 
 #: protocol/loli_nrf24l01.c:65
 msgid "Chan 1"
-msgstr ""
+msgstr "Canal 1"
 
 #: protocol/loli_nrf24l01.c:66
 msgid "Chan 2"
-msgstr ""
+msgstr "Canal 2"
 
 #: protocol/loli_nrf24l01.c:67
 msgid "Chan 3"
-msgstr ""
+msgstr "Canal 3"
 
 #: protocol/loli_nrf24l01.c:68
 msgid "Chan 4"
-msgstr ""
+msgstr "Canal 4"
 
 #: protocol/loli_nrf24l01.c:69
 msgid "Chan 5"
-msgstr ""
+msgstr "Canal 5"
 
 #: protocol/loli_nrf24l01.c:70
 msgid "Chan 6"
-msgstr ""
+msgstr "Canal 6"
 
 #: protocol/loli_nrf24l01.c:71
 msgid "Chan 7"
-msgstr ""
+msgstr "Canal 7"
 
 #: protocol/loli_nrf24l01.c:72
 msgid "Chan 8"
-msgstr ""
+msgstr "Canal 8"
 
 #: protocol/ppmout.c:41
 msgid "Notch PW"
