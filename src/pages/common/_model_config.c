@@ -143,12 +143,10 @@ const char *set_train_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     int idx = (long)data;
     int s1, s2, min, max, value;
-    u16 *ptr;
     u8 changed;
     if (idx == 0) {
         min = 1;
         max = MAX_PPM_IN_CHANNELS;
-        ptr = NULL;
         value = Model.num_ppmin_channels;
         s1 = 1;
         s2 = 1;
@@ -158,21 +156,26 @@ const char *set_train_cb(guiObject_t *obj, int dir, void *data)
         if (idx == 1) {
             min = 1000;
             max = 1800;
-            ptr = &Model.ppmin_centerpw;
             value = Model.ppmin_centerpw;
         } else {
             min = 100;
             max = 700;
-            ptr = &Model.ppmin_deltapw;
             value = Model.ppmin_deltapw;
         }
     }
     value = GUI_TextSelectHelper(value, min, max, dir, s1, s2, &changed);
     if (changed) {
-        if(! ptr) {
-           Model.ppmin_mode = value;
-        } else {
-           *ptr = value;
+        switch (idx)
+        {
+            case 0:
+                Model.ppmin_mode = value;
+                break;
+            case 1:
+                Model.ppmin_centerpw = value;
+                break;
+            case 2:
+                Model.ppmin_deltapw = value;
+                break;
         }
     }
     sprintf(tempstring, "%d", value);
