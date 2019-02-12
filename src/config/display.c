@@ -154,7 +154,7 @@ static const struct struct_map _secbargraph[] =
     {FG_COLOR_ZERO,          OFFSET_COL(struct disp_bargraph, fg_color_zero)},
     {OUTLINE_COLOR,          OFFSET_COL(struct disp_bargraph, outline_color)},
 };
-static const struct struct_map _secbargraph_old[] =
+static const struct struct_map _secbargraph_legacy[] =
 {
     {FG_COLOR,           OFFSET_COL(struct disp_bargraph, fg_color_pos)},
 };
@@ -241,7 +241,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             if (assign_int(graph, _secbargraph, ARRAYSIZE(_secbargraph), name, value))
                 return 1;
 
-            if (assign_int(graph, _secbargraph_old, ARRAYSIZE(_secbargraph_old), name, value)) {
+            if (assign_int(graph, _secbargraph_legacy, ARRAYSIZE(_secbargraph_legacy), name, value)) {
                 graph->fg_color_neg = graph->fg_color_zero = graph->fg_color_pos;
                 return 1;
             }
@@ -251,6 +251,24 @@ static int ini_handler(void* user, const char* section, const char* name, const 
     }
     printf("Could not handle [%s] %s=%s\n", section, name, value);
     return 1;
+}
+
+static void convert_legacy()
+{
+    for (int i = 0; i < NUM_LABELS; i++) {
+        struct LabelDesc *label = &Display.font[i];
+        // For compatibility reasons,
+        // use the old alignment values as default
+        // if the new one is not yet set:
+        if (label->align == 0) {
+            switch (label->style) {
+                case LABEL_CENTER: label->align = ALIGN_CENTER; break;
+                case LABEL_LEFT:   label->align = ALIGN_LEFT;   break;
+                case LABEL_RIGHT:  label->align = ALIGN_RIGHT;  break;
+                default: break;
+            }
+        }
+    }
 }
 
 u8 CONFIG_ReadDisplay()
@@ -274,21 +292,7 @@ u8 CONFIG_ReadDisplay()
     char filename[] = "media/config.ini";
     #endif
     if (CONFIG_IniParse(filename, ini_handler, (void *)&Display)) {
-        for (int i = 0; i < NUM_LABELS; i++) {
-            struct LabelDesc *label = &Display.font[i];
-            // For compatibility reasons,
-            // use the old alignment values as default
-            // if the new one is not yet set:
-            if (label->align == 0) {
-                switch (label->style) {
-                    case LABEL_CENTER: label->align = ALIGN_CENTER; break;
-                    case LABEL_LEFT:   label->align = ALIGN_LEFT;   break;
-                    case LABEL_RIGHT:  label->align = ALIGN_RIGHT;  break;
-                    default: break;
-                }
-            }
-        }
-
+        convert_legacy();
         return 1;
     }
 
