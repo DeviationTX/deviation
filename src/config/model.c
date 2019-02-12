@@ -564,6 +564,7 @@ static const struct struct_map _secswash[] = {
     {SWASH_AILMIX, OFFSET(struct Model, swashmix[0])},
     {SWASH_ELEMIX, OFFSET(struct Model, swashmix[1])},
     {SWASH_COLMIX, OFFSET(struct Model, swashmix[2])},
+    {SWASH_TYPE,   OFFSET_STRCALL(struct Model, swash_type, MIXER_SwashType, SWASH_TYPE_LAST)},
 };
 static const u16 _secswash_defaults[] = {
     60, 60, 60
@@ -843,16 +844,6 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         return 0;
     }
     if (MATCH_SECTION(SECTION_SWASH)) {
-        if (MATCH_KEY(SWASH_TYPE)) {
-            for (i = SWASH_TYPE_NONE; i <= SWASH_TYPE_90; i++) {
-                if(strcasecmp(MIXER_SwashType(i), value) == 0) {
-                    m->swash_type = i;
-                    return 1;
-                }
-            }
-            printf("%s: Unknown swash_type: %s\n", section, value);
-            return 1;
-        }
         if (MATCH_KEY(SWASH_ELE_INV)) {
             if (value_int)
                 m->swash_invert |= 0x01;
@@ -1254,7 +1245,6 @@ u8 CONFIG_WriteModel(u8 model_num) {
     }
     if (WRITE_FULL_MODEL || m->swash_type) {
         fprintf(fh, "[%s]\n", SECTION_SWASH);
-        fprintf(fh, "%s=%s\n", SWASH_TYPE, MIXER_SwashType(m->swash_type));
         if (WRITE_FULL_MODEL || m->swash_invert & 0x01)
             fprintf(fh, "%s=1\n", SWASH_ELE_INV);
         if (WRITE_FULL_MODEL || m->swash_invert & 0x02)

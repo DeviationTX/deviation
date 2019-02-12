@@ -26,6 +26,9 @@
 #define MATCH_KEY(s)     strcasecmp(name,    s) == 0
 #define MATCH_VALUE(s)   strcasecmp(value,   s) == 0
 
+typedef const char* StringCallback(int value);
+typedef const char* StringCallback2(char* buffer, int value);
+
 extern u8 FONT_GetFromString(const char *);
 
 static u16 get_color(const char *value) {
@@ -142,13 +145,30 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size, const char
                     const char* const *list = (const char* const *)map[i].str;
                     unsigned length = map[i].offset;
                     for (unsigned j = 0; j < length; j++) {
-                        if (list[j] && MATCH_VALUE(list[j]))
+                        if (list[j] && MATCH_VALUE(list[j])) {
                             *((u8 *)((u8*)ptr + offset)) = j;
+                            return 1;
+                        }
                     }
+                    printf("unknow value %s for %s\n", value, name);
+                    break;
+                }
+                case TYPE_STR_CALL: {
+                    i++;
+                    StringCallback *callback = (StringCallback*)map[i].str;
+                    for (unsigned j = 0; j < map[i].offset; j++)
+                    {
+                        if (mapstrcasecmp(name, callback(i)) == 0) {
+                            *((u8 *)((u8*)ptr + offset)) = j;
+                            return 1;
+                        }
+                    }
+                    printf("unknow value %s for %s\n", value, name);
                     break;
                 }
                 default:
                     printf("Unknown type: %d\n", size);
+                    break;
             }
             return 1;
         }
@@ -179,6 +199,8 @@ int write_int2(void* ptr, const struct struct_map *map, int map_size,
                 value = *((u32 *)((u8*)ptr + offset)); break;
 
             case TYPE_STR_LIST:
+            case TYPE_STR_CALL:
+            case TYPE_STR_CALL2:
             case TYPE_BUTTON:
             case TYPE_SOURCE:
                 value = *((u8 *)((u8*)ptr + offset)); break;
@@ -209,6 +231,12 @@ int write_int2(void* ptr, const struct struct_map *map, int map_size,
             case TYPE_SOURCE: {
                 char tmpstr[20];
                 fprintf(fh, "%s=%s\n", map[i].str, INPUT_SourceNameReal(tmpstr, value));
+                break;
+            }
+            case TYPE_STR_CALL: {
+                i++;
+                StringCallback *callback = (StringCallback*)map[i].str;
+                fprintf(fh, "%s=%s\n", map[i].str, callback(value));
                 break;
             }
             default:

@@ -29,11 +29,12 @@ enum {
 
     TYPE_STR_LIST = 8,
     TYPE_STR_CALL = 9,
+    TYPE_STR_CALL2 = 10,
 
-    TYPE_COLOR = 10,
-    TYPE_FONT = 11,
-    TYPE_SOURCE = 12,
-    TYPE_BUTTON = 13,
+    TYPE_COLOR = 11,
+    TYPE_FONT = 12,
+    TYPE_SOURCE = 13,
+    TYPE_BUTTON = 14,
 };
 
 struct struct_map {const char *str;  u16 offset;};
@@ -45,7 +46,9 @@ struct struct_map {const char *str;  u16 offset;};
 #define OFFSET_STRLIST(s, v, StrList, StrListSize) \
     (offsetof(s, v) | (TYPE_STR_LIST << 12)) }, { (const char*)StrList, StrListSize
 #define OFFSET_STRCALL(s, v, StrCallback, N) \
-    (offsetof(s, v) | (TYPE_STR_LIST << 12)) }, { (const char*)StrCallback, N
+    (offsetof(s, v) | (TYPE_STR_CALL << 12)) }, { (const char*)StrCallback, N
+#define OFFSET_STRCALL2(s, v, StrCallback, N) \
+    (offsetof(s, v) | (TYPE_STR_CALL2 << 12)) }, { (const char*)StrCallback, N
 #define OFFSET_SRC(s, v) (offsetof(s, v) | (TYPE_SOURCE << 12))
 #define OFFSET_BUT(s, v) (offsetof(s, v) | (TYPE_BUTTON << 12))
 
