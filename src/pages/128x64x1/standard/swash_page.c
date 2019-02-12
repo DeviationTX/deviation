@@ -43,13 +43,9 @@ void PAGE_SwashInit(int page)
     GUI_CreateTextSelectPlate(&gui->type, FIELD_X, 0, FIELD_WIDTH, HEADER_WIDGET_HEIGHT, &TEXTSEL_FONT, NULL, swash_val_cb, NULL); // FIXME: need a special value for header button/textsels
 
     u8 y = HEADER_HEIGHT + 1;
-    const void * swashlbl = _tr("ELE Mix");
+    const void * swashlbl[3] = { _tr_noop("ELE Mix"), _tr_noop("AIL Mix"), _tr_noop("PIT Mix") };
     for (int i = 0; i < 3; i++) {
-        if (i == 1)
-            swashlbl = _tr("AIL Mix");
-        if (i == 2)
-            swashlbl = _tr("PIT Mix");
-        GUI_CreateLabelBox(&gui->lbl[i], LABEL_X, y, LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, NULL, NULL, swashlbl);
+        GUI_CreateLabelBox(&gui->lbl[i], LABEL_X, y, LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, GUI_Localize, NULL, swashlbl[i]);
         GUI_CreateTextSelectPlate(&gui->mix[i], FIELD_X, y, FIELD_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT, NULL, swashmix_val_cb, (void *)(long)i);
         y += LINE_SPACE;
     }
