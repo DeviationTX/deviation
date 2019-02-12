@@ -215,7 +215,7 @@ static const char *ppmin_select_cb(guiObject_t *obj, int dir, void *data)
             }
         }
         GUI_TextSelectEnablePress((guiTextSelect_t *)obj, new_ppm);
-        Model.num_ppmin_mode = new_ppm;
+        Model.ppmin_mode = new_ppm;
     }
     if (new_ppm == 0) {
         return _tr("None");

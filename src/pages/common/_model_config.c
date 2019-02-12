@@ -170,7 +170,7 @@ const char *set_train_cb(guiObject_t *obj, int dir, void *data)
     value = GUI_TextSelectHelper(value, min, max, dir, s1, s2, &changed);
     if (changed) {
         if(! ptr) {
-           Model.num_ppmin_mode = value;
+           Model.ppmin_mode = value;
         } else {
            *ptr = value;
         }

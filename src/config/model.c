@@ -1041,7 +1041,7 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
         if (MATCH_KEY(PPMIN_MODE)) {
             for(i = 0; i < 4; i++) {
                 if(mapstrcasecmp(PPMIN_MODE_VALUE[i], value) == 0) {
-                    m->num_ppmin_mode = i;
+                    m->ppmin_mode = i;
                     return 1;
                 }
             }
