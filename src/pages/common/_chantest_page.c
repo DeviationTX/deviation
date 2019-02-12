@@ -108,7 +108,7 @@ static int get_channel_idx(int chan)
         return i + NUM_INPUTS;
     } else {
         if (cp->type == MONITOR_RAWINPUT) {
-            int ppms = (PPMin_Mode() == PPM_IN_SOURCE) ? Model.num_ppmin & 0x3f: 0;
+            int ppms = (PPMin_Mode() == PPM_IN_SOURCE) ? Model.num_ppmin_channels: 0;
             if (chan < ppms)
                 return NUM_INPUTS + NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS + chan;
             chan -= ppms;
@@ -140,7 +140,7 @@ static int num_disp_bars() {
             }
         }
         if (cp->type == MONITOR_RAWINPUT && PPMin_Mode() == PPM_IN_SOURCE) {
-            j += Model.num_ppmin & 0x3f;
+            j += Model.num_ppmin_channels;
         }
     }
     //printf("%d\n", j);

@@ -149,7 +149,7 @@ const char *set_train_cb(guiObject_t *obj, int dir, void *data)
         min = 1;
         max = MAX_PPM_IN_CHANNELS;
         ptr = NULL;
-        value = Model.num_ppmin & 0x3f;
+        value = Model.num_ppmin_channels;
         s1 = 1;
         s2 = 1;
     } else {
@@ -170,7 +170,7 @@ const char *set_train_cb(guiObject_t *obj, int dir, void *data)
     value = GUI_TextSelectHelper(value, min, max, dir, s1, s2, &changed);
     if (changed) {
         if(! ptr) {
-           Model.num_ppmin = (Model.num_ppmin & 0xc0) | value;
+           Model.num_ppmin_mode = value;
         } else {
            *ptr = value;
         }

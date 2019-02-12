@@ -87,7 +87,7 @@ void TestUpdateRawInputs(CuTest *t)
 
     //PPMin = TRAIN2
     memset((s32 *)raw, 0, sizeof(raw));
-    Model.num_ppmin = PPM_IN_TRAIN2 << 6;
+    Model.num_ppmin_mode = PPM_IN_TRAIN2;
     Model.train_sw = INP_GEAR1;
     raw[Model.train_sw] = 100;
     for(int i = 0; i < MAX_PPM_IN_CHANNELS; i++) {
@@ -107,7 +107,8 @@ void TestUpdateRawInputs(CuTest *t)
     //PPMin = Source
     ppmSync = 1;
     memset((s32 *)raw, 0, sizeof(raw));
-    Model.num_ppmin = (PPM_IN_SOURCE << 6) | MAX_PPM_IN_CHANNELS;
+    Model.num_ppmin_mode = PPM_IN_SOURCE;
+    Model.num_ppmin_channels = MAX_PPM_IN_CHANNELS;
     MIXER_UpdateRawInputs();
     for(unsigned i = 0; i < MAX_PPM_IN_CHANNELS; i++) {
         CuAssertIntEquals(t, -100 * i, raw[1 + NUM_INPUTS + NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS + i]);
@@ -174,7 +175,7 @@ void TestGetChannel(CuTest *t)
     raw[NUM_INPUTS + 1] = 1000;
     CuAssertIntEquals(t, 1000, MIXER_GetChannel(0, 0));
 
-    Model.num_ppmin = PPM_IN_TRAIN1 << 6;
+    Model.num_ppmin_mode = PPM_IN_TRAIN1;
     Model.train_sw = INP_GEAR1;
     raw[Model.train_sw] = 100;
     ppmSync = 1;

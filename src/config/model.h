@@ -33,7 +33,8 @@ struct Model {
     enum Protocols protocol;
     s16 proto_opts[NUM_PROTO_OPTS];
     u8 num_channels;
-    u8 num_ppmin;
+    u8 num_ppmin_channels;
+    u8 num_ppmin_mode;
     u16 ppmin_centerpw;
     u16 ppmin_deltapw;
     u8 train_sw;
