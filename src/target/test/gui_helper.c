@@ -36,7 +36,7 @@ void AssertScreenshot(CuTest* t, const char* filename)
 
     if (png_open_file_read(&png, filepath) != PNG_NO_ERROR)
     {
-        printf("Missing expected screenshot. Please add %s to git repo.", filepath);
+        printf("Missing expected screenshot. Please add %s to git repo.\n", filepath);
         WriteScreen(filepath);
     }
     else
