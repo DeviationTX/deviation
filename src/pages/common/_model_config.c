@@ -168,7 +168,7 @@ const char *set_train_cb(guiObject_t *obj, int dir, void *data)
         switch (idx)
         {
             case 0:
-                Model.ppmin_mode = value;
+                Model.num_ppmin_channels = value;
                 break;
             case 1:
                 Model.ppmin_centerpw = value;
