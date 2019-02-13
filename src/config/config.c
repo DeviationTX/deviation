@@ -162,9 +162,9 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size, const char
                         j = 0;
                     }
 
-                    for (; j < map[i].offset; j++)
+                    for (; j < (map[i].offset & 0xFF); j++)
                     {
-                        if (mapstrcasecmp(value, callback(i)) == 0) {
+                        if (mapstrcasecmp(value, callback(j)) == 0) {
                             *((u8 *)((u8*)ptr + offset)) = j;
                             return 1;
                         }
@@ -183,9 +183,9 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size, const char
                     } else {
                         j = 0;
                     }
-                    for (; j < map[i].offset; j++)
+                    for (; j < (map[i].offset & 0xFF); j++)
                     {
-                        if (mapstrcasecmp(value, callback(strbuf, i)) == 0) {
+                        if (mapstrcasecmp(value, callback(strbuf, j)) == 0) {
                             *((u8 *)((u8*)ptr + offset)) = j;
                             return 1;
                         }
