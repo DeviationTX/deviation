@@ -4,6 +4,7 @@ extern void AssertScreenshot(CuTest* t, const char* testname);
 
 #define PAGEDEF(id, init, event, exit, menu, name) menu,
 static int page_attr[] = {
+    #include "pagelist.h"
 };
 #undef PAGEDEF
 
@@ -15,8 +16,9 @@ void TestAllPages(CuTest* t)
     CONFIG_LoadTx();
     CONFIG_ReadDisplay();
     CONFIG_ResetModel();
+    CONFIG_ReadTemplate("heli_std.ini");
+    Transmitter.audio_player = AUDIO_AUDIOFX;
     Transmitter.current_model = 1;
-    STDMIXER_InitSwitches();
 
     PAGE_Init();
     for (int i = 0; i < PAGEID_LAST; i++) {
@@ -25,6 +27,7 @@ void TestAllPages(CuTest* t)
             // If this is a mixer specific page
             if (page_attr[i] & MIXER_STANDARD) {
                 Model.mixer_mode = MIXER_STANDARD;
+                STDMIXER_Preset();
             } else {
                 Model.mixer_mode = MIXER_ADVANCED;
             }
