@@ -228,6 +228,10 @@ int write_int2(void* ptr, const struct struct_map *map, int map_size,
             case TYPE_STR_LIST:
             case TYPE_STR_CALL:
             case TYPE_STR_CALL2:
+                i++;  // next entry is additional info for string list
+                value = *((u8 *)((u8*)ptr + offset));
+                break;
+
             case TYPE_BUTTON:
             case TYPE_SOURCE:
                 value = *((u8 *)((u8*)ptr + offset)); break;
@@ -247,7 +251,6 @@ int write_int2(void* ptr, const struct struct_map *map, int map_size,
         switch (size)
         {
             case TYPE_STR_LIST: {
-                i++;  // next entry is additional info for string list
                 const char* const *list = (const char* const *)map[i].str;
                 fprintf(fh, "%s=%s\n", map[i - 1].str, list[value]);
                 break;
@@ -261,16 +264,14 @@ int write_int2(void* ptr, const struct struct_map *map, int map_size,
                 break;
             }
             case TYPE_STR_CALL: {
-                i++;
                 StringCallback *callback = (StringCallback*)map[i].str;
-                fprintf(fh, "%s=%s\n", map[i].str, callback(value));
+                fprintf(fh, "%s=%s\n", map[i - 1].str, callback(value));
                 break;
             }
             case TYPE_STR_CALL2: {
-                i++;
                 char strbuf[30];
                 StringCallback2 *callback = (StringCallback2*)map[i].str;
-                fprintf(fh, "%s=%s\n", map[i].str, callback(strbuf, value));
+                fprintf(fh, "%s=%s\n", map[i - 1].str, callback(strbuf, value));
                 break;
             }
             default:

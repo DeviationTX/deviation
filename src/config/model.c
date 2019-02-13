@@ -1123,7 +1123,6 @@ u8 CONFIG_WriteModel(u8 model_num) {
     CONFIG_EnableLanguage(0);
     fprintf(fh, "%s=%s\n", MODEL_NAME, m->name);
     write_int2(m, _secnone, ARRAYSIZE(_secnone), DEFAULTS_ZERO, 0, fh);
-    fprintf(fh, "%s=%s\n", MODEL_MIXERMODE, STDMIXER_ModeName(m->mixer_mode));
     if(m->icon[0] != 0)
         fprintf(fh, "%s=%s\n", MODEL_ICON, m->icon + 9);
     if(WRITE_FULL_MODEL || m->type != 0)
