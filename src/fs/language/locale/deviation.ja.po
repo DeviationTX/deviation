@@ -467,7 +467,7 @@ msgstr "速度"
 
 #: pages/128x64x1/advanced/mixer_page.c:44
 msgid "Mixer    Reorder:Hold R+"
-msgstr "ミキサー パターン   R+"
+msgstr "ミキサー : 右キー長押し"
 
 #: pages/128x64x1/advanced/mixer_setup.c:78
 #: pages/128x64x1/advanced/mixer_setup.c:157
