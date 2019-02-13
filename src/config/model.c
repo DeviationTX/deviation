@@ -508,12 +508,14 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
     return 1;
 }
 
-#if HAS_PERMANENT_TIMER
 static const struct struct_map _secnone[] =
 {
+#if HAS_PERMANENT_TIMER
     {PERMANENT_TIMER, OFFSET(struct Model, permanent_timer)},
-};
 #endif
+    {MODEL_TYPE, OFFSET_STRLIST(struct Model, type, MODEL_TYPE_VAL, ARRAYSIZE(MODEL_TYPE_VAL))},
+    {MODEL_MIXERMODE, OFFSET_STRCALL(struct Model, mixer_mode, STDMIXER_ModeName, 0x0103)},
+};
 static const struct struct_map _secradio[] = {
     {RADIO_NUM_CHANNELS, OFFSET(struct Model, num_channels)},
     {RADIO_FIXED_ID,     OFFSET(struct Model, fixed_id)},
@@ -526,6 +528,7 @@ static const struct struct_map _secradio[] = {
 #if HAS_EXTENDED_TELEMETRY
     {RADIO_GROUND_LEVEL,     OFFSET(struct Model, ground_level)},
 #endif
+    {RADIO_PROTOCOL, OFFSET_STRCALL(struct Model, protocol, PROTOCOL_GetName, PROTOCOL_COUNT)},
 };
 static const struct struct_map _secmixer[] = {
     {MIXER_SCALAR, OFFSETS(struct Mixer, scalar)},
@@ -608,44 +611,14 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             CONFIG_ParseIconName(m->icon, value);
             return 1;
         }
-#if HAS_PERMANENT_TIMER
-        if (assign_int(&Model, _secnone, ARRAYSIZE(_secnone), name, value))
-            return 1;
-#endif
-        if (MATCH_KEY(MODEL_TYPE)) {
-            for (i = 0; i < NUM_STR_ELEMS(MODEL_TYPE_VAL); i++) {
-                if (MATCH_VALUE(MODEL_TYPE_VAL[i])) {
-                    m->type = i;
-                    return 1;
-                }
-            }
-            return 0;
-        }
         if (MATCH_KEY(MODEL_AUTOMAP)) {
             auto_map = atoi(value);
             return 1;
         }
-        if (MATCH_KEY(MODEL_MIXERMODE)) {
-            for(i = 1; i < 3; i++) {
-                if(MATCH_VALUE(STDMIXER_ModeName(i)))
-                    m->mixer_mode = i;
-            }
+        if (assign_int(&Model, _secnone, ARRAYSIZE(_secnone), name, value))
             return 1;
-        }
     }
     if (MATCH_SECTION(SECTION_RADIO)) {
-        if (MATCH_KEY(RADIO_PROTOCOL)) {
-            for (i = 0; i < PROTOCOL_COUNT; i++) {
-                if (MATCH_VALUE(PROTOCOL_GetName(i))) {
-                    m->protocol = i;
-                    m->radio = PROTOCOL_GetRadio(i);
-                    PROTOCOL_Load(1);
-                    return 1;
-                }
-            }
-            printf("Unknown protocol: %s\n", value);
-            return 1;
-        }
         if (assign_int(&Model, _secradio, ARRAYSIZE(_secradio), name, value))
             return 1;
         if (MATCH_KEY(RADIO_TX_POWER)) {
@@ -1149,9 +1122,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
     }
     CONFIG_EnableLanguage(0);
     fprintf(fh, "%s=%s\n", MODEL_NAME, m->name);
-#if HAS_PERMANENT_TIMER
     write_int2(m, _secnone, ARRAYSIZE(_secnone), DEFAULTS_ZERO, 0, fh);
-#endif
     fprintf(fh, "%s=%s\n", MODEL_MIXERMODE, STDMIXER_ModeName(m->mixer_mode));
     if(m->icon[0] != 0)
         fprintf(fh, "%s=%s\n", MODEL_ICON, m->icon + 9);
@@ -1411,6 +1382,8 @@ u8 CONFIG_ReadModel(u8 model_num) {
         CONFIG_ReadLayout("layout/default.ini");
     if(! PROTOCOL_HasPowerAmp(Model.protocol))
         Model.tx_power = TXPOWER_150mW;
+    Model.radio = PROTOCOL_GetRadio(Model.protocol);
+    PROTOCOL_Load(1);
     MIXER_SetMixers(NULL, 0);
     if(auto_map)
         RemapChannelsForProtocol(EATRG0);

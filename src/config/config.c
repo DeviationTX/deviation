@@ -152,8 +152,17 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size, const char
                 }
                 case TYPE_STR_CALL: {
                     i++;
+                    unsigned j;
                     StringCallback *callback = (StringCallback*)map[i].str;
-                    for (unsigned j = 0; j < map[i].offset; j++)
+
+                    // If the length is larger than 256, upper part is start index
+                    if (map[i].offset & 0xFF00) {
+                        j = (map[i].offset & 0xFF00) >> 8;
+                    } else {
+                        j = 0;
+                    }
+
+                    for (; j < map[i].offset; j++)
                     {
                         if (mapstrcasecmp(value, callback(i)) == 0) {
                             *((u8 *)((u8*)ptr + offset)) = j;
@@ -166,8 +175,15 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size, const char
                 case TYPE_STR_CALL2: {
                     i++;
                     char strbuf[30];
+                    unsigned j;
                     StringCallback2 *callback = (StringCallback2*)map[i].str;
-                    for (unsigned j = 0; j < map[i].offset; j++)
+                    // If the length is larger than 256, upper part is start index
+                    if (map[i].offset & 0xFF00) {
+                        j = (map[i].offset & 0xFF00) >> 8;
+                    } else {
+                        j = 0;
+                    }
+                    for (; j < map[i].offset; j++)
                     {
                         if (mapstrcasecmp(value, callback(strbuf, i)) == 0) {
                             *((u8 *)((u8*)ptr + offset)) = j;
