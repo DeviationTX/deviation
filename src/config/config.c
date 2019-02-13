@@ -23,9 +23,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MATCH_KEY(s)     strcasecmp(name,    s) == 0
-#define MATCH_VALUE(s)   strcasecmp(value,   s) == 0
-
 typedef const char* StringCallback(int value);
 typedef const char* StringCallback2(char* buffer, int value);
 
@@ -112,7 +109,7 @@ u8 get_source(const char *value)
 
 int assign_int(void* ptr, const struct struct_map *map, int map_size, const char* name, const char* value) {
     for (int i = 0; i < map_size; i++) {
-        if (MATCH_KEY(map[i].str)) {
+        if (strcasecmp(name, map[i].str) == 0) {
             int size = map[i].offset >> 12;
             int offset = map[i].offset & 0xFFF;
             switch (size) {
@@ -145,7 +142,7 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size, const char
                     const char* const *list = (const char* const *)map[i].str;
                     unsigned length = map[i].offset;
                     for (unsigned j = 0; j < length; j++) {
-                        if (list[j] && MATCH_VALUE(list[j])) {
+                        if (list[j] && strcasecmp(value, list[j]) == 0) {
                             *((u8 *)((u8*)ptr + offset)) = j;
                             return 1;
                         }
@@ -158,7 +155,21 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size, const char
                     StringCallback *callback = (StringCallback*)map[i].str;
                     for (unsigned j = 0; j < map[i].offset; j++)
                     {
-                        if (mapstrcasecmp(name, callback(i)) == 0) {
+                        if (mapstrcasecmp(value, callback(i)) == 0) {
+                            *((u8 *)((u8*)ptr + offset)) = j;
+                            return 1;
+                        }
+                    }
+                    printf("unknow value %s for %s\n", value, name);
+                    break;
+                }
+                case TYPE_STR_CALL2: {
+                    i++;
+                    char strbuf[30];
+                    StringCallback2 *callback = (StringCallback2*)map[i].str;
+                    for (unsigned j = 0; j < map[i].offset; j++)
+                    {
+                        if (mapstrcasecmp(value, callback(strbuf, i)) == 0) {
                             *((u8 *)((u8*)ptr + offset)) = j;
                             return 1;
                         }
@@ -237,6 +248,13 @@ int write_int2(void* ptr, const struct struct_map *map, int map_size,
                 i++;
                 StringCallback *callback = (StringCallback*)map[i].str;
                 fprintf(fh, "%s=%s\n", map[i].str, callback(value));
+                break;
+            }
+            case TYPE_STR_CALL2: {
+                i++;
+                char strbuf[30];
+                StringCallback2 *callback = (StringCallback2*)map[i].str;
+                fprintf(fh, "%s=%s\n", map[i].str, callback(strbuf, value));
                 break;
             }
             default:
