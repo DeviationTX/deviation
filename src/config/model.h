@@ -33,7 +33,7 @@ struct Model {
     enum Protocols protocol;
     s16 proto_opts[NUM_PROTO_OPTS];
     u8 num_channels;
-    u8 num_ppmin;
+    u8 num_ppmin_channels;
     u16 ppmin_centerpw;
     u16 ppmin_deltapw;
     u8 train_sw;
@@ -49,7 +49,8 @@ struct Model {
     u8 safety[NUM_SOURCES+1];
     MixerMode mixer_mode;
     s8 ppm_map[MAX_PPM_IN_CHANNELS];
-    u8 padding_1[2];
+    u8 ppmin_mode;
+    u8 padding_1[1];
 #if HAS_PERMANENT_TIMER
     u32 permanent_timer;
 #endif

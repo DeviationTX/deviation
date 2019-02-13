@@ -155,7 +155,7 @@ static void MIXER_UpdateRawInputs()
         raw[i] = CHAN_ReadInput(mapped_channel);
     }
     if (PPMin_Mode() == PPM_IN_SOURCE && ppmSync) {
-        for (i = 0; i < (Model.num_ppmin & 0x3f); i++) {
+        for (i = 0; i < Model.num_ppmin_channels; i++) {
             raw[1 + NUM_INPUTS + NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS + i] = ppmChannels[i];
         }
     }

@@ -1035,13 +1035,13 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
     }
     if (MATCH_SECTION(SECTION_PPMIN)) {
         if (MATCH_KEY(PPMIN_NUM_CHANNELS)) {
-            m->num_ppmin = (m->num_ppmin & 0xC0) | atoi(value);
+            m->num_ppmin_channels = atoi(value);
             return 1;
         }
         if (MATCH_KEY(PPMIN_MODE)) {
             for(i = 0; i < 4; i++) {
                 if(mapstrcasecmp(PPMIN_MODE_VALUE[i], value) == 0) {
-                    m->num_ppmin = (m->num_ppmin & 0x3F) | (i << 6);
+                    m->ppmin_mode = i;
                     return 1;
                 }
             }
@@ -1297,7 +1297,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
     if (PPMin_Mode()) {
         fprintf(fh, "[%s]\n", SECTION_PPMIN);
         fprintf(fh, "%s=%s\n", PPMIN_MODE, PPMIN_MODE_VALUE[PPMin_Mode()]);
-        fprintf(fh, "%s=%d\n", PPMIN_NUM_CHANNELS, (m->num_ppmin & 0x3F));
+        fprintf(fh, "%s=%d\n", PPMIN_NUM_CHANNELS, m->num_ppmin_channels);
         if (PPMin_Mode() != PPM_IN_SOURCE) {
             fprintf(fh, "%s=%s\n", PPMIN_SWITCH, INPUT_SourceNameReal(file, m->train_sw));
         }
