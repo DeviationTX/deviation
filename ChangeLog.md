@@ -22,16 +22,18 @@
   * Introduce a new format of localiztion file to save Flash space and speed up UI rendering.
   * Scanner to check the RF enviroment around.
   * Enhance telemetry support by adding some new fields.
-
+  * Support Japanese language in manual and Tx
+  * F12e-XMS supports CN/JA/RU language
+  * Improved Tx Power interface
 
 ## Minor Features / Bug Fixes
   * Reduce RAM requirement by optimizing stack and heap usage
   * Reduce ROM size for AT9
+  * New bigger font for AT9
   * Support of Beken BK2421 / BK2423 support is removed.
   * Fix USBHID under OSX
   * Tx power setting shows power values of radio in use
   * Support Walkera QR-X350 telemetry format
-
 
 ## New protocols
     * PXX protocol
@@ -43,3 +45,4 @@
     * SBUS, CRSF
     * Flydream V3 protocol
     * Corona protocol
+    * LOLI protocol
