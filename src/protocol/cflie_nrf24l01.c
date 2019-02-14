@@ -892,15 +892,15 @@ uintptr_t CFlie_Cmds(enum ProtoCmds cmd)
             CLOCK_StopTimer();
             NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0);
             return 0;
-        case PROTOCMD_CHECK_AUTOBIND: return 0; // never Autobind // always Autobind
-        case PROTOCMD_BIND:  initialize(); return 0;
+        case PROTOCMD_CHECK_AUTOBIND: return 0;  // never Autobind
+        case PROTOCMD_BIND: initialize(); return 0;
         case PROTOCMD_NUMCHAN:
             switch(Model.proto_opts[PROTOOPTS_CRTP_MODE]) {
                 case CRTP_MODE_CPPM:
                     return 12;  // A, E, R, T, up to 8 additional aux channels
                 case CRTP_MODE_RPYT:
                 default:
-                    return 5; // A, E, R, T, + or x mode
+                    return 5;  // A, E, R, T, + or x mode
             }
         case PROTOCMD_DEFAULT_NUMCHAN: return 5;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id;

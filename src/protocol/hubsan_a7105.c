@@ -662,7 +662,7 @@ uintptr_t HUBSAN_Cmds(enum ProtoCmds cmd)
             return (A7105_Reset() ? 1 : -1);
         case PROTOCMD_CHECK_AUTOBIND: return Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H107;
         case PROTOCMD_BIND:  initialize(1); return 0;
-        case PROTOCMD_NUMCHAN: return 13; // A, E, T, R, Leds, Flips(or alt-hold), Snapshot, Video Recording, Headless, RTH, GPS Hold, Mode, flip
+        case PROTOCMD_NUMCHAN: return 13;  // A, E, T, R, Leds, Flips(or alt-hold), Snapshot, Video Recording, Headless, RTH, GPS Hold, Mode, flip
         case PROTOCMD_DEFAULT_NUMCHAN: return 13;
         case PROTOCMD_CURRENT_ID: return 0;
         case PROTOCMD_GETOPTIONS:

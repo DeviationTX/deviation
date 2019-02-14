@@ -380,9 +380,9 @@ uintptr_t HM830_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_RESET:
             CLOCK_StopTimer();
             return (NRF24L01_Reset() ? 1 : -1);
-        case PROTOCMD_CHECK_AUTOBIND: return 1; // Always Autobind
+        case PROTOCMD_CHECK_AUTOBIND: return 1;  // Always Autobind
         case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return  5; // T, A, E, R, G
+        case PROTOCMD_NUMCHAN: return 5;  // T, A, E, R, G
         case PROTOCMD_DEFAULT_NUMCHAN: return 5;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id;
         case PROTOCMD_TELEMETRYSTATE: return PROTO_TELEM_UNSUPPORTED;

@@ -554,9 +554,9 @@ uintptr_t Q303_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_RESET:
             CLOCK_StopTimer();
             return (NRF24L01_Reset() ? 1 : -1);
-        case PROTOCMD_CHECK_AUTOBIND: return 1; // always Autobind
+        case PROTOCMD_CHECK_AUTOBIND: return 1;  // always Autobind
         case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return 11; // A, E, T, R, altitude hold, flip, photo, video, headless, RTH, gimbal
+        case PROTOCMD_NUMCHAN: return 11;  // A, E, T, R, altitude hold, flip, photo, video, headless, RTH, gimbal
         case PROTOCMD_DEFAULT_NUMCHAN: return 11;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id;
         case PROTOCMD_GETOPTIONS: return (uintptr_t)q303_opts;

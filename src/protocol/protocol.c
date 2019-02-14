@@ -51,7 +51,7 @@ static u32 bind_time;
 
 #ifdef ENABLE_MODULAR
 unsigned long * const loaded_protocol = (unsigned long *)ENABLE_MODULAR;
-uintptr_t (* const PROTO_Cmds)(enum ProtoCmds) = (void *)(ENABLE_MODULAR +sizeof(long)+1);
+uintptr_t (* const PROTO_Cmds)(enum ProtoCmds) = (void *)(ENABLE_MODULAR + sizeof(unsigned) + 1);
 #define PROTOCOL_LOADED (*loaded_protocol == Model.protocol)
 #else
 uintptr_t (*PROTO_Cmds)(enum ProtoCmds) = NULL;

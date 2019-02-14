@@ -811,7 +811,7 @@ uintptr_t INAV_Cmds(enum ProtoCmds cmd)
             CLOCK_StopTimer();
             return (NRF24L01_Reset() ? 1 : -1);
         //case PROTOCMD_CHECK_AUTOBIND: return 0; 
-        case PROTOCMD_CHECK_AUTOBIND: return 1; // always Autobind
+        case PROTOCMD_CHECK_AUTOBIND: return 1;  // always Autobind
         case PROTOCMD_BIND:  initialize(INIT_BIND); return 0;
         case PROTOCMD_NUMCHAN: return rc_channel_count;
         case PROTOCMD_DEFAULT_NUMCHAN: return RC_CHANNEL_COUNT_DEFAULT;

@@ -352,9 +352,9 @@ uintptr_t ESKY_Cmds(enum ProtoCmds cmd)
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(0); return 0;
         case PROTOCMD_DEINIT: return 0;
-        case PROTOCMD_CHECK_AUTOBIND: return 0; //Never Autobind
+        case PROTOCMD_CHECK_AUTOBIND: return 0;  // Never Autobind
         case PROTOCMD_BIND:  initialize(1); return 0;
-        case PROTOCMD_NUMCHAN: return 6; // AETRGP
+        case PROTOCMD_NUMCHAN: return 6;  // AETRGP
         case PROTOCMD_DEFAULT_NUMCHAN: return 6;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id;
         case PROTOCMD_TELEMETRYSTATE: return PROTO_TELEM_UNSUPPORTED;

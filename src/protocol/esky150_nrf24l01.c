@@ -171,19 +171,19 @@ uintptr_t ESKY150_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:
-        	esky2_start_tx((Model.proto_opts[PROTOOPTS_STARTBIND] == STARTBIND_YES));
+            esky2_start_tx((Model.proto_opts[PROTOOPTS_STARTBIND] == STARTBIND_YES));
             return 0;
         case PROTOCMD_DEINIT:
         case PROTOCMD_RESET:
             CLOCK_StopTimer();
             return ((NRF24L01_Reset()) ? 1 : -1);
         case PROTOCMD_CHECK_AUTOBIND:
-            return 0; // Never Autobind
+            return 0;  // Never Autobind
         case PROTOCMD_BIND:
-        	esky2_start_tx(STARTBIND_YES);
-			return 0;
+            esky2_start_tx(STARTBIND_YES);
+            return 0;
         case PROTOCMD_NUMCHAN:
-            return 7; // T, A, E, R, FMODE, AUX1, AUX2
+            return 7;  // T, A, E, R, FMODE, AUX1, AUX2
         case PROTOCMD_DEFAULT_NUMCHAN:
             return 4;
         case PROTOCMD_CURRENT_ID: 

@@ -194,19 +194,19 @@ uintptr_t KN_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:
-        	kn_start_tx((Model.proto_opts[PROTOOPTS_STARTBIND] == STARTBIND_YES));
+            kn_start_tx((Model.proto_opts[PROTOOPTS_STARTBIND] == STARTBIND_YES));
             return 0;
         case PROTOCMD_DEINIT:
         case PROTOCMD_RESET:
             CLOCK_StopTimer();
             return ((NRF24L01_Reset()) ? 1 : -1);
         case PROTOCMD_CHECK_AUTOBIND:
-            return 0; // Never Autobind
+            return 0;  // Never Autobind
         case PROTOCMD_BIND:
-        	kn_start_tx(STARTBIND_YES);
-			return 0;
+            kn_start_tx(STARTBIND_YES);
+            return 0;
         case PROTOCMD_NUMCHAN:
-            return 11; // T, R, E, A, DR, TH, Flight mode, 6G, trim T, R, E and V977 side DR
+            return 11;  // T, R, E, A, DR, TH, Flight mode, 6G, trim T, R, E and V977 side DR
         case PROTOCMD_DEFAULT_NUMCHAN:
             return 11;
         case PROTOCMD_CURRENT_ID: 
