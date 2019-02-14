@@ -29,8 +29,6 @@
     //Some versions of gcc applythis to definitions, others to calls
     //So just use long_calls everywhere
     //#pragma no_long_calls
-    extern unsigned _data_loadaddr;
-    const unsigned long protocol_type = (unsigned long)&_data_loadaddr;
 #endif
 
 #ifdef PROTO_HAS_CYRF6936
