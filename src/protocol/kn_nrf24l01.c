@@ -190,31 +190,31 @@ static u32 tx_power_;
 //================================================================================================
 // Public Functions
 //================================================================================================
-const void *KN_Cmds(enum ProtoCmds cmd)
+uintptr_t KN_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:
-        	kn_start_tx((Model.proto_opts[PROTOOPTS_STARTBIND] == STARTBIND_YES));
+            kn_start_tx((Model.proto_opts[PROTOOPTS_STARTBIND] == STARTBIND_YES));
             return 0;
         case PROTOCMD_DEINIT:
         case PROTOCMD_RESET:
             CLOCK_StopTimer();
-            return (void *)((NRF24L01_Reset()) ? 1L : -1L);
+            return ((NRF24L01_Reset()) ? 1 : -1);
         case PROTOCMD_CHECK_AUTOBIND:
-            return (void *)0L; // Never Autobind
+            return 0;  // Never Autobind
         case PROTOCMD_BIND:
-        	kn_start_tx(STARTBIND_YES);
-			return 0;
+            kn_start_tx(STARTBIND_YES);
+            return 0;
         case PROTOCMD_NUMCHAN:
-            return (void *)11L; // T, R, E, A, DR, TH, Flight mode, 6G, trim T, R, E and V977 side DR
+            return 11;  // T, R, E, A, DR, TH, Flight mode, 6G, trim T, R, E and V977 side DR
         case PROTOCMD_DEFAULT_NUMCHAN:
-            return (void *)11L;
+            return 11;
         case PROTOCMD_CURRENT_ID: 
-            return (Model.fixed_id) ? (void *)Model.fixed_id : 0;
+            return Model.fixed_id;
         case PROTOCMD_GETOPTIONS: 
-            return KN_PROTOCOL_OPTIONS;
+            return (uintptr_t)KN_PROTOCOL_OPTIONS;
         case PROTOCMD_TELEMETRYSTATE: 
-            return (void *)PROTO_TELEM_UNSUPPORTED;
+            return PROTO_TELEM_UNSUPPORTED;
         case PROTOCMD_CHANNELMAP:
             return TAERG;
         default: break;

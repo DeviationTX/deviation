@@ -347,18 +347,17 @@ static void initialize(u8 bind)
     CLOCK_StartTimer(50000, esky_callback);
 }
 
-const void *ESKY_Cmds(enum ProtoCmds cmd)
+uintptr_t ESKY_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(0); return 0;
         case PROTOCMD_DEINIT: return 0;
-        case PROTOCMD_CHECK_AUTOBIND: return (void *)0L; //Never Autobind
+        case PROTOCMD_CHECK_AUTOBIND: return 0;  // Never Autobind
         case PROTOCMD_BIND:  initialize(1); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 6L; // AETRGP
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)6L;
-        // TODO: return id correctly
-        case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
-        case PROTOCMD_TELEMETRYSTATE: return (void *) PROTO_TELEM_UNSUPPORTED;
+        case PROTOCMD_NUMCHAN: return 6;  // AETRGP
+        case PROTOCMD_DEFAULT_NUMCHAN: return 6;
+        case PROTOCMD_CURRENT_ID: return Model.fixed_id;
+        case PROTOCMD_TELEMETRYSTATE: return PROTO_TELEM_UNSUPPORTED;
         case PROTOCMD_CHANNELMAP: return AETRG;
         default: break;
     }

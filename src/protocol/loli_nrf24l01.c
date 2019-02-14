@@ -442,23 +442,23 @@ static void initialize(u8 bind)
     CLOCK_StartTimer(500, LOLI_callback);
 }
 
-const void *LOLI_Cmds(enum ProtoCmds cmd)
+uintptr_t LOLI_Cmds(enum ProtoCmds cmd)
 {
     switch (cmd) {
         case PROTOCMD_INIT:  initialize(0); return 0;
         case PROTOCMD_DEINIT:
         case PROTOCMD_RESET:
             CLOCK_StopTimer();
-            return (void *)(NRF24L01_Reset() ? 1L : -1L);
-        case PROTOCMD_CHECK_AUTOBIND: return (void *)0L;
-        case PROTOCMD_BIND:  initialize(1); return (void*)0L;
-        case PROTOCMD_NUMCHAN: return (void *) 8L;
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
-        case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((u32)Model.fixed_id) : 0;
-        case PROTOCMD_GETOPTIONS: return loli_opts;
-        case PROTOCMD_SETOPTIONS: rxConfigChanged = 1; return (void*)0L;
-        case PROTOCMD_TELEMETRYSTATE: return (void *)PROTO_TELEM_ON;
-        case PROTOCMD_TELEMETRYTYPE: return (void *)(u32)TELEM_FRSKY;
+            return (NRF24L01_Reset() ? 1 : -1);
+        case PROTOCMD_CHECK_AUTOBIND: return 0;
+        case PROTOCMD_BIND:  initialize(1); return 0;
+        case PROTOCMD_NUMCHAN: return  8;
+        case PROTOCMD_DEFAULT_NUMCHAN: return 8;
+        case PROTOCMD_CURRENT_ID: return Model.fixed_id;
+        case PROTOCMD_GETOPTIONS: return (uintptr_t)loli_opts;
+        case PROTOCMD_SETOPTIONS: rxConfigChanged = 1; return 0;
+        case PROTOCMD_TELEMETRYSTATE: return PROTO_TELEM_ON;
+        case PROTOCMD_TELEMETRYTYPE: return TELEM_FRSKY;
         case PROTOCMD_CHANNELMAP: return AETRG;
         default: break;
     }

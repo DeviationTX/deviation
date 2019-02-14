@@ -348,21 +348,21 @@ static void initialize()
     CLOCK_StartTimer(1000, serial_cb);
 }
 
-const void * CRSF_Cmds(enum ProtoCmds cmd)
+uintptr_t CRSF_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(); return 0;
         case PROTOCMD_DEINIT: UART_Stop(); UART_Initialize(); return 0;
-        case PROTOCMD_CHECK_AUTOBIND: return (void *)1L;
+        case PROTOCMD_CHECK_AUTOBIND: return 1;
         case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *)16L;
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
-	case PROTOCMD_CHANNELMAP: return UNCHG;
+        case PROTOCMD_NUMCHAN: return 16;
+        case PROTOCMD_DEFAULT_NUMCHAN: return 8;
+        case PROTOCMD_CHANNELMAP: return UNCHG;
 #if HAS_EXTENDED_TELEMETRY
         case PROTOCMD_TELEMETRYSTATE:
-            return (void *)(long)PROTO_TELEM_ON;
+            return PROTO_TELEM_ON;
         case PROTOCMD_TELEMETRYTYPE:
-            return (void *)(long) TELEM_CRSF;
+            return TELEM_CRSF;
 #endif
         default: break;
     }

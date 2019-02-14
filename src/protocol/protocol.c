@@ -51,10 +51,10 @@ static u32 bind_time;
 
 #ifdef ENABLE_MODULAR
 unsigned long * const loaded_protocol = (unsigned long *)ENABLE_MODULAR;
-void * (* const PROTO_Cmds)(enum ProtoCmds) = (void *)(ENABLE_MODULAR +sizeof(long)+1);
+uintptr_t (* const PROTO_Cmds)(enum ProtoCmds) = (void *)(ENABLE_MODULAR + sizeof(unsigned) + 1);
 #define PROTOCOL_LOADED (*loaded_protocol == Model.protocol)
 #else
-const void * (*PROTO_Cmds)(enum ProtoCmds) = NULL;
+uintptr_t (*PROTO_Cmds)(enum ProtoCmds) = NULL;
 #define PROTOCOL_LOADED PROTO_Cmds
 #endif
 
@@ -72,7 +72,7 @@ const struct{
 #define PROTODEF(proto, module, map, cmd, name) {module, cmd, name},
 const struct{
     enum Radio module;
-    const void * (*cmd)(enum ProtoCmds);
+    uintptr_t (*cmd)(enum ProtoCmds);
     const char* name;
 }Protocols[PROTOCOL_COUNT] = {
     { 0, NULL, "None"},

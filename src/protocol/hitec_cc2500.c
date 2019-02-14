@@ -611,23 +611,23 @@ static void initialize(u8 bind)
   CLOCK_StartTimer(initHITEC(), hitec_cb);
 }
 
-const void *Hitec_Cmds(enum ProtoCmds cmd)
+uintptr_t Hitec_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(0); return 0;
         case PROTOCMD_DEINIT:
         case PROTOCMD_RESET:
             CLOCK_StopTimer();
-            return (void *)(CC2500_Reset() ? 1L : -1L);
+            return (CC2500_Reset() ? 1 : -1);
         case PROTOCMD_BIND:  initialize(1); return 0;
-        case PROTOCMD_NUMCHAN: return (void *)8L;
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
-        case PROTOCMD_CURRENT_ID: return (void *)((long)Model.fixed_id);
-        case PROTOCMD_GETOPTIONS: return hitec_opts;
+        case PROTOCMD_NUMCHAN: return 8;
+        case PROTOCMD_DEFAULT_NUMCHAN: return 8;
+        case PROTOCMD_CURRENT_ID: return Model.fixed_id;
+        case PROTOCMD_GETOPTIONS: return (uintptr_t)hitec_opts;
         case PROTOCMD_TELEMETRYSTATE:
-            return (void *)(long)(PROTO_TELEM_ON);
+            return PROTO_TELEM_ON;
         case PROTOCMD_TELEMETRYTYPE: 
-            return (void *)(long) TELEM_FRSKY;
+            return TELEM_FRSKY;
         case PROTOCMD_CHANNELMAP: return AETRG;
         default: break;
     }

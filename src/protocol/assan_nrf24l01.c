@@ -261,22 +261,22 @@ void initASSAN(u8 bind)
     CLOCK_StartTimer(50000, ASSAN_callback);
 }
 
-const void *ASSAN_Cmds(enum ProtoCmds cmd)
+uintptr_t ASSAN_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initASSAN(0); return 0;
         case PROTOCMD_DEINIT:
         case PROTOCMD_RESET:
             CLOCK_StopTimer();
-            return (void *)(NRF24L01_Reset() ? 1L : -1L);
-        case PROTOCMD_CHECK_AUTOBIND: return (void *)0L;
+            return (NRF24L01_Reset() ? 1L : -1L);
+        case PROTOCMD_CHECK_AUTOBIND: return 0L;
         case PROTOCMD_BIND:  initASSAN(1); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 8L;
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
-        case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
-        case PROTOCMD_GETOPTIONS: return (void*)0L;
+        case PROTOCMD_NUMCHAN: return  8L;
+        case PROTOCMD_DEFAULT_NUMCHAN: return 8L;
+        case PROTOCMD_CURRENT_ID: return Model.fixed_id;
+        case PROTOCMD_GETOPTIONS: return 0L;
         case PROTOCMD_CHANNELMAP: return AETRG;
-        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
+        case PROTOCMD_TELEMETRYSTATE: return PROTO_TELEM_UNSUPPORTED;
         default: break;
     }
     return 0;

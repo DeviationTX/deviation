@@ -288,20 +288,20 @@ static void initialize(u8 bind)
     CLOCK_StartTimer(2400, j6pro_cb);
 }
 
-const void *J6PRO_Cmds(enum ProtoCmds cmd)
+uintptr_t J6PRO_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(0); return 0;
         case PROTOCMD_DEINIT:
         case PROTOCMD_RESET:
             CLOCK_StopTimer();
-            return (void *)(CYRF_Reset() ? 1L : -1L);
+            return (CYRF_Reset() ? 1 : -1);
         case PROTOCMD_CHECK_AUTOBIND: return 0; //Never Autobind
         case PROTOCMD_BIND:  initialize(1); return 0;
-        case PROTOCMD_NUMCHAN: return (void *)12L;
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)6L;
+        case PROTOCMD_NUMCHAN: return 12;
+        case PROTOCMD_DEFAULT_NUMCHAN: return 6;
         case PROTOCMD_CURRENT_ID: return 0;
-        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
+        case PROTOCMD_TELEMETRYSTATE: return PROTO_TELEM_UNSUPPORTED;
         case PROTOCMD_CHANNELMAP: return AETRG;
         default: break;
     }

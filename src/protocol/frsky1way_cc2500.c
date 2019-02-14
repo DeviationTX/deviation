@@ -332,21 +332,21 @@ static void initialize(int bind)
     CLOCK_StartTimer(10000, frsky_cb);
 }
 
-const void *FRSKY1WAY_Cmds(enum ProtoCmds cmd)
+uintptr_t FRSKY1WAY_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(0); return 0;
         case PROTOCMD_DEINIT:
         case PROTOCMD_RESET:
             CLOCK_StopTimer();
-            return (void *)(CC2500_Reset() ? 1L : -1L);
+            return (CC2500_Reset() ? 1 : -1);
         case PROTOCMD_CHECK_AUTOBIND: return 0; //Never Autobind
         case PROTOCMD_BIND:  initialize(1); return 0;
-        case PROTOCMD_NUMCHAN: return (void *)8L;
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
-        case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
-        case PROTOCMD_GETOPTIONS: return frsky_opts;
-        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
+        case PROTOCMD_NUMCHAN: return 8;
+        case PROTOCMD_DEFAULT_NUMCHAN: return 8;
+        case PROTOCMD_CURRENT_ID: return Model.fixed_id;
+        case PROTOCMD_GETOPTIONS: return (uintptr_t)frsky_opts;
+        case PROTOCMD_TELEMETRYSTATE: return PROTO_TELEM_UNSUPPORTED;
         case PROTOCMD_CHANNELMAP: return AETRG;
         default: break;
     }

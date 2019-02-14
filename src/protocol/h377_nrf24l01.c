@@ -348,21 +348,22 @@ static void initialize(u8 bind)
     CLOCK_StartTimer(1000, h377_cb);
 }
 
-const void *H377_Cmds(enum ProtoCmds cmd)
+uintptr_t H377_Cmds(enum ProtoCmds cmd)
 {
      
     switch(cmd) {
-        case PROTOCMD_INIT:  initialize(0); printf("=>H377 : cmd %d PROTOCMD_INIT\n", cmd); return 0;
+        case PROTOCMD_INIT: initialize(0); return 0;
         case PROTOCMD_DEINIT:
         case PROTOCMD_RESET:
             CLOCK_StopTimer();
-            return (void *)(NRF24L01_Reset() ? 1L : -1L);
-        case PROTOCMD_CHECK_AUTOBIND: printf("=>H377 : cmd %d PROTOCMD_CHECK_AUTOBIND\n", cmd); return (void *)0L; //Never Autobind
-        case PROTOCMD_BIND:  initialize(1); printf("=>H377 : cmd %d PROTOCMD_BIND\n", cmd); return 0;
-        case PROTOCMD_NUMCHAN: printf("=>H377 : cmd %d PROTOCMD_NUMCHAN\n", cmd); return (void *)6L;
-        case PROTOCMD_DEFAULT_NUMCHAN: printf("=>H377 : cmd %d PROTOCMD_DEFAULT_NUMCHAN\n", cmd); return (void *)6L;
-        case PROTOCMD_CURRENT_ID: printf("=>H377 : cmd %d PROTOCMD_CURRENT_ID\n", cmd); return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
-        case PROTOCMD_TELEMETRYSTATE: return (void *) PROTO_TELEM_UNSUPPORTED;
+            return (NRF24L01_Reset() ? 1 : -1);
+        case PROTOCMD_CHECK_AUTOBIND:
+            return 0;  // Never Autobind
+        case PROTOCMD_BIND:  initialize(1); return 0;
+        case PROTOCMD_NUMCHAN: return 6;
+        case PROTOCMD_DEFAULT_NUMCHAN: return 6;
+        case PROTOCMD_CURRENT_ID: return Model.fixed_id;
+        case PROTOCMD_TELEMETRYSTATE: return PROTO_TELEM_UNSUPPORTED;
         case PROTOCMD_CHANNELMAP: return AETRG;
         default: break;
     }
