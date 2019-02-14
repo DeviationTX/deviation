@@ -200,8 +200,6 @@ static u32 rxid_to_radioid(u16 rxid) {
   //Some versions of gcc applythis to definitions, others to calls
   //So just use long_calls everywhere
   //#pragma long_calls_off
-  extern unsigned _data_loadaddr;
-  const unsigned long protocol_type = (unsigned long)&_data_loadaddr;
 #endif
 #ifdef PROTO_HAS_A7105
 

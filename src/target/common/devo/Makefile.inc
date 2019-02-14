@@ -24,6 +24,7 @@ ifdef MODULAR
 PROTO_EXTRA_C = $(wildcard $(SDIR)/target/common/devo/protocol/*.c) \
                 $(wildcard $(SDIR)/target/common/devo/hid/*.c) \
                 $(wildcard $(SDIR)/protocol/spi/*.c) \
+                $(SDIR)/target/common/devo/module_signature.c \
                 $(SDIR)/target/common/devo/uart.c
 SRC_C   += objs/$(TARGET)/proto_stubs.c
 else

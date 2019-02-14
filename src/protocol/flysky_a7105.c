@@ -28,8 +28,6 @@
 
 #ifdef MODULAR
   #pragma long_calls_off
-  extern unsigned _data_loadaddr;
-  const unsigned long protocol_type = (unsigned long)&_data_loadaddr;
 #endif
 
 #ifdef PROTO_HAS_A7105

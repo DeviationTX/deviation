@@ -26,8 +26,6 @@
 
 #ifdef MODULAR
   #pragma long_calls_off
-  extern unsigned _data_loadaddr;
-  const unsigned long protocol_type = (unsigned long)&_data_loadaddr;
 #endif
 //To change USBHID_MAX_CHANNELS you must change the Report_Descriptor in hid_usb_desc.c as well
 #define USBHID_ANALOG_CHANNELS 8

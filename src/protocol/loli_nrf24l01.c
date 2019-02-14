@@ -29,8 +29,6 @@
     // Some versions of gcc apply this to definitions, others to calls
     // So just use long_calls everywhere
     // #pragma long_calls_off
-    extern unsigned _data_loadaddr;
-    const u32 protocol_type = (u32)&_data_loadaddr;
 #endif
 
 #ifdef PROTO_HAS_NRF24L01
