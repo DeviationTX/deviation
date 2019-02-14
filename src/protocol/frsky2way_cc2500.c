@@ -507,25 +507,25 @@ static void initialize(int bind)
 #endif
 }
 
-const void *FRSKY2WAY_Cmds(enum ProtoCmds cmd)
+uintptr_t FRSKY2WAY_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(0); return 0;
         case PROTOCMD_CHECK_AUTOBIND: return 0; //Never Autobind
         case PROTOCMD_BIND:  initialize(1); return 0;
-        case PROTOCMD_NUMCHAN: return (void *)8L;
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
-        case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
+        case PROTOCMD_NUMCHAN: return 8;
+        case PROTOCMD_DEFAULT_NUMCHAN: return 8;
+        case PROTOCMD_CURRENT_ID: return Model.fixed_id;
         case PROTOCMD_GETOPTIONS:
-            return frsky_opts;
+            return (uintptr_t)frsky_opts;
         case PROTOCMD_TELEMETRYSTATE:
-            return (void *)(long)(Model.proto_opts[PROTO_OPTS_TELEM] == TELEM_ON ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
+            return (Model.proto_opts[PROTO_OPTS_TELEM] == TELEM_ON ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
         case PROTOCMD_RESET:
         case PROTOCMD_DEINIT:
             CLOCK_StopTimer();
-            return (void *)(CC2500_Reset() ? 1L : -1L);
+            return (CC2500_Reset() ? 1 : -1);
         case PROTOCMD_TELEMETRYTYPE: 
-            return (void *)(long) TELEM_FRSKY;
+            return TELEM_FRSKY;
         case PROTOCMD_TELEMETRYRESET:
 #if HAS_EXTENDED_TELEMETRY
             Model.ground_level = 0;

@@ -438,24 +438,24 @@ static void initialize(u8 bind)
     CLOCK_StartTimer(INITIAL_WAIT, bugs3mini_callback);
 }
 
-const void *BUGS3MINI_Cmds(enum ProtoCmds cmd)
+uintptr_t BUGS3MINI_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(0); return 0;
         case PROTOCMD_DEINIT:
         case PROTOCMD_RESET:
             CLOCK_StopTimer();
-            return (void *)(NRF24L01_Reset() ? 1L : -1L);
+            return (NRF24L01_Reset() ? 1 : -1);
         case PROTOCMD_CHECK_AUTOBIND: return 0;
         case PROTOCMD_BIND:  initialize(1); return 0;
-        case PROTOCMD_NUMCHAN: return (void *)10L;
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)10L;
-        case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
-        case PROTOCMD_GETOPTIONS: return bugs3mini_opts;
+        case PROTOCMD_NUMCHAN: return 10;
+        case PROTOCMD_DEFAULT_NUMCHAN: return 10;
+        case PROTOCMD_CURRENT_ID: return Model.fixed_id;
+        case PROTOCMD_GETOPTIONS: return (uintptr_t)bugs3mini_opts;
         case PROTOCMD_TELEMETRYSTATE:
-            return (void *)(long) PROTO_TELEM_ON;
+            return PROTO_TELEM_ON;
         case PROTOCMD_TELEMETRYTYPE:
-            return (void *)(long) TELEM_FRSKY;
+            return TELEM_FRSKY;
         case PROTOCMD_CHANNELMAP: return AETRG;
         default: break;
     }

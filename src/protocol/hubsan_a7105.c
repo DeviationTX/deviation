@@ -652,27 +652,27 @@ static void initialize(u8 bind) {
     CLOCK_StartTimer(10000, hubsan_cb);
 }
 
-const void *HUBSAN_Cmds(enum ProtoCmds cmd)
+uintptr_t HUBSAN_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT: initialize(0); return 0;
         case PROTOCMD_DEINIT:
         case PROTOCMD_RESET:
             CLOCK_StopTimer();
-            return (void *)(A7105_Reset() ? 1L : -1L);
-        case PROTOCMD_CHECK_AUTOBIND: return Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H107 ? (void*)1L : 0;
+            return (A7105_Reset() ? 1 : -1);
+        case PROTOCMD_CHECK_AUTOBIND: return Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H107;
         case PROTOCMD_BIND:  initialize(1); return 0;
-        case PROTOCMD_NUMCHAN: return (void *)13L; // A, E, T, R, Leds, Flips(or alt-hold), Snapshot, Video Recording, Headless, RTH, GPS Hold, Mode, flip
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)13L;
+        case PROTOCMD_NUMCHAN: return 13; // A, E, T, R, Leds, Flips(or alt-hold), Snapshot, Video Recording, Headless, RTH, GPS Hold, Mode, flip
+        case PROTOCMD_DEFAULT_NUMCHAN: return 13;
         case PROTOCMD_CURRENT_ID: return 0;
         case PROTOCMD_GETOPTIONS:
             if( Model.proto_opts[PROTOOPTS_VTX_FREQ] == 0)
                 Model.proto_opts[PROTOOPTS_VTX_FREQ] = 5885;
-            return hubsan4_opts;
+            return (uintptr_t)hubsan4_opts;
         case PROTOCMD_TELEMETRYSTATE: 
-            return (void *)(long)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
+            return (Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
         case PROTOCMD_TELEMETRYTYPE: 
-            return (void *)(long) TELEM_DEVO;
+            return TELEM_DEVO;
         case PROTOCMD_CHANNELMAP: return AETRG;
         default: break;
     }

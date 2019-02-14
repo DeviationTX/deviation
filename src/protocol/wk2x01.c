@@ -556,29 +556,23 @@ static void initialize()
     CLOCK_StartTimer(2800, wk_cb);
 }
 
-const void *WK2x01_Cmds(enum ProtoCmds cmd)
+uintptr_t WK2x01_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(); return 0;
         case PROTOCMD_DEINIT: return 0;
         case PROTOCMD_CHECK_AUTOBIND:
-            return (Model.protocol == PROTOCOL_WK2801 && Model.fixed_id) ? 0 : (void *)1L;
+            return (Model.protocol == PROTOCOL_WK2801 && Model.fixed_id) ? 0 : 1;
         case PROTOCMD_BIND:  wk_bind(); return 0;
         case PROTOCMD_DEFAULT_NUMCHAN: return (Model.protocol == PROTOCOL_WK2801)
-              ? (void *)8L
-              : (Model.protocol == PROTOCOL_WK2601)
-                ? (void *)6L
-                : (void *)4L;
+              ? 8 : (Model.protocol == PROTOCOL_WK2601) ? 6 : 4;
         case PROTOCMD_NUMCHAN: return (Model.protocol == PROTOCOL_WK2801)
-              ? (void *)8L
-              : (Model.protocol == PROTOCOL_WK2601)
-                ? (void *)7L
-                : (void *)4L;
+              ? 8 : (Model.protocol == PROTOCOL_WK2601) ? 7 : 4;
         case PROTOCMD_GETOPTIONS:
             if(Model.protocol == PROTOCOL_WK2601)
-                return wk2601_opts;
+                return (uintptr_t)wk2601_opts;
             break;
-        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
+        case PROTOCMD_TELEMETRYSTATE: return PROTO_TELEM_UNSUPPORTED;
         case PROTOCMD_CHANNELMAP:
             return EATRG;
         default: break;

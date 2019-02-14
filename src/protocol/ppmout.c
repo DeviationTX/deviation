@@ -94,23 +94,23 @@ static void initialize()
 }
 
 
-const void * PPMOUT_Cmds(enum ProtoCmds cmd)
+uintptr_t PPMOUT_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(); return 0;
         case PROTOCMD_DEINIT: PWM_Stop(); return 0;
-        case PROTOCMD_CHECK_AUTOBIND: return (void *)1L;
+        case PROTOCMD_CHECK_AUTOBIND: return 1L;
         case PROTOCMD_BIND:  initialize(); return 0;
         case PROTOCMD_NUMCHAN:
             if (Model.proto_opts[CENTER_PW] != 0) {
                 uint32_t chan = (Model.proto_opts[PERIOD_PW] - Model.proto_opts[NOTCH_PW])
                               / (Model.proto_opts[CENTER_PW] + Model.proto_opts[DELTA_PW] + Model.proto_opts[NOTCH_PW]);
                 if (chan > NUM_OUT_CHANNELS)
-                    return (void *)(long)NUM_OUT_CHANNELS;
-                return (void *)(long)chan;
+                    return NUM_OUT_CHANNELS;
+                return chan;
             }
-            return (void *)10L;
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)6L;
+            return 10;
+        case PROTOCMD_DEFAULT_NUMCHAN: return 6;
         case PROTOCMD_GETOPTIONS:
             if (Model.proto_opts[CENTER_PW] == 0) {
                 Model.proto_opts[CENTER_PW] = 1100;
@@ -118,9 +118,9 @@ const void * PPMOUT_Cmds(enum ProtoCmds cmd)
                 Model.proto_opts[NOTCH_PW] = 400;
                 Model.proto_opts[PERIOD_PW] = 22500;
             }
-            return ppm_opts;
-	case PROTOCMD_CHANNELMAP: return UNCHG;
-        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
+            return (uintptr_t)ppm_opts;
+        case PROTOCMD_CHANNELMAP: return UNCHG;
+        case PROTOCMD_TELEMETRYSTATE: return PROTO_TELEM_UNSUPPORTED;
         default: break;
     }
     return 0;

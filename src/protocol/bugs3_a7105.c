@@ -711,24 +711,24 @@ static void initialize(u8 bind) {
     CLOCK_StartTimer(100, bugs3_cb);
 }
 
-const void *BUGS3_Cmds(enum ProtoCmds cmd)
+uintptr_t BUGS3_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT: initialize(0); return 0;
         case PROTOCMD_DEINIT:
         case PROTOCMD_RESET:
             CLOCK_StopTimer();
-            return (void *)(A7105_Reset() ? 1L : -1L);
+            return (A7105_Reset() ? 1 : -1);
         case PROTOCMD_BIND:  initialize(1); return 0;
-        case PROTOCMD_NUMCHAN: return (void *)10L;
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)10L;
+        case PROTOCMD_NUMCHAN: return 10;
+        case PROTOCMD_DEFAULT_NUMCHAN: return 10;
         case PROTOCMD_CURRENT_ID: return 0;
         case PROTOCMD_GETOPTIONS:
-            return bugs3_opts;
+            return (uintptr_t)bugs3_opts;
         case PROTOCMD_TELEMETRYSTATE:
-            return (void *)(long)(PROTO_TELEM_ON);
+            return PROTO_TELEM_ON;
         case PROTOCMD_TELEMETRYTYPE:
-            return (void *)(long) TELEM_FRSKY;
+            return TELEM_FRSKY;
         case PROTOCMD_CHANNELMAP: return AETRG;
         default: break;
     }

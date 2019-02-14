@@ -167,7 +167,7 @@ static u8 flags;
 //================================================================================================
 // Public Functions
 //================================================================================================
-const void *ESKY150_Cmds(enum ProtoCmds cmd)
+uintptr_t ESKY150_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:
@@ -176,22 +176,22 @@ const void *ESKY150_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_DEINIT:
         case PROTOCMD_RESET:
             CLOCK_StopTimer();
-            return (void *)((NRF24L01_Reset()) ? 1L : -1L);
+            return ((NRF24L01_Reset()) ? 1 : -1);
         case PROTOCMD_CHECK_AUTOBIND:
-            return (void *)0L; // Never Autobind
+            return 0; // Never Autobind
         case PROTOCMD_BIND:
         	esky2_start_tx(STARTBIND_YES);
 			return 0;
         case PROTOCMD_NUMCHAN:
-            return (void *)7L; // T, A, E, R, FMODE, AUX1, AUX2
+            return 7; // T, A, E, R, FMODE, AUX1, AUX2
         case PROTOCMD_DEFAULT_NUMCHAN:
-            return (void *)4L;
+            return 4;
         case PROTOCMD_CURRENT_ID: 
-            return (Model.fixed_id) ? (void *)Model.fixed_id : 0;
+            return (Model.fixed_id) ? Model.fixed_id : 0;
         case PROTOCMD_GETOPTIONS: 
-            return ESKY2_PROTOCOL_OPTIONS;
+            return (uintptr_t)ESKY2_PROTOCOL_OPTIONS;
         case PROTOCMD_TELEMETRYSTATE: 
-            return (void *)PROTO_TELEM_UNSUPPORTED;
+            return PROTO_TELEM_UNSUPPORTED;
         case PROTOCMD_CHANNELMAP:
             return TAERG;
         default: break;

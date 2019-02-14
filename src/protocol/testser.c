@@ -150,18 +150,18 @@ static void initialize()
     CLOCK_StartTimer(10000, serial_cb);
 }
 
-const void * TESTSER_Cmds(enum ProtoCmds cmd)
+uintptr_t TESTSER_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(); return 0;
         case PROTOCMD_DEINIT: UART_Initialize(); return 0;
-        case PROTOCMD_CHECK_AUTOBIND: return (void *)1L;
+        case PROTOCMD_CHECK_AUTOBIND: return 1;
         case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *)16L;
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
-        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
-	case PROTOCMD_CHANNELMAP: return UNCHG;
-        case PROTOCMD_GETOPTIONS: return testser_opts;
+        case PROTOCMD_NUMCHAN: return 16;
+        case PROTOCMD_DEFAULT_NUMCHAN: return 8;
+        case PROTOCMD_TELEMETRYSTATE: return PROTO_TELEM_UNSUPPORTED;
+        case PROTOCMD_CHANNELMAP: return UNCHG;
+        case PROTOCMD_GETOPTIONS: return (uintptr_t)testser_opts;
         default: break;
     }
     return 0;

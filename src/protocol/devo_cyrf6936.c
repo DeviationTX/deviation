@@ -615,28 +615,28 @@ static void initialize()
     devo_start();
 }
 
-const void *DEVO_Cmds(enum ProtoCmds cmd)
+uintptr_t DEVO_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(); return 0;
         case PROTOCMD_DEINIT:
         case PROTOCMD_RESET:
             CLOCK_StopTimer();
-            return (void *)(CYRF_Reset() ? 1L : -1L);
-        case PROTOCMD_CHECK_AUTOBIND: return Model.fixed_id ? 0 : (void *)1L;
+            return (CYRF_Reset() ? 1 : -1);
+        case PROTOCMD_CHECK_AUTOBIND: return Model.fixed_id ? 0 : 1;
         case PROTOCMD_BIND:  devo_bind(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *)12L;
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
-        case PROTOCMD_CURRENT_ID:  return (void *)((unsigned long)fixed_id);
+        case PROTOCMD_NUMCHAN: return 12;
+        case PROTOCMD_DEFAULT_NUMCHAN: return 8;
+        case PROTOCMD_CURRENT_ID:  return fixed_id;
         case PROTOCMD_GETOPTIONS:
-            return devo_opts;
+            return (uintptr_t)devo_opts;
         case PROTOCMD_SETOPTIONS:
             devo_start();  // only 1 prot_ops item, it is to enable/disable telemetry
             break;
         case PROTOCMD_TELEMETRYSTATE:
-            return (void *)(Model.proto_opts[PROTOOPTS_TELEMETRY] != TELEM_OFF ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
+            return (Model.proto_opts[PROTOOPTS_TELEMETRY] != TELEM_OFF ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
         case PROTOCMD_TELEMETRYTYPE: 
-            return (void *)(long) TELEM_DEVO;
+            return TELEM_DEVO;
         case PROTOCMD_CHANNELMAP:
             return EATRG;
         default: break;

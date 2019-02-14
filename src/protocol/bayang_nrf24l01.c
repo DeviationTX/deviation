@@ -506,7 +506,7 @@ static void initialize()
     CLOCK_StartTimer(INITIAL_WAIT, bay_callback);
 }
 
-const void *Bayang_Cmds(enum ProtoCmds cmd)
+uintptr_t Bayang_Cmds(enum ProtoCmds cmd)
 {
     switch (cmd) {
     case PROTOCMD_INIT:
@@ -515,27 +515,26 @@ const void *Bayang_Cmds(enum ProtoCmds cmd)
     case PROTOCMD_DEINIT:
     case PROTOCMD_RESET:
         CLOCK_StopTimer();
-        return (void *) (NRF24L01_Reset()? 1L : -1L);
+        return (NRF24L01_Reset()? 1 : -1);
     case PROTOCMD_CHECK_AUTOBIND:
-        return (void *) 1L;     // always Autobind
+        return 1;     // always Autobind
     case PROTOCMD_BIND:
         initialize();
         return 0;
     case PROTOCMD_NUMCHAN:
-        return (void *) 12L;
+        return 12;
     case PROTOCMD_DEFAULT_NUMCHAN:
-        return (void *) 12L;
+        return 12;
     case PROTOCMD_CURRENT_ID:
-        return Model.fixed_id ? (void *) ((unsigned long) Model.
-                                          fixed_id) : 0;
+        return Model.fixed_id;
     case PROTOCMD_GETOPTIONS:
-        return bay_opts;
+        return (uintptr_t)bay_opts;
     case PROTOCMD_TELEMETRYSTATE:
-        return (void *) (long) (Model.proto_opts[PROTOOPTS_TELEMETRY] ==
+        return (Model.proto_opts[PROTOOPTS_TELEMETRY] ==
                                 TELEM_ON ? PROTO_TELEM_ON :
                                 PROTO_TELEM_OFF);
     case PROTOCMD_TELEMETRYTYPE:
-        return (void *)(long) TELEM_DSM;
+        return TELEM_DSM;
     case PROTOCMD_CHANNELMAP:
         return AETRG;
     default:

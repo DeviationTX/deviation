@@ -320,7 +320,7 @@ static void initialize(u8 bind)
 }
 
 
-const void * PXXOUT_Cmds(enum ProtoCmds cmd)
+uintptr_t PXXOUT_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(0); return 0;
@@ -332,14 +332,14 @@ const void * PXXOUT_Cmds(enum ProtoCmds cmd)
           return 0;
         case PROTOCMD_CHECK_AUTOBIND: return 0;
         case PROTOCMD_BIND:  initialize(1); return 0;
-        case PROTOCMD_NUMCHAN: return (void *)16L;
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
-        case PROTOCMD_GETOPTIONS: return pxx_opts;
+        case PROTOCMD_NUMCHAN: return 16;
+        case PROTOCMD_DEFAULT_NUMCHAN: return 8;
+        case PROTOCMD_GETOPTIONS: return (uintptr_t)pxx_opts;
 #if HAS_EXTENDED_TELEMETRY
         case PROTOCMD_TELEMETRYSTATE:
-            return (void *)(long)PROTO_TELEM_ON;
+            return PROTO_TELEM_ON;
         case PROTOCMD_TELEMETRYTYPE:
-            return (void *)(long) TELEM_FRSKY;
+            return TELEM_FRSKY;
 #endif
         case PROTOCMD_CHANNELMAP: return UNCHG;
         default: break;

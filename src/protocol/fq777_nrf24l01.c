@@ -327,21 +327,21 @@ void initFQ777(void)
     CLOCK_StartTimer(INITIAL_WAIT, fq777_callback);
 }
 
-const void *FQ777_Cmds(enum ProtoCmds cmd)
+uintptr_t FQ777_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initFQ777(); return 0;
         case PROTOCMD_DEINIT:
         case PROTOCMD_RESET:
             CLOCK_StopTimer();
-            return (void *)(NRF24L01_Reset() ? 1L : -1L);
-        case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // always Autobind
+            return (NRF24L01_Reset() ? 1 : -1);
+        case PROTOCMD_CHECK_AUTOBIND: return 1; // always Autobind
         case PROTOCMD_BIND:  initFQ777(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 10L;
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)10L;
-        case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
-        case PROTOCMD_GETOPTIONS: return fq777_opts;
-        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
+        case PROTOCMD_NUMCHAN: return 10;
+        case PROTOCMD_DEFAULT_NUMCHAN: return 10;
+        case PROTOCMD_CURRENT_ID: return Model.fixed_id;
+        case PROTOCMD_GETOPTIONS: return (uintptr_t)fq777_opts;
+        case PROTOCMD_TELEMETRYSTATE: return PROTO_TELEM_UNSUPPORTED;
         case PROTOCMD_CHANNELMAP: return AETRG;
         default: break;
     }

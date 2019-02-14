@@ -376,22 +376,22 @@ static void initNCC(void)
     CLOCK_StartTimer(INITIAL_WAIT, ncc1701_callback);
 }
 
-const void *NCC1701_Cmds(enum ProtoCmds cmd)
+uintptr_t NCC1701_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initNCC(); return 0;
         case PROTOCMD_DEINIT:
         case PROTOCMD_RESET:
             CLOCK_StopTimer();
-            return (void *)(NRF24L01_Reset() ? 1L : -1L);
-        case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // always Autobind
+            return (NRF24L01_Reset() ? 1 : -1);
+        case PROTOCMD_CHECK_AUTOBIND: return 1; // always Autobind
         case PROTOCMD_BIND:  initNCC(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 5L;
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)5L; // A,E,T,R,Warp
-        case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
-        case PROTOCMD_GETOPTIONS: return (void *)0L;
-        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_ON;
-        case PROTOCMD_TELEMETRYTYPE: return (void *)(long) TELEM_FRSKY;
+        case PROTOCMD_NUMCHAN: return  5;
+        case PROTOCMD_DEFAULT_NUMCHAN: return 5; // A,E,T,R,Warp
+        case PROTOCMD_CURRENT_ID: return Model.fixed_id;
+        case PROTOCMD_GETOPTIONS: return 0;
+        case PROTOCMD_TELEMETRYSTATE: return PROTO_TELEM_ON;
+        case PROTOCMD_TELEMETRYTYPE: return TELEM_FRSKY;
         case PROTOCMD_CHANNELMAP: return AETRG;
         default: break;
     }

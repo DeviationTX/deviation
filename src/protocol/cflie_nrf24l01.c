@@ -883,7 +883,7 @@ static void initialize()
     CLOCK_StartTimer(delay, cflie_callback);
 }
 
-const void *CFlie_Cmds(enum ProtoCmds cmd)
+uintptr_t CFlie_Cmds(enum ProtoCmds cmd)
 {
     // dbgprintf("CFlie_Cmds %d\n", cmd);
     switch(cmd) {
@@ -892,23 +892,23 @@ const void *CFlie_Cmds(enum ProtoCmds cmd)
             CLOCK_StopTimer();
             NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0);
             return 0;
-        case PROTOCMD_CHECK_AUTOBIND: return (void *)0L; // never Autobind // always Autobind
+        case PROTOCMD_CHECK_AUTOBIND: return 0; // never Autobind // always Autobind
         case PROTOCMD_BIND:  initialize(); return 0;
         case PROTOCMD_NUMCHAN:
             switch(Model.proto_opts[PROTOOPTS_CRTP_MODE]) {
                 case CRTP_MODE_CPPM:
-                    return (void *)12L;  // A, E, R, T, up to 8 additional aux channels
+                    return 12;  // A, E, R, T, up to 8 additional aux channels
                 case CRTP_MODE_RPYT:
                 default:
-                    return (void *)5L; // A, E, R, T, + or x mode
+                    return 5; // A, E, R, T, + or x mode
             }
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)5L;
-        case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
-        case PROTOCMD_GETOPTIONS: return cflie_opts;
+        case PROTOCMD_DEFAULT_NUMCHAN: return 5;
+        case PROTOCMD_CURRENT_ID: return Model.fixed_id;
+        case PROTOCMD_GETOPTIONS: return (uintptr_t)cflie_opts;
         case PROTOCMD_TELEMETRYSTATE:
-            return (void *)(long)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_OFF ? PROTO_TELEM_OFF : PROTO_TELEM_ON);
+            return (Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_OFF ? PROTO_TELEM_OFF : PROTO_TELEM_ON);
         case PROTOCMD_TELEMETRYTYPE: 
-            return (void *)(long) TELEM_DSM;
+            return TELEM_DSM;
         case PROTOCMD_CHANNELMAP: return AETRG;
         default: break;
     }

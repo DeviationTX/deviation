@@ -802,26 +802,26 @@ static void initialize(init_bind_t bind)
     CLOCK_StartTimer(INITIAL_WAIT, inav_callback);
 }
 
-const void *INAV_Cmds(enum ProtoCmds cmd)
+uintptr_t INAV_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(INIT_BIND); return 0;
         case PROTOCMD_DEINIT:
         case PROTOCMD_RESET:
             CLOCK_StopTimer();
-            return (void *)(NRF24L01_Reset() ? 1L : -1L);
+            return (NRF24L01_Reset() ? 1 : -1);
         //case PROTOCMD_CHECK_AUTOBIND: return 0; 
-        case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // always Autobind
+        case PROTOCMD_CHECK_AUTOBIND: return 1; // always Autobind
         case PROTOCMD_BIND:  initialize(INIT_BIND); return 0;
-        case PROTOCMD_NUMCHAN: return (void *)((long)rc_channel_count);
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)((long)RC_CHANNEL_COUNT_DEFAULT);
+        case PROTOCMD_NUMCHAN: return rc_channel_count;
+        case PROTOCMD_DEFAULT_NUMCHAN: return RC_CHANNEL_COUNT_DEFAULT;
         case PROTOCMD_CURRENT_ID: return 0;
-        case PROTOCMD_GETOPTIONS: return inav_opts;
+        case PROTOCMD_GETOPTIONS: return (uintptr_t)inav_opts;
 #ifdef INAV_TELEMETRY
-        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
-        case PROTOCMD_TELEMETRYTYPE:  return (void *)(long) TELEM_LTM;
+        case PROTOCMD_TELEMETRYSTATE: return (Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
+        case PROTOCMD_TELEMETRYTYPE:  return TELEM_LTM;
 #else
-        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
+        case PROTOCMD_TELEMETRYSTATE: return PROTO_TELEM_UNSUPPORTED;
 #endif
         case PROTOCMD_CHANNELMAP: return AETRG;
         default: break;
