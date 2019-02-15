@@ -467,7 +467,7 @@ msgstr "速度"
 
 #: pages/128x64x1/advanced/mixer_page.c:44
 msgid "Mixer    Reorder:Hold R+"
-msgstr "ミキサー入替: R+長押し"
+msgstr "ミキサー入替 : R+長押し"
 
 #: pages/128x64x1/advanced/mixer_setup.c:78
 #: pages/128x64x1/advanced/mixer_setup.c:157
@@ -1003,7 +1003,7 @@ msgstr "ENTを押しテストを開始"
 
 #: pages/128x64x1/reorder_list.c:39
 msgid "Dn"
-msgstr "Dn"
+msgstr "下"
 
 #: pages/128x64x1/reorder_list.c:40 pages/320x240x16/reorder_list.c:30
 msgid "Copy To"
@@ -1147,7 +1147,7 @@ msgstr "入力"
 
 #: pages/128x64x1/trim_page.c:71
 msgid "Step"
-msgstr "ステップ"
+msgstr "Trim間隔"
 
 #: pages/128x64x1/trim_page.c:73 pages/128x64x1/trim_page.c:111
 #: pages/320x240x16/trim_page.c:69 pages/320x240x16/trim_page.c:110
