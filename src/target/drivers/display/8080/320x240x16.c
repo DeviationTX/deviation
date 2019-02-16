@@ -16,7 +16,9 @@
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/fsmc.h>
 #include "common.h"
-#include "lcd.h"
+#include "320x240x16.h"
+#include "320x240x16_hx8347.h"
+#include "320x240x16_ili9341.h"
 
 u8 screen_flip;
 const struct lcdtype *disp_type;

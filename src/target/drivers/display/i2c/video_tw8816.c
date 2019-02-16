@@ -21,6 +21,7 @@
 #include <libopencm3/stm32/rcc.h>
 #include "common.h"
 #include "lcd.h"
+#include "tw8816_map.h"
 
 //Set this to the number of trials
 #define DEBUG_SCREEN_ALIGNMENT 0

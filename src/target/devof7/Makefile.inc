@@ -1,4 +1,5 @@
 SCREENSIZE  := text
+DISPLAY_DRIVER := spi/video_ia9211.c
 FILESYSTEMS := common text
 
 OPTIMIZE_DFU     := 1

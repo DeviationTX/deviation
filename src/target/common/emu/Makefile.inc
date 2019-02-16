@@ -4,6 +4,12 @@ SRC_CXX  = $(wildcard target/$(TARGET)/*.cpp) $(wildcard target/common/emu/*.cpp
 SRC_C  = $(wildcard target/$(TARGET)/*.c) $(wildcard target/common/emu/*.c) \
          $(wildcard $(SDIR)/target/common/filesystems/*.c)
 
+ifeq ("$(SCREENSIZE)", "128x64x1")
+SRC_C  += $(SDIR)/target/drivers/display/emu/emu_monochrome.c
+else ifneq ("$(SCREENSIZE)", "text")
+SRC_C  += $(SDIR)/target/drivers/display/emu/emu_color.c
+endif
+
 ifdef USE_INTERNAL_FS
 SRC_C  += $(wildcard $(SDIR)/target/common/filesystems/devofs/*.c) \
           $(wildcard $(SDIR)/target/common/filesystems/petit_fat/*.c)

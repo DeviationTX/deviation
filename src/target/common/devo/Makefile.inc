@@ -12,8 +12,9 @@ PROTO_LINKFILE = $(SDIR)/target/$(TARGET)/protocol.ld
 LIBOPENCM3 = $(SDIR)/libopencm3/lib/libopencm3_stm32f1.a
 
 SRC_C    = $(wildcard $(SDIR)/target/$(TARGET)/*.c) \
-           $(wildcard $(SDIR)/target/common/stm32/*.c) \
+           $(wildcard $(SDIR)/target/drivers/mcu/stm32/*.c) \
            $(wildcard $(SDIR)/target/common/devo/*.c) \
+           $(addprefix $(SDIR)/target/drivers/display/, $(DISPLAY_DRIVER)) \
            $(wildcard $(SDIR)/target/common/filesystems/*.c) \
            $(wildcard $(SDIR)/target/common/filesystems/petit_fat/*.c) \
            $(wildcard $(SDIR)/target/common/filesystems/devofs/*.c) \

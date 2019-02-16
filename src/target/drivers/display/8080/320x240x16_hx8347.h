@@ -1,7 +1,3 @@
-#include "common.h"
-#include "lcd.h"
-
-
 void hx8347_set_pos(unsigned int x0, unsigned int y0)
 {
     lcd_cmd(0x03, (x0>>0)); //set x0

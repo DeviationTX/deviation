@@ -1,4 +1,5 @@
 SCREENSIZE  := 128x64x1
+DISPLAY_DRIVER := spi/128x64x1_nt7538.c
 FILESYSTEMS := common base_fonts 128x64x1
 DFU_ARGS    := -c 7 -b 0x08003000
 FONTS        = filesystem/$(FILESYSTEM)/media/12normal.fon \
@@ -12,8 +13,7 @@ include $(SDIR)/target/common/devo/Makefile.inc
 ifndef BUILD_TARGET
 
 SRC_C   += $(SDIR)/target/devo7e/backlight.c \
-					 $(SDIR)/target/devo7e/crc.c \
-           $(SDIR)/target/devo7e/lcd.c
+           $(SDIR)/target/devo7e/crc.c
 
 else
 
