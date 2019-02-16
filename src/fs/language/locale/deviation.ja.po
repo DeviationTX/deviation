@@ -1301,7 +1301,7 @@ msgstr "リンク"
 
 #: pages/320x240x16/datalog_page.c:146
 msgid "Sample Rate"
-msgstr "基本レート"
+msgstr "サンプルレート"
 
 #: pages/320x240x16/dialogs.c:63
 msgid ""
