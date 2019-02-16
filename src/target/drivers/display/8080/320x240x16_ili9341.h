@@ -32,7 +32,7 @@
 #define ILI9341_36_MEMACCESS_REG          0x36
 #define ILI9341_37_VERSCRSRART_REG        0x37
 #define ILI9341_38_IDLEMODEOFF_REG        0x38
-#define ILI9341_39_IDLEMODEON_REG         0x39                                                    
+#define ILI9341_39_IDLEMODEON_REG         0x39
 #define ILI9341_3A_PIXFORMATSET_REG       0x3A
 #define ILI9341_3C_WRITEMEMCONTINUE_REG   0x3C
 #define ILI9341_3E_READMEMCONTINUE_REG    0x3E
@@ -41,9 +41,9 @@
 #define ILI9341_51_WRITEBRIGHT_REG        0x51
 #define ILI9341_52_READBRIGHT_REG         0x52
 #define ILI9341_53_WRITECTRL_REG          0x53
-#define ILI9341_54_READCTRL_REG           0x54  
+#define ILI9341_54_READCTRL_REG           0x54
 #define ILI9341_55_WRITECABC_REG          0x55
-#define ILI9341_56_READCABC_REG           0x56                                         
+#define ILI9341_56_READCABC_REG           0x56
 #define ILI9341_5E_WRITECABCMB_REG        0x5E
 #define ILI9341_5F_READCABCMB_REG         0x5F
 #define ILI9341_B0_RGB_ISCTL_REG          0xB0
@@ -111,7 +111,7 @@ void ili9341_draw_start(unsigned int x0, unsigned int y0, unsigned int x1, unsig
         LCD_DATA = 0x28;     //MY=0 MX=0 MV=1 ML=0 BGR=1
     } else {
         LCD_DATA = 0x68;     //MY=0 MX=1 MV=1 ML=0 BGR=1
-    }    
+    }
     //_x1 = x1;
     //_y1 = y1;
     //set x0
