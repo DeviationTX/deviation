@@ -15,9 +15,9 @@ SRC_C    = $(wildcard $(SDIR)/target/$(TARGET)/*.c) \
            $(wildcard $(SDIR)/target/drivers/mcu/stm32/*.c) \
            $(wildcard $(SDIR)/target/common/devo/*.c) \
            $(addprefix $(SDIR)/target/drivers/display/, $(DISPLAY_DRIVER)) \
-           $(wildcard $(SDIR)/target/common/filesystems/*.c) \
-           $(wildcard $(SDIR)/target/common/filesystems/petit_fat/*.c) \
-           $(wildcard $(SDIR)/target/common/filesystems/devofs/*.c) \
+           $(wildcard $(SDIR)/target/drivers/filesystems/*.c) \
+           $(wildcard $(SDIR)/target/drivers/filesystems/petit_fat/*.c) \
+           $(wildcard $(SDIR)/target/drivers/filesystems/devofs/*.c) \
            $(wildcard $(SDIR)/target/common/devo/msc2/*.c) \
            $(wildcard $(SDIR)/target/common/devo/msc2/lib/*.c)
 
@@ -33,7 +33,7 @@ SRC_C   += $(wildcard $(SDIR)/target/common/devo/protocol/*.c) \
            $(wildcard $(SDIR)/target/common/devo/hid/*.c)
 endif
 
-CFLAGS   = -D"assert_param(x)=" -DSTM32F10X_HD -DSTM32F1 -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -fdata-sections -ffunction-sections -I$(SDIR)/target/common/devo -I$(SDIR)/target/common/devo/msc2/lib -I$(SDIR)/target/common/devo/msc2 -I$(SDIR)/libopencm3/include -I$(SDIR)/target/common/filesystems -fno-builtin-printf -Os --specs=nano.specs
+CFLAGS   = -D"assert_param(x)=" -DSTM32F10X_HD -DSTM32F1 -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -fdata-sections -ffunction-sections -I$(SDIR)/target/common/devo -I$(SDIR)/target/common/devo/msc2/lib -I$(SDIR)/target/common/devo/msc2 -I$(SDIR)/libopencm3/include -I$(SDIR)/target/drivers/filesystems -fno-builtin-printf -Os --specs=nano.specs
 ifeq "$(HAS_4IN1_FLASH)" "1"
 CFLAGS  += -D"HAS_4IN1_FLASH=1"
 endif
