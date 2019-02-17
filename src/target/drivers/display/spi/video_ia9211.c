@@ -18,6 +18,7 @@
 #include "common.h"
 #include "gui/gui.h"
 #include "lcd.h"
+#include "ia9211_map.h"
 
 u32 IA9211_map_char(u32 c);
 

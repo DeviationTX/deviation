@@ -1,4 +1,5 @@
 SCREENSIZE  := 480x272x16
+DISPLAY_DRIVER := 8080/480x272x16_s1d13517f00a1_hx8257.c
 FILESYSTEMS := common base_fonts 320x240x16 480x272x16
 DFU_ARGS    := -c 12 -b 0x08004000
 FONTS        = filesystem/$(FILESYSTEM)/media/15normal.fon \

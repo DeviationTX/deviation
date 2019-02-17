@@ -1,4 +1,5 @@
 SCREENSIZE  := text
+DISPLAY_DRIVER := i2c/video_tw8816.c
 FILESYSTEMS := common text text_gfx
 
 DFU_ARGS         := -c 12 -b 0x08004000

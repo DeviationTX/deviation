@@ -1,5 +1,6 @@
 FILESYSTEMS := common text
 SCREENSIZE  := text
+DISPLAY_DRIVER := spi/video_ia9211.c
 
 OPTIMIZE_DFU     := 1
 MODULAR          := 0x20004000
@@ -12,8 +13,6 @@ ifndef BUILD_TARGET
 SRC_C   += $(SDIR)/target/devof7/backlight.c \
            $(SDIR)/target/devof7/channels.c \
            $(SDIR)/target/devof7/crc.c \
-           $(SDIR)/target/devof7/ia9211_map.c \
-           $(SDIR)/target/devof7/lcd.c \
            $(SDIR)/target/devof7/tx_buttons.c
 
 endif
