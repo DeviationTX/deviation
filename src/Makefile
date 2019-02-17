@@ -1,5 +1,6 @@
 ## the following disable builtin rules which we don't need
 ## and make debugging harder
+unexport LANGUAGE
 MAKEFLAGS += --no-builtin-rules
 .SUFFIXES:
 
