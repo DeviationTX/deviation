@@ -9,6 +9,8 @@
 #define SPIFLASH_SECTORS 512
 
 #define HAS_LCD_FLIPPED     1
+#define LCD_CONTRAST_FUNC(x) (x)
+
 #define HAS_STANDARD_GUI    1
 #define HAS_ADVANCED_GUI    1
 #define HAS_PERMANENT_TIMER 1

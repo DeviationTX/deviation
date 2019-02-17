@@ -26,6 +26,10 @@
 #ifndef HAS_LCD_FLIPPED
     #define HAS_LCD_FLIPPED 0
 #endif
+
+#ifndef LCD_CONTRAST_FUNC
+    #define LCD_CONTRAST_FUNC(x) ((x) * 12 + 76)  // Contrsat function for devo radios
+#endif
 //The screen is 129 characters, but we'll only expoise 128 of them
 #define PHY_LCD_WIDTH 129
 #define LCD_PAGES 8
@@ -74,7 +78,7 @@ void LCD_Contrast(unsigned contrast)
 {
     //int data = 0x20 + contrast * 0xC / 10;
     LCD_Cmd(0x81);
-    int c = contrast * 12 + 76; //contrast should range from ~72 to ~200
+    int c = LCD_CONTRAST_FUNC(contrast);
     LCD_Cmd(c);
 }
 
