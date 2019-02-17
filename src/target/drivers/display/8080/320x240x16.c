@@ -37,17 +37,23 @@ void lcd_set_pos(unsigned int x0, unsigned int y0)
     //printf("lcd_set_pos: %d, %d\n", x0, y0);
 }
 
-#define LCDTYPE_HX8347  1
-#define LCDTYPE_ILI9341 2
-#define LCDTYPE_UNKNOWN 0
+#define LCDTYPE_HX8347  0x01
+#define LCDTYPE_ILI9341 0x02
+#define LCDTYPE_UNKNOWN 0x00
+#define HAS_LCD_TYPE(x) ((HAS_LCD_TYPES) & x)
+
 int lcd_detect()
 {
-    //Read ID register for HX8347 (will be 0x47 if found)
-    LCD_REG = 0x00;
-    u8 data = LCD_DATA;
-    if (data == 0x47) {
-        return LCDTYPE_HX8347;
-    } else {
+    u8 data;
+    if (HAS_LCD_TYPE(LCDTYPE_HX8347)) {
+        //Read ID register for HX8347 (will be 0x47 if found)
+        LCD_REG = 0x00;
+        data = LCD_DATA;
+        if (data == 0x47) {
+            return LCDTYPE_HX8347;
+        }
+    }
+    if (HAS_LCD_TYPE(LCDTYPE_ILI9341)) {
         //Read ID register for ILI9341 (will be 0x9341 if found)
         LCD_REG = 0xd3;
         //As per the spec, the 1st 2 reads are dummy reads and irrelevant
@@ -57,12 +63,11 @@ int lcd_detect()
         data = LCD_DATA;
         u16 data2 = LCD_DATA;
         data2 = (((int)data) << 8) | data2;
-        if (data2 != 0x9341) {
-            return LCDTYPE_UNKNOWN;
-        } else {
+        if (data2 == 0x9341) {
             return LCDTYPE_ILI9341;
         }
     }
+    return LCDTYPE_UNKNOWN;
 }
 
 void LCD_DrawPixel(unsigned int color)
@@ -134,9 +139,9 @@ void LCD_Init()
     FSMC_BTR1  = FSMC_BTR_DATASTx(2) | FSMC_BTR_ADDHLDx(0) | FSMC_BTR_ADDSETx(1) | FSMC_BTR_ACCMODx(FSMC_BTx_ACCMOD_B);
     FSMC_BWTR1 = FSMC_BTR_DATASTx(2) | FSMC_BTR_ADDHLDx(0) | FSMC_BTR_ADDSETx(1) | FSMC_BTR_ACCMODx(FSMC_BTx_ACCMOD_B);
     int type = lcd_detect();
-    if (type == LCDTYPE_ILI9341) {
+    if (HAS_LCD_TYPE(LCDTYPE_ILI9341) && type == LCDTYPE_ILI9341) {
         ili9341_init();
-    } else if (type == LCDTYPE_HX8347) {
+    } else if (HAS_LCD_TYPE(LCDTYPE_HX8347) && type == LCDTYPE_HX8347) {
         hx8347_init();
     } else {
         printf("No LCD detected\n");

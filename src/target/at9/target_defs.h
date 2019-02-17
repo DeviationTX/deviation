@@ -28,6 +28,7 @@
     #endif
 #endif
 
+#define HAS_LCD_TYPES       (LCDTYPE_ILI9341)
 #ifndef LCD_ForceUpdate
 static inline void LCD_ForceUpdate() {}
 #endif
