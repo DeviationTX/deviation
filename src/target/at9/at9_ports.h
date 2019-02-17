@@ -10,6 +10,8 @@
     #define _SPI_FLASH_SCK_PIN       {GPIOB, GPIO13}
     #define _SPI_FLASH_MISO_PIN      {GPIOB, GPIO14}
     #define _SPI_FLASH_MOSI_PIN      {GPIOB, GPIO15}
+
+#define ILI9341_RESET_PIN ((struct mcu_pin){GPIOE, GPIO0})
     
 #include "../../common/devo/ports.h"
 

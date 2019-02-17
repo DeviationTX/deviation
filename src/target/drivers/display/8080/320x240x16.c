@@ -46,7 +46,7 @@ int lcd_detect()
 {
     u8 data;
     if (HAS_LCD_TYPE(LCDTYPE_HX8347)) {
-        //Read ID register for HX8347 (will be 0x47 if found)
+        // Read ID register for HX8347 (will be 0x47 if found)
         LCD_REG = 0x00;
         data = LCD_DATA;
         if (data == 0x47) {
@@ -54,12 +54,12 @@ int lcd_detect()
         }
     }
     if (HAS_LCD_TYPE(LCDTYPE_ILI9341)) {
-        //Read ID register for ILI9341 (will be 0x9341 if found)
+        // Read ID register for ILI9341 (will be 0x9341 if found)
         LCD_REG = 0xd3;
-        //As per the spec, the 1st 2 reads are dummy reads and irrelevant
+        // As per the spec, the 1st 2 reads are dummy reads and irrelevant
         data = LCD_DATA;
         data = LCD_DATA;
-        //Actual ID is in 3rd and 4th bytes
+        // Actual ID is in 3rd and 4th bytes
         data = LCD_DATA;
         u16 data2 = LCD_DATA;
         data2 = (((int)data) << 8) | data2;
@@ -138,6 +138,17 @@ void LCD_Init()
     /* Read & write timings */
     FSMC_BTR1  = FSMC_BTR_DATASTx(2) | FSMC_BTR_ADDHLDx(0) | FSMC_BTR_ADDSETx(1) | FSMC_BTR_ACCMODx(FSMC_BTx_ACCMOD_B);
     FSMC_BWTR1 = FSMC_BTR_DATASTx(2) | FSMC_BTR_ADDHLDx(0) | FSMC_BTR_ADDSETx(1) | FSMC_BTR_ACCMODx(FSMC_BTx_ACCMOD_B);
+
+#ifdef ILI9341_RESET_PIN
+    /* Reset pin for ILI9341 */
+    gpio_set_mode(ILI9341_RESET_PIN.port, GPIO_MODE_OUTPUT_50_MHZ,
+                  GPIO_CNF_OUTPUT_PUSHPULL, ILI9341_RESET_PIN.pin);
+
+    gpio_clear(ILI9341_RESET_PIN.port, ILI9341_RESET_PIN.pin);
+    _usleep(10);  // must be held low for at least 10us
+    gpio_set(ILI9341_RESET_PIN.port, ILI9341_RESET_PIN.pin);
+    _msleep(120); // must wait 120ms after reset
+#endif  // ILI9341_RESET_PIN
     int type = lcd_detect();
     if (HAS_LCD_TYPE(LCDTYPE_ILI9341) && type == LCDTYPE_ILI9341) {
         ili9341_init();
