@@ -26,6 +26,8 @@ void LCD_DrawPixel(unsigned int color)
         gui.image[3*(LCD_WIDTH*gui.y+gui.x)] = r;
         gui.image[3*(LCD_WIDTH*gui.y+gui.x)+1] = g;
         gui.image[3*(LCD_WIDTH*gui.y+gui.x)+2] = b;
+
+        gui.pixel_tracking[gui.x][gui.y]++;
 	}
 	// this must be executed to continue drawing in the next row
     gui.x++;

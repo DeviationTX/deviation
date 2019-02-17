@@ -665,8 +665,42 @@ void PWR_Sleep() {
 void LCD_ForceUpdate() {
     if (changed) {
         changed = false;
+#ifdef BUILDTYPE_DEV
+        for (int x = 0; x < LCD_WIDTH; x++)
+            for (int y = 0; y < LCD_HEIGHT; y++) {
+                switch(gui.pixel_tracking[x][y]) {
+                    case 0:
+                    case 1:
+                        break;
+
+                    case 2:
+                        // draw as blue
+                        gui.image[3*(LCD_WIDTH*y+x)] >>= 3;
+                        gui.image[3*(LCD_WIDTH*y+x)+1] >>= 3;
+                        gui.image[3*(LCD_WIDTH*y+x)+2] |= 0xC0;
+
+                        break;
+
+                    case 3:
+                        // draw as green
+                        gui.image[3*(LCD_WIDTH*y+x)] >>= 3;
+                        gui.image[3*(LCD_WIDTH*y+x)+1] |= 0xC0;
+                        gui.image[3*(LCD_WIDTH*y+x)+2] >>= 3;
+                        break;
+
+                    default:
+                        // draw as red
+                        gui.image[3*(LCD_WIDTH*y+x)] |= 0xC0;
+                        gui.image[3*(LCD_WIDTH*y+x)+1] >>= 3;
+                        gui.image[3*(LCD_WIDTH*y+x)+2] >>= 3;
+                        break;
+                }
+            }
+#endif
         image->redraw();
         Fl::check();
     }
+
+    memset(gui.pixel_tracking, 0, sizeof(gui.pixel_tracking));
 }
 } //extern "C"

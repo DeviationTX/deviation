@@ -60,6 +60,7 @@ struct Gui {
     Fl_Output *final[12];
     u32 last_redraw;
     u8  image[IMAGE_X*IMAGE_Y*3];
+    u8  pixel_tracking[IMAGE_X][IMAGE_Y];
 #if SCREEN_RESIZE
     u8 scaled_img[SCREEN_X*SCREEN_Y*3];
 #endif
