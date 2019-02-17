@@ -1,3 +1,5 @@
+#ifndef _GUI_H_
+#define _GUI_H_
 #include "target.h"
 
 #ifndef LCD_WIDTH
@@ -50,4 +52,4 @@ enum ButtonType {
 #define ARROW_WIDTH 16
 #define ARROW_HEIGHT 16
 #define LINE_SPACING 2
-
+#endif

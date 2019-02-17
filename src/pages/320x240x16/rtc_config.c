@@ -271,16 +271,16 @@ static const char *rtc_val_cb(guiObject_t *obj, int dir, void *data)
             GUI_Redraw(&gui->newdate);
         }
         if (idx == YEAR)
-            snprintf(tempstring, 5, "%4d", rp->value[idx]);
+            sprintf(tempstring, "%4d", rp->value[idx]);
         else if (idx == HOUR) {
             u8 tmp = rp->value[HOUR];
             if (Transmitter.rtc_timeformat & CLOCK12HR) {
                 tmp %= 12;
                 if (tmp == 0)
                     tmp = 12;
-                snprintf(tempstring, 6, "%2d %s", tmp, rp->value[HOUR] >= 12? "pm" : "am");
+                sprintf(tempstring, "%2d %s", tmp, rp->value[HOUR] >= 12? "pm" : "am");
             } else {
-                snprintf(tempstring, 3, "%2d", tmp);
+                sprintf(tempstring, "%2d", tmp);
             }
         }
         else if (idx == MONTH)
