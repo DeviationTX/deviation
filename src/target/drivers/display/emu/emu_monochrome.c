@@ -17,7 +17,7 @@
 
 #include "common.h"
 #include "gui/gui.h"
-#include "../common/emu/fltk.h"
+#include "target/drivers/mcu/emu/fltk.h"
 
 //NOTE: LCD scaling used to be done here, but is now done in the fltk code
 /*
