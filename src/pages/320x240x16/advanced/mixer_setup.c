@@ -39,6 +39,23 @@ enum {
      EXP_WIDTH   =  77,
      EXP_HEIGHT  =  96,
 };
+#else
+    // 480x227
+enum {
+     COL1        = 90,
+     COL2        = 136,
+     COL3        = ((310 - 120 - (COL2 + 106)) / 2 + COL2 + 106 + 80),
+     COL_SCALEHI = 116,
+     COL_EXP2    = 192,
+     COL_EXP3    = 296,
+     COL_GRAPH   = 272,
+     COL1_TEXT   =  84,
+     COL1_VALUE  = 136,
+     COL2_TEXT   = 244,
+     COL2_VALUE  = 296,
+     EXP_WIDTH   =  96,
+     EXP_HEIGHT  = 120,
+};
 #endif
 static const int COL_TEMPLATE = 56;
 static const int GRAPH_Y = ((220 - 40 - 150) / 2 + 40);

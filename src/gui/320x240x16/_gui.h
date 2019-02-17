@@ -1,6 +1,15 @@
+#include "target.h"
+
+#ifndef LCD_WIDTH
 #define LCD_WIDTH 320
+#endif
+
+#ifndef LCD_HEIGHT
 #define LCD_HEIGHT 240
+#endif
+
 #define LCD_DEPTH 16
+
 enum ImageNames {
     FILE_BTN96_24,
     FILE_BTN48_24,
