@@ -2,7 +2,7 @@ ifndef BUILD_TARGET
 
 SRC_CXX  = $(wildcard target/$(TARGET)/*.cpp) $(wildcard target/common/emu/*.cpp)
 SRC_C  = $(wildcard target/$(TARGET)/*.c) $(wildcard target/common/emu/*.c) \
-         $(wildcard $(SDIR)/target/common/filesystems/*.c)
+         $(wildcard $(SDIR)/target/drivers/filesystems/*.c)
 
 ifeq ("$(SCREENSIZE)", "128x64x1")
 SRC_C  += $(SDIR)/target/drivers/display/emu/emu_monochrome.c
@@ -11,14 +11,14 @@ SRC_C  += $(SDIR)/target/drivers/display/emu/emu_color.c
 endif
 
 ifdef USE_INTERNAL_FS
-SRC_C  += $(wildcard $(SDIR)/target/common/filesystems/devofs/*.c) \
-          $(wildcard $(SDIR)/target/common/filesystems/petit_fat/*.c)
+SRC_C  += $(wildcard $(SDIR)/target/drivers/filesystems/devofs/*.c) \
+          $(wildcard $(SDIR)/target/drivers/filesystems/petit_fat/*.c)
 CFLAGS = -DEMULATOR=USE_INTERNAL_FS
 else
 CFLAGS = -DEMULATOR=USE_NATIVE_FS
 endif
 
-CFLAGS += -Itarget/common/emu -I$(SDIR)/target/common/filesystems
+CFLAGS += -Itarget/common/emu -I$(SDIR)/target/drivers/filesystems
 
 ALL = $(TARGET).$(EXEEXT)
 
