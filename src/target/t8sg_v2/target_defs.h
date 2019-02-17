@@ -8,6 +8,7 @@
 #define HAS_FLASH_DETECT 1
 #define SPIFLASH_SECTOR_OFFSET 0
 
+#define HAS_LCD_FLIPPED     1
 #define HAS_STANDARD_GUI    1
 #define HAS_ADVANCED_GUI    1
 #define HAS_PERMANENT_TIMER 1

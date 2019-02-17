@@ -23,6 +23,9 @@
 #define CMD_MODE() gpio_clear(GPIOC,GPIO5)
 #define DATA_MODE() gpio_set(GPIOC,GPIO5)
 
+#ifndef HAS_LCD_FLIPPED
+    #define HAS_LCD_FLIPPED 0
+#endif
 //The screen is 129 characters, but we'll only expoise 128 of them
 #define PHY_LCD_WIDTH 129
 #define LCD_PAGES 8
@@ -88,12 +91,17 @@ void LCD_Init()
     LCD_Cmd(0xE2);  //Reset
     volatile int i = 0x8000;
     while(i) i--;
-    LCD_Cmd(0xAE);  //Display off
+    lcd_display(0); //Display Off
     LCD_Cmd(0xA6);  //Normal display
     LCD_Cmd(0xA4);  //All Points Normal
-    LCD_Cmd(0xEA);  //??
-    LCD_Cmd(0xA0);  //ADC Normal
-    LCD_Cmd(0xC4);  //Common Output Mode Scan Rate
+    LCD_Cmd(0xA0);  //Set SEG Direction (Normal)
+    if (HAS_LCD_FLIPPED) {
+        LCD_Cmd(0xC8);  //Set COM Direction (Reversed)
+        LCD_Cmd(0xA2);  //Set The LCD Display Driver Voltage Bias Ratio (1/9)
+    } else {
+        LCD_Cmd(0xEA);  //??
+        LCD_Cmd(0xC4);  //Common Output Mode Scan Rate
+    }
     LCD_Cmd(0x2C); //Power Controller:Booster ON
     i = 0x8000;
     while(i) i--;
