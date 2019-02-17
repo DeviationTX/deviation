@@ -8,8 +8,11 @@ typedef enum {
 
 struct rtc_page {
     u16 value[6];
-    void (*return_page)(int page);
-    int return_val;
+    int clocksource;
+    int prescaler;
+    int clocksourceready;
+    int min[6], max[6];     // for reordering the values are set dynamically
+    u8 order[6];
 };
 
 #endif
