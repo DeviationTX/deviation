@@ -145,9 +145,9 @@ void LCD_Init()
                   GPIO_CNF_OUTPUT_PUSHPULL, ILI9341_RESET_PIN.pin);
 
     gpio_clear(ILI9341_RESET_PIN.port, ILI9341_RESET_PIN.pin);
-    _usleep(10);  // must be held low for at least 10us
+    _usleep(10);   // must be held low for at least 10us
     gpio_set(ILI9341_RESET_PIN.port, ILI9341_RESET_PIN.pin);
-    _msleep(120); // must wait 120ms after reset
+    _msleep(120);  // must wait 120ms after reset
 #endif  // ILI9341_RESET_PIN
     int type = lcd_detect();
     if (HAS_LCD_TYPE(LCDTYPE_ILI9341) && type == LCDTYPE_ILI9341) {
