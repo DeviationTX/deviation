@@ -7,7 +7,7 @@ LANGUAGE    := devo8
 CFLAGS += -DTEST --coverage -g -O0 -fPIC
 ifndef BUILD_TARGET
 
-SRC_C  = $(wildcard $(SDIR)/target/$(TARGET)/*.c) \
+SRC_C  = $(wildcard $(SDIR)/target/transmitters/$(FAMILY)/$(TARGET)/*.c) \
          $(wildcard $(SDIR)/target/drivers/filesystems/*.c)
 
 ifdef USE_INTERNAL_FS
@@ -30,7 +30,7 @@ SRC_C += objs/test/AllTests.c
 else #BUILD_TARGET
 CFLAGS += -DFILESYSTEM_DIR="\"filesystem/$(FILESYSTEM)\""
 
-objs/test/AllTests.c: target/test/make-tests.sh tests/*.c
-	sh target/test/make-tests.sh > $(ODIR)/AllTests.c
+objs/test/AllTests.c: target/transmitters/$(FAMILY)/$(TARGET)/make-tests.sh tests/*.c
+	sh target/transmitters/$(FAMILY)/$(TARGET)/make-tests.sh > $(ODIR)/AllTests.c
 
 endif #BUILD_TARGET

@@ -1,1 +1,1 @@
-#include "../devo8/capabilities.h"
+#include "target/transmitters/devo/devo8/capabilities.h"
