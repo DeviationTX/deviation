@@ -23,6 +23,13 @@
 #define CMD_MODE() gpio_clear(GPIOC,GPIO5)
 #define DATA_MODE() gpio_set(GPIOC,GPIO5)
 
+#ifndef HAS_LCD_FLIPPED
+    #define HAS_LCD_FLIPPED 0
+#endif
+
+#ifndef LCD_CONTRAST_FUNC
+    #define LCD_CONTRAST_FUNC(x) ((x) * 12 + 76)  // Contrsat function for devo radios
+#endif
 //The screen is 129 characters, but we'll only expoise 128 of them
 #define PHY_LCD_WIDTH 129
 #define LCD_PAGES 8
@@ -71,7 +78,7 @@ void LCD_Contrast(unsigned contrast)
 {
     //int data = 0x20 + contrast * 0xC / 10;
     LCD_Cmd(0x81);
-    int c = contrast * 12 + 76; //contrast should range from ~72 to ~200
+    int c = LCD_CONTRAST_FUNC(contrast);
     LCD_Cmd(c);
 }
 
@@ -88,24 +95,29 @@ void LCD_Init()
     LCD_Cmd(0xE2);  //Reset
     volatile int i = 0x8000;
     while(i) i--;
-    LCD_Cmd(0xAE);  //Display off
-    LCD_Cmd(0xA6);  //Normal display
-    LCD_Cmd(0xA4);  //All Points Normal
-    LCD_Cmd(0xEA);  //??
-    LCD_Cmd(0xA0);  //ADC Normal
-    LCD_Cmd(0xC4);  //Common Output Mode Scan Rate
-    LCD_Cmd(0x2C); //Power Controller:Booster ON
+    lcd_display(0);     // Display Off
+    LCD_Cmd(0xA6);      // Normal display
+    LCD_Cmd(0xA4);      // All Points Normal
+    LCD_Cmd(0xA0);      // Set SEG Direction (Normal)
+    if (HAS_LCD_FLIPPED) {
+        LCD_Cmd(0xC8);  // Set COM Direction (Reversed)
+        LCD_Cmd(0xA2);  // Set The LCD Display Driver Voltage Bias Ratio (1/9)
+    } else {
+        LCD_Cmd(0xEA);  // ??
+        LCD_Cmd(0xC4);  // Common Output Mode Scan Rate
+    }
+    LCD_Cmd(0x2C);      // Power Controller:Booster ON
     i = 0x8000;
     while(i) i--;
-    LCD_Cmd(0x2E); //Power Controller: VReg ON
+    LCD_Cmd(0x2E);      // Power Controller: VReg ON
     i = 0x8000;
     while(i) i--;
-    LCD_Cmd(0x2F); //Power Controller: VFollower ON
+    LCD_Cmd(0x2F);      // Power Controller: VFollower ON
     i = 0x8000;
     while(i) i--;
     lcd_set_start_line(0);
     // Display data write (6)
-    //Clear the screen
+    // Clear the screen
     for(int page = 0; page < LCD_PAGES; page++) {
         lcd_set_page_address(page);
         lcd_set_column_address(0);
