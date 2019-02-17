@@ -39,6 +39,9 @@ POST_FILTER = {
     "whitespace/newline": [
        'An else should appear on the same line as the preceding }',
        ],
+    "runtime/printf": [
+       'Never use sprintf. Use snprintf instead.',
+    ]
     }
 
 UNMATCHED_LINT_ERROR = "Unmatched Lint Error(s):\n"
