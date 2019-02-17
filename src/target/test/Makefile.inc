@@ -8,17 +8,17 @@ CFLAGS += -DTEST --coverage -g -O0 -fPIC
 ifndef BUILD_TARGET
 
 SRC_C  = $(wildcard $(SDIR)/target/$(TARGET)/*.c) \
-         $(wildcard $(SDIR)/target/common/filesystems/*.c)
+         $(wildcard $(SDIR)/target/drivers/filesystems/*.c)
 
 ifdef USE_INTERNAL_FS
-SRC_C  += $(wildcard $(SDIR)/target/common/filesystems/devofs/*.c) \
-          $(wildcard $(SDIR)/target/common/filesystems/petit_fat/*.c)
+SRC_C  += $(wildcard $(SDIR)/target/drivers/filesystems/devofs/*.c) \
+          $(wildcard $(SDIR)/target/drivers/filesystems/petit_fat/*.c)
 CFLAGS = -DEMULATOR=USE_INTERNAL_FS
 else
 CFLAGS = -DEMULATOR=USE_NATIVE_FS
 endif
 
-CFLAGS += -I$(SDIR)/target/common/filesystems
+CFLAGS += -I$(SDIR)/target/drivers/filesystems
 LFLAGS += -lz
 
 ALL = $(TARGET).$(EXEEXT)
