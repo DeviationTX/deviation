@@ -103,7 +103,7 @@ DUMP ?= objdump
 ############################################
 #This section defines the source files used#
 ############################################
-SRC_C    +=  $(wildcard *.c) $(wildcard screen/*.c) $(wildcard screen/$(SCREENSIZE)/*.c) \
+SRC_C    +=  $(wildcard *.c) $(wildcard misc/*.c) $(wildcard screen/*.c) $(wildcard screen/$(SCREENSIZE)/*.c) \
              $(wildcard gui/*.c) $(wildcard pages/$(SCREENSIZE)/*.c) $(wildcard config/*.c)
 
 ifdef MODULAR
