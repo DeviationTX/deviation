@@ -7,6 +7,8 @@
 #include <libopencm3/stm32/timer.h>
 #include <libopencm3/stm32/i2c.h>
 #include <libopencm3/stm32/adc.h>
+#include <libopencm3/stm32/usart.h>
+#include <libopencm3/stm32/dma.h>
 
 static inline  enum rcc_periph_clken get_rcc_from_port(u32 port)
 {
@@ -39,6 +41,7 @@ static inline  enum rcc_periph_clken get_rcc_from_port(u32 port)
         case TIM12:  return RCC_TIM12;
         case TIM13:  return RCC_TIM13;
         case TIM14:  return RCC_TIM14;
+        case USART1: return RCC_USART1;
         default:    return ltassert();  // We should never get here
     }
 }

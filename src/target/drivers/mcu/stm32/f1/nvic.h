@@ -3,6 +3,7 @@
 
 #include <libopencm3/cm3/nvic.h>
 #include <libopencm3/stm32/dma.h>
+#include <libopencm3/stm32/usart.h>
 
 static inline uint32_t get_nvic_dma_irq(struct dma_config dma)
 {
@@ -31,4 +32,13 @@ static inline uint32_t get_nvic_dma_irq(struct dma_config dma)
     }
     return irq;
 }
+
+static inline uint32_t get_nvic_irq(uint32_t port)
+{
+    switch (port) {
+        case USART1: return NVIC_USART1_IRQ;
+        default: ltassert(); return 0;
+    }
+}
+
 #endif  // _DTX_STM32F1_NVIC_H_

@@ -32,4 +32,21 @@
     #define _PWM_DMA_ISR                dma1_channel3_isr
 #endif
 
+#ifndef UART_CFG
+    #define UART_CFG ((struct uart_config) {   \
+        .uart = USART1,                         \
+        .tx = ((struct mcu_pin){GPIOA, GPIO9}),  \
+        .rx = ((struct mcu_pin){GPIOA, GPIO10}), \
+        })
+    #define _UART_ISR usart1_isr
+#endif 
+
+#ifndef AUDIO_UART_CFG
+    #define AUDIO_UART_CFG ((struct uart_config) {   \
+        .uart = UART5,                         \
+        .tx = ((struct mcu_pin){GPIOC, GPIO12}),  \
+        .rx = ((struct mcu_pin){GPIOD, GPIO2}), \
+        })
+#endif 
+    
 #endif  // _DEVO_DEFAULT_HARDWARE_H_

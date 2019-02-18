@@ -32,50 +32,48 @@
 void UART_Initialize()
 {
     /* Enable clocks for GPIO port containing _USART and USART */
-    rcc_peripheral_enable_clock(&_USART_RCC_APB_ENR_IOP,   _USART_RCC_APB_ENR_IOP_EN);
-    rcc_peripheral_enable_clock(&_USART_RCC_APB_ENR_USART, _USART_RCC_APB_ENR_USART_EN);
+    rcc_periph_clock_enable(get_rcc_from_port(UART_CFG.uart));
+    rcc_periph_clock_enable(get_rcc_from_pin(UART_CFG.rx));
+    rcc_periph_clock_enable(get_rcc_from_pin(UART_CFG.tx));
 
     /* Enable DMA clock */
     rcc_periph_clock_enable(get_rcc_from_port(USART_DMA.dma));
 
     /* Setup GPIO pin GPIO_USARTX_TX on USART GPIO port for transmit.
        Set normal function to input as this is mode reverted to in half-duplex receive */
-    gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, _USART_GPIO_USART_RX);
-    gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, _USART_GPIO_USART_TX);
-    gpio_set_mode(_USART_GPIO, GPIO_MODE_OUTPUT_50_MHZ,
-                    GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, _USART_GPIO_USART_TX);
+    GPIO_setup_input(UART_CFG.rx, ITYPE_FLOAT);
+    GPIO_setup_output_af(UART_CFG.tx, OTYPE_PUSHPULL, UART_CFG.uart);
 
     /* Setup UART parameters. */
     UART_SetDataRate(0);
     UART_SetFormat(8, UART_PARITY_NONE, UART_STOPBITS_1);
     UART_SetDuplex(UART_DUPLEX_FULL);
-    usart_set_flow_control(_USART, USART_FLOWCONTROL_NONE);
-    usart_set_mode(_USART, USART_MODE_TX_RX);
+    usart_set_flow_control(UART_CFG.uart, USART_FLOWCONTROL_NONE);
+    usart_set_mode(UART_CFG.uart, USART_MODE_TX_RX);
 
     /* Finally enable the USART. */
-    usart_enable(_USART);
+    usart_enable(UART_CFG.uart);
 
     nvic_set_priority(get_nvic_dma_irq(USART_DMA), 3);
     nvic_enable_irq(get_nvic_dma_irq(USART_DMA));
 
-#if HAS_AUDIO_UART5
+#if HAS_AUDIO_UART
     /* Enable clocks for GPIO port C (for GPIO_UART5_TX) and UART5. */
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPCEN);
-    rcc_peripheral_enable_clock(&RCC_APB1ENR, RCC_APB1ENR_UART5EN);
+    rcc_periph_clock_enable(get_rcc_from_port(AUDIO_UART_CFG.uart));
+    rcc_periph_clock_enable(get_rcc_from_pin(AUDIO_UART_CFG.tx));
 
     /* Setup GPIO pins to use UART5 */
-    gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_50_MHZ,
-                    GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO_UART5_TX);
+    GPIO_setup_output_af(AUDIO_UART_CFG.tx, OTYPE_PUSHPULL, AUDO_UART_CFG.uart);
 
     /* Setup UART5 parameters. */
-    usart_set_baudrate(UART5, 9600);
-    usart_set_databits(UART5, 8);
-    usart_set_stopbits(UART5, USART_STOPBITS_1);
-    usart_set_parity(UART5, USART_PARITY_NONE);
-    usart_set_mode(UART5, USART_MODE_TX);
+    usart_set_baudrate(AUDO_UART_CFG.uart, 9600);
+    usart_set_databits(AUDO_UART_CFG.uart, 8);
+    usart_set_stopbits(AUDO_UART_CFG.uart, USART_STOPBITS_1);
+    usart_set_parity(AUDO_UART_CFG.uart, USART_PARITY_NONE);
+    usart_set_mode(AUDO_UART_CFG.uart, USART_MODE_TX);
 
-    /* Finally enable the UART5. */
-    usart_enable(UART5);
+    /* Finally enable the AUDO_UART_CFG.uart. */
+    usart_enable(AUDO_UART_CFG.uart);
 #endif
 }
 
@@ -83,10 +81,10 @@ void UART_Stop()
 {
     UART_StopReceive();
     nvic_disable_irq(get_nvic_dma_irq(USART_DMA));
-    usart_set_mode(_USART, 0);
-    usart_disable(_USART);
-    rcc_peripheral_disable_clock(&_USART_RCC_APB_ENR_USART, _USART_RCC_APB_ENR_USART_EN);
-    gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, _USART_GPIO_USART_TX);
+    usart_set_mode(UART_CFG.uart, 0);
+    usart_disable(UART_CFG.uart);
+    rcc_periph_clock_disable(get_rcc_from_port(UART_CFG.uart));
+    GPIO_setup_input(UART_CFG.tx, ITYPE_FLOAT);
 }
 
 void UART_SetDataRate(u32 bps)
@@ -94,7 +92,7 @@ void UART_SetDataRate(u32 bps)
     if (bps == 0) bps = 115200;
     if (bps > 2000000) bps = 2000000;
 
-    usart_set_baudrate(_USART, bps);
+    usart_set_baudrate(UART_CFG.uart, bps);
 }
 
 void UART_SetFormat(int bits, uart_parity parity, uart_stopbits stopbits)
@@ -103,27 +101,27 @@ void UART_SetFormat(int bits, uart_parity parity, uart_stopbits stopbits)
     // so bits and parity settings are interdependent.
     if (bits == 8) {
         if (parity == UART_PARITY_NONE) {
-            usart_set_databits(_USART, 8);
-            usart_set_parity(_USART, USART_PARITY_NONE);
+            usart_set_databits(UART_CFG.uart, 8);
+            usart_set_parity(UART_CFG.uart, USART_PARITY_NONE);
         } else {
-            usart_set_databits(_USART, 9);
+            usart_set_databits(UART_CFG.uart, 9);
             if (parity == UART_PARITY_EVEN)
-                usart_set_parity(_USART, USART_PARITY_EVEN);
+                usart_set_parity(UART_CFG.uart, USART_PARITY_EVEN);
             else
-                usart_set_parity(_USART, USART_PARITY_ODD);
+                usart_set_parity(UART_CFG.uart, USART_PARITY_ODD);
         }
     } else if (bits == 7 && parity != UART_PARITY_NONE) {
-        usart_set_databits(_USART, 8);
+        usart_set_databits(UART_CFG.uart, 8);
         if (parity == UART_PARITY_EVEN)
-            usart_set_parity(_USART, USART_PARITY_EVEN);
+            usart_set_parity(UART_CFG.uart, USART_PARITY_EVEN);
         else
-            usart_set_parity(_USART, USART_PARITY_ODD);
+            usart_set_parity(UART_CFG.uart, USART_PARITY_ODD);
     }
 
     switch (stopbits) {
-    case UART_STOPBITS_1:   usart_set_stopbits(_USART, USART_STOPBITS_1); break;
-    case UART_STOPBITS_1_5: usart_set_stopbits(_USART, USART_STOPBITS_1_5); break;
-    case UART_STOPBITS_2:   usart_set_stopbits(_USART, USART_STOPBITS_2); break;
+    case UART_STOPBITS_1:   usart_set_stopbits(UART_CFG.uart, USART_STOPBITS_1); break;
+    case UART_STOPBITS_1_5: usart_set_stopbits(UART_CFG.uart, USART_STOPBITS_1_5); break;
+    case UART_STOPBITS_2:   usart_set_stopbits(UART_CFG.uart, USART_STOPBITS_2); break;
     }
 }
 
@@ -134,7 +132,7 @@ u8 UART_Send(u8 *data, u16 len) {
 
     DMA_stream_reset(USART_DMA);
 
-    dma_set_peripheral_address(USART_DMA.dma, USART_DMA.stream, (u32) &USART_DR(_USART));  /* send data to the USART data register */
+    dma_set_peripheral_address(USART_DMA.dma, USART_DMA.stream, (u32) &USART_DR(UART_CFG.uart));  /* send data to the USART data register */
     dma_set_memory_address(USART_DMA.dma, USART_DMA.stream, (u32) data);
     dma_set_number_of_data(USART_DMA.dma, USART_DMA.stream, len);
     dma_set_read_from_memory(USART_DMA.dma, USART_DMA.stream);                     /* direction is from memory to usart */
@@ -146,7 +144,7 @@ u8 UART_Send(u8 *data, u16 len) {
     DMA_channel_select(USART_DMA);
 
     DMA_enable_stream(USART_DMA);    /* dma ready to go */
-    usart_enable_tx_dma(_USART);
+    usart_enable_tx_dma(UART_CFG.uart);
 
     return 0;
 }
@@ -162,11 +160,11 @@ void UART_StartReceive(usart_callback_t *isr_callback)
     rx_callback = isr_callback;
 
     if (isr_callback) {
-        nvic_enable_irq(_USART_NVIC_USART_IRQ);
-        usart_enable_rx_interrupt(_USART);
+        nvic_enable_irq(get_nvic_irq(UART_CFG.uart));
+        usart_enable_rx_interrupt(UART_CFG.uart);
     } else {
-        usart_disable_rx_interrupt(_USART);
-        nvic_disable_irq(_USART_NVIC_USART_IRQ);
+        usart_disable_rx_interrupt(UART_CFG.uart);
+        nvic_disable_irq(get_nvic_irq(UART_CFG.uart));
     }
 }
 
@@ -179,7 +177,7 @@ void UART_SetDuplex(uart_duplex duplex)
 {
     // no libopencm3 function for duplex
     if (duplex == UART_DUPLEX_FULL)
-        USART_CR3(_USART) &= ~USART_CR3_HDSEL;
+        USART_CR3(UART_CFG.uart) &= ~USART_CR3_HDSEL;
     else
-        USART_CR3(_USART) |= USART_CR3_HDSEL;
+        USART_CR3(UART_CFG.uart) |= USART_CR3_HDSEL;
 }

@@ -59,8 +59,8 @@ struct Transmitter {
     enum AudioPlayers audio_player;
     u8 audio_vol;
 #endif
-#if HAS_AUDIO_UART5
-    u8 audio_uart5;
+#if HAS_AUDIO_UART
+    u8 audio_uart;
 #endif
     enum Mode mode;
     u16 batt_alarm;

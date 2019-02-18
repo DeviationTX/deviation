@@ -27,16 +27,16 @@
 #if HAS_EXTENDED_AUDIO
 void
 AUDIO_send_char(uint8_t c) {
-#if HAS_AUDIO_UART5
+#if HAS_AUDIO_UART
     if (Transmitter.audio_uart5) {
         usart_send_blocking(UART5, c);
     }
     else {
-        usart_send_blocking(_USART, c);
+        usart_send_blocking(UART_CFG.uart, c);
     }
       
 #else
-    usart_send_blocking(_USART, c);
+    usart_send_blocking(UART_CFG.uart, c);
 #endif
 }
 #endif

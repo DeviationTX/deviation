@@ -31,7 +31,7 @@
 #define HAS_VIDEO           0
 #define HAS_4IN1_FLASH      0
 #define HAS_EXTENDED_AUDIO  0
-#define HAS_AUDIO_UART5     0
+#define HAS_AUDIO_UART     0
 #define HAS_MUSIC_CONFIG    0
 
 #define SUPPORT_MULTI_LANGUAGE 0
