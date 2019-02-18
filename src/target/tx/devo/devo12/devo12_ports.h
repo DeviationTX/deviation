@@ -1,12 +1,9 @@
 #ifndef _DEVO12_PORTS_H_
 #define _DEVO12_PORTS_H_
 
+#include "hardware.h"
 //ADC overrides
 #define ADC_OVERSAMPLE_WINDOW_COUNT 10
-#define _ADC                    ADC3
-#define _RCC_APB2ENR_ADCEN      RCC_APB2ENR_ADC3EN
-#define _RCC_APB2RSTR_ADCRST    RCC_APB2RSTR_ADC3RST
-#define _ADC_SMPR_SMP_XXDOT5CYC ADC_SMPR_SMP_13DOT5CYC
 #define _DMA                    DMA2
 #define _DMA_CHANNEL            DMA_CHANNEL5
 #define _RCC_AHBENR_DMAEN       RCC_AHBENR_DMA2EN
