@@ -31,6 +31,7 @@
 #include "common.h"
 #include "config/model.h"
 #include "../ports.h"
+#include "target/drivers/mcu/stm32/rcc.h"
 
 #ifndef DISABLE_PWM
 
@@ -42,8 +43,8 @@ void PWM_Initialize()
 
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_TIM1EN
                                             | RCC_APB2ENR_IOPAEN
-                                            | RCC_APB2ENR_AFIOEN
-                                            | _RCC_AHBENR_DMAEN);
+                                            | RCC_APB2ENR_AFIOEN);
+    rcc_periph_clock_enable(get_rcc_from_port(ADC_DMA.dma));  // FIXME - don't use ADC cfg here
 
     // connect timer compare output to pin
     gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, _PWM_PIN);
@@ -72,7 +73,7 @@ void PWM_Stop()
     nvic_disable_irq(_PWM_NVIC_DMA_CHANNEL_IRQ);
     dma_disable_transfer_complete_interrupt(_PWM_DMA, _PWM_DMA_CHANNEL);
     dma_disable_channel(_PWM_DMA, _PWM_DMA_CHANNEL);
-    rcc_peripheral_disable_clock(&RCC_APB2ENR, RCC_APB2ENR_TIM1EN | _RCC_AHBENR_DMAEN);
+    rcc_peripheral_disable_clock(&RCC_APB2ENR, RCC_APB2ENR_TIM1EN);
 
 #if _PWM_PIN == GPIO_USART1_TX
     UART_Initialize();

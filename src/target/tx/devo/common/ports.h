@@ -45,16 +45,6 @@ static const struct mcu_pin PROTO_MISO_PIN  = _SPI_PROTO_MISO_PIN;
 static const struct mcu_pin PROTO_MOSI_PIN  = _SPI_PROTO_MOSI_PIN;
 #endif
 
-#ifndef ADC_CFG
-#define ADC_OVERSAMPLE_WINDOW_COUNT 1
-    #define _DMA                    DMA1
-    #define _DMA_CHANNEL            DMA_CHANNEL1
-    #define _RCC_AHBENR_DMAEN       RCC_AHBENR_DMA1EN
-    #define _DMA_ISR                dma1_channel1_isr
-    #define _DMA_IFCR_CGIF          DMA_IFCR_CGIF1
-    #define _NVIC_DMA_CHANNEL_IRQ   NVIC_DMA1_CHANNEL1_IRQ
-#endif //_ADC
-
 //Power switch configuration
 #ifndef _PWRSW_PORT
     #define _PWRSW_PORT               GPIOA

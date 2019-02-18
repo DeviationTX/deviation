@@ -5,17 +5,18 @@
 
 #define DMA_SxCR_DIR_PERIPHERAL_TO_MEM   (0 << 6)
 #define DMA_SxCR_DIR_MEM_TO_PERIPHERAL   (1 << 6)
+#define DMA_SxCR_MSIZE_16BIT DMA_CCR_MSIZE_16BIT
+#define DMA_SxCR_PSIZE_16BIT DMA_CCR_PSIZE_16BIT
 
-inline static void DMA_stream_channel_reset(uint32_t dma, uint32_t stream, uint32_t channel)
+inline static void DMA_stream_reset(struct dma_config dma)
 {
-    (void)stream;
-    dma_channel_reset(dma, channel);
+    dma_channel_reset(dma.dma, dma.stream);
 }
 
-inline static void DMA_channel_select(uint32_t dma, uint32_t stream, uint32_t channel)
+inline static void DMA_channel_select(struct dma_config dma)
 {
-    (void)stream;
-    dma_enable_channel(dma, channel);
+    // Not implemented on STM32F1
+    (void)dma;
 }
 
 inline static void DMA_set_dma_flow_control(uint32_t dma, uint32_t stream)
@@ -40,13 +41,12 @@ inline static void DMA_enable_direct_mode(uint32_t dma, uint32_t stream)
     (void)stream;
 }
 
-inline static void DMA_set_transfer_mode(uint32_t dma, uint32_t stream, uint32_t channel, uint32_t direction)
+inline static void DMA_set_transfer_mode(struct dma_config dma, uint32_t direction)
 {
-    (void)stream;
     if (direction == DMA_SxCR_DIR_PERIPHERAL_TO_MEM) {
-        dma_set_read_from_peripheral(dma, channel);
+        dma_set_read_from_peripheral(dma.dma, dma.stream);
     } else {
-        dma_set_read_from_memory(dma, channel);
+        dma_set_read_from_memory(dma.dma, dma.stream);
     }
 }
 
@@ -57,10 +57,8 @@ inline static void DMA_disable_double_buffer_mode(uint32_t dma, uint32_t stream)
     (void)stream;
 }
 
-inline static void DMA_enable_stream(uint32_t dma, uint32_t stream)
+inline static void DMA_enable_stream(struct dma_config dma)
 {
-    // Not implemented on STM32F1
-    (void)dma;
-    (void)stream;
+    dma_enable_channel(dma.dma, dma.stream);
 }
 #endif  // DTX_STM32F1_DMA_H_

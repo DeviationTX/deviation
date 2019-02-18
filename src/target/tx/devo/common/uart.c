@@ -12,12 +12,12 @@
     You should have received a copy of the GNU General Public License
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/usart.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/dma.h>
 #include <libopencm3/cm3/nvic.h>
 #include "common.h"
+#include "target/drivers/mcu/stm32/rcc.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -34,7 +34,7 @@ void UART_Initialize()
     rcc_peripheral_enable_clock(&_USART_RCC_APB_ENR_USART, _USART_RCC_APB_ENR_USART_EN);
 
     /* Enable DMA clock */
-    rcc_peripheral_enable_clock(&RCC_AHBENR, _RCC_AHBENR_DMAEN);
+    rcc_periph_clock_enable(get_rcc_from_port(ADC_DMA.dma));  // FIXME - don't use ADC cfg here
 
     /* Setup GPIO pin GPIO_USARTX_TX on USART GPIO port for transmit.
        Set normal function to input as this is mode reverted to in half-duplex receive */

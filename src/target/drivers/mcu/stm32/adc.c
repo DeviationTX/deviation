@@ -61,33 +61,37 @@ void ADC_Init(void)
 
     /* The following is based on code from here: http://code.google.com/p/rayaairbot */
     /* Enable DMA clock */
-    rcc_peripheral_enable_clock(&RCC_AHBENR, _RCC_AHBENR_DMAEN);
-    /* no reconfig for every ADC group conversion */
-    dma_enable_circular_mode(_DMA, _DMA_CHANNEL);
+    rcc_periph_clock_enable(ADC_DMA.dma);
+    /* 1) Disable DMA and wait for it to complete */
+    DMA_stream_reset(ADC_DMA);
+    /* 2) get the data from the ADC data register */
+    dma_set_peripheral_address(ADC_DMA.dma, ADC_DMA.stream, (u32)&ADC_DR(ADC_CFG.adc));
+    /* 3) put everything in this array */
+    dma_set_memory_address(ADC_DMA.dma, ADC_DMA.stream, (u32)&adc_array_oversample);
+    /* 4) Number of elements in the memory array */
+    dma_set_number_of_data(ADC_DMA.dma, ADC_DMA.stream, SAMPLE_COUNT);
+    /* 5) Select dma channel*/
+    DMA_channel_select(ADC_DMA);
     /* the memory pointer has to be increased, and the peripheral not */
-    dma_enable_memory_increment_mode(_DMA, _DMA_CHANNEL);
+    dma_enable_memory_increment_mode(ADC_DMA.dma, ADC_DMA.stream);
     /* ADC_DR is only 16bit wide in this mode */
-    dma_set_peripheral_size(_DMA, _DMA_CHANNEL, DMA_CCR_PSIZE_16BIT);
+    dma_set_peripheral_size(ADC_DMA.dma, ADC_DMA.stream, DMA_SxCR_PSIZE_16BIT);
     /*destination memory is also 16 bit wide */
-    dma_set_memory_size(_DMA, _DMA_CHANNEL, DMA_CCR_MSIZE_16BIT);
+    dma_set_memory_size(ADC_DMA.dma, ADC_DMA.stream, DMA_SxCR_MSIZE_16BIT);
     /* direction is from ADC to memory */
-    dma_set_read_from_peripheral(_DMA, _DMA_CHANNEL);
-    /* get the data from the ADC data register */
-    dma_set_peripheral_address(_DMA, _DMA_CHANNEL, (u32) &ADC_DR(ADC_CFG.adc));
-    /* put everything in this array */
-    dma_set_memory_address(_DMA, _DMA_CHANNEL, (u32) &adc_array_oversample);
-    /* we convert only 3 values in one adc-group */
-    dma_set_number_of_data(_DMA, _DMA_CHANNEL, SAMPLE_COUNT);
+    dma_set_read_from_peripheral(ADC_DMA.dma, ADC_DMA.stream);
+    /* continuous operation */
+    dma_enable_circular_mode(ADC_DMA.dma, ADC_DMA.stream);
     /* we want an interrupt after the adc is finished */
-    //dma_enable_transfer_complete_interrupt(_DMA, _DMA_CHANNEL);
+    // dma_enable_transfer_complete_interrupt(ADC_DMA.dma, ADC_DMA.stream);
 
     /* dma ready to go. waiting til the peripheral gives the first data */
-    dma_enable_channel(_DMA, _DMA_CHANNEL);
+    DMA_enable_stream(ADC_DMA);
 
     adc_enable_dma(ADC_CFG.adc);
     adc_set_regular_sequence(ADC_CFG.adc, NUM_ADC_CHANNELS, (u8 *)adc_chan_sel);
     adc_set_continuous_conversion_mode(ADC_CFG.adc);
-    adc_start_conversion_direct(ADC_CFG.adc);
+    ADC_start_conversion(ADC_CFG.adc);
 }
 
 unsigned ADC_Read(unsigned channel)
