@@ -7,6 +7,8 @@
 #define DMA_SxCR_DIR_MEM_TO_PERIPHERAL   (1 << 6)
 #define DMA_SxCR_MSIZE_16BIT DMA_CCR_MSIZE_16BIT
 #define DMA_SxCR_PSIZE_16BIT DMA_CCR_PSIZE_16BIT
+#define DMA_SxCR_MSIZE_8BIT DMA_CCR_MSIZE_8BIT
+#define DMA_SxCR_PSIZE_8BIT DMA_CCR_PSIZE_8BIT
 
 inline static void DMA_stream_reset(struct dma_config dma)
 {
@@ -24,14 +26,6 @@ inline static void DMA_set_dma_flow_control(uint32_t dma, uint32_t stream)
     // Not implemented on STM32F1
     (void)dma;
     (void)stream;
-}
-
-inline static void DMA_set_priority(uint32_t dma, uint32_t stream, uint32_t priority)
-{
-    // Not implemented on STM32F1
-    (void)dma;
-    (void)stream;
-    (void)priority;
 }
 
 inline static void DMA_enable_direct_mode(uint32_t dma, uint32_t stream)
@@ -60,5 +54,10 @@ inline static void DMA_disable_double_buffer_mode(uint32_t dma, uint32_t stream)
 inline static void DMA_enable_stream(struct dma_config dma)
 {
     dma_enable_channel(dma.dma, dma.stream);
+}
+
+inline static void DMA_disable_stream(struct dma_config dma)
+{
+    dma_disable_channel(dma.dma, dma.stream);
 }
 #endif  // DTX_STM32F1_DMA_H_

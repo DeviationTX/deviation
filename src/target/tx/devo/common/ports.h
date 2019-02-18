@@ -87,10 +87,6 @@ static const struct mcu_pin PROTO_MOSI_PIN  = _SPI_PROTO_MOSI_PIN;
 
 #ifndef _USART
     #define _USART                        USART1
-    #define _USART_DR                     USART1_DR
-    #define _USART_DMA                    DMA1
-    #define _USART_DMA_CHANNEL            DMA_CHANNEL4
-    #define _USART_DMA_ISR                dma1_channel4_isr
     #define _USART_NVIC_DMA_CHANNEL_IRQ   NVIC_DMA1_CHANNEL4_IRQ
     #define _USART_RCC_APB_ENR_IOP        RCC_APB2ENR
     #define _USART_RCC_APB_ENR_IOP_EN     RCC_APB2ENR_IOPAEN

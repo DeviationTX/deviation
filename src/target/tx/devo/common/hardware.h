@@ -15,4 +15,13 @@
         .stream = DMA_CHANNEL1,            \
         })
 #endif
+
+#ifndef USART_DMA
+    #define USART_DMA ((struct dma_config) { \
+        .dma = DMA1,                       \
+        .stream = DMA_CHANNEL4,            \
+        })
+    #define _USART_DMA_ISR                dma1_channel4_isr
+#endif
+
 #endif  // _DEVO_DEFAULT_HARDWARE_H_
