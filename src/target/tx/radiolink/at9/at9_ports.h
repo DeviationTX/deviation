@@ -12,7 +12,6 @@
     #define _SPI_FLASH_MOSI_PIN      {GPIOB, GPIO15}
 
 #define LCD_RESET_PIN ((struct mcu_pin){GPIOE, GPIO0})
-
 #include "target/tx/devo/common/ports.h"
 
 #if 0

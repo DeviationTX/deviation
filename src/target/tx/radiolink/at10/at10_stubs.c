@@ -19,6 +19,23 @@
 
 #include "common.h"
 
+void SOUND_Init() {}
+void SOUND_SetFrequency(unsigned frequency, unsigned volume) {
+    (void)frequency;
+    (void)volume;
+}
+void SOUND_Start(unsigned msec, u16(*next_note_cb)(), u8 vibrate) {
+    (void)msec;
+    (void)next_note_cb;
+    (void)vibrate;
+}
+void SOUND_StartWithoutVibrating(unsigned msec, u16(*next_note_cb)()) {
+    (void)msec;
+    (void)next_note_cb;
+}
+void SOUND_Stop() {}
+u32 SOUND_Callback() { return 0;}
+
 #if !defined HAS_4IN1_FLASH || !HAS_4IN1_FLASH
 void SPIFlash_Init() {}
 void SPI_FlashBlockWriteEnable(unsigned enable) {

@@ -1,8 +1,6 @@
 #ifndef _AT10_TARGET_DEFS_H_
 #define _AT10_TARGET_DEFS_H_
 
-#include "target/tx/radiolink/common/common_at.h"
-
 #define TXID 0xAA
 #define VECTOR_TABLE_LOCATION 0xa000
 
@@ -16,6 +14,8 @@
     #define USE_PBM_IMAGE 1
     #define USE_DEVOFS 1 //Must be before common_devo include
 #endif
+
+#include "target/tx/radiolink/common/common_at.h"
 
 #define DISABLE_PWM 1                 //FIXME
 #define SUPPORT_MULTI_LANGUAGE 0

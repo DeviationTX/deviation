@@ -5,6 +5,12 @@ SCREENSIZE  := 320x240x16
 FONTS        = filesystem/$(FILESYSTEM)/media/15ascii.fon \
                filesystem/$(FILESYSTEM)/media/23bold.fon
 
+ifeq "$(HAS_4IN1_FLASH)" "1"
+FILESYSTEMS := common base_fonts 320x240x16
+else
+FILESYSTEMS := common base_fonts 320x240x1
+endif
+
 include $(SDIR)/target/tx/radiolink/common/Makefile.inc
 
 ifndef BUILD_TARGET

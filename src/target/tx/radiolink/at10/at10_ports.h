@@ -13,12 +13,6 @@
 
 #define LCD_RESET_PIN ((struct mcu_pin){GPIOE, GPIO0})
 
-#define _SOUND_PORT                GPIOA
-#define _SOUND_PIN                 GPIO11
-#define _SOUND_RCC_APB1ENR_TIMEN   RCC_APB2ENR_TIM1EN
-#define _SOUND_TIM_OC              TIM_OC4
-#define _SOUND_TIM                 TIM1
-
 #include "target/tx/devo/common/ports.h"
 
 #if 0

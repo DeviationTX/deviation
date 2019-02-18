@@ -178,6 +178,8 @@ void LCD_Init()
         ili9341_init();
     } else if (HAS_LCD_TYPE(LCDTYPE_HX8347) && type == LCDTYPE_HX8347) {
         hx8347_init();
+    } else if (HAS_LCD_TYPE(LCDTYPE_ST7796) && type == LCDTYPE_ST7796) {
+        st7796_init();
     } else {
         printf("No LCD detected\n");
     }

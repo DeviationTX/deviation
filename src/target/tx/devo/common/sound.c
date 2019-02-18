@@ -18,7 +18,7 @@
 #include <libopencm3/stm32/timer.h>
 
 #include "common.h"
-#include "target/tx/devo/common/devo.h"
+#include "devo.h"
 
 static u16(*Callback)();
 
