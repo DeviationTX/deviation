@@ -22,7 +22,7 @@
 #include "320x240x16_ili9341.h"
 
 u8 screen_flip;
-const struct lcdtype *disp_type;
+static const struct lcdtype *disp_type;
 
 void lcd_cmd(uint8_t addr, uint8_t data)
 {
@@ -33,9 +33,9 @@ void lcd_cmd(uint8_t addr, uint8_t data)
 void lcd_set_pos(unsigned int x0, unsigned int y0)
 {
     if (screen_flip)
-        y0 = 239 - y0;
+        y0 = LCD_HEIGHT - 1 - y0;
     disp_type->set_pos(x0, y0);
-    //printf("lcd_set_pos: %d, %d\n", x0, y0);
+    // printf("lcd_set_pos: %d, %d\n", x0, y0);
 }
 
 // LCDTYPE_XXX is a bitmask enum.
@@ -131,10 +131,10 @@ void LCD_DrawStart(unsigned int x0, unsigned int y0, unsigned int x1, unsigned i
         y1 = y;
         screen_flip = 1;
     } else {
-       screen_flip = 0;
+        screen_flip = 0;
     }
 
-    //printf("LCD_DrawStart: (%d, %d) - (%d, %d)\n", x0, y0, x1, y1);
+    // printf("LCD_DrawStart: (%d, %d) - (%d, %d)\n", x0, y0, x1, y1);
     disp_type->draw_start(x0, y0, x1, y1);
     return;
 }
