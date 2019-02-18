@@ -89,7 +89,7 @@ static u16 radiolink_cb()
     return PACKET_INTERVAL;
 }
 
-static void RADIOLINK_Reset()
+static void RADIOLINK_Initialize()
 {
     PROTO_CS_HI(RADIOLINK_CC2530);
     PROTOSPI_pin_clear(RADIOLINK_CC2530_RESET_PIN);
@@ -107,7 +107,7 @@ static void RADIOLINK_Stop()
 static void initialize()
 {
     CLOCK_StopTimer();
-    RADIOLINK_Reset();
+    RADIOLINK_Initialize();
     CLOCK_StartTimer(1000, radiolink_cb);
 }
 
