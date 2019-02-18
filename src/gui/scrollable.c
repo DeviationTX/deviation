@@ -28,7 +28,7 @@
 static void create_scrollable_objs(guiScrollable_t *scrollable, int row);
 static int has_selectable(guiScrollable_t *scrollable);
 
-guiObject_t *GUI_CreateScrollable(guiScrollable_t *scrollable, u16 x, u16 y, u16 width, u16 height, u8 row_height, u8 item_count,
+guiObject_t *GUI_CreateScrollable(guiScrollable_t *scrollable, u16 x, u16 y, u16 width, u16 height, u16 row_height, u8 item_count,
      int (*row_cb)(int absrow, int relrow, int x, void *data),
      guiObject_t * (*getobj_cb)(int relrow, int col, void *data),
      int (*size_cb)(int absrow, void *data),

@@ -16,7 +16,8 @@ else
 NUM_MODELS ?= 10
 endif
 
-SRC_C   := $(wildcard $(SDIR)/target/tx/$(FAMILY)/$(TARGET)/*.c) \
+SRC_C   := $(wildcard $(SDIR)/target/tx/$(FAMILY)/common/*.c) \
+           $(wildcard $(SDIR)/target/tx/$(FAMILY)/$(TARGET)/*.c) \
            $(wildcard $(SDIR)/target/drivers/mcu/stm32/*.c) \
            $(wildcard $(SDIR)/target/drivers/filesystems/*.c) \
            $(wildcard $(SDIR)/target/drivers/filesystems/devofs/*.c) \
@@ -25,7 +26,8 @@ SRC_C   := $(wildcard $(SDIR)/target/tx/$(FAMILY)/$(TARGET)/*.c) \
            $(wildcard $(SDIR)/target/tx/devo/common/msc2/lib/*.c) \
            $(wildcard $(SDIR)/target/tx/devo/common/hid/*.c) \
            $(wildcard $(SDIR)/target/tx/devo/common/protocol/*.c) \
-           $(wildcard $(SDIR)/target/tx/devo/common/uart.c)
+           $(wildcard $(SDIR)/target/tx/devo/common/uart.c) \
+
 
 ifneq "$(HAS_4IN1_FLASH)" "1"
 SRC_C := $(filter-out $(SDIR)/target/drivers/mcu/stm32/spi_flash.c, $(SRC_C))
@@ -46,15 +48,11 @@ LFLAGS2  = -Wl,-T$(LINKFILE)
 
 else #BUILD_TARGET
 
-$(TARGET).bin: $(TARGET).elf
-	$(CP) -O binary $< $@
-	$(DUMP) -S $< > $(TARGET).list
-
 $(LIBOPENCM3):
 	test -s $(SDIR)/libopencm3/Makefile || { echo "Fetch libopencm3 via 'git submodule update --init'"; exit 1; }
 	+$(MAKE) -C $(SDIR)/libopencm3 TARGETS=stm32/f1 lib
 
-$(ODIR)/devo.fs: $(LAST_MODEL) $(TARGET).dfu $(PRE_FS) $(TARGET).fs_wrapper
+$(ODIR)/devo.fs: $(LAST_MODEL) $(PRE_FS) $(TARGET).fs_wrapper
 	target/drivers/filesystems/devofs/buildfs.py -c -i -f $@ -d filesystem/$(FILESYSTEM)
 
 endif #BUILD_TARGET

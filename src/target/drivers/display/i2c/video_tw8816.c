@@ -11,9 +11,6 @@
 
     You should have received a copy of the GNU General Public License
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
-
-    This file is partially based upon the CooCox ILI9341S driver
-    http://www.coocox.org/driver_repo/305488dd-734b-4cce-a8a4-39dcfef8cc66/html/group___i_l_i9341_s.html
 */
 
 #include <libopencm3/stm32/i2c.h>

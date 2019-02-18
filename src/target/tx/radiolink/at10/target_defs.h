@@ -1,10 +1,10 @@
-#ifndef _AT9_TARGET_DEFS_H_
-#define _AT9_TARGET_DEFS_H_
+#ifndef _AT10_TARGET_DEFS_H_
+#define _AT10_TARGET_DEFS_H_
 
 #include "target/tx/radiolink/common/common_at.h"
 
-#define TXID 0xA9
-#define VECTOR_TABLE_LOCATION 0x3000
+#define TXID 0xAA
+#define VECTOR_TABLE_LOCATION 0xa000
 
 #define SPIFLASH_SECTOR_OFFSET 0x0000
 
@@ -20,27 +20,25 @@
 #define DISABLE_PWM 1                 //FIXME
 #define SUPPORT_MULTI_LANGUAGE 0
 
-#define HAS_LCD_TYPES       (LCDTYPE_ILI9341)
+#define HAS_LCD_TYPES       (LCDTYPE_ST7796)
 #ifndef LCD_ForceUpdate
 static inline void LCD_ForceUpdate() {}
 #endif
 
-#define USE_4BUTTON_MODE    1
-#define HAS_STANDARD_GUI    0
+#define HAS_STANDARD_GUI    1
 #define HAS_ADVANCED_GUI    1
 #define HAS_PERMANENT_TIMER 1
 #define HAS_TELEMETRY       1
 #define HAS_EXTENDED_TELEMETRY 1
 #define HAS_TOUCH           0
 #define HAS_RTC             0
-#define HAS_VIBRATINGMOTOR  1
+#define HAS_VIBRATINGMOTOR  0
 #define HAS_DATALOG         1
 #define HAS_LAYOUT_EDITOR   1
 #define HAS_SCANNER         0
 #define HAS_EXTRA_SWITCHES  0
 #define HAS_EXTRA_BUTTONS   0
 #define HAS_MULTIMOD_SUPPORT 0
-//#define HAS_4IN1_FLASH 1 // NB set in the Makefile.inc
 #define HAS_VIDEO           0
 #define HAS_EXTENDED_AUDIO  0
 #define HAS_AUDIO_UART5     0
@@ -53,6 +51,9 @@ static inline void LCD_ForceUpdate() {}
 #else
    #define DEBUG_WINDOW_SIZE 0
 #endif
+
+#define LCD_WIDTH 480
+#define LCD_HEIGHT 320
 
 #define MIN_BRIGHTNESS 0
 #define DEFAULT_BATTERY_ALARM 8000
@@ -68,12 +69,12 @@ static inline void LCD_ForceUpdate() {}
 #define MAX_POINTS 13
 #define NUM_MIXERS ((NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS) * 4)
 
-#define INP_HAS_CALIBRATION 8
+#define INP_HAS_CALIBRATION 9
 
 /* Compute voltage from y = 0.003672x + 0.0287 */
 #define VOLTAGE_NUMERATOR 367
 #define VOLTAGE_OFFSET    29
-#include "at9_ports.h"
+#include "../at9/at9_ports.h"
 
 
 /* Define button placement for chantest page*/
@@ -87,4 +88,4 @@ static inline void LCD_ForceUpdate() {}
     }
 
 
-#endif //_AT9_TARGET_DEFS_H_
+#endif  // _AT10_TARGET_DEFS_H_
