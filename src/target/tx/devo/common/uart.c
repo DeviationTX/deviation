@@ -63,17 +63,17 @@ void UART_Initialize()
     rcc_periph_clock_enable(get_rcc_from_pin(AUDIO_UART_CFG.tx));
 
     /* Setup GPIO pins to use UART5 */
-    GPIO_setup_output_af(AUDIO_UART_CFG.tx, OTYPE_PUSHPULL, AUDO_UART_CFG.uart);
+    GPIO_setup_output_af(AUDIO_UART_CFG.tx, OTYPE_PUSHPULL, AUDIO_UART_CFG.uart);
 
     /* Setup UART5 parameters. */
-    usart_set_baudrate(AUDO_UART_CFG.uart, 9600);
-    usart_set_databits(AUDO_UART_CFG.uart, 8);
-    usart_set_stopbits(AUDO_UART_CFG.uart, USART_STOPBITS_1);
-    usart_set_parity(AUDO_UART_CFG.uart, USART_PARITY_NONE);
-    usart_set_mode(AUDO_UART_CFG.uart, USART_MODE_TX);
+    usart_set_baudrate(AUDIO_UART_CFG.uart, 9600);
+    usart_set_databits(AUDIO_UART_CFG.uart, 8);
+    usart_set_stopbits(AUDIO_UART_CFG.uart, USART_STOPBITS_1);
+    usart_set_parity(AUDIO_UART_CFG.uart, USART_PARITY_NONE);
+    usart_set_mode(AUDIO_UART_CFG.uart, USART_MODE_TX);
 
-    /* Finally enable the AUDO_UART_CFG.uart. */
-    usart_enable(AUDO_UART_CFG.uart);
+    /* Finally enable the AUDIO_UART_CFG.uart. */
+    usart_enable(AUDIO_UART_CFG.uart);
 #endif
 }
 

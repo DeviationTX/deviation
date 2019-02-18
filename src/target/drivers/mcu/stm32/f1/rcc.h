@@ -10,7 +10,7 @@
 #include <libopencm3/stm32/usart.h>
 #include <libopencm3/stm32/dma.h>
 
-static inline  enum rcc_periph_clken get_rcc_from_port(u32 port)
+__attribute__((always_inline)) static inline enum rcc_periph_clken get_rcc_from_port(u32 port)
 {
     switch (port) {
         case GPIOA:  return RCC_GPIOA;
@@ -42,6 +42,7 @@ static inline  enum rcc_periph_clken get_rcc_from_port(u32 port)
         case TIM13:  return RCC_TIM13;
         case TIM14:  return RCC_TIM14;
         case USART1: return RCC_USART1;
+        case UART5:  return RCC_UART5;
         default:    return ltassert();  // We should never get here
     }
 }
