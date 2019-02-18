@@ -1,20 +1,15 @@
 HAS_4IN1_FLASH ?= 0
 HAS_FLASH_DETECT ?= $(HAS_4IN1_FLASH)
 
-ifeq "$(HAS_4IN1_FLASH)" "1"
-FILESYSTEMS := common base_fonts 320x240x16
-else
-FILESYSTEMS := common base_fonts 320x240x1
-endif
-
 SCREENSIZE  := 320x240x16
 FONTS        = filesystem/$(FILESYSTEM)/media/15ascii.fon \
                filesystem/$(FILESYSTEM)/media/23bold.fon
 
 DFU_ARGS    := -D 0x0483:0xdf12 -b 0x08003000
 
+include $(SDIR)/target/tx/radiolink/common/Makefile.inc
+
 ifndef BUILD_TARGET
-CROSS    = arm-none-eabi-
 
 ifneq "$(HAS_4IN1_FLASH)" "1"
 EXTRA_DFUS = $(TARGET)-fs.dfu
@@ -22,53 +17,10 @@ endif
 
 ALL = $(LIBOPENCM3) $(TARGET).dfu $(EXTRA_DFUS)
 
-ifeq "$(HAS_4IN1_FLASH)" "1"
-NUM_MODELS ?= 30
-else
-NUM_MODELS ?= 10
-endif
-
-LINKFILE = $(SDIR)/target/tx/$(FAMILY)/$(TARGET)/$(TARGET).ld
-LIBOPENCM3 = $(SDIR)/libopencm3/lib/libopencm3_stm32f1.a
-
-SRC_C   := $(wildcard $(SDIR)/target/tx/$(FAMILY)/$(TARGET)/*.c) \
-           $(wildcard $(SDIR)/target/drivers/mcu/stm32/*.c) \
-           $(SDIR)/target/drivers/display/8080/320x240x16.c \
-           $(wildcard $(SDIR)/target/drivers/filesystems/*.c) \
-           $(wildcard $(SDIR)/target/drivers/filesystems/devofs/*.c) \
-           $(wildcard $(SDIR)/target/drivers/filesystems/petit_fat/*.c) \
-           $(wildcard $(SDIR)/target/tx/devo/common/msc2/*.c) \
-           $(wildcard $(SDIR)/target/tx/devo/common/msc2/lib/*.c) \
-           $(wildcard $(SDIR)/target/tx/devo/common/hid/*.c) \
-           $(wildcard $(SDIR)/target/tx/devo/common/protocol/*.c) \
-           $(wildcard $(SDIR)/target/tx/devo/common/uart.c)
-
-ifneq "$(HAS_4IN1_FLASH)" "1"
-SRC_C := $(filter-out $(SDIR)/target/drivers/mcu/stm32/spi_flash.c, $(SRC_C))
-endif
-
-CFLAGS   = -D"assert_param(x)=" -DSTM32F10X_HD -DSTM32F1 -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -fdata-sections -ffunction-sections -I$(SDIR)/target/tx/devo/common/msc2/lib -I$(SDIR)/target/tx/devo/common/msc2 -I$(SDIR)/libopencm3/include -I$(SDIR)/target/drivers/filesystems -fno-builtin-printf -Os --specs=nano.specs
-ifeq "$(HAS_4IN1_FLASH)" "1"
-CFLAGS  += -D"HAS_4IN1_FLASH=1"
-endif
-ifeq "$(HAS_FLASH_DETECT)" "1"
-CFLAGS  += -D"HAS_FLASH_DETECT=1"
-endif
-MODULE_FLAGS = -fno-builtin
-
-LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -lc -lnosys -L$(SDIR) -Lobjs/$(TARGET)
-LFLAGS2  = -Wl,-T$(LINKFILE)
-
+SRC_C   += $(SDIR)/target/drivers/display/8080/320x240x16.c \
+           $(wildcard $(SDIR)/target/drivers/input/rotary/*.c)
 
 else #BUILD_TARGET
-
-$(TARGET).bin: $(TARGET).elf
-	$(CP) -O binary $< $@
-	$(DUMP) -S $< > $(TARGET).list
-
-$(LIBOPENCM3):
-	test -s $(SDIR)/libopencm3/Makefile || { echo "Fetch libopencm3 via 'git submodule update --init'"; exit 1; }
-	+$(MAKE) -C $(SDIR)/libopencm3 TARGETS=stm32/f1 lib
 
 $(TARGET).dfu: $(TARGET).bin
 	$(SDIR)/../utils/dfu.py --name "$(HGVERSION) Firmware" $(DFU_ARGS):$< $@
