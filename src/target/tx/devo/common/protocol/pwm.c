@@ -31,6 +31,9 @@
 #include "common.h"
 #include "config/model.h"
 #include "../ports.h"
+#include "target/drivers/mcu/stm32/rcc.h"
+#include "target/drivers/mcu/stm32/dma.h"
+#include "target/drivers/mcu/stm32/nvic.h"
 
 #ifndef DISABLE_PWM
 
@@ -42,8 +45,8 @@ void PWM_Initialize()
 
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_TIM1EN
                                             | RCC_APB2ENR_IOPAEN
-                                            | RCC_APB2ENR_AFIOEN
-                                            | _RCC_AHBENR_DMAEN);
+                                            | RCC_APB2ENR_AFIOEN);
+    rcc_periph_clock_enable(get_rcc_from_port(PWM_DMA.dma));
 
     // connect timer compare output to pin
     gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, _PWM_PIN);
@@ -69,10 +72,10 @@ void PWM_Stop()
         return;
 
     timer_disable_counter(TIM1);
-    nvic_disable_irq(_PWM_NVIC_DMA_CHANNEL_IRQ);
-    dma_disable_transfer_complete_interrupt(_PWM_DMA, _PWM_DMA_CHANNEL);
-    dma_disable_channel(_PWM_DMA, _PWM_DMA_CHANNEL);
-    rcc_peripheral_disable_clock(&RCC_APB2ENR, RCC_APB2ENR_TIM1EN | _RCC_AHBENR_DMAEN);
+    nvic_disable_irq(get_nvic_dma_irq(PWM_DMA));
+    dma_disable_transfer_complete_interrupt(PWM_DMA.dma, PWM_DMA.stream);
+    dma_disable_channel(PWM_DMA.dma, PWM_DMA.stream);
+    rcc_peripheral_disable_clock(&RCC_APB2ENR, RCC_APB2ENR_TIM1EN);
 
 #if _PWM_PIN == GPIO_USART1_TX
     UART_Initialize();
@@ -84,16 +87,17 @@ void PPM_Enable(unsigned low_time, volatile u16 *pulses, u8 num_pulses)
     if (!pulses || num_pulses < 1) return;
 
     // Setup DMA
-    dma_channel_reset(_PWM_DMA, _PWM_DMA_CHANNEL);
-    dma_set_peripheral_address(_PWM_DMA, _PWM_DMA_CHANNEL, (u32) &_PWM_TIM_ARR);
-    dma_set_memory_address(_PWM_DMA, _PWM_DMA_CHANNEL, (u32) pulses);
-    dma_set_number_of_data(_PWM_DMA, _PWM_DMA_CHANNEL, num_pulses);
-    dma_set_read_from_memory(_PWM_DMA, _PWM_DMA_CHANNEL);
-    dma_enable_memory_increment_mode(_PWM_DMA, _PWM_DMA_CHANNEL);
-    dma_set_peripheral_size(_PWM_DMA, _PWM_DMA_CHANNEL, DMA_CCR_PSIZE_16BIT);
-    dma_set_memory_size(_PWM_DMA, _PWM_DMA_CHANNEL, DMA_CCR_MSIZE_16BIT);
-    dma_set_priority(_PWM_DMA, _PWM_DMA_CHANNEL, DMA_CCR_PL_VERY_HIGH);
-    dma_enable_channel(_PWM_DMA, _PWM_DMA_CHANNEL);    // dma ready to go
+    DMA_stream_reset(PWM_DMA);
+    dma_set_peripheral_address(PWM_DMA.dma, PWM_DMA.stream, (u32) &TIM_ARR(TIM1));
+    dma_set_memory_address(PWM_DMA.dma, PWM_DMA.stream, (u32) pulses);
+    dma_set_number_of_data(PWM_DMA.dma, PWM_DMA.stream, num_pulses);
+    dma_set_read_from_memory(PWM_DMA.dma, PWM_DMA.stream);
+    dma_enable_memory_increment_mode(PWM_DMA.dma, PWM_DMA.stream);
+    dma_set_peripheral_size(PWM_DMA.dma, PWM_DMA.stream, DMA_SxCR_PSIZE_16BIT);
+    dma_set_memory_size(PWM_DMA.dma, PWM_DMA.stream, DMA_SxCR_MSIZE_16BIT);
+    dma_set_priority(PWM_DMA.dma, PWM_DMA.stream, DMA_CCR_PL_VERY_HIGH);
+    DMA_channel_select(USART_DMA);
+    DMA_enable_stream(PWM_DMA);    // dma ready to go
 
     // Setup timer for PPM
     timer_set_oc_value(TIM1, _PWM_TIM_OC, low_time);
@@ -150,17 +154,18 @@ void PXX_Enable(u8 *packet)
     pc += 8;
 
     // Setup DMA
-    dma_channel_reset(_PWM_DMA, _PWM_DMA_CHANNEL);
-    dma_set_peripheral_address(_PWM_DMA, _PWM_DMA_CHANNEL, (u32) &_PWM_TIM_ARR);
-    dma_set_memory_address(_PWM_DMA, _PWM_DMA_CHANNEL, (u32) pxx_bits);
-    dma_set_number_of_data(_PWM_DMA, _PWM_DMA_CHANNEL, pc - pxx_bits + 1);
-    dma_set_read_from_memory(_PWM_DMA, _PWM_DMA_CHANNEL);
-    dma_enable_memory_increment_mode(_PWM_DMA, _PWM_DMA_CHANNEL);
-    dma_set_peripheral_size(_PWM_DMA, _PWM_DMA_CHANNEL, DMA_CCR_PSIZE_16BIT);
-    dma_set_memory_size(_PWM_DMA, _PWM_DMA_CHANNEL, DMA_CCR_MSIZE_8BIT);
-    dma_set_priority(_PWM_DMA, _PWM_DMA_CHANNEL, DMA_CCR_PL_VERY_HIGH);
-    dma_enable_transfer_complete_interrupt(_PWM_DMA, _PWM_DMA_CHANNEL);
-    dma_enable_channel(_PWM_DMA, _PWM_DMA_CHANNEL);    // dma ready to go
+    DMA_stream_reset(PWM_DMA);
+    dma_set_peripheral_address(PWM_DMA.dma, PWM_DMA.stream, (u32) &TIM_ARR(TIM1));
+    dma_set_memory_address(PWM_DMA.dma, PWM_DMA.stream, (u32) pxx_bits);
+    dma_set_number_of_data(PWM_DMA.dma, PWM_DMA.stream, pc - pxx_bits + 1);
+    dma_set_read_from_memory(PWM_DMA.dma, PWM_DMA.stream);
+    dma_enable_memory_increment_mode(PWM_DMA.dma, PWM_DMA.stream);
+    dma_set_peripheral_size(PWM_DMA.dma, PWM_DMA.stream, DMA_SxCR_PSIZE_16BIT);
+    dma_set_memory_size(PWM_DMA.dma, PWM_DMA.stream, DMA_SxCR_MSIZE_8BIT);
+    dma_set_priority(PWM_DMA.dma, PWM_DMA.stream, DMA_CCR_PL_VERY_HIGH);
+    dma_enable_transfer_complete_interrupt(PWM_DMA.dma, PWM_DMA.stream);
+    DMA_channel_select(USART_DMA);
+    DMA_enable_stream(PWM_DMA);    // dma ready to go
 
     // configure timer for PXX
     timer_set_period(TIM1, 0);                          // hold timer stopped
@@ -171,8 +176,8 @@ void PXX_Enable(u8 *packet)
     timer_enable_irq(TIM1, _PWM_TIM_DIER_DMAEN);        // enable timer dma request
     timer_set_oc_mode(TIM1, _PWM_TIM_OC, TIM_OCM_PWM1); // output active while counter below compare
 
-    nvic_set_priority(_PWM_NVIC_DMA_CHANNEL_IRQ, 3);    // DMA interrupt on transfer complete
-    nvic_enable_irq(_PWM_NVIC_DMA_CHANNEL_IRQ);
+    nvic_set_priority(get_nvic_dma_irq(PWM_DMA), 3);    // DMA interrupt on transfer complete
+    nvic_enable_irq(get_nvic_dma_irq(PWM_DMA));
 
     timer_enable_counter(TIM1);
     timer_generate_event(TIM1, TIM_EGR_UG);             // Generate event to start DMA

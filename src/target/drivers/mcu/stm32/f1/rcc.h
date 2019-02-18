@@ -6,6 +6,7 @@
 #include <libopencm3/stm32/spi.h>
 #include <libopencm3/stm32/timer.h>
 #include <libopencm3/stm32/i2c.h>
+#include <libopencm3/stm32/adc.h>
 
 static inline  enum rcc_periph_clken get_rcc_from_port(u32 port)
 {

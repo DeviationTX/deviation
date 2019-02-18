@@ -133,8 +133,8 @@ void CLOCK_Init()
     nvic_enable_irq(NVIC_EXTI1_IRQ);
     nvic_set_priority(NVIC_EXTI1_IRQ, 64); //Medium priority
     /* Enable DMA Channel1 with same priority as EXTI1 */
-    nvic_enable_irq(_NVIC_DMA_CHANNEL_IRQ);
-    nvic_set_priority(_NVIC_DMA_CHANNEL_IRQ, 65); //Medium priority
+    // nvic_enable_irq(_NVIC_DMA_CHANNEL_IRQ);
+    // nvic_set_priority(_NVIC_DMA_CHANNEL_IRQ, 65); // Medium priority
 
     /* wait for system to start up and stabilize */
     while(msecs < 100)

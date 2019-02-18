@@ -45,16 +45,6 @@ static const struct mcu_pin PROTO_MISO_PIN  = _SPI_PROTO_MISO_PIN;
 static const struct mcu_pin PROTO_MOSI_PIN  = _SPI_PROTO_MOSI_PIN;
 #endif
 
-#ifndef ADC_CFG
-#define ADC_OVERSAMPLE_WINDOW_COUNT 1
-    #define _DMA                    DMA1
-    #define _DMA_CHANNEL            DMA_CHANNEL1
-    #define _RCC_AHBENR_DMAEN       RCC_AHBENR_DMA1EN
-    #define _DMA_ISR                dma1_channel1_isr
-    #define _DMA_IFCR_CGIF          DMA_IFCR_CGIF1
-    #define _NVIC_DMA_CHANNEL_IRQ   NVIC_DMA1_CHANNEL1_IRQ
-#endif //_ADC
-
 //Power switch configuration
 #ifndef _PWRSW_PORT
     #define _PWRSW_PORT               GPIOA
@@ -87,21 +77,11 @@ static const struct mcu_pin PROTO_MOSI_PIN  = _SPI_PROTO_MOSI_PIN;
     #define _PWM_PIN                   GPIO_USART1_TX    //GPIO9
     #define _PWM_EXTI                  EXTI9
     #define _PWM_TIM_OC                TIM_OC2
-    #define _PWM_TIM_ARR               TIM1_ARR
     #define _PWM_TIM_DIER_DMAEN        TIM_DIER_CC2DE
-    #define _PWM_DMA                   DMA1
-    #define _PWM_DMA_CHANNEL           DMA_CHANNEL3
-    #define _PWM_DMA_ISR               dma1_channel3_isr
-    #define _PWM_NVIC_DMA_CHANNEL_IRQ  NVIC_DMA1_CHANNEL3_IRQ
 #endif //_PWM_PIN
 
 #ifndef _USART
     #define _USART                        USART1
-    #define _USART_DR                     USART1_DR
-    #define _USART_DMA                    DMA1
-    #define _USART_DMA_CHANNEL            DMA_CHANNEL4
-    #define _USART_DMA_ISR                dma1_channel4_isr
-    #define _USART_NVIC_DMA_CHANNEL_IRQ   NVIC_DMA1_CHANNEL4_IRQ
     #define _USART_RCC_APB_ENR_IOP        RCC_APB2ENR
     #define _USART_RCC_APB_ENR_IOP_EN     RCC_APB2ENR_IOPAEN
     #define _USART_RCC_APB_ENR_USART      RCC_APB2ENR
