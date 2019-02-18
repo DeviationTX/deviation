@@ -35,7 +35,6 @@ enum { TIMEBUTTON=DAY+100, DATEBUTTON,  // for buttons setting time and date
        ACTTIME, ACTDATE,                // ACT-/NEWTIME and *DATE are used for the formatted values
        SETLABEL, RESULTLABEL,           // for labels at new time/date and result time/date
        NEWTIME, NEWDATE };
-u8 order[6] = { DAY, MONTH, YEAR, HOUR, MINUTE, SECOND };
 
 extern const char *timeformats[];
 extern const char *dateformats[];
@@ -45,41 +44,43 @@ static struct rtc_page * const rp = &pagemem.u.rtc_page;
 void _show_page();
 static const char *rtc_val_cb(guiObject_t *obj, int dir, void *data);
 
-int min[6], max[6];     // for reordering the values are set dynamically
 static const u8 daysInMonth[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-
-char newstring[31], resultstring[31];
-
-struct Rtc {
-    u16 value[6];
-    int clocksource;
-    int prescaler;
-    int clocksourceready;
-} Rtc;
 
 void PAGE_RTCInit(int page)
 {
     (void)page;
     PAGE_SetModal(0);
     PAGE_ShowHeader(PAGE_GetName(PAGEID_RTC));
+
+    RTC_GetDateFormattedOrder(Transmitter.rtc_dateformat, &rp->order[0], &rp->order[1], &rp->order[2]);  // initial rp->ordering
+    rp->order[3] = HOUR;
+    rp->order[4] = MINUTE;
+    rp->order[5] = SECOND;
+
     u32 time = RTC_GetValue();
     u32 timevalue = RTC_GetTimeValue(time);
-    Rtc.value[HOUR] = (u16)(timevalue / 3600);
-    Rtc.value[MINUTE] = (u16)(timevalue % 3600) / 60;
-    Rtc.value[SECOND] = (u16)(timevalue % 60);
+    rp->value[HOUR] = (u16)(timevalue / 3600);
+    rp->value[MINUTE] = (u16)(timevalue % 3600) / 60;
+    rp->value[SECOND] = (u16)(timevalue % 60);
     RTC_GetDateStringLong(tempstring,time);
     int idx = (tempstring[1] == '.' ? 1 : 2);
     tempstring[idx] = 0;
     tempstring[idx+3] = 0;
-    Rtc.value[DAY] = atoi(tempstring);
-    Rtc.value[MONTH] = atoi(tempstring + idx + 1);
-    Rtc.value[YEAR] = atoi(tempstring + idx + 4);
-    min[SECOND] = 0;             max[SECOND] = 59;
-    min[MINUTE] = 0;             max[MINUTE] = 59;
-    min[HOUR]   = 0;             max[HOUR]   = 23;
-    min[DAY]    = 1;             max[DAY]    = daysInMonth[Rtc.value[MONTH] - 1] + (((Rtc.value[YEAR] % 4) == 0) && (Rtc.value[MONTH] == 2) ? 1 : 0);
-    min[MONTH]  = 1;             max[MONTH]  = 12;
-    min[YEAR]   = RTC_STARTYEAR; max[YEAR]   = RTC_STARTYEAR + 67;
+    rp->value[DAY] = atoi(tempstring);
+    rp->value[MONTH] = atoi(tempstring + idx + 1);
+    rp->value[YEAR] = atoi(tempstring + idx + 4);
+    rp->min[SECOND] = 0;
+    rp->max[SECOND] = 59;
+    rp->min[MINUTE] = 0;
+    rp->max[MINUTE] = 59;
+    rp->min[HOUR]   = 0;
+    rp->max[HOUR]   = 23;
+    rp->min[DAY]    = 1;
+    rp->max[DAY]    = daysInMonth[rp->value[MONTH] - 1] + (((rp->value[YEAR] % 4) == 0) && (rp->value[MONTH] == 2) ? 1 : 0);
+    rp->min[MONTH]  = 1;
+    rp->max[MONTH]  = 12;
+    rp->min[YEAR]   = RTC_STARTYEAR;
+    rp->max[YEAR]   = RTC_STARTYEAR + 67;
     _show_page();
 }
 
@@ -127,9 +128,9 @@ static const char *rtc_text_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     unsigned int idx = (long)data;
-    if (idx <= (sizeof(Rtc.value) / sizeof(Rtc.value[0]))) {
+    if (idx <= (sizeof(rp->value) / sizeof(rp->value[0]))) {
         GUI_DrawBackground(X(idx/3, 32) + ((idx%3 == 2) ? 67 : 0) - ((idx%3 == 0) ? 67 : 0), 84, 64, 16);
-        idx = order[idx];
+        idx = rp->order[idx];
     }
     switch (idx) {
         case SECOND:     return _tr("Second");
@@ -147,11 +148,11 @@ static const char *rtc_text_cb(guiObject_t *obj, const void *data)
             return tempstring;
         }
         case NEWTIME: {
-            RTC_GetTimeFormatted(tempstring, RTC_GetSerial(Rtc.value[YEAR], Rtc.value[MONTH], Rtc.value[DAY], Rtc.value[HOUR], Rtc.value[MINUTE], Rtc.value[SECOND]));
+            RTC_GetTimeFormatted(tempstring, RTC_GetSerial(rp->value[YEAR], rp->value[MONTH], rp->value[DAY], rp->value[HOUR], rp->value[MINUTE], rp->value[SECOND]));
             return tempstring;
         }
         case NEWDATE: {
-            RTC_GetDateFormatted(tempstring, RTC_GetSerial(Rtc.value[YEAR], Rtc.value[MONTH], Rtc.value[DAY], Rtc.value[HOUR], Rtc.value[MINUTE], Rtc.value[SECOND]));
+            RTC_GetDateFormatted(tempstring, RTC_GetSerial(rp->value[YEAR], rp->value[MONTH], rp->value[DAY], rp->value[HOUR], rp->value[MINUTE], rp->value[SECOND]));
             return tempstring;
         }
         case TIMEBUTTON:   return _tr("Set time");
@@ -168,10 +169,10 @@ void rtc_set_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     if ((long)data == TIMEBUTTON) {
-        RTC_SetTime(Rtc.value[HOUR], Rtc.value[MINUTE], Rtc.value[SECOND]);
+        RTC_SetTime(rp->value[HOUR], rp->value[MINUTE], rp->value[SECOND]);
         GUI_Redraw(&gui->acttime);
     } else if ((long)data == DATEBUTTON) {
-        RTC_SetDate(Rtc.value[YEAR], Rtc.value[MONTH], Rtc.value[DAY]);
+        RTC_SetDate(rp->value[YEAR], rp->value[MONTH], rp->value[DAY]);
         GUI_Redraw(&gui->actdate);
     }
 }
@@ -187,8 +188,8 @@ const char *rtc_select_format_cb(guiObject_t *obj, int dir, void *data)
             Transmitter.rtc_timeformat = index;
             GUI_Redraw(&gui->acttime);
             GUI_Redraw(&gui->newtime);
-            for (u8 i=0; i<sizeof(order); i++)
-                if (order[i] == HOUR) {
+            for (u8 i = 0; i < sizeof(rp->order); i++)
+                if (rp->order[i] == HOUR) {
                     GUI_Redraw(&gui->select[i]);
                     break;
                 }
@@ -203,8 +204,8 @@ const char *rtc_select_format_cb(guiObject_t *obj, int dir, void *data)
             Transmitter.rtc_dateformat = index;
             GUI_Redraw(&gui->actdate);
             GUI_Redraw(&gui->newdate);
-            // reorder spinbuttons to date format
-            RTC_GetDateFormattedOrder(index, &order[0], &order[1], &order[2]);
+            // rerp->order spinbuttons to date format
+            RTC_GetDateFormattedOrder(index, &rp->order[0], &rp->order[1], &rp->order[2]);
             for (u8 i=0; i<=2; i++) {
                 GUI_Redraw(&gui->label[i]);
                 GUI_Redraw(&gui->select[i]);
@@ -221,8 +222,6 @@ void _show_page()
     GUI_CreateLabel(&gui->timelbl, XR(128), 40, rtc_text_cb, DEFAULT_FONT, (void *)TIMELABEL);
     GUI_CreateTextSelect(&gui->dateformat, XL(128), 56, TEXTSELECT_128, NULL, rtc_select_format_cb, (void *)ACTDATE);
     GUI_CreateTextSelect(&gui->timeformat, XR(128), 56, TEXTSELECT_128, NULL, rtc_select_format_cb, (void *)ACTTIME);
-
-    RTC_GetDateFormattedOrder(Transmitter.rtc_dateformat, &order[0], &order[1], &order[2]);  // initial ordering
 
     for (long i=0; i<6; i++) {
         GUI_CreateLabel(&gui->label[i], X(i/3, 32) + ((i%3 == 2) ? 67 : 0) - ((i%3 == 0) ? 67 : 0), 84, rtc_text_cb, DEFAULT_FONT, (void *)i);
@@ -262,32 +261,32 @@ static const char *rtc_val_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     unsigned int idx = (long)data;
     u8 changed;
-    if (idx <= (sizeof(Rtc.value) / sizeof(Rtc.value[0]))) {
-        idx = order[idx];
-        Rtc.value[idx] = GUI_TextSelectHelper(Rtc.value[idx], min[idx], max[idx], dir, 1, 4, &changed);
+    if (idx <= (sizeof(rp->value) / sizeof(rp->value[0]))) {
+        idx = rp->order[idx];
+        rp->value[idx] = GUI_TextSelectHelper(rp->value[idx], rp->min[idx], rp->max[idx], dir, 1, 4, &changed);
         if (changed) {
             if (idx == MONTH || idx == YEAR)
-                max[DAY] = daysInMonth[Rtc.value[MONTH] - 1] + (((Rtc.value[YEAR] % 4) == 0) && (Rtc.value[MONTH] == 2) ? 1 : 0);
+                rp->max[DAY] = daysInMonth[rp->value[MONTH] - 1] + (((rp->value[YEAR] % 4) == 0) && (rp->value[MONTH] == 2) ? 1 : 0);
             GUI_Redraw(&gui->newtime);
             GUI_Redraw(&gui->newdate);
         }
         if (idx == YEAR)
-            sprintf(tempstring, "%4d", Rtc.value[idx]);
+            sprintf(tempstring, "%4d", rp->value[idx]);
         else if (idx == HOUR) {
-            u8 tmp = Rtc.value[HOUR];
+            u8 tmp = rp->value[HOUR];
             if (Transmitter.rtc_timeformat & CLOCK12HR) {
                 tmp %= 12;
                 if (tmp == 0)
                     tmp = 12;
-                sprintf(tempstring, "%2d %s", tmp, Rtc.value[HOUR] >= 12? "pm" : "am");
+                sprintf(tempstring, "%2d %s", tmp, rp->value[HOUR] >= 12? "pm" : "am");
             } else {
                 sprintf(tempstring, "%2d", tmp);
             }
         }
         else if (idx == MONTH)
-            RTC_GetMonthFormatted(tempstring, Rtc.value[MONTH]);
+            RTC_GetMonthFormatted(tempstring, rp->value[MONTH]);
         else
-            sprintf(tempstring, "%2d", Rtc.value[idx]);
+            sprintf(tempstring, "%2d", rp->value[idx]);
     }
     return tempstring;
 }

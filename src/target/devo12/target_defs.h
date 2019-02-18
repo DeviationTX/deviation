@@ -11,6 +11,9 @@
 
 #define TRANSPARENT_COLOR 0x10000
 
+#define LCD_WIDTH 480
+#define LCD_HEIGHT 272
+
 #define HAS_STANDARD_GUI    1
 #define HAS_ADVANCED_GUI    1
 #define HAS_PERMANENT_TIMER 1
