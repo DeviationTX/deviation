@@ -37,10 +37,13 @@ void lcd_set_pos(unsigned int x0, unsigned int y0)
     //printf("lcd_set_pos: %d, %d\n", x0, y0);
 }
 
-#define LCDTYPE_HX8347  0x01
-#define LCDTYPE_ILI9341 0x02
-#define LCDTYPE_ST7796  0x03
-#define LCDTYPE_UNKNOWN 0x00
+// LCDTYPE_XXX is a bitmask enum.
+enum {
+    LCDTYPE_UNKNOWN     = 0x00,
+    LCDTYPE_HX8347      = 0x01,
+    LCDTYPE_ILI9341     = 0x02,
+    LCDTYPE_ST7796      = 0x04
+};
 #define HAS_LCD_TYPE(x) ((HAS_LCD_TYPES) & x)
 
 int lcd_detect()
