@@ -144,7 +144,7 @@ int AUDIO_Play(u16 music) {
 void AUDIO_SetVolume() {
 #ifndef _DEVO12_TARGET_H_
 #if HAS_AUDIO_UART
-    if ( !Transmitter.audio_uart && (PPMin_Mode() || Model.protocol == PROTOCOL_PPM) ) { // don't send volume command when using PPM port
+    if ( !Transmitter.audio_uart && (PPMin_Mode() || Model.protocol == PROTOCOL_PPM) ) {  // don't send volume command when using PPM port
 #else
     if ( PPMin_Mode() || Model.protocol == PROTOCOL_PPM ) { // don't send volume command when using PPM port
 #endif
@@ -191,7 +191,7 @@ void AUDIO_CheckQueue() {
 int AUDIO_VoiceAvailable() {
 #ifndef _DEVO12_TARGET_H_
 #if HAS_AUDIO_UART
-    if ( !Transmitter.audio_uart && (PPMin_Mode() || Model.protocol == PROTOCOL_PPM) ) { // don't send play command when using PPM port
+    if ( !Transmitter.audio_uart && (PPMin_Mode() || Model.protocol == PROTOCOL_PPM) ) {  // don't send play command when using PPM port
 #else
     if ( PPMin_Mode() || Model.protocol == PROTOCOL_PPM ) { // don't send play command when using PPM port
 #endif

@@ -39,7 +39,7 @@
         .rx = ((struct mcu_pin){GPIOA, GPIO10}), \
         })
     #define _UART_ISR usart1_isr
-#endif 
+#endif
 
 #ifndef AUDIO_UART_CFG
     #define AUDIO_UART_CFG ((struct uart_config) {   \
@@ -47,6 +47,6 @@
         .tx = ((struct mcu_pin){GPIOC, GPIO12}),  \
         .rx = ((struct mcu_pin){GPIOD, GPIO2}), \
         })
-#endif 
-    
+#endif
+
 #endif  // _DEVO_DEFAULT_HARDWARE_H_

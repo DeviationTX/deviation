@@ -25,7 +25,7 @@ void printstr(char * ptr, int len)
 
     for(index=0; index<len; index++) {
         if (ptr[index] == '\n') {
-            usart_send_blocking(UART_CFG.uart,'\r');
+            usart_send_blocking(UART_CFG.uart, '\r');
         }  
         usart_send_blocking(UART_CFG.uart, ptr[index]);
     }    
