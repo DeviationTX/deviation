@@ -17,7 +17,7 @@
 #include <libopencm3/cm3/nvic.h>
 
 #include "common.h"
-#include "target/transmitters/devo/common/devo.h"
+#include "target/tx/devo/common/devo.h"
 
 extern volatile u32 msecs;
 extern volatile u32 wdg_time;

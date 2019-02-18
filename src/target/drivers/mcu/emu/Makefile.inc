@@ -1,8 +1,8 @@
 ifndef BUILD_TARGET
 
-SRC_CXX  = $(wildcard target/transmitters/$(FAMILY)/$(TARGET)/*.cpp) \
+SRC_CXX  = $(wildcard target/tx/$(FAMILY)/$(TARGET)/*.cpp) \
            $(wildcard target/drivers/mcu/emu/*.cpp)
-SRC_C  = $(wildcard target/transmitters/$(FAMILY)/$(TARGET)/*.c) \
+SRC_C  = $(wildcard target/tx/$(FAMILY)/$(TARGET)/*.c) \
          $(wildcard target/drivers/mcu/emu/*.c) \
          $(wildcard $(SDIR)/target/drivers/filesystems/*.c)
 
