@@ -19,8 +19,6 @@
 
 #include "common.h"
 
-void init_err_handler() {}
-
 void SOUND_Init() {}
 void SOUND_SetFrequency(unsigned frequency, unsigned volume) {
     (void)frequency;
