@@ -12,13 +12,14 @@
     You should have received a copy of the GNU General Public License
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include <libopencm3/stm32/adc.h>
-#include <libopencm3/stm32/rcc.h>
-#include <libopencm3/stm32/dma.h>
 #include "common.h"
-#include "target/tx/devo/common/devo.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include "target/drivers/mcu/stm32/adc.h"
+#include "target/drivers/mcu/stm32/dma.h"
+#include "target/drivers/mcu/stm32/rcc.h"
+
+#include "target/tx/devo/common/devo.h"  // FIXME - Shouldn't rely on things from 'devo' here
 
 unsigned ADC_Read(unsigned channel);
 volatile u16 adc_array_raw[NUM_ADC_CHANNELS];
@@ -27,26 +28,23 @@ volatile u16 adc_array_raw[NUM_ADC_CHANNELS];
 static volatile u16 adc_array_oversample[SAMPLE_COUNT];
 void ADC_Init(void)
 {
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, _RCC_APB2ENR_ADCEN);
-    /* Make sure the ADC doesn't run during config. */
-    adc_power_off(_ADC);
-    rcc_peripheral_reset(&RCC_APB2RSTR, _RCC_APB2RSTR_ADCRST);
-    rcc_peripheral_clear_reset(&RCC_APB2RSTR, _RCC_APB2RSTR_ADCRST);
-    rcc_set_adcpre(RCC_CFGR_ADCPRE_PCLK2_DIV6);
+    rcc_periph_clock_enable(get_rcc_from_port(ADC_CFG.adc));
+    adc_power_off(ADC_CFG.adc);
+    ADC_reset(ADC_CFG.adc);
+    adc_set_clk_prescale(ADC_CFG.prescalar);
     /* We configure to scan the entire group each time conversion is requested. */
-    adc_enable_scan_mode(_ADC);
-    adc_set_single_conversion_mode(_ADC);
-    adc_disable_discontinuous_mode_regular(_ADC);
-    adc_disable_external_trigger_regular(_ADC);
-    adc_set_right_aligned(_ADC);
+    adc_enable_scan_mode(ADC_CFG.adc);
+    adc_set_single_conversion_mode(ADC_CFG.adc);
+    adc_disable_discontinuous_mode_regular(ADC_CFG.adc);
+    adc_disable_external_trigger_regular(ADC_CFG.adc);
+    adc_set_right_aligned(ADC_CFG.adc);
 
     /* We want to read the temperature sensor, so we have to enable it. */
     adc_enable_temperature_sensor();
-    adc_set_sample_time_on_all_channels(_ADC, _ADC_SMPR_SMP_XXDOT5CYC);
+    adc_set_sample_time_on_all_channels(ADC_CFG.adc, ADC_CFG.sampletime);
 
-    adc_power_on(_ADC);
-    adc_reset_calibration(_ADC);
-    adc_calibrate(_ADC);
+    adc_power_on(ADC_CFG.adc);
+    ADC_calibrate(ADC_CFG.adc);
 
     //Build a RNG seed using ADC 14, 16, 17
     for(int i = 0; i < 8; i++) {
@@ -75,7 +73,7 @@ void ADC_Init(void)
     /* direction is from ADC to memory */
     dma_set_read_from_peripheral(_DMA, _DMA_CHANNEL);
     /* get the data from the ADC data register */
-    dma_set_peripheral_address(_DMA, _DMA_CHANNEL,(u32) &ADC_DR(_ADC));
+    dma_set_peripheral_address(_DMA, _DMA_CHANNEL,(u32) &ADC_DR(ADC_CFG.adc));
     /* put everything in this array */
     dma_set_memory_address(_DMA, _DMA_CHANNEL, (u32) &adc_array_oversample);
     /* we convert only 3 values in one adc-group */
@@ -86,10 +84,10 @@ void ADC_Init(void)
     /* dma ready to go. waiting til the peripheral gives the first data */
     dma_enable_channel(_DMA, _DMA_CHANNEL);
 
-    adc_enable_dma(_ADC);
-    adc_set_regular_sequence(_ADC, NUM_ADC_CHANNELS, (u8 *)adc_chan_sel);
-    adc_set_continuous_conversion_mode(_ADC);
-    adc_start_conversion_direct(_ADC);
+    adc_enable_dma(ADC_CFG.adc);
+    adc_set_regular_sequence(ADC_CFG.adc, NUM_ADC_CHANNELS, (u8 *)adc_chan_sel);
+    adc_set_continuous_conversion_mode(ADC_CFG.adc);
+    adc_start_conversion_direct(ADC_CFG.adc);
 }
 
 unsigned ADC_Read(unsigned channel)
@@ -97,24 +95,24 @@ unsigned ADC_Read(unsigned channel)
     u8 channel_array[1];
     /* Select the channel we want to convert. 16=temperature_sensor. */
     channel_array[0] = channel;
-    adc_set_regular_sequence(_ADC, 1, channel_array);
+    adc_set_regular_sequence(ADC_CFG.adc, 1, channel_array);
 
     /*
      * If the ADC_CR2_ON bit is already set -> setting it another time
      * starts the conversion.
      */
-    adc_start_conversion_direct(_ADC);
+    adc_start_conversion_direct(ADC_CFG.adc);
 
     /* Wait for end of conversion. */
-    while (! adc_eoc(_ADC))
+    while (! adc_eoc(ADC_CFG.adc))
         ;
-    return adc_read_regular(_ADC);
+    return adc_read_regular(ADC_CFG.adc);
 }
 
 void ADC_StartCapture()
 {
     //while (!(ADC_SR(_ADC) & ADC_SR_EOC));
-    adc_start_conversion_direct(_ADC);
+    adc_start_conversion_direct(ADC_CFG.adc);
 }
 
 void ADC_Filter()

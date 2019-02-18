@@ -2,13 +2,9 @@
 #define _PORTS_H_
 
 #ifndef EMULATOR
-#include <libopencm3/stm32/gpio.h> /* For GPIO* definitions */
+#include "target/drivers/mcu/stm32/gpio.h"
 #endif
 
-struct mcu_pin {
-    u32 port;
-    u16 pin;
-};
 #define PORT_mode_setup(io, mode, pullup) gpio_set_mode(io.port, mode, pullup, io.pin)
 #define PORT_pin_set(io)                  gpio_set(io.port,io.pin)
 #define PORT_pin_clear(io)                gpio_clear(io.port,io.pin)
@@ -49,12 +45,8 @@ static const struct mcu_pin PROTO_MISO_PIN  = _SPI_PROTO_MISO_PIN;
 static const struct mcu_pin PROTO_MOSI_PIN  = _SPI_PROTO_MOSI_PIN;
 #endif
 
-#ifndef _ADC
+#ifndef ADC_CFG
 #define ADC_OVERSAMPLE_WINDOW_COUNT 1
-    #define _ADC                    ADC1
-    #define _RCC_APB2ENR_ADCEN      RCC_APB2ENR_ADC1EN
-    #define _RCC_APB2RSTR_ADCRST    RCC_APB2RSTR_ADC1RST
-    #define _ADC_SMPR_SMP_XXDOT5CYC ADC_SMPR_SMP_239DOT5CYC
     #define _DMA                    DMA1
     #define _DMA_CHANNEL            DMA_CHANNEL1
     #define _RCC_AHBENR_DMAEN       RCC_AHBENR_DMA1EN
@@ -128,5 +120,8 @@ static const struct mcu_pin PROTO_MOSI_PIN  = _SPI_PROTO_MOSI_PIN;
 #ifndef FREQ_MHz
     #define FREQ_MHz 72
 #endif
+
+#include "hardware.h"
+
 #endif //_PORTS_H_
 
