@@ -228,7 +228,10 @@ void EventLoop()
 #if HAS_EXTENDED_AUDIO
         if(AUDIO_VoiceAvailable()) {
             MUSIC_Play(MUSIC_SHUTDOWN);
-            while (CLOCK_getms()<audio_queue_time); // Wait for voice to finished
+            while (CLOCK_getms() < audio_queue_time) {
+                // Wait for voice to finished
+                CLOCK_ResetWatchdog();
+            }
         } else {
 #else
         {
@@ -236,7 +239,9 @@ void EventLoop()
             unsigned int time;
             MUSIC_Play(MUSIC_SHUTDOWN);
             time = CLOCK_getms()+700;
-            while(CLOCK_getms()<time);
+            while (CLOCK_getms() < time) {
+                CLOCK_ResetWatchdog();
+            }
 #endif
         }
 	}
