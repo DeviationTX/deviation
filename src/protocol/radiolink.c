@@ -24,7 +24,7 @@
 #ifdef PROTO_HAS_RADIOLINK_CC2530
 
 #ifdef MODULAR
-  //Allows the linker to properly relocate
+  // Allows the linker to properly relocate
   #define RADIOLINK_Cmds PROTO_Cmds
   #pragma long_calls
 #endif
@@ -56,14 +56,14 @@ static void send_packet()
     packet[i++] = 0x29;
     packet[i++] = 0x01;
     // channels
-    for(chan = 0; chan < 10; chan++) {
+    for (chan = 0; chan < 10; chan++) {
         // is 0-4000 for 100% endpoints ? can it be extended ?
         val = scale_channel(Channels[chan], CHAN_MIN_VALUE, CHAN_MAX_VALUE, 4000, 0);
         packet[i++] = val & 0xff;
         packet[i++] = val >> 8;
     }
     // failsafe
-    for(chan = 0; chan < 8; chan++) {
+    for (chan = 0; chan < 8; chan++) {
         // any way to disable failsafe on a channel ? (keep last received value)
         val = scale_channel(Channels[chan], -100, 100, 4000, 0);
         packet[i++] = val & 0xff;
@@ -71,15 +71,15 @@ static void send_packet()
     }
     // checksum
     packet[40] = packet[4];
-    for(i = 5; i < PACKET_SIZE-1; i++)
+    for (i = 5; i < PACKET_SIZE-1; i++)
         packet[40] += packet[i];
-    
+
     // send packet to Radiolink CC2530 module
     PROTO_CS_LO(RADIOLINK_MODULE);
-    for(i = 0; i < PACKET_SIZE; i++)
+    for (i = 0; i < PACKET_SIZE; i++)
             packet[i] = PROTOSPI_xfer(packet[i]);
     PROTO_CS_HI(RADIOLINK_MODULE);
-    
+
     // todo: packet[] now contains the module's response, with telemetry data
 }
 
@@ -113,7 +113,7 @@ static void initialize()
 
 uintptr_t RADIOLINK_Cmds(enum ProtoCmds cmd)
 {
-    switch(cmd) {
+    switch (cmd) {
         case PROTOCMD_INIT:  initialize(); return 0;
         case PROTOCMD_DEINIT: RADIOLINK_Stop(); return 0;
         case PROTOCMD_CHECK_AUTOBIND: return 1L;
