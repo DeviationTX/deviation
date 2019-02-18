@@ -165,7 +165,7 @@ void init_err_handler() {
         return;
     }
     fs_maximize_file_size();
-    if (fs_lseek(&fat, 1) != FR_OK) {  //Seeking to a non-zero address causes petitfat to calculatethe disk-address
+    if (fs_lseek(&fat, 1) != FR_OK) {  // Seeking to a non-zero address causes petitfat to calculatethe disk-address
         fs_mount(0);
         return;
     }

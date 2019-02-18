@@ -19,12 +19,12 @@
 #if ! defined(EMULATOR) || EMULATOR == USE_INTERNAL_FS
 
 #define FILE void
-uintptr_t _open_r (void *r, const char *file, int flags, int mode);
-int _close_r (void *r);
-int _read_r (void *r, char * ptr, int len);
-int _write_r (void *r, char * ptr, int len);
-int _lseek_r (void *r, int ptr, int dir);
-int _ltell_r (void *r);
+uintptr_t _open_r(void *r, const char *file, int flags, int mode);
+int _close_r(void *r);
+int _read_r(void *r, char * ptr, int len);
+int _write_r(void *r, char * ptr, int len);
+int _lseek_r(void *r, int ptr, int dir);
+int _ltell_r(void *r);
 int FS_Mount(void *FAT, const char *drive);
 
 FILE *devo_fopen2(void *r, const char *path, const char *mode)
@@ -32,7 +32,7 @@ FILE *devo_fopen2(void *r, const char *path, const char *mode)
     int flags = (mode && *mode == 'w') ? O_CREAT : 0;
     int _mode = flags ? O_WRONLY : O_RDONLY;
         
-    uintptr_t fd = _open_r (r, path, flags, _mode);
+    uintptr_t fd = _open_r(r, path, flags, _mode);
     if (fd <= 0)
         return NULL;
     return (FILE *)fd;

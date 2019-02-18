@@ -146,7 +146,7 @@ uintptr_t _open_r(FIL *r, const char *file, int flags, int mode) {
         fs_switchfile(r);
         _drive_num = fs_get_drive_num(r);
         int res = fs_open(r, file, flags, mode);
-        if(res == FR_OK) {
+        if (res == FR_OK) {
             dbgprintf("_open_r(%08lx): fs_open (%s) flags: %d, mode: %d ok\r\n", r, file, flags, mode);
             if (flags & O_CREAT)
                 fs_maximize_file_size();
@@ -175,7 +175,7 @@ int _read_r(FIL *r, char * ptr, int len)
             _drive_num = fs_get_drive_num(r);
             int res = fs_read(r, ptr, len, &bytes_read);
             dbgprintf("_read_r: len %d, bytes_read %d, result %d\r\n", len, bytes_read, res); 
-            if(res == FR_OK) return bytes_read;
+            if (res == FR_OK) return bytes_read;
         }
     }    
 
@@ -195,17 +195,17 @@ int _write_r(FIL *r, char * ptr, int len)
             _drive_num = fs_get_drive_num(r);
             int res = fs_write(r, ptr, len, &bytes_written);
             dbgprintf("_write_r: len %d, bytes_written %d, result %d\r\n",len, bytes_written, res);
-            if(res == FR_OK) return bytes_written;
+            if (res == FR_OK) return bytes_written;
         }
     }
     errno = EINVAL;
     return -1;
 }
 
-long _ltell_r(FIL *r)
+int _ltell_r(FIL *r)
 {
-    if((unsigned long)r>2 && fs_is_open(r)) {
-        return fs_ltell(r);
+    if((uintptr_t)r>2 && fs_is_open(r)) {
+        return (int)fs_ltell(r);
     }
     return -1;
 }
@@ -214,8 +214,8 @@ int _lseek_r(FIL *r, int ptr, int dir)
 {
     (void)r;
     
-    if((uintptr_t)r > 2 && fs_is_open(r)) {
-        if(dir == SEEK_CUR) {
+    if ((uintptr_t)r > 2 && fs_is_open(r)) {
+        if (dir == SEEK_CUR) {
             ptr += fs_ltell(r);
         } else if (dir == SEEK_END) {
             ptr += fs_filesize(r);
@@ -223,7 +223,7 @@ int _lseek_r(FIL *r, int ptr, int dir)
         fs_switchfile(r);
         _drive_num = fs_get_drive_num(r);
         int res = fs_lseek(r, ptr);
-        if(res == FR_OK) {
+        if (res == FR_OK) {
            return fs_ltell(r);
         }
     }
