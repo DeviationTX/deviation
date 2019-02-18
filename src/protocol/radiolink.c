@@ -92,16 +92,16 @@ static u16 radiolink_cb()
 static void RADIOLINK_Reset()
 {
     PROTO_CS_HI(RADIOLINK_CC2530);
-    PROTOSPI_pin_clear(RADIOLINK_MODULE_RESET_PIN);
+    PROTOSPI_pin_clear(RADIOLINK_CC2530_RESET_PIN);
     Delay(100);
-    PROTOSPI_pin_set(RADIOLINK_MODULE_RESET_PIN);
+    PROTOSPI_pin_set(RADIOLINK_CC2530_RESET_PIN);
 }
 
 // todo: call during transmitter startup ?
 static void RADIOLINK_Stop()
 {
     PROTO_CS_HI(RADIOLINK_CC2530);
-    PROTOSPI_pin_clear(RADIOLINK_MODULE_RESET_PIN);
+    PROTOSPI_pin_clear(RADIOLINK_CC2530_RESET_PIN);
 }
 
 static void initialize()
