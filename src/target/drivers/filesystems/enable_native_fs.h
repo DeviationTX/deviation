@@ -1,5 +1,6 @@
 #ifndef _ENABLE_NATIVE_FS_H_
 #define _ENABLE_NATIVE_FS_H_
+    #define FIL FATFS
     typedef struct {
         int dummy;
     }FATFS;
