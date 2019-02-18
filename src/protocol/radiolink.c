@@ -116,7 +116,7 @@ uintptr_t RADIOLINK_Cmds(enum ProtoCmds cmd)
     switch (cmd) {
         case PROTOCMD_INIT:  initialize(); return 0;
         case PROTOCMD_DEINIT: RADIOLINK_Stop(); return 0;
-        case PROTOCMD_CHECK_AUTOBIND: return 1L;
+        case PROTOCMD_CHECK_AUTOBIND: return 1;
         case PROTOCMD_BIND:  initialize(); return 0;
         case PROTOCMD_NUMCHAN: return 10;
         case PROTOCMD_DEFAULT_NUMCHAN: return 10;
