@@ -27,8 +27,8 @@
 
 #if HAS_EXTENDED_AUDIO
 u16 voice_map_entries;
-struct VoiceMap current_voice_mapping;
-struct AudioQueue audio_queue[AUDIO_QUEUE_LENGTH];
+struct QueueEntry current_voice_mapping;
+struct QueueEntry audio_queue[AUDIO_QUEUE_LENGTH];
 u8 next_audio;
 u8 num_audio;
 u32 audio_queue_time;

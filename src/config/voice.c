@@ -84,10 +84,11 @@ const char* CONFIG_VoiceParse(unsigned id)
     char filename[] = "media/voice.ini";
     #endif
     if (id == MAX_VOICEMAP_ENTRIES) {  // initial parse of voice.ini
-        if (CONFIG_IniParse(filename, ini_handler, &id)) {
-            printf("Failed to parse voice.ini\n");
-            // Transmitter.audio_player = AUDIO_NONE;  // disable external voice output
+        if (CONFIG_IniParse(filename, ini_handler, &id))
             tempstring[0] = '\0';
+        if (voice_map_entries == 0) {
+            printf("Failed to parse voice.ini\n");
+            Transmitter.audio_player = AUDIO_NONE;  // disable external voice when no custom voices are found in voice.ini
         }
     }
     if ( (id < MAX_VOICEMAP_ENTRIES) ) {

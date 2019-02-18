@@ -48,21 +48,16 @@ static struct CustomVoice *voiceconfig_setsrcptr(u8 idx) {
     switch (voiceconfig_getsrctype(idx)) {
         case VOICE_SRC_SWITCH:
             return &Model.voice.switches[idx - VOICE_SRC_SWITCH];
-            break;
 #if NUM_AUX_KNOBS
         case VOICE_SRC_AUX:
             return &Model.voice.aux[idx - VOICE_SRC_AUX];
-            break;
 #endif
         case VOICE_SRC_TIMER:
             return &Model.voice.timer[idx - VOICE_SRC_TIMER];
-            break;
         case VOICE_SRC_TELEMETRY:
             return &Model.voice.telemetry[idx - VOICE_SRC_TELEMETRY];
-            break;
         case VOICE_SRC_MIXER:
             return &Model.voice.mixer[idx - VOICE_SRC_MIXER];
-            break;
     }
     return NULL;
 }

@@ -10,8 +10,8 @@ void AUDIO_SetVolume();
 void AUDIO_CheckQueue();
 int AUDIO_AddQueue(u16 music);
 
-extern struct AudioQueue audio_queue[AUDIO_QUEUE_LENGTH];
-extern struct VoiceMap current_voice_mapping;
+extern struct QueueEntry audio_queue[AUDIO_QUEUE_LENGTH];
+extern struct QueueEntry current_voice_mapping;
 extern u8 next_audio;
 extern u8 num_audio;
 extern u32 audio_queue_time;

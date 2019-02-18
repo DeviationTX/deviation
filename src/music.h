@@ -103,12 +103,7 @@ struct Voice {
 
 extern u16 voice_map_entries;
 
-struct VoiceMap {
-    u16 id;
-    u16 duration;
-};
-
-struct AudioQueue {
+struct QueueEntry {
     u16 id;
     u16 duration;
 };
