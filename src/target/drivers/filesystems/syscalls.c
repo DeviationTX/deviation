@@ -204,7 +204,7 @@ int _write_r(FIL *r, char * ptr, int len)
 
 int _ltell_r(FIL *r)
 {
-    if((uintptr_t)r>2 && fs_is_open(r)) {
+    if ((uintptr_t)r > 2 && fs_is_open(r)) {
         return (int)fs_ltell(r);
     }
     return -1;
