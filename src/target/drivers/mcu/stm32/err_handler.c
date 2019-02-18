@@ -160,12 +160,12 @@ void init_err_handler() {
     FATFS fat;
     if(fs_mount(&fat) != FR_OK)
         return;
-    if(fs_open("errors.txt", O_WRONLY) != FR_OK) {
+    if(fs_open(&fat, "errors.txt", O_WRONLY, 0) != FR_OK) {
         fs_mount(0);
         return;
     }
     fs_maximize_file_size();
-    if(fs_lseek(1) != FR_OK) {  //Seeking to a non-zero address causes petitfat to calculatethe disk-address
+    if(fs_lseek(&fat, 1) != FR_OK) {  //Seeking to a non-zero address causes petitfat to calculatethe disk-address
         fs_mount(0);
         return;
     }
