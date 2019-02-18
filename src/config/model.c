@@ -45,21 +45,22 @@ const char * radio_tx_power_val(enum Radio radio, enum TxPower power) {
     static const char * const nrf_powers[] = { "1mW", "6mW", "25mW", "100mW"};
     static const char * const r9m_powers[] = { "10/25mW", "100/25mW", "500/500", "Auto/200" };
 
-    if (radio >= TX_MODULE_LAST) return NULL;
-    if (power >= RADIO_TX_POWER_COUNT[radio]) power = RADIO_TX_POWER_COUNT[radio]-1;
 
     switch (radio) {
     case CYRF6936:
     case CC2500:
     case A7105:
     case MULTIMOD:
+        power = RADIO_TX_POWER_COUNT[radio]-1;
         return std_powers[power];
     case NRF24L01:
+        power = RADIO_TX_POWER_COUNT[radio]-1;
         return nrf_powers[power];
     case R9M:
+        power = RADIO_TX_POWER_COUNT[radio]-1;
         return r9m_powers[power];
     default:
-        return NULL;    // never reached, silence warning
+        return std_powers[TXPOWER_LAST-1];
     }
 }
 
