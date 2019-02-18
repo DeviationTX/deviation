@@ -61,4 +61,4 @@ static inline uint16_t GPIO_pin_get(struct mcu_pin pin)
 {
     return gpio_get(pin.port, pin.pin);
 }
-#endif  //__DTX_STM32F1_GPIO_H_
+#endif  // _DTX_STM32F1_GPIO_H_

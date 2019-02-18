@@ -73,7 +73,7 @@ void ADC_Init(void)
     /* direction is from ADC to memory */
     dma_set_read_from_peripheral(_DMA, _DMA_CHANNEL);
     /* get the data from the ADC data register */
-    dma_set_peripheral_address(_DMA, _DMA_CHANNEL,(u32) &ADC_DR(ADC_CFG.adc));
+    dma_set_peripheral_address(_DMA, _DMA_CHANNEL, (u32) &ADC_DR(ADC_CFG.adc));
     /* put everything in this array */
     dma_set_memory_address(_DMA, _DMA_CHANNEL, (u32) &adc_array_oversample);
     /* we convert only 3 values in one adc-group */
@@ -104,7 +104,7 @@ unsigned ADC_Read(unsigned channel)
     adc_start_conversion_direct(ADC_CFG.adc);
 
     /* Wait for end of conversion. */
-    while (! adc_eoc(ADC_CFG.adc))
+    while (!adc_eoc(ADC_CFG.adc))
         ;
     return adc_read_regular(ADC_CFG.adc);
 }

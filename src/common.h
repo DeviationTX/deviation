@@ -8,6 +8,7 @@
 //Magic macro to check enum size
 //#define ctassert(n,e) extern unsigned char n[(e)?0:-1]
 #define ctassert(COND,MSG) typedef char static_assertion_##MSG[(COND)?1:-1]
+#define cterror(MSG) ((MSG)[0] / 0)
 int ltassert();  // This function does not exist, and if called will throw an error during linking
 #define _UNUSED   __attribute__ ((unused))
 #define NO_INLINE __attribute__ ((noinline))

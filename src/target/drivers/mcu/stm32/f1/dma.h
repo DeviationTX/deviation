@@ -3,8 +3,8 @@
 
 #include <libopencm3/stm32/dma.h>
 
-#define 	DMA_SxCR_DIR_PERIPHERAL_TO_MEM   (0 << 6)
-#define 	DMA_SxCR_DIR_MEM_TO_PERIPHERAL   (1 << 6)
+#define DMA_SxCR_DIR_PERIPHERAL_TO_MEM   (0 << 6)
+#define DMA_SxCR_DIR_MEM_TO_PERIPHERAL   (1 << 6)
 
 inline static void DMA_stream_channel_reset(uint32_t dma, uint32_t stream, uint32_t channel)
 {
@@ -43,12 +43,11 @@ inline static void DMA_enable_direct_mode(uint32_t dma, uint32_t stream)
 inline static void DMA_set_transfer_mode(uint32_t dma, uint32_t stream, uint32_t channel, uint32_t direction)
 {
     (void)stream;
-    if(direction == DMA_SxCR_DIR_PERIPHERAL_TO_MEM) {
+    if (direction == DMA_SxCR_DIR_PERIPHERAL_TO_MEM) {
         dma_set_read_from_peripheral(dma, channel);
     } else {
         dma_set_read_from_memory(dma, channel);
     }
-
 }
 
 inline static void DMA_disable_double_buffer_mode(uint32_t dma, uint32_t stream)

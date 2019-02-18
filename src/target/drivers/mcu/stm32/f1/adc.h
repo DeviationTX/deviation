@@ -13,7 +13,7 @@ static inline void ADC_reset(uint32_t adc)
     rcc_peripheral_clear_reset(&RCC_APB2RSTR, reset);
 }
 
-//Emulate newer libopencm3 interface
+// Emulate newer libopencm3 interface
 static inline void adc_set_clk_prescale(uint32_t prescalar)
 {
     rcc_set_adcpre(prescalar);
@@ -21,7 +21,7 @@ static inline void adc_set_clk_prescale(uint32_t prescalar)
 
 static inline void adc_set_dma_continue(uint32_t adc)
 {
-    //Not implemented on STM32F1
+    // Not implemented on STM32F1
     (void)adc;
 }
 
@@ -35,4 +35,4 @@ static inline void ADC_calibrate(uint32_t adc)
     adc_reset_calibration(adc);
     adc_calibrate(adc);
 }
-#endif //_DTX_STM32F1_ADC_H_
+#endif  // _DTX_STM32F1_ADC_H_

@@ -43,9 +43,9 @@ static inline  enum rcc_periph_clken get_rcc_from_port(u32 port)
 }
 
 #define get_rcc_from_pin(x) get_rcc_from_port((x).port)
-//static inline  enum rcc_periph_clken get_rcc_from_pin(struct mcu_pin pin)
-//{
+// static inline  enum rcc_periph_clken get_rcc_from_pin(struct mcu_pin pin)
+// {
 //    return get_rcc_from_port(pin.port);
-//}
+// }
 
-#endif // _DTX_STM32F1_RCC_H_
+#endif  // _DTX_STM32F1_RCC_H_

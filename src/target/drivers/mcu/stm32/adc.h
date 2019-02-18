@@ -37,6 +37,6 @@
         pin == GPIO8 ? 6 : \
         pin == GPIO9 ? 7 : \
         pin == GPIO10 ? 8 : cterror("unsupported_analog_pin")) : \
-    port == 0 ? 16 : cterror("unsupported_analog_pin"))   //Temperature is channel 16
+    port == 0 ? 16 : cterror("unsupported_analog_pin"))   // Temperature is channel 16
 
 #endif  // DTX_STM32_ADC_H_

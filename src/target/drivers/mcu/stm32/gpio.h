@@ -20,10 +20,10 @@ struct spi_config {
 };
 
 #define DEFAULT_SPI_SETTINGS \
-   .cpol = SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE, \
-   .cpha = SPI_CR1_CPHA_CLK_TRANSITION_1, \
-   .dff  = SPI_CR1_DFF_8BIT, \
-   .endian = SPI_CR1_MSBFIRST
+    .cpol = SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE, \
+    .cpha = SPI_CR1_CPHA_CLK_TRANSITION_1, \
+    .dff  = SPI_CR1_DFF_8BIT, \
+    .endian = SPI_CR1_MSBFIRST
 
 struct spi_csn {
     unsigned spi;
@@ -53,7 +53,7 @@ struct tim_config {
 #define TIM_CFG(x) ((struct tim_config){ \
     .tim = TIM_CONCAT(TIM, x,),          \
     .rst = TIM_CONCAT(RST_TIM, x,),      \
-    .irq = TIM_CONCAT(NVIC_TIM, x, _IRQ)   \
+    .irq = TIM_CONCAT(NVIC_TIM, x, _IRQ) \
     })
 
 struct dma_config {
