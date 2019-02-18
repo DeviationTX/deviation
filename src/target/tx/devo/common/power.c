@@ -60,7 +60,7 @@ void PWR_Shutdown()
     gpio_clear(_PWREN_PORT, _PWREN_PIN);
     while (1) {
 #if defined(HAS_BUTTON_POWER_ON) && HAS_BUTTON_POWER_ON
-        CLOCK_ResetWatchdog;  // If the reset is held too long, the watchdog could kick in
+        CLOCK_ResetWatchdog();  // If the reset is held too long, the watchdog could kick in
 #endif
     }
 }
