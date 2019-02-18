@@ -53,6 +53,17 @@ enum {
 int lcd_detect()
 {
     u8 data;
+#ifdef LCD_RESET_PIN
+    /* Reset pin for ILI9341 */
+    gpio_set_mode(LCD_RESET_PIN.port, GPIO_MODE_OUTPUT_50_MHZ,
+                  GPIO_CNF_OUTPUT_PUSHPULL, LCD_RESET_PIN.pin);
+
+    gpio_clear(LCD_RESET_PIN.port, LCD_RESET_PIN.pin);
+    _usleep(10);   // must be held low for at least 10us
+    gpio_set(LCD_RESET_PIN.port, LCD_RESET_PIN.pin);
+    _msleep(120);  // must wait 120ms after reset
+#endif  // LCD_RESET_PIN
+
     if (HAS_LCD_TYPE(LCDTYPE_HX8347)) {
         // Read ID register for HX8347 (will be 0x47 if found)
         LCD_REG = 0x00;
@@ -62,17 +73,6 @@ int lcd_detect()
         }
     }
     if (HAS_LCD_TYPE(LCDTYPE_ILI9341)) {
-#ifdef ILI9341_RESET_PIN
-        /* Reset pin for ILI9341 */
-        gpio_set_mode(ILI9341_RESET_PIN.port, GPIO_MODE_OUTPUT_50_MHZ,
-                      GPIO_CNF_OUTPUT_PUSHPULL, ILI9341_RESET_PIN.pin);
-
-        gpio_clear(ILI9341_RESET_PIN.port, ILI9341_RESET_PIN.pin);
-        _usleep(10);   // must be held low for at least 10us
-        gpio_set(ILI9341_RESET_PIN.port, ILI9341_RESET_PIN.pin);
-        _msleep(120);  // must wait 120ms after reset
-#endif  // ILI9341_RESET_PIN
-
         // Read ID register for ILI9341 (will be 0x9341 if found)
         LCD_REG = 0xd3;
         // As per the spec, the 1st 2 reads are dummy reads and irrelevant
@@ -87,17 +87,6 @@ int lcd_detect()
         }
     }
     if (HAS_LCD_TYPE(LCDTYPE_ST7796)) {
-#ifdef ST7796_RESET_PIN
-        /* Reset pin for ST7796 */
-        gpio_set_mode(ST7796_RESET_PIN.port, GPIO_MODE_OUTPUT_50_MHZ,
-                      GPIO_CNF_OUTPUT_PUSHPULL, ST7796_RESET_PIN.pin);
-
-        gpio_clear(ST7796_RESET_PIN.port, ST7796_RESET_PIN.pin);
-        _usleep(10);   // must be held low for at least 10us
-        gpio_set(ST7796_RESET_PIN.port, ST7796_RESET_PIN.pin);
-        _msleep(120);  // must wait 120ms after reset
-#endif  // ILI9341_RESET_PIN
-
           // Read ID register for ST7796 (will be 0x7796 if found)
           LCD_REG = 0xD3;
           // As per the spec, the 1st 2 reads are dummy reads and irrelevant
