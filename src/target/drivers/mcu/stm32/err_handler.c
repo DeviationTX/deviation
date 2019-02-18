@@ -158,14 +158,14 @@ void init_err_handler() {
     //This is a hack to get the memory address of a file
     //we can't use 'fopen' because it masks the structure we need
     FATFS fat;
-    if(fs_mount(&fat) != FR_OK)
+    if (fs_mount(&fat) != FR_OK)
         return;
-    if(fs_open("errors.txt", O_WRONLY) != FR_OK) {
+    if (fs_open(&fat, "errors.txt", O_WRONLY, 0) != FR_OK) {
         fs_mount(0);
         return;
     }
     fs_maximize_file_size();
-    if(fs_lseek(1) != FR_OK) {  //Seeking to a non-zero address causes petitfat to calculatethe disk-address
+    if (fs_lseek(&fat, 1) != FR_OK) {  // Seeking to a non-zero address causes petitfat to calculatethe disk-address
         fs_mount(0);
         return;
     }

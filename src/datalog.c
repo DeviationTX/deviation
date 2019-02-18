@@ -43,7 +43,7 @@ const u32 sample_rate[DLOG_RATE_LAST] = {
     [DLOG_RATE_1MIN]  = 60000,
 };
 
-static FATFS DatalogFAT;
+static FIL DatalogFAT;
 static FILE *fh;
 static u32 next_update;
 static u32 dlog_pos;
