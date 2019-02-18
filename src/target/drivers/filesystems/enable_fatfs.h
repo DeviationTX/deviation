@@ -16,12 +16,12 @@
     #define fs_opendir                f_opendir
     #define fs_readdir                f_readdir
     #define fs_write                  f_write
-    #define fs_maximize_file_size()   if(0) {}
+    #define fs_maximize_file_size()   if (0) {}
     #define fs_ltell                  f_tell
     #define fs_get_drive_num(x)       0
-    #define fs_set_drive_num(x,num)   if(0) {}
+    #define fs_set_drive_num(x, num)  if (0) {}
     #define fs_is_open(x)             (x)->obj.fs
     #define fs_close                  f_close
     #define fs_filesize(x)            (x)->obj.objsize
     #define fs_switchfile(x)          (void)(x)
-#endif //_ENABLE_FATFS_H
+#endif  // _ENABLE_FATFS_H

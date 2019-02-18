@@ -47,13 +47,13 @@ extern void init_err_handler();
 int FS_Mount();
 void FS_Unmount();
 
-long _open_r (FIL *r, const char *file, int flags, int mode);
-int _close_r (FIL *r);
+uintptr_t _open_r(FIL *r, const char *file, int flags, int mode);
+int _close_r(FIL *r);
 
 
-int _read_r (FIL *r, char * ptr, int len);
-int _write_r (FIL *r, char * ptr, int len);
-int _lseek_r (FIL *r, int ptr, int dir);
+int _read_r(FIL *r, char * ptr, int len);
+int _write_r(FIL *r, char * ptr, int len);
+int _lseek_r(FIL *r, int ptr, int dir);
 
 
 int FS_Mount(void *_f, const char *drive)
@@ -116,7 +116,7 @@ int FS_ReadDir(char *path)
     FILINFO fi;
     int res = fs_readdir(&dir, &fi);
     dbgprintf("ReadDir: %d\n", res);
-    if (res != FR_OK || ! fi.fname[0])
+    if (res != FR_OK || !fi.fname[0])
         return 0;
     dbgprintf("Read: %s %d\n", fi.fname, fi.fattrib);
     strlcpy(path, fi.fname, 13);
@@ -127,7 +127,7 @@ void FS_CloseDir()
 {
 }
 
-long _open_r (FIL *r, const char *file, int flags, int mode) {
+uintptr_t _open_r(FIL *r, const char *file, int flags, int mode) {
     (void)flags;
     (void)mode;
 
@@ -145,8 +145,8 @@ long _open_r (FIL *r, const char *file, int flags, int mode) {
     } else {
         fs_switchfile(r);
         _drive_num = fs_get_drive_num(r);
-        int res=fs_open(r, file, flags, mode);
-        if(res==FR_OK) {
+        int res = fs_open(r, file, flags, mode);
+        if(res == FR_OK) {
             dbgprintf("_open_r(%08lx): fs_open (%s) flags: %d, mode: %d ok\r\n", r, file, flags, mode);
             if (flags & O_CREAT)
                 fs_maximize_file_size();
@@ -158,7 +158,7 @@ long _open_r (FIL *r, const char *file, int flags, int mode) {
     }
 }
 
-int _close_r (FIL *r) {
+int _close_r(FIL *r) {
     if(r) {
        fs_close(r);
        dbgprintf("_close_r(%p): file closed.\r\n", r);
@@ -166,24 +166,24 @@ int _close_r (FIL *r) {
     return 0;
 }
 
-int _read_r (FIL *r, char * ptr, int len)
+int _read_r(FIL *r, char * ptr, int len)
 {
     if((unsigned long)r>2 && fs_is_open(r)) {
         if(len <= 0xffff) {
             unsigned  bytes_read = 0;
             fs_switchfile(r);
             _drive_num = fs_get_drive_num(r);
-            int res=fs_read(r, ptr, len, &bytes_read);
+            int res = fs_read(r, ptr, len, &bytes_read);
             dbgprintf("_read_r: len %d, bytes_read %d, result %d\r\n", len, bytes_read, res); 
-            if(res==FR_OK) return bytes_read;
+            if(res == FR_OK) return bytes_read;
         }
     }    
 
-    errno=EINVAL;
+    errno = EINVAL;
     return -1;
 }
 
-int _write_r (FIL *r, char * ptr, int len)
+int _write_r(FIL *r, char * ptr, int len)
 {  
     if((unsigned long)r==1 || (unsigned long)r==2) {
         printstr(ptr, len);
@@ -193,16 +193,16 @@ int _write_r (FIL *r, char * ptr, int len)
             unsigned bytes_written = 0;
             fs_switchfile(r);
             _drive_num = fs_get_drive_num(r);
-            int res=fs_write(r, ptr, len, &bytes_written);
+            int res = fs_write(r, ptr, len, &bytes_written);
             dbgprintf("_write_r: len %d, bytes_written %d, result %d\r\n",len, bytes_written, res);
-            if(res==FR_OK) return bytes_written;
+            if(res == FR_OK) return bytes_written;
         }
     }
-    errno=EINVAL;
+    errno = EINVAL;
     return -1;
 }
 
-long _ltell_r (FIL *r)
+long _ltell_r(FIL *r)
 {
     if((unsigned long)r>2 && fs_is_open(r)) {
         return fs_ltell(r);
@@ -210,24 +210,24 @@ long _ltell_r (FIL *r)
     return -1;
 }
 
-int _lseek_r (FIL *r, int ptr, int dir)
+int _lseek_r(FIL *r, int ptr, int dir)
 {
     (void)r;
     
-    if((unsigned long)r>2 && fs_is_open(r)) {
-        if(dir==SEEK_CUR) {
+    if((uintptr_t)r > 2 && fs_is_open(r)) {
+        if(dir == SEEK_CUR) {
             ptr += fs_ltell(r);
-        } else if (dir==SEEK_END) {
+        } else if (dir == SEEK_END) {
             ptr += fs_filesize(r);
         }
         fs_switchfile(r);
         _drive_num = fs_get_drive_num(r);
-        int res=fs_lseek(r, ptr);
-        if(res==FR_OK) {
+        int res = fs_lseek(r, ptr);
+        if(res == FR_OK) {
            return fs_ltell(r);
         }
     }
-    errno=EINVAL;
+    errno = EINVAL;
     return -1;
 }
-#endif //! defined(EMULATOR) || EMULATOR == USE_INTERNAL_FS
+#endif  // !defined(EMULATOR) || EMULATOR == USE_INTERNAL_FS

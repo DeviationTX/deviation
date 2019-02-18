@@ -12,8 +12,8 @@
     #define fs_readdir                        df_readdir
     #define fs_write(r, ptr, len, bw)         df_write(ptr, len, (u16 *)(bw))
     #define fs_switchfile                     df_switchfile
-    #define fs_maximize_file_size()           if(0) {}
-    #define fs_set_drive_num(x,num)           if(0) {}
+    #define fs_maximize_file_size()           if (0) {}
+    #define fs_set_drive_num(x, num)          if (0) {}
     #define fs_get_drive_num(x)               0
     #define fs_is_open(x)                     ((x)->file_cur_pos != -1)
     #define fs_close(x)                       df_switchfile(x); df_close()
