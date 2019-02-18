@@ -20,8 +20,6 @@
 
 void VIBRATINGMOTOR_Init()
 {
-    if (!HAS_VIBRATINGMOTOR)
-        return;
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPDEN);
 
     gpio_set_mode(GPIOD, GPIO_MODE_OUTPUT_2_MHZ,
@@ -31,15 +29,13 @@ void VIBRATINGMOTOR_Init()
 
 void VIBRATINGMOTOR_Start()
 {
-    if (!HAS_VIBRATINGMOTOR || !Transmitter.vibration_state)
+    if (!Transmitter.vibration_state)
         return;
     gpio_set(GPIOD, GPIO2);
 }
 
 void VIBRATINGMOTOR_Stop()
 {
-    if (!HAS_VIBRATINGMOTOR)
-        return;
     gpio_clear(GPIOD, GPIO2);
 }
 

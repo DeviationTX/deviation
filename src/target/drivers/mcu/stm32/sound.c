@@ -18,7 +18,7 @@
 #include <libopencm3/stm32/timer.h>
 
 #include "common.h"
-#include "devo.h"
+#include "target/tx/devo/common/devo.h"
 
 static u16(*Callback)();
 
@@ -52,7 +52,8 @@ void SOUND_Init()
     /* ARR reload enable */
     timer_enable_preload(_SOUND_TIM);
 
-    VIBRATINGMOTOR_Init(); // Since the vibrating motor is tightly controlled by sound, we put its init() here instead of in the main()
+    if (HAS_VIBRATINGMOTOR)
+        VIBRATINGMOTOR_Init(); // Since the vibrating motor is tightly controlled by sound, we put its init() here instead of in the main()
 }
 
 void SOUND_SetFrequency(unsigned frequency, unsigned volume)
@@ -83,7 +84,7 @@ void SOUND_SetFrequency(unsigned frequency, unsigned volume)
 void SOUND_Start(unsigned msec, u16(*next_note_cb)(), u8 vibrate)
 {
     SOUND_StartWithoutVibrating(msec, next_note_cb);
-    if (vibrate)
+    if (HAS_VIBRATINGMOTOR && vibrate)
         VIBRATINGMOTOR_Start();
 }
 
@@ -99,7 +100,9 @@ void SOUND_Stop()
     CLOCK_ClearMsecCallback(TIMER_SOUND);
     timer_disable_counter(_SOUND_TIM);
     timer_disable_oc_output(_SOUND_TIM, _SOUND_TIM_OC);
-    VIBRATINGMOTOR_Stop();
+
+    if (HAS_VIBRATINGMOTOR)
+        VIBRATINGMOTOR_Stop();
 }
 
 u32 SOUND_Callback()

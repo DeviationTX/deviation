@@ -74,7 +74,7 @@ static inline void LCD_ForceUpdate() {}
 /* Compute voltage from y = 0.003672x + 0.0287 */
 #define VOLTAGE_NUMERATOR 367
 #define VOLTAGE_OFFSET    29
-#include "../at9/at9_ports.h"
+#include "at10_ports.h"
 
 
 /* Define button placement for chantest page*/
