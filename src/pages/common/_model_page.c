@@ -250,7 +250,7 @@ static const char *protoselect_cb(guiObject_t *obj, int dir, void *data)
         // Load() the new protocol
         Model.protocol = new_protocol;
         Model.radio = PROTOCOL_GetRadio(new_protocol);
-        if (Model.radio < TX_MODULE_LAST) Model.tx_power = RADIO_TX_POWER_COUNT[Model.radio]-1;
+        Model.tx_power = RADIO_TX_POWER_COUNT[Model.radio]-1;
         PROTOCOL_Load(1);
         Model.num_channels = PROTOCOL_DefaultNumChannels();
         memset(Model.proto_opts, 0, sizeof(Model.proto_opts));
