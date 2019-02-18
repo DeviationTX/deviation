@@ -65,7 +65,7 @@ static void send_packet()
     // failsafe
     for (chan = 0; chan < 8; chan++) {
         // any way to disable failsafe on a channel ? (keep last received value)
-        val = scale_channel(Channels[chan], -100, 100, 4000, 0);
+        val = scale_channel(Model.limits[chan].failsafe, -100, 100, 4000, 0);
         packet[i++] = val & 0xff;
         packet[i++] = val >> 8;
     }
