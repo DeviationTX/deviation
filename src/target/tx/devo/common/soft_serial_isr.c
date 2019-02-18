@@ -18,9 +18,11 @@
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/timer.h>
+#include <libopencm3/stm32/usart.h>
 
 #include "common.h"
 #include "devo.h"
+#include "target/drivers/mcu/stm32/rcc.h"
 
 #ifndef MODULAR
 extern u8 in_byte;
@@ -58,7 +60,7 @@ static void next_byte() {
 void __attribute__((__used__)) tim6_isr(void) {
     timer_clear_flag(TIM6, TIM_SR_UIF);
 
-    u16 value = gpio_get(GPIOA, _USART_GPIO_USART_RX);
+    u16 value = GPIO_pin_get(UART_CFG.rx);
 
     if (in_byte == 1) {  // first interrupt after edge, check start bit
         if (value) {

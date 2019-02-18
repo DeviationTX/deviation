@@ -136,8 +136,8 @@ static void initialize()
         return;
     }
 #if HAS_EXTENDED_AUDIO
-#if HAS_AUDIO_UART5
-    if (!Transmitter.audio_uart5)
+#if HAS_AUDIO_UART
+    if (!Transmitter.audio_uart)
 #endif
     Transmitter.audio_player = AUDIO_DISABLED; // disable voice commands on serial port
 #endif

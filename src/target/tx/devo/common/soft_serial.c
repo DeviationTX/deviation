@@ -23,6 +23,7 @@
 #include "common.h"
 #include "devo.h"
 
+#include "target/drivers/mcu/stm32/rcc.h"
 
 // soft serial receiver for s.port data
 // receive inverted data (high input volgate = 0, low is 1)
@@ -50,11 +51,10 @@ void SSER_Initialize()
     data_byte = 0;
 
     /* Enable GPIOA clock. */
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPAEN);
+    rcc_periph_clock_enable(get_rcc_from_pin(UART_CFG.rx));
 
     // Set RX pin mode to pull up
-    gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN, _USART_GPIO_USART_RX);
-    gpio_set(GPIOA, _USART_GPIO_USART_RX);
+    GPIO_setup_input(UART_CFG.rx, ITYPE_PULLUP);
 
     // Interrupt on input rising edge to find start bit
     exti_select_source(EXTI10, GPIOA);

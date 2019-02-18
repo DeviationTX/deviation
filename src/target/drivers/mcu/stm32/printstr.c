@@ -20,14 +20,14 @@ void printstr(char * ptr, int len)
 {
     int index;
 
-    if (0 == (USART_CR1(_USART) & USART_CR1_UE))
+    if (0 == (USART_CR1(UART_CFG.uart) & USART_CR1_UE))
         return; //Don't send if USART is disabled
 
     for(index=0; index<len; index++) {
         if (ptr[index] == '\n') {
-            usart_send_blocking(_USART,'\r');
+            usart_send_blocking(UART_CFG.uart, '\r');
         }  
-        usart_send_blocking(_USART, ptr[index]);
+        usart_send_blocking(UART_CFG.uart, ptr[index]);
     }    
     return;
 }

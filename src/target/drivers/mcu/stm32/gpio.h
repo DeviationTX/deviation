@@ -42,6 +42,12 @@ struct i2c_config {
     unsigned speed;
 };
 
+struct uart_config {
+    unsigned uart;
+    struct mcu_pin tx;
+    struct mcu_pin rx;
+};
+
 struct tim_config {
     unsigned tim;
     unsigned rst;
