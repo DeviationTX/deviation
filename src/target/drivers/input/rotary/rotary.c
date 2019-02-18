@@ -22,7 +22,7 @@ void ROTARY_Init()
     gpio_set(GPIOC, GPIO13 | GPIO14 | GPIO15);
 
     nvic_enable_irq(NVIC_EXTI15_10_IRQ);
-    nvic_set_priority(NVIC_EXTI15_10_IRQ, 66); //Medium priority
+    nvic_set_priority(NVIC_EXTI15_10_IRQ, 66);  // Medium priority
     exti_select_source(EXTI13 | EXTI14, GPIOC);
     exti_set_trigger(EXTI13 | EXTI14, EXTI_TRIGGER_BOTH);
     exti_enable_request(EXTI13 | EXTI14);
@@ -33,7 +33,7 @@ u32 ROTARY_Scan()
     int last_rotary;
     u32 result = 0;
 
-    result |= ! gpio_get(GPIOC, GPIO15) ? CHAN_ButtonMask(BUT_ENTER) : 0;
+    result |= !gpio_get(GPIOC, GPIO15) ? CHAN_ButtonMask(BUT_ENTER) : 0;
 
     last_rotary = rotary;
     if (last_rotary) {
@@ -49,3 +49,4 @@ u32 ROTARY_Scan()
 
     return result;
 }
+
