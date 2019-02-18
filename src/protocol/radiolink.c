@@ -112,7 +112,7 @@ static int RADIOLINK_Reset()
 #ifdef EMULATOR
     return 1;
 #endif
-    return (packet[0] == 0x55) && (packet[1] == 0x55); 
+    return (packet[0] == 0x55) && (packet[1] == 0x55);
 }
 
 static void initialize()
