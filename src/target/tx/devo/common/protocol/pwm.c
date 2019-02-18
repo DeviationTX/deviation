@@ -46,7 +46,7 @@ void PWM_Initialize()
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_TIM1EN
                                             | RCC_APB2ENR_IOPAEN
                                             | RCC_APB2ENR_AFIOEN);
-    rcc_periph_clock_enable(get_rcc_from_port(PWM_DMA.dma));  // FIXME - don't use ADC cfg here
+    rcc_periph_clock_enable(get_rcc_from_port(PWM_DMA.dma));
 
     // connect timer compare output to pin
     gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, _PWM_PIN);
