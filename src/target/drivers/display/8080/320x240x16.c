@@ -59,7 +59,6 @@ int lcd_detect()
         }
     }
     if (HAS_LCD_TYPE(LCDTYPE_ILI9341)) {
-
 #ifdef ILI9341_RESET_PIN
         /* Reset pin for ILI9341 */
         gpio_set_mode(ILI9341_RESET_PIN.port, GPIO_MODE_OUTPUT_50_MHZ,
