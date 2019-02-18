@@ -97,11 +97,22 @@ static void RADIOLINK_Initialize()
     PROTOSPI_pin_set(RADIOLINK_CC2530_RESET_PIN);
 }
 
-// todo: call during transmitter startup ?
 static void RADIOLINK_Stop()
 {
     PROTO_CS_HI(RADIOLINK_CC2530);
     PROTOSPI_pin_clear(RADIOLINK_CC2530_RESET_PIN);
+}
+
+// todo: call during transmitter startup
+static int RADIOLINK_Reset()
+{
+    RADIOLINK_Initialize();
+    send_packet();
+    RADIOLINK_Stop();
+#ifdef EMULATOR
+    return 1;
+#endif
+    return (packet[0] == 0x55) && (packet[1] == 0x55); 
 }
 
 static void initialize()
