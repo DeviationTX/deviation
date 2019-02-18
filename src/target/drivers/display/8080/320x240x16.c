@@ -39,6 +39,7 @@ void lcd_set_pos(unsigned int x0, unsigned int y0)
 
 #define LCDTYPE_HX8347  0x01
 #define LCDTYPE_ILI9341 0x02
+#define LCDTYPE_ST7796  0x03
 #define LCDTYPE_UNKNOWN 0x00
 #define HAS_LCD_TYPE(x) ((HAS_LCD_TYPES) & x)
 
@@ -66,6 +67,20 @@ int lcd_detect()
         if (data2 == 0x9341) {
             return LCDTYPE_ILI9341;
         }
+    }
+    if (HAS_LCD_TYPE(LCDTYPE_ST7796)) {
+          // Read ID register for ST7796 (will be 0x7796 if found)
+          LCD_REG = 0xD3;
+          // As per the spec, the 1st 2 reads are dummy reads and irrelevant
+          u8 data = LCD_DATA;
+          data = LCD_DATA;
+          // Actual ID is in 3rd and 4th bytes
+          data = LCD_DATA;
+          u16 data2 = LCD_DATA;
+          data2 = (((int)data) << 8) | data2;
+          if (data2 == 0x7796) {
+              return LCDTYPE_ST7796;
+          }
     }
     return LCDTYPE_UNKNOWN;
 }
