@@ -11,7 +11,7 @@ ifndef  TARGET
 TARGET   ?= devo8
 default: $(TARGET)
 
-ALLTARGETS = $(filter-out common,$(notdir $(wildcard target/*)))
+ALLTARGETS = $(filter-out common,$(notdir $(wildcard target/tx/*/*)))
 
 # The supported transmitters
 TXS ?= devo6 devo7e devo7e-256 devo8 devo10 devo12e devo12 devof7 devof7-XMS devof4 devof4-XMS devof12e devof12e-XMS at9 t8sg t8sg_v2 t8sg_v2_plus ir8m
@@ -65,13 +65,16 @@ endef
 $(foreach t,$(ALLTARGETS),$(eval $(call make-target,$t)))
 endif
 
+# Determine the directory above the target directory
+FAMILY = $(notdir $(patsubst %/,%,$(dir $(wildcard target/tx/*/$(TARGET)))))
+
 # We want to turn on INCLUDE_FS by default
 INCLUDE_FS ?= 1
 
 # Use VERBOSE=1 to enable verbose make
 PROGMODE ?= STATUS_SCREEN
 SDIR := .
-include target/$(TARGET)/Makefile.inc
+include target/tx/$(FAMILY)/$(TARGET)/Makefile.inc
 
 NUM_MODELS ?= 30
 TYPE     ?= prd
@@ -163,7 +166,7 @@ EXTRA_CFLAGS   :=  -DMODULAR=$(MODULAR)
 CFLAGS   +=  -DENABLE_MODULAR=$(MODULAR)
 endif
 
-CFLAGS   := $(CFLAGS) -g -Wall -Wextra -Werror=undef -I. -D$(PROGMODE) -std=gnu99 -Itarget/$(TARGET) -Igui/$(SCREENSIZE) \
+CFLAGS   := $(CFLAGS) -g -Wall -Wextra -Werror=undef -I. -D$(PROGMODE) -std=gnu99 -Itarget/tx/$(FAMILY)/$(TARGET) -Igui/$(SCREENSIZE) \
             -Ipages/$(SCREENSIZE) \
             -DHGVERSION="\"${HGVERSION}\""
 CXXFLAGS := $(CXXFLAGS) $(patsubst -std=gnu99,,$(CFLAGS))
@@ -196,7 +199,7 @@ all : $(ALL)
 ####################################
 # recompile if the Makefile changes#
 ####################################
-$(OBJS) $(PROTO_OBJS) ($PROTO_EXTRA_OBJS): Makefile target/$(TARGET)/Makefile.inc $(EXTRA_MAKEFILES)
+$(OBJS) $(PROTO_OBJS) ($PROTO_EXTRA_OBJS): Makefile target/tx/$(FAMILY)/$(TARGET)/Makefile.inc $(EXTRA_MAKEFILES)
 
 ##################################################################################
 # The following enables quiet output unless you use VERBOSE=1                    #
@@ -400,7 +403,7 @@ $(ODIR)/hgstamp:
 	echo $(HGVERSION) > $(ODIR)/hgstamp
 
 BUILD_TARGET := 1
-include target/$(TARGET)/Makefile.inc
+include target/tx/$(FAMILY)/$(TARGET)/Makefile.inc
 ifdef MODULAR
 include protocol/Makefile.inc
 endif
