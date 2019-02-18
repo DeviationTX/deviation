@@ -145,7 +145,7 @@ u8 UART_Send(u8 *data, u16 len) {
     dma_enable_transfer_complete_interrupt(USART_DMA.dma, USART_DMA.stream);
     DMA_channel_select(USART_DMA);
 
-    dma_enable_channel(USART_DMA.dma, USART_DMA.stream);    /* dma ready to go */
+    DMA_enable_stream(USART_DMA);    /* dma ready to go */
     usart_enable_tx_dma(_USART);
 
     return 0;

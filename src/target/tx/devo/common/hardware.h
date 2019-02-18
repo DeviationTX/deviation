@@ -24,4 +24,12 @@
     #define _USART_DMA_ISR                dma1_channel4_isr
 #endif
 
+#ifndef PWM_DMA
+    #define PWM_DMA ((struct dma_config) { \
+        .dma = DMA1,                       \
+        .stream = DMA_CHANNEL3,            \
+        })
+    #define _PWM_DMA_ISR                dma1_channel3_isr
+#endif
+
 #endif  // _DEVO_DEFAULT_HARDWARE_H_

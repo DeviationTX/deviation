@@ -15,4 +15,11 @@
     .stream = DMA_CHANNEL5,            \
     })
 
+// PWM overrides
+#define PWM_DMA ((struct dma_config) { \
+    .dma = DMA1,                       \
+    .stream = DMA_CHANNEL2,            \
+    })
+#define _PWM_DMA_ISR                dma1_channel2_isr
+
 #endif  // _DEVO12_HARDWARE_H_
