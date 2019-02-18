@@ -19,6 +19,7 @@
 #include "common.h"
 #include "target/drivers/mcu/stm32/rcc.h"
 #include "target/drivers/mcu/stm32/dma.h"
+#include "target/drivers/mcu/stm32/nvic.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -54,8 +55,8 @@ void UART_Initialize()
     /* Finally enable the USART. */
     usart_enable(_USART);
 
-    nvic_set_priority(_USART_NVIC_DMA_CHANNEL_IRQ, 3);
-    nvic_enable_irq(_USART_NVIC_DMA_CHANNEL_IRQ);
+    nvic_set_priority(get_nvic_dma_irq(USART_DMA), 3);
+    nvic_enable_irq(get_nvic_dma_irq(USART_DMA));
 
 #if HAS_AUDIO_UART5
     /* Enable clocks for GPIO port C (for GPIO_UART5_TX) and UART5. */
@@ -81,7 +82,7 @@ void UART_Initialize()
 void UART_Stop()
 {
     UART_StopReceive();
-    nvic_disable_irq(_USART_NVIC_DMA_CHANNEL_IRQ);
+    nvic_disable_irq(get_nvic_dma_irq(USART_DMA));
     usart_set_mode(_USART, 0);
     usart_disable(_USART);
     rcc_peripheral_disable_clock(&_USART_RCC_APB_ENR_USART, _USART_RCC_APB_ENR_USART_EN);
