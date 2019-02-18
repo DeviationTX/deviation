@@ -59,15 +59,15 @@ static void send_packet()
     for (chan = 0; chan < 10; chan++) {
         // is 0-4000 for 100% endpoints ? can it be extended ?
         val = scale_channel(Channels[chan], CHAN_MIN_VALUE, CHAN_MAX_VALUE, 4000, 0);
-        packet[i++] = val & 0xff;
         packet[i++] = val >> 8;
+        packet[i++] = val & 0xff;
     }
     // failsafe
     for (chan = 0; chan < 8; chan++) {
         // any way to disable failsafe on a channel ? (keep last received value)
         val = scale_channel(Model.limits[chan].failsafe, -100, 100, 4000, 0);
-        packet[i++] = val & 0xff;
         packet[i++] = val >> 8;
+        packet[i++] = val & 0xff;
     }
     // checksum
     packet[40] = packet[4];
