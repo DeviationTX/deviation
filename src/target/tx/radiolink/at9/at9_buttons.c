@@ -14,23 +14,13 @@
 */
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
-#include <libopencm3/cm3/nvic.h>
-#include <libopencm3/stm32/exti.h>
 
 #include "common.h"
-
-// To use interpretation of rapid rotary movement as long press
-// this timeout should be less than long press timeout, 100ms
-#define ROTARY_TIMEOUT 50
-
-volatile int rotary = 0;
-static u32 last_rotary_clock = 0;
 
 void Initialize_ButtonMatrix()
 {
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPAEN);
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPBEN);
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPCEN);
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPDEN);
 
     /* Mode and End */
@@ -40,25 +30,16 @@ void Initialize_ButtonMatrix()
     gpio_set_mode(GPIOB, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN,
                   GPIO3 | GPIO4 | GPIO5 | GPIO6);
     gpio_set(GPIOB, GPIO3 | GPIO4 | GPIO5 | GPIO6);
-    /*Rotary */
-    gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN,
-                  GPIO13 | GPIO14 | GPIO15);
-    gpio_set(GPIOC, GPIO13 | GPIO14 | GPIO15);
     /* Trim */
     gpio_set_mode(GPIOD, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN,
                   GPIO2 | GPIO3 | GPIO12 | GPIO13);
     gpio_set(GPIOD, GPIO2 | GPIO3 | GPIO12 | GPIO13);
 
-    nvic_enable_irq(NVIC_EXTI15_10_IRQ);
-    nvic_set_priority(NVIC_EXTI15_10_IRQ, 66); //Medium priority
-    exti_select_source(EXTI13 | EXTI14, GPIOC);
-    exti_set_trigger(EXTI13 | EXTI14, EXTI_TRIGGER_BOTH);
-    exti_enable_request(EXTI13 | EXTI14);
+    ROTARY_Init();
 }
 
 u32 ScanButtons()
 {
-    int last_rotary;
     u32 result = 0;
     result |= ! gpio_get(GPIOB, GPIO6)  ? CHAN_ButtonMask(BUT_TRIM_LV_NEG) : 0;
     result |= ! gpio_get(GPIOB, GPIO5)  ? CHAN_ButtonMask(BUT_TRIM_LV_POS) : 0;
@@ -70,19 +51,9 @@ u32 ScanButtons()
     result |= ! gpio_get(GPIOB, GPIO3)  ? CHAN_ButtonMask(BUT_TRIM_RH_POS) : 0;
 
     result |= ! gpio_get(GPIOA, GPIO14) ? CHAN_ButtonMask(BUT_RIGHT) : 0; // MODE
-    result |= ! gpio_get(GPIOC, GPIO15) ? CHAN_ButtonMask(BUT_ENTER) : 0;
     result |= ! gpio_get(GPIOA, GPIO15) ? CHAN_ButtonMask(BUT_EXIT) : 0;
 
-    last_rotary = rotary;
-    if (last_rotary) {
-        u32 rotary_clock = CLOCK_getms();
-        // To prevent rotary to generate button clicks too frequently we register
-        // an event in 'result' not more often than every ROTARY_TIMEOUT msec
-        if (rotary_clock > last_rotary_clock) {
-            result |= last_rotary > 0 ? CHAN_ButtonMask(BUT_DOWN) : CHAN_ButtonMask(BUT_UP);
-            last_rotary_clock = rotary_clock + ROTARY_TIMEOUT;
-        }
-        rotary = 0;
-    }
+    result |= ROTARY_Scan();
+
     return result;
 }

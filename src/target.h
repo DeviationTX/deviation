@@ -117,6 +117,10 @@ void SPITouch_Calibrate(s32 xscale, s32 yscale, s32 xoff, s32 yoff);
 void Initialize_ButtonMatrix();
 u32 ScanButtons();
 
+/* Rotary */
+void ROTARY_Init();
+u32 ROTARY_Scan();
+
 /* Power functions */
 void PWR_Init(void);
 unsigned  PWR_ReadVoltage(void);
