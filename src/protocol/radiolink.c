@@ -75,10 +75,10 @@ static void send_packet()
         packet[40] += packet[i];
     
     // send packet to Radiolink CC2530 module
-    PROTO_CS_LO(RADIOLINK_MODULE)
+    PROTO_CS_LO(RADIOLINK_MODULE);
     for(i = 0; i < PACKET_SIZE; i++)
             packet[i] = PROTOSPI_xfer(packet[i]);
-    PROTO_CS_HI(RADIOLINK_MODULE)
+    PROTO_CS_HI(RADIOLINK_MODULE);
     
     // todo: packet[] now contains the module's response, with telemetry data
 }
@@ -91,12 +91,13 @@ static u16 radiolink_cb()
 
 static void RADIOLINK_Reset()
 {
-    PROTO_CS_HI(RADIOLINK_MODULE)
+    PROTO_CS_HI(RADIOLINK_MODULE);
     PROTOSPI_pin_clear(RADIOLINK_MODULE_RESET_PIN);
     Delay(100);
     PROTOSPI_pin_set(RADIOLINK_MODULE_RESET_PIN);
 }
 
+// todo: call during transmitter startup ?
 static void RADIOLINK_Stop()
 {
     PROTO_CS_HI(RADIOLINK_MODULE);
@@ -119,7 +120,7 @@ uintptr_t RADIOLINK_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_BIND:  initialize(); return 0;
         case PROTOCMD_NUMCHAN: return 10;
         case PROTOCMD_DEFAULT_NUMCHAN: return 10;
-        case PROTOCMD_CHANNELMAP: return AETR;
+        case PROTOCMD_CHANNELMAP: return AETRG;
         case PROTOCMD_TELEMETRYSTATE: return PROTO_TELEM_UNSUPPORTED;
         default: break;
     }
