@@ -58,7 +58,11 @@ void PWR_Shutdown()
     rcc_set_sysclk_source(RCC_CFGR_SW_SYSCLKSEL_HSICLK);
     rcc_wait_for_osc_ready(RCC_HSI);
     gpio_clear(_PWREN_PORT, _PWREN_PIN);
-    while(1) ;
+    while (1) {
+#if defined(HAS_BUTTON_POWER_ON) && HAS_BUTTON_POWER_ON
+        CLOCK_ResetWatchdog();  // If the reset is held too long, the watchdog could kick in
+#endif
+    }
 }
 
 int PWR_CheckPowerSwitch()
