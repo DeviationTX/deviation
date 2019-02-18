@@ -238,6 +238,10 @@ u16 load_char_font(u32 c)
         end = start + height;
     }
 
+    if (width > CHAR_WIDTH) {
+        width = CHAR_WIDTH;
+    }
+
     // convert font to tw8816 format
     for (int x = 0; x < width; x++)
     {
