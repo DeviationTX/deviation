@@ -49,6 +49,7 @@ enum Radio {
     CC2500,
     NRF24L01,
     MULTIMOD,
+    RADIOLINK_CC2530,
     R9M,
     TX_MODULE_LAST,
 };

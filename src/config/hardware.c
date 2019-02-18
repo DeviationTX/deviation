@@ -49,6 +49,7 @@ const char * const MODULE_NAME[TX_MODULE_LAST] = {
       [CC2500]   = "CC2500",
       [NRF24L01] = "NRF24l01",
       [MULTIMOD] = "MultiMod",
+      [RADIOLINK_CC2530] = "Radiolink",
       };
 
 #define MATCH_SECTION(s) strcasecmp(section, s) == 0
