@@ -16,9 +16,6 @@
     http://www.coocox.org/driver_repo/305488dd-734b-4cce-a8a4-39dcfef8cc66/html/group___i_l_i9341_s.html
 */
 
-#include "lcd.h"
-#include "common.h"
-
 void st7796_draw_start(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1)
 {
     // setup x

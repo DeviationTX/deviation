@@ -14,11 +14,5 @@ struct lcdtype {
     void (*draw_start)(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1);
     void (*sleep)();
 };
-extern const struct lcdtype *disp_type;
-extern uint8_t screen_flip;
 
-extern void lcd_cmd(uint8_t addr, uint8_t data);
-
-extern void ili9341_init();
-extern void hx8347_init();
 #endif

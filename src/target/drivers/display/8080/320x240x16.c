@@ -18,19 +18,22 @@
 #include "common.h"
 #include "gui/gui.h"
 #include "320x240x16.h"
+
+static u8 screen_flip;
+static const struct lcdtype *disp_type;
+static void lcd_cmd(uint8_t addr, uint8_t data);
+
 #include "320x240x16_hx8347.h"
 #include "320x240x16_ili9341.h"
+#include "480x320x16_st7796.h"
 
-u8 screen_flip;
-static const struct lcdtype *disp_type;
-
-void lcd_cmd(uint8_t addr, uint8_t data)
+static void lcd_cmd(uint8_t addr, uint8_t data)
 {
     LCD_REG = addr;
     LCD_DATA = data;
 }
 
-void lcd_set_pos(unsigned int x0, unsigned int y0)
+static void lcd_set_pos(unsigned int x0, unsigned int y0)
 {
     if (screen_flip)
         y0 = LCD_HEIGHT - 1 - y0;
