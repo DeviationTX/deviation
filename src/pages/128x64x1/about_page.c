@@ -13,20 +13,9 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef OVERRIDE_PLACEMENT
 #include "common.h"
 #include "pages.h"
 #include "gui/gui.h"
-
-enum {
-    ROW_1_X = 0,
-    ROW_1_Y = 15,
-    ROW_2_X = 0,
-    ROW_2_Y = 30,
-    ROW_3_X = 0,
-    ROW_3_Y = 45
-};
-#endif //OVERRIDE_PLACEMENT
 
 static struct about_obj * const gui = &gui_objs.u.about;
 
