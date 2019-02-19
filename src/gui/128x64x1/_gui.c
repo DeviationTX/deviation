@@ -15,6 +15,10 @@
 
 static unsigned _handle_modalbuttons(u32 button, unsigned flags, void *data);
 
+const struct ImageMap image_map[] = {
+    {NULL, 37, 15, 0, 0}
+};
+
 void _gui_hilite_selected(struct guiObject *obj)
 {
     (void)obj;

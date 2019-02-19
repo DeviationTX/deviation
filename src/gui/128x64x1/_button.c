@@ -13,14 +13,10 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-static const struct ImageMap image_map = {
-    NULL, 37, 15, 0, 0
-};
-
 const struct ImageMap *_button_image_map(enum ButtonType type)
 {
     (void)type;
-    return &image_map;
+    return &image_map[0];
 }
 
 void _DrawButton(struct guiObject *obj)

@@ -95,7 +95,7 @@ struct ImageMap {
 
 #include "buttons.h"
 
-//extern const struct ImageMap image_map[IMAGE_MAP_END];
+extern const struct ImageMap image_map[IMAGE_MAP_END];
 
 enum GUIType {
     UnknownGUI,

@@ -15,10 +15,6 @@
 
 #include "lcd_page_props.h"
 
-const struct ImageMap image_map = {
-    NULL, 1, 1, 0, 0
-};
-
 const struct ImageMap *_button_image_map(enum ButtonType type)
 {
     (void)type;
