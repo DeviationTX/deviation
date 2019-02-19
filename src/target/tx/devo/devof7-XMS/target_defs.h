@@ -63,6 +63,7 @@
 #define VOLTAGE_NUMERATOR 324
 #define VOLTAGE_OFFSET    382
 
+#include "../devof7/hardware.h"
 #include "../common/common_devo.h"
 
 #endif //_DEVO_F7_XMS_TARGET_H_

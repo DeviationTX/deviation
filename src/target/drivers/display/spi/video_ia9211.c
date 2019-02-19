@@ -31,8 +31,8 @@ static u16 is_double_row = 0x00;
 
 #define CUR_CHAR_SIZE  (cur_str.font.zoom)
 
-#define CS_HI() gpio_set(GPIOB, GPIO0)
-#define CS_LO() gpio_clear(GPIOB, GPIO0)
+#define CS_HI() GPIO_pin_set(LCD_SPI.csn)
+#define CS_LO() GPIO_pin_clear(LCD_SPI.csn)
 
 // The IA911 chip defines
 #define LCD_IA911_CLEAR_VRAM        0x00
@@ -99,7 +99,7 @@ void LCD_CMDLength(const u8 cmd[], u8 length) {
     while(i) i--;
 
     for(i = 0; i < length; i++) {
-        spi_xfer(SPI1, cmd[i]);
+        spi_xfer(LCD_SPI.spi, cmd[i]);
 
         // Wait a couple of clock ticks
         j = 100;
@@ -244,26 +244,24 @@ void LCD_Init()
 {
     LCD_SetFont(1);
     /* Enable GPIOA and GPIOB clock. */
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPAEN);
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPBEN);
-
-    /* Set GPIO0, GPIO8, GPIO15, GPIO4 (in GPIO port A) to 'output push-pull'. */
-    gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_2_MHZ,
-		  GPIO_CNF_OUTPUT_PUSHPULL, GPIO0);  //CS0
-    gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_2_MHZ,
-		  GPIO_CNF_OUTPUT_PUSHPULL, GPIO8);  //CS1
-    gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_2_MHZ,
-		  GPIO_CNF_OUTPUT_PUSHPULL, GPIO15); //CS2
-    gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_2_MHZ,
-		  GPIO_CNF_OUTPUT_PUSHPULL, GPIO9);  //ON, OFF?
+    rcc_periph_clock_enable(get_rcc_from_pin(LCD_SPI.csn));
+    rcc_periph_clock_enable(get_rcc_from_pin(LCD_VIDEO_CS0));
+    rcc_periph_clock_enable(get_rcc_from_pin(LCD_VIDEO_CS1));
+    rcc_periph_clock_enable(get_rcc_from_pin(LCD_VIDEO_CS2));
+    rcc_periph_clock_enable(get_rcc_from_pin(LCD_VIDEO_PWR));
+    GPIO_setup_output(LCD_SPI.csn, OTYPE_PUSHPULL);
+    GPIO_setup_output(LCD_VIDEO_CS0, OTYPE_PUSHPULL);
+    GPIO_setup_output(LCD_VIDEO_CS1, OTYPE_PUSHPULL);
+    GPIO_setup_output(LCD_VIDEO_CS2, OTYPE_PUSHPULL);
+    GPIO_setup_output(LCD_VIDEO_PWR, OTYPE_PUSHPULL);
 
     // Set the 5.8GHz receiver off (default)
-    gpio_clear(GPIOB, GPIO9);
+    GPIO_pin_clear(LCD_VIDEO_PWR);
 
     // Set the 5.8GHz channel
-    gpio_clear(GPIOA, GPIO0);
-    gpio_clear(GPIOA, GPIO8);
-    gpio_clear(GPIOA, GPIO15);
+    GPIO_pin_clear(LCD_VIDEO_CS0);
+    GPIO_pin_clear(LCD_VIDEO_CS1);
+    GPIO_pin_clear(LCD_VIDEO_CS2);
 
     // Initialization is mostly done in SPI Flash
     // UNLESS we use SPI2 for 4-in-1 module
@@ -274,7 +272,7 @@ void LCD_Init()
     // Setup CS as B.0 Data/Control = C.5
     gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
                   GPIO_CNF_OUTPUT_PUSHPULL, GPIO0);
-    gpio_set(GPIOB, GPIO0); // CS_HI();
+    GPIO_pin_set(LCD_SPI.csn);  // CS_HI();
 
     LCD_Cmd(LCD_IA911_CLEAR_VRAM); //Clear the VRAM
     // Wait for a couple of clock ticks
@@ -328,11 +326,11 @@ void LCD_ShowVideo(u8 enable)
         return;
 
     if(enable) {
-        gpio_set(GPIOB, GPIO9);
+        GPIO_pin_set(LCD_VIDEO_PWR);
         LCD_Cmd(LCD_IA911_CLOCK | LCD_IA911_XOSC); // Set to external mode en enable ossilator
     }
     else {
-        gpio_clear(GPIOB, GPIO9);
+        GPIO_pin_clear(LCD_VIDEO_PWR);
         LCD_Cmd(LCD_IA911_CLOCK | LCD_IA911_I_MODE | LCD_IA911_XOSC); // Set to external mode en enable ossilator
     }
 
@@ -351,19 +349,19 @@ void VIDEO_Enable(int on)
 void VIDEO_SetChannel(int ch) 
 {
     if(ch & 0x01)
-        gpio_clear(GPIOA, GPIO0);
+        GPIO_pin_clear(LCD_VIDEO_CS0);
     else
-        gpio_set(GPIOA, GPIO0);
+        GPIO_pin_set(LCD_VIDEO_CS0);
 
     if(ch & 0x02)
-        gpio_clear(GPIOA, GPIO8);
+        GPIO_pin_clear(LCD_VIDEO_CS1);
     else
-        gpio_set(GPIOA, GPIO8);
+        GPIO_pin_set(LCD_VIDEO_CS1);
 
     if(ch & 0x04)
-        gpio_clear(GPIOA, GPIO15);
+        GPIO_pin_clear(LCD_VIDEO_CS2);
     else
-        gpio_set(GPIOA, GPIO15);
+        GPIO_pin_set(LCD_VIDEO_CS2);
 }
 
 

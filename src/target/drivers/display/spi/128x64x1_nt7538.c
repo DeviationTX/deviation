@@ -17,11 +17,12 @@
 #include <libopencm3/stm32/spi.h>
 #include "common.h"
 #include "gui/gui.h"
+#include "target/drivers/mcu/stm32/rcc.h"
 
-#define CS_HI() gpio_set(GPIOB, GPIO0)
-#define CS_LO() gpio_clear(GPIOB, GPIO0)
-#define CMD_MODE() gpio_clear(GPIOC,GPIO5)
-#define DATA_MODE() gpio_set(GPIOC,GPIO5)
+#define CS_HI() GPIO_pin_set(LCD_SPI.csn)
+#define CS_LO() GPIO_pin_clear(LCD_SPI.csn)
+#define CMD_MODE() GPIO_pin_clear(LCD_SPI_MODE)
+#define DATA_MODE() GPIO_pin_set(LCD_SPI_MODE)
 
 #ifndef HAS_LCD_FLIPPED
     #define HAS_LCD_FLIPPED 0
@@ -42,14 +43,14 @@ static s8 dir;
 void LCD_Cmd(unsigned cmd) {
     CMD_MODE();
     CS_LO();
-    spi_xfer(SPI1, cmd);
+    spi_xfer(LCD_SPI.spi, cmd);
     CS_HI();
 }
 
 void LCD_Data(unsigned cmd) {
     DATA_MODE();
     CS_LO();
-    spi_xfer(SPI1, cmd);
+    spi_xfer(LCD_SPI.spi, cmd);
     CS_HI();
 }
 
@@ -86,12 +87,10 @@ void LCD_Init()
 {
     //Initialization is mostly done in SPI Flash
     //Setup CS as B.0 Data/Control = C.5
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPBEN);
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPCEN);
-    gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_PUSHPULL, GPIO0);
-    gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_PUSHPULL, GPIO5);
+    rcc_periph_clock_enable(get_rcc_from_pin(LCD_SPI.csn));
+    rcc_periph_clock_enable(get_rcc_from_pin(LCD_SPI_MODE));
+    GPIO_setup_output(LCD_SPI.csn, OTYPE_PUSHPULL);
+    GPIO_setup_output(LCD_SPI_MODE, OTYPE_PUSHPULL);
     LCD_Cmd(0xE2);  //Reset
     volatile int i = 0x8000;
     while(i) i--;
