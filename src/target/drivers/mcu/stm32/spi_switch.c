@@ -12,26 +12,14 @@
     You should have received a copy of the GNU General Public License
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include <libopencm3/stm32/rcc.h>
-#include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/spi.h>
 #include "common.h"
+#include "target/drivers/mcu/stm32/rcc.h"
 
 #if defined HAS_4IN1_FLASH && HAS_4IN1_FLASH
 
-#if _SPI_PROTO_PORT == 1
-    #define SPIx        SPI1
-    #define SPIxEN      RCC_APB2ENR_SPI1EN
-    #define APB_SPIxEN  RCC_APB2ENR
-#elif _SPI_PROTO_PORT == 2
-    #define SPIx        SPI2
-    #define SPIxEN      RCC_APB1ENR_SPI2EN
-    #define APB_SPIxEN  RCC_APB1ENR
-#endif
-
-
-#define CS_HI() PORT_pin_set(PROTO_RST_PIN)
-#define CS_LO() PORT_pin_clear(PROTO_RST_PIN)
+#define CS_HI() GPIO_pin_set(PROTO_RST_PIN)
+#define CS_LO() GPIO_pin_clear(PROTO_RST_PIN)
 
 // Numbers correspond to connection order on 4-in-1 board
 // and on Discrete Logic board
@@ -73,10 +61,10 @@ static void detect()
     Delay(100);
     CS_LO();
     Delay(100);
-    PORT_pin_clear(PROTO_CSN_PIN);
-    spi_xfer(SPIx, 0x10);
-    res = spi_xfer(SPIx, 0);
-    PORT_pin_set(PROTO_CSN_PIN);
+    GPIO_pin_clear(PROTO_SPI.csn);
+    spi_xfer(PROTO_SPI.spi, 0x10);
+    res = spi_xfer(PROTO_SPI.spi, 0);
+    GPIO_pin_set(PROTO_SPI.csn);
     if (res == 0xa5) {
         printf("CYRF6936 directly available, no switch\n");
         return;
@@ -89,10 +77,10 @@ static void detect()
     Delay(100);
     SPISwitch_CYRF6936_RESET(0);
     Delay(100);
-    PORT_pin_clear(PROTO_CSN_PIN);
-    spi_xfer(SPIx, 0x10);
-    res = spi_xfer(SPIx, 0);
-    PORT_pin_set(PROTO_CSN_PIN);
+    GPIO_pin_clear(PROTO_SPI.csn);
+    spi_xfer(PROTO_SPI.spi, 0x10);
+    res = spi_xfer(PROTO_SPI.spi, 0);
+    GPIO_pin_set(PROTO_SPI.csn);
     if (res == 0xa5) {
         printf("CYRF6936 found at pos 3\n");
         cyrf_present = 1;
@@ -100,14 +88,14 @@ static void detect()
     /* Switch to flash module */
     UseModule(MODULE_FLASH);
     /* Check that JEDEC ID command returns non-zero and not all bits high */
-    PORT_pin_clear(PROTO_CSN_PIN);
-    spi_xfer(SPIx, 0x9F);
-    res  = (u8)spi_xfer(SPIx, 0);
+    GPIO_pin_clear(PROTO_SPI.csn);
+    spi_xfer(PROTO_SPI.spi, 0x9F);
+    res  = (u8)spi_xfer(PROTO_SPI.spi, 0);
     res <<= 8;
-    res |= (u8)spi_xfer(SPIx, 0);
+    res |= (u8)spi_xfer(PROTO_SPI.spi, 0);
     res <<= 8;
-    res |= (u8)spi_xfer(SPIx, 0);
-    PORT_pin_set(PROTO_CSN_PIN);
+    res |= (u8)spi_xfer(PROTO_SPI.spi, 0);
+    GPIO_pin_set(PROTO_SPI.csn);
     if (res && res != 0xFFFFFF) {
         printf("Flash detected, JEDEC ID: '%X'\n", res);
         flash_present = 1;
@@ -120,12 +108,9 @@ void SPISwitch_Init()
 {
     last_module_used = -1;
     extra_bits = NRF24L01_CE;
-    /* Enable GPIOA */
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPAEN);
-    /* Enable GPIOB */
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPBEN);
+    rcc_periph_clock_enable(get_rcc_from_pin(PROTO_RST_PIN));
     /* RST used as CS for switch */
-    PORT_mode_setup(PROTO_RST_PIN,  GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_PUSHPULL);
+    GPIO_setup_output(PROTO_RST_PIN, OTYPE_PUSHPULL);
     detect();
 }
 
@@ -145,17 +130,17 @@ static void UseModule(int module)
 
     u8 cmd = (module & 0x07) | extra_bits;
     CS_LO();
-    spi_xfer(SPIx, cmd);
+    spi_xfer(PROTO_SPI.spi, cmd);
     CS_HI();
 
     // Adjust baud rate
-    spi_disable(SPIx);
+    spi_disable(PROTO_SPI.spi);
     if (module == MODULE_FLASH) {
-        spi_set_baudrate_prescaler(SPIx, SPI_CR1_BR_FPCLK_DIV_4);
+        spi_set_baudrate_prescaler(PROTO_SPI.spi, SPI_CR1_BR_FPCLK_DIV_4);
     } else if (last_module_used == MODULE_FLASH) {
-        spi_set_baudrate_prescaler(SPIx, SPI_CR1_BR_FPCLK_DIV_16);
+        spi_set_baudrate_prescaler(PROTO_SPI.spi, SPI_CR1_BR_FPCLK_DIV_16);
     }
-    spi_enable(SPIx);
+    spi_enable(PROTO_SPI.spi);
 
     last_module_used = module;
 }
@@ -163,13 +148,13 @@ static void UseModule(int module)
 void SPISwitch_CS_HI(int module)
 {
     (void) module;
-    PORT_pin_set(PROTO_CSN_PIN);
+    GPIO_pin_set(PROTO_SPI.csn);
 }
 
 void SPISwitch_CS_LO(int module)
 {
     UseModule(module_map[module]);
-    PORT_pin_clear(PROTO_CSN_PIN);
+    GPIO_pin_clear(PROTO_SPI.csn);
 }
     
 
@@ -186,7 +171,7 @@ static void SetExtraBits(u8 mask, int state)
     else       extra_bits &= ~mask;
     u8 cmd = (last_module_used & 0x07) | extra_bits;
     CS_LO();
-    spi_xfer(SPIx, cmd);
+    spi_xfer(PROTO_SPI.spi, cmd);
     CS_HI();
 }
 

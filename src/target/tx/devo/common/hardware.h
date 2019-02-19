@@ -95,23 +95,6 @@
     #define LCD_SPI_CFG SPI1_CFG
 #endif // LCD_SPI
 
-// FIXME
-#ifndef _SPI_PROTO_PORT
-    #define _SPI_PROTO_PORT          2 //SPI2
-    #define _SPI_PROTO_RST_PIN       {GPIOB, GPIO11}
-    #define _SPI_PROTO_CSN_PIN       {GPIOB, GPIO12}
-    #define _SPI_PROTO_SCK_PIN       {GPIOB, GPIO13}
-    #define _SPI_PROTO_MISO_PIN      {GPIOB, GPIO14}
-    #define _SPI_PROTO_MOSI_PIN      {GPIOB, GPIO15}
-#endif
-#ifndef EMULATOR
-static const struct mcu_pin PROTO_RST_PIN   = _SPI_PROTO_RST_PIN;
-static const struct mcu_pin PROTO_CSN_PIN   = _SPI_PROTO_CSN_PIN;
-static const struct mcu_pin PROTO_SCK_PIN   = _SPI_PROTO_SCK_PIN;
-static const struct mcu_pin PROTO_MISO_PIN  = _SPI_PROTO_MISO_PIN;
-static const struct mcu_pin PROTO_MOSI_PIN  = _SPI_PROTO_MOSI_PIN;
-#endif
-
 #ifndef PROTO_SPI
     #define PROTO_SPI ((struct spi_csn) { \
         .spi = SPI2,                      \
@@ -128,5 +111,17 @@ static const struct mcu_pin PROTO_MOSI_PIN  = _SPI_PROTO_MOSI_PIN;
            })
     #endif
     #define PROTO_SPI_CFG SPI2_CFG
+    #define PROTO_RST_PIN ((struct mcu_pin){GPIOB, GPIO11})
 #endif  // PROTO_SPI
+
+#ifndef TOUCH_SPI
+    #define TOUCH_SPI ((struct spi_csn) { \
+        .spi = SPI1,           \
+        .csn = {GPIOB, GPIO0}, \
+        })
+    #define TOUCH_IRQ_PIN ((struct mcu_pin) {GPIOB, GPIO5})
+    #define TOUCH_COORDS_REVERSE      1
+    #define TOUCH_SPI_CFG SPI1_CFG
+#endif //_TOUCH_PORT
+
 #endif  // _DEVO_DEFAULT_HARDWARE_H_

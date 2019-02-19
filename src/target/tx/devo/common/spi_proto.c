@@ -19,24 +19,13 @@
   Note that we lie aboiut the arguments to these functions. It is
   Important that the actual functions never execute
 */
-#include <libopencm3/stm32/rcc.h>
-#include <libopencm3/stm32/gpio.h>
-#include <libopencm3/stm32/spi.h>
 #include "common.h"
 #include "devo.h"
 #include "config/tx.h"
 #include "protocol/interface.h"
 #include <stdlib.h>
-
-#if _SPI_PROTO_PORT == 1
-    #define SPIx        SPI1
-    #define SPIxEN      RCC_APB2ENR_SPI1EN
-    #define APB_SPIxEN  RCC_APB2ENR
-#elif _SPI_PROTO_PORT == 2
-    #define SPIx        SPI2
-    #define SPIxEN      RCC_APB1ENR_SPI2EN
-    #define APB_SPIxEN  RCC_APB1ENR
-#endif
+#include "target/drivers/mcu/stm32/spi.h"
+#include "target/drivers/mcu/stm32/rcc.h"
 
 #ifndef HAS_4IN1_FLASH
     #define HAS_4IN1_FLASH 0
@@ -49,30 +38,28 @@ int SPI_ConfigSwitch(unsigned csn_high, unsigned csn_low)
     //Switch output on clock before switching off SPI
     //Otherwise the pin will float which could cause a false trigger
     //SCK is now on output
-    gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_PUSHPULL, GPIO13);
-    spi_disable(SPIx);
+    GPIO_setup_output(PROTO_SPI_CFG.sck, OTYPE_PUSHPULL);
+    spi_disable(PROTO_SPI.spi);
     for(i = 0; i < 100; i++)
         asm volatile ("nop");
-    gpio_set(GPIOB, GPIO13);
+    GPIO_pin_set(PROTO_SPI_CFG.sck);
     for(i = 0; i < 100; i++)
         asm volatile ("nop");
-    gpio_clear(GPIOB, GPIO13);
+    GPIO_pin_clear(PROTO_SPI_CFG.sck);
     //Switch back to SPI
-    gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO13);
-    spi_set_baudrate_prescaler(SPIx, SPI_CR1_BR_FPCLK_DIV_128);
-    spi_enable(SPIx);
+    GPIO_setup_output_af(PROTO_SPI_CFG.sck, OTYPE_PUSHPULL, PROTO_SPI.spi);
+    spi_set_baudrate_prescaler(PROTO_SPI.spi, SPI_CR1_BR_FPCLK_DIV_128);
+    spi_enable(PROTO_SPI.spi);
     //Finally ready to send a command
     
-    int byte1 = spi_xfer(SPIx, csn_high); //Set all other pins high
-    int byte2 = spi_xfer(SPIx, csn_low); //Toggle related pin with CSN
+    int byte1 = spi_xfer(PROTO_SPI.spi, csn_high); //Set all other pins high
+    int byte2 = spi_xfer(PROTO_SPI.spi, csn_low); //Toggle related pin with CSN
     for(i = 0; i < 100; i++)
         asm volatile ("nop");
     //Reset transfer speed
-    spi_disable(SPIx);
-    spi_set_baudrate_prescaler(SPIx, SPI_CR1_BR_FPCLK_DIV_16);
-    spi_enable(SPIx);
+    spi_disable(PROTO_SPI.spi);
+    spi_set_baudrate_prescaler(PROTO_SPI.spi, PROTO_SPI_CFG.rate);
+    spi_enable(PROTO_SPI.spi);
     return byte1 == 0xa5 ? byte2 : 0;
 }
 
@@ -105,42 +92,10 @@ void SPI_ProtoInit()
 {
 // If we use SPI Switch board then SPI2 is shared between RF chips
 // and flash, so it is initialized in SPIFlash.
+    if (HAS_PIN(PROTO_RST_PIN))
+        GPIO_pin_clear(PROTO_RST_PIN);
     if (PROTO_SPI_CFG.spi != FLASH_SPI_CFG.spi) {
-        /* Enable SPIx */
-        rcc_peripheral_enable_clock(&APB_SPIxEN, SPIxEN);
-        /* Enable GPIOA */
-        rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPAEN);
-        /* Enable GPIOB */
-        rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPBEN);
-
-        PORT_mode_setup(PROTO_RST_PIN,  GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_PUSHPULL);
-        PORT_mode_setup(PROTO_SCK_PIN,  GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL);
-        PORT_mode_setup(PROTO_MOSI_PIN, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL);
-        PORT_mode_setup(PROTO_MISO_PIN, GPIO_MODE_INPUT,         GPIO_CNF_INPUT_FLOAT);
-        
-        PORT_pin_clear(PROTO_RST_PIN);
-
-#if     0 //In power.c
-        //Disable JTAG and SWD and set both pins high
-        AFIO_MAPR = (AFIO_MAPR & ~AFIO_MAPR_SWJ_MASK) | AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_OFF;
-        gpio_set_mode(GPIO_BANK_JTMS_SWDIO, GPIO_MODE_OUTPUT_50_MHZ,
-                      GPIO_CNF_OUTPUT_PUSHPULL, GPIO_JTMS_SWDIO);
-        gpio_set(GPIO_BANK_JTMS_SWDIO, GPIO_JTMS_SWDIO);
-        gpio_set_mode(GPIO_BANK_JTCK_SWCLK, GPIO_MODE_OUTPUT_50_MHZ,
-                      GPIO_CNF_OUTPUT_PUSHPULL, GPIO_JTCK_SWCLK);
-        gpio_set(GPIO_BANK_JTCK_SWCLK, GPIO_JTCK_SWCLK);
-#endif
-
-        /* Includes enable? */
-        spi_init_master(SPIx, 
-                        SPI_CR1_BAUDRATE_FPCLK_DIV_16,
-                        SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE,
-                        SPI_CR1_CPHA_CLK_TRANSITION_1, 
-                        SPI_CR1_DFF_8BIT,
-                        SPI_CR1_MSBFIRST);
-        spi_enable_software_slave_management(SPIx);
-        spi_set_nss_high(SPIx);
-        spi_enable(SPIx);
+        _spi_init(PROTO_SPI_CFG);
         if (HAS_4IN1_FLASH) {
             SPISwitch_Init();
         }
@@ -148,22 +103,20 @@ void SPI_ProtoInit()
 
 #if HAS_MULTIMOD_SUPPORT
     if(Transmitter.module_enable[MULTIMOD].port) {
-        struct mcu_pin *port = &Transmitter.module_enable[MULTIMOD];
-        printf("Switch port: %08x pin: %04x\n", port->port, port->pin);
-        gpio_set_mode(port->port, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_PUSHPULL, port->pin);
-        gpio_set(port->port, port->pin);
+        struct mcu_pin port = Transmitter.module_enable[MULTIMOD];
+        printf("Switch port: %08x pin: %04x\n", port.port, port.pin);
+        GPIO_setup_output(port, OTYPE_PUSHPULL);
+        GPIO_pin_set(port);
     }
 #endif //HAS_MULTIMOD_SUPPORT
     for (int i = 0; i < MULTIMOD; i++) {
         if(Transmitter.module_enable[i].port
            && Transmitter.module_enable[i].port != SWITCH_ADDRESS)
         {
-            struct mcu_pin *port = &Transmitter.module_enable[i];
-            printf("%s port: %08x pin: %04x\n", MODULE_NAME[i], port->port, port->pin);
-            gpio_set_mode(port->port, GPIO_MODE_OUTPUT_50_MHZ,
-                      GPIO_CNF_OUTPUT_PUSHPULL, port->pin);
-            gpio_set(port->port, port->pin);
+            struct mcu_pin port = Transmitter.module_enable[i];
+            printf("%s port: %08x pin: %04x\n", MODULE_NAME[i], port.port, port.pin);
+            GPIO_setup_output(port, OTYPE_PUSHPULL);
+            GPIO_pin_set(port);
         }
     }
 #ifdef ENABLE_MODULAR
@@ -174,19 +127,17 @@ void SPI_ProtoInit()
 void SPI_AVRProgramInit()
 {
     rcc_set_ppre1(RCC_CFGR_PPRE1_HCLK_DIV16);  //72 / 16 = 4.5MHz
-    spi_disable(SPIx);
-    spi_set_baudrate_prescaler(SPIx, SPI_CR1_BR_FPCLK_DIV_256);// 4.5 / 256 = 17.5kHz
-    spi_enable(SPIx);
+    spi_disable(PROTO_SPI.spi);
+    spi_set_baudrate_prescaler(PROTO_SPI.spi, SPI_CR1_BR_FPCLK_DIV_256);// 4.5 / 256 = 17.5kHz
+    spi_enable(PROTO_SPI.spi);
 }
 
 void MCU_InitModules()
 {
     //CSN                               
-    PORT_mode_setup(PROTO_CSN_PIN,  GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_PUSHPULL);
-    PORT_pin_set(PROTO_CSN_PIN);
-    Transmitter.module_enable[CYRF6936] = PROTO_CSN_PIN;
-    //Transmitter.module_enable[CYRF6936].port = GPIOB;
-    //Transmitter.module_enable[CYRF6936].pin = GPIO12;
+    GPIO_setup_output(PROTO_SPI.csn, OTYPE_PUSHPULL);
+    GPIO_pin_set(PROTO_SPI.csn);
+    Transmitter.module_enable[CYRF6936] = PROTO_SPI.csn;
     Transmitter.module_poweramp = (1 << CYRF6936);
 }
 
