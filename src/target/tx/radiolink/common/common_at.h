@@ -9,3 +9,4 @@
 #endif
 
 #define USE_4BUTTON_MODE 1
+#define HAS_HARD_POWER_OFF  1

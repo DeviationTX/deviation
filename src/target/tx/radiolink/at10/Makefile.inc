@@ -33,7 +33,7 @@ $(TARGET).bin: $(TARGET).elf $(ODIR)/devo.fs
 	$(DUMP) -S $(TARGET).elf > $(TARGET).list
 	$(SDIR)/../utils/get_mem_usage.pl $(TARGET).map
 ifneq "$(HAS_4IN1_FLASH)" "1"
-	# padding the file to 216KB
+	# padding firmware to 216KB
 	truncate --size=216K $(ODIR)/$@
 	cat $(ODIR)/$@ $(ODIR)/devo.fs > $@
 endif

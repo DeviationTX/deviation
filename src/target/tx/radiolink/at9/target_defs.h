@@ -25,7 +25,6 @@
 static inline void LCD_ForceUpdate() {}
 #endif
 
-#define USE_4BUTTON_MODE    1
 #define HAS_STANDARD_GUI    0
 #define HAS_ADVANCED_GUI    1
 #define HAS_PERMANENT_TIMER 1
@@ -45,7 +44,6 @@ static inline void LCD_ForceUpdate() {}
 #define HAS_EXTENDED_AUDIO  0
 #define HAS_AUDIO_UART5     0
 #define HAS_MUSIC_CONFIG    0
-#define HAS_HARD_POWER_OFF  1
 #define HAS_ROTARY_ENCODER  1
 
 #ifdef BUILDTYPE_DEV

@@ -69,6 +69,7 @@ int lcd_detect()
         LCD_REG = 0x00;
         data = LCD_DATA;
         if (data == 0x47) {
+            hx8347_init();
             return LCDTYPE_HX8347;
         }
     }
@@ -83,23 +84,27 @@ int lcd_detect()
         u16 data2 = LCD_DATA;
         data2 = (((int)data) << 8) | data2;
         if (data2 == 0x9341) {
+            ili9341_init();
             return LCDTYPE_ILI9341;
         }
     }
     if (HAS_LCD_TYPE(LCDTYPE_ST7796)) {
-          // Read ID register for ST7796 (will be 0x7796 if found)
-          LCD_REG = 0xD3;
-          // As per the spec, the 1st 2 reads are dummy reads and irrelevant
-          u8 data = LCD_DATA;
-          data = LCD_DATA;
-          // Actual ID is in 3rd and 4th bytes
-          data = LCD_DATA;
-          u16 data2 = LCD_DATA;
-          data2 = (((int)data) << 8) | data2;
-          if (data2 == 0x7796) {
-              return LCDTYPE_ST7796;
-          }
+        // Read ID register for ST7796 (will be 0x7796 if found)
+        LCD_REG = 0xD3;
+        // As per the spec, the 1st 2 reads are dummy reads and irrelevant
+        u8 data = LCD_DATA;
+        data = LCD_DATA;
+        // Actual ID is in 3rd and 4th bytes
+        data = LCD_DATA;
+        u16 data2 = LCD_DATA;
+        data2 = (((int)data) << 8) | data2;
+        if (data2 == 0x7796) {
+            st7796_init();
+            return LCDTYPE_ST7796;
+        }
     }
+
+    printf("No LCD detected\n");
     return LCDTYPE_UNKNOWN;
 }
 
@@ -173,14 +178,7 @@ void LCD_Init()
     FSMC_BTR1  = FSMC_BTR_DATASTx(2) | FSMC_BTR_ADDHLDx(0) | FSMC_BTR_ADDSETx(1) | FSMC_BTR_ACCMODx(FSMC_BTx_ACCMOD_B);
     FSMC_BWTR1 = FSMC_BTR_DATASTx(2) | FSMC_BTR_ADDHLDx(0) | FSMC_BTR_ADDSETx(1) | FSMC_BTR_ACCMODx(FSMC_BTx_ACCMOD_B);
 
-    int type = lcd_detect();
-    if (HAS_LCD_TYPE(LCDTYPE_ILI9341) && type == LCDTYPE_ILI9341) {
-        ili9341_init();
-    } else if (HAS_LCD_TYPE(LCDTYPE_HX8347) && type == LCDTYPE_HX8347) {
-        hx8347_init();
-    } else if (HAS_LCD_TYPE(LCDTYPE_ST7796) && type == LCDTYPE_ST7796) {
-        st7796_init();
-    } else {
-        printf("No LCD detected\n");
+    while (lcd_detect() != LCDTYPE_UNKNOWN) {
+        // retry inititalize and detect
     }
 }
