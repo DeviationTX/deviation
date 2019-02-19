@@ -105,46 +105,45 @@ void SPI_ProtoInit()
 {
 // If we use SPI Switch board then SPI2 is shared between RF chips
 // and flash, so it is initialized in SPIFlash.
-#if _SPI_PROTO_PORT != _SPI_FLASH_PORT
-    /* Enable SPIx */
-    rcc_peripheral_enable_clock(&APB_SPIxEN, SPIxEN);
-    /* Enable GPIOA */
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPAEN);
-    /* Enable GPIOB */
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPBEN);
+    if (PROTO_SPI_CFG.spi != FLASH_SPI_CFG.spi) {
+        /* Enable SPIx */
+        rcc_peripheral_enable_clock(&APB_SPIxEN, SPIxEN);
+        /* Enable GPIOA */
+        rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPAEN);
+        /* Enable GPIOB */
+        rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPBEN);
 
-    PORT_mode_setup(PROTO_RST_PIN,  GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_PUSHPULL);
-    PORT_mode_setup(PROTO_SCK_PIN,  GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL);
-    PORT_mode_setup(PROTO_MOSI_PIN, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL);
-    PORT_mode_setup(PROTO_MISO_PIN, GPIO_MODE_INPUT,         GPIO_CNF_INPUT_FLOAT);
-    
-    PORT_pin_clear(PROTO_RST_PIN);
+        PORT_mode_setup(PROTO_RST_PIN,  GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_PUSHPULL);
+        PORT_mode_setup(PROTO_SCK_PIN,  GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL);
+        PORT_mode_setup(PROTO_MOSI_PIN, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL);
+        PORT_mode_setup(PROTO_MISO_PIN, GPIO_MODE_INPUT,         GPIO_CNF_INPUT_FLOAT);
+        
+        PORT_pin_clear(PROTO_RST_PIN);
 
-#if 0 //In power.c
-    //Disable JTAG and SWD and set both pins high
-    AFIO_MAPR = (AFIO_MAPR & ~AFIO_MAPR_SWJ_MASK) | AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_OFF;
-    gpio_set_mode(GPIO_BANK_JTMS_SWDIO, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_PUSHPULL, GPIO_JTMS_SWDIO);
-    gpio_set(GPIO_BANK_JTMS_SWDIO, GPIO_JTMS_SWDIO);
-    gpio_set_mode(GPIO_BANK_JTCK_SWCLK, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_PUSHPULL, GPIO_JTCK_SWCLK);
-    gpio_set(GPIO_BANK_JTCK_SWCLK, GPIO_JTCK_SWCLK);
+#if     0 //In power.c
+        //Disable JTAG and SWD and set both pins high
+        AFIO_MAPR = (AFIO_MAPR & ~AFIO_MAPR_SWJ_MASK) | AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_OFF;
+        gpio_set_mode(GPIO_BANK_JTMS_SWDIO, GPIO_MODE_OUTPUT_50_MHZ,
+                      GPIO_CNF_OUTPUT_PUSHPULL, GPIO_JTMS_SWDIO);
+        gpio_set(GPIO_BANK_JTMS_SWDIO, GPIO_JTMS_SWDIO);
+        gpio_set_mode(GPIO_BANK_JTCK_SWCLK, GPIO_MODE_OUTPUT_50_MHZ,
+                      GPIO_CNF_OUTPUT_PUSHPULL, GPIO_JTCK_SWCLK);
+        gpio_set(GPIO_BANK_JTCK_SWCLK, GPIO_JTCK_SWCLK);
 #endif
 
-    /* Includes enable? */
-    spi_init_master(SPIx, 
-                    SPI_CR1_BAUDRATE_FPCLK_DIV_16,
-                    SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE,
-                    SPI_CR1_CPHA_CLK_TRANSITION_1, 
-                    SPI_CR1_DFF_8BIT,
-                    SPI_CR1_MSBFIRST);
-    spi_enable_software_slave_management(SPIx);
-    spi_set_nss_high(SPIx);
-    spi_enable(SPIx);
-#endif
-
-    if (HAS_4IN1_FLASH && _SPI_FLASH_PORT != _SPI_PROTO_PORT) {
-        SPISwitch_Init();
+        /* Includes enable? */
+        spi_init_master(SPIx, 
+                        SPI_CR1_BAUDRATE_FPCLK_DIV_16,
+                        SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE,
+                        SPI_CR1_CPHA_CLK_TRANSITION_1, 
+                        SPI_CR1_DFF_8BIT,
+                        SPI_CR1_MSBFIRST);
+        spi_enable_software_slave_management(SPIx);
+        spi_set_nss_high(SPIx);
+        spi_enable(SPIx);
+        if (HAS_4IN1_FLASH) {
+            SPISwitch_Init();
+        }
     }
 
 #if HAS_MULTIMOD_SUPPORT

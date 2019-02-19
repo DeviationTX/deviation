@@ -17,23 +17,9 @@
 #include <libopencm3/stm32/spi.h>
 #include <libopencm3/cm3/cortex.h>
 #include "common.h"
+#include "spi.h"
 
 #ifdef SPIFLASH_TYPE
-
-//#define _SPI_CONCAT(x, y, z) x ## y ## z
-//#define SPI_CONCAT(x, y, z)  _SPI_CONCAT(x, y, z)
-//#define SPIx           SPI_CONCAT(SPI,                         _SPI_FLASH_PORT,)
-//#define SPIxEN         SPI_CONCAT(RCC_APB2ENR_SPI,             _SPI_FLASH_PORT, EN)
-
-#if _SPI_FLASH_PORT == 1
-    #define SPIx        SPI1
-    #define SPIxEN      RCC_APB2ENR_SPI1EN
-    #define APB_SPIxEN  RCC_APB2ENR
-#elif _SPI_FLASH_PORT == 2
-    #define SPIx        SPI2
-    #define SPIxEN      RCC_APB1ENR_SPI2EN
-    #define APB_SPIxEN  RCC_APB1ENR
-#endif
 
 #ifndef HAS_4IN1_FLASH
     #define HAS_4IN1_FLASH 0
@@ -57,19 +43,19 @@ static u8 SPIFLASH_USE_AAI      = 1;
 
 static void CS_HI()
 {
-    if (HAS_4IN1_FLASH && _SPI_PROTO_PORT == _SPI_FLASH_PORT) {
+    if (HAS_4IN1_FLASH && PROTO_SPI.spi == FLASH_SPI.spi) {
         cm_enable_interrupts();
     }
-    PORT_pin_set(FLASH_CSN_PIN);
+    GPIO_pin_set(FLASH_SPI.csn);
 }
 
 static void CS_LO()
 {
-    if (HAS_4IN1_FLASH && _SPI_PROTO_PORT == _SPI_FLASH_PORT) {
+    if (HAS_4IN1_FLASH && PROTO_SPI.spi == FLASH_SPI.spi) {
         cm_disable_interrupts();
         SPISwitch_UseFlashModule();
     }
-    PORT_pin_clear(FLASH_CSN_PIN);
+    GPIO_pin_clear(FLASH_SPI.csn);
 }
 
 #if HAS_FLASH_DETECT
@@ -92,10 +78,10 @@ void detect_memory_type()
     u8 mfg_id, memtype, capacity;
     u32 id;
     CS_LO();
-    spi_xfer(SPIx, 0x9F);
-    mfg_id  = (u8)spi_xfer(SPIx, 0);
-    memtype = (u8)spi_xfer(SPIx, 0);
-    capacity = (u8)spi_xfer(SPIx, 0);
+    spi_xfer(FLASH_SPI.spi, 0x9F);
+    mfg_id  = (u8)spi_xfer(FLASH_SPI.spi, 0);
+    memtype = (u8)spi_xfer(FLASH_SPI.spi, 0);
+    capacity = (u8)spi_xfer(FLASH_SPI.spi, 0);
     CS_HI();
     switch (mfg_id) {
     case 0xBF: // Microchip
@@ -211,35 +197,12 @@ void detect_memory_type()
  */
 void SPIFlash_Init()
 {
-    /* Enable SPIx */
-    rcc_peripheral_enable_clock(&APB_SPIxEN,  SPIxEN);
-    /* Enable GPIOA */
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPAEN);
-    /* Enable GPIOB */
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPBEN);
-
-    PORT_mode_setup(FLASH_CSN_PIN,  GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_PUSHPULL);
-    PORT_mode_setup(FLASH_SCK_PIN,  GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL);
-    PORT_mode_setup(FLASH_MOSI_PIN, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL);
-    PORT_mode_setup(FLASH_MISO_PIN, GPIO_MODE_INPUT,         GPIO_CNF_INPUT_FLOAT);
-
+    /* Enable FLASH_SPI.spi */
+    GPIO_setup_output(FLASH_SPI.csn, OTYPE_PUSHPULL);
     CS_HI();
-    /* Includes enable */
-    spi_init_master(SPIx, 
-#if defined(HAS_OLED_DISPLAY) && HAS_OLED_DISPLAY
-                    SPI_CR1_BAUDRATE_FPCLK_DIV_8,
-#else
-                    SPI_CR1_BAUDRATE_FPCLK_DIV_4,
-#endif
-                    SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE,
-                    SPI_CR1_CPHA_CLK_TRANSITION_1, 
-                    SPI_CR1_DFF_8BIT,
-                    SPI_CR1_MSBFIRST);
-    spi_enable_software_slave_management(SPIx);
-    spi_set_nss_high(SPIx);
+    _spi_init(FLASH_SPI_CFG);
 
-    spi_enable(SPIx);
-    if (HAS_4IN1_FLASH && _SPI_FLASH_PORT == _SPI_PROTO_PORT) {
+    if (HAS_4IN1_FLASH && FLASH_SPI.spi  == PROTO_SPI.spi) {
         SPISwitch_Init();
     }
 #if 0 //4IN1DEBUG
@@ -249,7 +212,7 @@ void SPIFlash_Init()
     // And this is equivalent of using SPISwitch_UseFlashModule in CS_LO
     u8 cmd = 4;
     PORT_pin_clear(FLASH_RESET_PIN);
-    spi_xfer(SPIx, cmd);
+    spi_xfer(FLASH_SPI.spi, cmd);
     PORT_pin_set(FLASH_RESET_PIN);
 #endif
 #if HAS_FLASH_DETECT
@@ -262,10 +225,10 @@ void SPIFlash_Init()
 static void SPIFlash_SetAddr(unsigned cmd, u32 address)
 {
     CS_LO();
-    spi_xfer(SPIx, cmd);
-    spi_xfer(SPIx, (u8)(address >> 16));
-    spi_xfer(SPIx, (u8)(address >>  8));
-    spi_xfer(SPIx, (u8)(address));
+    spi_xfer(FLASH_SPI.spi, cmd);
+    spi_xfer(FLASH_SPI.spi, (u8)(address >> 16));
+    spi_xfer(FLASH_SPI.spi, (u8)(address >>  8));
+    spi_xfer(FLASH_SPI.spi, (u8)(address));
 }
 /*
  *
@@ -275,13 +238,13 @@ u32 SPIFlash_ReadID()
     u32 result;
 
     SPIFlash_SetAddr(0x90, 0);
-    result  = (u8)spi_xfer(SPIx, 0);
+    result  = (u8)spi_xfer(FLASH_SPI.spi, 0);
     result <<= 8;
-    result |= (u8)spi_xfer(SPIx, 0);
+    result |= (u8)spi_xfer(FLASH_SPI.spi, 0);
     result <<= 8;
-    result |= (u8)spi_xfer(SPIx, 0);
+    result |= (u8)spi_xfer(FLASH_SPI.spi, 0);
     result <<= 8;
-    result |= (u8)spi_xfer(SPIx, 0);
+    result |= (u8)spi_xfer(FLASH_SPI.spi, 0);
    
     CS_HI();
     return result;
@@ -292,7 +255,7 @@ u32 SPIFlash_ReadID()
 void WriteFlashWriteEnable()
 {
     CS_LO();
-    spi_xfer(SPIx, 0x06);
+    spi_xfer(FLASH_SPI.spi, 0x06);
     CS_HI();
 }
 /*
@@ -301,7 +264,7 @@ void WriteFlashWriteEnable()
 void WriteFlashWriteDisable()
 {
     CS_LO();
-    spi_xfer(SPIx, 0x04);
+    spi_xfer(FLASH_SPI.spi, 0x04);
     CS_HI();
 }
 /*
@@ -315,9 +278,9 @@ void WaitForWriteComplete()
     while(true) {
         int i;
         CS_LO();
-        spi_xfer(SPIx, 0x05);
+        spi_xfer(FLASH_SPI.spi, 0x05);
         for (i = 0; i < 100; ++i) {
-            sr = spi_xfer(SPIx, 0x00);
+            sr = spi_xfer(FLASH_SPI.spi, 0x00);
             if (!(sr & 0x01)) break;
         }
         CS_HI();
@@ -331,30 +294,30 @@ void SPI_FlashBlockWriteEnable(unsigned enable)
 {
     //printf("SPI_FlashBlockWriteEnable: %d\n", enable);
     CS_LO();
-    spi_xfer(SPIx, SPIFLASH_SR_ENABLE);
+    spi_xfer(FLASH_SPI.spi, SPIFLASH_SR_ENABLE);
     CS_HI();
     if (SPIFLASH_PROTECT_MASK) {
         CS_LO();
-        spi_xfer(SPIx, 0x01);
-        spi_xfer(SPIx, enable ? 0 : SPIFLASH_PROTECT_MASK);
+        spi_xfer(FLASH_SPI.spi, 0x01);
+        spi_xfer(FLASH_SPI.spi, enable ? 0 : SPIFLASH_PROTECT_MASK);
         CS_HI();
     } else {
         //Microchip SST26VFxxxB Serial Flash
         if(enable) {
             CS_LO();
             //Global Block Protection unlock
-            spi_xfer(SPIx, 0x98);
+            spi_xfer(FLASH_SPI.spi, 0x98);
             CS_HI();
         } else {
             CS_LO();
             //Write Block-Protection Register
-            spi_xfer(SPIx, 0x42);
+            spi_xfer(FLASH_SPI.spi, 0x42);
             //write-protected BPR[79:0] = 5555 FFFFFFFF FFFFFFFF
             //data input must be most significant bit(s) first
-            spi_xfer(SPIx, 0x55);
-            spi_xfer(SPIx, 0x55);
+            spi_xfer(FLASH_SPI.spi, 0x55);
+            spi_xfer(FLASH_SPI.spi, 0x55);
             for (int i = 0; i < 8; i++) {
-                spi_xfer(SPIx, 0xFF);
+                spi_xfer(FLASH_SPI.spi, 0xFF);
             }
             CS_HI();
             WaitForWriteComplete();
@@ -368,7 +331,7 @@ void SPI_FlashBlockWriteEnable(unsigned enable)
 void DisableHWRYBY()
 {
     CS_LO();
-    spi_xfer(SPIx, 0x80);
+    spi_xfer(FLASH_SPI.spi, 0x80);
     CS_HI();
 }
 /*
@@ -395,7 +358,7 @@ void SPIFlash_BulkErase()
     WriteFlashWriteEnable();
 
     CS_LO();
-    spi_xfer(SPIx, 0xC7);
+    spi_xfer(FLASH_SPI.spi, 0xC7);
     CS_HI();
 
     WaitForWriteComplete();
@@ -427,9 +390,9 @@ void SPIFlash_WriteBytes(u32 writeAddress, u32 length, const u8 * buffer)
             WriteFlashWriteEnable();
         }
         SPIFlash_SetAddr(SPIFLASH_WRITE_CMD, writeAddress);
-        spi_xfer(SPIx, (u8)~buffer[i++]);
+        spi_xfer(FLASH_SPI.spi, (u8)~buffer[i++]);
         if (SPIFLASH_WRITE_SIZE == 2) {
-            spi_xfer(SPIx, i < length ? ~buffer[i++] : 0xff);
+            spi_xfer(FLASH_SPI.spi, i < length ? ~buffer[i++] : 0xff);
         }
     } else {
         SPIFlash_SetAddr(0x02, writeAddress);
@@ -439,13 +402,13 @@ void SPIFlash_WriteBytes(u32 writeAddress, u32 length, const u8 * buffer)
             CS_HI();
             WaitForWriteComplete();
             CS_LO();
-            spi_xfer(SPIx, SPIFLASH_WRITE_CMD);
+            spi_xfer(FLASH_SPI.spi, SPIFLASH_WRITE_CMD);
             if (SPIFLASH_WRITE_SIZE == 2) {
                 //Writing 0xff will have no effect even if there is already data at this address
-                spi_xfer(SPIx, i < length ? ~buffer[i++] : 0xff);
+                spi_xfer(FLASH_SPI.spi, i < length ? ~buffer[i++] : 0xff);
             }
         }
-        spi_xfer(SPIx, (u8)~buffer[i++]);
+        spi_xfer(FLASH_SPI.spi, (u8)~buffer[i++]);
     }
     CS_HI();
     WaitForWriteComplete();
@@ -459,7 +422,7 @@ void SPIFlash_WriteByte(u32 writeAddress, const unsigned byte) {
        DisableHWRYBY();
    WriteFlashWriteEnable();
    SPIFlash_SetAddr(0x02, writeAddress);
-   spi_xfer(SPIx, (u8)(~byte));
+   spi_xfer(FLASH_SPI.spi, (u8)(~byte));
    CS_HI();
    WaitForWriteComplete();
    WriteFlashWriteDisable();
@@ -472,14 +435,14 @@ void SPIFlash_ReadBytes(u32 readAddress, u32 length, u8 * buffer)
     u32 i;
     if (SPIFLASH_FAST_READ) {
         SPIFlash_SetAddr(0x0b, readAddress);
-        spi_xfer(SPIx, 0); // Dummy read
+        spi_xfer(FLASH_SPI.spi, 0); // Dummy read
     } else {
         SPIFlash_SetAddr(0x03, readAddress);
     }
 
     for(i=0;i<length;i++)
     {
-        buffer[i] = ~spi_xfer(SPIx, 0);
+        buffer[i] = ~spi_xfer(FLASH_SPI.spi, 0);
     }
 
     CS_HI();
@@ -490,14 +453,14 @@ int SPIFlash_ReadBytesStopCR(u32 readAddress, u32 length, u8 * buffer)
     u32 i;
     if (SPIFLASH_FAST_READ) {
         SPIFlash_SetAddr(0x0b, readAddress);
-        spi_xfer(SPIx, 0); // Dummy read
+        spi_xfer(FLASH_SPI.spi, 0); // Dummy read
     } else {
         SPIFlash_SetAddr(0x03, readAddress);
     }
 
     for(i=0;i<length;i++)
     {
-        buffer[i] = ~spi_xfer(SPIx, 0);
+        buffer[i] = ~spi_xfer(FLASH_SPI.spi, 0);
         if (buffer[i] == '\n') {
             i++;
             break;

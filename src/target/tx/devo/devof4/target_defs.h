@@ -3,12 +3,12 @@
 
 #define SPIFLASH_SECTOR_OFFSET 0
 #if defined HAS_4IN1_FLASH && HAS_4IN1_FLASH
-// Use 4-in-1 flash
-#define _SPI_FLASH_PORT              2 //SPI2
-    #define _SPI_FLASH_CSN_PIN       {GPIOB, GPIO12}
-    #define _SPI_FLASH_SCK_PIN       {GPIOB, GPIO13}
-    #define _SPI_FLASH_MISO_PIN      {GPIOB, GPIO14}
-    #define _SPI_FLASH_MOSI_PIN      {GPIOB, GPIO15}
+    // Use 4-in-1 flash
+    #define FLASH_SPI ((struct spi_csn) { \
+        .spi = SPI2, \
+        .csn = {GPIOB, GPIO12}, \
+        })
+    #define FLASH_SPI_CFG SPI2_CFG
 
     #define SPIFLASH_SECTORS 4096
     #define SPIFLASH_TYPE W25QxxBV
