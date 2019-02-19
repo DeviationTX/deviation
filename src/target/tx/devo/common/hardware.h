@@ -70,7 +70,7 @@
                 : SPI_CR1_BAUDRATE_FPCLK_DIV_4,   \
             DEFAULT_SPI_SETTINGS,                 \
            })
-    #endif  //SPI1_CFG
+    #endif  // SPI1_CFG
     #define FLASH_SPI_CFG SPI1_CFG
 #endif  // FLASH_SPI
 
@@ -91,16 +91,16 @@
                 : SPI_CR1_BAUDRATE_FPCLK_DIV_4,   \
             DEFAULT_SPI_SETTINGS,                 \
            })
-    #endif  //SPI1_CFG
+    #endif  // SPI1_CFG
     #define LCD_SPI_CFG SPI1_CFG
-#endif // LCD_SPI
+#endif  // LCD_SPI
 
 #ifndef PROTO_SPI
     #define PROTO_SPI ((struct spi_csn) { \
         .spi = SPI2,                      \
         .csn = {GPIOB, GPIO12},           \
         })
-    #ifndef SPI2_CFG 
+    #ifndef SPI2_CFG
         #define SPI2_CFG ((struct spi_config) {    \
             .spi = SPI2,                           \
             .sck = {GPIOB, GPIO13},                \
@@ -122,6 +122,6 @@
     #define TOUCH_IRQ_PIN ((struct mcu_pin) {GPIOB, GPIO5})
     #define TOUCH_COORDS_REVERSE      1
     #define TOUCH_SPI_CFG SPI1_CFG
-#endif //_TOUCH_PORT
+#endif  // TOUCH_SPI
 
 #endif  // _DEVO_DEFAULT_HARDWARE_H_

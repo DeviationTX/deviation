@@ -52,8 +52,8 @@ int SPI_ConfigSwitch(unsigned csn_high, unsigned csn_low)
     spi_enable(PROTO_SPI.spi);
     //Finally ready to send a command
     
-    int byte1 = spi_xfer(PROTO_SPI.spi, csn_high); //Set all other pins high
-    int byte2 = spi_xfer(PROTO_SPI.spi, csn_low); //Toggle related pin with CSN
+    int byte1 = spi_xfer(PROTO_SPI.spi, csn_high);  // Set all other pins high
+    int byte2 = spi_xfer(PROTO_SPI.spi, csn_low);   // Toggle related pin with CSN
     for(i = 0; i < 100; i++)
         asm volatile ("nop");
     //Reset transfer speed
@@ -126,9 +126,9 @@ void SPI_ProtoInit()
 
 void SPI_AVRProgramInit()
 {
-    rcc_set_ppre1(RCC_CFGR_PPRE1_HCLK_DIV16);  //72 / 16 = 4.5MHz
+    rcc_set_ppre1(RCC_CFGR_PPRE1_HCLK_DIV16);  // 72 / 16 = 4.5MHz
     spi_disable(PROTO_SPI.spi);
-    spi_set_baudrate_prescaler(PROTO_SPI.spi, SPI_CR1_BR_FPCLK_DIV_256);// 4.5 / 256 = 17.5kHz
+    spi_set_baudrate_prescaler(PROTO_SPI.spi, SPI_CR1_BR_FPCLK_DIV_256);  // 4.5 / 256 = 17.5kHz
     spi_enable(PROTO_SPI.spi);
 }
 

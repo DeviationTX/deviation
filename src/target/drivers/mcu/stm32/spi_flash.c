@@ -418,14 +418,14 @@ void SPIFlash_WriteBytes(u32 writeAddress, u32 length, const u8 * buffer)
  *
  */
 void SPIFlash_WriteByte(u32 writeAddress, const unsigned byte) {
-   if (SPIFLASH_USE_AAI)
-       DisableHWRYBY();
-   WriteFlashWriteEnable();
-   SPIFlash_SetAddr(0x02, writeAddress);
-   spi_xfer(FLASH_SPI.spi, (u8)(~byte));
-   CS_HI();
-   WaitForWriteComplete();
-   WriteFlashWriteDisable();
+    if (SPIFLASH_USE_AAI)
+        DisableHWRYBY();
+    WriteFlashWriteEnable();
+    SPIFlash_SetAddr(0x02, writeAddress);
+    spi_xfer(FLASH_SPI.spi, (u8)(~byte));
+    CS_HI();
+    WaitForWriteComplete();
+    WriteFlashWriteDisable();
 }
 /*
  *
@@ -435,7 +435,7 @@ void SPIFlash_ReadBytes(u32 readAddress, u32 length, u8 * buffer)
     u32 i;
     if (SPIFLASH_FAST_READ) {
         SPIFlash_SetAddr(0x0b, readAddress);
-        spi_xfer(FLASH_SPI.spi, 0); // Dummy read
+        spi_xfer(FLASH_SPI.spi, 0);  // Dummy read
     } else {
         SPIFlash_SetAddr(0x03, readAddress);
     }
@@ -453,7 +453,7 @@ int SPIFlash_ReadBytesStopCR(u32 readAddress, u32 length, u8 * buffer)
     u32 i;
     if (SPIFLASH_FAST_READ) {
         SPIFlash_SetAddr(0x0b, readAddress);
-        spi_xfer(FLASH_SPI.spi, 0); // Dummy read
+        spi_xfer(FLASH_SPI.spi, 0);  // Dummy read
     } else {
         SPIFlash_SetAddr(0x03, readAddress);
     }

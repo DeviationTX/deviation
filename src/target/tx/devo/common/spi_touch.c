@@ -57,7 +57,7 @@ PA7 : TOUCH_SPI.spi_MOSI
 
 #define CS_HI() GPIO_pin_set(TOUCH_SPI.csn)
 #define CS_LO() GPIO_pin_clear(TOUCH_SPI.csn)
-#define pen_is_down() (! GPIO_pin_get(TOUCH_IRQ_PIN))
+#define pen_is_down() (!GPIO_pin_get(TOUCH_IRQ_PIN))
 
 unsigned read_channel(unsigned address)
 {

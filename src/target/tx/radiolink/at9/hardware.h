@@ -4,7 +4,7 @@
 #include "target/drivers/mcu/stm32/gpio.h"
 
 #define LCD_RESET_PIN ((struct mcu_pin){GPIOE, GPIO0})
-    
+
 #define FLASH_SPI ((struct spi_csn) { \
     .spi = SPI2, \
     .csn = {GPIOB, GPIO12}, \
