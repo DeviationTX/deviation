@@ -178,7 +178,7 @@ void LCD_Init()
     FSMC_BTR1  = FSMC_BTR_DATASTx(2) | FSMC_BTR_ADDHLDx(0) | FSMC_BTR_ADDSETx(1) | FSMC_BTR_ACCMODx(FSMC_BTx_ACCMOD_B);
     FSMC_BWTR1 = FSMC_BTR_DATASTx(2) | FSMC_BTR_ADDHLDx(0) | FSMC_BTR_ADDSETx(1) | FSMC_BTR_ACCMODx(FSMC_BTx_ACCMOD_B);
 
-    while (lcd_detect() != LCDTYPE_UNKNOWN) {
+    while (lcd_detect() == LCDTYPE_UNKNOWN) {
         // retry inititalize and detect
     }
 }

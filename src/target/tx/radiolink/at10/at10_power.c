@@ -43,6 +43,8 @@ void PWR_Shutdown()
 void PWR_Sleep()
 {
     //asm("wfi");
+    gpio_toggle(GPIOA, GPIO13);
+    usleep(100);
 }
 
 /* Return milivolts */
