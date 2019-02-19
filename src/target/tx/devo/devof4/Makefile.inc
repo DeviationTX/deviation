@@ -1,4 +1,5 @@
 SCREENSIZE  := text
+DISPLAY_DRIVER := spi/video_ia9211.c
 FILESYSTEMS := common text
 
 OPTIMIZE_DFU     := 1
@@ -19,8 +20,6 @@ MEDIA_FILES =
 NUM_MODELS ?= 10
 
 SRC_C   += $(SDIR)/target/tx/devo/devof7/backlight.c\
-           $(SDIR)/target/tx/devo/devof7/ia9211_map.c \
-           $(SDIR)/target/tx/devo/devof7/lcd.c \
            $(SDIR)/target/tx/devo/devof7/tx_buttons.c \
            $(SDIR)/target/tx/devo/devof7/crc.c
 

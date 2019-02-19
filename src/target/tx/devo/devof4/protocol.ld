@@ -1,1 +1,1 @@
-INCLUDE target/devof7/protocol.ld
+INCLUDE target/tx/devo/devof7/protocol.ld
