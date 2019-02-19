@@ -1,5 +1,65 @@
 #include "CuTest.h"
 
+extern u8 CONFIG_ReadModel_old(const char* file); 
+extern u8 CONFIG_WriteModel_old(u8 model_num);
+
+u8 CONFIG_ReadModel_new(const char* file) {
+    clear_model(1);
+
+    auto_map = 0;
+    if (CONFIG_IniParse(file, ini_handler, &Model)) {
+        printf("Failed to parse Model file: %s\n", file);
+    }
+    if (! ELEM_USED(Model.pagecfg2.elem[0]))
+        CONFIG_ReadLayout("layout/default.ini");
+    if(! PROTOCOL_HasPowerAmp(Model.protocol))
+        Model.tx_power = TXPOWER_150mW;
+    MIXER_SetMixers(NULL, 0);
+    if(auto_map)
+        RemapChannelsForProtocol(EATRG0);
+    if(! Model.name[0])
+        sprintf(Model.name, "Model%d", 1);
+    return 1;
+}
+
+const char* const names[] = {
+"tests/models/280qav.ini",
+"tests/models/bixler2.ini",
+"tests/models/geniuscp.ini",
+"tests/models/yacht.ini",
+
+"tests/models/4g6s.ini",
+"tests/models/blade130x.ini",
+"tests/models/nazath.ini",
+
+"tests/models/apm.ini",
+"tests/models/deltaray.ini",
+"tests/models/trex150dfc.ini",
+
+"tests/models/ardrone2.ini",
+"tests/models/fx071.ini",
+"tests/models/wltoys931.ini",
+};
+
+void TestNewAndOld(CuTest *t)
+{
+    struct Model ValidateModel;
+
+    for (unsigned i = 0; i < ARRAYSIZE(names); i++) {
+        const char *filename = names[i];
+        printf("Test model: %s\n", filename);
+        CONFIG_ReadModel_old(filename);
+        memcpy(&ValidateModel, &Model, sizeof(Model));
+        CONFIG_ReadModel_new(filename);
+
+        CuAssertTrue(t, memcmp(&ValidateModel, &Model, sizeof(Model)) == 0);
+
+        CONFIG_WriteModel(1);
+        CONFIG_ReadModel(1);
+        CuAssertTrue(t, memcmp(&ValidateModel, &Model, sizeof(Model)) == 0);
+    }
+}
+
 void TestModelLoadSave(CuTest *t)
 {
     struct Model ValidateModel;

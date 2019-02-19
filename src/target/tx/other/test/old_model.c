@@ -14,58 +14,20 @@
  */
 
 #include "common.h"
-#include "model.h"
+#include "config/model.h"
 #include "telemetry.h"
-#include "tx.h"
+#include "config/tx.h"
 #include "music.h"
 #include "extended_audio.h"
 
-#include "config.h"
-
 #include <stdlib.h>
 #include <string.h>
-
-extern u8 get_source(const char *value);
 extern const u8 EATRG0[PROTO_MAP_LEN];
 
-struct Model Model;
+extern struct Model Model;
 /*set this to write all model data even if it is the same as the default */
 static u32 crc32;
-
 static const char * const MODEL_TYPE_VAL[MODELTYPE_LAST] = { "heli", "plane", "multi" };
-const u8 RADIO_TX_POWER_COUNT[TX_MODULE_LAST] = {  // number of power settings
-     8,    //   CYRF6936,
-     7,    //   A7105,
-     8,    //   CC2500,
-     4,    //   NRF24L01,
-     8,    //   MULTIMOD,
-     4,    //   R9M (FCC/EU),
-};
-
-const char * radio_tx_power_val(enum Radio radio, enum TxPower power) {
-    // entries in this list must match order in enum TxPower definition
-    static const char * const std_powers[TXPOWER_LAST] = {
-        "100uW", "300uW", "1mW", "3mW", "10mW", "30mW", "100mW", "150mW"};
-    static const char * const nrf_powers[] = { "1mW", "6mW", "25mW", "100mW"};
-    static const char * const r9m_powers[] = { "10/25mW", "100/25mW", "500/500", "Auto/200" };
-
-    if (radio >= TX_MODULE_LAST) return NULL;
-    if (power >= RADIO_TX_POWER_COUNT[radio]) power = RADIO_TX_POWER_COUNT[radio]-1;
-
-    switch (radio) {
-    case CYRF6936:
-    case CC2500:
-    case A7105:
-    case MULTIMOD:
-        return std_powers[power];
-    case NRF24L01:
-        return nrf_powers[power];
-    case R9M:
-        return r9m_powers[power];
-    default:
-        return NULL;    // never reached, silence warning
-    }
-}
 
 #define MATCH_SECTION(s) (strcasecmp(section, s) == 0)
 #define MATCH_START(x,y) (strncasecmp(x, y, sizeof(y)-1) == 0)
@@ -75,13 +37,6 @@ const char * radio_tx_power_val(enum Radio radio, enum TxPower power) {
 
 #define WRITE_FULL_MODEL 0
 static u8 auto_map;
-
-const char MODEL_NAME[] = "name";
-const char MODEL_ICON[] = "icon";
-const char MODEL_TYPE[] = "type";
-const char MODEL_TEMPLATE[] = "template";
-const char MODEL_AUTOMAP[] = "automap";
-const char MODEL_MIXERMODE[] = "mixermode";
 
 /* Section: Radio */
 static const char SECTION_RADIO[]   = "radio";
@@ -238,7 +193,7 @@ static const char * const VOICE_TIMER[NUM_TIMERS] =
 #endif
 
 
-s8 mapstrcasecmp(const char *s1, const char *s2)
+static s8 mapstrcasecmp(const char *s1, const char *s2)
 {
     int i = 0;
     while(1) {
@@ -255,6 +210,55 @@ s8 mapstrcasecmp(const char *s1, const char *s2)
         }
         return(s1[i] < s2[i] ? -1 : 1);
     }
+}
+static u8 get_source(const char *section, const char *value)
+{
+    unsigned i;
+    unsigned val;
+    const char *ptr = (value[0] == '!') ? value + 1 : value;
+    const char *tmp;
+    char cmp[10];
+    for (i = 0; i <= NUM_SOURCES; i++) {
+        if(mapstrcasecmp(INPUT_SourceNameReal(cmp, i), ptr) == 0) {
+            #if defined(HAS_SWITCHES_NOSTOCK) && HAS_SWITCHES_NOSTOCK
+            #define SWITCH_NOSTOCK ((1 << INP_HOLD0) | (1 << INP_HOLD1) | \
+                                    (1 << INP_FMOD0) | (1 << INP_FMOD1))
+            if ((Transmitter.ignore_src & SWITCH_NOSTOCK) == SWITCH_NOSTOCK) {
+                if(mapstrcasecmp("FMODE0", ptr) == 0 ||
+                   mapstrcasecmp("FMODE1", ptr) == 0 ||
+                   mapstrcasecmp("HOLD0", ptr) == 0 ||
+                   mapstrcasecmp("HOLD1", ptr) == 0)
+                    break;
+            }
+            #endif //HAS_SWITCHES_NOSTOCK
+            return ((ptr == value) ? 0 : 0x80) | i;
+        }
+    }
+    for (i = 0; i < 4; i++) {
+        if(mapstrcasecmp(tx_stick_names[i], ptr) == 0) {
+            return ((ptr == value) ? 0 : 0x80) | (i + 1);
+        }
+    }
+    i = 0;
+    while((tmp = INPUT_MapSourceName(i++, &val))) {
+        if(mapstrcasecmp(tmp, ptr) == 0) {
+            return ((ptr == value) ? 0 : 0x80) | val;
+        }
+    }
+    printf("%s: Could not parse Source %s\n", section, value);
+    return 0;
+}
+
+static u8 get_button(const char *section, const char *value)
+{
+    u8 i;
+    for (i = 0; i <= NUM_TX_BUTTONS; i++) {
+        if(strcasecmp(INPUT_ButtonName(i), value) == 0) {
+            return i;
+        }
+    }
+    printf("%s: Could not parse Button %s\n", section, value);
+    return 0;
 }
 
 static int handle_proto_opts(struct Model *m, const char* key, const char* value, const char **opts)
@@ -470,7 +474,7 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
                 }
             }
             if (src == -1) {
-                u8 newsrc = get_source(ptr);
+                u8 newsrc = get_source(section, ptr);
                 if(newsrc >= NUM_INPUTS) {
                     src = newsrc - (NUM_INPUTS + 1 - (NUM_RTC + NUM_TIMERS + NUM_TELEM + 1));
                 }
@@ -484,7 +488,7 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
         {
             if (count != 3)
                 return 1;
-            u8 src = get_source(ptr);
+            u8 src = get_source(section, ptr);
             if (src < NUM_INPUTS)
                 src = 0;
             data[5] = src - NUM_INPUTS;
@@ -508,94 +512,101 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
     return 1;
 }
 
+struct struct_map {const char *str;  u16 offset; u16 defval;};
+#define MAPSIZE(x)  (sizeof(x) / sizeof(struct struct_map))
+#define OFFSET(s,v) (((long)(&s.v) - (long)(&s)) | ((sizeof(s.v)-1) << 13))
+#define OFFSETS(s,v) (((long)(&s.v) - (long)(&s)) | ((sizeof(s.v)+3) << 13))
+#define OFFSET_SRC(s,v) (((long)(&s.v) - (long)(&s)) | (2 << 13))
+#define OFFSET_BUT(s,v) (((long)(&s.v) - (long)(&s)) | (6 << 13))
+#if HAS_PERMANENT_TIMER
 static const struct struct_map _secnone[] =
 {
-#if HAS_PERMANENT_TIMER
-    {PERMANENT_TIMER, OFFSET(struct Model, permanent_timer)},
-#endif
-    {MODEL_TYPE, OFFSET_STRLIST(struct Model, type, MODEL_TYPE_VAL, ARRAYSIZE(MODEL_TYPE_VAL))},
-    {MODEL_MIXERMODE, OFFSET_STRCALL(struct Model, mixer_mode, STDMIXER_ModeName, 0x0103)},
+    {PERMANENT_TIMER, OFFSET(Model, permanent_timer), 0},
 };
+#endif
 static const struct struct_map _secradio[] = {
-    {RADIO_NUM_CHANNELS, OFFSET(struct Model, num_channels)},
-    {RADIO_FIXED_ID,     OFFSET(struct Model, fixed_id)},
+    {RADIO_NUM_CHANNELS, OFFSET(Model, num_channels), 0},
+    {RADIO_FIXED_ID,     OFFSET(Model, fixed_id), 0},
 #if HAS_VIDEO
-    {RADIO_VIDEOSRC,     OFFSET_SRC(struct Model, videosrc)},
-    {RADIO_VIDEOCH,      OFFSET(struct Model, videoch)},
-    {RADIO_VIDEOCONTRAST, OFFSET(struct Model, video_contrast)},
-    {RADIO_VIDEOBRIGHTNESS, OFFSET(struct Model, video_brightness)},
+    {RADIO_VIDEOSRC,     OFFSET_SRC(Model, videosrc), 0},
+    {RADIO_VIDEOCH,      OFFSET(Model, videoch), 0},
+    {RADIO_VIDEOCONTRAST,OFFSET(Model, video_contrast), 0},
+    {RADIO_VIDEOBRIGHTNESS,OFFSET(Model, video_brightness), 0},
 #endif
 #if HAS_EXTENDED_TELEMETRY
-    {RADIO_GROUND_LEVEL,     OFFSET(struct Model, ground_level)},
+    {RADIO_GROUND_LEVEL,     OFFSET(Model, ground_level), 0},
 #endif
-    {RADIO_PROTOCOL, OFFSET_STRCALL(struct Model, protocol, PROTOCOL_GetName, PROTOCOL_COUNT)},
 };
 static const struct struct_map _secmixer[] = {
-    {MIXER_SCALAR, OFFSETS(struct Mixer, scalar)},
-    {MIXER_SWITCH, OFFSET_SRC(struct Mixer, sw)},
-    {MIXER_OFFSET, OFFSETS(struct Mixer, offset)},
-};
-static const u16 _secmixer_defaults[] = {
-    100
+    {MIXER_SWITCH, OFFSET_SRC(Model.mixers[0], sw), 0},
+    {MIXER_SCALAR, OFFSETS(Model.mixers[0], scalar), 100},
+    {MIXER_OFFSET, OFFSETS(Model.mixers[0], offset), 0},
 };
 static const struct struct_map _seclimit[] = {
-    {CHAN_LIMIT_SAFETYSW,  OFFSET_SRC(struct Limit, safetysw)},
-    {CHAN_LIMIT_SAFETYVAL, OFFSETS(struct Limit, safetyval)},
-    {CHAN_LIMIT_MAX,       OFFSET(struct Limit, max)},
-    {CHAN_LIMIT_SPEED,     OFFSET(struct Limit, speed)},
-    {CHAN_SCALAR,          OFFSET(struct Limit, servoscale)},
-    {CHAN_SCALAR_NEG,      OFFSET(struct Limit, servoscale_neg)},
-    {CHAN_SUBTRIM,         OFFSETS(struct Limit, subtrim)},
-    {CHAN_DISPLAY_SCALE,   OFFSETS(struct Limit, displayscale)},
-};
-static const u16 _seclimit_defaults[] = {
-    0, 0, DEFAULT_SERVO_LIMIT, 0, 100, 0, 0, DEFAULT_DISPLAY_SCALE
+    {CHAN_LIMIT_SAFETYSW,  OFFSET_SRC(Model.limits[0], safetysw), 0},
+    {CHAN_LIMIT_SAFETYVAL, OFFSETS(Model.limits[0], safetyval), 0},
+    {CHAN_LIMIT_MAX,       OFFSET(Model.limits[0], max), DEFAULT_SERVO_LIMIT},
+    {CHAN_LIMIT_SPEED,     OFFSET(Model.limits[0], speed), 0},
+    {CHAN_SCALAR,          OFFSET(Model.limits[0], servoscale), 100},
+    {CHAN_SCALAR_NEG,      OFFSET(Model.limits[0], servoscale_neg), 0},
+    {CHAN_SUBTRIM,         OFFSETS(Model.limits[0], subtrim), 0},
+    {CHAN_DISPLAY_SCALE,   OFFSETS(Model.limits[0], displayscale), DEFAULT_DISPLAY_SCALE},
 };
 static const struct struct_map _sectrim[] = {
-    {TRIM_STEP,   OFFSET(struct Trim, step)},
-    {TRIM_POS,    OFFSET_BUT(struct Trim, pos)},
-    {TRIM_NEG,    OFFSET_BUT(struct Trim, neg)},
+    {TRIM_SOURCE, OFFSET_SRC(Model.trims[0], src), 0xFFFF},
+    {TRIM_POS,    OFFSET_BUT(Model.trims[0], pos), 0},
+    {TRIM_NEG,    OFFSET_BUT(Model.trims[0], neg), 0},
+    {TRIM_STEP,   OFFSET(Model.trims[0], step), 1},
 };
-static const u16 _sectrim_defaults[] = {
-    1
-};
-static const struct struct_map _sectrim_rdonly[] = {
-    {TRIM_SOURCE, OFFSET_SRC(struct Trim, src)},
-};
-
 static const struct struct_map _secswash[] = {
-    {SWASH_AILMIX, OFFSET(struct Model, swashmix[0])},
-    {SWASH_ELEMIX, OFFSET(struct Model, swashmix[1])},
-    {SWASH_COLMIX, OFFSET(struct Model, swashmix[2])},
-    {SWASH_TYPE,   OFFSET_STRCALL(struct Model, swash_type, MIXER_SwashType, SWASH_TYPE_LAST)},
+    {SWASH_AILMIX, OFFSET(Model, swashmix[0]), 60},
+    {SWASH_ELEMIX, OFFSET(Model, swashmix[1]), 60},
+    {SWASH_COLMIX, OFFSET(Model, swashmix[2]), 60},
 };
-static const u16 _secswash_defaults[] = {
-    60, 60, 60
-};
-
 static const struct struct_map _sectimer[] = {
-    {TIMER_SOURCE,   OFFSET_SRC(struct Timer, src)},
-    {TIMER_RESETSRC, OFFSET_SRC(struct Timer, resetsrc)},
-    {TIMER_TYPE, OFFSET_STRLIST(struct Timer, type, TIMER_TYPE_VAL, ARRAYSIZE(TIMER_TYPE_VAL))}
+    {TIMER_TIME,     OFFSET(Model.timer[0], timer), 0xFFFF},
+    {TIMER_VAL,      OFFSET(Model.timer[0], val), 0xFFFF},
+    {TIMER_SOURCE,   OFFSET_SRC(Model.timer[0], src), 0},
+    {TIMER_RESETSRC, OFFSET_SRC(Model.timer[0], resetsrc), 0},
 };
-static const struct struct_map _sectimer_rdonly[] = {
-    {TIMER_TIME,     OFFSET(struct Timer, timer)},
-    {TIMER_VAL,      OFFSET(struct Timer, val)},
-};
-
 static const struct struct_map _secppm[] = {
-    {PPMIN_CENTERPW, OFFSET(struct Model, ppmin_centerpw)},
-    {PPMIN_DELTAPW,  OFFSET(struct Model, ppmin_deltapw)},
+    {PPMIN_CENTERPW, OFFSET(Model, ppmin_centerpw), 0},
+    {PPMIN_DELTAPW,  OFFSET(Model, ppmin_deltapw), 0},
+    {PPMIN_SWITCH,   OFFSET_SRC(Model, train_sw), 0xFFFF},
 };
-static const struct struct_map _secppm_rdonly[] = {
-    {PPMIN_SWITCH,   OFFSET_SRC(struct Model, train_sw)},
-};
-
 static int ini_handler(void* user, const char* section, const char* name, const char* value)
 {
     int value_int = atoi(value);
     struct Model *m = (struct Model *)user;
-
+int assign_int(void* ptr, const struct struct_map *map, int map_size)
+{
+    for(int i = 0; i < map_size; i++) {
+        if(MATCH_KEY(map[i].str)) {
+            int size = map[i].offset >> 13;
+            int offset = map[i].offset & 0x1FFF;
+            switch(size) {
+                case 0:
+                    *((u8 *)((long)ptr + offset)) = value_int; break;
+                case 1:
+                    *((u16 *)((long)ptr + offset)) = value_int; break;
+                case 2:
+                    *((u8 *)((long)ptr + offset)) = get_source(section, value); break;
+                case 3:
+                    *((u32 *)((long)ptr + offset)) = value_int; break;
+                case 4:
+                    *((s8 *)((long)ptr + offset)) = value_int; break;
+                case 5:
+                    *((s16 *)((long)ptr + offset)) = value_int; break;
+                case 6:
+                    *((u8 *)((long)ptr + offset)) = get_button(section, value); break;
+                case 7:
+                    *((s32 *)((long)ptr + offset)) = value_int; break;
+            }
+            return 1;
+        }
+    }
+    return 0;
+}
     CLOCK_ResetWatchdog();
     unsigned i;
     if (MATCH_SECTION("")) {
@@ -611,15 +622,45 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             CONFIG_ParseIconName(m->icon, value);
             return 1;
         }
+#if HAS_PERMANENT_TIMER
+        if(assign_int(&Model, _secnone, MAPSIZE(_secnone)))
+            return 1;
+#endif
+        if (MATCH_KEY(MODEL_TYPE)) {
+            for (i = 0; i < NUM_STR_ELEMS(MODEL_TYPE_VAL); i++) {
+                if (MATCH_VALUE(MODEL_TYPE_VAL[i])) {
+                    m->type = i;
+                    return 1;
+                }
+            }
+            return 0;
+        }
         if (MATCH_KEY(MODEL_AUTOMAP)) {
             auto_map = atoi(value);
             return 1;
         }
-        if (assign_int(&Model, _secnone, ARRAYSIZE(_secnone), name, value))
+        if (MATCH_KEY(MODEL_MIXERMODE)) {
+            for(i = 1; i < 3; i++) {
+                if(MATCH_VALUE(STDMIXER_ModeName(i)))
+                    m->mixer_mode = i;
+            }
             return 1;
+        }
     }
     if (MATCH_SECTION(SECTION_RADIO)) {
-        if (assign_int(&Model, _secradio, ARRAYSIZE(_secradio), name, value))
+        if (MATCH_KEY(RADIO_PROTOCOL)) {
+            for (i = 0; i < PROTOCOL_COUNT; i++) {
+                if (MATCH_VALUE(PROTOCOL_GetName(i))) {
+                    m->protocol = i;
+                    m->radio = PROTOCOL_GetRadio(i);
+                    PROTOCOL_Load(1);
+                    return 1;
+                }
+            }
+            printf("Unknown protocol: %s\n", value);
+            return 1;
+        }
+        if(assign_int(&Model, _secradio, MAPSIZE(_secradio)))
             return 1;
         if (MATCH_KEY(RADIO_TX_POWER)) {
             if (m->radio == TX_MODULE_LAST) {
@@ -656,15 +697,15 @@ static int ini_handler(void* user, const char* section, const char* name, const 
                 printf("%s: Only %d mixers are supported\n", section, NUM_MIXERS);
                 return 1;
             }
-            m->mixers[idx].src = get_source(value);
+            m->mixers[idx].src = get_source(section, value);
             return 1;
         }
         idx--;
         if (MATCH_KEY(MIXER_DEST)) {
-            m->mixers[idx].dest = get_source(value) - NUM_INPUTS - 1;
+            m->mixers[idx].dest = get_source(section, value) - NUM_INPUTS - 1;
             return 1;
         }
-        if (assign_int(&m->mixers[idx], _secmixer, ARRAYSIZE(_secmixer), name, value))
+        if(assign_int(&m->mixers[idx], _secmixer, MAPSIZE(_secmixer)))
             return 1;
         if (MATCH_KEY(MIXER_USETRIM)) {
             MIXER_SET_APPLY_TRIM(&m->mixers[idx], value_int);
@@ -737,7 +778,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 1;
         }
 
-        if (assign_int(&m->limits[idx], _seclimit, ARRAYSIZE(_seclimit), name, value))
+        if(assign_int(&m->limits[idx], _seclimit, MAPSIZE(_seclimit)))
             return 1;
         if (MATCH_KEY(CHAN_LIMIT_MIN)) {
             m->limits[idx].min = -value_int;
@@ -795,9 +836,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 1;
         }
         idx--;
-        if (assign_int(&m->trims[idx], _sectrim, ARRAYSIZE(_sectrim), name, value))
-            return 1;
-        if (assign_int(&m->trims[idx], _sectrim_rdonly, ARRAYSIZE(_sectrim_rdonly), name, value))
+        if(assign_int(&m->trims[idx], _sectrim, MAPSIZE(_sectrim)))
             return 1;
         if (MATCH_KEY(TRIM_SWITCH)) {
             for (int i = 0; i <= NUM_SOURCES; i++) {
@@ -817,6 +856,16 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         return 0;
     }
     if (MATCH_SECTION(SECTION_SWASH)) {
+        if (MATCH_KEY(SWASH_TYPE)) {
+            for (i = SWASH_TYPE_NONE; i <= SWASH_TYPE_90; i++) {
+                if(strcasecmp(MIXER_SwashType(i), value) == 0) {
+                    m->swash_type = i;
+                    return 1;
+                }
+            }
+            printf("%s: Unknown swash_type: %s\n", section, value);
+            return 1;
+        }
         if (MATCH_KEY(SWASH_ELE_INV)) {
             if (value_int)
                 m->swash_invert |= 0x01;
@@ -832,7 +881,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
                 m->swash_invert |= 0x04;
             return 1;
         }
-        if (assign_int(m, _secswash, ARRAYSIZE(_secswash), name, value))
+        if(assign_int(m, _secswash, MAPSIZE(_secswash)))
             return 1;
     }
     if (MATCH_START(section, SECTION_TIMER)) {
@@ -856,9 +905,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             printf("%s: Unknown timer type: %s\n", section, value);
             return 1;
         }
-        if (assign_int(&m->timer[idx], _sectimer, ARRAYSIZE(_sectimer), name, value))
-            return 1;
-        if (assign_int(&m->timer[idx], _sectimer_rdonly, ARRAYSIZE(_sectimer_rdonly), name, value))
+        if(assign_int(&m->timer[idx], _sectimer, MAPSIZE(_sectimer)))
             return 1;
     }
     if (MATCH_START(section, SECTION_TELEMALARM)) {
@@ -903,7 +950,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
 #if HAS_DATALOG
     if (MATCH_SECTION(SECTION_DATALOG)) {
         if (MATCH_KEY(DATALOG_SWITCH)) {
-            m->datalog.enable = get_source(value);
+            m->datalog.enable = get_source(section, value);
         } else if (MATCH_KEY(DATALOG_RATE)) {
             for (i = 0; i < DLOG_RATE_LAST; i++) {
                 if(mapstrcasecmp(DATALOG_RateString(i), value) == 0) {
@@ -930,7 +977,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             src = 0;
             found = 1;
         } else {
-            src = get_source(name);
+            src = get_source(section, name);
         }
         if(found || src) {
             u32 i;
@@ -959,14 +1006,12 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             }
             return 1;
         }
-        if (assign_int(m, _secppm, ARRAYSIZE(_secppm), name, value))
-            return 1;
-        if (assign_int(m, _secppm_rdonly, ARRAYSIZE(_secppm_rdonly), name, value))
+        if(assign_int(m, _secppm, MAPSIZE(_secppm)))
             return 1;
         if (MATCH_START(name, PPMIN_MAP)) {
             u8 idx = atoi(name + sizeof(PPMIN_MAP)-1) -1;
             if (idx < MAX_PPM_IN_CHANNELS) {
-                m->ppm_map[idx]  = get_source(value);
+                m->ppm_map[idx]  = get_source(section, value);
                 if (PPMin_Mode() == PPM_IN_TRAIN1) {
                     m->ppm_map[idx] =  (m->ppm_map[idx] <= NUM_INPUTS)
                                        ? -1
@@ -1043,6 +1088,36 @@ static void get_model_file(char *file, u8 model_num)
         sprintf(file, "models/model%d.ini", model_num);
 }
 
+static void write_int(FILE *fh, void* ptr, const struct struct_map *map, int map_size)
+{
+    char tmpstr[20];
+    for(int i = 0; i < map_size; i++) {
+        int size = map[i].offset >> 13;
+        int offset = map[i].offset & 0x1FFF;
+        int value;
+        if (map[i].defval == 0xffff)
+            continue;
+        switch(size) {
+            case 0:
+            case 2: //SRC
+            case 6: //BUTTON
+                    value = *((u8 *)((long)ptr + offset)); break;
+            case 1: value = *((u16 *)((long)ptr + offset)); break;
+            case 3: value = *((u32 *)((long)ptr + offset)); break;
+            case 4: value = *((s8 *)((long)ptr + offset)); break;
+            case 5: value = *((s16 *)((long)ptr + offset)); break;
+            case 7: value = *((s32 *)((long)ptr + offset)); break;
+            default: continue;
+        }
+        if(WRITE_FULL_MODEL || value != map[i].defval) {
+            if (2 == (size & 0x03)) //2, 6
+                fprintf(fh, "%s=%s\n", map[i].str, size == 2 ? INPUT_SourceNameReal(tmpstr, value) : INPUT_ButtonName(value));
+            else
+                fprintf(fh, "%s=%d\n", map[i].str, value);
+        }
+    }
+}
+
 static u8 write_mixer(FILE *fh, struct Model *m, u8 channel)
 {
     int idx;
@@ -1056,8 +1131,7 @@ static u8 write_mixer(FILE *fh, struct Model *m, u8 channel)
         fprintf(fh, "[%s]\n", SECTION_MIXER);
         fprintf(fh, "%s=%s\n", MIXER_SOURCE, INPUT_SourceNameReal(tmpstr, m->mixers[idx].src));
         fprintf(fh, "%s=%s\n", MIXER_DEST, INPUT_SourceNameReal(tmpstr, m->mixers[idx].dest + NUM_INPUTS + 1));
-        write_int2(&m->mixers[idx], _secmixer, ARRAYSIZE(_secmixer),
-            _secmixer_defaults, ARRAYSIZE(_secmixer_defaults), fh);
+        write_int(fh, &m->mixers[idx], _secmixer, MAPSIZE(_secmixer));
         if(WRITE_FULL_MODEL || ! MIXER_APPLY_TRIM(&m->mixers[idx]))
             fprintf(fh, "%s=%d\n", MIXER_USETRIM, MIXER_APPLY_TRIM(&m->mixers[idx]) ? 1 : 0);
         if(WRITE_FULL_MODEL || MIXER_MUX(&m->mixers[idx]))
@@ -1107,7 +1181,7 @@ static void write_proto_opts(FILE *fh, struct Model *m)
     fprintf(fh, "\n");
 }
 
-u8 CONFIG_WriteModel(u8 model_num) {
+u8 CONFIG_WriteModel_old(u8 model_num) {
     char file[20];
     FILE *fh;
     u8 idx;
@@ -1122,14 +1196,17 @@ u8 CONFIG_WriteModel(u8 model_num) {
     }
     CONFIG_EnableLanguage(0);
     fprintf(fh, "%s=%s\n", MODEL_NAME, m->name);
-    write_int2(m, _secnone, ARRAYSIZE(_secnone), DEFAULTS_ZERO, 0, fh);
+#if HAS_PERMANENT_TIMER
+    write_int(fh, m, _secnone, MAPSIZE(_secnone));
+#endif
+    fprintf(fh, "%s=%s\n", MODEL_MIXERMODE, STDMIXER_ModeName(m->mixer_mode));
     if(m->icon[0] != 0)
         fprintf(fh, "%s=%s\n", MODEL_ICON, m->icon + 9);
     if(WRITE_FULL_MODEL || m->type != 0)
         fprintf(fh, "%s=%s\n", MODEL_TYPE, MODEL_TYPE_VAL[m->type]);
     fprintf(fh, "[%s]\n", SECTION_RADIO);
     fprintf(fh, "%s=%s\n", RADIO_PROTOCOL, PROTOCOL_GetName(m->protocol));
-    write_int2(m, _secradio, ARRAYSIZE(_secradio), DEFAULTS_ZERO, 0, fh);
+    write_int(fh, m, _secradio, MAPSIZE(_secradio));
     fprintf(fh, "%s=%s\n", RADIO_TX_POWER, radio_tx_power_val(m->radio, m->tx_power));
     fprintf(fh, "\n");
     write_proto_opts(fh, m);
@@ -1148,7 +1225,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
         fprintf(fh, "[%s%d]\n", SECTION_CHANNEL, idx+1);
         if(WRITE_FULL_MODEL || (m->limits[idx].flags & CH_REVERSE))
             fprintf(fh, "%s=%d\n", CHAN_LIMIT_REVERSE, (m->limits[idx].flags & CH_REVERSE) ? 1 : 0);
-        write_int2(&m->limits[idx], _seclimit, ARRAYSIZE(_seclimit),  _seclimit_defaults, ARRAYSIZE(_seclimit_defaults), fh);
+        write_int(fh, &m->limits[idx], _seclimit, MAPSIZE(_seclimit));
         if(WRITE_FULL_MODEL || (m->limits[idx].flags & CH_FAILSAFE_EN)) {
             if(m->limits[idx].flags & CH_FAILSAFE_EN) {
                 fprintf(fh, "%s=%d\n", CHAN_LIMIT_FAILSAFE, m->limits[idx].failsafe);
@@ -1183,7 +1260,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
         if (PPMin_Mode() != PPM_IN_SOURCE) {
             fprintf(fh, "%s=%s\n", PPMIN_SWITCH, INPUT_SourceNameReal(file, m->train_sw));
         }
-        write_int2(m, _secppm, ARRAYSIZE(_secppm), DEFAULTS_ZERO, 0, fh);
+        write_int(fh, m, _secppm, MAPSIZE(_secppm));
         //fprintf(fh, "%s=%d\n", PPMIN_CENTERPW, m->ppmin_centerpw);
         //fprintf(fh, "%s=%d\n", PPMIN_DELTAPW, m->ppmin_deltapw);
         if (PPMin_Mode() != PPM_IN_SOURCE) {
@@ -1204,7 +1281,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
              m->trims[idx].src >= 1 && m->trims[idx].src <= 4
              ? tx_stick_names[m->trims[idx].src-1]
              : INPUT_SourceNameReal(file, m->trims[idx].src));
-        write_int2(&m->trims[idx], _sectrim, ARRAYSIZE(_sectrim), _sectrim_defaults, ARRAYSIZE(_sectrim_defaults), fh);
+        write_int(fh, &m->trims[idx], _sectrim, MAPSIZE(_sectrim));
         if(WRITE_FULL_MODEL || m->trims[idx].sw)
             fprintf(fh, "%s=%s\n", TRIM_SWITCH, INPUT_SourceNameAbbrevSwitchReal(file, m->trims[idx].sw));
         if(WRITE_FULL_MODEL || m->trims[idx].value[0] || m->trims[idx].value[1] || m->trims[idx].value[2]
@@ -1215,19 +1292,22 @@ u8 CONFIG_WriteModel(u8 model_num) {
     }
     if (WRITE_FULL_MODEL || m->swash_type) {
         fprintf(fh, "[%s]\n", SECTION_SWASH);
+        fprintf(fh, "%s=%s\n", SWASH_TYPE, MIXER_SwashType(m->swash_type));
         if (WRITE_FULL_MODEL || m->swash_invert & 0x01)
             fprintf(fh, "%s=1\n", SWASH_ELE_INV);
         if (WRITE_FULL_MODEL || m->swash_invert & 0x02)
             fprintf(fh, "%s=1\n", SWASH_AIL_INV);
         if (WRITE_FULL_MODEL || m->swash_invert & 0x04)
             fprintf(fh, "%s=1\n", SWASH_COL_INV);
-        write_int2(m, _secswash, ARRAYSIZE(_secswash), _secswash_defaults, ARRAYSIZE(_secswash_defaults), fh);
+        write_int(fh, m, _secswash, MAPSIZE(_secswash));
     }
     for(idx = 0; idx < NUM_TIMERS; idx++) {
         if (! WRITE_FULL_MODEL && m->timer[idx].src == 0 && m->timer[idx].type == TIMER_STOPWATCH)
             continue;
         fprintf(fh, "[%s%d]\n", SECTION_TIMER, idx+1);
-        write_int(&m->timer[idx], _sectimer, ARRAYSIZE(_sectimer), fh);
+        if (WRITE_FULL_MODEL || m->timer[idx].type != TIMER_STOPWATCH)
+            fprintf(fh, "%s=%s\n", TIMER_TYPE, TIMER_TYPE_VAL[m->timer[idx].type]);
+        write_int(fh, &m->timer[idx], _sectimer, MAPSIZE(_sectimer));
         if (WRITE_FULL_MODEL || ((m->timer[idx].type == TIMER_COUNTDOWN || m->timer[idx].type == TIMER_COUNTDOWN_PROP) && m->timer[idx].timer))
             fprintf(fh, "%s=%d\n", TIMER_TIME, m->timer[idx].timer);
         if (WRITE_FULL_MODEL || (m->timer[idx].val != 0 && m->timer[idx].type == TIMER_PERMANENT))
@@ -1366,146 +1446,7 @@ static void clear_model(u8 full)
     Model.ppmin_deltapw = 400;
 }
 
-u8 CONFIG_ReadModel(u8 model_num) {
-    crc32 = 0;
-    Transmitter.current_model = model_num;
-    clear_model(1);
-
-    char file[30];
-    auto_map = 0;
-    get_model_file(file, model_num);
-    if (CONFIG_IniParse(file, ini_handler, &Model)) {
-        printf("Failed to parse Model file: %s\n", file);
-    }
-    if (! ELEM_USED(Model.pagecfg2.elem[0]))
-        CONFIG_ReadLayout("layout/default.ini");
-    if(! PROTOCOL_HasPowerAmp(Model.protocol))
-        Model.tx_power = TXPOWER_150mW;
-    Model.radio = PROTOCOL_GetRadio(Model.protocol);
-    PROTOCOL_Load(1);
-    MIXER_SetMixers(NULL, 0);
-    if(auto_map)
-        RemapChannelsForProtocol(EATRG0);
-    TIMER_Init();
-    MIXER_RegisterTrimButtons();
-    crc32 = Crc(&Model, sizeof(Model));
-    if(! Model.name[0])
-        sprintf(Model.name, "Model%d", model_num);
-    if (PPMin_Mode())
-        PPMin_Start();
-    else
-        PPMin_Stop();
-#if HAS_EXTENDED_AUDIO
-    AUDIO_Init();
-#endif
-    STDMIXER_Preset(); // bug fix: this must be invoked in all modes
-    return 1;
-}
-
-u8 CONFIG_IsModelChanged() {
-    u32 newCrc = Crc(&Model, sizeof(Model));
-    return (crc32 != newCrc);
-}
-
-u8 CONFIG_SaveModelIfNeeded() {
-    if (CONFIG_IsModelChanged()) {
-        crc32 = Crc(&Model, sizeof(Model));
-        //printf("Saving model, page %d\n", PAGE_GetID());
-        CONFIG_WriteModel(Transmitter.current_model);
-    }
-    return 1;
-}
-
-void CONFIG_ResetModel()
-{
-    u8 model_num = Transmitter.current_model;
-    PROTOCOL_DeInit();
-    CONFIG_ReadModel(0);
-    Transmitter.current_model = model_num;
-    sprintf(Model.name, "Model%d", model_num);
-}
-
-u8 CONFIG_GetCurrentModel() {
-    return Transmitter.current_model;
-}
-
-const char *CONFIG_GetIcon(enum ModelType type) {
-    const char *const icons[] = {
-       "modelico/heli" IMG_EXT,
-       "modelico/plane" IMG_EXT,
-       "modelico/multi" IMG_EXT,
-    };
-    return icons[type];
-}
-
-const char *CONFIG_GetCurrentIcon() {
-    if(Model.icon[0]) {
-        return fexists(Model.icon) ? Model.icon : UNKNOWN_ICON;
-    } else {
-        return CONFIG_GetIcon(Model.type);
-    }
-}
-
-void CONFIG_ParseIconName(char *name, const char *value)
-{
-    sprintf(name, "modelico/%s", value);
-}
-
-enum ModelType CONFIG_ParseModelType(const char *value)
-{
-    u8 i;
-    for (i = 0; i < NUM_STR_ELEMS(MODEL_TYPE_VAL); i++) {
-        if (MATCH_VALUE(MODEL_TYPE_VAL[i])) {
-            return i;
-        }
-    }
-    printf("Unknown model type: %s\n", value);
-    return 0;
-}
-
-u8 CONFIG_ReadTemplateByIndex(u8 template_num) {
-    char filename[13];
-    int type;
-    if (! FS_OpenDir("template")) {
-        printf("Failed to read dir 'template'\n");
-        return 0;
-    }
-    while((type = FS_ReadDir(filename)) != 0) {
-        if (type == 1 && strncasecmp(filename + strlen(filename) - 4, ".ini", 4) == 0) {
-            template_num--;
-            if (template_num == 0){
-                break;
-            }
-        }
-    }
-    FS_CloseDir();
-    if(template_num) {
-        printf("Failed to find template #%d\n", template_num);
-        return 0;
-    }
-    return CONFIG_ReadTemplate(filename);
-}
-
-u8 CONFIG_ReadTemplate(const char *filename) {
-    char file[25];
-
-    sprintf(file, "template/%s", filename);
-    clear_model(0);
-    auto_map = 0;
-    if (CONFIG_IniParse(file, ini_handler, &Model)) {
-        printf("Failed to parse Model file: %s\n", file);
-        return 0;
-    }
-    if(auto_map)
-        RemapChannelsForProtocol(EATRG0);
-    MIXER_RegisterTrimButtons();
-    STDMIXER_Preset(); // bug fix: this must be invoked in all modes
-    if (Model.mixer_mode == MIXER_STANDARD)
-        STDMIXER_SetChannelOrderByProtocol();
-    return 1;
-}
-
-u8 CONFIG_ReadLayout(const char *filename) {
+u8 CONFIG_ReadLayout_old(const char *filename) {
     memset(&Model.pagecfg2, 0, sizeof(Model.pagecfg2));
     if (CONFIG_IniParse(filename, layout_ini_handler, &Model)) {
         printf("Failed to parse Layout file: %s\n", filename);
@@ -1514,5 +1455,21 @@ u8 CONFIG_ReadLayout(const char *filename) {
     return 1;
 }
 
-#define TESTNAME model
-#include "tests.h"
+u8 CONFIG_ReadModel_old(const char* file) {
+    clear_model(1);
+
+    auto_map = 0;
+    if (CONFIG_IniParse(file, ini_handler, &Model)) {
+        printf("Failed to parse Model file: %s\n", file);
+    }
+    if (! ELEM_USED(Model.pagecfg2.elem[0]))
+        CONFIG_ReadLayout_old("layout/default.ini");
+    if(! PROTOCOL_HasPowerAmp(Model.protocol))
+        Model.tx_power = TXPOWER_150mW;
+    MIXER_SetMixers(NULL, 0);
+    if(auto_map)
+        RemapChannelsForProtocol(EATRG0);
+    if(! Model.name[0])
+        sprintf(Model.name, "Model%d", 1);
+    return 1;
+}
