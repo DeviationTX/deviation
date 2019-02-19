@@ -39,6 +39,10 @@ struct pagemem {
     u8 modal_page;
 };
 
+#define HEADER_HEIGHT (LCD_HEIGHT == 240 ? 37 : 40)
+#define LINE_SPACE    29
+#define LINE_HEIGHT   20
+
 #define TOGGLE_FILE    ("media/toggle" IMG_EXT)
 #define MODELMENU_FILE ("media/modelmnu" IMG_EXT)
 #define SPLASH_FILE    ("media/splash" IMG_EXT)

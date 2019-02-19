@@ -20,7 +20,6 @@
 #include <string.h>
 
 #include "../common/_lang_select.c"
-#define LINE_HEIGHT 24
 static struct lang_obj * const gui = &gui_objs.u.lang;
 
 static int row_cb(int absrow, int relrow, int y, void *data)
