@@ -147,13 +147,13 @@ void lcd_clear(unsigned int color)
 void SPILCD_SetRegister(u8 address, u16 data)
 {
     CS_LO();
-    spi_xfer(LCD_SPI.spi, 0x70); //Address
+    spi_xfer(LCD_SPI.spi, 0x70);  // Address
     spi_xfer(LCD_SPI.spi, 0x00);
     spi_xfer(LCD_SPI.spi, address);
     CS_HI();
     usleep(1);
     CS_LO();
-    spi_xfer(LCD_SPI.spi, 0x72); //Write Data
+    spi_xfer(LCD_SPI.spi, 0x72);  // Write Data
     spi_xfer(LCD_SPI.spi, data >> 8);
     spi_xfer(LCD_SPI.spi, data & 0xFF);
     CS_HI();
@@ -162,13 +162,13 @@ void SPILCD_SetRegister(u8 address, u16 data)
 u16 SPILCD_ReadRegister(u8 address)
 {
     CS_LO();
-    spi_xfer(LCD_SPI.spi, 0x70); //Address
+    spi_xfer(LCD_SPI.spi, 0x70);  // Address
     spi_xfer(LCD_SPI.spi, 0x00);
     spi_xfer(LCD_SPI.spi, address);
     CS_HI();
     usleep(1);
     CS_LO();
-    spi_xfer(LCD_SPI.spi, 0x73); //Write Data
+    spi_xfer(LCD_SPI.spi, 0x73);  // Write Data
     u16 out = spi_xfer(LCD_SPI.spi, 0);
     out <<= 8;
     out |= spi_xfer(LCD_SPI.spi, 0);

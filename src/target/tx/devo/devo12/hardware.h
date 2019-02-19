@@ -37,5 +37,5 @@
     .csn = {GPIOB, GPIO1},          \
     })
 #define LCD_SPI_CFG SPI1_CFG
- 
+
 #endif  // _DEVO12_HARDWARE_H_
