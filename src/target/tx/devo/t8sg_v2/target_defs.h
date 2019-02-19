@@ -1,8 +1,6 @@
 #ifndef _T8SG_V2_TARGET_H_
 #define _T8SG_V2_TARGET_H_
 
-#include "../common/common_devo.h"
-
 #define TXID 0x7e
 #define VECTOR_TABLE_LOCATION 0x3000
 #define HAS_FLASH_DETECT 1
@@ -63,5 +61,7 @@
 /* Compute voltage from y = 2.1592x + 0.2493 */
 #define VOLTAGE_NUMERATOR 216
 #define VOLTAGE_OFFSET    249
+
+#include "../common/common_devo.h"
 
 #endif //_T8SG_V2_TARGET_H_

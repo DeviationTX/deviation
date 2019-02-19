@@ -21,6 +21,8 @@
 #include "config/tx.h"
 //#include "protocol/interface.h"
 //#include <stdlib.h>
+#include "target/drivers/mcu/stm32/spi.h"
+#include "target/drivers/mcu/stm32/rcc.h"
 
 
 void SPI_ProtoInit()
@@ -28,44 +30,13 @@ void SPI_ProtoInit()
 // If we use SPI Switch board then SPI2 is shared between RF chips
 // and flash, so it is initialized in SPIFlash.
 //#if !defined HAS_4IN1_FLASH || !HAS_4IN1_FLASH
-#if _SPI_PROTO_PORT != _SPI_FLASH_PORT
-    #if _SPI_PROTO_PORT == 1
-        #define SPIx        SPI1
-        #define SPIxEN      RCC_APB2ENR_SPI1EN
-        #define APB_SPIxEN  RCC_APB2ENR
-    #elif _SPI_PROTO_PORT == 2
-        #define SPIx        SPI2
-        #define SPIxEN      RCC_APB1ENR_SPI2EN
-        #define APB_SPIxEN  RCC_APB1ENR
-    #endif
-    /* Enable SPIx */
-    rcc_peripheral_enable_clock(&APB_SPIxEN,  SPIxEN);
-    /* Enable GPIOA */
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPAEN);
-    /* Enable GPIOB */
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPBEN);
-
-    PORT_mode_setup(PROTO_RST_PIN,  GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_PUSHPULL);
-    PORT_mode_setup(PROTO_CSN_PIN,  GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_PUSHPULL);
-    PORT_mode_setup(PROTO_SCK_PIN,  GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL);
-    PORT_mode_setup(PROTO_MOSI_PIN, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL);
-    PORT_mode_setup(PROTO_MISO_PIN, GPIO_MODE_INPUT,         GPIO_CNF_INPUT_FLOAT);
-    
-    PORT_pin_clear(PROTO_RST_PIN);
-    PORT_pin_set(PROTO_CSN_PIN);
-
-
-    /* Includes enable? */
-    spi_init_master(SPIx, 
-                    SPI_CR1_BAUDRATE_FPCLK_DIV_16,
-                    SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE,
-                    SPI_CR1_CPHA_CLK_TRANSITION_1, 
-                    SPI_CR1_DFF_8BIT,
-                    SPI_CR1_MSBFIRST);
-    spi_enable_software_slave_management(SPIx);
-    spi_set_nss_high(SPIx);
-    spi_enable(SPIx);
-#endif
+    if (PROTO_SPI.spi == FLASH_SPI.spi)
+        return;
+    _spi_init(PROTO_SPI_CFG);
+    if (HAS_PIN(PROTO_RST_PIN))
+        GPIO_pin_clear(PROTO_RST_PIN);
+    GPIO_pin_clear(PROTO_RST_PIN);
+    GPIO_pin_set(PROTO_SPI.csn);
 }
 
 void MCU_InitModules()

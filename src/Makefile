@@ -334,7 +334,8 @@ filesystem/$(FILESYSTEM)/media/15normal.fon: fonts/15normal.bdf
 	mkdir -p filesystem/$(FILESYSTEM)/media/
 	../utils/font/bdf_to_font.pl -maxsize 15 -mode bin $< -out $@ -minspace 8
 
-filesystem/$(FILESYSTEM)/media/18bold.fon: fonts/18bold.bdf
+# special font for f12e with 18x12 char size
+filesystem/$(FILESYSTEM)/media/f12e.fon: fonts/f12e.bdf
 	mkdir -p filesystem/$(FILESYSTEM)/media/
 	../utils/font/bdf_to_font.pl -maxsize 18 -mode bin $< -out $@ -minspace 8
 

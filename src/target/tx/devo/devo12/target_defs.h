@@ -1,9 +1,6 @@
 #ifndef _DEVO12_TARGET_H_
 #define _DEVO12_TARGET_H_
 
-#include "devo12_ports.h"
-#include "../common/common_devo.h"
-
 #define TXID 0x0c
 #define VECTOR_TABLE_LOCATION 0x4000
 #define SPIFLASH_SECTOR_OFFSET 0
@@ -75,5 +72,8 @@
 #define MEDIA_DRIVE PARFlash_ReadBytes, PARFlash_ReadBytesStopCR, NULL, NULL, 0
 int PARFlash_ReadBytesStopCR(u32 readAddress, u32 length, u8 * buffer);
 void PARFlash_ReadBytes(u32 readAddress, u32 length, u8 * buffer);
+
+#include "devo12_ports.h"
+#include "../common/common_devo.h"
 
 #endif //_DEVO12_TARGET_H_

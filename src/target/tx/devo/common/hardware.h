@@ -49,4 +49,79 @@
         })
 #endif
 
+#ifndef FLASH_SPI
+    #define FLASH_SPI ((struct spi_csn) { \
+        .spi = SPI1, \
+        .csn = {GPIOB, GPIO2}, \
+        })
+    // On STM32F1, LCD is on SPI1->APB2@72MHz, ClockDiv=4, Fspi=18MHz
+    // On STM32F1, LCD is on SPI1->APB2@72MHz, ClockDiv=8, Fspi=9MHz
+    #ifndef HAS_OLED_DISPLAY
+        #define HAS_OLED_DISPLAY 0
+    #endif
+    #ifndef SPI1_CFG
+        #define SPI1_CFG ((struct spi_config) {   \
+            .spi = SPI1,                          \
+            .sck = {GPIOA, GPIO5},                \
+            .miso = {GPIOA, GPIO6},               \
+            .mosi = {GPIOA, GPIO7},               \
+            .rate = HAS_OLED_DISPLAY              \
+                ? SPI_CR1_BAUDRATE_FPCLK_DIV_8    \
+                : SPI_CR1_BAUDRATE_FPCLK_DIV_4,   \
+            DEFAULT_SPI_SETTINGS,                 \
+           })
+    #endif  // SPI1_CFG
+    #define FLASH_SPI_CFG SPI1_CFG
+#endif  // FLASH_SPI
+
+#ifndef LCD_SPI
+    #define LCD_SPI ((struct spi_csn) { \
+        .spi = SPI1,                    \
+        .csn = {GPIOB, GPIO0},          \
+        })
+    #define LCD_SPI_MODE ((struct mcu_pin) {GPIOC, GPIO5})
+    #ifndef SPI1_CFG
+        #define SPI1_CFG ((struct spi_config) {   \
+            .spi = SPI1,                          \
+            .sck = {GPIOA, GPIO5},                \
+            .miso = {GPIOA, GPIO6},               \
+            .mosi = {GPIOA, GPIO7},               \
+            .rate = HAS_OLED_DISPLAY              \
+                ? SPI_CR1_BAUDRATE_FPCLK_DIV_8    \
+                : SPI_CR1_BAUDRATE_FPCLK_DIV_4,   \
+            DEFAULT_SPI_SETTINGS,                 \
+           })
+    #endif  // SPI1_CFG
+    #define LCD_SPI_CFG SPI1_CFG
+#endif  // LCD_SPI
+
+#ifndef PROTO_SPI
+    #define PROTO_SPI ((struct spi_csn) { \
+        .spi = SPI2,                      \
+        .csn = {GPIOB, GPIO12},           \
+        })
+    #ifndef SPI2_CFG
+        #define SPI2_CFG ((struct spi_config) {    \
+            .spi = SPI2,                           \
+            .sck = {GPIOB, GPIO13},                \
+            .miso = {GPIOB, GPIO14},               \
+            .mosi = {GPIOB, GPIO15},               \
+            .rate = SPI_CR1_BAUDRATE_FPCLK_DIV_16, \
+            DEFAULT_SPI_SETTINGS,                  \
+           })
+    #endif
+    #define PROTO_SPI_CFG SPI2_CFG
+    #define PROTO_RST_PIN ((struct mcu_pin){GPIOB, GPIO11})
+#endif  // PROTO_SPI
+
+#ifndef TOUCH_SPI
+    #define TOUCH_SPI ((struct spi_csn) { \
+        .spi = SPI1,           \
+        .csn = {GPIOB, GPIO0}, \
+        })
+    #define TOUCH_IRQ_PIN ((struct mcu_pin) {GPIOB, GPIO5})
+    #define TOUCH_COORDS_REVERSE      1
+    #define TOUCH_SPI_CFG SPI1_CFG
+#endif  // TOUCH_SPI
+
 #endif  // _DEVO_DEFAULT_HARDWARE_H_

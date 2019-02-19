@@ -12,12 +12,11 @@
     You should have received a copy of the GNU General Public License
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include <libopencm3/stm32/rcc.h>
-#include <libopencm3/stm32/gpio.h>
-#include <libopencm3/stm32/spi.h>
 #include "common.h"
 #include "config/tx.h"
 #include "devo.h"
+#include "target/drivers/mcu/stm32/rcc.h"
+#include "target/drivers/mcu/stm32/spi.h"
 
 #define START   (1 << 7)     // 1 = user command, 0 = reserved for factory purposes
 
@@ -51,67 +50,43 @@
 /*
 PB0 : Chip Select
 PB5 : PenIRQ
-PA5 : SPI1_SCK
-PA6 : SPI1_MISO
-PA7 : SPI1_MOSI
+PA5 : TOUCH_SPI.spi_SCK
+PA6 : TOUCH_SPI.spi_MISO
+PA7 : TOUCH_SPI.spi_MOSI
 */
 
-#define CS_HI() gpio_set(_TOUCH_PORT, _TOUCH_PIN)
-#define CS_LO() gpio_clear(_TOUCH_PORT, _TOUCH_PIN)
-#define pen_is_down() (! gpio_get(_TOUCH_PORT, _TOUCH_IRQ_PIN))
+#define CS_HI() GPIO_pin_set(TOUCH_SPI.csn)
+#define CS_LO() GPIO_pin_clear(TOUCH_SPI.csn)
+#define pen_is_down() (!GPIO_pin_get(TOUCH_IRQ_PIN))
 
 unsigned read_channel(unsigned address)
 {
-    spi_xfer(SPI1, address);
+    spi_xfer(TOUCH_SPI.spi, address);
     while(pen_is_down())
         ;
-    return spi_xfer(SPI1, 0x00);
+    return spi_xfer(TOUCH_SPI.spi, 0x00);
 }
 
 void SPITouch_Init()
 {
     if(! HAS_TOUCH)
         return;
-#if 0
-    /* Enable SPI1 */
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_SPI1EN);
-    /* Enable GPIOA */
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPAEN);
-    /* Enable GPIOB */
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPBEN);
-#endif
+    rcc_periph_clock_enable(get_rcc_from_pin(TOUCH_SPI.csn));
+    rcc_periph_clock_enable(get_rcc_from_pin(TOUCH_IRQ_PIN));
     /* CS */
-    gpio_set_mode(_TOUCH_PORT, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_PUSHPULL, _TOUCH_PIN);
+    GPIO_setup_output(TOUCH_SPI.csn, OTYPE_PUSHPULL);
 
     /* PenIRQ is pull-up input*/
-    gpio_set_mode(_TOUCH_PORT, GPIO_MODE_INPUT,
-                  GPIO_CNF_INPUT_PULL_UPDOWN, _TOUCH_IRQ_PIN);
-    gpio_set(_TOUCH_PORT, _TOUCH_IRQ_PIN);
+    GPIO_setup_input(TOUCH_IRQ_PIN, ITYPE_PULLUP);
+
+    if (TOUCH_SPI_CFG.spi != FLASH_SPI_CFG.spi) {
+        _spi_init(TOUCH_SPI_CFG);
+    }
 
     CS_LO();
-    spi_xfer(SPI1, RESET);
+    spi_xfer(TOUCH_SPI.spi, RESET);
     CS_HI();
     //SPITouch_Calibrate(197312, 147271, -404, -20); /* Read from my Tx */
-#if 0
-    /* SCK, MOSI */
-    gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO5 | GPIO7);
-    /* MISO */
-    gpio_set_mode(GPIOA, GPIO_MODE_INPUT,
-                  GPIO_CNF_INPUT_FLOAT, GPIO6);
-    /* Includes enable */
-    spi_init_master(SPI1, 
-                    SPI_CR1_BAUDRATE_FPCLK_DIV_4,
-                    SPI_CR1_CPOL_CLK_TO_1_WHEN_IDLE,
-                    SPI_CR1_CPHA_CLK_TRANSITION_2, 
-                    SPI_CR1_DFF_8BIT,
-                    SPI_CR1_MSBFIRST);
-    spi_enable_software_slave_management(SPI1);
-    spi_set_nss_high(SPI1);
-
-    spi_enable(SPI1);
-#endif
 }
 
 struct touch SPITouch_GetCoords()
@@ -124,15 +99,15 @@ struct touch SPITouch_GetCoords()
     CS_LO();
     // read TOUCH_READS times from the touchpad and store the values
     for (int i=0; i<TOUCH_READS; i++) {
-        #if _TOUCH_COORDS_REVERSE
+        if (TOUCH_COORDS_REVERSE) {
             /* X and Y are swapped on Devo8 */
             /* and X is reversed */
             data[i].x = 255 - read_channel(READ_Y);
             data[i].y = read_channel(READ_X);
-        #else
+        } else {
             data[i].x = 255 - read_channel(READ_X);
             data[i].y = read_channel(READ_Y);
-        #endif
+        }
         // TODO: is it necessary to read all values? Must they also be calculated (or: are they used somewhere? AFAIK only in tx_configure.c for display testing)?
         data[i].z1 = read_channel(READ_Z1);
         data[i].z2 = read_channel(READ_Z2);

@@ -1,8 +1,6 @@
 #ifndef _DEVO_F12E_XMS_TARGET_H_
 #define _DEVO_F12E_XMS_TARGET_H_
 
-#include "../common/common_devo.h"
-
 #define TXID 0xEC
 #define VECTOR_TABLE_LOCATION 0x4000
 #define HAS_FLASH_DETECT 1
@@ -60,5 +58,7 @@
 /* Compute voltage from y = 3.261x + 507 */
 #define VOLTAGE_NUMERATOR 326
 #define VOLTAGE_OFFSET    507
+
+#include "../common/common_devo.h"
 
 #endif //_DEVO_F12E_XMS_TARGET_H_
