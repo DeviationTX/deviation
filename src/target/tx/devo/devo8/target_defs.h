@@ -1,8 +1,6 @@
 #ifndef _DEVO8_TARGET_H_
 #define _DEVO8_TARGET_H_
 
-#include "../common/common_devo.h"
-
 #define TXID 0x08
 #define VECTOR_TABLE_LOCATION 0x4000
 #define SPIFLASH_SECTOR_OFFSET 54
@@ -63,4 +61,7 @@
     {30, 71}, {30, 56}, {-250, 71}, {-250, 56}, \
     {185, 220}, {185, 200}, {-95, 220}, {-95, 200}, {200, 180}, {-80, 180}, \
     }
+
+#include "../common/common_devo.h"
+
 #endif //_DEVO8_TARGET_H_

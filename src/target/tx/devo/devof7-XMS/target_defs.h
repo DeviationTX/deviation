@@ -1,8 +1,6 @@
 #ifndef _DEVO_F7_XMS_TARGET_H_
 #define _DEVO_F7_XMS_TARGET_H_
 
-#include "../common/common_devo.h"
-
 #define TXID 0xF7
 #define VECTOR_TABLE_LOCATION 0x3000
 #define HAS_FLASH_DETECT 1
@@ -64,5 +62,7 @@
 /* Compute voltage from y = 2.1592x + 0.2493 */
 #define VOLTAGE_NUMERATOR 324
 #define VOLTAGE_OFFSET    382
+
+#include "../common/common_devo.h"
 
 #endif //_DEVO_F7_XMS_TARGET_H_
