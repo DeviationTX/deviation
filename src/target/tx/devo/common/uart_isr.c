@@ -16,28 +16,29 @@
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/usart.h>
 #include <libopencm3/stm32/gpio.h>
-#include <libopencm3/stm32/dma.h>
 #include <libopencm3/cm3/nvic.h>
 
 #include "common.h"
+#include "target/drivers/mcu/stm32/dma.h"
 
 extern volatile u8 busy;
+
 void __attribute__((__used__)) _USART_DMA_ISR(void)
 {
-    DMA_IFCR(_USART_DMA) |= DMA_IFCR_CTCIF(_USART_DMA_CHANNEL);
+    DMA_IFCR(USART_DMA.dma) |= DMA_IFCR_CTCIF(USART_DMA.stream);
 
-    dma_disable_transfer_complete_interrupt(_USART_DMA, _USART_DMA_CHANNEL);
-    usart_disable_tx_dma(_USART);
-    dma_disable_channel(_USART_DMA, _USART_DMA_CHANNEL);
+    dma_disable_transfer_complete_interrupt(USART_DMA.dma, USART_DMA.stream);
+    usart_disable_tx_dma(UART_CFG.uart);
+    DMA_disable_stream(USART_DMA);
 
     busy = 0;
 }
 
 extern usart_callback_t *rx_callback;
-void __attribute__((__used__)) _USART_ISR(void)
+void __attribute__((__used__)) _UART_ISR(void)
 {
-	u8 status = USART_SR(_USART) & (USART_SR_RXNE | USART_SR_PE | USART_SR_FE | USART_SR_NE | USART_SR_ORE) ;
-    u8 data = usart_recv(_USART);       // read unconditionally to reset interrupt and error flags
+    u8 status = USART_SR(UART_CFG.uart) & (USART_SR_RXNE | USART_SR_PE | USART_SR_FE | USART_SR_NE | USART_SR_ORE);
+    u8 data = usart_recv(UART_CFG.uart);       // read unconditionally to reset interrupt and error flags
 
     if (rx_callback) rx_callback(data, status);
 

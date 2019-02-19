@@ -339,8 +339,8 @@ void CONFIG_LoadTx()
     Transmitter.audio_player = AUDIO_NONE;
     Transmitter.audio_vol = 10;
 #endif
-#if HAS_AUDIO_UART5
-    Transmitter.audio_uart5 = 0;
+#if HAS_AUDIO_UART
+    Transmitter.audio_uart = 0;
 #endif
 #if HAS_EXTRA_BUTTONS
     CHAN_SetButtonCfg("");

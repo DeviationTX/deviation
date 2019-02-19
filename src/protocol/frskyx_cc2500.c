@@ -333,8 +333,8 @@ static void setup_serial_port() {
     if ( Model.proto_opts[PROTO_OPTS_SPORTOUT] ) {
         UART_SetDataRate(57600);    // set for s.port compatibility
 #if HAS_EXTENDED_AUDIO
-#if HAS_AUDIO_UART5
-        if (Transmitter.audio_uart5) return;
+#if HAS_AUDIO_UART
+        if (Transmitter.audio_uart) return;
 #endif
         Transmitter.audio_player = AUDIO_DISABLED; // disable voice commands on serial port
 #endif

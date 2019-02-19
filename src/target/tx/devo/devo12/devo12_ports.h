@@ -1,18 +1,7 @@
 #ifndef _DEVO12_PORTS_H_
 #define _DEVO12_PORTS_H_
 
-//ADC overrides
-#define ADC_OVERSAMPLE_WINDOW_COUNT 10
-#define _ADC                    ADC3
-#define _RCC_APB2ENR_ADCEN      RCC_APB2ENR_ADC3EN
-#define _RCC_APB2RSTR_ADCRST    RCC_APB2RSTR_ADC3RST
-#define _ADC_SMPR_SMP_XXDOT5CYC ADC_SMPR_SMP_13DOT5CYC
-#define _DMA                    DMA2
-#define _DMA_CHANNEL            DMA_CHANNEL5
-#define _RCC_AHBENR_DMAEN       RCC_AHBENR_DMA2EN
-#define _DMA_ISR                dma2_channel4_5_isr
-#define _DMA_IFCR_CGIF          DMA_IFCR_CGIF5
-#define _NVIC_DMA_CHANNEL_IRQ   NVIC_DMA2_CHANNEL4_5_IRQ
+#include "hardware.h"
 //End ADC
 
 //Power Switch configuration
@@ -45,11 +34,6 @@
 #define _PWM_PIN                   GPIO8
 #define _PWM_EXTI                  EXTI8
 #define _PWM_TIM_OC                TIM_OC1
-#define _PWM_TIM_ARR               TIM1_ARR
 #define _PWM_TIM_DIER_DMAEN        TIM_DIER_CC1DE
-#define _PWM_DMA                   DMA1
-#define _PWM_DMA_CHANNEL           DMA_CHANNEL2
-#define _PWM_DMA_ISR               dma1_channel2_isr
-#define _PWM_NVIC_DMA_CHANNEL_IRQ  NVIC_DMA1_CHANNEL2_IRQ
 //End PWM Port
 #endif //_DEVO12_PORTS_H_

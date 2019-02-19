@@ -20,16 +20,18 @@
 
 #include "common.h"
 #ifndef DISABLE_PWM
+#include "target/drivers/mcu/stm32/dma.h"
+#include "target/drivers/mcu/stm32/nvic.h"
 
 #include "../ports.h"
 
 void __attribute__((__used__)) _PWM_DMA_ISR(void)
 {
     timer_disable_counter(TIM1);
-    nvic_disable_irq(_PWM_NVIC_DMA_CHANNEL_IRQ);
-    DMA_IFCR(_PWM_DMA) |= DMA_IFCR_CTCIF(_PWM_DMA_CHANNEL);
-    dma_disable_transfer_complete_interrupt(_PWM_DMA, _PWM_DMA_CHANNEL);
-    dma_disable_channel(_PWM_DMA, _PWM_DMA_CHANNEL);
+    nvic_disable_irq(get_nvic_dma_irq(PWM_DMA));
+    DMA_IFCR(PWM_DMA.dma) |= DMA_IFCR_CTCIF(PWM_DMA.stream);
+    dma_disable_transfer_complete_interrupt(PWM_DMA.dma, PWM_DMA.stream);
+    DMA_disable_stream(PWM_DMA);
 }
 
 #endif

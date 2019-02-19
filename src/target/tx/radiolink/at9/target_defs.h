@@ -42,7 +42,7 @@ static inline void LCD_ForceUpdate() {}
 //#define HAS_4IN1_FLASH 1 // NB set in the Makefile.inc
 #define HAS_VIDEO           0
 #define HAS_EXTENDED_AUDIO  0
-#define HAS_AUDIO_UART5     0
+#define HAS_AUDIO_UART     0
 #define HAS_MUSIC_CONFIG    0
 #define HAS_ROTARY_ENCODER  1
 

@@ -2,13 +2,9 @@
 #define _PORTS_H_
 
 #ifndef EMULATOR
-#include <libopencm3/stm32/gpio.h> /* For GPIO* definitions */
+#include "target/drivers/mcu/stm32/gpio.h"
 #endif
 
-struct mcu_pin {
-    u32 port;
-    u16 pin;
-};
 #define PORT_mode_setup(io, mode, pullup) gpio_set_mode(io.port, mode, pullup, io.pin)
 #define PORT_pin_set(io)                  gpio_set(io.port,io.pin)
 #define PORT_pin_clear(io)                gpio_clear(io.port,io.pin)
@@ -49,20 +45,6 @@ static const struct mcu_pin PROTO_MISO_PIN  = _SPI_PROTO_MISO_PIN;
 static const struct mcu_pin PROTO_MOSI_PIN  = _SPI_PROTO_MOSI_PIN;
 #endif
 
-#ifndef _ADC
-#define ADC_OVERSAMPLE_WINDOW_COUNT 1
-    #define _ADC                    ADC1
-    #define _RCC_APB2ENR_ADCEN      RCC_APB2ENR_ADC1EN
-    #define _RCC_APB2RSTR_ADCRST    RCC_APB2RSTR_ADC1RST
-    #define _ADC_SMPR_SMP_XXDOT5CYC ADC_SMPR_SMP_239DOT5CYC
-    #define _DMA                    DMA1
-    #define _DMA_CHANNEL            DMA_CHANNEL1
-    #define _RCC_AHBENR_DMAEN       RCC_AHBENR_DMA1EN
-    #define _DMA_ISR                dma1_channel1_isr
-    #define _DMA_IFCR_CGIF          DMA_IFCR_CGIF1
-    #define _NVIC_DMA_CHANNEL_IRQ   NVIC_DMA1_CHANNEL1_IRQ
-#endif //_ADC
-
 //Power switch configuration
 #ifndef _PWRSW_PORT
     #define _PWRSW_PORT               GPIOA
@@ -95,31 +77,8 @@ static const struct mcu_pin PROTO_MOSI_PIN  = _SPI_PROTO_MOSI_PIN;
     #define _PWM_PIN                   GPIO_USART1_TX    //GPIO9
     #define _PWM_EXTI                  EXTI9
     #define _PWM_TIM_OC                TIM_OC2
-    #define _PWM_TIM_ARR               TIM1_ARR
     #define _PWM_TIM_DIER_DMAEN        TIM_DIER_CC2DE
-    #define _PWM_DMA                   DMA1
-    #define _PWM_DMA_CHANNEL           DMA_CHANNEL3
-    #define _PWM_DMA_ISR               dma1_channel3_isr
-    #define _PWM_NVIC_DMA_CHANNEL_IRQ  NVIC_DMA1_CHANNEL3_IRQ
 #endif //_PWM_PIN
-
-#ifndef _USART
-    #define _USART                        USART1
-    #define _USART_DR                     USART1_DR
-    #define _USART_DMA                    DMA1
-    #define _USART_DMA_CHANNEL            DMA_CHANNEL4
-    #define _USART_DMA_ISR                dma1_channel4_isr
-    #define _USART_NVIC_DMA_CHANNEL_IRQ   NVIC_DMA1_CHANNEL4_IRQ
-    #define _USART_RCC_APB_ENR_IOP        RCC_APB2ENR
-    #define _USART_RCC_APB_ENR_IOP_EN     RCC_APB2ENR_IOPAEN
-    #define _USART_RCC_APB_ENR_USART      RCC_APB2ENR
-    #define _USART_RCC_APB_ENR_USART_EN   RCC_APB2ENR_USART1EN
-    #define _USART_GPIO                   GPIOA
-    #define _USART_GPIO_USART_TX          GPIO_USART1_TX
-    #define _USART_GPIO_USART_RX          GPIO_USART1_RX
-    #define _USART_ISR                    usart1_isr
-    #define _USART_NVIC_USART_IRQ         NVIC_USART1_IRQ
-#endif
 
 #ifndef SYSCLK_TIM // System-clock timer
     #define SYSCLK_TIM 4
@@ -128,5 +87,8 @@ static const struct mcu_pin PROTO_MOSI_PIN  = _SPI_PROTO_MOSI_PIN;
 #ifndef FREQ_MHz
     #define FREQ_MHz 72
 #endif
+
+#include "hardware.h"
+
 #endif //_PORTS_H_
 

@@ -27,7 +27,7 @@
 #define HAS_VIDEO           0
 #define HAS_4IN1_FLASH      0
 #define HAS_EXTENDED_AUDIO  1
-#define HAS_AUDIO_UART5     1
+#define HAS_AUDIO_UART     1
 #define HAS_MUSIC_CONFIG    1
 #define HAS_BUTTON_POWER_ON 1
 #define HAS_OLED_DISPLAY    1
