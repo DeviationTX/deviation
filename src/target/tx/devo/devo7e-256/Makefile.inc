@@ -12,8 +12,8 @@ include $(SDIR)/target/tx/devo/common/Makefile.inc
 
 ifndef BUILD_TARGET
 
-SRC_C   += $(SDIR)/target/devo7e/backlight.c \
-           $(SDIR)/target/devo7e/crc.c
+SRC_C   += $(SDIR)/target/tx/devo/devo7e/backlight.c \
+           $(SDIR)/target/tx/devo/devo7e/crc.c
 
 else
 
