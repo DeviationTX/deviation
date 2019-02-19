@@ -77,6 +77,7 @@
 #define VOLTAGE_NUMERATOR 324
 #define VOLTAGE_OFFSET    382
 
+#include "../devof4/hardware.h"
 #include "../common/common_devo.h"
 
 #endif //_DEVO_F4_XMS_TARGET_H_
