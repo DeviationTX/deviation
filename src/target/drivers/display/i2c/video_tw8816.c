@@ -22,6 +22,7 @@
 #include "common.h"
 #include "lcd.h"
 #include "tw8816_map.h"
+#include "target/drivers/mcu/stm32/i2c.h"
 
 //Set this to the number of trials
 #define DEBUG_SCREEN_ALIGNMENT 0
@@ -268,23 +269,13 @@ static void wait_button() {
 
 static void TW8816_Init_Ports()
 {
-    rcc_peripheral_enable_clock(&RCC_APB1ENR, RCC_APB1ENR_I2C1EN);
-    i2c_peripheral_disable(I2C1);
-    i2c_set_clock_frequency(I2C1, I2C_CR2_FREQ_36MHZ);
-    i2c_set_fast_mode(I2C1);
-    i2c_set_ccr(I2C1, 0x1e);
-    i2c_set_trise(I2C1, 0x0b);
-    i2c_set_dutycycle(I2C1, I2C_CCR_DUTY_DIV2);
-    i2c_peripheral_enable(I2C1);
+    _i2c_init(LCD_I2C_CFG);
 
+    // LCD Reset
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPEEN);
     gpio_set_mode(GPIOE, GPIO_MODE_OUTPUT_50_MHZ,
               GPIO_CNF_OUTPUT_PUSHPULL, GPIO7);
     gpio_set(GPIOE, GPIO7);
-
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPBEN);
-    gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
-              GPIO_CNF_OUTPUT_ALTFN_OPENDRAIN, GPIO6 | GPIO7);
 
     //Video channel bits 2:0 and av on/off
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPDEN);

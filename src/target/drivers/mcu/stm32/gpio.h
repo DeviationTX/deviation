@@ -39,7 +39,9 @@ struct adc_config {
 struct i2c_config {
     unsigned i2c;
     struct mcu_pin scl_sca;
-    unsigned speed;
+    unsigned i2c_freq;        // Target i2c frequency (Hz) (max: std-mode:100kHz, fast-mode:400kHz)
+    unsigned dutycycle;       // only relevant for fast-mode I2C_CCR_DUTY_DIV2 or I2C_CCR_DUTY_16_DIV_9
+    unsigned fastmode;        // 1: fast-mode, 0: standard-mode
 };
 
 struct uart_config {
