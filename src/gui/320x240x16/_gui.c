@@ -24,9 +24,6 @@ const struct ImageMap image_map[] = {
     {"media/spin96"   IMG_EXT, 96, 16, 0, 0}, /*FILE_SPIN96 */
     {"media/spin64"   IMG_EXT, 64, 16, 0, 0}, /*FILE_SPIN64 */
     {"media/spin32"   IMG_EXT, 32, 16, 0, 0}, /*FILE_SPIN32 */
-    {"media/spinp96"  IMG_EXT, 96, 16, 0, 0}, /*FILE_SPINPRESS96 */
-    {"media/spinp64"  IMG_EXT, 64, 16, 0, 0}, /*FILE_SPINPRESS64 */
-    {"media/spinp32"  IMG_EXT, 32, 16, 0, 0}, /*FILE_SPINPRESS32 */
     {"media/arrows16" IMG_EXT, 16, 16, 0, 0}, /*FILE_ARROW_16_UP */
     {"media/arrows16" IMG_EXT, 16, 16, 16, 0}, /*FILE_ARROW_16_DOWN */
     {"media/arrows16" IMG_EXT, 16, 16, 32, 0}, /*FILE_ARROW_16_RIGHT */
