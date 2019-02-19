@@ -89,7 +89,7 @@ guiObject_t *GUI_CreateTextSelectPlate(guiTextSelect_t *select, u16 x, u16 y, u1
     CLEAR_OBJ(select);
     box = &obj->box;
 
-    select->type = TEXTSELECT_DEVO10;
+    select->type = TEXTSELECT_TEXT;
     box->height = height;
     box->width = width;
 
@@ -270,9 +270,8 @@ void GUI_PressTextSelect(struct guiObject *obj, u32 button, u8 press_type)
 
 void GUI_TextSelectEnablePress(guiTextSelect_t *select, u8 enable)
 {
-    guiObject_t *obj = (guiObject_t *)select;
     select->enable = enable ? select->enable | 0x02 : select->enable & ~0x02;
-    if (select->type == TEXTSELECT_DEVO10) { // plate text for Devo10
+    if (select->type == TEXTSELECT_TEXT) {
         if (enable)
             select->desc.style = LABEL_BOX;
         else {
@@ -281,6 +280,8 @@ void GUI_TextSelectEnablePress(guiTextSelect_t *select, u8 enable)
         }
         return;
     }
+#if IMAGE_MAP_END > 1
+    guiObject_t *obj = (guiObject_t *)select;
     enum ImageNames fileidx;
     switch (select->type) {
         case TEXTSELECT_224: fileidx = FILE_SPIN192; /* enable ? FILE_SPIN192 : FILE_SPIN192;*/ break;
@@ -293,6 +294,7 @@ void GUI_TextSelectEnablePress(guiTextSelect_t *select, u8 enable)
         select->button = &image_map[fileidx];
         OBJ_SET_DIRTY(obj, 1);
     }
+#endif
 }
 
 void GUI_TextSelectEnable(guiTextSelect_t *select, u8 enable)

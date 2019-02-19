@@ -13,11 +13,7 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-static unsigned int _handle_modalbuttons_devo10(u32 button, unsigned int flags, void *data);
-
-const struct ImageMap image_map[] = {
-    {NULL, 1, 1, 0, 0}, /*DRAW_BTN32_18 */
-};
+static unsigned int _handle_modalbuttons(u32 button, unsigned int flags, void *data);
 
 void _gui_hilite_selected(struct guiObject *obj)
 {
@@ -46,11 +42,11 @@ void GUI_HandleModalButtons(u8 enable)
         BUTTON_RegisterCallback(&button_modalaction,
                 0xFFFFFFFF,
                 BUTTON_PRESS | BUTTON_RELEASE | BUTTON_LONGPRESS | BUTTON_PRIORITY,
-                _handle_modalbuttons_devo10,
+                _handle_modalbuttons,
                 NULL);
 }
 
-static unsigned int _handle_modalbuttons_devo10(u32 button, unsigned int flags, void *data)
+static unsigned int _handle_modalbuttons(u32 button, unsigned int flags, void *data)
 {
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {

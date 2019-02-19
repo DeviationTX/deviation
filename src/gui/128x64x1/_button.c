@@ -13,14 +13,14 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+static const struct ImageMap image_map = {
+    NULL, 37, 15, 0, 0
+};
+
 const struct ImageMap *_button_image_map(enum ButtonType type)
 {
-    switch (type) {
-        case BUTTON_DEVO10: return &image_map[DRAW_BTN32_15]; break;
-        default:
-            break;
-    }
-    return NULL;
+    (void)type;
+    return &image_map;
 }
 
 void _DrawButton(struct guiObject *obj)
