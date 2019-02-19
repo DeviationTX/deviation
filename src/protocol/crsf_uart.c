@@ -158,7 +158,9 @@ static void processCrossfireTelemetryFrame()
         if (getCrossfireTelemetryValue(2+i, &value, 1)) {   // payload starts at third byte of rx packet
           if (i == TELEM_CRSF_TX_POWER) {
             static const s32 power_values[] = { 0, 10, 25, 100, 500, 1000, 2000, 250 };
-            value = power_values[value % (sizeof power_values / sizeof (s32))];
+            if ((u8)value >= (sizeof power_values / sizeof (s32)))
+              continue;
+            value = power_values[value];
           }
           set_telemetry(i, value);
         }
