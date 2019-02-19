@@ -35,7 +35,9 @@ void PAGE_AboutInit(int page)
     (void)page;
     PAGE_ShowHeader(PAGE_GetName(PAGEID_ABOUT));
 
-    GUI_CreateLabelBox(&gui->label[0], ROW_1_X, ROW_1_Y, LCD_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, "www.deviationtx.com");
-    GUI_CreateLabelBox(&gui->label[1], ROW_2_X, ROW_2_Y, LCD_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, GUI_Localize, NULL, _tr_noop("Deviation FW version:"));
-    GUI_CreateLabelBox(&gui->label[2], ROW_3_X, ROW_3_Y, LCD_WIDTH, LINE_HEIGHT, &TINY_FONT, GUI_Localize, NULL, _tr_noop(DeviationVersion));
+    BeginGridLayout(4, 1) {
+        GUI_CreateLabelBox(&gui->label[0], Grid_XY(1, 1), LCD_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, "www.deviationtx.com");
+        GUI_CreateLabelBox(&gui->label[1], Grid_XY(2, 1), LCD_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, GUI_Localize, NULL, _tr_noop("Deviation FW version:"));
+        GUI_CreateLabelBox(&gui->label[2], Grid_XY(3, 1), LCD_WIDTH, LINE_HEIGHT, &TINY_FONT, GUI_Localize, NULL, _tr_noop(DeviationVersion));
+    }
 }

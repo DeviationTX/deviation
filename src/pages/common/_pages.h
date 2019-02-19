@@ -25,6 +25,8 @@
 #include "voiceconfig_page.h"
 #include "scanner_page.h"
 
+#include "layout.h"
+
 #define PAGE_NAME_MAX 10
 
 #define PAGEDEF(id, init, event, exit, menu, name) id,
