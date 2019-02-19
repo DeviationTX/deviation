@@ -280,7 +280,8 @@ void GUI_TextSelectEnablePress(guiTextSelect_t *select, u8 enable)
         }
         return;
     }
-#if IMAGE_MAP_END > 1
+
+#if LCD_DEPTH != 1
     guiObject_t *obj = (guiObject_t *)select;
     enum ImageNames fileidx;
     switch (select->type) {
