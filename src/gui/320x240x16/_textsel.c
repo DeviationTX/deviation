@@ -16,7 +16,7 @@
 #define KEY_ADJUST_Y 1 /* ensure cooridnate is within button */
 #define KEY_ADJUST_X 1
 
-const struct ImageMap *_textself_image_map(enum ButtonType type, int enable)
+static const struct ImageMap *_textself_image_map(enum ButtonType type, int enable)
 {
         enum ImageNames fileidx;
         switch (type) {
