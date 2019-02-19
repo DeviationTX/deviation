@@ -10,8 +10,6 @@ enum ButtonType {
 
 #define DIALOG_BUTTON BUTTON_GENERIC
 
-#define ARROW_LEFT  (&image_map[DRAW_BTN32_15])
-#define ARROW_RIGHT (&image_map[DRAW_BTN32_15])
 #define ARROW_UP    NULL
 #define ARROW_DOWN  NULL
 #define ARROW_WIDTH 1

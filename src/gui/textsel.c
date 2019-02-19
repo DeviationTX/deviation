@@ -281,21 +281,15 @@ void GUI_TextSelectEnablePress(guiTextSelect_t *select, u8 enable)
         return;
     }
 
-#if LCD_DEPTH != 1
-    guiObject_t *obj = (guiObject_t *)select;
-    enum ImageNames fileidx;
-    switch (select->type) {
-        case TEXTSELECT_224: fileidx = FILE_SPIN192; /* enable ? FILE_SPIN192 : FILE_SPIN192;*/ break;
-        case TEXTSELECT_128: fileidx = enable ? FILE_SPINPRESS96 : FILE_SPIN96; break;
-        case TEXTSELECT_96:  fileidx = enable ? FILE_SPINPRESS64 : FILE_SPIN64; break;
-        case TEXTSELECT_64:  fileidx = enable ? FILE_SPINPRESS32 : FILE_SPIN32; break;
-        default: fileidx = FILE_SPIN32; break;
+    if (LCD_DEPTH != 1) {
+        guiObject_t *obj = (guiObject_t *)select;
+
+        const struct ImageMap *map = _textself_image_map(select->type, enable);
+        if (select->button != map) {
+            select->button = map;
+            OBJ_SET_DIRTY(obj, 1);
+        }
     }
-    if (select->button != &image_map[fileidx]) {
-        select->button = &image_map[fileidx];
-        OBJ_SET_DIRTY(obj, 1);
-    }
-#endif
 }
 
 void GUI_TextSelectEnable(guiTextSelect_t *select, u8 enable)
