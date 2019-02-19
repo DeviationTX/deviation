@@ -18,6 +18,8 @@ SRC_C   += $(SDIR)/target/tx/devo/devof12e/backlight.c \
            $(SDIR)/target/tx/devo/devof12e/mapped_gfx.c \
            $(SDIR)/target/tx/devo/devof12e/tx_buttons.c
 
+else
+
 $(TARGET).fs_wrapper: $(LAST_MODEL)
 	perl -p -i -e 's/=12normal/=f12e/' filesystem/$(FILESYSTEM)/media/config.ini
 
