@@ -22,4 +22,20 @@
     })
 #define _PWM_DMA_ISR                dma1_channel2_isr
 
+// Touch pins
+#define TOUCH_SPI ((struct spi_csn) { \
+    .spi = SPI1,                      \
+    .csn = {GPIOC, GPIO4},            \
+    })
+#define TOUCH_IRQ_PIN ((struct mcu_pin){GPIOC, GPIO5})
+#define TOUCH_COORDS_REVERSE      0
+#define TOUCH_SPI_CFG SPI1_CFG
+
+// LCD override
+#define LCD_SPI ((struct spi_csn) { \
+    .spi = SPI1,                    \
+    .csn = {GPIOB, GPIO1},          \
+    })
+#define LCD_SPI_CFG SPI1_CFG
+ 
 #endif  // _DEVO12_HARDWARE_H_
