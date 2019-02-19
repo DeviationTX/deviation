@@ -1,8 +1,6 @@
 #ifndef _DEVO7E_256_TARGET_H_
 #define _DEVO7E_256_TARGET_H_
 
-#include "../common/common_devo.h"
-
 #define TXID 0x7e
 #define VECTOR_TABLE_LOCATION 0x3000
 #define SPIFLASH_SECTOR_OFFSET 0
@@ -59,5 +57,7 @@
 /* Compute voltage from y = 2.1592x + 0.2493 */
 #define VOLTAGE_NUMERATOR 216
 #define VOLTAGE_OFFSET    249
+
+#include "../common/common_devo.h"
 
 #endif //_DEVO7E_256_TARGET_H_

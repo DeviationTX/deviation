@@ -5,14 +5,7 @@
 
 #define SYSCLK_TIM 3
 
-#define _SPI_FLASH_PORT              2 //SPI2
-    #define _SPI_FLASH_CSN_PIN       {GPIOB, GPIO12}
-    #define _SPI_FLASH_SCK_PIN       {GPIOB, GPIO13}
-    #define _SPI_FLASH_MISO_PIN      {GPIOB, GPIO14}
-    #define _SPI_FLASH_MOSI_PIN      {GPIOB, GPIO15}
-
-#define LCD_RESET_PIN ((struct mcu_pin){GPIOE, GPIO0})
-    
+#include "hardware.h"
 #include "target/tx/devo/common/ports.h"
 
 #if 0

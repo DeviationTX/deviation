@@ -3,7 +3,6 @@
 
 #define USE_DEVOFS 1 //Must be before common_devo include
 #define SPIFLASH_TYPE SST25VFxxxA
-#include "../common/common_devo.h"
 
 #define TXID 0xF7
 #define VECTOR_TABLE_LOCATION 0x3000 //0x3000
@@ -66,6 +65,9 @@
 /* Compute voltage from y = 2.1592x + 0.2493 */
 #define VOLTAGE_NUMERATOR 324
 #define VOLTAGE_OFFSET    382
+
+#include "hardware.h"
+#include "../common/common_devo.h"
 
 #endif //_DEVO_F7_TARGET_H_
 

@@ -1,8 +1,6 @@
 #ifndef _DEVO10_TARGET_H_
 #define _DEVO10_TARGET_H_
 
-#include "../common/common_devo.h"
-
 #define TXID 0x0a
 #define VECTOR_TABLE_LOCATION 0x4000
 #define SPIFLASH_SECTOR_OFFSET 54
@@ -53,5 +51,7 @@
 /* Compute voltage from y = 0.003246x + 0.4208 */
 #define VOLTAGE_NUMERATOR 324
 #define VOLTAGE_OFFSET    421
+
+#include "../common/common_devo.h"
 
 #endif //_DEVO10_TARGET_H_

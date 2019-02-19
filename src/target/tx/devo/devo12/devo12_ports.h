@@ -22,14 +22,6 @@
 #define _SOUND_TIM                 TIM3
 //End Sound port
 
-//Touch pins
-#define _TOUCH_PORT                GPIOC
-#define _TOUCH_PIN                 GPIO4
-#define _TOUCH_IRQ_PIN             GPIO5
-#define _TOUCH_RCC_APB2ENR_IOPEN   RCC_APB2ENR_IOPCEN
-#define _TOUCH_COORDS_REVERSE      0
-//End Touch pins
-
 //PWM Port
 #define _PWM_PIN                   GPIO8
 #define _PWM_EXTI                  EXTI8

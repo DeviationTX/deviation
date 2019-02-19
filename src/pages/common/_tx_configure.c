@@ -31,7 +31,7 @@ enum {
     ITEM_BATT,
     ITEM_ALARM_INTV,
     ITEM_PWRDN_ALARM,
-#ifndef HAS_OLED_DISPLAY
+#if !HAS_OLED_DISPLAY
     ITEM_BACKLIGHT,
 #endif
     ITEM_CONTRAST,
@@ -184,7 +184,7 @@ static const char *modeselect_cb(guiObject_t *obj, int dir, void *data)
     return tempstring;
 }
 
-#ifndef HAS_OLED_DISPLAY
+#if !HAS_OLED_DISPLAY
 static const char *backlight_select_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)data;

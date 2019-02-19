@@ -13,11 +13,11 @@
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <libopencm3/stm32/gpio.h>
-#include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/fsmc.h>
 #include <libopencm3/stm32/spi.h>
 #include "common.h"
-#include "lcd.h"
+#include "480x272x16_s1d13517f00a1.h"
+#include "target/drivers/mcu/stm32/rcc.h"
 
 #define LCD_REG_ADDR  ((uint32_t)0x6C000000)    /* Register Address */
 #define LCD_DATA_ADDR  ((uint32_t)(LCD_REG_ADDR + 2)) /* Data Address */
@@ -25,8 +25,8 @@
 #define LCD_REG  *(volatile uint16_t *)(LCD_REG_ADDR)
 #define LCD_DATA *(volatile uint16_t *)(LCD_DATA_ADDR)
 
-#define CS_HI() gpio_set(GPIOB, GPIO1)
-#define CS_LO() gpio_clear(GPIOB, GPIO1)
+#define CS_HI() GPIO_pin_set(LCD_SPI.csn)
+#define CS_LO() GPIO_pin_clear(LCD_SPI.csn)
 
 //See this thread: http://www.deviationtx.com/forum/6-general-discussions/4278-please-help-devo-12s-fonts-is-out-of-wack
 //The new Devo12 uses a different rev of the Epson chip, which doesn't like our transparency value
@@ -147,40 +147,39 @@ void lcd_clear(unsigned int color)
 void SPILCD_SetRegister(u8 address, u16 data)
 {
     CS_LO();
-    spi_xfer(SPI1, 0x70); //Address
-    spi_xfer(SPI1, 0x00);
-    spi_xfer(SPI1, address);
+    spi_xfer(LCD_SPI.spi, 0x70);  // Address
+    spi_xfer(LCD_SPI.spi, 0x00);
+    spi_xfer(LCD_SPI.spi, address);
     CS_HI();
     usleep(1);
     CS_LO();
-    spi_xfer(SPI1, 0x72); //Write Data
-    spi_xfer(SPI1, data >> 8);
-    spi_xfer(SPI1, data & 0xFF);
+    spi_xfer(LCD_SPI.spi, 0x72);  // Write Data
+    spi_xfer(LCD_SPI.spi, data >> 8);
+    spi_xfer(LCD_SPI.spi, data & 0xFF);
     CS_HI();
 }
 
 u16 SPILCD_ReadRegister(u8 address)
 {
     CS_LO();
-    spi_xfer(SPI1, 0x70); //Address
-    spi_xfer(SPI1, 0x00);
-    spi_xfer(SPI1, address);
+    spi_xfer(LCD_SPI.spi, 0x70);  // Address
+    spi_xfer(LCD_SPI.spi, 0x00);
+    spi_xfer(LCD_SPI.spi, address);
     CS_HI();
     usleep(1);
     CS_LO();
-    spi_xfer(SPI1, 0x73); //Write Data
-    u16 out = spi_xfer(SPI1, 0);
+    spi_xfer(LCD_SPI.spi, 0x73);  // Write Data
+    u16 out = spi_xfer(LCD_SPI.spi, 0);
     out <<= 8;
-    out |= spi_xfer(SPI1, 0);
+    out |= spi_xfer(LCD_SPI.spi, 0);
     CS_HI();
     return out;
 }
 
 void SPILCD_Init()
 {
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPBEN);
-    gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_PUSHPULL, GPIO1);
+    rcc_periph_clock_enable(get_rcc_from_pin(LCD_SPI.csn));
+    GPIO_setup_output(LCD_SPI.csn, OTYPE_PUSHPULL);
     CS_HI();
     SPILCD_SetRegister(0x01, 0x7946);
     SPILCD_SetRegister(0x02, 0x2037);
