@@ -408,7 +408,7 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
         int max = PAGE_GetNumPages();
         for(i = 0; i < max; i++) {
             if(mapstrcasecmp(PAGE_GetName(i), value) == 0) {
-                m->pagecfg2.quickpage[idx] = i;
+                m->quickpage[idx] = i;
                 return 1;
             }
         }
@@ -423,7 +423,7 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
     };
     if (! MATCH_SECTION(SECTION_GUI)) {
         if(MATCH_SECTION("gui-320x240")
-           && (! ELEM_USED(Model.pagecfg2.elem[0]) || seen_res != HIRES))
+           && (! ELEM_USED(Model.elem[0]) || seen_res != HIRES))
         {
             seen_res = LOWRES;
             offset_x = (LCD_WIDTH - 320) / 2;
@@ -432,7 +432,7 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
             return 1;
     } else {
         if (seen_res == LOWRES) {
-            memset(&Model.pagecfg2.elem, 0, sizeof(Model.pagecfg2.elem));
+            memset(&Model.elem, 0, sizeof(Model.elem));
         }
         seen_res = HIRES;
     }
@@ -441,7 +441,7 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
         return 1;
 #endif
     for (idx = 0; idx < NUM_ELEMS; idx++) {
-        if (Model.pagecfg2.elem[idx].type == ELEM_NONE)
+        if (Model.elem[idx].type == ELEM_NONE)
             break;
     }
     if (idx == NUM_ELEMS) {
@@ -468,7 +468,7 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
     }
 
     struct elem *cur_elem;
-    cur_elem = &Model.pagecfg2.elem[idx];
+    cur_elem = &Model.elem[idx];
 
     memset(cur_elem, 0, sizeof(struct elem));
     cur_elem->x = data[0];
@@ -1384,7 +1384,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
     }
     fprintf(fh, "[%s]\n", SECTION_GUI);
     for(idx = 0; idx < NUM_ELEMS; idx++) {
-        struct elem *cur_elem = &Model.pagecfg2.elem[idx];
+        struct elem *cur_elem = &Model.elem[idx];
         if (cur_elem->type == ELEM_NONE)
             break;
         int src = cur_elem->src;
@@ -1418,8 +1418,8 @@ u8 CONFIG_WriteModel(u8 model_num) {
         }
     }
     for(idx = 0; idx < NUM_QUICKPAGES; idx++) {
-        if (WRITE_FULL_MODEL || m->pagecfg2.quickpage[idx]) {
-            u8 val = m->pagecfg2.quickpage[idx];
+        if (WRITE_FULL_MODEL || m->quickpage[idx]) {
+            u8 val = m->quickpage[idx];
             fprintf(fh, "%s%d=%s\n", GUI_QUICKPAGE, idx+1, PAGE_GetName(val));
         }
     }
@@ -1501,7 +1501,7 @@ u8 CONFIG_ReadModel(u8 model_num) {
     if (CONFIG_IniParse(file, ini_handler, &Model)) {
         printf("Failed to parse Model file: %s\n", file);
     }
-    if (Model.pagecfg2.elem[0].type == ELEM_NONE)
+    if (Model.elem[0].type == ELEM_NONE)
         CONFIG_ReadLayout("layout/default.ini");
     if(! PROTOCOL_HasPowerAmp(Model.protocol))
         Model.tx_power = TXPOWER_150mW;
@@ -1628,7 +1628,7 @@ u8 CONFIG_ReadTemplate(const char *filename) {
 }
 
 u8 CONFIG_ReadLayout(const char *filename) {
-    memset(&Model.pagecfg2, 0, sizeof(Model.pagecfg2));
+    memset(&Model.elem, 0, sizeof(Model.elem));
     if (CONFIG_IniParse(filename, layout_ini_handler, &Model)) {
         printf("Failed to parse Layout file: %s\n", filename);
         return 0;

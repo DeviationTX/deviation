@@ -41,11 +41,6 @@ struct elem {
 //#define NUM_BAR_ELEMS 8
 //#define NUM_TOGGLE_ELEMS 4
 
-struct PageCfg2 {
-    struct elem elem[NUM_ELEMS];
-    u8 quickpage[NUM_QUICKPAGES];
-    u8 padding_1[3];
-};
 
 enum {
     ELEM_NONE,

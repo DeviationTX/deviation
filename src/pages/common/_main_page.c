@@ -15,7 +15,6 @@
 
 static struct main_page    * const mp  = &pagemem.u.main_page;
 static struct mainpage_obj * const gui = &gui_objs.u.mainpage;
-static struct PageCfg2     * const pc  = &Model.pagecfg2;
 const char *show_box_cb(guiObject_t *obj, const void *data);
 const char *voltage_cb(guiObject_t *obj, const void *data);
 static s32 trim_cb(void * data);
@@ -151,12 +150,12 @@ void PAGE_MainEvent()
     }
     volatile s32 *raw = MIXER_GetInputs();
     for(i = 0; i < NUM_ELEMS; i++) {
-        if (pc->elem[i].type == ELEM_NONE)
+        if (Model.elem[i].type == ELEM_NONE)
             break;
         if (! OBJ_IS_USED(&gui->elem[i]))
             continue;
-        int src = pc->elem[i].src;
-        int type = pc->elem[i].type;
+        int src = Model.elem[i].src;
+        int type = Model.elem[i].type;
         switch(type) {
             case ELEM_VTRIM:
             case ELEM_HTRIM:
@@ -225,16 +224,16 @@ void PAGE_MainEvent()
                         //switch
                         for (int j = 0; j < 3; j++) {
                             // Assume switch 0/1/2 are in order
-                            if(pc->elem[i].extra.ico[j] && raw[src+j] > 0) {
-                                idx = pc->elem[i].extra.ico[j];
+                            if(Model.elem[i].extra.ico[j] && raw[src+j] > 0) {
+                                idx = Model.elem[i].extra.ico[j];
                                 break;
                             }
                         }
                     } else {
                         //Non switch
                         int sw = raw[src] > 0 ? 1 : 0;
-                        if (pc->elem[i].extra.ico[sw]) {
-                            idx = pc->elem[i].extra.ico[sw];
+                        if (Model.elem[i].extra.ico[sw]) {
+                            idx = Model.elem[i].extra.ico[sw];
                         }
                     }
                 }
@@ -339,9 +338,9 @@ int MAINPAGE_FindNextElem(unsigned type, int idx)
 {
     type = map_type(type);
     for(int i = idx; i < NUM_ELEMS; i++) {
-        if (pc->elem[i].type == ELEM_NONE)
+        if (Model.elem[i].type == ELEM_NONE)
             break;
-        if (map_type(pc->elem[i].type) == type)
+        if (map_type(Model.elem[i].type) == type)
             return i;
     }
     return -1;
@@ -351,9 +350,9 @@ void show_elements()
 {
     u16 x, y, w, h;
     for (int i = 0; i < NUM_ELEMS; i++) {
-        if (! GetWidgetLoc(&pc->elem[i], &x, &y, &w, &h))
+        if (! GetWidgetLoc(&Model.elem[i], &x, &y, &w, &h))
             break;
-        int type = pc->elem[i].type;
+        int type = Model.elem[i].type;
         switch(type) {
             case ELEM_MODELICO:
                 GUI_CreateImageOffset(&gui->elem[i].img, x, y, w, h, 0, 0, CONFIG_GetCurrentIcon(), press_icon_cb, (void *)1);
@@ -361,7 +360,7 @@ void show_elements()
             case ELEM_VTRIM:
             case ELEM_HTRIM:
             {
-                int src = pc->elem[i].src;
+                int src = Model.elem[i].src;
                 if (src == 0)
                     continue;
                 mp->elem[i] = *(MIXER_GetTrim(src-1));
@@ -372,7 +371,7 @@ void show_elements()
             case ELEM_SMALLBOX:
             case ELEM_BIGBOX:
             {
-                int src = pc->elem[i].src;
+                int src = Model.elem[i].src;
                 if (src == 0)
                     continue;
                 mp->elem[i] = get_boxval(src);
@@ -395,7 +394,7 @@ void show_elements()
             }
             case ELEM_BAR:
             {
-                int src = pc->elem[i].src;
+                int src = Model.elem[i].src;
                 if (src == 0)
                     continue;
                 mp->elem[i] = MIXER_GetChannel(src-1, APPLY_SAFETY);
@@ -407,9 +406,9 @@ void show_elements()
             {
 #ifdef HAS_CHAR_ICONS
                 GUI_CreateLabelBox(&gui->elem[i].box, x, y, 2, 2, &DEFAULT_FONT, TGLICO_font_cb, NULL,
-                    (void *)(uintptr_t)pc->elem[i].extra.ico[0]);
+                    (void *)(uintptr_t)Model.elem[i].extra.ico[0]);
 #else
-                struct ImageMap img = TGLICO_GetImage(pc->elem[i].extra.ico[0]); //We'll set this properly down below
+                struct ImageMap img = TGLICO_GetImage(Model.elem[i].extra.ico[0]); //We'll set this properly down below
                 GUI_CreateImageOffset(&gui->elem[i].img, x, y, w, h,
                                   img.x_off, img.y_off, img.file, NULL, NULL);
 #endif

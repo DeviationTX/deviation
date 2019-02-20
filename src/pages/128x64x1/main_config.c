@@ -41,7 +41,6 @@ enum {
 };
 #endif //OVERRIDE_PLACEMENT
 static struct layout_page    * const lp  = &pagemem.u.layout_page;
-static struct PageCfg2       * const pc  = &Model.pagecfg2;
 static struct mainconfig_obj * const gui = &gui_objs.u.mainconfig;
 static u16 current_selected = 0;
 
@@ -77,7 +76,7 @@ static const char *cfglabel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     int i = (long)data;
-    int type = pc->elem[i].type;
+    int type = Model.elem[i].type;
     int idx = elem_abs_to_rel(i);
     const char *str;
     switch(type) {
@@ -122,13 +121,13 @@ void newelem_press_cb(guiObject_t *obj, const void *data)
 static const char *dlgts1_cb(guiObject_t *obj, int dir, void *data)
 {
     int idx = (long)data;
-    if (pc->elem[idx].src == 0 && dir < 0)
-        pc->elem[idx].src = -1;
-    if ((s8)pc->elem[idx].src == -1 && dir > 0) {
-        pc->elem[idx].src = 0;
+    if (Model.elem[idx].src == 0 && dir < 0)
+        Model.elem[idx].src = -1;
+    if ((s8)Model.elem[idx].src == -1 && dir > 0) {
+        Model.elem[idx].src = 0;
         dir = 0;
     }
-    if ((s8)pc->elem[idx].src < 0) {
+    if ((s8)Model.elem[idx].src < 0) {
         GUI_TextSelectEnablePress((guiTextSelect_t *)obj, 1);
         //PAGE_MainLayoutExit();
         return _tr("Delete");
@@ -205,7 +204,7 @@ void show_config()
 {
     long count = 0;
     for (count = 0; count < NUM_ELEMS; count++) {
-        if (pc->elem[count].type == ELEM_NONE)
+        if (Model.elem[count].type == ELEM_NONE)
             break;
     }
 #if HAS_LAYOUT_EDITOR
