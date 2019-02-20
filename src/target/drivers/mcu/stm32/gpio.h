@@ -53,7 +53,7 @@ struct uart_config {
 struct tim_config {
     unsigned tim;
     struct mcu_pin pin;
-    unsigned channel;
+    unsigned ch;          // Timer channel
 };
 
 struct dma_config {

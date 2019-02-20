@@ -124,19 +124,11 @@
     #define TOUCH_SPI_CFG SPI1_CFG
 #endif  // TOUCH_SPI
 
-//FIXME
-#ifndef _PWM_PIN
-    #define _PWM_PIN                   GPIO_USART1_TX    //GPIO9
-    #define _PWM_EXTI                  EXTI9
-    #define _PWM_TIM_OC                TIM_OC2
-    #define _PWM_TIM_DIER_DMAEN        TIM_DIER_CC2DE
-#endif //_PWM_PIN
-
 #ifndef PWM_TIMER
     #define PWM_TIMER ((struct tim_config) { \
         .tim = TIM1,             \
         .pin = {GPIOA, GPIO9},   \
-        .channel = 2,            \
+        .ch = 2,                 \
         })
     #define PWM_TIMER_ISR exti9_5_isr    // Matches PA.9
 #endif  //PWM_TIMER

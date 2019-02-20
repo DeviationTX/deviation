@@ -43,9 +43,9 @@ sser_callback_t *soft_rx_callback;
 
 void SSER_Initialize()
 {
-#if _PWM_PIN == GPIO_USART1_TX
-    UART_Stop();  // disable USART1 for GPIO PA9 & PA10 (Trainer Tx(PA9) & Rx(PA10))
-#endif
+    if (PWM_TIMER.pin.pin == GPIO_USART1_TX) {
+        UART_Stop();  // disable USART1 for GPIO PA9 & PA10 (Trainer Tx(PA9) & Rx(PA10))
+    }
     in_byte = 0;
     bit_pos = 0;
     data_byte = 0;

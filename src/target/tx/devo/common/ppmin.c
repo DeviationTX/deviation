@@ -106,10 +106,8 @@ void PPMin_Init()
     if (PWM_TIMER.pin.pin == GPIO_USART1_TX) {
         UART_Stop();  // disable USART1 for GPIO PA9 & PA10 (Trainer Tx(PA9) & Rx(PA10))
     }
-    /* Enable GPIOA clock. */
+    rcc_periph_clock_enable(get_rcc_from_port(PWM_TIMER.tim));
     rcc_periph_clock_enable(get_rcc_from_pin(PWM_TIMER.pin));
-
-    /* Enable AFIO clock. */
     rcc_periph_clock_enable(RCC_AFIO);
 
     /* Enable EXTI interrupt. */
