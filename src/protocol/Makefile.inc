@@ -58,7 +58,6 @@ PROTO_MODULES += $(ODIR)/protocol/gd00x.mod
 PROTO_MODULES += $(ODIR)/protocol/sbus.mod
 PROTO_MODULES += $(ODIR)/protocol/pxx.mod
 PROTO_MODULES += $(ODIR)/protocol/loli.mod
-PROTO_MODULES += $(ODIR)/protocol/radiolin.mod
 
 ALL += $(PROTO_MODULES)
 else #BUILD_TARGET
@@ -292,10 +291,6 @@ $(ODIR)/protocol/pxx.mod : $(ODIR)/pxxout.bin
 
 $(ODIR)/protocol/loli.mod : $(ODIR)/loli_nrf24l01.bin
 	@echo Building 'loli' module
-	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
-
-$(ODIR)/protocol/radiolin.mod : $(ODIR)/radiolink.bin
-	@echo Building 'radiolink' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
 endif #BUILD_TARGET

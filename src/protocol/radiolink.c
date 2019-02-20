@@ -23,12 +23,6 @@
 
 #ifdef PROTO_HAS_RADIOLINK_CC2530
 
-#ifdef MODULAR
-  // Allows the linker to properly relocate
-  #define RADIOLINK_Cmds PROTO_Cmds
-  #pragma long_calls
-#endif
-
 #define PACKET_SIZE     41
 #define PACKET_INTERVAL 4000
 
