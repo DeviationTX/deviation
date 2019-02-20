@@ -11,7 +11,7 @@
 #if 0
 // _SPI_PROTO_PORT defined in ports.h
 
-#if 0 // defined in ports.h
+#if 0  // defined in ports.h
     #define _USART                        USART1
     #define _USART_DR                     USART1_DR
     #define _USART_DMA                    DMA1
@@ -42,4 +42,4 @@
     #define _NVIC_DMA_CHANNEL_IRQ   NVIC_DMA1_CHANNEL1_IRQ
 #endif
 
-#endif //_RADIOLINK_AT9_PORTS_H
+#endif  // _RADIOLINK_AT9_PORTS_H
