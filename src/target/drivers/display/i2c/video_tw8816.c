@@ -51,161 +51,161 @@ extern u8 window;
 #define LONG_TIMEOUT 0x10000
 #define FLAG_TIMEOUT 0x1000
 
-static u32 i2c1_timeout()
+static u32 lcd_i2c_timeout()
 {
-    I2C1_SR1 = ~ (0x1000DFDF & 0xFFFFFF);
-    i2c_send_stop(I2C1);
+    I2C_SR1(LCD_I2C_CFG.i2c) = ~(0x1000DFDF & 0xFFFFFF);
+    i2c_send_stop(LCD_I2C_CFG.i2c);
     return 1;
 }
 
-static u32 I2C1_WriteBuffer(u16 deviceId, u8 *buffer, s16 periphMemAddr, int len)
+static u32 LCD_I2C_WriteBuffer(u16 deviceId, u8 *buffer, s16 periphMemAddr, int len)
 {
   /* While the bus is busy */
   unsigned timeout = LONG_TIMEOUT;
-  while(I2C_SR2(I2C1) & I2C_SR2_BUSY)
+  while (I2C_SR2(LCD_I2C_CFG.i2c) & I2C_SR2_BUSY)
   {
-    if((timeout--) == 0) {printf("Error1\n"); return i2c1_timeout(); }
+    if ((timeout--) == 0) {printf("Error1\n"); return lcd_i2c_timeout(); }
   }
 
   /* Send START condition */
-  i2c_send_start(I2C1);
+  i2c_send_start(LCD_I2C_CFG.i2c);
 
   /* Wait for master mode selected */
   timeout = FLAG_TIMEOUT;
-  while(!((I2C_SR1(I2C1) & I2C_SR1_SB) & (I2C_SR2(I2C1) & (I2C_SR2_MSL | I2C_SR2_BUSY))))
+  while (!((I2C_SR1(LCD_I2C_CFG.i2c) & I2C_SR1_SB) & (I2C_SR2(LCD_I2C_CFG.i2c) & (I2C_SR2_MSL | I2C_SR2_BUSY))))
   {
-    if((timeout--) == 0) {printf("Error2\n"); return i2c1_timeout(); }
+    if ((timeout--) == 0) {printf("Error2\n"); return lcd_i2c_timeout(); }
   }
 
   /* Send EEPROM address for write */
-  i2c_send_7bit_address(I2C1, deviceId, I2C_WRITE);
+  i2c_send_7bit_address(LCD_I2C_CFG.i2c, deviceId, I2C_WRITE);
 
   /* Waiting for address is transferred */
   timeout = FLAG_TIMEOUT;
-  while (!(I2C_SR1(I2C1) & I2C_SR1_ADDR))
+  while (!(I2C_SR1(LCD_I2C_CFG.i2c) & I2C_SR1_ADDR))
   {
-    if((timeout--) == 0) {printf("Error3\n"); return i2c1_timeout(); }
+    if ((timeout--) == 0) {printf("Error3\n"); return lcd_i2c_timeout(); }
   }
 
   /* Cleaning ADDR condition sequence */
-  (void)I2C_SR2(I2C1);
+  (void)I2C_SR2(LCD_I2C_CFG.i2c);
 
   /* Send the EEPROM's internal address to write to : only one byte Address */
-  i2c_send_data(I2C1, periphMemAddr);
+  i2c_send_data(LCD_I2C_CFG.i2c, periphMemAddr);
 
   /* Waiting for byte transfer finished */
   timeout = FLAG_TIMEOUT;
-  while (!(I2C_SR1(I2C1) & (I2C_SR1_BTF)))
+  while (!(I2C_SR1(LCD_I2C_CFG.i2c) & (I2C_SR1_BTF)))
   {
-    if((timeout--) == 0) {printf("Error4\n"); return i2c1_timeout(); }
+    if ((timeout--) == 0) {printf("Error4\n"); return lcd_i2c_timeout(); }
   }
 
   while(len--) {
       /* Send the byte to be written */
-      i2c_send_data(I2C1, *buffer++);
+      i2c_send_data(LCD_I2C_CFG.i2c, *buffer++);
       /* Waiting for byte transfer finished */
       timeout = FLAG_TIMEOUT;
       u32 flag = len ? I2C_SR1_BTF : (I2C_SR1_BTF | I2C_SR1_TxE);
-      while (!(I2C_SR1(I2C1) & flag))
+      while (!(I2C_SR1(LCD_I2C_CFG.i2c) & flag))
       {
-        if((timeout--) == 0) {printf("Error%d\n", 5 + len); return i2c1_timeout(); }
+        if ((timeout--) == 0) {printf("Error%d\n", 5 + len); return lcd_i2c_timeout(); }
       }
   }
 
   /* Send STOP condition. */
-  i2c_send_stop(I2C1);
+  i2c_send_stop(LCD_I2C_CFG.i2c);
 
   /* If all operations OK, return sEE_OK (0) */
   return 0;
 }
 
-static u32 I2C1_ReadBuffer(u16 deviceId, u8 *buffer, s16 periphMemAddr, int len)
+static u32 LCD_I2C_ReadBuffer(u16 deviceId, u8 *buffer, s16 periphMemAddr, int len)
 {
   /* While the bus is busy */
   unsigned timeout = LONG_TIMEOUT;
-  while(I2C_SR2(I2C1) & I2C_SR2_BUSY)
+  while (I2C_SR2(LCD_I2C_CFG.i2c) & I2C_SR2_BUSY)
   {
-    if((timeout--) == 0) {printf("ReadErr1\n"); return i2c1_timeout();}
+    if ((timeout--) == 0) {printf("ReadErr1\n"); return lcd_i2c_timeout();}
   }
 
   /* Send START condition */
-  i2c_send_start(I2C1);
+  i2c_send_start(LCD_I2C_CFG.i2c);
 
   /* Wait for master mode selected */
   timeout = FLAG_TIMEOUT;
-  while(!((I2C_SR1(I2C1) & I2C_SR1_SB) & (I2C_SR2(I2C1) & (I2C_SR2_MSL | I2C_SR2_BUSY))))
+  while (!((I2C_SR1(LCD_I2C_CFG.i2c) & I2C_SR1_SB) & (I2C_SR2(LCD_I2C_CFG.i2c) & (I2C_SR2_MSL | I2C_SR2_BUSY))))
   {
-    if((timeout--) == 0) {printf("ReadErr2\n"); return i2c1_timeout();}
+    if ((timeout--) == 0) {printf("ReadErr2\n"); return lcd_i2c_timeout();}
   }
 
   /* Send EEPROM address for write */
-  i2c_send_7bit_address(I2C1, deviceId, I2C_WRITE);
+  i2c_send_7bit_address(LCD_I2C_CFG.i2c, deviceId, I2C_WRITE);
 
   /* Waiting for address is transferred */
   timeout = FLAG_TIMEOUT;
-  while(!(I2C_SR1(I2C1) & I2C_SR1_ADDR))
+  while (!(I2C_SR1(LCD_I2C_CFG.i2c) & I2C_SR1_ADDR))
   {
-    if((timeout--) == 0) {printf("ReadErr3\n"); return i2c1_timeout();}
+    if ((timeout--) == 0) {printf("ReadErr3\n"); return lcd_i2c_timeout();}
   }
 
   /* Cleaning ADDR condition sequence */
-  (void)I2C_SR2(I2C1);
+  (void)I2C_SR2(LCD_I2C_CFG.i2c);
 
   /* Send the EEPROM's internal address to read from: Only one byte address */
-  i2c_send_data(I2C1, periphMemAddr);
+  i2c_send_data(LCD_I2C_CFG.i2c, periphMemAddr);
 
   /* Waiting for byte transfer finished */
   timeout = FLAG_TIMEOUT;
-  while (!(I2C_SR1(I2C1) & (I2C_SR1_BTF | I2C_SR1_TxE)))
+  while (!(I2C_SR1(LCD_I2C_CFG.i2c) & (I2C_SR1_BTF | I2C_SR1_TxE)))
   {
-    if((timeout--) == 0) {printf("ReadErr4\n"); return i2c1_timeout();}
+    if ((timeout--) == 0) {printf("ReadErr4\n"); return lcd_i2c_timeout();}
   }
 
   /* Send START condition a second time */
-  i2c_send_start(I2C1);
+  i2c_send_start(LCD_I2C_CFG.i2c);
 
   /* Wait for master mode selected */
   timeout = FLAG_TIMEOUT;
-  while(!((I2C_SR1(I2C1) & I2C_SR1_SB) & (I2C_SR2(I2C1) & (I2C_SR2_MSL | I2C_SR2_BUSY))))
+  while (!((I2C_SR1(LCD_I2C_CFG.i2c) & I2C_SR1_SB) & (I2C_SR2(LCD_I2C_CFG.i2c) & (I2C_SR2_MSL | I2C_SR2_BUSY))))
   {
-    if((timeout--) == 0) {printf("ReadErr5\n"); return i2c1_timeout();}
+    if ((timeout--) == 0) {printf("ReadErr5\n"); return lcd_i2c_timeout();}
   }
 
   /* Send EEPROM address for read */
-  i2c_send_7bit_address(I2C1, deviceId, I2C_READ);
+  i2c_send_7bit_address(LCD_I2C_CFG.i2c, deviceId, I2C_READ);
 
   /* Waiting for address is transferred */
   timeout = FLAG_TIMEOUT;
-  while(!(I2C_SR1(I2C1) & I2C_SR1_ADDR))
+  while (!(I2C_SR1(LCD_I2C_CFG.i2c) & I2C_SR1_ADDR))
   {
-    if((timeout--) == 0) {printf("ReadErr6a\n"); return i2c1_timeout();}
+    if ((timeout--) == 0) {printf("ReadErr6a\n"); return lcd_i2c_timeout();}
   }
 
   /* Cleaning ADDR condition sequence */
-  (void)I2C_SR2(I2C1);
+  (void)I2C_SR2(LCD_I2C_CFG.i2c);
 
   /* Enable Acknowledgement to be ready for another reception */
-  i2c_enable_ack(I2C1);
+  i2c_enable_ack(LCD_I2C_CFG.i2c);
 
   /* While there is data to be read */
   while(len) {
       if(len == 1) {
           /* Disable Acknowledgement */
-          i2c_disable_ack(I2C1);
+          i2c_disable_ack(LCD_I2C_CFG.i2c);
 
           /* Send STOP Condition */
-          i2c_send_stop(I2C1);
+          i2c_send_stop(LCD_I2C_CFG.i2c);
       }
 
       /* Wait for the byte to be received */
       timeout = FLAG_TIMEOUT;
-      while(!(I2C_SR1(I2C1) & (I2C_SR1_RxNE)))
+      while (!(I2C_SR1(LCD_I2C_CFG.i2c) & (I2C_SR1_RxNE)))
       {
-        if((timeout--) == 0) {printf("ReadErr6b\n"); return i2c1_timeout(); }
+        if ((timeout--) == 0) {printf("ReadErr6b\n"); return lcd_i2c_timeout(); }
       }
 
       /* Read a next byte */
-      *buffer = i2c_get_data(I2C1);
+      *buffer = i2c_get_data(LCD_I2C_CFG.i2c);
 
       /* Point to the next location where the byte read will be saved */
       buffer++;
@@ -216,13 +216,13 @@ static u32 I2C1_ReadBuffer(u16 deviceId, u8 *buffer, s16 periphMemAddr, int len)
 
   /* Wait to make sure that STOP control bit has been cleared */
   timeout = FLAG_TIMEOUT;
-  while(I2C_CR1(I2C1) & I2C_CR1_STOP)
+  while (I2C_CR1(LCD_I2C_CFG.i2c) & I2C_CR1_STOP)
   {
-    if((timeout--) == 0) {printf("ReadErr6c\n"); return i2c1_timeout();}
+    if ((timeout--) == 0) {printf("ReadErr6c\n"); return lcd_i2c_timeout();}
   }
 
   /* Re-Enable Acknowledgement to be ready for another reception */
-  i2c_enable_ack(I2C1);
+  i2c_enable_ack(LCD_I2C_CFG.i2c);
 
   /* If all operations OK, return sEE_OK (0) */
   return 0;
@@ -232,7 +232,7 @@ static u32 LCD_ReadReg(unsigned reg)
 {
     u8 val = 0;
     for (int i = 0; i < 2; i++) {
-        if (! I2C1_ReadBuffer(0x45, &val, reg, 1))
+        if (!LCD_I2C_ReadBuffer(0x45, &val, reg, 1))
             break;
     }
     return val;
@@ -242,7 +242,7 @@ static void LCD_WriteReg(unsigned reg, u8 val)
 {
     u8 value = val;
     for (int i = 0; i < 2; i++) {
-        if (! I2C1_WriteBuffer(0x45, &value, reg, 1))
+        if (!LCD_I2C_WriteBuffer(0x45, &value, reg, 1))
             break;
     }
 }
@@ -250,7 +250,7 @@ static void LCD_WriteReg(unsigned reg, u8 val)
 static void LCD_WriteBuffer(u16 periphAddr, u8 *buffer, unsigned len)
 {
     for (int i = 0; i < 2; i++) {
-        if (! I2C1_WriteBuffer(0x45, buffer, periphAddr, len))
+        if (!LCD_I2C_WriteBuffer(0x45, buffer, periphAddr, len))
             break;
     }
 }
