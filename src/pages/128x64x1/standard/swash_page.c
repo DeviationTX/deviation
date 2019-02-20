@@ -46,7 +46,7 @@ void PAGE_SwashInit(int page)
     const void * swashlbl[3] = { _tr_noop("ELE Mix"), _tr_noop("AIL Mix"), _tr_noop("PIT Mix") };
     for (int i = 0; i < 3; i++) {
         GUI_CreateLabelBox(&gui->lbl[i], LABEL_X, y, LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, GUI_Localize, NULL, swashlbl[i]);
-        GUI_CreateTextSelectPlate(&gui->mix[i], FIELD_X, y, FIELD_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT, NULL, swashmix_val_cb, (void *)(long)i);
+        GUI_CreateTextSelectPlate(&gui->mix[i], FIELD_X, y, FIELD_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT, NULL, swashmix_val_cb, (void *)(uintptr_t)i);
         y += LINE_SPACE;
     }
 
