@@ -41,6 +41,7 @@ POST_FILTER = {
        ],
     "runtime/printf": [
        'Never use sprintf. Use snprintf instead.',
+       'Almost always, snprintf is better than strcpy',
     ]
     }
 
