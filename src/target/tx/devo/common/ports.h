@@ -36,13 +36,6 @@
     #define _SOUND_TIM                 TIM2
 #endif //_SOUND_PORT
 
-#ifndef _PWM_PIN
-    #define _PWM_PIN                   GPIO_USART1_TX    //GPIO9
-    #define _PWM_EXTI                  EXTI9
-    #define _PWM_TIM_OC                TIM_OC2
-    #define _PWM_TIM_DIER_DMAEN        TIM_DIER_CC2DE
-#endif //_PWM_PIN
-
 #ifndef SYSCLK_TIM // System-clock timer
     #define SYSCLK_TIM 4
 #endif

@@ -22,9 +22,11 @@
 #include <libopencm3/stm32/timer.h>
 #include <libopencm3/stm32/usart.h>
 #include <libopencm3/stm32/iwdg.h>
- 
 #include "common.h"
 #include "devo.h"
+#include "target/drivers/mcu/stm32/rcc.h" 
+#include "target/drivers/mcu/stm32/tim.h" 
+#include "target/drivers/mcu/stm32/exti.h" 
 //#include "interface.h"
 #include "mixer.h"
 #include "config/model.h"
@@ -101,25 +103,25 @@ void PPMin_TIM_Init()
 
 void PPMin_Init()
 {
-#if _PWM_PIN == GPIO_USART1_TX
-    UART_Stop();  // disable USART1 for GPIO PA9 & PA10 (Trainer Tx(PA9) & Rx(PA10))
-#endif
+    if (PWM_TIMER.pin.pin == GPIO_USART1_TX) {
+        UART_Stop();  // disable USART1 for GPIO PA9 & PA10 (Trainer Tx(PA9) & Rx(PA10))
+    }
     /* Enable GPIOA clock. */
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPAEN);
+    rcc_periph_clock_enable(get_rcc_from_pin(PWM_TIMER.pin));
 
     /* Enable AFIO clock. */
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_AFIOEN);
+    rcc_periph_clock_enable(RCC_AFIO);
 
     /* Enable EXTI interrupt. */
-    nvic_enable_irq(NVIC_EXTI9_5_IRQ);
+    nvic_enable_irq(NVIC_EXTIx_IRQ(PWM_TIMER.pin));
 
     /* Set GPIO0 (in GPIO port A) to 'input float'. */
-    gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, _PWM_PIN);
+    GPIO_setup_input_af(PWM_TIMER.pin, ITYPE_FLOAT, PWM_TIMER.tim);
     
     /* Configure the EXTI subsystem. */
-    exti_select_source(_PWM_EXTI, GPIOA);
-    exti_set_trigger(_PWM_EXTI, EXTI_TRIGGER_RISING);
-    exti_disable_request(_PWM_EXTI);
+    exti_select_source(EXTIx(PWM_TIMER.pin), PWM_TIMER.pin.port);
+    exti_set_trigger(EXTIx(PWM_TIMER.pin), EXTI_TRIGGER_RISING);
+    exti_disable_request(EXTIx(PWM_TIMER.pin));
 }
 /* ===get PPM===
 (1) capture  ppmSync (for ppm-timing > MIN_PPMin_Sync : 3300uSecond)
@@ -137,9 +139,9 @@ volatile u8 ppmin_num_channels;     //  the ppmin_num_channels for mixer.c
 
 void PPMin_Stop()
 {
-    nvic_disable_irq(NVIC_EXTI9_5_IRQ);
-    exti_disable_request(_PWM_EXTI);
-    timer_disable_counter(TIM1);
+    nvic_disable_irq(NVIC_EXTIx_IRQ(PWM_TIMER.pin));
+    exti_disable_request(EXTIx(PWM_TIMER.pin));
+    timer_disable_counter(PWM_TIMER.tim);
     ppmSync = 0;
 }
 
@@ -149,8 +151,8 @@ void PPMin_Start()
         CLOCK_StopTimer();
     PPMin_Init();
     ppmSync = 0;
-    timer_enable_counter(TIM1);
-    nvic_enable_irq(NVIC_EXTI9_5_IRQ);
-    exti_enable_request(_PWM_EXTI);
+    timer_enable_counter(PWM_TIMER.tim);
+    nvic_enable_irq(NVIC_EXTIx_IRQ(PWM_TIMER.pin));
+    exti_enable_request(EXTIx(PWM_TIMER.pin));
     ppmSync = 0;
 }

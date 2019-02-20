@@ -50,6 +50,7 @@ INLINE static inline void GPIO_setup_input(struct mcu_pin pin, enum gpio_input_t
         gpio_clear(pin.port, pin.pin);
     }
 }
+#define GPIO_setup_input_af(x,y,z) GPIO_setup_input(x,y)  //FIXME
 
 INLINE static inline void GPIO_setup_input_af(struct mcu_pin pin, enum gpio_input_type type, unsigned af)
 {

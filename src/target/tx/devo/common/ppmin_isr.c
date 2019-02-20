@@ -14,7 +14,6 @@
  */
 
 #include <libopencm3/cm3/nvic.h>
-#include <libopencm3/stm32/exti.h>
 
 #include <libopencm3/cm3/systick.h>
 #include <libopencm3/stm32/timer.h>
@@ -23,6 +22,8 @@
 
 #include "common.h"
 #include "devo.h"
+#include "target/drivers/mcu/stm32/tim.h"
+#include "target/drivers/mcu/stm32/exti.h"
 //#include "interface.h"
 #include "mixer.h"
 #include "config/model.h"
@@ -43,8 +44,8 @@ void __attribute__((__used__)) exti9_5_isr(void)
     u16 t1 = 0;
     u16 t = 0;
 
-    t1 = timer_get_counter(TIM1);     // get the counter(TIM1) value
-    exti_reset_request(_PWM_EXTI);         //  reset(clean) the IRQ
+    t1 = timer_get_counter(PWM_TIMER.tim);     // get the counter(TIM1) value
+    exti_reset_request(EXTIx(PWM_TIMER.pin));         //  reset(clean) the IRQ
 
     t = (t1>=t0) ? (t1-t0) : (65536+t1-t0);     // none-stop TIM1 counter, compute ppm-signal width (2MHz = 0.5uSecond)
     t0 = t1;
