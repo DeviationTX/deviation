@@ -47,7 +47,7 @@ extern void init_err_handler();
 int FS_Mount();
 void FS_Unmount();
 
-uintptr_t _open_r(FIL *r, const char *file, int flags, int mode);
+intptr_t _open_r(FIL *r, const char *file, int flags, int mode);
 int _close_r(FIL *r);
 
 
@@ -127,7 +127,7 @@ void FS_CloseDir()
 {
 }
 
-uintptr_t _open_r(FIL *r, const char *file, int flags, int mode) {
+intptr_t _open_r(FIL *r, const char *file, int flags, int mode) {
     (void)flags;
     (void)mode;
 
@@ -204,7 +204,7 @@ int _write_r(FIL *r, char * ptr, int len)
 
 int _ltell_r(FIL *r)
 {
-    if ((uintptr_t)r > 2 && fs_is_open(r)) {
+    if ((intptr_t)r > 2 && fs_is_open(r)) {
         return (int)fs_ltell(r);
     }
     return -1;
@@ -214,7 +214,7 @@ int _lseek_r(FIL *r, int ptr, int dir)
 {
     (void)r;
     
-    if ((uintptr_t)r > 2 && fs_is_open(r)) {
+    if ((intptr_t)r > 2 && fs_is_open(r)) {
         if (dir == SEEK_CUR) {
             ptr += fs_ltell(r);
         } else if (dir == SEEK_END) {
