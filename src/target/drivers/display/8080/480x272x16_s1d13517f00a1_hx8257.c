@@ -12,10 +12,9 @@
     You should have received a copy of the GNU General Public License
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include <libopencm3/stm32/gpio.h>
-#include <libopencm3/stm32/fsmc.h>
 #include <libopencm3/stm32/spi.h>
 #include "common.h"
+#include "target/drivers/mcu/stm32/fsmc.h"
 #include "480x272x16_s1d13517f00a1.h"
 #include "target/drivers/mcu/stm32/rcc.h"
 
@@ -205,57 +204,18 @@ void SPILCD_Init()
 
 void LCD_Init()
 {
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPDEN);
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPEEN);
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPFEN);
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPGEN);
-    rcc_peripheral_enable_clock(&RCC_AHBENR, RCC_AHBENR_FSMCEN);
+static inline int _fsmc_init(uint32_t data_len, uint32_t address_mask, uint32_t ctrl_bits
+                             uint32_t bank, uint32_t bcr, uint32_t btr, uint32_t bwtr
+    _fsmc_init(
+        16,
+        0x7fffff /*23 bit addr */,
+        FSMC_NOA | FSMC_NWE | FSMC_NE2 | FSMC_NE4,
+        4, 
+        FSMC_BCR_MWID | FSMC_BCR_WREN | FSMC_BCR_MBKEN,
+        FSMC_BTR_DATASTx(2) | FSMC_BTR_ADDHLDx(0) | FSMC_BTR_ADDSETx(1) | FSMC_BTR_ACCMODx(FSMC_BTx_ACCMOD_B),
+        FSMC_BTR_DATASTx(2) | FSMC_BTR_ADDHLDx(0) | FSMC_BTR_ADDSETx(1) | FSMC_BTR_ACCMODx(FSMC_BTx_ACCMOD_B)
+        );
 
-    // FSMC Data/Address pins
-    gpio_set_mode(GPIOD, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_ALTFN_PUSHPULL,
-                  GPIO0 | GPIO1 | GPIO8 | GPIO9 | GPIO10 | GPIO14 | GPIO15);
-
-    gpio_set_mode(GPIOE, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_ALTFN_PUSHPULL,
-                  GPIO7 | GPIO8 | GPIO9 | GPIO10 | GPIO11 | GPIO12 | GPIO13 | GPIO14 | GPIO15);
-
-    gpio_set_mode(GPIOF, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_ALTFN_PUSHPULL,
-                  GPIO0 | GPIO1 | GPIO2 | GPIO3 | GPIO4 | GPIO5 | GPIO12 | GPIO13 | GPIO14 | GPIO15);
-
-    gpio_set_mode(GPIOG, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_ALTFN_PUSHPULL,
-                  GPIO0 | GPIO1 | GPIO2 | GPIO3 | GPIO4 | GPIO5);
-
-
-    gpio_set_mode(GPIOD, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_ALTFN_PUSHPULL,
-                  GPIO11 | GPIO12 | GPIO13);
-
-    gpio_set_mode(GPIOE, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_ALTFN_PUSHPULL,
-                  GPIO3 | GPIO4 | GPIO5 | GPIO6);
-
-    gpio_set_mode(GPIOD, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_ALTFN_PUSHPULL,
-                  GPIO4 | GPIO5);
-
-    gpio_set_mode(GPIOG, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_ALTFN_PUSHPULL,
-                  GPIO9 | GPIO12);
-
-    gpio_set_mode(GPIOD, GPIO_MODE_INPUT,
-                  GPIO_CNF_INPUT_PULL_UPDOWN,
-                  GPIO6);
-    gpio_set(GPIOD, GPIO6); //Pull Up
-
-    /* Extended mode, write enable, 16 bit access, bank enabled */
-    FSMC_BCR4 = FSMC_BCR_MWID | FSMC_BCR_WREN | FSMC_BCR_MBKEN;
-
-    /* Read & write timings */
-    FSMC_BTR4  = FSMC_BTR_DATASTx(2) | FSMC_BTR_ADDHLDx(0) | FSMC_BTR_ADDSETx(1) | FSMC_BTR_ACCMODx(FSMC_BTx_ACCMOD_B);
-    FSMC_BWTR4 = FSMC_BTR_DATASTx(2) | FSMC_BTR_ADDHLDx(0) | FSMC_BTR_ADDSETx(1) | FSMC_BTR_ACCMODx(FSMC_BTx_ACCMOD_B);
     PARFlash_Init();
 
     //SPILCD_Init();
