@@ -46,6 +46,7 @@ static inline void LCD_ForceUpdate() {}
 #define HAS_HARD_POWER_OFF  1
 #define HAS_ROTARY_ENCODER  1
 #define HAS_OLED_DISPLAY    0
+#define ENABLE_320x240_GUI  1 //Enable support for 320x240 gui items as well as 480x320 ones
 
 #ifdef BUILDTYPE_DEV
    #define DEBUG_WINDOW_SIZE 200
