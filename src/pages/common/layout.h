@@ -8,7 +8,8 @@ typedef struct _grid_layout_data {
 #define BeginGridLayout(row, col) BeginGridLayout2(0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT, row, col)
 
 #define BeginGridLayout2(startx, starty, width, height, row, col) \
-        for (GridData _grid = { (width)/(col), (height)/(row), (startx), (starty)}; _grid.w > 0; _grid.w = 0)
+        unsigned _d = 1; \
+        for (const GridData _grid = { (width)/(col), (height)/(row), (startx), (starty)}; _d > 0 ; _d = 0 )
 
 #define Grid_XY(row, col) \
         (_grid.x + _grid.w * ((col) - 1)), (_grid.y + _grid.h * ((row) - 1))
