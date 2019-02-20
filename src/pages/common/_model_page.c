@@ -179,7 +179,9 @@ static const char *powerselect_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     if(! PROTOCOL_HasPowerAmp(Model.protocol))
         return _tr("Default");
-    Model.tx_power = GUI_TextSelectHelper(Model.tx_power, TXPOWER_100uW, radio_tx_power_int(Model.radio,TXPOWER_LAST), dir, 1, 1, NULL);
+    Model.tx_power = GUI_TextSelectHelper(Model.tx_power,
+                       TXPOWER_100uW, radio_tx_power_int(Model.radio, TXPOWER_LAST),
+                       dir, 1, 1, NULL);
     mp->last_txpower = Model.tx_power;
     return radio_tx_power_val(Model.radio, Model.tx_power);
 }
