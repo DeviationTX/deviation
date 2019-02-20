@@ -77,7 +77,7 @@ static const char *cfglabel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     int i = (long)data;
-    int type = ELEM_TYPE(pc->elem[i]);
+    int type = pc->elem[i].type;
     int idx = elem_abs_to_rel(i);
     const char *str;
     switch(type) {
@@ -205,7 +205,7 @@ void show_config()
 {
     long count = 0;
     for (count = 0; count < NUM_ELEMS; count++) {
-        if (! ELEM_USED(pc->elem[count]))
+        if (pc->elem[count].type == ELEM_NONE)
             break;
     }
 #if HAS_LAYOUT_EDITOR

@@ -35,7 +35,7 @@ void tglico_select_cb(guiObject_t *obj, s8 press_type, const void *data)
         // --> data = (ToggleNumber << 12) | (IconNumber << 8) | IconPosition
         u8 IconPosition = ((long)data      ) & 0xff;
         u8 IconNumber   = ((long)data >> 8 ) & 0x0f;
-        Model.pagecfg2.elem[tp->tglidx].extra[IconNumber] = IconPosition;
+        Model.pagecfg2.elem[tp->tglidx].extra.ico[IconNumber] = IconPosition;
         show_iconsel_page(IconNumber);
     }
 }
@@ -107,7 +107,7 @@ void tglico_reset_cb(guiObject_t *obj, s8 press_type, const void *data)
     (void)obj;
     if (press_type == -1) {
         u32 pos = (long)data;
-        Model.pagecfg2.elem[tp->tglidx].extra[pos] = 0;
+        Model.pagecfg2.elem[tp->tglidx].extra.ico[pos] = 0;
         show_iconsel_page(pos);
     }
 }
@@ -140,7 +140,7 @@ static void revert_cb(guiObject_t *obj, const void *data)
 {
     (void)data;
     (void)obj;
-    memcpy(Model.pagecfg2.elem[tp->tglidx].extra, tp->tglicons, sizeof(tp->tglicons));
+    memcpy(Model.pagecfg2.elem[tp->tglidx].extra.ico, tp->tglicons, sizeof(tp->tglicons));
     PAGE_ChangeByID(PAGEID_TGLEDIT, tp->tglidx);
 }
 

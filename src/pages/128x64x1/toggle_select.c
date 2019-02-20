@@ -100,9 +100,9 @@ static void show_iconsel_page(int SelectedIcon) {
         GUI_CreateLabelBox(&gui->togglelabel[i], LABEL_X, row, LABEL_W, LABEL_H, SelectedIcon == i ? &inverted : &DEFAULT_FONT, NULL, NULL, tglidx[i]);
 #ifdef HAS_CHAR_ICONS
         GUI_CreateLabelBox(&gui->toggleicon[i], ICON_X, row, ICON_W, LABEL_H, &DEFAULT_FONT, TGLICO_font_cb,
-                           NULL, (void *)(long)Model.pagecfg2.elem[tp->tglidx].extra[i]); 
+                           NULL, (void *)(long)Model.pagecfg2.elem[tp->tglidx].extra.ico[i]); 
 #else
-        struct ImageMap img = TGLICO_GetImage(Model.pagecfg2.elem[tp->tglidx].extra[i]);
+        struct ImageMap img = TGLICO_GetImage(Model.pagecfg2.elem[tp->tglidx].extra.ico[i]);
         GUI_CreateImageOffset(&gui->toggleicon[i], ICON_X, row, ICON_W, LABEL_H, img.x_off, img.y_off, img.file,
              NULL, //SelectedIcon == 0 ? tglico_reset_cb : tglico_setpos_cb,
              (void *)(long)i);
@@ -121,7 +121,7 @@ static void show_iconsel_page(int SelectedIcon) {
 void PAGE_ToggleEditInit(int page)
 {
     tp->tglidx = page;
-    memcpy(tp->tglicons, Model.pagecfg2.elem[tp->tglidx].extra, sizeof(tp->tglicons));
+    memcpy(tp->tglicons, Model.pagecfg2.elem[tp->tglidx].extra.ico, sizeof(tp->tglicons));
     PAGE_SetActionCB(_action_cb);
     show_iconsel_page(0);
 }

@@ -34,7 +34,7 @@ static void show_icons(int SelectedIcon, int idx)
 {
     int x, y;
     struct ImageMap img;
-    u8 cursel = Model.pagecfg2.elem[tp->tglidx].extra[SelectedIcon];
+    u8 cursel = Model.pagecfg2.elem[tp->tglidx].extra.ico[SelectedIcon];
 
     for(int i = 0; i < NUM_SYMBOL_ELEMS; i++) {
         y = 80 + (i / NUM_SYMBOL_COLS) * 40;
@@ -114,17 +114,17 @@ static void show_iconsel_page(int SelectedIcon)
         num_positions = 2;
 
     GUI_CreateLabelBox(&gui->togglelabel[0], 94, 50, 30, 14, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Pos 0"));
-    img = TGLICO_GetImage(Model.pagecfg2.elem[tp->tglidx].extra[0]);
+    img = TGLICO_GetImage(Model.pagecfg2.elem[tp->tglidx].extra.ico[0]);
     GUI_CreateImageOffset(&gui->toggleicon[0], 124, 40, TOGGLEICON_WIDTH, TOGGLEICON_HEIGHT, img.x_off, img.y_off, img.file,
              SelectedIcon == 0 ? tglico_reset_cb : tglico_setpos_cb, (void *)0L);
 
     GUI_CreateLabelBox(&gui->togglelabel[1], 174, 50, 30, 14, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Pos 1"));
-    img = TGLICO_GetImage(Model.pagecfg2.elem[tp->tglidx].extra[1]);
+    img = TGLICO_GetImage(Model.pagecfg2.elem[tp->tglidx].extra.ico[1]);
     GUI_CreateImageOffset(&gui->toggleicon[1], 204, 40, TOGGLEICON_WIDTH, TOGGLEICON_HEIGHT, img.x_off, img.y_off, img.file,
              SelectedIcon == 1 ? tglico_reset_cb : tglico_setpos_cb, (void *)1L);
     if (num_positions == 3) {
         GUI_CreateLabelBox(&gui->togglelabel[2], 254, 50, 30, 14, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Pos 2"));
-        img = TGLICO_GetImage(Model.pagecfg2.elem[tp->tglidx].extra[2]);
+        img = TGLICO_GetImage(Model.pagecfg2.elem[tp->tglidx].extra.ico[2]);
         GUI_CreateImageOffset(&gui->toggleicon[2], 284, 40, TOGGLEICON_WIDTH, TOGGLEICON_HEIGHT, img.x_off, img.y_off, img.file,
              SelectedIcon == 2 ? tglico_reset_cb : tglico_setpos_cb, (void *)2L);
     }
@@ -137,7 +137,7 @@ static void show_iconsel_page(int SelectedIcon)
 
 void PAGE_ToggleEditInit(int page) {
     tp->tglidx = page;
-    memcpy(tp->tglicons, Model.pagecfg2.elem[tp->tglidx].extra, sizeof(tp->tglicons));
+    memcpy(tp->tglicons, Model.pagecfg2.elem[tp->tglidx].extra.ico, sizeof(tp->tglicons));
     show_iconsel_page(0);
 }
 

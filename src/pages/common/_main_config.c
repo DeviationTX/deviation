@@ -17,7 +17,7 @@
 
 int elem_abs_to_rel(int idx)
 {
-    unsigned type = ELEM_TYPE(pc->elem[idx]);
+    unsigned type = pc->elem[idx].type;
     int nxt = -1;
     for (int i = 0; i < NUM_ELEMS-1; i++) {
         nxt = MAINPAGE_FindNextElem(type, nxt+1);
@@ -109,7 +109,7 @@ int create_element()
     int i;
     u16 x,y,w,h;
     for (i = 0; i < NUM_ELEMS; i++)
-        if (! ELEM_USED(pc->elem[i]))
+        if (pc->elem[i].type == ELEM_NONE)
             break;
     if (i == NUM_ELEMS)
         return -1;
@@ -118,9 +118,9 @@ int create_element()
     x = (LCD_WIDTH - w) / 2;
     y = (((LCD_HEIGHT - HEADER_Y) - h) / 2) + HEADER_Y;
     memset(&pc->elem[i], 0, sizeof(struct elem));
-    ELEM_SET_X(pc->elem[i], x);
-    ELEM_SET_Y(pc->elem[i], y);
-    ELEM_SET_TYPE(pc->elem[i], lp->newelem);
+    pc->elem[i].x = x;
+    pc->elem[i].y = y;
+    pc->elem[i].type = lp->newelem;
     return i;
 }
 
@@ -150,7 +150,7 @@ static const char *dlgts_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     int idx = (long)data;
-    int type = ELEM_TYPE(pc->elem[idx]);
+    int type = pc->elem[idx].type;
     switch (type) {
         case ELEM_SMALLBOX:
         case ELEM_BIGBOX:
@@ -213,14 +213,14 @@ static void dlgbut_cb(struct guiObject *obj, const void *data)
     GUI_DrawBackground(x, y, w, h);
 #endif
     //Remove object
-    int type = ELEM_TYPE(pc->elem[idx]);
+    int type = pc->elem[idx].type;
     for(i = idx+1; i < NUM_ELEMS; i++) {
-        if (! ELEM_USED(pc->elem[i]))
+        if (pc->elem[i].type == ELEM_NONE)
             break;
         pc->elem[i-1] = pc->elem[i];
     }
-         ELEM_SET_X(pc->elem[i-1], 0);
-         ELEM_SET_Y(pc->elem[i-1], 0);
+    pc->elem[i-1].x = 0;
+    pc->elem[i-1].y = 0;
     idx = MAINPAGE_FindNextElem(type, 0);
     set_selected_for_move(idx);
     //close the dialog and reopen with new elements

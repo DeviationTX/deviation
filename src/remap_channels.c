@@ -106,7 +106,7 @@ void RemapChannelsForProtocol(const u8 *oldmap)
     }
     //Map display
     for(i = 0; i < NUM_ELEMS; i++) {
-        switch(ELEM_TYPE(Model.pagecfg2.elem[i])) {
+        switch(Model.pagecfg2.elem[i].type) {
             case ELEM_SMALLBOX:
             case ELEM_BIGBOX:
                 _map_inp(chmap, &Model.pagecfg2.elem[i].src, NUM_TELEM + NUM_TIMERS + NUM_RTC+1);

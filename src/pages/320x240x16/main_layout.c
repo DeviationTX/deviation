@@ -319,7 +319,7 @@ void show_config()
         FullRedraw = draw_mode;
     }
     if(lp->selected_for_move >= 0) {
-        type = ELEM_TYPE(pc->elem[lp->selected_for_move]);
+        type = pc->elem[lp->selected_for_move].type;
         row_idx = elem_abs_to_rel(lp->selected_for_move);
         count = elem_get_count(type);
     }

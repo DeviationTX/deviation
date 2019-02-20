@@ -40,7 +40,7 @@ void draw_elements()
     for (i = 0; i < NUM_ELEMS; i++) {
         if (! GetWidgetLoc(&pc->elem[i], &x, &y, &w, &h))
             break;
-        int type = ELEM_TYPE(pc->elem[i]);
+        int type = pc->elem[i].type;
         const char *(*strCallback)(guiObject_t *, const void *) = label_cb;
         void *data = (void *)(long)elem_abs_to_rel(i);
         int desc = 0;
@@ -158,8 +158,8 @@ void move_elem()
         h = LCD_HEIGHT - y;
     }
     GUI_DrawBackground(x, y, w, h);
-    ELEM_SET_X(pc->elem[idx], lp->selected_x);
-    ELEM_SET_Y(pc->elem[idx], lp->selected_y);
+    pc->elem[idx].x = lp->selected_x;
+    pc->elem[idx].y = lp->selected_y;
     draw_elements();
     select_for_move((guiLabel_t *)obj);
 }
@@ -169,10 +169,10 @@ void notify_cb(guiObject_t *obj)
     if ((guiLabel_t *)obj < gui->elem)
         return;
     int idx = guielem_idx(obj);
-    lp->selected_x = ELEM_X(pc->elem[idx]);
-    lp->selected_y = ELEM_Y(pc->elem[idx]);
-    GetElementSize(ELEM_TYPE(pc->elem[idx]), &lp->selected_w, &lp->selected_h);
-    if (ELEM_TYPE(pc->elem[idx]) == ELEM_MODELICO)
+    lp->selected_x = pc->elem[idx].x;
+    lp->selected_y = pc->elem[idx].y;
+    GetElementSize(pc->elem[idx].type, &lp->selected_w, &lp->selected_h);
+    if (pc->elem[idx].type == ELEM_MODELICO)
         AdjustIconSize(&lp->selected_x, &lp->selected_y, &lp->selected_h, &lp->selected_w);
     GUI_Redraw((guiObject_t *)&gui->xlbl);
     GUI_Redraw((guiObject_t *)&gui->x);
