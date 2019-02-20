@@ -46,6 +46,7 @@ POST_FILTER = {
 
 UNMATCHED_LINT_ERROR = "Unmatched Lint Error(s):\n"
 LINT_ERROR = "Lint Error:\n"
+ERROR_EXIT_STATUS = 1
 
 URL_CACHE = {}
 GITHUB_TOKEN = os.environ.get('GITHUB_TOKEN')
@@ -60,11 +61,6 @@ if TRAVIS_PULL_REQUEST == 'false':
 
 
 def main():
-    with open(os.devnull, 'w') as devnull:
-        if subprocess.call(["which", "cpplint"], stdout=devnull):
-            print("Please install cpplint via 'pip install cpplint' or equivalent")
-            sys.exit(1)
-
     parser = argparse.ArgumentParser()
     parser.add_argument("path", nargs='*', help="Paths to lint")
     parser.add_argument("--diff", action="store_true",
@@ -73,12 +69,27 @@ def main():
                         help="Add debug output")
     parser.add_argument("--skip-github", action="store_true",
                         help="Don't update GitHub")
+    parser.add_argument("--no-fail", action="store_true",
+                        help="Don't fail on lint errors")
     args = parser.parse_args()
     if args.debug:
         logging.basicConfig(level=logging.DEBUG)
+    if args.no_fail:
+        global ERROR_EXIT_STATUS
+        ERROR_EXIT_STATUS = 0
+
+    with open(os.devnull, 'w') as devnull:
+        if subprocess.call(["which", "cpplint"], stdout=devnull):
+            print("Please install cpplint via 'pip install cpplint' or equivalent")
+            sys.exit(ERROR_EXIT_STATUS)
 
     pwd = os.getcwd()
     os.chdir(system(["git", "rev-parse", "--show-toplevel"]).rstrip())
+    new_pwd = os.getcwd()
+    if pwd != new_pwd and pwd.startswith(new_pwd):
+        path_delta = pwd[len(new_pwd)+1:]
+    else:
+        path_delta = None
 
     logging.debug("TRAVIS_PULL_REQUEST:     %s",  TRAVIS_PULL_REQUEST)
     logging.debug("TRAVIS_PULL_REQUEST_SHA: %s",  TRAVIS_PULL_REQUEST_SHA)
@@ -95,7 +106,7 @@ def main():
             changed = get_changed_lines_from_git()
 
     paths = filter_paths(args.path, changed, pwd)
-    violations = run_lint(paths, changed)
+    violations = run_lint(paths, changed, path_delta)
     if GITHUB_TOKEN and TRAVIS_PULL_REQUEST and not args.skip_github:
         update_github_status(violations)
 
@@ -181,7 +192,12 @@ def filter_paths(paths, changed, pwd):
             ret += line
     return ret
 
-def run_lint(paths, changed):
+def cleanup_line(line, path_delta):
+    if path_delta and line.startswith(path_delta):
+        return line[len(path_delta)+1:]
+    return line
+
+def run_lint(paths, changed, path_delta):
     violations = {}
     count = {}
     errors = {}
@@ -205,7 +221,7 @@ def run_lint(paths, changed):
                 continue
             if not changed or linenum not in changed[filename]:
                 continue
-            print line
+            print cleanup_line(line, path_delta)
             if filename not in errors:
                 errors[filename] = 0
             errors[filename] += 1
@@ -218,9 +234,10 @@ def run_lint(paths, changed):
                 violations[filename][linenum] = []
             violations[filename][linenum].append(line)
 
-    print "\nSummary\n-------";
-    for err in sorted(count.keys()):
-        print "{:30s}: {}".format(err, count[err])
+    if count:
+        print "\nSummary\n-------";
+        for err in sorted(count.keys()):
+            print "{:30s}: {}".format(err, count[err])
     return violations
 
 def update_github_status(violations):
@@ -395,7 +412,7 @@ def post_pull_comment(filename, offset, message):
     except urllib2.HTTPError as e:
         print e
         print e.read()
-        sys.exit(1)
+        sys.exit(ERROR_EXIT_STATUS)
     time.sleep(1.0)
 
 
@@ -427,7 +444,7 @@ def delete_comment(_type, _id):
     except urllib2.HTTPError as e:
         print e
         print e.read()
-        sys.exit(1)
+        sys.exit(ERROR_EXIT_STATUS)
 
 
 def system(cmd):
