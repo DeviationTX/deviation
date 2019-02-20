@@ -204,17 +204,14 @@ void SPILCD_Init()
 
 void LCD_Init()
 {
-static inline int _fsmc_init(uint32_t data_len, uint32_t address_mask, uint32_t ctrl_bits
-                             uint32_t bank, uint32_t bcr, uint32_t btr, uint32_t bwtr
     _fsmc_init(
         16,
         0x7fffff /*23 bit addr */,
-        FSMC_NOA | FSMC_NWE | FSMC_NE2 | FSMC_NE4,
-        4, 
+        FSMC_NOE | FSMC_NWE | FSMC_NE2 | FSMC_NE4,
+        4,
         FSMC_BCR_MWID | FSMC_BCR_WREN | FSMC_BCR_MBKEN,
         FSMC_BTR_DATASTx(2) | FSMC_BTR_ADDHLDx(0) | FSMC_BTR_ADDSETx(1) | FSMC_BTR_ACCMODx(FSMC_BTx_ACCMOD_B),
-        FSMC_BTR_DATASTx(2) | FSMC_BTR_ADDHLDx(0) | FSMC_BTR_ADDSETx(1) | FSMC_BTR_ACCMODx(FSMC_BTx_ACCMOD_B)
-        );
+        FSMC_BTR_DATASTx(2) | FSMC_BTR_ADDHLDx(0) | FSMC_BTR_ADDSETx(1) | FSMC_BTR_ACCMODx(FSMC_BTx_ACCMOD_B));
 
     PARFlash_Init();
 

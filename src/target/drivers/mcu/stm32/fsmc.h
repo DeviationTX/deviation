@@ -15,7 +15,7 @@
 #define FSMC_NBL0  (1 << 8)
 #define FSMC_NBL1  (1 << 9)
 
-static inline int _fsmc_init(uint32_t data_len, uint32_t address_mask, uint32_t ctrl_bits
+static inline void _fsmc_init(uint32_t data_len, uint32_t address_mask, uint32_t ctrl_bits,
                              uint32_t bank, uint32_t bcr, uint32_t btr, uint32_t bwtr)
 {
     //                      D0       D1       D2      D3
@@ -55,7 +55,7 @@ static inline int _fsmc_init(uint32_t data_len, uint32_t address_mask, uint32_t 
                           (address_mask & (1 << 21) ? GPIO5  : 0) |  /* A21 */
                           (address_mask & (1 << 22) ? GPIO6  : 0) |  /* A22 */
                           (address_mask & (1 << 23) ? GPIO2  : 0);   /* A23 */
-    
+
     addr_portg |=         (address_mask & (1 << 24) ? GPIO13 : 0) |  /* A24 */
                           (address_mask & (1 << 25) ? GPIO14 : 0);   /* A25 */
 
@@ -71,39 +71,39 @@ static inline int _fsmc_init(uint32_t data_len, uint32_t address_mask, uint32_t 
 
     unsigned ctrl_porte = (ctrl_bits &  FSMC_NBL0  ? GPIO0  : 0) |  /* NBL0 */
                           (ctrl_bits &  FSMC_NBL1  ? GPIO1 : 0);    /* NBL1 */
-   
-    unsigned inp_portd  = (ctrl_bits &  FSMC_NWAIT ? GPIO6 : 0) |  /* NWAIT */
+
+    unsigned inp_portd  = (ctrl_bits &  FSMC_NWAIT ? GPIO6 : 0);    /* NWAIT */
 
     rcc_periph_clock_enable(RCC_FSMC);
     if (data_portd || addr_portd | ctrl_portd | inp_portd) {
         rcc_periph_clock_enable(RCC_GPIOD);
         if (data_portd || addr_portd | ctrl_portd) {
             GPIO_setup_output_af((struct mcu_pin){GPIOD, data_portd | addr_portd | ctrl_portd},
-                                 OTYPE_PUSHPULL, FSMC);
+                                 OTYPE_PUSHPULL, AF_FSMC);
         }
         if (inp_portd) {
-            GPIO_setup_input((struct mcu_pin){GPIOD, inp_portd}, ITYPE_PULLUP);
+            GPIO_setup_input_af((struct mcu_pin){GPIOD, inp_portd}, ITYPE_PULLUP, AF_FSMC);
         }
     }
     if (data_porte || addr_porte | ctrl_porte) {
         rcc_periph_clock_enable(RCC_GPIOE);
         GPIO_setup_output_af((struct mcu_pin){GPIOE, data_porte | addr_porte | ctrl_porte},
-                             OTYPE_PUSHPULL, FSMC);
+                             OTYPE_PUSHPULL, AF_FSMC);
     }
     if (addr_portf) {
         rcc_periph_clock_enable(RCC_GPIOF);
         GPIO_setup_output_af((struct mcu_pin){GPIOF, addr_portf},
-                             OTYPE_PUSHPULL, FSMC);
+                             OTYPE_PUSHPULL, AF_FSMC);
     }
     if (addr_portg | ctrl_portg) {
         rcc_periph_clock_enable(RCC_GPIOG);
         GPIO_setup_output_af((struct mcu_pin){GPIOG, addr_portg | ctrl_portg},
-                             OTYPE_PUSHPULL, FSMC);
+                             OTYPE_PUSHPULL, AF_FSMC);
     }
     if (ctrl_portb) {
         rcc_periph_clock_enable(RCC_GPIOB);
         GPIO_setup_output_af((struct mcu_pin){GPIOB, ctrl_portg},
-                             OTYPE_PUSHPULL, FSMC);
+                             OTYPE_PUSHPULL, AF_FSMC);
     }
     /* Extended mode, write enable, 16 bit access, bank enabled */
     FSMC_BCR(bank) = bcr;

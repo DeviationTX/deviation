@@ -70,16 +70,15 @@ void LCD_Init()
 {
     _fsmc_init(
         8,
-        0x100 /*only bit 16 of addr */,
-        FSMC_NOE | FSMC_NWE |NE1 /* Not connected */,
-        1, 
+        0x100,  /*only bit 16 of addr */
+        FSMC_NOE | FSMC_NWE | FSMC_NE1,  /* Not connected */
+        1,
         /* Normal mode, write enable, 8 bit access, SRAM, bank enabled */
         0xC0 | FSMC_BCR_MWID | FSMC_BCR_WREN | FSMC_BCR_MBKEN,
         /* Data Setup > 90ns, Address Setup = 2xHCLK to ensure no output collision in 6800
            mode since LCD E and !CS always active */
         FSMC_BTR_DATASTx(7) | FSMC_BTR_ADDHLDx(0) | FSMC_BTR_ADDSETx(2),
-        0
-        );
+        0);
 
 
 

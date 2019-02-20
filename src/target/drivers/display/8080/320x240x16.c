@@ -146,12 +146,11 @@ void LCD_Init()
     _fsmc_init(
         16,
         0x100 /*only bit 16 of addr */,
-        FSMC_NOE | FSMC_NWE |NE1,
-        1, 
+        FSMC_NOE | FSMC_NWE |FSMC_NE1,
+        1,
         FSMC_BCR_MWID | FSMC_BCR_WREN | FSMC_BCR_MBKEN,
         FSMC_BTR_DATASTx(2) | FSMC_BTR_ADDHLDx(0) | FSMC_BTR_ADDSETx(1) | FSMC_BTR_ACCMODx(FSMC_BTx_ACCMOD_B),
-        FSMC_BTR_DATASTx(2) | FSMC_BTR_ADDHLDx(0) | FSMC_BTR_ADDSETx(1) | FSMC_BTR_ACCMODx(FSMC_BTx_ACCMOD_B)
-        );
+        FSMC_BTR_DATASTx(2) | FSMC_BTR_ADDHLDx(0) | FSMC_BTR_ADDSETx(1) | FSMC_BTR_ACCMODx(FSMC_BTx_ACCMOD_B));
 
     while (lcd_detect() == LCDTYPE_UNKNOWN) {
         // retry inititalize and detect
