@@ -41,6 +41,21 @@ static void lcd_set_pos(unsigned int x0, unsigned int y0)
     // printf("lcd_set_pos: %d, %d\n", x0, y0);
 }
 
+static u16 lcd_read_id() {
+    u8 data;
+    // Read ID register
+    LCD_REG = 0xd3;
+    // As per the spec, the 1st 2 reads are dummy reads and irrelevant
+    data = LCD_DATA;
+    data = LCD_DATA;
+    // Actual ID is in 3rd and 4th bytes
+    data = LCD_DATA;
+    u16 data2 = LCD_DATA;
+    data2 = (((int)data) << 8) | data2;
+
+    return data2;
+}
+
 // LCDTYPE_XXX is a bitmask enum.
 enum {
     LCDTYPE_UNKNOWN     = 0x00,
@@ -52,7 +67,6 @@ enum {
 
 int lcd_detect()
 {
-    u8 data;
 #ifdef LCD_RESET_PIN
     /* Reset pin for ILI9341 */
     gpio_set_mode(LCD_RESET_PIN.port, GPIO_MODE_OUTPUT_50_MHZ,
@@ -67,39 +81,26 @@ int lcd_detect()
     if (HAS_LCD_TYPE(LCDTYPE_HX8347)) {
         // Read ID register for HX8347 (will be 0x47 if found)
         LCD_REG = 0x00;
-        data = LCD_DATA;
+        u8 data = LCD_DATA;
         if (data == 0x47) {
+            hx8347_init();
             return LCDTYPE_HX8347;
         }
     }
     if (HAS_LCD_TYPE(LCDTYPE_ILI9341)) {
-        // Read ID register for ILI9341 (will be 0x9341 if found)
-        LCD_REG = 0xd3;
-        // As per the spec, the 1st 2 reads are dummy reads and irrelevant
-        data = LCD_DATA;
-        data = LCD_DATA;
-        // Actual ID is in 3rd and 4th bytes
-        data = LCD_DATA;
-        u16 data2 = LCD_DATA;
-        data2 = (((int)data) << 8) | data2;
-        if (data2 == 0x9341) {
+        if (lcd_read_id() == 0x9341) {
+            ili9341_init();
             return LCDTYPE_ILI9341;
         }
     }
     if (HAS_LCD_TYPE(LCDTYPE_ST7796)) {
-          // Read ID register for ST7796 (will be 0x7796 if found)
-          LCD_REG = 0xD3;
-          // As per the spec, the 1st 2 reads are dummy reads and irrelevant
-          u8 data = LCD_DATA;
-          data = LCD_DATA;
-          // Actual ID is in 3rd and 4th bytes
-          data = LCD_DATA;
-          u16 data2 = LCD_DATA;
-          data2 = (((int)data) << 8) | data2;
-          if (data2 == 0x7796) {
-              return LCDTYPE_ST7796;
-          }
+        if (lcd_read_id() == 0x7796) {
+            st7796_init();
+            return LCDTYPE_ST7796;
+        }
     }
+
+    printf("No LCD detected\n");
     return LCDTYPE_UNKNOWN;
 }
 
@@ -173,12 +174,7 @@ void LCD_Init()
     FSMC_BTR1  = FSMC_BTR_DATASTx(2) | FSMC_BTR_ADDHLDx(0) | FSMC_BTR_ADDSETx(1) | FSMC_BTR_ACCMODx(FSMC_BTx_ACCMOD_B);
     FSMC_BWTR1 = FSMC_BTR_DATASTx(2) | FSMC_BTR_ADDHLDx(0) | FSMC_BTR_ADDSETx(1) | FSMC_BTR_ACCMODx(FSMC_BTx_ACCMOD_B);
 
-    int type = lcd_detect();
-    if (HAS_LCD_TYPE(LCDTYPE_ILI9341) && type == LCDTYPE_ILI9341) {
-        ili9341_init();
-    } else if (HAS_LCD_TYPE(LCDTYPE_HX8347) && type == LCDTYPE_HX8347) {
-        hx8347_init();
-    } else {
-        printf("No LCD detected\n");
+    while (lcd_detect() == LCDTYPE_UNKNOWN) {
+        // retry inititalize and detect
     }
 }
