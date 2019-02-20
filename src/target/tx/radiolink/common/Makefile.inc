@@ -1,9 +1,3 @@
-ifeq "$(HAS_4IN1_FLASH)" "1"
-FILESYSTEMS := common base_fonts 320x240x16
-else
-FILESYSTEMS := common base_fonts 320x240x1
-endif
-
 ifndef BUILD_TARGET
 CROSS    = arm-none-eabi-
 
@@ -16,7 +10,8 @@ else
 NUM_MODELS ?= 10
 endif
 
-SRC_C   := $(wildcard $(SDIR)/target/tx/$(FAMILY)/$(TARGET)/*.c) \
+SRC_C   := $(wildcard $(SDIR)/target/tx/$(FAMILY)/common/*.c) \
+           $(wildcard $(SDIR)/target/tx/$(FAMILY)/$(TARGET)/*.c) \
            $(wildcard $(SDIR)/target/drivers/mcu/stm32/*.c) \
            $(wildcard $(SDIR)/target/drivers/filesystems/*.c) \
            $(wildcard $(SDIR)/target/drivers/filesystems/devofs/*.c) \
@@ -27,11 +22,12 @@ SRC_C   := $(wildcard $(SDIR)/target/tx/$(FAMILY)/$(TARGET)/*.c) \
            $(wildcard $(SDIR)/target/tx/devo/common/protocol/*.c) \
            $(wildcard $(SDIR)/target/tx/devo/common/uart.c)
 
+
 ifneq "$(HAS_4IN1_FLASH)" "1"
 SRC_C := $(filter-out $(SDIR)/target/drivers/mcu/stm32/spi_flash.c, $(SRC_C))
 endif
 
-CFLAGS   = -D"assert_param(x)=" -DSTM32F10X_HD -DSTM32F1 -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -fdata-sections -ffunction-sections -I$(SDIR)/target/tx/devo/common/msc2/lib -I$(SDIR)/target/tx/devo/common/msc2 -I$(SDIR)/libopencm3/include -I$(SDIR)/target/drivers/filesystems -fno-builtin-printf -Os --specs=nano.specs
+CFLAGS   = -D"assert_param(x)=" -DSTM32F10X_HD -DSTM32F1 -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -fdata-sections -ffunction-sections -I$(SDIR)/target/tx/devo/common/msc2/lib -I$(SDIR)/target/tx/devo/common/msc2 -I$(SDIR)/libopencm3/include -I$(SDIR)/target/drivers/filesystems -I$(SDIR)/target/tx/radiolink/common  -fno-builtin-printf -Os --specs=nano.specs
 
 ifeq "$(HAS_4IN1_FLASH)" "1"
 CFLAGS  += -D"HAS_4IN1_FLASH=1"
@@ -46,15 +42,11 @@ LFLAGS2  = -Wl,-T$(LINKFILE)
 
 else #BUILD_TARGET
 
-$(TARGET).bin: $(TARGET).elf
-	$(CP) -O binary $< $@
-	$(DUMP) -S $< > $(TARGET).list
-
 $(LIBOPENCM3):
 	test -s $(SDIR)/libopencm3/Makefile || { echo "Fetch libopencm3 via 'git submodule update --init'"; exit 1; }
 	+$(MAKE) -C $(SDIR)/libopencm3 TARGETS=stm32/f1 lib
 
-$(ODIR)/devo.fs: $(LAST_MODEL) $(TARGET).dfu $(PRE_FS) $(TARGET).fs_wrapper
+$(ODIR)/devo.fs: $(LAST_MODEL) $(PRE_FS) $(TARGET).fs_wrapper
 	target/drivers/filesystems/devofs/buildfs.py -c -i -f $@ -d filesystem/$(FILESYSTEM)
 
 endif #BUILD_TARGET

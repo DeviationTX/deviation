@@ -15,25 +15,16 @@
     #define USE_DEVOFS 1 //Must be before common_devo include
 #endif
 
+#include "target/tx/radiolink/common/common_at.h"
+
 #define DISABLE_PWM 1                 //FIXME
 #define SUPPORT_MULTI_LANGUAGE 0
-
-#ifndef FATSTRUCT_SIZE
-    #if defined(EMULATOR) && EMULATOR == USE_NATIVE_FS
-        #include "enable_native_fs.h"
-    #elif defined USE_DEVOFS && USE_DEVOFS == 1
-        #include "enable_devofs.h"
-    #else
-        #include "enable_petit_fat.h"
-    #endif
-#endif
 
 #define HAS_LCD_TYPES       (LCDTYPE_ILI9341)
 #ifndef LCD_ForceUpdate
 static inline void LCD_ForceUpdate() {}
 #endif
 
-#define USE_4BUTTON_MODE    1
 #define HAS_STANDARD_GUI    0
 #define HAS_ADVANCED_GUI    1
 #define HAS_PERMANENT_TIMER 1
@@ -53,7 +44,6 @@ static inline void LCD_ForceUpdate() {}
 #define HAS_EXTENDED_AUDIO  0
 #define HAS_AUDIO_UART     0
 #define HAS_MUSIC_CONFIG    0
-#define HAS_HARD_POWER_OFF  1
 #define HAS_ROTARY_ENCODER  1
 #define HAS_OLED_DISPLAY    0
 

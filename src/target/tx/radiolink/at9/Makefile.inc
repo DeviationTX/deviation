@@ -5,6 +5,12 @@ SCREENSIZE  := 320x240x16
 FONTS        = filesystem/$(FILESYSTEM)/media/15ascii.fon \
                filesystem/$(FILESYSTEM)/media/23bold.fon
 
+ifeq "$(HAS_4IN1_FLASH)" "1"
+FILESYSTEMS := common base_fonts 320x240x16
+else
+FILESYSTEMS := common base_fonts 320x240x1
+endif
+
 DFU_ARGS    := -D 0x0483:0xdf12 -b 0x08003000
 
 include $(SDIR)/target/tx/radiolink/common/Makefile.inc
@@ -22,12 +28,13 @@ SRC_C   += $(SDIR)/target/drivers/display/8080/320x240x16.c \
 
 else #BUILD_TARGET
 
+$(TARGET).bin: $(TARGET).elf
+	$(CP) -O binary $< $@
+	$(DUMP) -S $< > $(TARGET).list
+
 $(TARGET).dfu: $(TARGET).bin
 	$(SDIR)/../utils/dfu.py --name "$(HGVERSION) Firmware" $(DFU_ARGS):$< $@
 	$(SDIR)/../utils/get_mem_usage.pl $(TARGET).map
-
-$(ODIR)/devo.fs: $(LAST_MODEL) $(TARGET).dfu $(PRE_FS) $(TARGET).fs_wrapper
-	target/drivers/filesystems/devofs/buildfs.py -c -i -f $@ -d filesystem/$(FILESYSTEM)
 
 $(TARGET)-fs.dfu: $(ODIR)/devo.fs
 	$(SDIR)/../utils/dfu.py --name "$(HGVERSION) Filesystem" -D 0x0483:0xdf12 -b 0x08040000:$< $@
