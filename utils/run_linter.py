@@ -85,6 +85,11 @@ def main():
 
     pwd = os.getcwd()
     os.chdir(system(["git", "rev-parse", "--show-toplevel"]).rstrip())
+    new_pwd = os.getcwd()
+    if pwd != new_pwd and pwd.startswith(new_pwd):
+        path_delta = pwd[len(new_pwd)+1:]
+    else:
+        path_delta = None
 
     logging.debug("TRAVIS_PULL_REQUEST:     %s",  TRAVIS_PULL_REQUEST)
     logging.debug("TRAVIS_PULL_REQUEST_SHA: %s",  TRAVIS_PULL_REQUEST_SHA)
@@ -101,7 +106,7 @@ def main():
             changed = get_changed_lines_from_git()
 
     paths = filter_paths(args.path, changed, pwd)
-    violations = run_lint(paths, changed)
+    violations = run_lint(paths, changed, path_delta)
     if GITHUB_TOKEN and TRAVIS_PULL_REQUEST and not args.skip_github:
         update_github_status(violations)
 
@@ -187,7 +192,12 @@ def filter_paths(paths, changed, pwd):
             ret += line
     return ret
 
-def run_lint(paths, changed):
+def cleanup_line(line, path_delta):
+    if path_delta and line.startswith(path_delta):
+        return line[len(path_delta)+1:]
+    return line
+
+def run_lint(paths, changed, path_delta):
     violations = {}
     count = {}
     errors = {}
@@ -211,7 +221,7 @@ def run_lint(paths, changed):
                 continue
             if not changed or linenum not in changed[filename]:
                 continue
-            print line
+            print cleanup_line(line, path_delta)
             if filename not in errors:
                 errors[filename] = 0
             errors[filename] += 1
@@ -224,9 +234,10 @@ def run_lint(paths, changed):
                 violations[filename][linenum] = []
             violations[filename][linenum].append(line)
 
-    print "\nSummary\n-------";
-    for err in sorted(count.keys()):
-        print "{:30s}: {}".format(err, count[err])
+    if count:
+        print "\nSummary\n-------";
+        for err in sorted(count.keys()):
+            print "{:30s}: {}".format(err, count[err])
     return violations
 
 def update_github_status(violations):

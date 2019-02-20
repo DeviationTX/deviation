@@ -264,7 +264,6 @@ coverity:
 lint:
 	../utils/run_linter.py --diff --debug
 
-
 ##########################################
 #Ensure necessary directories are created#
 ##########################################
