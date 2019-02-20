@@ -46,6 +46,7 @@ POST_FILTER = {
 
 UNMATCHED_LINT_ERROR = "Unmatched Lint Error(s):\n"
 LINT_ERROR = "Lint Error:\n"
+ERROR_EXIT_STATUS = 1
 
 URL_CACHE = {}
 GITHUB_TOKEN = os.environ.get('GITHUB_TOKEN')
@@ -60,11 +61,6 @@ if TRAVIS_PULL_REQUEST == 'false':
 
 
 def main():
-    with open(os.devnull, 'w') as devnull:
-        if subprocess.call(["which", "cpplint"], stdout=devnull):
-            print("Please install cpplint via 'pip install cpplint' or equivalent")
-            sys.exit(1)
-
     parser = argparse.ArgumentParser()
     parser.add_argument("path", nargs='*', help="Paths to lint")
     parser.add_argument("--diff", action="store_true",
@@ -73,9 +69,19 @@ def main():
                         help="Add debug output")
     parser.add_argument("--skip-github", action="store_true",
                         help="Don't update GitHub")
+    parser.add_argument("--no-fail", action="store_true",
+                        help="Don't fail on lint errors")
     args = parser.parse_args()
     if args.debug:
         logging.basicConfig(level=logging.DEBUG)
+    if args.no_fail:
+        global ERROR_EXIT_STATUS
+        ERROR_EXIT_STATUS = 0
+
+    with open(os.devnull, 'w') as devnull:
+        if subprocess.call(["which", "cpplint"], stdout=devnull):
+            print("Please install cpplint via 'pip install cpplint' or equivalent")
+            sys.exit(ERROR_EXIT_STATUS)
 
     pwd = os.getcwd()
     os.chdir(system(["git", "rev-parse", "--show-toplevel"]).rstrip())
@@ -395,7 +401,7 @@ def post_pull_comment(filename, offset, message):
     except urllib2.HTTPError as e:
         print e
         print e.read()
-        sys.exit(1)
+        sys.exit(ERROR_EXIT_STATUS)
     time.sleep(1.0)
 
 
@@ -427,7 +433,7 @@ def delete_comment(_type, _id):
     except urllib2.HTTPError as e:
         print e
         print e.read()
-        sys.exit(1)
+        sys.exit(ERROR_EXIT_STATUS)
 
 
 def system(cmd):

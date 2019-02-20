@@ -264,6 +264,7 @@ coverity:
 lint:
 	../utils/run_linter.py --diff --debug
 
+
 ##########################################
 #Ensure necessary directories are created#
 ##########################################
@@ -322,6 +323,7 @@ ifeq "$(TYPE)" "dev"
 else
 	../utils/check_string_size.pl -target $(FILESYSTEM) -objdir $(ODIR) -quiet
 endif
+	../utils/run_linter.py --diff --skip-github --no-fail
 
 ######################
 #Necessary Font files#
