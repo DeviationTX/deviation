@@ -67,12 +67,19 @@ void STANDARD_Init(const struct page_defs *page_defs)
 }
 
 //"Throttle curve" and "Pitch curve" pages XY-graph points
+static const char *curvepointnr_cb(guiObject_t *obj, const void *data)
+{
+    (void) obj;
+    unsigned idx = (uintptr_t)data;
+    snprintf(tempstring, sizeof(tempstring), "%u", idx+1);
+    return tempstring;
+}
+
 void STANDARD_DrawCurvePoints(guiLabel_t vallbl[], guiTextSelect_t val[],
         u8 selectable_bitmap,
         void (*press_cb)(guiObject_t *obj, void *data),
         const char *(*set_pointval_cb)(guiObject_t *obj, int value, void *data))
 {
-    void * lbl_nr = "";
     u8 y  = LINE_Y;
     u8 w1 = WIDTH1;
     u8 w2 = WIDTH2;
@@ -97,14 +104,14 @@ void STANDARD_DrawCurvePoints(guiLabel_t vallbl[], guiTextSelect_t val[],
         if  (i == 4)
             i++;  // lbl/selection 4 is used for center value
         switch (i) {
-            case 1: lbl_nr = "2"; x = 0; break;
-            case 2: lbl_nr = "3"; x += w2 + WIDTH2_ADD; break;
-            case 3: lbl_nr = "4"; x = 0; y += height + LINE_H_OFFS; break;
-            case 5: lbl_nr = "6"; x += w2 + WIDTH2_ADD; break;
-            case 6: lbl_nr = "7"; x = 0; y += height + LINE_H_OFFS; break;
-            case 7: lbl_nr = "8"; x += w2 + WIDTH2_ADD; break;
+            case 1: x = 0; break;
+            case 2: x += w2 + WIDTH2_ADD; break;
+            case 3: x = 0; y += height + LINE_H_OFFS; break;
+            case 5: x += w2 + WIDTH2_ADD; break;
+            case 6: x = 0; y += height + LINE_H_OFFS; break;
+            case 7: x += w2 + WIDTH2_ADD; break;
         }
-        GUI_CreateLabelBox(&vallbl[i], x, y,  w1, height, &TINY_FONT, NULL, NULL, lbl_nr);
+        GUI_CreateLabelBox(&vallbl[i], x, y,  w1, height, &TINY_FONT, curvepointnr_cb, NULL, (void *)(uintptr_t)(i));
         x += w1;
         GUI_CreateTextSelectPlate(&val[i], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(uintptr_t)i);
     }
