@@ -53,7 +53,7 @@ void SOUND_Init()
     timer_enable_preload(_SOUND_TIM);
 
     if (HAS_VIBRATINGMOTOR)
-        VIBRATINGMOTOR_Init(); // Since the vibrating motor is tightly controlled by sound, we put its init() here instead of in the main()
+        VIBRATINGMOTOR_Init();  // Since the vibrating motor is tightly controlled by sound, we put its init() here instead of in the main()
 }
 
 void SOUND_SetFrequency(unsigned frequency, unsigned volume)

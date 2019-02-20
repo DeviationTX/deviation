@@ -42,7 +42,7 @@
 #define INPNAME_AUX5(x,y)     x = _tr_noop("AUX5"); y = -1
 #define INPNAME_AUX6(x,y)     x = _tr_noop("AUX6"); y = -1
 #define INPNAME_AUX7(x,y)     x = _tr_noop("AUX7"); y = -1
-#define INPNAME_AUX8(x,y)     x = _tr_noop("AUX8"); y = -1
+#define INPNAME_AUX8(x, y)    x = _tr_noop("AUX8"); y = -1
 #define INPNAME_DR0(x,y)      x = _tr_noop("DR"); y = 0
 #define INPNAME_DR1(x,y)      x = _tr_noop("DR"); y = 1
 #define INPNAME_RUD_DR0(x,y)  x = _tr_noop("RUD DR"); y = 0
