@@ -423,7 +423,7 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
     };
     if (! MATCH_SECTION(SECTION_GUI)) {
         if(MATCH_SECTION("gui-320x240")
-           && (!ELEM_USED(Model.elem[0]) || seen_res != HIRES))
+           && (Model.elem[0].type == 0 || seen_res != HIRES))
         {
             seen_res = LOWRES;
             offset_x = (LCD_WIDTH - 320) / 2;
