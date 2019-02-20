@@ -78,7 +78,7 @@ static const char *binding_string_cb(guiObject_t *obj, void *data)
         return tempstring;
     u32 bind_time = PROTOCOL_Binding();
     char tmp[10];
-    strlcpy(tmp, sizeof(tmp), Model.name);
+    strlcpy(tmp, Model.name, sizeof(tmp));
     snprintf(tempstring, sizeof(tempstring), _tr("Binding %s...\nPress ENT to stop"), tmp);
     if (bind_time != 0xFFFFFFFF ) {
         int len = strlen(tempstring);
