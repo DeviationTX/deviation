@@ -97,7 +97,6 @@ static void RADIOLINK_Stop()
     PROTOSPI_pin_clear(RADIOLINK_CC2530_RESET_PIN);
 }
 
-// todo: call during transmitter startup
 static int RADIOLINK_Reset()
 {
     RADIOLINK_Initialize();
@@ -120,7 +119,10 @@ uintptr_t RADIOLINK_Cmds(enum ProtoCmds cmd)
 {
     switch (cmd) {
         case PROTOCMD_INIT:  initialize(); return 0;
-        case PROTOCMD_DEINIT: RADIOLINK_Stop(); return 0;
+        case PROTOCMD_RESET:
+        case PROTOCMD_DEINIT: 
+            CLOCK_StopTimer();
+            return (RADIOLINK_Reset() ? 1 : -1);
         case PROTOCMD_CHECK_AUTOBIND: return 1;
         case PROTOCMD_BIND:  initialize(); return 0;
         case PROTOCMD_NUMCHAN: return 10;
