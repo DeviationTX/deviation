@@ -35,7 +35,6 @@ static inline void _i2c_init(struct i2c_config i2c)
     GPIO_setup_output_af(i2c.scl_sca, OTYPE_OPENDRAIN, i2c.i2c);
 
     i2c_peripheral_enable(i2c.i2c);
-    
 }
 
 #endif  // _DTX_STM32_I2C_H_
