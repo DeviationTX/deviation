@@ -233,7 +233,7 @@ void EventLoop()
     	if(Transmitter.music_shutdown) {
 #if HAS_EXTENDED_AUDIO
             MUSIC_Play(MUSIC_SHUTDOWN);
-            while (CLOCK_getms()<audio_queue_time); {
+            while (CLOCK_getms() < audio_queue_time) {
                 // Wait for voice to finished
                 CLOCK_ResetWatchdog();
             }

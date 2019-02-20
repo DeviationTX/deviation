@@ -384,7 +384,7 @@ void TELEMETRY_Alarm()
         unsigned telem_prec = 0;
         switch (TELEMETRY_Type()) {
             case TELEM_DEVO:
-                switch (alarm->src]) {
+                switch (alarm->src) {
                     case TELEM_DEVO_VOLT1:
                     case TELEM_DEVO_VOLT2:
                     case TELEM_DEVO_VOLT3: telem_unit = VOICE_UNIT_VOLT; telem_prec = 1; break;
