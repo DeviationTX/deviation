@@ -83,19 +83,19 @@ static void _show_settimer_page(u8 index)
     };
 
     // actual value
-    firstObj = GUI_CreateLabel(&guiset->oldlbl, XLEFT, YOLD, GUI_Localize, DEFAULT_FONT, _tr_noop("actual value"));
+    firstObj = GUI_CreateLabel(&guiset->oldlbl, XLEFT, YOLD, GUI_Localize, &DEFAULT_FONT, _tr_noop("actual value"));
     GUI_CreateLabelBox(&guiset->oldvalue, XLEFT, YOLD + 16, 128, 30, &BIGBOX_FONT, timer_value_str_cb, NULL, (void *)OLD_TIMER);
 
     // value to add or set
-    GUI_CreateLabel(&guiset->addlbl, XLEFT, YNEW, GUI_Localize, DEFAULT_FONT, _tr_noop("value to add or set"));
+    GUI_CreateLabel(&guiset->addlbl, XLEFT, YNEW, GUI_Localize, &DEFAULT_FONT, _tr_noop("value to add or set"));
     GUI_CreateLabelBox(&guiset->addvalue, XLEFT, YNEW + 16, 128, 30, &BIGBOX_FONT, timer_value_str_cb, NULL, (void *)ADD_TIMER);
 
     // select boxes
-    GUI_CreateLabel(&guiset->hourlbl, XUNIT, YUNIT + 1, GUI_Localize, DEFAULT_FONT, _tr_noop("Hour"));
+    GUI_CreateLabel(&guiset->hourlbl, XUNIT, YUNIT + 1, GUI_Localize, &DEFAULT_FONT, _tr_noop("Hour"));
     GUI_CreateTextSelect(&guiset->hoursel, XVAL, YUNIT, TEXTSELECT_64, NULL, _timer_new_str_cb, (void *)TIMER_HOURS);
-    GUI_CreateLabel(&guiset->minutelbl, XUNIT, YUNIT + YDIFF + 1, GUI_Localize, DEFAULT_FONT, _tr_noop("Minute"));
+    GUI_CreateLabel(&guiset->minutelbl, XUNIT, YUNIT + YDIFF + 1, GUI_Localize, &DEFAULT_FONT, _tr_noop("Minute"));
     GUI_CreateTextSelect(&guiset->minutesel, XVAL, YUNIT + YDIFF, TEXTSELECT_64, NULL, _timer_new_str_cb, (void *)TIMER_MINUTES);
-    GUI_CreateLabel(&guiset->secondlbl, XUNIT, YUNIT + YDIFF + YDIFF + 1, GUI_Localize, DEFAULT_FONT, _tr_noop("Second"));
+    GUI_CreateLabel(&guiset->secondlbl, XUNIT, YUNIT + YDIFF + YDIFF + 1, GUI_Localize, &DEFAULT_FONT, _tr_noop("Second"));
     GUI_CreateTextSelect(&guiset->secondsel, XVAL, YUNIT + YDIFF + YDIFF, TEXTSELECT_64, NULL, _timer_new_str_cb, (void *)TIMER_SECONDS);
 
     // add / set buttons
@@ -103,6 +103,6 @@ static void _show_settimer_page(u8 index)
     GUI_CreateButton(&guiset->setbtn, XSET, YBTN, BUTTON_64x16, timer_value_str_cb, add_set_button_cb, (void *)SET_BUTTON);
 
     // resulting value
-    GUI_CreateLabel(&guiset->newlbl, XLEFT, YRES, GUI_Localize, DEFAULT_FONT, _tr_noop("resulting value"));
+    GUI_CreateLabel(&guiset->newlbl, XLEFT, YRES, GUI_Localize, &DEFAULT_FONT, _tr_noop("resulting value"));
     GUI_CreateLabelBox(&guiset->newvalue, XLEFT, YRES + 16, 128, 30, &BIGBOX_FONT, timer_value_str_cb, NULL, (void *)NEW_TIMER);
 }

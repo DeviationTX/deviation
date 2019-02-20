@@ -80,9 +80,9 @@ void PAGE_LayoutEditInit(int page)
     rect.outline_color = 0x0000;
     GUI_CreateRect(&gui->editelem, 41, 1, 9, 5, &rect);
     gui->editelem.CallBack = move_cb;
-    GUI_CreateLabel(&gui->xlbl, 0,  1, NULL, micro, "X:");
+    GUI_CreateLabel(&gui->xlbl, 0,  1, NULL, &micro, "X:");
     GUI_CreateLabelBox(&gui->x, 8, 1, 13, 6, &micro, pos_cb, NULL, (void *) 0L);
-    GUI_CreateLabel(&gui->ylbl, 22, 1, NULL, micro, "Y:");
+    GUI_CreateLabel(&gui->ylbl, 22, 1, NULL, &micro, "Y:");
     GUI_CreateLabelBox(&gui->y, 30, 1, 10, 6, &micro, pos_cb, NULL, (void *) 1L);
     //gui->y must be the last element!
     GUI_SelectionNotify(notify_cb);

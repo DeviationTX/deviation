@@ -336,7 +336,10 @@ guiObject_t *GUI_CreateDialog(guiDialog_t *,u16 x, u16 y, u16 width, u16 height,
         const char *(*string_cb)(guiObject_t *obj, void *data),
         void (*CallBack)(u8 state, void *data),
         enum DialogType dgType, void *data);
-#define GUI_CreateLabel(obj, x, y, cb, desc, data) GUI_CreateLabelBox(obj, x, y, 0, 0, &desc, cb, NULL, data)
+guiObject_t *GUI_CreateLabel(guiLabel_t *, u16 x, u16 y,
+             const char *(*strCallback)(guiObject_t *, const void *),
+             const struct LabelDesc *desc,
+             const void *data);
 guiObject_t *GUI_CreateLabelBox(guiLabel_t *,u16 x, u16 y, u16 width, u16 height, const struct LabelDesc *desc,
              const char *(*strCallback)(guiObject_t *, const void *),
              void (*pressCallback)(guiObject_t *obj, s8 press_type, const void *data),
@@ -345,7 +348,7 @@ void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height,
         const char *str, const struct LabelDesc *desc, u8 is_selected);
 void GUI_SetLabelDesc(guiLabel_t *obj, struct LabelDesc *desc);
 
-#define GUI_CreateImage(obj, x, y, w,h, file) GUI_CreateImageOffset(obj, x, y, w, h, 0, 0, file, NULL, NULL)
+guiObject_t *GUI_CreateImage(guiImage_t *obj, u16 x, u16 y, u16 w, u16 h, const char *file);
 guiObject_t *GUI_CreateImageOffset(guiImage_t *, u16 x, u16 y, u16 width, u16 height, u16 x_off, u16 y_off, const char *file,
         void (*CallBack)(guiObject_t *obj, s8 press_type, const void *data), const void *cb_data);
 
