@@ -106,7 +106,7 @@ void STANDARD_DrawCurvePoints(guiLabel_t vallbl[], guiTextSelect_t val[],
         }
         GUI_CreateLabelBox(&vallbl[i], x, y,  w1, height, &TINY_FONT, NULL, NULL, lbl_nr);
         x += w1;
-        GUI_CreateTextSelectPlate(&val[i], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)i);
+        GUI_CreateTextSelectPlate(&val[i], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(uintptr_t)i);
     }
 
     //update_textsel_state();
