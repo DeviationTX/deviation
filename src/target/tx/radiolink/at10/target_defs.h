@@ -12,12 +12,12 @@
 #else
     #define SPIFLASH_SECTORS 64
     #define USE_PBM_IMAGE 1
-    #define USE_DEVOFS 1 //Must be before common_devo include
+    #define USE_DEVOFS 1  // Must be before common_devo include
 #endif
 
 #include "target/tx/radiolink/common/common_at.h"
 
-#define DISABLE_PWM 1                 //FIXME
+#define DISABLE_PWM 1                 // FIXME
 #define SUPPORT_MULTI_LANGUAGE 0
 
 #define HAS_LCD_TYPES       (LCDTYPE_ST7796)
@@ -46,12 +46,12 @@ static inline void LCD_ForceUpdate() {}
 #define HAS_HARD_POWER_OFF  1
 #define HAS_ROTARY_ENCODER  1
 #define HAS_OLED_DISPLAY    0
-#define ENABLE_320x240_GUI  1 //Enable support for 320x240 gui items as well as 480x320 ones
+#define ENABLE_320x240_GUI  1  // Enable support for 320x240 gui items as well as 480x320 ones
 
 #ifdef BUILDTYPE_DEV
-   #define DEBUG_WINDOW_SIZE 200
+    #define DEBUG_WINDOW_SIZE 200
 #else
-   #define DEBUG_WINDOW_SIZE 0
+    #define DEBUG_WINDOW_SIZE 0
 #endif
 
 #define LCD_WIDTH 480
