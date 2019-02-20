@@ -1,6 +1,7 @@
 *.bin
 *.dfu
 *.elf
+*.mac
 *.exe
 *.list
 *.gz
