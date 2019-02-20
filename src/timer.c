@@ -119,7 +119,10 @@ void TIMER_Power(){
 
     elevator = 2 == mode ? abs(CHAN_ReadInput(INP_THROTTLE)) : abs(CHAN_ReadInput(INP_ELEVATOR));
     new_throttle = 2 == mode ?  abs(CHAN_ReadInput(INP_ELEVATOR)) : abs(CHAN_ReadInput(INP_THROTTLE));
-    new_throttle = abs(new_throttle - throttle);
+    if (new_throttle > throttle)
+        new_throttle = new_throttle - throttle;
+    else
+        new_throttle = throttle - new_throttle;
 
     if( elevator < 1000 && abs(CHAN_ReadInput(INP_AILERON)) < 1000 &&
                 new_throttle < 1000 && abs(CHAN_ReadInput(INP_RUDDER)) < 1000 &&
