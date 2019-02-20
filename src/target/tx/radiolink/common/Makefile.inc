@@ -27,7 +27,7 @@ ifneq "$(HAS_4IN1_FLASH)" "1"
 SRC_C := $(filter-out $(SDIR)/target/drivers/mcu/stm32/spi_flash.c, $(SRC_C))
 endif
 
-CFLAGS   = -D"assert_param(x)=" -DSTM32F10X_HD -DSTM32F1 -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -fdata-sections -ffunction-sections -I$(SDIR)/target/tx/devo/common/msc2/lib -I$(SDIR)/target/tx/devo/common/msc2 -I$(SDIR)/libopencm3/include -I$(SDIR)/target/drivers/filesystems -fno-builtin-printf -Os --specs=nano.specs
+CFLAGS   = -D"assert_param(x)=" -DSTM32F10X_HD -DSTM32F1 -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -fdata-sections -ffunction-sections -I$(SDIR)/target/tx/devo/common/msc2/lib -I$(SDIR)/target/tx/devo/common/msc2 -I$(SDIR)/libopencm3/include -I$(SDIR)/target/drivers/filesystems -I$(SDIR)/target/tx/radiolink/common  -fno-builtin-printf -Os --specs=nano.specs
 
 ifeq "$(HAS_4IN1_FLASH)" "1"
 CFLAGS  += -D"HAS_4IN1_FLASH=1"

@@ -7,7 +7,7 @@
 void PWR_Init(void)
 {
     SCB_VTOR = VECTOR_TABLE_LOCATION;
-    SCB_SCR  &= ~SCB_SCR_SLEEPONEXIT; //sleep immediate on WFI
+    SCB_SCR  &= ~SCB_SCR_SLEEPONEXIT;  // sleep immediate on WFI
     rcc_clock_setup_in_hse_8mhz_out_72mhz();
 
     /* Enable GPIOA and GPIOE so we can blink LEDs! */
@@ -37,14 +37,12 @@ void PWR_Shutdown()
     BACKLIGHT_Brightness(0);
     rcc_set_sysclk_source(RCC_CFGR_SW_SYSCLKSEL_HSICLK);
     rcc_wait_for_osc_ready(RCC_HSI);
-    while(1) ;
+    while (1) {}
 }
 
 void PWR_Sleep()
 {
-    //asm("wfi");
-    gpio_toggle(GPIOA, GPIO13);
-    usleep(100);
+    // asm("wfi");
 }
 
 /* Return milivolts */
