@@ -115,7 +115,7 @@ void PAGE_ChangeQuick(int dir)
 {
     int quick = 0;
     for (int i = 0; i < NUM_QUICKPAGES; i++) {
-        if(Model.quickpage[i] && Model.quickpage[i] == cur_page) {
+        if (Model.quickpage[i] && Model.quickpage[i] == cur_page) {
             quick = i + 1;
             break;
         }

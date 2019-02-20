@@ -100,7 +100,7 @@ static void show_iconsel_page(int SelectedIcon) {
         GUI_CreateLabelBox(&gui->togglelabel[i], LABEL_X, row, LABEL_W, LABEL_H, SelectedIcon == i ? &inverted : &DEFAULT_FONT, NULL, NULL, tglidx[i]);
 #ifdef HAS_CHAR_ICONS
         GUI_CreateLabelBox(&gui->toggleicon[i], ICON_X, row, ICON_W, LABEL_H, &DEFAULT_FONT, TGLICO_font_cb,
-                           NULL, (void *)(long)Model.elem[tp->tglidx].extra.ico[i]); 
+                           NULL, (void *)(uintptr_t)Model.elem[tp->tglidx].extra.ico[i]);
 #else
         struct ImageMap img = TGLICO_GetImage(Model.elem[tp->tglidx].extra.ico[i]);
         GUI_CreateImageOffset(&gui->toggleicon[i], ICON_X, row, ICON_W, LABEL_H, img.x_off, img.y_off, img.file,

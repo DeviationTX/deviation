@@ -87,9 +87,9 @@ struct ImageMap TGLICO_GetImage(int idx)
 void TGLICO_Select(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    if(Model.elem[(long)data].src)
+    if (Model.elem[(uintptr_t)data].src)
     {
-        PAGE_PushByID(PAGEID_TGLEDIT, (long)data);
+        PAGE_PushByID(PAGEID_TGLEDIT, (uintptr_t)data);
     }
 }
 

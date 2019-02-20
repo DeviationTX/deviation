@@ -175,7 +175,7 @@ static const char *dlgts_cb(guiObject_t *obj, int dir, void *data)
             Model.elem[idx].src = GUI_TextSelectHelper(Model.elem[idx].src, 0, NUM_TRIMS, dir, 1, 1, NULL);
             if (Model.elem[idx].src == 0)
                 return _tr("None");
-            snprintf(tempstring, sizeof(tempstring), "%s%d", _tr("Trim"),Model.elem[idx].src);
+            snprintf(tempstring, sizeof(tempstring), "%s%d", _tr("Trim"), Model.elem[idx].src);
             return tempstring;
     }
     return _tr("None");

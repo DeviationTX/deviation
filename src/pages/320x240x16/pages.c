@@ -239,7 +239,7 @@ void PAGE_ChangeQuick(int dir)
 {
     int quick = 0;
     for (int i = 0; i < NUM_QUICKPAGES; i++) {
-        if(Model.quickpage[i] && Model.quickpage[i] == cur_page) {
+        if (Model.quickpage[i] && Model.quickpage[i] == cur_page) {
             quick = i+1;
             break;
         }
@@ -266,7 +266,7 @@ int PAGE_QuickPage(u32 buttons, u8 flags, void *data)
     (void)flags;
     int i;
     for(i = 0; i < NUM_QUICKPAGES; i++)
-        if(Model.quickpage[i])
+        if (Model.quickpage[i])
             break;
     if(i == NUM_QUICKPAGES)
         return 0;

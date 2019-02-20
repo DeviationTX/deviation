@@ -38,7 +38,7 @@ void draw_elements()
         FullRedraw = redraw_mode;
     }
     for (i = 0; i < NUM_ELEMS; i++) {
-        if (! GetWidgetLoc(&Model.elem[i], &x, &y, &w, &h))
+        if (!GetWidgetLoc(&Model.elem[i], &x, &y, &w, &h))
             break;
         int type = Model.elem[i].type;
         const char *(*strCallback)(guiObject_t *, const void *) = label_cb;

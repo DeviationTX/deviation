@@ -224,7 +224,7 @@ void PAGE_MainEvent()
                         //switch
                         for (int j = 0; j < 3; j++) {
                             // Assume switch 0/1/2 are in order
-                            if(Model.elem[i].extra.ico[j] && raw[src+j] > 0) {
+                            if (Model.elem[i].extra.ico[j] && raw[src+j] > 0) {
                                 idx = Model.elem[i].extra.ico[j];
                                 break;
                             }
@@ -350,7 +350,7 @@ void show_elements()
 {
     u16 x, y, w, h;
     for (int i = 0; i < NUM_ELEMS; i++) {
-        if (! GetWidgetLoc(&Model.elem[i], &x, &y, &w, &h))
+        if (!GetWidgetLoc(&Model.elem[i], &x, &y, &w, &h))
             break;
         int type = Model.elem[i].type;
         switch(type) {
@@ -408,7 +408,7 @@ void show_elements()
                 GUI_CreateLabelBox(&gui->elem[i].box, x, y, 2, 2, &DEFAULT_FONT, TGLICO_font_cb, NULL,
                     (void *)(uintptr_t)Model.elem[i].extra.ico[0]);
 #else
-                struct ImageMap img = TGLICO_GetImage(Model.elem[i].extra.ico[0]); //We'll set this properly down below
+                struct ImageMap img = TGLICO_GetImage(Model.elem[i].extra.ico[0]);  // We'll set this properly down below
                 GUI_CreateImageOffset(&gui->elem[i].img, x, y, w, h,
                                   img.x_off, img.y_off, img.file, NULL, NULL);
 #endif
