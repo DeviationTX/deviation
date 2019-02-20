@@ -47,10 +47,6 @@
     #define SYSCLK_TIM 4
 #endif
 
-#ifndef FREQ_MHz
-    #define FREQ_MHz 72
-#endif
-
 #include "hardware.h"
 
 #endif //_PORTS_H_

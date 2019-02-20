@@ -3,6 +3,8 @@
 
 #include <libopencm3/stm32/gpio.h> /* For GPIO* definitions */
 
+#include "freq.h"
+
 enum gpio_output_type {
     OTYPE_OPENDRAIN = GPIO_CNF_OUTPUT_OPENDRAIN,
     OTYPE_PUSHPULL  = GPIO_CNF_OUTPUT_PUSHPULL,
