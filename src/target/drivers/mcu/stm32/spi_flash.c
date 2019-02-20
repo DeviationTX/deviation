@@ -198,6 +198,7 @@ void detect_memory_type()
 void SPIFlash_Init()
 {
     /* Enable FLASH_SPI.spi */
+    rcc_periph_clock_enable(get_rcc_from_pin(FLASH_SPI.csn));  // Assume sck, mosi, miso all on same port
     GPIO_setup_output(FLASH_SPI.csn, OTYPE_PUSHPULL);
     CS_HI();
     _spi_init(FLASH_SPI_CFG);
