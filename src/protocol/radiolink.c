@@ -120,7 +120,7 @@ uintptr_t RADIOLINK_Cmds(enum ProtoCmds cmd)
     switch (cmd) {
         case PROTOCMD_INIT:  initialize(); return 0;
         case PROTOCMD_RESET:
-        case PROTOCMD_DEINIT: 
+        case PROTOCMD_DEINIT:
             CLOCK_StopTimer();
             return (RADIOLINK_Reset() ? 1 : -1);
         case PROTOCMD_CHECK_AUTOBIND: return 1;
