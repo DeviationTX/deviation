@@ -42,7 +42,7 @@ static const char * const r9m_powers[] = { "10/25mW", "100/25mW", "500/500", "Au
 #define R9M_POWER_COUNT   (sizeof r9m_powers / sizeof (char *))
 
 u8 radio_tx_power_int(enum Radio radio, enum TxPower power) {
-    static const u8 RADIO_TX_POWER_COUNT[TX_MODULE_LAST] = {  // number of power settings
+    const u8 RADIO_TX_POWER_COUNT[TX_MODULE_LAST] = {  // number of power settings
          STD_POWER_COUNT,   // CYRF6936,
          A7105_POWER_COUNT, // A7105,
          STD_POWER_COUNT,   // CC2500,
@@ -55,7 +55,6 @@ u8 radio_tx_power_int(enum Radio radio, enum TxPower power) {
     if (power >= RADIO_TX_POWER_COUNT[radio]) return RADIO_TX_POWER_COUNT[radio]-1;
     return power;
 }
-
 
 const char * radio_tx_power_val(enum Radio radio, enum TxPower power) {
     power = radio_tx_power_int(radio, power);
