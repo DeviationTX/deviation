@@ -19,10 +19,19 @@
 #include "config/tx.h"
 #include "target/tx/devo/common/devo.h"
 
-//Order is MODE1: AIL, ELE, THR, RUD, LeftDial, Right Dial, Left Shoulder, Right Shoulder, Vdd, Voltage
-//                PA0  PA1, PA2, PA3, PA5,      PA6,        PB0            PA4,                 PB1
-const u8 adc_chan_sel[NUM_ADC_CHANNELS] =  
-                 {0,   1,   2,   3,   5,        6,          8,             4,              16,  9};
+// Order is MODE1
+const u8 adc_chan_sel[NUM_ADC_CHANNELS] = {
+    0,   // AIL PA0
+    1,   // ELE PA1
+    2,   // THR PA2
+    3,   // RUD PA3
+    5,   // LeftDial PA5
+    6,   // RightDial PA6
+    8,   // LeftShoulder PB0
+    4,   // RightShoulder PA4
+    16,  // Vdd
+    9    // Battery Voltage PB1
+};
 
 void CHAN_Init()
 {
@@ -56,58 +65,60 @@ void CHAN_Init()
 
 s32 CHAN_ReadRawInput(int channel)
 {
-    s32 value = 0;
-    switch(channel) {
-    case INP_AILERON:  value = adc_array_raw[0]; break;  // bug fix: right vertical
-    case INP_ELEVATOR: value = adc_array_raw[1]; break;  // bug fix: right horizon
-    case INP_THROTTLE: value = adc_array_raw[2]; break;  // bug fix: left horizon
-    case INP_RUDDER:   value = adc_array_raw[3]; break;  // bug fix: left vertical
+    s32 value;
+    switch (channel) {
+    case INP_AILERON:  value = adc_array_raw[0]; break;
+    case INP_ELEVATOR: value = adc_array_raw[1]; break;
+    case INP_THROTTLE: value = adc_array_raw[2]; break;
+    case INP_RUDDER:   value = adc_array_raw[3]; break;
     case INP_AUX4:     value = adc_array_raw[4]; break;
     case INP_AUX5:     value = adc_array_raw[5]; break;
     case INP_AUX6:     value = adc_array_raw[6]; break;
     case INP_AUX7:     value = adc_array_raw[7]; break;
     case INP_SWA0:     value = gpio_get(GPIOC, GPIO0); break;
-    case INP_SWA1:     value = ! gpio_get(GPIOC, GPIO0); break;
+    case INP_SWA1:     value = !gpio_get(GPIOC, GPIO0); break;
     case INP_SWB0:     value = gpio_get(GPIOC, GPIO1); break;
-    case INP_SWB1:     value = ! gpio_get(GPIOC, GPIO1); break;
-    case INP_SWC0:     value = ! gpio_get(GPIOC, GPIO2); break;
+    case INP_SWB1:     value = !gpio_get(GPIOC, GPIO1); break;
+    case INP_SWC0:     value = !gpio_get(GPIOC, GPIO2); break;
     case INP_SWC1:     value = (gpio_get(GPIOC, GPIO2) && gpio_get(GPIOC, GPIO3)); break;
-    case INP_SWC2:     value = ! gpio_get(GPIOC, GPIO3); break;
+    case INP_SWC2:     value = !gpio_get(GPIOC, GPIO3); break;
     case INP_SWD0:     value = gpio_get(GPIOC, GPIO6); break;
-    case INP_SWD1:     value = ! gpio_get(GPIOC, GPIO6); break;
-    case INP_SWE0:     value = ! gpio_get(GPIOC, GPIO4); break;
+    case INP_SWD1:     value = !gpio_get(GPIOC, GPIO6); break;
+    case INP_SWE0:     value = !gpio_get(GPIOC, GPIO4); break;
     case INP_SWE1:     value = (gpio_get(GPIOC, GPIO4) && gpio_get(GPIOC, GPIO5)); break;
-    case INP_SWE2:     value = ! gpio_get(GPIOC, GPIO5); break;
+    case INP_SWE2:     value = !gpio_get(GPIOC, GPIO5); break;
     case INP_SWF0:     value = gpio_get(GPIOC, GPIO7); break;
-    case INP_SWF1:     value = ! gpio_get(GPIOC, GPIO7); break;
-    case INP_SWG0:     value = ! gpio_get(GPIOC, GPIO8); break;
+    case INP_SWF1:     value = !gpio_get(GPIOC, GPIO7); break;
+    case INP_SWG0:     value = !gpio_get(GPIOC, GPIO8); break;
     case INP_SWG1:     value = (gpio_get(GPIOC, GPIO8) && gpio_get(GPIOC, GPIO9)); break;
-    case INP_SWG2:     value = ! gpio_get(GPIOC, GPIO9); break;
+    case INP_SWG2:     value = !gpio_get(GPIOC, GPIO9); break;
     case INP_SWH0:     value = gpio_get(GPIOA, GPIO8); break;
-    case INP_SWH1:     value = ! gpio_get(GPIOA, GPIO8); break;
+    case INP_SWH1:     value = !gpio_get(GPIOA, GPIO8); break;
+    default:           value = 0;
     }
     return value;
 }
+
 s32 CHAN_ReadInput(int channel)
 {
     s32 value = CHAN_ReadRawInput(channel);
-    if(channel <= INP_HAS_CALIBRATION) {
+    if (channel <= INP_HAS_CALIBRATION) {
         s32 max = Transmitter.calibration[channel - 1].max;
         s32 min = Transmitter.calibration[channel - 1].min;
         s32 zero = Transmitter.calibration[channel - 1].zero;
-        if(! zero) {
-            //If this input doesn't have a zero, calculate from max/min
+        if (!zero) {
+            // If this input doesn't have a zero, calculate from max/min
             zero = ((u32)max + min) / 2;
         }
         // Derate min and max by 1% to ensure we can get all the way to 100%
         max = (max - zero) * 99 / 100;
         min = (min - zero) * 99 / 100;
-        if(value >= zero) {
+        if (value >= zero) {
             value = (value - zero) * CHAN_MAX_VALUE / max;
         } else {
             value = (value - zero) * CHAN_MIN_VALUE / min;
         }
-        //Bound output
+        // Bound output
         if (value > CHAN_MAX_VALUE)
             value = CHAN_MAX_VALUE;
         if (value < CHAN_MIN_VALUE)
