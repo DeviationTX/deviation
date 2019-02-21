@@ -1,8 +1,8 @@
-#ifndef _AT9_TARGET_DEFS_H_
-#define _AT9_TARGET_DEFS_H_
+#ifndef _AT10_TARGET_DEFS_H_
+#define _AT10_TARGET_DEFS_H_
 
-#define TXID 0xA9
-#define VECTOR_TABLE_LOCATION 0x3000
+#define TXID 0xAA
+#define VECTOR_TABLE_LOCATION 0xa000
 
 #define SPIFLASH_SECTOR_OFFSET 0x0000
 
@@ -12,44 +12,48 @@
 #else
     #define SPIFLASH_SECTORS 64
     #define USE_PBM_IMAGE 1
-    #define USE_DEVOFS 1 //Must be before common_devo include
+    #define USE_DEVOFS 1  // Must be before common_devo include
 #endif
 
-#define DISABLE_PWM 1                 //FIXME
+#define DISABLE_PWM 1                 // FIXME
 #define SUPPORT_MULTI_LANGUAGE 0
 
-#define HAS_LCD_TYPES       (LCDTYPE_ILI9341)
+#define HAS_LCD_TYPES       (LCDTYPE_ST7796)
 #ifndef LCD_ForceUpdate
 static inline void LCD_ForceUpdate() {}
 #endif
 
-#define HAS_STANDARD_GUI    0
+#define HAS_STANDARD_GUI    1
 #define HAS_ADVANCED_GUI    1
 #define HAS_PERMANENT_TIMER 1
 #define HAS_TELEMETRY       1
 #define HAS_EXTENDED_TELEMETRY 1
 #define HAS_TOUCH           0
 #define HAS_RTC             0
-#define HAS_VIBRATINGMOTOR  1
+#define HAS_VIBRATINGMOTOR  0
 #define HAS_DATALOG         1
 #define HAS_LAYOUT_EDITOR   1
 #define HAS_SCANNER         0
 #define HAS_EXTRA_SWITCHES  0
 #define HAS_EXTRA_BUTTONS   0
 #define HAS_MULTIMOD_SUPPORT 0
-//#define HAS_4IN1_FLASH 1 // NB set in the Makefile.inc
 #define HAS_VIDEO           0
 #define HAS_EXTENDED_AUDIO  0
-#define HAS_AUDIO_UART     0
+#define HAS_AUDIO_UART      0
 #define HAS_MUSIC_CONFIG    0
+#define HAS_HARD_POWER_OFF  1
 #define HAS_ROTARY_ENCODER  1
 #define HAS_OLED_DISPLAY    0
+#define ENABLE_320x240_GUI  1  // Enable support for 320x240 gui items as well as 480x320 ones
 
 #ifdef BUILDTYPE_DEV
-   #define DEBUG_WINDOW_SIZE 200
+    #define DEBUG_WINDOW_SIZE 200
 #else
-   #define DEBUG_WINDOW_SIZE 0
+    #define DEBUG_WINDOW_SIZE 0
 #endif
+
+#define LCD_WIDTH 480
+#define LCD_HEIGHT 320
 
 #define MIN_BRIGHTNESS 0
 #define DEFAULT_BATTERY_ALARM 8000
@@ -65,12 +69,12 @@ static inline void LCD_ForceUpdate() {}
 #define MAX_POINTS 13
 #define NUM_MIXERS ((NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS) * 4)
 
-#define INP_HAS_CALIBRATION 8
+#define INP_HAS_CALIBRATION 9
 
 /* Compute voltage from y = 0.003672x + 0.0287 */
 #define VOLTAGE_NUMERATOR 367
 #define VOLTAGE_OFFSET    29
-#include "at9_ports.h"
+#include "at10_ports.h"
 
 
 /* Define button placement for chantest page*/
@@ -85,4 +89,4 @@ static inline void LCD_ForceUpdate() {}
 
 #include "target/tx/radiolink/common/common_at.h"
 
-#endif //_AT9_TARGET_DEFS_H_
+#endif  // _AT10_TARGET_DEFS_H_
