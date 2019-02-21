@@ -14,9 +14,9 @@
 */
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/rcc.h>
-#include <libopencm3/stm32/fsmc.h>
 #include "common.h"
 #include "gui/gui.h"
+#include "target/drivers/mcu/stm32/fsmc.h"
 #include "320x240x16.h"
 
 static u8 screen_flip;
@@ -143,36 +143,14 @@ void LCD_Sleep()
 
 void LCD_Init()
 {
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPDEN);
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPEEN);
-    rcc_peripheral_enable_clock(&RCC_AHBENR, RCC_AHBENR_FSMCEN);
-
-    gpio_set_mode(GPIOD, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_ALTFN_PUSHPULL,
-                  GPIO0 | GPIO1 | GPIO8 | GPIO9 | GPIO10 | GPIO14 | GPIO15);
-
-    gpio_set_mode(GPIOE, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_ALTFN_PUSHPULL,
-                  GPIO7 | GPIO8 | GPIO9 | GPIO10 | GPIO11 | GPIO12 | GPIO13 | GPIO14 | GPIO15);
-
-    gpio_set_mode(GPIOD, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_ALTFN_PUSHPULL,
-                  GPIO11);
-
-    gpio_set_mode(GPIOD, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_ALTFN_PUSHPULL,
-                  GPIO4 | GPIO5);
-
-    gpio_set_mode(GPIOD, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_ALTFN_PUSHPULL,
-                  GPIO7);
-
-    /* Extended mode, write enable, 16 bit access, bank enabled */
-    FSMC_BCR1 = FSMC_BCR_MWID | FSMC_BCR_WREN | FSMC_BCR_MBKEN;
-
-    /* Read & write timings */
-    FSMC_BTR1  = FSMC_BTR_DATASTx(2) | FSMC_BTR_ADDHLDx(0) | FSMC_BTR_ADDSETx(1) | FSMC_BTR_ACCMODx(FSMC_BTx_ACCMOD_B);
-    FSMC_BWTR1 = FSMC_BTR_DATASTx(2) | FSMC_BTR_ADDHLDx(0) | FSMC_BTR_ADDSETx(1) | FSMC_BTR_ACCMODx(FSMC_BTx_ACCMOD_B);
+    _fsmc_init(
+        16,
+        0x100 /*only bit 16 of addr */,
+        FSMC_NOE | FSMC_NWE |FSMC_NE1,
+        1,
+        FSMC_BCR_MWID | FSMC_BCR_WREN | FSMC_BCR_MBKEN,
+        FSMC_BTR_DATASTx(2) | FSMC_BTR_ADDHLDx(0) | FSMC_BTR_ADDSETx(1) | FSMC_BTR_ACCMODx(FSMC_BTx_ACCMOD_B),
+        FSMC_BTR_DATASTx(2) | FSMC_BTR_ADDHLDx(0) | FSMC_BTR_ADDSETx(1) | FSMC_BTR_ACCMODx(FSMC_BTx_ACCMOD_B));
 
     while (lcd_detect() == LCDTYPE_UNKNOWN) {
         // retry inititalize and detect

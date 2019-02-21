@@ -5,6 +5,8 @@
 
 #include "freq.h"
 
+#define AF_FSMC 0xFFFFFFFF  // Unused for F1 but needs definition
+
 enum gpio_output_type {
     OTYPE_OPENDRAIN = GPIO_CNF_OUTPUT_OPENDRAIN,
     OTYPE_PUSHPULL  = GPIO_CNF_OUTPUT_PUSHPULL,
@@ -47,6 +49,13 @@ INLINE static inline void GPIO_setup_input(struct mcu_pin pin, enum gpio_input_t
     } else if (type == ITYPE_PULLDOWN) {
         gpio_clear(pin.port, pin.pin);
     }
+}
+
+INLINE static inline void GPIO_setup_input_af(struct mcu_pin pin, enum gpio_input_type type, unsigned af)
+{
+    // STM32F1 does not have alt-func for inputs
+    (void)af;
+    GPIO_setup_input(pin, type);
 }
 
 static inline void GPIO_pin_set(struct mcu_pin pin)
