@@ -106,9 +106,9 @@ static inline void _fsmc_init(uint32_t data_len, uint32_t address_mask, uint32_t
                              OTYPE_PUSHPULL, AF_FSMC);
     }
     /* Extended mode, write enable, 16 bit access, bank enabled */
-    FSMC_BCR(bank) = bcr;
-    FSMC_BTR(bank) = btr;
+    FSMC_BCR(bank - 1) = bcr;
+    FSMC_BTR(bank - 1) = btr;
     if (bwtr)
-        FSMC_BWTR(bank) = bwtr;
+        FSMC_BWTR(bank - 1) = bwtr;
 }
 #endif  // _DTX_STM32_FSMC_H_
