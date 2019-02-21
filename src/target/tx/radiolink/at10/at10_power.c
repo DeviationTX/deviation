@@ -12,14 +12,13 @@ void PWR_Init(void)
 
     /* Enable GPIOA and GPIOE so we can blink LEDs! */
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPAEN);
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPEEN);
 
     /* Disable SWD - SWDIO PA13 is used for Green LED */
     AFIO_MAPR = (AFIO_MAPR & ~AFIO_MAPR_SWJ_MASK) | AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_OFF;
 
     /* Green LED - pin PA13 */
     gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_PUSHPULL, GPIO12 | GPIO13);
+                  GPIO_CNF_OUTPUT_PUSHPULL, GPIO13);
 
     /* Pin to ground - Green LED lit */
     gpio_clear(GPIOA, GPIO13);
