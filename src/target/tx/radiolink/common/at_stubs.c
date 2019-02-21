@@ -36,47 +36,6 @@ void SOUND_StartWithoutVibrating(unsigned msec, u16(*next_note_cb)()) {
 void SOUND_Stop() {}
 u32 SOUND_Callback() { return 0;}
 
-#if !defined HAS_4IN1_FLASH || !HAS_4IN1_FLASH
-void SPIFlash_Init() {}
-void SPI_FlashBlockWriteEnable(unsigned enable) {
-    (void)enable;
-}
-
-#define FS_ADDRESS (void *)0x08040000
-void SPIFlash_ReadBytes(u32 readAddress, u32 length, u8 * buffer) {
-    u8 *address = FS_ADDRESS + readAddress;
-    for(unsigned i=0;i<length;i++)
-    {
-        buffer[i] = ~address[i];
-    }
-}
-int SPIFlash_ReadBytesStopCR(u32 readAddress, u32 length, u8 * buffer) {
-    unsigned i;
-    u8 *address = FS_ADDRESS + readAddress;
-    for(i=0;i<length;i++)
-    {
-        buffer[i] = ~address[i];
-        if (buffer[i] == '\n') {
-            i++;
-            break;
-        }
-    }
-    return i;
-}
-void SPIFlash_WriteByte(u32 writeAddress, const unsigned byte) {
-    (void)writeAddress;
-    (void)byte;
-}
-void SPIFlash_WriteBytes(u32 writeAddress, u32 length, const u8 * buffer) {
-    (void)writeAddress;
-    (void)length;
-    (void)buffer;
-}
-void SPIFlash_EraseSector(u32 sectorAddress) {
-    (void)sectorAddress;
-}
-#endif // !defined HAS_4IN1_FLASH || !HAS_4IN1_FLASH
-
 volatile u8 ppmSync = 0;     //  the ppmSync for mixer.c,  0:ppm-Not-Sync , 1:ppm-Got-Sync
 volatile s32 ppmChannels[MAX_PPM_IN_CHANNELS];    //  [0...ppmin_num_channels-1] for each channels width, [ppmin_num_channels] for sync-signal width
 volatile u8 ppmin_num_channels;     //  the ppmin_num_channels for mixer.c 
