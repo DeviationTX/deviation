@@ -15,8 +15,6 @@
     #define USE_DEVOFS 1  // Must be before common_devo include
 #endif
 
-#include "target/tx/radiolink/common/common_at.h"
-
 #define DISABLE_PWM 1                 // FIXME
 #define SUPPORT_MULTI_LANGUAGE 0
 
@@ -89,5 +87,6 @@ static inline void LCD_ForceUpdate() {}
     {185, 220}, {185, 200}, \
     }
 
+#include "target/tx/radiolink/common/common_at.h"
 
 #endif  // _AT10_TARGET_DEFS_H_
