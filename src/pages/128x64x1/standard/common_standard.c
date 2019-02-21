@@ -67,6 +67,14 @@ void STANDARD_Init(const struct page_defs *page_defs)
 }
 
 //"Throttle curve" and "Pitch curve" pages XY-graph points
+static const char *curvepointnr_cb(guiObject_t *obj, const void *data)
+{
+    (void) obj;
+    unsigned idx = (uintptr_t)data;
+    snprintf(tempstring, sizeof(tempstring), "%u", idx+1);
+    return tempstring;
+}
+
 void STANDARD_DrawCurvePoints(guiLabel_t vallbl[], guiTextSelect_t val[],
         u8 selectable_bitmap,
         void (*press_cb)(guiObject_t *obj, void *data),
@@ -92,34 +100,21 @@ void STANDARD_DrawCurvePoints(guiLabel_t vallbl[], guiTextSelect_t val[],
     GUI_CreateTextSelectPlate(&val[4], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)4);
 
     y += height + LINE_H_OFFS + M_LEBEL_Y_OFFS;
-    x = 0;
-    GUI_CreateLabelBox(&vallbl[1], x, y,  w1, height, &TINY_FONT, NULL, NULL, "2");
-    x += w1;
-    GUI_CreateTextSelectPlate(&val[1], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)1);
-    x += w2 + WIDTH2_ADD;
-    GUI_CreateLabelBox(&vallbl[2], x, y,  w1, height, &TINY_FONT, NULL, NULL, "3");
-    x += w1;
-    GUI_CreateTextSelectPlate(&val[2], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)2);
-
-    y += height + LINE_H_OFFS;
-    x = 0;
-    GUI_CreateLabelBox(&vallbl[3], x, y,  w1, height, &TINY_FONT, NULL, NULL, "4");
-    x += w1;
-    GUI_CreateTextSelectPlate(&val[3], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)3);
-    x += w2 + WIDTH2_ADD;
-    GUI_CreateLabelBox(&vallbl[5], x, y,  w1, height, &TINY_FONT, NULL, NULL, "6");
-    x += w1;
-    GUI_CreateTextSelectPlate(&val[5], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)5);
-
-    y += height + LINE_H_OFFS;
-    x = 0;
-    GUI_CreateLabelBox(&vallbl[6], x, y,  w1, height, &TINY_FONT, NULL, NULL, "7");
-    x += w1;
-    GUI_CreateTextSelectPlate(&val[6], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)6);
-    x += w2 + WIDTH2_ADD;
-    GUI_CreateLabelBox(&vallbl[7], x, y,  w1, height, &TINY_FONT, NULL, NULL, "8");
-    x += w1;
-    GUI_CreateTextSelectPlate(&val[7], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)7);
+    for (int i = 1; i < 8; i++) {
+        if  (i == 4)
+            i++;  // lbl/selection 4 is used for center value
+        switch (i) {
+            case 1: x = 0; break;
+            case 2: x += w2 + WIDTH2_ADD; break;
+            case 3: x = 0; y += height + LINE_H_OFFS; break;
+            case 5: x += w2 + WIDTH2_ADD; break;
+            case 6: x = 0; y += height + LINE_H_OFFS; break;
+            case 7: x += w2 + WIDTH2_ADD; break;
+        }
+        GUI_CreateLabelBox(&vallbl[i], x, y,  w1, height, &TINY_FONT, curvepointnr_cb, NULL, (void *)(uintptr_t)(i));
+        x += w1;
+        GUI_CreateTextSelectPlate(&val[i], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(uintptr_t)i);
+    }
 
     //update_textsel_state();
     for (u8 i = 1; i < 8; i++) {
