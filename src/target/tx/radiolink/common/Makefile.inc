@@ -20,7 +20,8 @@ SRC_C   := $(wildcard $(SDIR)/target/tx/$(FAMILY)/common/*.c) \
            $(wildcard $(SDIR)/target/tx/devo/common/msc2/lib/*.c) \
            $(wildcard $(SDIR)/target/tx/devo/common/hid/*.c) \
            $(wildcard $(SDIR)/target/tx/devo/common/protocol/*.c) \
-           $(wildcard $(SDIR)/target/tx/devo/common/uart.c)
+           $(wildcard $(SDIR)/target/tx/devo/common/uart.c) \
+           $(SDIR)/target/drivers/backlight/backlight.c
 
 
 ifneq "$(HAS_4IN1_FLASH)" "1"

@@ -17,4 +17,10 @@
     })
 #define SYSCLK_TIMER_ISR tim3_isr
 
+#define BACKLIGHT_TIM ((struct tim_config) { \
+    .tim = TIM4,            \
+    .pin = {GPIOB, GPIO9},  \
+    .ch = 4,                \
+    })
+
 #endif  // _AT10_HARDWARE_H_

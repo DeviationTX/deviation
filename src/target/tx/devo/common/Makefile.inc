@@ -19,7 +19,8 @@ SRC_C    = $(wildcard $(SDIR)/target/tx/devo/$(TARGET)/*.c) \
            $(wildcard $(SDIR)/target/drivers/filesystems/petit_fat/*.c) \
            $(wildcard $(SDIR)/target/drivers/filesystems/devofs/*.c) \
            $(wildcard $(SDIR)/target/tx/devo/common/msc2/*.c) \
-           $(wildcard $(SDIR)/target/tx/devo/common/msc2/lib/*.c)
+           $(wildcard $(SDIR)/target/tx/devo/common/msc2/lib/*.c) \
+           $(SDIR)/target/drivers/backlight/backlight.c
 
 ifdef MODULAR
 PROTO_EXTRA_C = $(wildcard $(SDIR)/target/tx/devo/common/protocol/*.c) \
