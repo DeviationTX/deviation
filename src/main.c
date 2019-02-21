@@ -133,8 +133,8 @@ int main() {
     if(PWR_CheckPowerSwitch()) PWR_Shutdown();
 #if SPI_BOOTLOADER
     Initialize_ButtonMatrix();
-    SPIFlash_Init(); //This must come before LCD_Init() for 7e
-    SPI_FlashBlockWriteEnable(1); //Enable writing to all banks of SPIFlash
+    Flash_Init();  // This must come before LCD_Init() for 7e
+    Flash_BlockWriteEnable(1);  // Enable writing to all banks of storage
     LCD_Init();
     LCD_Clear(0x0000);
     BACKLIGHT_Init();
@@ -154,7 +154,11 @@ void Init() {
     UART_Initialize();
     printf("Start\n");
     Initialize_ButtonMatrix();
-    SPIFlash_Init(); //This must come before LCD_Init() for 7e
+    Flash_Init();  // This must come before LCD_Init() for 7e
+
+#ifdef MEDIA_DRIVE
+    MEDIA_Init();
+#endif
 
     LCD_Init();
     CHAN_Init();
@@ -164,7 +168,7 @@ void Init() {
     BACKLIGHT_Init();
     BACKLIGHT_Brightness(1);
     AUTODIMMER_Init();
-    SPI_FlashBlockWriteEnable(1); //Enable writing to all banks of SPIFlash
+    Flash_BlockWriteEnable(1);  // Enable writing to all banks of storage
 
     PPMin_TIM_Init();
 #ifdef ENABLE_MODULAR
@@ -189,7 +193,7 @@ void Banner()
 
     printf("BootLoader    : '%s'\n",tmp);
     printf("Power         : '%s'\n",Power == CYRF_PWR_100MW ? "100mW" : "10mW" );
-    printf("SPI Flash     : '%X'\n",(unsigned int)SPIFlash_ReadID());
+    printf("SPI Flash     : '%X'\n", Flash_ReadID());
     CYRF_GetMfgData(mfgdata);
     printf("CYRF Mfg Data : '%02X %02X %02X %02X %02X %02X'\n",
             mfgdata[0],

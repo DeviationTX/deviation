@@ -24,4 +24,6 @@ static inline void LCD_ForceUpdate() {}
     #define USE_4BUTTON_MODE 0
 #endif
 
+#define FLASHTYPE FLASHTYPE_SPI
+
 #endif //_COMMON_DEVO_H_

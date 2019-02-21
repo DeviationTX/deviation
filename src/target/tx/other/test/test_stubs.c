@@ -123,7 +123,7 @@ void CLOCK_StartMixer() {}
 volatile mixsync_t mixer_sync;
 
 u32  SPIFlash_ReadID() { return 0x12345678; }
-void SPI_FlashBlockWriteEnable(unsigned enable) {(void)enable;}
+void SPIFlash_BlockWriteEnable(unsigned enable) {(void)enable;}
 void SPITouch_Init() {}
 
 u8 *BOOTLOADER_Read(int idx) {

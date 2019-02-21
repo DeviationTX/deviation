@@ -17,9 +17,7 @@
 #include <libopencm3/stm32/spi.h>
 #include <libopencm3/cm3/cortex.h>
 #include "common.h"
-#include "spi.h"
-
-#ifdef SPIFLASH_TYPE
+#include "target/drivers/mcu/stm32/spi.h"
 
 #ifndef HAS_4IN1_FLASH
     #define HAS_4IN1_FLASH 0
@@ -291,7 +289,7 @@ void WaitForWriteComplete()
 /*
  *
  */
-void SPI_FlashBlockWriteEnable(unsigned enable)
+void SPIFlash_BlockWriteEnable(unsigned enable)
 {
     //printf("SPI_FlashBlockWriteEnable: %d\n", enable);
     CS_LO();
@@ -329,7 +327,7 @@ void SPI_FlashBlockWriteEnable(unsigned enable)
 /*
  *
  */
-void DisableHWRYBY()
+static void DisableHWRYBY()
 {
     CS_LO();
     spi_xfer(FLASH_SPI.spi, 0x80);
@@ -483,7 +481,7 @@ void debug_spi_flash()
     for (i = 0; i < sizeof(data); i++) {
         data[i] = rand32();
     }
-    SPI_FlashBlockWriteEnable(1);
+    SPIFlash_BlockWriteEnable(1);
     SPIFlash_EraseSector(start);
     SPIFlash_ReadBytes(start, 101, check);
     for (i = 0; i < 101; i++) {
@@ -519,4 +517,3 @@ void debug_spi_flash()
     }
     while(1) { if(PWR_CheckPowerSwitch()) PWR_Shutdown(); }
 }
-#endif //SPIFLASH_TYPE

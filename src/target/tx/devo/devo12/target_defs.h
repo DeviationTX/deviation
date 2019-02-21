@@ -70,8 +70,7 @@
 
 //Use 2nd ROM for media
 #define MEDIA_DRIVE PARFlash_ReadBytes, PARFlash_ReadBytesStopCR, NULL, NULL, 0
-int PARFlash_ReadBytesStopCR(u32 readAddress, u32 length, u8 * buffer);
-void PARFlash_ReadBytes(u32 readAddress, u32 length, u8 * buffer);
+#define MEDIA_Init PARFlash_Init
 
 #include "devo12_ports.h"
 #include "../common/common_devo.h"

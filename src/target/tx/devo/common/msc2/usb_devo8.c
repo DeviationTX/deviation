@@ -110,7 +110,7 @@ int main(void)
 	gpio_set(GPIOB, GPIO10);
 	Delay(0x2710);
 	LCD_Init();
-        SPIFlash_Init();
+        Flash_Init();
         UART_Initialize();
 
 	LCD_Clear(0x0000);
@@ -119,7 +119,7 @@ int main(void)
 
         USB_Enable();
 	//gpio_set(GPIOB, GPIO10);
-	SPI_FlashBlockWriteEnable(1);
+        Flash_BlockWriteEnable(1);
 	while (1) {
 		if(PWR_CheckPowerSwitch())
 			PWR_Shutdown();

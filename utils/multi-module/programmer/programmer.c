@@ -47,7 +47,7 @@ int main() {
     CLOCK_Init();
     UART_Initialize();
     Initialize_ButtonMatrix();
-    SPIFlash_Init(); //This must come before LCD_Init() for 7e
+    Flash_Init();  // This must come before LCD_Init() for 7e
 
     if(PWR_CheckPowerSwitch()) PWR_Shutdown();
     LCD_Init();
@@ -57,7 +57,7 @@ int main() {
 
     u32 buttons = ScanButtons();
     if(CHAN_ButtonIsPressed(buttons, BUT_ENTER) || !FS_Mount(NULL, NULL)) {
-        SPI_FlashBlockWriteEnable(1); //Enable writing to all banks of SPIFlash
+        Flash_BlockWriteEnable(1);  // Enable writing to all banks of SPIFlash
         LCD_DrawUSBLogo(LCD_WIDTH, LCD_HEIGHT);
         USB_Connect();
         LCD_Clear(0x0000);
