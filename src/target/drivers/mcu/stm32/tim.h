@@ -8,9 +8,9 @@ INLINE static inline uint32_t TIM_OCx(unsigned channel)
 {
     switch (channel) {
         case 1: return TIM_OC1;
-        case 2: return TIM_OC1;
-        case 3: return TIM_OC1;
-        case 4: return TIM_OC1;
+        case 2: return TIM_OC2;
+        case 3: return TIM_OC3;
+        case 4: return TIM_OC4;
         default: return ltassert();
     }
 }
@@ -68,4 +68,4 @@ INLINE static inline uint32_t TIM_FREQ_MHz(uint32_t tim)
         default: return ltassert();
     }
 }
-#endif
+#endif  // _DTX_STM32_TIMER_H_

@@ -23,17 +23,9 @@
 
 #include "common.h"
 #include "target/tx/devo/common/devo.h"
-
-// Let's abuse the preprocessor to let us specify a single
-// sysclock timer value 'SYSCLK_TIM'
-
-#define _TIM_CONCAT(x, y, z) x ## y ## z
-#define TIM_CONCAT(x, y, z)  _TIM_CONCAT(x, y, z)
-
-#define TIMx               TIM_CONCAT(TIM,             SYSCLK_TIM,)
-#define RST_TIMx           TIM_CONCAT(RST_TIM,         SYSCLK_TIM,)
-#define NVIC_TIMx_IRQ      TIM_CONCAT(NVIC_TIM,        SYSCLK_TIM, _IRQ)
-#define RCC_APB1ENR_TIMxEN TIM_CONCAT(RCC_APB1ENR_TIM, SYSCLK_TIM, EN)
+#include "target/drivers/mcu/stm32/tim.h"
+#include "target/drivers/mcu/stm32/rcc.h"
+#include "target/drivers/mcu/stm32/nvic.h"
 
 volatile u32 msecs;
 volatile u32 wdg_time;
@@ -81,50 +73,50 @@ void CLOCK_Init()
     /* Setup timer for Transmitter */
     timer_callback = NULL;
     /* Enable TIMx clock. */
-    rcc_peripheral_enable_clock(&RCC_APB1ENR, RCC_APB1ENR_TIMxEN);
+    rcc_periph_clock_enable(get_rcc_from_port(SYSCLK_TIM.tim));
 
     /* Enable TIMx interrupt. */
-    nvic_enable_irq(NVIC_TIMx_IRQ);
-    nvic_set_priority(NVIC_TIMx_IRQ, 16); //High priority
+    nvic_enable_irq(get_nvic_irq(SYSCLK_TIM.tim));
+    nvic_set_priority(get_nvic_irq(SYSCLK_TIM.tim), 16);  // High priority
 
-    timer_disable_counter(TIMx);
+    timer_disable_counter(SYSCLK_TIM.tim);
     /* Reset TIMx peripheral. */
-    rcc_periph_reset_pulse(RST_TIMx);
+    rcc_periph_reset_pulse(RST_TIMx(SYSCLK_TIM.tim));
 
     /* Timer global mode:
      * - No divider
      * - Alignment edge
      * - Direction up
      */
-    timer_set_mode(TIMx, TIM_CR1_CKD_CK_INT,
+    timer_set_mode(SYSCLK_TIM.tim, TIM_CR1_CKD_CK_INT,
                    TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
 
     /* timer updates each microsecond */
-    timer_set_prescaler(TIMx, FREQ_MHz - 1);
-    timer_set_period(TIMx, 65535);
+    timer_set_prescaler(SYSCLK_TIM.tim, FREQ_MHz - 1);
+    timer_set_period(SYSCLK_TIM.tim, 65535);
 
     /* Disable preload. */
-    timer_disable_preload(TIMx);
+    timer_disable_preload(SYSCLK_TIM.tim);
 
     /* Continous mode. */
-    timer_continuous_mode(TIMx);
+    timer_continuous_mode(SYSCLK_TIM.tim);
 
     /* Disable outputs. */
-    timer_disable_oc_output(TIMx, TIM_OC1);
-    timer_disable_oc_output(TIMx, TIM_OC2);
-    timer_disable_oc_output(TIMx, TIM_OC3);
-    timer_disable_oc_output(TIMx, TIM_OC4);
+    timer_disable_oc_output(SYSCLK_TIM.tim, TIM_OC1);
+    timer_disable_oc_output(SYSCLK_TIM.tim, TIM_OC2);
+    timer_disable_oc_output(SYSCLK_TIM.tim, TIM_OC3);
+    timer_disable_oc_output(SYSCLK_TIM.tim, TIM_OC4);
 
     /* Enable CCP1 */
-    timer_disable_oc_clear(TIMx, TIM_OC1);
-    timer_disable_oc_preload(TIMx, TIM_OC1);
-    timer_set_oc_slow_mode(TIMx, TIM_OC1);
-    timer_set_oc_mode(TIMx, TIM_OC1, TIM_OCM_FROZEN);
+    timer_disable_oc_clear(SYSCLK_TIM.tim, TIM_OC1);
+    timer_disable_oc_preload(SYSCLK_TIM.tim, TIM_OC1);
+    timer_set_oc_slow_mode(SYSCLK_TIM.tim, TIM_OC1);
+    timer_set_oc_mode(SYSCLK_TIM.tim, TIM_OC1, TIM_OCM_FROZEN);
 
     /* Disable CCP1 interrupt. */
-    timer_disable_irq(TIMx, TIM_DIER_CC1IE);
+    timer_disable_irq(SYSCLK_TIM.tim, TIM_DIER_CC1IE);
 
-    timer_enable_counter(TIMx);
+    timer_enable_counter(SYSCLK_TIM.tim);
 
     /* Enable EXTI1 interrupt for medium priority callback. */
     /* We are enabling only the interrupt
@@ -147,12 +139,12 @@ void CLOCK_StartTimer(unsigned us, u16 (*cb)(void))
         return;
     timer_callback = cb;
     /* Counter enable. */
-    unsigned t = timer_get_counter(TIMx);
+    unsigned t = timer_get_counter(SYSCLK_TIM.tim);
     /* Set the capture compare value for OC1. */
-    timer_set_oc_value(TIMx, TIM_OC1, us + t);
+    timer_set_oc_value(SYSCLK_TIM.tim, TIM_OC1, us + t);
 
-    timer_clear_flag(TIMx, TIM_SR_CC1IF);
-    timer_enable_irq(TIMx, TIM_DIER_CC1IE);
+    timer_clear_flag(SYSCLK_TIM.tim, TIM_SR_CC1IF);
+    timer_enable_irq(SYSCLK_TIM.tim, TIM_DIER_CC1IE);
 }
 
 void CLOCK_StartWatchdog()
@@ -171,7 +163,7 @@ void CLOCK_ResetWatchdog()
     wdg_time = msecs;
 }
 void CLOCK_StopTimer() {
-    timer_disable_irq(TIMx, TIM_DIER_CC1IE);
+    timer_disable_irq(SYSCLK_TIM.tim, TIM_DIER_CC1IE);
     timer_callback = NULL;
 }
 

@@ -28,7 +28,7 @@
 #include "mixer.h"
 #include "config/model.h"
 
-#define MIN_PPMin_Sync 6600   // 3300uSecond=  0.5uSecond(2MHz)*6600times,  TIM1_prescaler=0.5uSecond
+#define MIN_PPMin_Sync 6600   // 3300uSecond=  0.5uSecond(2MHz)*6600times,  TIM_prescaler=0.5uSecond
 
 extern volatile u8 ppmSync;     //  the ppmSync for mixer.c,  0:ppm-Not-Sync , 1:ppm-Got-Sync
 extern volatile s32 ppmChannels[MAX_PPM_IN_CHANNELS];    //  [0...ppmin_num_channels-1] for each channels width, [ppmin_num_channels] for sync-signal width
@@ -44,10 +44,10 @@ void __attribute__((__used__)) exti9_5_isr(void)
     u16 t1 = 0;
     u16 t = 0;
 
-    t1 = timer_get_counter(PWM_TIMER.tim);     // get the counter(TIM1) value
+    t1 = timer_get_counter(PWM_TIMER.tim);     // get the counter value
     exti_reset_request(EXTIx(PWM_TIMER.pin));         //  reset(clean) the IRQ
 
-    t = (t1>=t0) ? (t1-t0) : (65536+t1-t0);     // none-stop TIM1 counter, compute ppm-signal width (2MHz = 0.5uSecond)
+    t = (t1 >= t0) ? (t1-t0) : (65536+t1-t0);     // none-stop counter, compute ppm-signal width (2MHz = 0.5uSecond)
     t0 = t1;
 
     if (!ppmSync) {      // ppm-in status : not Sync

@@ -45,4 +45,11 @@
     .ch = 1,                \
     })
 
+// Sound override
+#define SOUND_TIM ((struct tim_config) { \
+    .tim = TIM3,           \
+    .pin = {GPIOB, GPIO0}, \
+    .ch = 3,               \
+    })
+
 #endif  // _DEVO12_HARDWARE_H_

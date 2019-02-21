@@ -11,4 +11,10 @@
     })
 #define FLASH_SPI_CFG SPI2_CFG
 
+#define SYSCLK_TIM ((struct tim_config) { \
+    .tim = TIM3, \
+    .ch = 1,     \
+    })
+#define SYSCLK_TIMER_ISR tim3_isr
+
 #endif  // _AT9_HARDWARE_H_

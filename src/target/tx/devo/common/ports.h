@@ -28,18 +28,6 @@
     #define _PWREN_RCC_APB2ENR_IOPEN   RCC_APB2ENR_IOPAEN
 #endif //_PWREN_PORT
 
-#ifndef _SOUND_PORT
-    #define _SOUND_PORT                GPIOA
-    #define _SOUND_PIN                 GPIO1
-    #define _SOUND_RCC_APB1ENR_TIMEN   RCC_APB1ENR_TIM2EN
-    #define _SOUND_TIM_OC              TIM_OC2
-    #define _SOUND_TIM                 TIM2
-#endif //_SOUND_PORT
-
-#ifndef SYSCLK_TIM // System-clock timer
-    #define SYSCLK_TIM 4
-#endif
-
 #include "hardware.h"
 
 #endif //_PORTS_H_

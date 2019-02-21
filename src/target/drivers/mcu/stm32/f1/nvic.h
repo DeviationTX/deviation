@@ -37,6 +37,14 @@ static inline uint32_t get_nvic_irq(uint32_t port)
 {
     switch (port) {
         case USART1: return NVIC_USART1_IRQ;
+        // case TIM1: return NVIC_TIM1_IRQ;
+        case TIM2: return NVIC_TIM2_IRQ;
+        case TIM3: return NVIC_TIM3_IRQ;
+        case TIM4: return NVIC_TIM4_IRQ;
+        case TIM5: return NVIC_TIM5_IRQ;
+        case TIM6: return NVIC_TIM6_IRQ;
+        case TIM7: return NVIC_TIM7_IRQ;
+        // case TIM8: return NVIC_TIM8_IRQ;
         default: ltassert(); return 0;
     }
 }

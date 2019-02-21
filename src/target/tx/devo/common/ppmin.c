@@ -31,11 +31,11 @@
 #include "mixer.h"
 #include "config/model.h"
 
-#define PPMIn_prescaler 35    // 72MHz /(35+1) = 2MHz = 0.5uSecond
-#define PPMIn_period 65535  // max value of u16
+#define PPMIn_prescaler (TIM_FREQ_MHz(PWM_TIMER.tim) / 2 - 1)  // 72MHz / (35+1) = 2MHz = 0.5uSecond
+#define PPMIn_period 65535                                     // max value of u16
 
 /*
-(1) use TIM1 : set the unit same as "ppmout.c" for count the ppm-input signal, "uSecond (72MHz / 36) = 2MHz = 0.5uSecond"
+(1) use TIMx : set the unit same as "ppmout.c" for count the ppm-input signal, "uSecond (72MHz / 36) = 2MHz = 0.5uSecond"
 (2) set GPIO PA10 input mode as external trigger 
 (3) set GPIO PA10 into source(EXTI10) interrupt(NVIC_EXTI15_10_IRQ) to trigger-call "exti15_10_isr()" function
 (4) transfer value for mixer.c   
@@ -49,56 +49,56 @@
 
 void PPMin_TIM_Init()
 {
-    /* Enable TIM1 clock. */
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_TIM1EN);
+    /* Enable TIMx clock. */
+    rcc_periph_clock_enable(get_rcc_from_port(PWM_TIMER.tim));
   
-    /* No Enable TIM1 interrupt. */
-    // nvic_enable_irq(NVIC_TIM1_IRQ);
-    // nvic_set_priority(NVIC_TIM1_IRQ, 16); //High priority
+    /* No Enable TIM interrupt. */
+    // nvic_enable_irq(NVIC_TIMx_IRQ(PWM_TIMER.tim));
+    // nvic_set_priority(NVIC_TIMx_IRQ(PWM_TIMER.tim), 16); //High priority
 
-    /* Reset TIM1 peripheral. */
-    timer_disable_counter(TIM1);
-    rcc_periph_reset_pulse(RST_TIM1);
+    /* Reset TIM peripheral. */
+    timer_disable_counter(PWM_TIMER.tim);
+    rcc_periph_reset_pulse(RST_TIMx(PWM_TIMER.tim));
 
     /* Timer global mode:
      * - No divider
      * - Alignment edge
      * - Direction up
      */
-    timer_set_mode(TIM1, TIM_CR1_CKD_CK_INT,
+    timer_set_mode(PWM_TIMER.tim, TIM_CR1_CKD_CK_INT,
                TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
 
        /* Reset prescaler value.  timer updates each uSecond */
-    timer_set_prescaler(TIM1, PPMIn_prescaler);     // uSecond (72MHz / (35+1) = 2MHz = 0.5uSecond
-    timer_set_period(TIM1, PPMIn_period);           // 3300uSecond= 2MHz*6600times,  TIM1_prescaler=0.5uSecond
+    timer_set_prescaler(PWM_TIMER.tim, PPMIn_prescaler);     // uSecond (72MHz / (35+1) = 2MHz = 0.5uSecond
+    timer_set_period(PWM_TIMER.tim, PPMIn_period);           // 3300uSecond= 2MHz*6600times,  TIM_prescaler=0.5uSecond
 
     /* Disable preload. */
-    timer_disable_preload(TIM1);
+    timer_disable_preload(PWM_TIMER.tim);
 
     /* Continous mode. */
-    timer_continuous_mode(TIM1);
+    timer_continuous_mode(PWM_TIMER.tim);
 
     /* Disable outputs. */
-    timer_disable_oc_output(TIM1, TIM_OC1);
-    timer_disable_oc_output(TIM1, TIM_OC2);
-    timer_disable_oc_output(TIM1, TIM_OC3);
-    timer_disable_oc_output(TIM1, TIM_OC4);
+    timer_disable_oc_output(PWM_TIMER.tim, TIM_OC1);
+    timer_disable_oc_output(PWM_TIMER.tim, TIM_OC2);
+    timer_disable_oc_output(PWM_TIMER.tim, TIM_OC3);
+    timer_disable_oc_output(PWM_TIMER.tim, TIM_OC4);
 
     /* -- OC1 configuration -- */
     /* Configure global mode of line 1. */
     /* Enable CCP1 */
-    timer_disable_oc_clear(TIM1, TIM_OC1);
-    timer_disable_oc_preload(TIM1, TIM_OC1);
-    timer_set_oc_slow_mode(TIM1, TIM_OC1);
-    timer_set_oc_mode(TIM1, TIM_OC1, TIM_OCM_FROZEN);
+    timer_disable_oc_clear(PWM_TIMER.tim, TIM_OC1);
+    timer_disable_oc_preload(PWM_TIMER.tim, TIM_OC1);
+    timer_set_oc_slow_mode(PWM_TIMER.tim, TIM_OC1);
+    timer_set_oc_mode(PWM_TIMER.tim, TIM_OC1, TIM_OCM_FROZEN);
 
     /* Enable commutation interrupt. */
-    //  timer_enable_irq(TIM1, TIM_DIER_CC1IE);
+    //  timer_enable_irq(PWM_TIMER.tim, TIM_DIER_CC1IE);
     /* Disable CCP1 interrupt. */
-    timer_disable_irq(TIM1, TIM_DIER_CC1IE);
+    timer_disable_irq(PWM_TIMER.tim, TIM_DIER_CC1IE);
 
     /* Counter enable. */
-    timer_disable_counter(TIM1);
+    timer_disable_counter(PWM_TIMER.tim);
 }
 
 void PPMin_Init()

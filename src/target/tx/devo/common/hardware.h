@@ -141,4 +141,20 @@
         })
 #endif  // BACKLIGHT_TIM
 
+#ifndef SOUND_TIM
+    #define SOUND_TIM ((struct tim_config) { \
+        .tim = TIM2,           \
+        .pin = {GPIOA, GPIO1}, \
+        .ch = 2,               \
+        })
+#endif  // SOUND_TIM
+
+#ifndef SYSCLK_TIM
+    #define SYSCLK_TIM ((struct tim_config) { \
+        .tim = TIM4,   \
+        .ch = 1        \
+        })
+    #define SYSCLK_TIMER_ISR tim4_isr
+#endif  // SYSCLK_TIM
+
 #endif  // _DEVO_DEFAULT_HARDWARE_H_
