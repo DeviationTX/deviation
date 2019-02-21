@@ -65,7 +65,7 @@ msgstr "11 Punkt"
 msgid "13 Point"
 msgstr "13 Punkt"
 
-#: curves.c:237 mixer.c:880 pages/320x240x16/rtc_config.c:164
+#: curves.c:237 mixer.c:880 pages/320x240x16/rtc_config.c:165
 #: pages/common/_lang_select.c:29 pages/common/_lang_select.c:59
 #: pages/common/_model_loadsave.c:111 pages/common/_model_loadsave.c:116
 #: pages/common/_model_loadsave.c:123
@@ -166,168 +166,172 @@ msgstr "AUX6"
 msgid "AUX7"
 msgstr "AUX7"
 
-#: inputs.c:45 inputs.c:46
+#: inputs.c:45
+msgid "AUX8"
+msgstr ""
+
+#: inputs.c:46 inputs.c:47
 msgid "DR"
 msgstr "DR"
 
-#: inputs.c:47 inputs.c:48 inputs.c:49
+#: inputs.c:48 inputs.c:49 inputs.c:50
 msgid "RUD DR"
 msgstr "SR DR"
 
-#: inputs.c:50 inputs.c:51 inputs.c:52
+#: inputs.c:51 inputs.c:52 inputs.c:53
 msgid "ELE DR"
 msgstr "HR DR"
 
-#: inputs.c:53 inputs.c:54 inputs.c:55
+#: inputs.c:54 inputs.c:55 inputs.c:56
 msgid "AIL DR"
 msgstr "QR DR"
 
-#: inputs.c:56 inputs.c:57 inputs.c:91 inputs.c:92 inputs.c:93
+#: inputs.c:57 inputs.c:58 inputs.c:92 inputs.c:93 inputs.c:94
 #: pages/common/standard/_common_standard.c:38
 #: pages/common/standard/_gyrosense_page.c:57
 msgid "GEAR"
 msgstr "FAHRW"
 
-#: inputs.c:58 inputs.c:59 inputs.c:60
+#: inputs.c:59 inputs.c:60 inputs.c:61
 msgid "MIX"
 msgstr "MIX"
 
-#: inputs.c:61 inputs.c:62 inputs.c:63
+#: inputs.c:62 inputs.c:63 inputs.c:64
 msgid "FMODE"
 msgstr "FMODE"
 
-#: inputs.c:64 inputs.c:65
+#: inputs.c:65 inputs.c:66
 msgid "HOLD"
 msgstr "HOLD"
 
-#: inputs.c:66 inputs.c:67
+#: inputs.c:67 inputs.c:68
 msgid "TRN"
 msgstr "TRN"
 
-#: inputs.c:68 inputs.c:69 inputs.c:70
+#: inputs.c:69 inputs.c:70 inputs.c:71
 msgid "SW A"
 msgstr "SW A"
 
-#: inputs.c:71 inputs.c:72 inputs.c:73
+#: inputs.c:72 inputs.c:73 inputs.c:74
 msgid "SW B"
 msgstr "SW B"
 
-#: inputs.c:74 inputs.c:75 inputs.c:76
+#: inputs.c:75 inputs.c:76 inputs.c:77
 msgid "SW C"
 msgstr "SW C"
 
-#: inputs.c:77 inputs.c:78 inputs.c:79
+#: inputs.c:78 inputs.c:79 inputs.c:80
 msgid "SW D"
 msgstr "SW D"
 
-#: inputs.c:80 inputs.c:81 inputs.c:82
+#: inputs.c:81 inputs.c:82 inputs.c:83
 msgid "SW E"
 msgstr "SW E"
 
-#: inputs.c:83 inputs.c:84
+#: inputs.c:84 inputs.c:85
 msgid "SW F"
 msgstr "SW F"
 
-#: inputs.c:85 inputs.c:86 inputs.c:87
+#: inputs.c:86 inputs.c:87 inputs.c:88
 msgid "SW G"
 msgstr "SW G"
 
-#: inputs.c:88 inputs.c:89
+#: inputs.c:89 inputs.c:90
 msgid "SW H"
 msgstr "SW H"
 
-#: inputs.c:95
+#: inputs.c:96
 msgid "TRIMLV-"
 msgstr "TRIMLV-"
 
-#: inputs.c:96
+#: inputs.c:97
 msgid "TRIMLV+"
 msgstr "TRIMLV+"
 
-#: inputs.c:97
+#: inputs.c:98
 msgid "TRIMRV-"
 msgstr "TRIMRV-"
 
-#: inputs.c:98
+#: inputs.c:99
 msgid "TRIMRV+"
 msgstr "TRIMRV+"
 
-#: inputs.c:99
+#: inputs.c:100
 msgid "TRIMLH-"
 msgstr "TRIMLH-"
 
-#: inputs.c:100
+#: inputs.c:101
 msgid "TRIMLH+"
 msgstr "TRIMLH+"
 
-#: inputs.c:101
+#: inputs.c:102
 msgid "TRIMRH-"
 msgstr "TRIMRH-"
 
-#: inputs.c:102
+#: inputs.c:103
 msgid "TRIMRH+"
 msgstr "TRIMRH+"
 
-#: inputs.c:103
+#: inputs.c:104
 msgid "TRIM_L-"
 msgstr "TRIM_L-"
 
-#: inputs.c:104
+#: inputs.c:105
 msgid "TRIM_L+"
 msgstr "TRIM_L+"
 
-#: inputs.c:105
+#: inputs.c:106
 msgid "TRIM_R-"
 msgstr "TRIM_R-"
 
-#: inputs.c:106
+#: inputs.c:107
 msgid "TRIM_R+"
 msgstr "TRIM_R+"
 
-#: inputs.c:107
+#: inputs.c:108
 msgid "Left"
 msgstr "Links"
 
-#: inputs.c:108
+#: inputs.c:109
 msgid "Right"
 msgstr "Rechts"
 
-#: inputs.c:109 pages/128x64x1/standard/traveladj_page.c:63
+#: inputs.c:110 pages/128x64x1/standard/traveladj_page.c:63
 #: pages/320x240x16/standard/traveladj_page.c:68
 msgid "Down"
 msgstr "Runter"
 
-#: inputs.c:110 pages/128x64x1/reorder_list.c:38
+#: inputs.c:111 pages/128x64x1/reorder_list.c:38
 #: pages/128x64x1/standard/traveladj_page.c:64
 #: pages/320x240x16/standard/traveladj_page.c:69
 msgid "Up"
 msgstr "Hoch"
 
-#: inputs.c:111
+#: inputs.c:112
 msgid "Enter"
 msgstr "Eingabe"
 
-#: inputs.c:112
+#: inputs.c:113
 msgid "Exit"
 msgstr "EXT"
 
-#: inputs.c:115
+#: inputs.c:116
 msgid "RIGHT_H"
 msgstr "RECHTS_H"
 
-#: inputs.c:116
+#: inputs.c:117
 msgid "LEFT_V"
 msgstr "LINKS_V"
 
-#: inputs.c:117
+#: inputs.c:118
 msgid "RIGHT_V"
 msgstr "RECHTS_V"
 
-#: inputs.c:118
+#: inputs.c:119
 msgid "LEFT_H"
 msgstr "LINKS_H"
 
-#: inputs.c:144 inputs.c:257 mixer.c:873 mixer.c:887
+#: inputs.c:145 inputs.c:258 mixer.c:873 mixer.c:887
 #: pages/128x64x1/datalog_page.c:79 pages/128x64x1/model_page.c:159
 #: pages/320x240x16/datalog_page.c:92 pages/320x240x16/model_page.c:100
 #: pages/320x240x16/trim_page.c:46 pages/common/advanced/_mixer_setup.c:400
@@ -343,16 +347,16 @@ msgstr "LINKS_H"
 msgid "None"
 msgstr "keine"
 
-#: inputs.c:154 pages/common/standard/_gyrosense_page.c:57
+#: inputs.c:155 pages/common/standard/_gyrosense_page.c:57
 #: pages/common/standard/_gyrosense_page.c:59
 msgid "Ch"
 msgstr "K"
 
-#: inputs.c:160 pages/320x240x16/chantest_page.c:219
+#: inputs.c:161 pages/320x240x16/chantest_page.c:219
 msgid "Virt"
 msgstr "Virt"
 
-#: inputs.c:163
+#: inputs.c:164
 msgid "PPM"
 msgstr "PPM"
 
@@ -470,7 +474,7 @@ msgid "Subtrim"
 msgstr "Servomitte"
 
 #: pages/128x64x1/advanced/mixer_limits.c:99
-#: pages/320x240x16/advanced/mixer_limits.c:68 telemetry.c:250
+#: pages/320x240x16/advanced/mixer_limits.c:68 telemetry.c:246
 msgid "Speed"
 msgstr ""
 "Geschwind.\n"
@@ -483,17 +487,17 @@ msgstr ""
 #: pages/128x64x1/advanced/mixer_setup.c:78
 #: pages/128x64x1/advanced/mixer_setup.c:157
 #: pages/128x64x1/advanced/mixer_setup.c:265
-#: pages/320x240x16/advanced/mixer_setup.c:59
-#: pages/320x240x16/advanced/mixer_setup.c:84
-#: pages/320x240x16/advanced/mixer_setup.c:151
+#: pages/320x240x16/advanced/mixer_setup.c:76
+#: pages/320x240x16/advanced/mixer_setup.c:101
+#: pages/320x240x16/advanced/mixer_setup.c:168
 #: pages/320x240x16/standard/drexp_page.c:57
 msgid "Src"
 msgstr "Quelle"
 
 #: pages/128x64x1/advanced/mixer_setup.c:82
 #: pages/128x64x1/advanced/mixer_setup.c:161
-#: pages/320x240x16/advanced/mixer_setup.c:63
-#: pages/320x240x16/advanced/mixer_setup.c:155
+#: pages/320x240x16/advanced/mixer_setup.c:80
+#: pages/320x240x16/advanced/mixer_setup.c:172
 msgid "Curve"
 msgstr "Kurve"
 
@@ -504,45 +508,45 @@ msgstr "Skalierung"
 
 #: pages/128x64x1/advanced/mixer_setup.c:90
 #: pages/128x64x1/advanced/mixer_setup.c:169
-#: pages/320x240x16/advanced/mixer_setup.c:76
-#: pages/320x240x16/advanced/mixer_setup.c:161
+#: pages/320x240x16/advanced/mixer_setup.c:93
+#: pages/320x240x16/advanced/mixer_setup.c:178
 msgid "Offset"
 msgstr "Versatz"
 
 #: pages/128x64x1/advanced/mixer_setup.c:141
-#: pages/320x240x16/advanced/mixer_setup.c:135
+#: pages/320x240x16/advanced/mixer_setup.c:152
 msgid "Mixers"
 msgstr "Mischer"
 
 #: pages/128x64x1/advanced/mixer_setup.c:145
-#: pages/320x240x16/advanced/mixer_setup.c:137
+#: pages/320x240x16/advanced/mixer_setup.c:154
 msgid "Page"
 msgstr "Seite"
 
 #: pages/128x64x1/advanced/mixer_setup.c:149 pages/128x64x1/trim_page.c:119
-#: pages/320x240x16/advanced/mixer_setup.c:145
+#: pages/320x240x16/advanced/mixer_setup.c:162
 #: pages/320x240x16/standard/curves_page.c:57 pages/320x240x16/trim_page.c:113
 #: pages/common/_timer_page.c:56
 msgid "Switch"
 msgstr "Schalter"
 
 #: pages/128x64x1/advanced/mixer_setup.c:153
-#: pages/320x240x16/advanced/mixer_setup.c:148
+#: pages/320x240x16/advanced/mixer_setup.c:165
 msgid "Mux"
 msgstr "Funktion"
 
 #: pages/128x64x1/advanced/mixer_setup.c:269
-#: pages/320x240x16/advanced/mixer_setup.c:95
+#: pages/320x240x16/advanced/mixer_setup.c:112
 msgid "High-Rate"
 msgstr "Hoch"
 
 #: pages/128x64x1/advanced/mixer_setup.c:279
-#: pages/320x240x16/advanced/mixer_setup.c:85
+#: pages/320x240x16/advanced/mixer_setup.c:102
 msgid "Switch1"
 msgstr "Schalter1"
 
 #: pages/128x64x1/advanced/mixer_setup.c:279
-#: pages/320x240x16/advanced/mixer_setup.c:86
+#: pages/320x240x16/advanced/mixer_setup.c:103
 msgid "Switch2"
 msgstr "Schalter2"
 
@@ -559,12 +563,12 @@ msgstr ""
 #: pages/320x240x16/usb_page.c:39 pages/320x240x16/usb_page.c:41
 #: pages/common/standard/_curves_page.c:109
 #: pages/common/standard/_throhold_page.c:40 pages/common/_tx_configure.c:376
-#: protocol/bayang_nrf24l01.c:100 protocol/cg023_nrf24l01.c:60
-#: protocol/dsm2_cyrf6936.c:49 protocol/dsm2_cyrf6936.c:52
-#: protocol/dsm2_cyrf6936.c:53 protocol/frsky2way_cc2500.c:40
-#: protocol/fy326_nrf24l01.c:59 protocol/hubsan_a7105.c:126
-#: protocol/inav_nrf24l01.c:182 protocol/kn_nrf24l01.c:172
-#: protocol/symax_nrf24l01.c:109 protocol/yd717_nrf24l01.c:111
+#: protocol/bayang_nrf24l01.c:98 protocol/cg023_nrf24l01.c:58
+#: protocol/dsm2_cyrf6936.c:47 protocol/dsm2_cyrf6936.c:50
+#: protocol/dsm2_cyrf6936.c:51 protocol/frsky2way_cc2500.c:38
+#: protocol/fy326_nrf24l01.c:57 protocol/hubsan_a7105.c:124
+#: protocol/inav_nrf24l01.c:180 protocol/kn_nrf24l01.c:170
+#: protocol/symax_nrf24l01.c:107 protocol/yd717_nrf24l01.c:109
 #: telemetry/telem_dsm.c:147
 msgid "On"
 msgstr "Ein"
@@ -581,14 +585,14 @@ msgstr "Ein"
 #: pages/common/_tx_configure.c:250 pages/common/_tx_configure.c:265
 #: pages/common/_tx_configure.c:278 pages/common/_tx_configure.c:305
 #: pages/common/_tx_configure.c:374 pages/common/_tx_configure.c:390
-#: pages/common/_tx_configure.c:412 protocol/bayang_nrf24l01.c:100
-#: protocol/cflie_nrf24l01.c:200 protocol/cg023_nrf24l01.c:60
-#: protocol/devo_cyrf6936.c:54 protocol/dsm2_cyrf6936.c:49
-#: protocol/dsm2_cyrf6936.c:52 protocol/dsm2_cyrf6936.c:53
-#: protocol/flysky_a7105.c:48 protocol/frsky2way_cc2500.c:40
-#: protocol/fy326_nrf24l01.c:59 protocol/hubsan_a7105.c:126
-#: protocol/inav_nrf24l01.c:182 protocol/kn_nrf24l01.c:172
-#: protocol/symax_nrf24l01.c:109 protocol/yd717_nrf24l01.c:111
+#: pages/common/_tx_configure.c:412 protocol/bayang_nrf24l01.c:98
+#: protocol/cflie_nrf24l01.c:198 protocol/cg023_nrf24l01.c:58
+#: protocol/devo_cyrf6936.c:52 protocol/dsm2_cyrf6936.c:47
+#: protocol/dsm2_cyrf6936.c:50 protocol/dsm2_cyrf6936.c:51
+#: protocol/flysky_a7105.c:46 protocol/frsky2way_cc2500.c:38
+#: protocol/fy326_nrf24l01.c:57 protocol/hubsan_a7105.c:124
+#: protocol/inav_nrf24l01.c:180 protocol/kn_nrf24l01.c:170
+#: protocol/symax_nrf24l01.c:107 protocol/yd717_nrf24l01.c:109
 msgid "Off"
 msgstr "Aus"
 
@@ -713,7 +717,7 @@ msgstr ""
 "devo8:Richtung Querruder"
 
 #: pages/128x64x1/model_config.c:69 pages/320x240x16/model_config.c:50
-#: protocol/wk2x01.c:80
+#: protocol/wk2x01.c:78
 msgid "COL Inv"
 msgstr ""
 "COL Inv\n"
@@ -756,12 +760,12 @@ msgid "Multirotor"
 msgstr ""
 
 #: pages/128x64x1/model_config.c:139 pages/320x240x16/model_config.c:103
-#: protocol/ppmout.c:39
+#: protocol/ppmout.c:37
 msgid "Center PW"
 msgstr "Mitte PW"
 
 #: pages/128x64x1/model_config.c:143 pages/320x240x16/model_config.c:106
-#: protocol/ppmout.c:40
+#: protocol/ppmout.c:38
 msgid "Delta PW"
 msgstr "Delta PW"
 
@@ -813,7 +817,7 @@ msgstr "Drücke ENT zum Kopier."
 msgid "Press ENT to load"
 msgstr "Drücke ENT zum Laden"
 
-#: pages/128x64x1/model_page.c:38 protocol/wk2x01.c:79
+#: pages/128x64x1/model_page.c:38 protocol/wk2x01.c:77
 msgid "Heli"
 msgstr "Heli"
 
@@ -826,7 +830,7 @@ msgid "Multi"
 msgstr ""
 
 #: pages/128x64x1/model_page.c:51 pages/common/_model_loadsave.c:114
-#: pages/common/_model_page.c:181 protocol/hisky_nrf24l01.c:73
+#: pages/common/_model_page.c:181 protocol/hisky_nrf24l01.c:71
 msgid "Default"
 msgstr "Standard"
 
@@ -1063,17 +1067,17 @@ msgstr "-20dB"
 msgid "0dB"
 msgstr "0dB"
 
-#: pages/128x64x1/set_timer_page.c:44 pages/320x240x16/rtc_config.c:135
+#: pages/128x64x1/set_timer_page.c:44 pages/320x240x16/rtc_config.c:136
 #: pages/320x240x16/set_timer_page.c:98
 msgid "Second"
 msgstr "Sekunde"
 
-#: pages/128x64x1/set_timer_page.c:46 pages/320x240x16/rtc_config.c:136
+#: pages/128x64x1/set_timer_page.c:46 pages/320x240x16/rtc_config.c:137
 #: pages/320x240x16/set_timer_page.c:96
 msgid "Minute"
 msgstr "Minute"
 
-#: pages/128x64x1/set_timer_page.c:48 pages/320x240x16/rtc_config.c:137
+#: pages/128x64x1/set_timer_page.c:48 pages/320x240x16/rtc_config.c:138
 #: pages/320x240x16/set_timer_page.c:94
 msgid "Hour"
 msgstr "Stunde"
@@ -1344,8 +1348,8 @@ msgstr ""
 "aktuell\n"
 "nicht verfügbar "
 
-#: pages/320x240x16/advanced/mixer_setup.c:101
-#: pages/320x240x16/advanced/mixer_setup.c:104
+#: pages/320x240x16/advanced/mixer_setup.c:118
+#: pages/320x240x16/advanced/mixer_setup.c:121
 #: pages/common/advanced/_mixer_setup.c:484
 msgid "Linked"
 msgstr ""
@@ -1510,39 +1514,39 @@ msgstr "Einfügen"
 msgid "Remove"
 msgstr "Löschen"
 
-#: pages/320x240x16/rtc_config.c:138
+#: pages/320x240x16/rtc_config.c:139
 msgid "Day"
 msgstr "Tag"
 
-#: pages/320x240x16/rtc_config.c:139
+#: pages/320x240x16/rtc_config.c:140
 msgid "Month"
 msgstr "Monat"
 
-#: pages/320x240x16/rtc_config.c:140
+#: pages/320x240x16/rtc_config.c:141
 msgid "Year"
 msgstr "Jahr"
 
-#: pages/320x240x16/rtc_config.c:157
+#: pages/320x240x16/rtc_config.c:158
 msgid "Set time"
 msgstr "Setze Zeit"
 
-#: pages/320x240x16/rtc_config.c:158
+#: pages/320x240x16/rtc_config.c:159
 msgid "Set date"
 msgstr "Setze Datum"
 
-#: pages/320x240x16/rtc_config.c:159
+#: pages/320x240x16/rtc_config.c:160
 msgid "Time format"
 msgstr "Zeitformat"
 
-#: pages/320x240x16/rtc_config.c:160
+#: pages/320x240x16/rtc_config.c:161
 msgid "Date format"
 msgstr "Datumsformat"
 
-#: pages/320x240x16/rtc_config.c:161
+#: pages/320x240x16/rtc_config.c:162
 msgid "value to set"
 msgstr "zu setzender Wert"
 
-#: pages/320x240x16/rtc_config.c:162 pages/320x240x16/set_timer_page.c:106
+#: pages/320x240x16/rtc_config.c:163 pages/320x240x16/set_timer_page.c:106
 msgid "resulting value"
 msgstr "Ergebnis"
 
@@ -1590,7 +1594,7 @@ msgstr "manuell"
 msgid "Auto"
 msgstr "Auto"
 
-#: pages/320x240x16/standard/curves_page.c:127 protocol/frskyx_cc2500.c:47
+#: pages/320x240x16/standard/curves_page.c:127 protocol/frskyx_cc2500.c:45
 msgid "Enabled"
 msgstr "Aktiv"
 
@@ -1692,19 +1696,19 @@ msgstr "+"
 msgid "Neg"
 msgstr "-"
 
-#: pages/common/advanced/_mixer_curves.c:157 protocol/dsm2_cyrf6936.c:50
-#: protocol/esky150_nrf24l01.c:150 protocol/kn_nrf24l01.c:169
-#: protocol/kn_nrf24l01.c:170 protocol/v202_nrf24l01.c:128
-#: protocol/v202_nrf24l01.c:129 protocol/v202_nrf24l01.c:131
-#: protocol/yd717_nrf24l01.c:109
+#: pages/common/advanced/_mixer_curves.c:157 protocol/dsm2_cyrf6936.c:48
+#: protocol/esky150_nrf24l01.c:148 protocol/kn_nrf24l01.c:167
+#: protocol/kn_nrf24l01.c:168 protocol/v202_nrf24l01.c:126
+#: protocol/v202_nrf24l01.c:127 protocol/v202_nrf24l01.c:129
+#: protocol/yd717_nrf24l01.c:107
 msgid "Yes"
 msgstr "Ja"
 
-#: pages/common/advanced/_mixer_curves.c:157 protocol/dsm2_cyrf6936.c:50
-#: protocol/esky150_nrf24l01.c:150 protocol/kn_nrf24l01.c:169
-#: protocol/kn_nrf24l01.c:170 protocol/v202_nrf24l01.c:128
-#: protocol/v202_nrf24l01.c:129 protocol/v202_nrf24l01.c:131
-#: protocol/yd717_nrf24l01.c:109
+#: pages/common/advanced/_mixer_curves.c:157 protocol/dsm2_cyrf6936.c:48
+#: protocol/esky150_nrf24l01.c:148 protocol/kn_nrf24l01.c:167
+#: protocol/kn_nrf24l01.c:168 protocol/v202_nrf24l01.c:126
+#: protocol/v202_nrf24l01.c:127 protocol/v202_nrf24l01.c:129
+#: protocol/yd717_nrf24l01.c:107
 msgid "No"
 msgstr "Nein"
 
@@ -1723,7 +1727,7 @@ msgstr "Umgekehrt"
 
 #: pages/common/advanced/_mixer_limits.c:208 pages/common/_model_config.c:36
 #: pages/common/standard/_common_standard.c:67
-#: pages/common/standard/_reverse_page.c:28 protocol/wk2x01.c:80
+#: pages/common/standard/_reverse_page.c:28 protocol/wk2x01.c:78
 msgid "Normal"
 msgstr "Normal"
 
@@ -1866,7 +1870,7 @@ msgstr "Laden"
 msgid "Menu"
 msgstr "Menü"
 
-#: pages/common/_model_config.c:37 protocol/wk2x01.c:80
+#: pages/common/_model_config.c:37 protocol/wk2x01.c:78
 msgid "Inverted"
 msgstr "Umgekehrt"
 
@@ -1875,7 +1879,7 @@ msgstr "Umgekehrt"
 msgid "Ch%d"
 msgstr "K%d"
 
-#: pages/common/_model_config.c:186
+#: pages/common/_model_config.c:189
 #, c-format
 msgid "PPM%d"
 msgstr "PPM%d"
@@ -1909,10 +1913,10 @@ msgid "Template.."
 msgstr "Vorlage..."
 
 #: pages/common/_pages.c:110 pages/common/_pages.c:117
-#: protocol/bayang_nrf24l01.c:100 protocol/cflie_nrf24l01.c:200
-#: protocol/devo_cyrf6936.c:54 protocol/dsm2_cyrf6936.c:49
-#: protocol/frsky2way_cc2500.c:40 protocol/hubsan_a7105.c:126
-#: protocol/inav_nrf24l01.c:182 protocol/yd717_nrf24l01.c:111
+#: protocol/bayang_nrf24l01.c:98 protocol/cflie_nrf24l01.c:198
+#: protocol/devo_cyrf6936.c:52 protocol/dsm2_cyrf6936.c:47
+#: protocol/frsky2way_cc2500.c:38 protocol/hubsan_a7105.c:124
+#: protocol/inav_nrf24l01.c:180 protocol/yd717_nrf24l01.c:109
 msgid "Telemetry"
 msgstr "Telemetrie"
 
@@ -2090,224 +2094,224 @@ msgstr ""
 msgid "Deviation"
 msgstr "Deviation"
 
-#: protocol/bayang_nrf24l01.c:101 protocol/corona_cc2500.c:41
-#: protocol/cx10_nrf24l01.c:69 protocol/fq777_nrf24l01.c:83
-#: protocol/frskyx_cc2500.c:45 protocol/fy326_nrf24l01.c:58
-#: protocol/h8_3d_nrf24l01.c:63 protocol/hisky_nrf24l01.c:73
-#: protocol/hitec_cc2500.c:62 protocol/hontai_nrf24l01.c:62
-#: protocol/hubsan_a7105.c:124 protocol/kn_nrf24l01.c:171
-#: protocol/mjxq_nrf24l01.c:60 protocol/mt99xx_nrf24l01.c:127
-#: protocol/q303_nrf24l01.c:76 protocol/slt_nrf24l01.c:85
-#: protocol/v202_nrf24l01.c:127 protocol/yd717_nrf24l01.c:108
+#: protocol/bayang_nrf24l01.c:99 protocol/corona_cc2500.c:39
+#: protocol/cx10_nrf24l01.c:67 protocol/fq777_nrf24l01.c:81
+#: protocol/frskyx_cc2500.c:43 protocol/fy326_nrf24l01.c:56
+#: protocol/h8_3d_nrf24l01.c:61 protocol/hisky_nrf24l01.c:71
+#: protocol/hitec_cc2500.c:60 protocol/hontai_nrf24l01.c:60
+#: protocol/hubsan_a7105.c:122 protocol/kn_nrf24l01.c:169
+#: protocol/mjxq_nrf24l01.c:58 protocol/mt99xx_nrf24l01.c:125
+#: protocol/q303_nrf24l01.c:74 protocol/slt_nrf24l01.c:83
+#: protocol/v202_nrf24l01.c:125 protocol/yd717_nrf24l01.c:106
 msgid "Format"
 msgstr ""
 
-#: protocol/bayang_nrf24l01.c:101
+#: protocol/bayang_nrf24l01.c:99
 msgid "regular"
 msgstr ""
 
-#: protocol/bugs3_a7105.c:244 protocol/flysky_afhds2a_a7105.c:80
-#: protocol/hubsan_a7105.c:127 protocol/joysway_a7105.c:55
+#: protocol/bugs3_a7105.c:242 protocol/flysky_afhds2a_a7105.c:78
+#: protocol/hubsan_a7105.c:125 protocol/joysway_a7105.c:53
 msgid "Freq Tune"
 msgstr ""
 
-#: protocol/bugs3mini_nrf24l01.c:133
+#: protocol/bugs3mini_nrf24l01.c:131
 msgid "RX Id"
 msgstr ""
 
-#: protocol/cflie_nrf24l01.c:200
+#: protocol/cflie_nrf24l01.c:198
 msgid "ACKPKT"
 msgstr ""
 
-#: protocol/cflie_nrf24l01.c:200
+#: protocol/cflie_nrf24l01.c:198
 msgid "CRTPLOG"
 msgstr ""
 
-#: protocol/cflie_nrf24l01.c:201
+#: protocol/cflie_nrf24l01.c:199
 msgid "CRTP Mode"
 msgstr ""
 
-#: protocol/cflie_nrf24l01.c:201
+#: protocol/cflie_nrf24l01.c:199
 msgid "RPYT"
 msgstr ""
 
-#: protocol/cflie_nrf24l01.c:201
+#: protocol/cflie_nrf24l01.c:199
 msgid "CPPM"
 msgstr ""
 
-#: protocol/corona_cc2500.c:42 protocol/frsky1way_cc2500.c:40
-#: protocol/frsky2way_cc2500.c:41 protocol/frskyx_cc2500.c:44
-#: protocol/hitec_cc2500.c:63 protocol/sfhss_cc2500.c:42
+#: protocol/corona_cc2500.c:40 protocol/frsky1way_cc2500.c:38
+#: protocol/frsky2way_cc2500.c:39 protocol/frskyx_cc2500.c:42
+#: protocol/hitec_cc2500.c:61 protocol/sfhss_cc2500.c:40
 msgid "Freq-Fine"
 msgstr ""
 
-#: protocol/cx10_nrf24l01.c:69
+#: protocol/cx10_nrf24l01.c:67
 msgid "Green"
 msgstr ""
 
-#: protocol/cx10_nrf24l01.c:69
+#: protocol/cx10_nrf24l01.c:67
 msgid "Blue-A"
 msgstr ""
 
-#: protocol/devo_cyrf6936.c:54
+#: protocol/devo_cyrf6936.c:52
 msgid "Std"
 msgstr ""
 
-#: protocol/devo_cyrf6936.c:54
+#: protocol/devo_cyrf6936.c:52
 msgid "X350"
 msgstr ""
 
-#: protocol/dsm2_cyrf6936.c:50
+#: protocol/dsm2_cyrf6936.c:48
 msgid "OrangeRx"
 msgstr ""
 
-#: protocol/dsm2_cyrf6936.c:52
+#: protocol/dsm2_cyrf6936.c:50
 msgid "HighSpeed"
 msgstr ""
 
-#: protocol/dsm2_cyrf6936.c:53
+#: protocol/dsm2_cyrf6936.c:51
 msgid "F.Log filter"
 msgstr ""
 
-#: protocol/esky150_nrf24l01.c:150 protocol/kn_nrf24l01.c:169
-#: protocol/v202_nrf24l01.c:128
+#: protocol/esky150_nrf24l01.c:148 protocol/kn_nrf24l01.c:167
+#: protocol/v202_nrf24l01.c:126
 msgid "Re-bind"
 msgstr ""
 
-#: protocol/flysky_afhds2a_a7105.c:77
+#: protocol/flysky_afhds2a_a7105.c:75
 msgid "Outputs"
 msgstr ""
 
-#: protocol/flysky_afhds2a_a7105.c:78
+#: protocol/flysky_afhds2a_a7105.c:76
 msgid "Servo Hz"
 msgstr ""
 
-#: protocol/flysky_afhds2a_a7105.c:79
+#: protocol/flysky_afhds2a_a7105.c:77
 msgid "LQI output"
 msgstr ""
 
-#: protocol/frsky1way_cc2500.c:41 protocol/frsky2way_cc2500.c:42
-#: protocol/sfhss_cc2500.c:43
+#: protocol/frsky1way_cc2500.c:39 protocol/frsky2way_cc2500.c:40
+#: protocol/sfhss_cc2500.c:41
 msgid "Freq-Coarse"
 msgstr ""
 
-#: protocol/frsky2way_cc2500.c:43 protocol/frskyx_cc2500.c:43
+#: protocol/frsky2way_cc2500.c:41 protocol/frskyx_cc2500.c:41
 msgid "AD2GAIN"
 msgstr ""
 
-#: protocol/frsky2way_cc2500.c:44 protocol/frskyx_cc2500.c:46
+#: protocol/frsky2way_cc2500.c:42 protocol/frskyx_cc2500.c:44
 msgid "RSSIChan"
 msgstr ""
 
-#: protocol/frskyx_cc2500.c:42 protocol/pxxout.c:48
+#: protocol/frskyx_cc2500.c:40 protocol/pxxout.c:46
 msgid "Failsafe"
 msgstr ""
 
-#: protocol/frskyx_cc2500.c:47
+#: protocol/frskyx_cc2500.c:45
 msgid "S.PORT Out"
 msgstr ""
 
-#: protocol/frskyx_cc2500.c:47
+#: protocol/frskyx_cc2500.c:45
 msgid "Disabled"
 msgstr ""
 
-#: protocol/fy326_nrf24l01.c:59
+#: protocol/fy326_nrf24l01.c:57
 msgid "Expert"
 msgstr ""
 
-#: protocol/hubsan_a7105.c:125
+#: protocol/hubsan_a7105.c:123
 msgid "vTX MHz"
 msgstr "vTX MHz"
 
-#: protocol/kn_nrf24l01.c:170
+#: protocol/kn_nrf24l01.c:168
 msgid "1Mbps"
 msgstr ""
 
-#: protocol/kn_nrf24l01.c:172
+#: protocol/kn_nrf24l01.c:170
 msgid "DynTrim"
 msgstr ""
 
-#: protocol/loli_nrf24l01.c:65
+#: protocol/loli_nrf24l01.c:63
 msgid "Chan 1"
 msgstr ""
 
-#: protocol/loli_nrf24l01.c:66
+#: protocol/loli_nrf24l01.c:64
 msgid "Chan 2"
 msgstr ""
 
-#: protocol/loli_nrf24l01.c:67
+#: protocol/loli_nrf24l01.c:65
 msgid "Chan 3"
 msgstr ""
 
-#: protocol/loli_nrf24l01.c:68
+#: protocol/loli_nrf24l01.c:66
 msgid "Chan 4"
 msgstr ""
 
-#: protocol/loli_nrf24l01.c:69
+#: protocol/loli_nrf24l01.c:67
 msgid "Chan 5"
 msgstr ""
 
-#: protocol/loli_nrf24l01.c:70
+#: protocol/loli_nrf24l01.c:68
 msgid "Chan 6"
 msgstr ""
 
-#: protocol/loli_nrf24l01.c:71
+#: protocol/loli_nrf24l01.c:69
 msgid "Chan 7"
 msgstr ""
 
-#: protocol/loli_nrf24l01.c:72
+#: protocol/loli_nrf24l01.c:70
 msgid "Chan 8"
 msgstr ""
 
-#: protocol/ppmout.c:41
+#: protocol/ppmout.c:39
 msgid "Notch PW"
 msgstr "Notch PW"
 
-#: protocol/ppmout.c:42
+#: protocol/ppmout.c:40
 msgid "Frame Size"
 msgstr "Paketgröße"
 
-#: protocol/pxxout.c:49
+#: protocol/pxxout.c:47
 msgid "Country"
 msgstr ""
 
-#: protocol/pxxout.c:50
+#: protocol/pxxout.c:48
 msgid "Rx PWM out"
 msgstr ""
 
-#: protocol/pxxout.c:51
+#: protocol/pxxout.c:49
 msgid "Rx Telem"
 msgstr ""
 
-#: protocol/sbus_uart.c:36
+#: protocol/sbus_uart.c:34
 msgid "Period (ms)"
 msgstr ""
 
-#: protocol/v202_nrf24l01.c:129
+#: protocol/v202_nrf24l01.c:127
 msgid "250kbps"
 msgstr ""
 
-#: protocol/v202_nrf24l01.c:131
+#: protocol/v202_nrf24l01.c:129
 msgid "Blink"
 msgstr ""
 
-#: protocol/wk2x01.c:79
+#: protocol/wk2x01.c:77
 msgid "Chan mode"
 msgstr "K Modus"
 
-#: protocol/wk2x01.c:79
+#: protocol/wk2x01.c:77
 msgid "5+1"
 msgstr "5+1"
 
-#: protocol/wk2x01.c:79
+#: protocol/wk2x01.c:77
 msgid "6+1"
 msgstr "6+1"
 
-#: protocol/wk2x01.c:81
+#: protocol/wk2x01.c:79
 msgid "COL Limit"
 msgstr "COL Limit"
 
-#: protocol/yd717_nrf24l01.c:109
+#: protocol/yd717_nrf24l01.c:107
 msgid "USE A.ACK"
 msgstr ""
 
@@ -2321,27 +2325,27 @@ msgid ""
 "   USB"
 msgstr ""
 
-#: telemetry.c:247
+#: telemetry.c:243
 msgid "Longitude"
 msgstr "Länge"
 
-#: telemetry.c:248
+#: telemetry.c:244
 msgid "Latitude"
 msgstr "Breite"
 
-#: telemetry.c:249
+#: telemetry.c:245
 msgid "Altitude"
 msgstr "Höhe"
 
-#: telemetry.c:251
+#: telemetry.c:247
 msgid "Time"
 msgstr "Zeit"
 
-#: telemetry.c:252
+#: telemetry.c:248
 msgid "SatCount"
 msgstr ""
 
-#: telemetry.c:253
+#: telemetry.c:249
 msgid "Heading"
 msgstr ""
 
