@@ -26,7 +26,7 @@ INLINE static inline uint32_t TIM_DIER_CCxDE(unsigned channel)
 
 INLINE static inline uint32_t RST_TIMx(uint32_t tim)
 {
-    switch(tim) {
+    switch (tim) {
         case TIM1: return RST_TIM1;
         case TIM2: return RST_TIM2;
         case TIM3: return RST_TIM3;
@@ -48,7 +48,7 @@ INLINE static inline uint32_t RST_TIMx(uint32_t tim)
 
 INLINE static inline uint32_t TIM_FREQ_MHz(uint32_t tim)
 {
-    switch(tim) {
+    switch (tim) {
         case TIM1:
         case TIM8:
         case TIM9:

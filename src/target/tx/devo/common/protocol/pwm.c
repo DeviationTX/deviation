@@ -34,8 +34,8 @@
 #include "target/drivers/mcu/stm32/rcc.h"
 #include "target/drivers/mcu/stm32/dma.h"
 #include "target/drivers/mcu/stm32/nvic.h"
-#include "target/drivers/mcu/stm32/tim.h" 
-#include "target/drivers/mcu/stm32/exti.h" 
+#include "target/drivers/mcu/stm32/tim.h"
+#include "target/drivers/mcu/stm32/exti.h"
 
 #ifndef DISABLE_PWM
 
@@ -61,7 +61,7 @@ void PWM_Initialize()
     timer_set_prescaler(PWM_TIMER.tim, TIM_FREQ_MHz(PWM_TIMER.tim) - 1);
 
     /* compare output setup. compare register must match i/o pin */
-    timer_set_oc_mode(PWM_TIMER.tim, TIM_OCx(PWM_TIMER.ch), TIM_OCM_FORCE_HIGH); // output force high
+    timer_set_oc_mode(PWM_TIMER.tim, TIM_OCx(PWM_TIMER.ch), TIM_OCM_FORCE_HIGH);  // output force high
 
     // further specific initialization in PPM_Enable and PXX_Enable
 }
@@ -103,12 +103,12 @@ void PPM_Enable(unsigned low_time, volatile u16 *pulses, u8 num_pulses)
     // Setup timer for PPM
     timer_set_oc_value(PWM_TIMER.tim, TIM_OCx(PWM_TIMER.ch), low_time);
     timer_set_period(PWM_TIMER.tim, 22500);
-    timer_set_oc_polarity_low(PWM_TIMER.tim, TIM_OCx(PWM_TIMER.ch));       // output active low
-    timer_set_oc_mode(PWM_TIMER.tim, TIM_OCx(PWM_TIMER.ch), TIM_OCM_PWM1); // output active when timer below compare
-    timer_enable_oc_output(PWM_TIMER.tim, TIM_OCx(PWM_TIMER.ch));          // enable OCx to pin
+    timer_set_oc_polarity_low(PWM_TIMER.tim, TIM_OCx(PWM_TIMER.ch));        // output active low
+    timer_set_oc_mode(PWM_TIMER.tim, TIM_OCx(PWM_TIMER.ch), TIM_OCM_PWM1);  // output active when timer below compare
+    timer_enable_oc_output(PWM_TIMER.tim, TIM_OCx(PWM_TIMER.ch));           // enable OCx to pin
     timer_enable_break_main_output(PWM_TIMER.tim);               // master output enable
     timer_set_dma_on_update_event(PWM_TIMER.tim);
-    timer_enable_irq(PWM_TIMER.tim, TIM_DIER_CCxDE(PWM_TIMER.ch)); // enable timer dma request (despite function name)
+    timer_enable_irq(PWM_TIMER.tim, TIM_DIER_CCxDE(PWM_TIMER.ch));  // enable timer dma request (despite function name)
     timer_generate_event(PWM_TIMER.tim, TIM_EGR_UG);      // Generate update event to start DMA
     timer_enable_counter(PWM_TIMER.tim);
 }
@@ -174,8 +174,8 @@ void PXX_Enable(u8 *packet)
     timer_enable_oc_output(PWM_TIMER.tim, TIM_OCx(PWM_TIMER.ch));          // enable OCx to pin
     timer_enable_break_main_output(PWM_TIMER.tim);               // master output enable
     timer_set_dma_on_update_event(PWM_TIMER.tim);
-    timer_enable_irq(PWM_TIMER.tim, TIM_DIER_CCxDE(PWM_TIMER.ch));        // enable timer dma request
-    timer_set_oc_mode(PWM_TIMER.tim, TIM_OCx(PWM_TIMER.ch), TIM_OCM_PWM1); // output active while counter below compare
+    timer_enable_irq(PWM_TIMER.tim, TIM_DIER_CCxDE(PWM_TIMER.ch));          // enable timer dma request
+    timer_set_oc_mode(PWM_TIMER.tim, TIM_OCx(PWM_TIMER.ch), TIM_OCM_PWM1);  // output active while counter below compare
 
     nvic_set_priority(get_nvic_dma_irq(PWM_DMA), 3);    // DMA interrupt on transfer complete
     nvic_enable_irq(get_nvic_dma_irq(PWM_DMA));

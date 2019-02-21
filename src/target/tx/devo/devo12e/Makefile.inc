@@ -9,6 +9,5 @@ LANGUAGE    := devo10
 include $(SDIR)/target/tx/devo/common/Makefile.inc
 
 ifndef BUILD_TARGET
-SRC_C   += $(SDIR)/target/tx/devo/devo10/backlight.c \
-           $(SDIR)/target/tx/devo/devo10/tx_buttons.c
+SRC_C   += $(SDIR)/target/tx/devo/devo10/tx_buttons.c
 endif

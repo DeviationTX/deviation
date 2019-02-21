@@ -131,6 +131,14 @@
         .ch = 2,                 \
         })
     #define PWM_TIMER_ISR exti9_5_isr    // Matches PA.9
-#endif  //PWM_TIMER
+#endif  // PWM_TIMER
+
+#ifndef BACKLIGHT_TIM
+    #define BACKLIGHT_TIM ((struct tim_config) { \
+        .tim = TIM3,            \
+        .pin = {GPIOB, GPIO1},  \
+        .ch = 4,                \
+        })
+#endif  // BACKLIGHT_TIM
 
 #endif  // _DEVO_DEFAULT_HARDWARE_H_

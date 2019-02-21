@@ -287,3 +287,8 @@ void LCD_Init()
 void LCD_Sleep()
 {
 }
+
+void LCD_Contrast(unsigned contrast)
+{
+    (void)contrast;  // dummy method for devo12. Only valid in devo10 now
+}

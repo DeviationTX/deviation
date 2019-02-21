@@ -24,9 +24,9 @@
 #include <libopencm3/stm32/iwdg.h>
 #include "common.h"
 #include "devo.h"
-#include "target/drivers/mcu/stm32/rcc.h" 
-#include "target/drivers/mcu/stm32/tim.h" 
-#include "target/drivers/mcu/stm32/exti.h" 
+#include "target/drivers/mcu/stm32/rcc.h"
+#include "target/drivers/mcu/stm32/tim.h"
+#include "target/drivers/mcu/stm32/exti.h"
 //#include "interface.h"
 #include "mixer.h"
 #include "config/model.h"

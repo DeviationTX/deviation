@@ -38,4 +38,11 @@
     })
 #define LCD_SPI_CFG SPI1_CFG
 
+// Backlight override
+#define BACKLIGHT_TIM ((struct tim_config) { \
+    .tim = TIM5,            \
+    .pin = {GPIOA, GPIO0},  \
+    .ch = 1,                \
+    })
+
 #endif  // _DEVO12_HARDWARE_H_

@@ -19,8 +19,7 @@ ifndef BUILD_TARGET
 MEDIA_FILES = 
 NUM_MODELS ?= 10
 
-SRC_C   += $(SDIR)/target/tx/devo/devof7/backlight.c\
-           $(SDIR)/target/tx/devo/devof7/tx_buttons.c \
+SRC_C   += $(SDIR)/target/tx/devo/devof7/tx_buttons.c \
            $(SDIR)/target/tx/devo/devof7/crc.c
 
 else
