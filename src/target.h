@@ -205,21 +205,21 @@ int  PARFlash_ReadBytesStopCR(u32 readAddress, u32 length, u8 * buffer);
 #define FLASHTYPE_MCU 2
 
 #if FLASHTYPE == FLASHTYPE_SPI
-    #define Flash_Init()   SPIFlash_Init()
-    #define Flash_ReadID() SPIFlash_ReadID()
-    #define Flash_BlockWriteEnable(enable) SPIFlash_BlockWriteEnable(enable)
-    #define Flash_ReadBytes SPIFlash_ReadBytes
-    #define Flash_ReadBytesStopCR SPIFlash_ReadBytesStopCR
-    #define Flash_WriteBytes SPIFlash_WriteBytes
-    #define Flash_EraseSector SPIFlash_EraseSector
+    #define STORAGE_Init()   SPIFlash_Init()
+    #define STORAGE_ReadID() SPIFlash_ReadID()
+    #define STORAGE_WriteEnable(enable) SPIFlash_BlockWriteEnable(enable)
+    #define STORAGE_ReadBytes SPIFlash_ReadBytes
+    #define STORAGE_ReadBytesStopCR SPIFlash_ReadBytesStopCR
+    #define STORAGE_WriteBytes SPIFlash_WriteBytes
+    #define STORAGE_EraseSector SPIFlash_EraseSector
 #elif FLASHTYPE == FLASHTYPE_MCU
-    #define Flash_Init()   MCUFlash_Init()
-    #define Flash_ReadID() MCUFlash_ReadID()
-    #define Flash_BlockWriteEnable(enable) MCUFlash_BlockWriteEnable(enable)
-    #define Flash_ReadBytes MCUFlash_ReadBytes
-    #define Flash_ReadBytesStopCR MCUFlash_ReadBytesStopCR
-    #define Flash_WriteBytes MCUFlash_WriteBytes
-    #define Flash_EraseSector MCUFlash_EraseSector
+    #define STORAGE_Init()   MCUFlash_Init()
+    #define STORAGE_ReadID() MCUFlash_ReadID()
+    #define STORAGE_WriteEnable(enable) MCUFlash_BlockWriteEnable(enable)
+    #define STORAGE_ReadBytes MCUFlash_ReadBytes
+    #define STORAGE_ReadBytesStopCR MCUFlash_ReadBytesStopCR
+    #define STORAGE_WriteBytes MCUFlash_WriteBytes
+    #define STORAGE_EraseSector MCUFlash_EraseSector
 #else
 #error Define FLASHTYPE to FLASHTYPE_MCU or FLASHTYPE_SPI
 #endif

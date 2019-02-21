@@ -129,7 +129,7 @@ uint16_t MAL_Write(uint8_t lun, uint32_t Memory_Offset, uint32_t *Writebuff, uin
           Memory_Offset = 0x1000 * FAT_OFFSET;
       }
 #endif
-      Flash_WriteBytes(Memory_Offset  + ((SPIFLASH_SECTOR_OFFSET - FAT_OFFSET) * 0x1000), Transfer_Length, (u8 *)Writebuff);
+      STORAGE_WriteBytes(Memory_Offset  + ((SPIFLASH_SECTOR_OFFSET - FAT_OFFSET) * 0x1000), Transfer_Length, (u8 *)Writebuff);
       break;
     default:
       return MAL_FAIL;
@@ -184,7 +184,7 @@ uint16_t MAL_Read(uint8_t lun, uint32_t Memory_Offset, uint32_t *Readbuff, uint1
           break;
       }
 #endif
-      Flash_ReadBytes(Memory_Offset  + ((SPIFLASH_SECTOR_OFFSET - FAT_OFFSET) * 0x1000), Transfer_Length, (u8*)Readbuff);
+      STORAGE_ReadBytes(Memory_Offset  + ((SPIFLASH_SECTOR_OFFSET - FAT_OFFSET) * 0x1000), Transfer_Length, (u8*)Readbuff);
       break;
     default:
       return MAL_FAIL;
@@ -208,7 +208,7 @@ uint16_t MAL_Clear(uint8_t lun, uint32_t Memory_Offset)
       return MAL_OK;
   }
 #endif
-  Flash_EraseSector(Memory_Offset + ((SPIFLASH_SECTOR_OFFSET - FAT_OFFSET) * 0x1000));
+  STORAGE_EraseSector(Memory_Offset + ((SPIFLASH_SECTOR_OFFSET - FAT_OFFSET) * 0x1000));
   return MAL_OK;
 }
 /*******************************************************************************
