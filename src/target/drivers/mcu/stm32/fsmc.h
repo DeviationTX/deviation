@@ -102,7 +102,7 @@ static inline void _fsmc_init(uint32_t data_len, uint32_t address_mask, uint32_t
     }
     if (ctrl_portb) {
         rcc_periph_clock_enable(RCC_GPIOB);
-        GPIO_setup_output_af((struct mcu_pin){GPIOB, ctrl_portg},
+        GPIO_setup_output_af((struct mcu_pin){GPIOB, ctrl_portb},
                              OTYPE_PUSHPULL, AF_FSMC);
     }
     /* Extended mode, write enable, 16 bit access, bank enabled */
