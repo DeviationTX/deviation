@@ -13,6 +13,7 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if 0
 const struct ImageMap image_map[] = {
     {"media/btn96_24" IMG_EXT, 96, 24, 0, 0}, /*FILE_BTN96_24 */
     {"media/btn48_24" IMG_EXT, 48, 24, 0, 0}, /*FILE_BTN48_24 */
@@ -29,6 +30,24 @@ const struct ImageMap image_map[] = {
     {"media/arrows16" IMG_EXT, 16, 16, 32, 0}, /*FILE_ARROW_16_RIGHT */
     {"media/arrows16" IMG_EXT, 16, 16, 48, 0}, /*FILE_ARROW_16_LEFT */
 };
+#else
+const struct ImageMap image_map[] = {
+    {NULL, 96, 24, 0, 0}, /*FILE_BTN96_24 */
+    {NULL, 48, 24, 0, 0}, /*FILE_BTN48_24 */
+    {NULL, 96, 16, 0, 0}, /*FILE_BTN96_16 */
+    {NULL, 64, 16, 0, 0}, /*FILE_BTN64_16 */
+    {NULL, 48, 16, 0, 0}, /*FILE_BTN48_16 */
+    {NULL, 32, 16, 0, 0}, /*FILE_BTN32_16 */
+    {NULL,192, 16, 1, 0}, /*FILE_SPIN192 */
+    {NULL, 96, 16, 1, 0}, /*FILE_SPIN96 */
+    {NULL, 64, 16, 1, 0}, /*FILE_SPIN64 */
+    {NULL, 32, 16, 1, 0}, /*FILE_SPIN32 */
+    {NULL, 16, 16, 2, 1}, /*FILE_ARROW_16_UP */
+    {NULL, 16, 16, 2, 2}, /*FILE_ARROW_16_DOWN */
+    {NULL, 16, 16, 2, 3}, /*FILE_ARROW_16_RIGHT */
+    {NULL, 16, 16, 2, 4}, /*FILE_ARROW_16_LEFT */
+};
+#endif
 
 void _gui_hilite_selected(struct guiObject *obj)
 {
