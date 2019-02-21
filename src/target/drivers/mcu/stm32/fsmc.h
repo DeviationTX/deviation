@@ -15,6 +15,11 @@
 #define FSMC_NBL0  (1 << 8)
 #define FSMC_NBL1  (1 << 9)
 
+#define FSMC_BANK1 0
+#define FSMC_BANK2 1
+#define FSMC_BANK3 2
+#define FSMC_BANK4 3
+
 static inline void _fsmc_init(uint32_t data_len, uint32_t address_mask, uint32_t ctrl_bits,
                              uint32_t bank, uint32_t bcr, uint32_t btr, uint32_t bwtr)
 {
@@ -102,7 +107,7 @@ static inline void _fsmc_init(uint32_t data_len, uint32_t address_mask, uint32_t
     }
     if (ctrl_portb) {
         rcc_periph_clock_enable(RCC_GPIOB);
-        GPIO_setup_output_af((struct mcu_pin){GPIOB, ctrl_portg},
+        GPIO_setup_output_af((struct mcu_pin){GPIOB, ctrl_portb},
                              OTYPE_PUSHPULL, AF_FSMC);
     }
     /* Extended mode, write enable, 16 bit access, bank enabled */

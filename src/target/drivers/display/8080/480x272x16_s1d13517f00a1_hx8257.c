@@ -208,7 +208,7 @@ void LCD_Init()
         16,
         0x7fffff /*23 bit addr */,
         FSMC_NOE | FSMC_NWE | FSMC_NE2 | FSMC_NE4,
-        4,
+        FSMC_BANK4,
         FSMC_BCR_MWID | FSMC_BCR_WREN | FSMC_BCR_MBKEN,
         FSMC_BTR_DATASTx(2) | FSMC_BTR_ADDHLDx(0) | FSMC_BTR_ADDSETx(1) | FSMC_BTR_ACCMODx(FSMC_BTx_ACCMOD_B),
         FSMC_BTR_DATASTx(2) | FSMC_BTR_ADDHLDx(0) | FSMC_BTR_ADDSETx(1) | FSMC_BTR_ACCMODx(FSMC_BTx_ACCMOD_B));
