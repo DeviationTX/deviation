@@ -27,7 +27,7 @@
 
 void __attribute__((__used__)) _PWM_DMA_ISR(void)
 {
-    timer_disable_counter(TIM1);
+    timer_disable_counter(PWM_TIMER.tim);
     nvic_disable_irq(get_nvic_dma_irq(PWM_DMA));
     DMA_IFCR(PWM_DMA.dma) |= DMA_IFCR_CTCIF(PWM_DMA.stream);
     dma_disable_transfer_complete_interrupt(PWM_DMA.dma, PWM_DMA.stream);

@@ -157,4 +157,12 @@
     #define SYSCLK_TIMER_ISR tim4_isr
 #endif  // SYSCLK_TIM
 
+#ifndef SSER_TIM
+    #define SSER_TIM ((struct tim_config) { \
+        .tim = TIM6,    \
+        })
+    #define SSER_TIM_ISR tim6_isr
+    #define SSER_RX_ISR exti15_10_isr
+#endif  // SSER-TIM
+
 #endif  // _DEVO_DEFAULT_HARDWARE_H_
