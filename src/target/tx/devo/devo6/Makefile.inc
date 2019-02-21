@@ -9,5 +9,4 @@ LANGUAGE    := devo8
 include $(SDIR)/target/tx/devo/common/Makefile.inc
 
 ifndef BUILD_TARGET
-SRC_C   += $(SDIR)/target/tx/devo/devo8/backlight.c
 endif

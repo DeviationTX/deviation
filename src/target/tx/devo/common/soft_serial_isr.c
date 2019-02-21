@@ -14,15 +14,15 @@
  */
 
 #include <libopencm3/cm3/nvic.h>
-#include <libopencm3/stm32/exti.h>
 #include <libopencm3/stm32/gpio.h>
-#include <libopencm3/stm32/rcc.h>
-#include <libopencm3/stm32/timer.h>
 #include <libopencm3/stm32/usart.h>
 
 #include "common.h"
 #include "devo.h"
 #include "target/drivers/mcu/stm32/rcc.h"
+#include "target/drivers/mcu/stm32/tim.h"
+#include "target/drivers/mcu/stm32/exti.h"
+#include "target/drivers/mcu/stm32/nvic.h"
 
 #ifndef MODULAR
 extern u8 in_byte;
@@ -30,11 +30,11 @@ extern u8 data_byte;
 extern u8 bit_pos;
 extern sser_callback_t *soft_rx_callback;
 
-#define SSER_BIT_TIME       1250   // 17.36 us at 72MHz
+#define SSER_BIT_TIME       (((TIM_FREQ_MHz(SSER_TIM.tim) * 1736) + 50) / 100)   // 17.36 us : 1250@72MHz, 1042@60MHz
 // rising edge ISR
-void __attribute__((__used__)) exti15_10_isr(void)
+void __attribute__((__used__)) SSER_RX_ISR(void)
 {
-    exti_reset_request(EXTI10);
+    exti_reset_request(EXTIx(UART_CFG.rx));
 
     if (in_byte) return;
 
@@ -42,30 +42,30 @@ void __attribute__((__used__)) exti15_10_isr(void)
     in_byte = 1;
     bit_pos = 0;
     data_byte = 0;
-    nvic_disable_irq(NVIC_EXTI15_10_IRQ);
+    nvic_disable_irq(NVIC_EXTIx_IRQ(UART_CFG.rx));
 
     //Configure timer for 1/2 bit time to start
-    timer_set_period(TIM6, SSER_BIT_TIME / 2);
-    nvic_enable_irq(NVIC_TIM6_IRQ);
-    timer_enable_counter(TIM6);
+    timer_set_period(SSER_TIM.tim, SSER_BIT_TIME / 2);
+    nvic_enable_irq(get_nvic_irq(SSER_TIM.tim));
+    timer_enable_counter(SSER_TIM.tim);
 }
 
 static void next_byte() {
     in_byte = 0;
-    timer_disable_counter(TIM6);
-    nvic_enable_irq(NVIC_EXTI15_10_IRQ);
+    timer_disable_counter(SSER_TIM.tim);
+    nvic_enable_irq(NVIC_EXTIx_IRQ(UART_CFG.rx));
 }
 
 // bit timer ISR
-void __attribute__((__used__)) tim6_isr(void) {
-    timer_clear_flag(TIM6, TIM_SR_UIF);
+void __attribute__((__used__)) SSER_TIM_ISR(void) {
+    timer_clear_flag(SSER_TIM.tim, TIM_SR_UIF);
 
     u16 value = GPIO_pin_get(UART_CFG.rx);
 
     if (in_byte == 1) {  // first interrupt after edge, check start bit
         if (value) {
             in_byte = 2;
-            timer_set_period(TIM6, SSER_BIT_TIME);
+            timer_set_period(SSER_TIM.tim, SSER_BIT_TIME);
         } else {
             next_byte(); // error in start bit, start looking again again
         }

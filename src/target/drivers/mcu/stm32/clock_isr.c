@@ -18,6 +18,7 @@
 
 #include "common.h"
 #include "target/tx/devo/common/devo.h"
+#include "target/drivers/mcu/stm32/tim.h"
 
 extern volatile u32 msecs;
 extern volatile u32 wdg_time;
@@ -26,16 +27,7 @@ extern u16 (*timer_callback)(void);
 extern volatile u8 msec_callbacks;
 extern volatile u32 msec_cbtime[NUM_MSEC_CALLBACKS];
 
-// Let's abuse the preprocessor to let us specify a single
-// sysclock timer value 'SYSCLK_TIM'
-
-#define _TIM_CONCAT(x, y, z) x ## y ## z
-#define TIM_CONCAT(x, y, z)  _TIM_CONCAT(x, y, z)
-
-#define TIMx               TIM_CONCAT(TIM,             SYSCLK_TIM,)
-#define TIMx_ISR           TIM_CONCAT(tim,             SYSCLK_TIM, _isr)
-
-void __attribute__((__used__)) TIMx_ISR()
+void __attribute__((__used__)) SYSCLK_TIMER_ISR()
 {
     if(timer_callback) {
 #ifdef TIMING_DEBUG
@@ -45,9 +37,9 @@ void __attribute__((__used__)) TIMx_ISR()
 #ifdef TIMING_DEBUG
         debug_timing(4, 1);
 #endif
-        timer_clear_flag(TIMx, TIM_SR_CC1IF);
+        timer_clear_flag(SYSCLK_TIM.tim, TIM_SR_CC1IF);
         if (us) {
-            timer_set_oc_value(TIMx, TIM_OC1, us + TIM_CCR1(TIMx));
+            timer_set_oc_value(SYSCLK_TIM.tim, TIM_OCx(SYSCLK_TIM.ch), us + TIM_CCR1(SYSCLK_TIM.tim));
             return;
         }
     }

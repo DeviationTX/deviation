@@ -14,16 +14,16 @@
  */
 
 #include <libopencm3/cm3/nvic.h>
-#include <libopencm3/stm32/exti.h>
 #include <libopencm3/stm32/gpio.h>
-#include <libopencm3/stm32/rcc.h>
-#include <libopencm3/stm32/timer.h>
 #include <libopencm3/stm32/usart.h>
 
 #include "common.h"
 #include "devo.h"
 
 #include "target/drivers/mcu/stm32/rcc.h"
+#include "target/drivers/mcu/stm32/tim.h"
+#include "target/drivers/mcu/stm32/exti.h"
+#include "target/drivers/mcu/stm32/nvic.h"
 
 // soft serial receiver for s.port data
 // receive inverted data (high input volgate = 0, low is 1)
@@ -43,9 +43,9 @@ sser_callback_t *soft_rx_callback;
 
 void SSER_Initialize()
 {
-#if _PWM_PIN == GPIO_USART1_TX
-    UART_Stop();  // disable USART1 for GPIO PA9 & PA10 (Trainer Tx(PA9) & Rx(PA10))
-#endif
+    if (PWM_TIMER.pin.pin == GPIO_USART1_TX) {
+        UART_Stop();  // disable USART1 for GPIO PA9 & PA10 (Trainer Tx(PA9) & Rx(PA10))
+    }
     in_byte = 0;
     bit_pos = 0;
     data_byte = 0;
@@ -57,16 +57,16 @@ void SSER_Initialize()
     GPIO_setup_input(UART_CFG.rx, ITYPE_PULLUP);
 
     // Interrupt on input rising edge to find start bit
-    exti_select_source(EXTI10, GPIOA);
-    exti_set_trigger(EXTI10, EXTI_TRIGGER_RISING);
-    exti_enable_request(EXTI10);
+    exti_select_source(EXTIx(UART_CFG.rx), UART_CFG.rx.port);
+    exti_set_trigger(EXTIx(UART_CFG.rx), EXTI_TRIGGER_RISING);
+    exti_enable_request(EXTIx(UART_CFG.rx));
 
     // Configure bit timer
-    rcc_peripheral_enable_clock(&RCC_APB1ENR, RCC_APB1ENR_TIM6EN);
-    rcc_periph_reset_pulse(RST_TIM6);
-    nvic_set_priority(NVIC_TIM6_IRQ, 8);
-    timer_set_prescaler(TIM6, 0);
-    timer_enable_irq(TIM6, TIM_DIER_UIE);
+    rcc_periph_clock_enable(get_rcc_from_port(SSER_TIM.tim));
+    rcc_periph_reset_pulse(RST_TIMx(SSER_TIM.tim));
+    nvic_set_priority(get_nvic_irq(SSER_TIM.tim), 8);
+    timer_set_prescaler(SSER_TIM.tim, 0);
+    timer_enable_irq(SSER_TIM.tim, TIM_DIER_UIE);
 }
 
 void SSER_StartReceive(sser_callback_t *isr_callback)
@@ -74,18 +74,18 @@ void SSER_StartReceive(sser_callback_t *isr_callback)
     soft_rx_callback = isr_callback;
 
     if (isr_callback) {
-        nvic_enable_irq(NVIC_EXTI15_10_IRQ);
+        nvic_enable_irq(NVIC_EXTIx_IRQ(UART_CFG.rx));
     } else {
-        nvic_disable_irq(NVIC_EXTI15_10_IRQ);
-        nvic_disable_irq(NVIC_TIM6_IRQ);
+        nvic_disable_irq(NVIC_EXTIx_IRQ(UART_CFG.rx));
+        nvic_disable_irq(get_nvic_irq(SSER_TIM.tim));
     }
 }
 
 void SSER_Stop()
 {
     SSER_StartReceive(NULL);
-    timer_disable_counter(TIM6);
-    exti_disable_request(EXTI10);
+    timer_disable_counter(SSER_TIM.tim);
+    exti_disable_request(EXTIx(UART_CFG.rx));
 }
 
 #endif //MODULAR

@@ -34,33 +34,34 @@
 #include "target/drivers/mcu/stm32/rcc.h"
 #include "target/drivers/mcu/stm32/dma.h"
 #include "target/drivers/mcu/stm32/nvic.h"
+#include "target/drivers/mcu/stm32/tim.h"
+#include "target/drivers/mcu/stm32/exti.h"
 
 #ifndef DISABLE_PWM
 
 void PWM_Initialize()
 {
-#if _PWM_PIN == GPIO_USART1_TX
-    UART_Stop();
-#endif
-
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_TIM1EN
-                                            | RCC_APB2ENR_IOPAEN
-                                            | RCC_APB2ENR_AFIOEN);
+    if (PWM_TIMER.pin.pin == GPIO_USART1_TX) {
+        UART_Stop();
+    }
+    rcc_periph_clock_enable(get_rcc_from_port(PWM_TIMER.tim));
+    rcc_periph_clock_enable(get_rcc_from_pin(PWM_TIMER.pin));
     rcc_periph_clock_enable(get_rcc_from_port(PWM_DMA.dma));
+    rcc_periph_clock_enable(RCC_AFIO);
 
     // connect timer compare output to pin
-    gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, _PWM_PIN);
+    GPIO_setup_output_af(PWM_TIMER.pin, OTYPE_PUSHPULL, PWM_TIMER.tim);
 
-    rcc_periph_reset_pulse(RST_TIM1);
+    rcc_periph_reset_pulse(RST_TIMx(PWM_TIMER.tim));
 
     // Timer global mode: No divider, Alignment edge, Direction up, auto-preload buffered
-    timer_set_mode(TIM1, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
+    timer_set_mode(PWM_TIMER.tim, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
 
     /* timer updates each microsecond */
-    timer_set_prescaler(TIM1, 72 - 1);
+    timer_set_prescaler(PWM_TIMER.tim, TIM_FREQ_MHz(PWM_TIMER.tim) - 1);
 
     /* compare output setup. compare register must match i/o pin */
-    timer_set_oc_mode(TIM1, _PWM_TIM_OC, TIM_OCM_FORCE_HIGH); // output force high
+    timer_set_oc_mode(PWM_TIMER.tim, TIM_OCx(PWM_TIMER.ch), TIM_OCM_FORCE_HIGH);  // output force high
 
     // further specific initialization in PPM_Enable and PXX_Enable
 }
@@ -71,15 +72,15 @@ void PWM_Stop()
     if (PPMin_Mode())
         return;
 
-    timer_disable_counter(TIM1);
+    timer_disable_counter(PWM_TIMER.tim);
     nvic_disable_irq(get_nvic_dma_irq(PWM_DMA));
     dma_disable_transfer_complete_interrupt(PWM_DMA.dma, PWM_DMA.stream);
     dma_disable_channel(PWM_DMA.dma, PWM_DMA.stream);
-    rcc_peripheral_disable_clock(&RCC_APB2ENR, RCC_APB2ENR_TIM1EN);
+    rcc_periph_clock_disable(get_rcc_from_port(PWM_TIMER.tim));
 
-#if _PWM_PIN == GPIO_USART1_TX
-    UART_Initialize();
-#endif
+    if (PWM_TIMER.pin.pin == GPIO_USART1_TX) {
+        UART_Initialize();
+    }
 }
 
 void PPM_Enable(unsigned low_time, volatile u16 *pulses, u8 num_pulses)
@@ -88,7 +89,7 @@ void PPM_Enable(unsigned low_time, volatile u16 *pulses, u8 num_pulses)
 
     // Setup DMA
     DMA_stream_reset(PWM_DMA);
-    dma_set_peripheral_address(PWM_DMA.dma, PWM_DMA.stream, (u32) &TIM_ARR(TIM1));
+    dma_set_peripheral_address(PWM_DMA.dma, PWM_DMA.stream, (u32) &TIM_ARR(PWM_TIMER.tim));
     dma_set_memory_address(PWM_DMA.dma, PWM_DMA.stream, (u32) pulses);
     dma_set_number_of_data(PWM_DMA.dma, PWM_DMA.stream, num_pulses);
     dma_set_read_from_memory(PWM_DMA.dma, PWM_DMA.stream);
@@ -100,16 +101,16 @@ void PPM_Enable(unsigned low_time, volatile u16 *pulses, u8 num_pulses)
     DMA_enable_stream(PWM_DMA);    // dma ready to go
 
     // Setup timer for PPM
-    timer_set_oc_value(TIM1, _PWM_TIM_OC, low_time);
-    timer_set_period(TIM1, 22500);
-    timer_set_oc_polarity_low(TIM1, _PWM_TIM_OC);       // output active low
-    timer_set_oc_mode(TIM1, _PWM_TIM_OC, TIM_OCM_PWM1); // output active when timer below compare
-    timer_enable_oc_output(TIM1, _PWM_TIM_OC);          // enable OCx to pin
-    timer_enable_break_main_output(TIM1);               // master output enable
-    timer_set_dma_on_update_event(TIM1);
-    timer_enable_irq(TIM1, _PWM_TIM_DIER_DMAEN); // enable timer dma request (despite function name)
-    timer_generate_event(TIM1, TIM_EGR_UG);      // Generate update event to start DMA
-    timer_enable_counter(TIM1);
+    timer_set_oc_value(PWM_TIMER.tim, TIM_OCx(PWM_TIMER.ch), low_time);
+    timer_set_period(PWM_TIMER.tim, 22500);
+    timer_set_oc_polarity_low(PWM_TIMER.tim, TIM_OCx(PWM_TIMER.ch));        // output active low
+    timer_set_oc_mode(PWM_TIMER.tim, TIM_OCx(PWM_TIMER.ch), TIM_OCM_PWM1);  // output active when timer below compare
+    timer_enable_oc_output(PWM_TIMER.tim, TIM_OCx(PWM_TIMER.ch));           // enable OCx to pin
+    timer_enable_break_main_output(PWM_TIMER.tim);               // master output enable
+    timer_set_dma_on_update_event(PWM_TIMER.tim);
+    timer_enable_irq(PWM_TIMER.tim, TIM_DIER_CCxDE(PWM_TIMER.ch));  // enable timer dma request (despite function name)
+    timer_generate_event(PWM_TIMER.tim, TIM_EGR_UG);      // Generate update event to start DMA
+    timer_enable_counter(PWM_TIMER.tim);
 }
 
 #define PXX_PKT_BYTES 18
@@ -155,7 +156,7 @@ void PXX_Enable(u8 *packet)
 
     // Setup DMA
     DMA_stream_reset(PWM_DMA);
-    dma_set_peripheral_address(PWM_DMA.dma, PWM_DMA.stream, (u32) &TIM_ARR(TIM1));
+    dma_set_peripheral_address(PWM_DMA.dma, PWM_DMA.stream, (u32) &TIM_ARR(PWM_TIMER.tim));
     dma_set_memory_address(PWM_DMA.dma, PWM_DMA.stream, (u32) pxx_bits);
     dma_set_number_of_data(PWM_DMA.dma, PWM_DMA.stream, pc - pxx_bits + 1);
     dma_set_read_from_memory(PWM_DMA.dma, PWM_DMA.stream);
@@ -168,19 +169,19 @@ void PXX_Enable(u8 *packet)
     DMA_enable_stream(PWM_DMA);    // dma ready to go
 
     // configure timer for PXX
-    timer_set_period(TIM1, 0);                          // hold timer stopped
-    timer_set_oc_value(TIM1, _PWM_TIM_OC, 8);           // 8 us high for PXX
-    timer_enable_oc_output(TIM1, _PWM_TIM_OC);          // enable OCx to pin
-    timer_enable_break_main_output(TIM1);               // master output enable
-    timer_set_dma_on_update_event(TIM1);
-    timer_enable_irq(TIM1, _PWM_TIM_DIER_DMAEN);        // enable timer dma request
-    timer_set_oc_mode(TIM1, _PWM_TIM_OC, TIM_OCM_PWM1); // output active while counter below compare
+    timer_set_period(PWM_TIMER.tim, 0);                          // hold timer stopped
+    timer_set_oc_value(PWM_TIMER.tim, TIM_OCx(PWM_TIMER.ch), 8);           // 8 us high for PXX
+    timer_enable_oc_output(PWM_TIMER.tim, TIM_OCx(PWM_TIMER.ch));          // enable OCx to pin
+    timer_enable_break_main_output(PWM_TIMER.tim);               // master output enable
+    timer_set_dma_on_update_event(PWM_TIMER.tim);
+    timer_enable_irq(PWM_TIMER.tim, TIM_DIER_CCxDE(PWM_TIMER.ch));          // enable timer dma request
+    timer_set_oc_mode(PWM_TIMER.tim, TIM_OCx(PWM_TIMER.ch), TIM_OCM_PWM1);  // output active while counter below compare
 
     nvic_set_priority(get_nvic_dma_irq(PWM_DMA), 3);    // DMA interrupt on transfer complete
     nvic_enable_irq(get_nvic_dma_irq(PWM_DMA));
 
-    timer_enable_counter(TIM1);
-    timer_generate_event(TIM1, TIM_EGR_UG);             // Generate event to start DMA
+    timer_enable_counter(PWM_TIMER.tim);
+    timer_generate_event(PWM_TIMER.tim, TIM_EGR_UG);             // Generate event to start DMA
 }
 
 #endif //DISABLE_PWM

@@ -1,13 +1,6 @@
 #ifndef _RADIOLINK_AT9_PORTS_H
 #define _RADIOLINK_AT9_PORTS_H
 
-#define FREQ_MHz 72
-
-#define SYSCLK_TIM 3
-
-#include "hardware.h"
-#include "target/tx/devo/common/ports.h"
-
 #if 0
 // _SPI_PROTO_PORT defined in ports.h
 
@@ -41,5 +34,8 @@
     #define _DMA_IFCR_CGIF          DMA_IFCR_CGIF1
     #define _NVIC_DMA_CHANNEL_IRQ   NVIC_DMA1_CHANNEL1_IRQ
 #endif
+
+#include "hardware.h"
+#include "target/tx/devo/common/ports.h"
 
 #endif  // _RADIOLINK_AT9_PORTS_H

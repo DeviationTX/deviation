@@ -1,5 +1,5 @@
-#ifndef _AT9_HARDWARE_H_
-#define _AT9_HARDWARE_H_
+#ifndef _AT10_HARDWARE_H_
+#define _AT10_HARDWARE_H_
 
 #include "target/drivers/mcu/stm32/gpio.h"
 
@@ -11,4 +11,16 @@
     })
 #define FLASH_SPI_CFG SPI2_CFG
 
-#endif  // _AT9_HARDWARE_H_
+#define SYSCLK_TIM ((struct tim_config) { \
+    .tim = TIM3, \
+    .ch = 1,     \
+    })
+#define SYSCLK_TIMER_ISR tim3_isr
+
+#define BACKLIGHT_TIM ((struct tim_config) { \
+    .tim = TIM4,            \
+    .pin = {GPIOB, GPIO9},  \
+    .ch = 4,                \
+    })
+
+#endif  // _AT10_HARDWARE_H_

@@ -52,17 +52,9 @@ struct uart_config {
 
 struct tim_config {
     unsigned tim;
-    unsigned rst;
-    unsigned irq;
+    struct mcu_pin pin;
+    unsigned ch;          // Timer channel
 };
-
-#define _TIM_CONCAT(x, y, z) x ## y ## z
-#define TIM_CONCAT(x, y, z)  _TIM_CONCAT(x, y, z)
-#define TIM_CFG(x) ((struct tim_config){ \
-    .tim = TIM_CONCAT(TIM, x,),          \
-    .rst = TIM_CONCAT(RST_TIM, x,),      \
-    .irq = TIM_CONCAT(NVIC_TIM, x, _IRQ) \
-    })
 
 struct dma_config {
     unsigned dma;

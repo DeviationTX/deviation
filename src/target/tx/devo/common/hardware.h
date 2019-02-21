@@ -124,4 +124,45 @@
     #define TOUCH_SPI_CFG SPI1_CFG
 #endif  // TOUCH_SPI
 
+#ifndef PWM_TIMER
+    #define PWM_TIMER ((struct tim_config) { \
+        .tim = TIM1,             \
+        .pin = {GPIOA, GPIO9},   \
+        .ch = 2,                 \
+        })
+    #define PWM_TIMER_ISR exti9_5_isr    // Matches PA.9
+#endif  // PWM_TIMER
+
+#ifndef BACKLIGHT_TIM
+    #define BACKLIGHT_TIM ((struct tim_config) { \
+        .tim = TIM3,            \
+        .pin = {GPIOB, GPIO1},  \
+        .ch = 4,                \
+        })
+#endif  // BACKLIGHT_TIM
+
+#ifndef SOUND_TIM
+    #define SOUND_TIM ((struct tim_config) { \
+        .tim = TIM2,           \
+        .pin = {GPIOA, GPIO1}, \
+        .ch = 2,               \
+        })
+#endif  // SOUND_TIM
+
+#ifndef SYSCLK_TIM
+    #define SYSCLK_TIM ((struct tim_config) { \
+        .tim = TIM4,   \
+        .ch = 1        \
+        })
+    #define SYSCLK_TIMER_ISR tim4_isr
+#endif  // SYSCLK_TIM
+
+#ifndef SSER_TIM
+    #define SSER_TIM ((struct tim_config) { \
+        .tim = TIM6,    \
+        })
+    #define SSER_TIM_ISR tim6_isr
+    #define SSER_RX_ISR exti15_10_isr
+#endif  // SSER-TIM
+
 #endif  // _DEVO_DEFAULT_HARDWARE_H_
