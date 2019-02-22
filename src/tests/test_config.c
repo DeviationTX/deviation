@@ -12,6 +12,8 @@ struct config_values {
     u16 color_val;
     u8 str_index_val;
     u8 font_val;
+
+    u8 mixer;
 } TestConfig;
 
 enum {
@@ -27,6 +29,13 @@ static const char * const ALIGN_VAL[] = {
     [STR_RIGHT]       = "right",
     };
 
+static const char *string_values(int i) {
+    if (i == 0)
+        return "standard";
+    else
+        return "advanced";
+}
+
 static const struct struct_map _secgeneral[] =
 {
     {"u8val",         OFFSET(struct config_values, u8_val)},
@@ -38,8 +47,8 @@ static const struct struct_map _secgeneral[] =
     {"index",         OFFSET_STRLIST(struct config_values, str_index_val, ALIGN_VAL, ARRAYSIZE(ALIGN_VAL))},
     {"color",         OFFSET_COL(struct config_values, color_val)},
     {"font",          OFFSET_FON(struct config_values, font_val)},
+    {"mixer",         OFFSET_STRCALL(struct config_values, mixer, string_values, 2)},
 };
-
 
 void TestConfigBasic(CuTest* t) {
     memset(&TestConfig, 0, sizeof(TestConfig));
@@ -89,4 +98,13 @@ void TestConfigFont(CuTest* t)
 
     CuAssertTrue(t, assign_int(&TestConfig, _secgeneral, ARRAYSIZE(_secgeneral), "font", "font1"));
     CuAssertIntEquals(t, fontindex, TestConfig.font_val);
+}
+
+void TestConfigStringCallback(CuTest* t)
+{
+    CuAssertTrue(t, assign_int(&TestConfig, _secgeneral, ARRAYSIZE(_secgeneral), "mixer", "standard"));
+    CuAssertIntEquals(t, 0, TestConfig.mixer);
+
+    CuAssertTrue(t, assign_int(&TestConfig, _secgeneral, ARRAYSIZE(_secgeneral), "mixer", "advanced"));
+    CuAssertIntEquals(t, 1, TestConfig.mixer);
 }

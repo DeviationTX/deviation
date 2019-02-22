@@ -536,7 +536,7 @@ static const struct struct_map _secmixer[] = {
     {MIXER_OFFSET, OFFSETS(struct Mixer, offset)},
 };
 static const u16 _secmixer_defaults[] = {
-    100
+    100, 0, 0
 };
 static const struct struct_map _seclimit[] = {
     {CHAN_LIMIT_SAFETYSW,  OFFSET_SRC(struct Limit, safetysw)},
@@ -557,7 +557,7 @@ static const struct struct_map _sectrim[] = {
     {TRIM_NEG,    OFFSET_BUT(struct Trim, neg)},
 };
 static const u16 _sectrim_defaults[] = {
-    1
+    1, 0, 0
 };
 static const struct struct_map _sectrim_rdonly[] = {
     {TRIM_SOURCE, OFFSET_SRC(struct Trim, src)},
@@ -570,7 +570,7 @@ static const struct struct_map _secswash[] = {
     {SWASH_TYPE,   OFFSET_STRCALL(struct Model, swash_type, MIXER_SwashType, SWASH_TYPE_LAST)},
 };
 static const u16 _secswash_defaults[] = {
-    60, 60, 60
+    60, 60, 60, 0
 };
 
 static const struct struct_map _sectimer[] = {
