@@ -14,10 +14,4 @@
 #define _PWREN_RCC_APB2ENR_IOPEN   RCC_APB2ENR_IOPEEN
 //End Power switch configuration
 
-//PWM Port
-#define _PWM_PIN                   GPIO8
-#define _PWM_EXTI                  EXTI8
-#define _PWM_TIM_OC                TIM_OC1
-#define _PWM_TIM_DIER_DMAEN        TIM_DIER_CC1DE
-//End PWM Port
 #endif //_DEVO12_PORTS_H_

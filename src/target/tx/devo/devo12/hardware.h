@@ -16,6 +16,11 @@
     })
 
 // PWM overrides
+#define PWM_TIMER ((struct tim_config) { \
+    .tim = TIM1,           \
+    .pin = {GPIOA, GPIO8}, \
+    .ch = 1,               \
+    })
 #define PWM_DMA ((struct dma_config) { \
     .dma = DMA1,                       \
     .stream = DMA_CHANNEL2,            \
