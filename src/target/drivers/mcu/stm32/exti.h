@@ -33,8 +33,15 @@ INLINE static inline uint32_t NVIC_EXTIx_IRQ(struct mcu_pin pin)
         case GPIO3: return NVIC_EXTI3_IRQ;
         case GPIO4: return NVIC_EXTI4_IRQ;
         case GPIO5: return NVIC_EXTI9_5_IRQ;
+        case GPIO6: return NVIC_EXTI9_5_IRQ;
+        case GPIO7: return NVIC_EXTI9_5_IRQ;
+        case GPIO8: return NVIC_EXTI9_5_IRQ;
         case GPIO9: return NVIC_EXTI9_5_IRQ;
         case GPIO10: return NVIC_EXTI15_10_IRQ;
+        case GPIO11: return NVIC_EXTI15_10_IRQ;
+        case GPIO12: return NVIC_EXTI15_10_IRQ;
+        case GPIO13: return NVIC_EXTI15_10_IRQ;
+        case GPIO14: return NVIC_EXTI15_10_IRQ;
         case GPIO15: return NVIC_EXTI15_10_IRQ;
         default: ltassert(); return 0;
     }
