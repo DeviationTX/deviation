@@ -61,7 +61,7 @@ void ADC_Init(void)
 
     /* The following is based on code from here: http://code.google.com/p/rayaairbot */
     /* Enable DMA clock */
-    rcc_periph_clock_enable(ADC_DMA.dma);
+    rcc_periph_clock_enable(get_rcc_from_port(ADC_DMA.dma));
     /* 1) Disable DMA and wait for it to complete */
     DMA_stream_reset(ADC_DMA);
     /* 2) get the data from the ADC data register */
