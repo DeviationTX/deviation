@@ -311,7 +311,17 @@ static void create_scrollable_objs(guiScrollable_t *scrollable, int row)
     {
         guiObject_t *row_start = get_last_object();
         scrollable->row_cb(row, rel_row, y, scrollable->cb_data);
-        OBJ_SET_ROWSTART(row_start ? row_start->next : objHEAD, 1);
+
+        // check if row_cb actual created one more contorl
+        if (!row_start) {
+            OBJ_SET_ROWSTART(objHEAD, 1);
+        } else {
+            if (row_start->next)
+                OBJ_SET_ROWSTART(row_start->next, 1);
+            else
+                break;  // no rows created, no more rows then
+        }
+
         y += scrollable->row_height * (scrollable->size_cb ? 
                                        scrollable->size_cb(row, scrollable->cb_data) : 1);
         if (y > bottom + scrollable->row_height - ROW_HEIGHT_OFFSET)
