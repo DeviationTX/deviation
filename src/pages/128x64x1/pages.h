@@ -24,6 +24,10 @@ struct pagemem {
 #if HAS_MUSIC_CONFIG
         struct voiceconfig_page voiceconfig_page;
 #endif
+#if HAS_CRSF_CONFIG
+        struct crsfconfig_page crsfconfig_page;
+        struct crsfdevice_page crsfdevice_page;
+#endif
         struct usb_page usb_page;
         struct tx_configure_page tx_configure_page;
         struct telemtest_page telemtest_page;
@@ -75,4 +79,7 @@ void PAGE_SplashExit();
 void PAGE_VideoSetupInit(int page);
 void PAGE_LayoutEditInit(int page);
 void PAGE_ExternalOSDInit(int page);
+
+void PAGE_CRSFdialog(int type, void *param);
+void PAGE_CRSFdialogClose();
 #endif

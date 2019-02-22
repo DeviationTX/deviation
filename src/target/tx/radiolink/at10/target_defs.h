@@ -41,6 +41,7 @@ static inline void LCD_ForceUpdate() {}
 #define HAS_EXTENDED_AUDIO  0
 #define HAS_AUDIO_UART      0
 #define HAS_MUSIC_CONFIG    0
+#define HAS_CRSF_CONFIG      0
 #define HAS_OLED_DISPLAY    0
 #define ENABLE_320x240_GUI  1  // Enable support for 320x240 gui items as well as 480x320 ones
 

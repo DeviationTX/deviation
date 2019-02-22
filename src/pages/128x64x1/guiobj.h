@@ -236,6 +236,25 @@ struct voiceconfig_obj {
 };
 #endif
 
+#if HAS_CRSF_CONFIG
+struct crsfconfig_obj {
+    guiLabel_t msg;
+    guiScrollable_t scrollable;
+    guiLabel_t name[4];
+};
+
+struct crsfdevice_obj {
+    guiLabel_t msg;
+    guiScrollable_t scrollable;
+    guiLabel_t name[10];
+    union {
+        guiTextSelect_t ts;
+        guiButton_t     but;
+        guiLabel_t      lbl;
+    } value[10];
+};
+#endif
+
 /****Advanced ****/
 struct advcurve_obj {
     guiTextSelect_t name;
@@ -392,6 +411,10 @@ struct _gui_objs {
         struct debuglog_obj debuglog;
 #ifdef HAS_MUSIC_CONFIG
         struct voiceconfig_obj voiceconfig;
+#endif
+#if HAS_CRSF_CONFIG
+        struct crsfconfig_obj crsfconfig;
+        struct crsfdevice_obj crsfdevice;
 #endif
 
         struct advcurve_obj advcurve;
