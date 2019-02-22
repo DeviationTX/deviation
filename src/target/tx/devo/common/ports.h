@@ -5,12 +5,6 @@
 #include "target/drivers/mcu/stm32/gpio.h"
 #endif
 
-#define PORT_mode_setup(io, mode, pullup) gpio_set_mode(io.port, mode, pullup, io.pin)
-#define PORT_pin_set(io)                  gpio_set(io.port,io.pin)
-#define PORT_pin_clear(io)                gpio_clear(io.port,io.pin)
-#define PORT_pin_get(io)                  gpio_get(io.port,io.pin)
-
-
 //SPI Flash
 #ifndef SPIFLASH_TYPE
     #define SPIFLASH_TYPE SST25VFxxxB
