@@ -23,21 +23,21 @@ void VIBRATINGMOTOR_Init()
 {
     if (!HAS_VIBRATINGMOTOR)
         return;
-    rcc_periph_clock_enable(get_rcc_from_pin(USB_ENABLE_PIN));
-    GPIO_setup_output(USB_ENABLE_PIN, OTYPE_PUSHPULL);
-    GPIO_pin_clear(USB_ENABLE_PIN);
+    rcc_periph_clock_enable(get_rcc_from_pin(HAPTIC_PIN));
+    GPIO_setup_output(HAPTIC_PIN, OTYPE_PUSHPULL);
+    GPIO_pin_clear(HAPTIC_PIN);
 }
 
 void VIBRATINGMOTOR_Start()
 {
     if (!HAS_VIBRATINGMOTOR || !Transmitter.vibration_state)
         return;
-    GPIO_pin_set(USB_ENABLE_PIN);
+    GPIO_pin_set(HAPTIC_PIN);
 }
 
 void VIBRATINGMOTOR_Stop()
 {
     if (!HAS_VIBRATINGMOTOR)
         return;
-    GPIO_pin_clear(USB_ENABLE_PIN);
+    GPIO_pin_clear(HAPTIC_PIN);
 }
