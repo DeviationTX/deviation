@@ -48,8 +48,9 @@ static volatile u16 adc_array_oversample[SAMPLE_COUNT];
     ADC_CHAN(GPIOC, GPIO1),  /* ADC123_11 */ \
     ADC_CHAN(GPIOC, GPIO2),  /* ADC123_12 */ \
     ADC_CHAN(GPIOC, GPIO3),  /* ADC123_13 */ \
-    ADC_CHAN(GPIOC, GPIO4),  /* ADC12_14    */ \
-    ADC_CHAN(0, 16),        /* TEMPERATURE */ \
+    ADC_CHAN(GPIOC, GPIO4),  /* ADC12_14  */ \
+    ADC_CHAN(GPIOC, GPIO5),  /* ADC12_15  */ \
+    ADC_CHAN(0, 16),       /* TEMPERATURE */ \
     // End
 #endif
 

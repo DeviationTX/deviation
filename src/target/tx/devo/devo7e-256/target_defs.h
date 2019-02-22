@@ -58,6 +58,7 @@
 #define VOLTAGE_NUMERATOR 216
 #define VOLTAGE_OFFSET    249
 
+#include "hardware.h"
 #include "../common/common_devo.h"
 
 #endif //_DEVO7E_256_TARGET_H_

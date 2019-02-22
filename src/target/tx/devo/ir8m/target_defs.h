@@ -58,6 +58,7 @@
 #define VOLTAGE_NUMERATOR 216
 #define VOLTAGE_OFFSET    249
 
+#include "hardware.h"
 #include "../common/common_devo.h"
 
 #endif //_IR8M_TARGET_H_
