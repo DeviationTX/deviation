@@ -120,10 +120,9 @@ void LCD_Init()
 
 void BACKLIGHT_Init()
 {
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPBEN);
+    rcc_periph_clock_enable(get_rcc_from_pin(BACKLIGHT_TIM.pin));
     //Turn off backlight
-    gpio_set_mode(GPIOB, GPIO_MODE_INPUT,
-                  GPIO_CNF_INPUT_FLOAT, GPIO1);
+    GPIO_setup_input(BACKLIGHT_TIM.pin, ITYPE_FLOAT);
 }
 
 void BACKLIGHT_Brightness(unsigned brightness)

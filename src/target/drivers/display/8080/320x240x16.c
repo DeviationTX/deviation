@@ -69,12 +69,10 @@ int lcd_detect()
 {
 #ifdef LCD_RESET_PIN
     /* Reset pin for ILI9341 */
-    gpio_set_mode(LCD_RESET_PIN.port, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_PUSHPULL, LCD_RESET_PIN.pin);
-
-    gpio_clear(LCD_RESET_PIN.port, LCD_RESET_PIN.pin);
+    GPIO_setup_output(LCD_RESET_PIN, OTYPE_PUSHPULL);
+    GPIO_pin_clear(LCD_RESET_PIN);
     _usleep(10);   // must be held low for at least 10us
-    gpio_set(LCD_RESET_PIN.port, LCD_RESET_PIN.pin);
+    GPIO_pin_set(LCD_RESET_PIN);
     _msleep(120);  // must wait 120ms after reset
 #endif  // LCD_RESET_PIN
 

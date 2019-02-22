@@ -270,8 +270,7 @@ void LCD_Init()
         _spi_init(LCD_SPI_CFG);
     }
     // Setup CS as B.0 Data/Control = C.5
-    gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_PUSHPULL, GPIO0);
+    GPIO_setup_output(LCD_SPI.csn, OTYPE_PUSHPULL);
     GPIO_pin_set(LCD_SPI.csn);  // CS_HI();
 
     LCD_Cmd(LCD_IA911_CLEAR_VRAM); //Clear the VRAM
