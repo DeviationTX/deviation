@@ -52,8 +52,10 @@ void MSC_Init() {
 
 void USB_Enable(unsigned use_interrupt)
 {
+#ifdef USB_ENABLE_PIN
     GPIO_setup_output(USB_ENABLE_PIN, OTYPE_PUSHPULL);
     GPIO_pin_set(USB_ENABLE_PIN);
+#endif
     //rcc_set_usbpre(RCC_CFGR_USBPRE_PLL_CLK_DIV1_5);
     rcc_periph_clock_enable(RCC_USB);
     USB_Init();
@@ -64,7 +66,9 @@ void USB_Enable(unsigned use_interrupt)
 
 void USB_Disable()
 {
+#ifdef USB_ENABLE_PIN
     GPIO_pin_set(USB_ENABLE_PIN);
+#endif
     nvic_disable_irq(NVIC_USB_LP_CAN_RX0_IRQ);
 }
 

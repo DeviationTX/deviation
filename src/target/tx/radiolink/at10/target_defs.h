@@ -74,8 +74,6 @@ static inline void LCD_ForceUpdate() {}
 /* Compute voltage from y = 0.003672x + 0.0287 */
 #define VOLTAGE_NUMERATOR 367
 #define VOLTAGE_OFFSET    29
-#include "at10_ports.h"
-
 
 /* Define button placement for chantest page*/
 /* these are supposed to more closely match real Tx button layout */
@@ -87,6 +85,7 @@ static inline void LCD_ForceUpdate() {}
     {185, 220}, {185, 200}, \
     }
 
+#include "hardware.h"
 #include "target/tx/radiolink/common/common_at.h"
 
 #endif  // _AT10_TARGET_DEFS_H_

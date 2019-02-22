@@ -8,4 +8,46 @@
 #define ROTARY_PRESS_PIN ((struct mcu_pin){GPIOC, GPIO15})
 #define ROTARY_ISR       exti15_10_isr
 
+#define CYRF_RESET_PIN   ((struct mcu_pin){GPIOB, GPIO11})
+#define AVR_RESET_PIN    ((struct mcu_pin){GPIOB, GPIO11})
+
+#define PROTO_SPI ((struct spi_csn) { \
+    .spi = SPI2,                      \
+    .csn = {GPIOB, GPIO12},           \
+    })
+#define SPI2_CFG ((struct spi_config) {    \
+    .spi = SPI2,                           \
+    .sck = {GPIOB, GPIO13},                \
+    .miso = {GPIOB, GPIO14},               \
+    .mosi = {GPIOB, GPIO15},               \
+    .rate = SPI_CR1_BAUDRATE_FPCLK_DIV_16, \
+    DEFAULT_SPI_SETTINGS,                  \
+    })
+#define PROTO_SPI_CFG SPI2_CFG
+#define PROTO_RST_PIN ((struct mcu_pin){GPIOB, GPIO11})
+
+#define ADC_OVERSAMPLE_WINDOW_COUNT 1
+#define ADC_CFG ((struct adc_config) {       \
+    .adc = ADC1,                             \
+    .prescalar = RCC_CFGR_ADCPRE_PCLK2_DIV6, \
+    .sampletime = ADC_SMPR_SMP_239DOT5CYC,   \
+    })
+#define ADC_DMA ((struct dma_config) { \
+    .dma = DMA1,                       \
+    .stream = DMA_CHANNEL1,            \
+    })
+
+#define UART_CFG ((struct uart_config) {   \
+    .uart = USART1,                         \
+    .tx = ((struct mcu_pin){GPIOA, GPIO9}),  \
+    .rx = ((struct mcu_pin){GPIOA, GPIO10}), \
+    })
+#define _UART_ISR usart1_isr
+
+#define USART_DMA ((struct dma_config) { \
+    .dma = DMA1,                       \
+    .stream = DMA_CHANNEL4,            \
+    })
+#define _USART_DMA_ISR                dma1_channel4_isr
+
 #endif  // _RADIOLINK_HARDWARE_H_
