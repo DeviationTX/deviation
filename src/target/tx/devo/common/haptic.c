@@ -17,29 +17,27 @@
 #include "common.h"
 #include "devo.h"
 #include "config/tx.h"
+#include "target/drivers/mcu/stm32/rcc.h"
 
 void VIBRATINGMOTOR_Init()
 {
     if (!HAS_VIBRATINGMOTOR)
         return;
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPDEN);
-
-    gpio_set_mode(GPIOD, GPIO_MODE_OUTPUT_2_MHZ,
-            GPIO_CNF_OUTPUT_PUSHPULL, GPIO2);
-    gpio_clear(GPIOD, GPIO2);
+    rcc_periph_clock_enable(get_rcc_from_pin(USB_ENABLE_PIN));
+    GPIO_setup_output(USB_ENABLE_PIN, OTYPE_PUSHPULL);
+    GPIO_pin_clear(USB_ENABLE_PIN);
 }
 
 void VIBRATINGMOTOR_Start()
 {
     if (!HAS_VIBRATINGMOTOR || !Transmitter.vibration_state)
         return;
-    gpio_set(GPIOD, GPIO2);
+    GPIO_pin_set(USB_ENABLE_PIN);
 }
 
 void VIBRATINGMOTOR_Stop()
 {
     if (!HAS_VIBRATINGMOTOR)
         return;
-    gpio_clear(GPIOD, GPIO2);
+    GPIO_pin_clear(USB_ENABLE_PIN);
 }
-

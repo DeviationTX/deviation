@@ -57,4 +57,8 @@
     .ch = 3,               \
     })
 
+// Power switch override
+#define PWR_SWITCH_PIN ((struct mcu_pin) {GPIOA, GPIO4})
+#define PWR_ENABLE_PIN ((struct mcu_pin) {GPIOE, GPIO0})
+
 #endif  // _DEVO12_HARDWARE_H_

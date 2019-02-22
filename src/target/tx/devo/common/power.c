@@ -13,41 +13,31 @@
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <libopencm3/stm32/gpio.h>
-#include <libopencm3/stm32/rcc.h>
 #include <libopencm3/cm3/scb.h>
 #include "common.h"
 #include "devo.h"
+#include "target/drivers/mcu/stm32/rcc.h"
+#include "target/drivers/mcu/stm32/pwr.h"
+#include "target/drivers/mcu/stm32/jtag.h"
 
 void PWR_Init(void)
 {
-    SCB_VTOR = VECTOR_TABLE_LOCATION;
-    SCB_SCR  &= ~SCB_SCR_SLEEPONEXIT; //sleep immediate on WFI
-    rcc_clock_setup_in_hse_8mhz_out_72mhz();
+    _pwr_init();
 
-    /* Enable GPIOA so we can manage the power switch */
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, _PWREN_RCC_APB2ENR_IOPEN);
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, _PWRSW_RCC_APB2ENR_IOPEN);
+    rcc_periph_clock_enable(get_rcc_from_pin(PWR_SWITCH_PIN));
+    rcc_periph_clock_enable(get_rcc_from_pin(PWR_ENABLE_PIN));
 
-    /* Pin 2 controls power-down */
-    gpio_set_mode(_PWREN_PORT, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_PUSHPULL, _PWREN_PIN);
-
+    /* Pin controls power-down */
+    GPIO_setup_output(PWR_ENABLE_PIN, OTYPE_PUSHPULL);
     /* Enable GPIOA.2 to keep from shutting down */
-    gpio_set(_PWREN_PORT, _PWREN_PIN);
+    GPIO_pin_set(PWR_ENABLE_PIN);
 
-    /* When Pin 3 goes high, the user turned off the Tx */
-    gpio_set_mode(_PWRSW_PORT, GPIO_MODE_INPUT,
-                  GPIO_CNF_INPUT_FLOAT, _PWRSW_PIN);
+    /* When Pin goes high, the user turned off the Tx */
+    GPIO_setup_input(PWR_SWITCH_PIN, ITYPE_FLOAT);
 
     /* Disable SWD and set SWD pins as I/O for programable switch */
 #if !defined USE_JTAG || !USE_JTAG
-    AFIO_MAPR = (AFIO_MAPR & ~AFIO_MAPR_SWJ_MASK) | AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_OFF;
-    gpio_set_mode(GPIO_BANK_JTMS_SWDIO, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_PUSHPULL, GPIO_JTMS_SWDIO);
-    gpio_set(GPIO_BANK_JTMS_SWDIO, GPIO_JTMS_SWDIO);
-    gpio_set_mode(GPIO_BANK_JTCK_SWCLK, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_PUSHPULL, GPIO_JTCK_SWCLK);
-    gpio_set(GPIO_BANK_JTCK_SWCLK, GPIO_JTCK_SWCLK);
+    DisableJTAG();
 #endif
 }
 
@@ -55,9 +45,8 @@ void PWR_Shutdown()
 {
     printf("Shutdown\n");
     BACKLIGHT_Brightness(0);
-    rcc_set_sysclk_source(RCC_CFGR_SW_SYSCLKSEL_HSICLK);
-    rcc_wait_for_osc_ready(RCC_HSI);
-    gpio_clear(_PWREN_PORT, _PWREN_PIN);
+    _pwr_shutdown();
+    GPIO_pin_clear(PWR_ENABLE_PIN);
     while (1) {
 #if defined(HAS_BUTTON_POWER_ON) && HAS_BUTTON_POWER_ON
         CLOCK_ResetWatchdog();  // If the reset is held too long, the watchdog could kick in
@@ -71,7 +60,7 @@ int PWR_CheckPowerSwitch()
     static u32 debounce = 0;
 #endif
 
-    if(gpio_get(_PWRSW_PORT, _PWRSW_PIN)) {
+    if (GPIO_pin_get(PWR_SWITCH_PIN)) {
 #if defined(HAS_BUTTON_POWER_ON) && HAS_BUTTON_POWER_ON
         if (debounce == 0) debounce = CLOCK_getms();
     } else {
