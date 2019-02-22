@@ -17,6 +17,7 @@ __attribute__((always_inline)) static inline enum rcc_periph_clken get_rcc_from_
         case GPIOB:  return RCC_GPIOB;
         case GPIOC:  return RCC_GPIOC;
         case GPIOD:  return RCC_GPIOD;
+        case GPIOE:  return RCC_GPIOE;
         case SPI1:   return RCC_SPI1;
         case SPI2:   return RCC_SPI2;
         case SPI3:   return RCC_SPI3;

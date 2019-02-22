@@ -3,6 +3,7 @@
 
 #include <libopencm3/cm3/nvic.h>
 #include <libopencm3/stm32/dma.h>
+#include <libopencm3/stm32/timer.h>
 #include <libopencm3/stm32/usart.h>
 
 static inline uint32_t get_nvic_dma_irq(struct dma_config dma)
@@ -45,6 +46,28 @@ static inline uint32_t get_nvic_irq(uint32_t port)
         case TIM6: return NVIC_TIM6_IRQ;
         case TIM7: return NVIC_TIM7_IRQ;
         // case TIM8: return NVIC_TIM8_IRQ;
+        default: ltassert(); return 0;
+    }
+}
+
+INLINE static inline uint32_t NVIC_EXTIx_IRQ(struct mcu_pin pin)
+{
+    switch (pin.pin) {
+        case GPIO1: return NVIC_EXTI1_IRQ;
+        case GPIO2: return NVIC_EXTI2_IRQ;
+        case GPIO3: return NVIC_EXTI3_IRQ;
+        case GPIO4: return NVIC_EXTI4_IRQ;
+        case GPIO5: return NVIC_EXTI9_5_IRQ;
+        case GPIO6: return NVIC_EXTI9_5_IRQ;
+        case GPIO7: return NVIC_EXTI9_5_IRQ;
+        case GPIO8: return NVIC_EXTI9_5_IRQ;
+        case GPIO9: return NVIC_EXTI9_5_IRQ;
+        case GPIO10: return NVIC_EXTI15_10_IRQ;
+        case GPIO11: return NVIC_EXTI15_10_IRQ;
+        case GPIO12: return NVIC_EXTI15_10_IRQ;
+        case GPIO13: return NVIC_EXTI15_10_IRQ;
+        case GPIO14: return NVIC_EXTI15_10_IRQ;
+        case GPIO15: return NVIC_EXTI15_10_IRQ;
         default: ltassert(); return 0;
     }
 }

@@ -272,27 +272,43 @@ static void TW8816_Init_Ports()
     _i2c_init(LCD_I2C_CFG);
 
     // LCD Reset
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPEEN);
-    gpio_set_mode(GPIOE, GPIO_MODE_OUTPUT_50_MHZ,
-              GPIO_CNF_OUTPUT_PUSHPULL, GPIO7);
-    gpio_set(GPIOE, GPIO7);
+    rcc_periph_clock_enable(get_rcc_from_pin(LCD_RESET_PIN));
+    GPIO_setup_output(LCD_RESET_PIN, OTYPE_PUSHPULL);
+    GPIO_pin_set(LCD_RESET_PIN);
 
-    //Video channel bits 2:0 and av on/off
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPDEN);
-    gpio_set_mode(GPIOE, GPIO_MODE_OUTPUT_50_MHZ,
-              GPIO_CNF_OUTPUT_PUSHPULL, GPIO8 | GPIO9 | GPIO10 | GPIO11);
-    gpio_clear(GPIOE, GPIO8 | GPIO9 | GPIO10 | GPIO11);
-    //Video channel bit 3, 4
-    gpio_set_mode(GPIOD, GPIO_MODE_OUTPUT_50_MHZ,
-              GPIO_CNF_OUTPUT_PUSHPULL, GPIO8 | GPIO10);
-    gpio_clear(GPIOD, GPIO8 | GPIO10);
+    // Video channel bits 2:0 and av on/off
+    // NOTE: do no wrap this in a loop.  Doing so will break macro expansion
+    // CS0
+    rcc_periph_clock_enable(get_rcc_from_pin(LCD_VIDEO_CS0));
+    GPIO_setup_output(LCD_VIDEO_CS0, OTYPE_PUSHPULL);
+    GPIO_pin_clear(LCD_VIDEO_CS0);
+    // CS1
+    rcc_periph_clock_enable(get_rcc_from_pin(LCD_VIDEO_CS1));
+    GPIO_setup_output(LCD_VIDEO_CS1, OTYPE_PUSHPULL);
+    GPIO_pin_clear(LCD_VIDEO_CS1);
+    // CS2
+    rcc_periph_clock_enable(get_rcc_from_pin(LCD_VIDEO_CS2));
+    GPIO_setup_output(LCD_VIDEO_CS2, OTYPE_PUSHPULL);
+    GPIO_pin_clear(LCD_VIDEO_CS2);
+    // CS3
+    rcc_periph_clock_enable(get_rcc_from_pin(LCD_VIDEO_CS3));
+    GPIO_setup_output(LCD_VIDEO_CS3, OTYPE_PUSHPULL);
+    GPIO_pin_clear(LCD_VIDEO_CS3);
+    // CS4
+    rcc_periph_clock_enable(get_rcc_from_pin(LCD_VIDEO_CS4));
+    GPIO_setup_output(LCD_VIDEO_CS4, OTYPE_PUSHPULL);
+    GPIO_pin_clear(LCD_VIDEO_CS4);
+    // PWR
+    rcc_periph_clock_enable(get_rcc_from_pin(LCD_VIDEO_PWR));
+    GPIO_setup_output(LCD_VIDEO_PWR, OTYPE_PUSHPULL);
+    GPIO_pin_clear(LCD_VIDEO_PWR);
 }
 
 static void TW8816_Reset()
 {
-    gpio_clear(GPIOE, GPIO7);
+    GPIO_pin_clear(LCD_RESET_PIN);
     _msleep(250);
-    gpio_set(GPIOE, GPIO7);
+    GPIO_pin_set(LCD_RESET_PIN);
     _msleep(100);
 }
 
@@ -625,37 +641,38 @@ void TW8816_SetVideoStandard(u8 standard)
 void TW8816_SetVideoChannel(int ch)
 {
     if(ch & 0x01)
-        gpio_clear(GPIOE, GPIO8);
+        GPIO_pin_clear(LCD_VIDEO_CS0);
     else
-        gpio_set(GPIOE, GPIO8);
+        GPIO_pin_set(LCD_VIDEO_CS0);
 
     if(ch & 0x02)
-        gpio_clear(GPIOE, GPIO9);
+        GPIO_pin_clear(LCD_VIDEO_CS1);
     else
-        gpio_set(GPIOE, GPIO9);
+        GPIO_pin_set(LCD_VIDEO_CS1);
 
     if(ch & 0x04)
-        gpio_clear(GPIOE, GPIO10);
+        GPIO_pin_clear(LCD_VIDEO_CS2);
     else
-        gpio_set(GPIOE, GPIO10);
+        GPIO_pin_set(LCD_VIDEO_CS2);
 
     if(ch & 0x08)
-        gpio_clear(GPIOD, GPIO10);
+        GPIO_pin_clear(LCD_VIDEO_CS3);
     else
-        gpio_set(GPIOD, GPIO10);
+        GPIO_pin_set(LCD_VIDEO_CS3);
+
     if(ch & 0x10)
-        gpio_set(GPIOD, GPIO8);
+        GPIO_pin_set(LCD_VIDEO_CS4);
     else
-        gpio_clear(GPIOD, GPIO8);
+        GPIO_pin_clear(LCD_VIDEO_CS4);
 }
 
 void TW8816_EnableVideo(int on)
 {
     if(on) {
-        gpio_set(GPIOE, GPIO11);
+        GPIO_pin_set(LCD_VIDEO_PWR);
         LCD_ShowVideo(1);
     } else {
-        gpio_clear(GPIOE, GPIO11);
+        GPIO_pin_clear(LCD_VIDEO_PWR);
         LCD_ShowVideo(0);
     }
 }

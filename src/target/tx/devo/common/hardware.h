@@ -165,4 +165,29 @@
     #define SSER_RX_ISR exti15_10_isr
 #endif  // SSER-TIM
 
+#ifndef USB_ENABLE_PIN
+    #define USB_ENABLE_PIN ((struct mcu_pin) {GPIOB, GPIO10})
+#endif
+
+#ifndef HAPTIC_PIN
+    #define HAPTIC_PIN ((struct mcu_pin) {GPIOD, GPIO2})
+#endif
+
+// Power switch configuration
+#ifndef PWR_SWITCH_PIN
+    #define PWR_SWITCH_PIN ((struct mcu_pin) {GPIOA, GPIO3})
+#endif
+
+#ifndef PWR_ENABLE_PIN
+    #define PWR_ENABLE_PIN ((struct mcu_pin) {GPIOA, GPIO2})
+#endif
+
+// Protocol pins
+#ifndef CYRF_RESET_PIN
+    #define CYRF_RESET_PIN ((struct mcu_pin) {GPIOB, GPIO11})
+#endif
+#ifndef AVR_RESET_PIN
+    #define AVR_RESET_PIN ((struct mcu_pin) {GPIO_BANK_JTCK_SWCLK, GPIO_JTCK_SWCLK})
+#endif
+
 #endif  // _DEVO_DEFAULT_HARDWARE_H_

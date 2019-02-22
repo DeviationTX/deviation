@@ -12,12 +12,9 @@
  You should have received a copy of the GNU General Public License
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <libopencm3/stm32/rcc.h>
-#include <libopencm3/stm32/gpio.h>
-#include <libopencm3/cm3/nvic.h>
-#include <libopencm3/stm32/exti.h>
-
 #include "common.h"
+#include "target/drivers/mcu/stm32/exti.h"
+#include "target/drivers/mcu/stm32/nvic.h"
 
 extern volatile int rotary;
 
@@ -37,11 +34,13 @@ static int handle_rotary_encoder(unsigned val)
   return 0;
 }
 
-void __attribute__((__used__)) exti15_10_isr()
+void __attribute__((__used__)) ROTARY_ISR()
 {
-    u32 button = gpio_port_read(GPIOC);
-    exti_reset_request(EXTI13 | EXTI14);
-    button = 0x03 & ((~button) >> 13);
+    ctassert(ROTARY_PIN0.port == ROTARY_PIN1.port, rotary_pins_must_be_on_same_port);
+    u32 port = gpio_port_read(ROTARY_PIN0.port);
+    exti_reset_request(EXTIx(ROTARY_PIN0) | EXTIx(ROTARY_PIN1));
+    u32 button = ((port & ROTARY_PIN0.pin) ? 0 : 0x01)
+               | ((port & ROTARY_PIN1.pin) ? 0 : 0x02);
     int dir = handle_rotary_encoder(button);
     if (button == 0) {
         rotary = 0;

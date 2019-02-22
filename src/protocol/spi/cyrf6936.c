@@ -109,7 +109,6 @@ int CYRF_Reset()
         Delay(200);
         /* Reset the CYRF chip */
 #else
-        static const struct mcu_pin CYRF_RESET_PIN  = _SPI_CYRF_RESET_PIN;
         PROTOSPI_pin_set(CYRF_RESET_PIN);
         Delay(100);
         PROTOSPI_pin_clear(CYRF_RESET_PIN);
