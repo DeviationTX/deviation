@@ -19,15 +19,60 @@
 #include "target/drivers/mcu/stm32/dma.h"
 #include "target/drivers/mcu/stm32/rcc.h"
 
-#include "target/tx/devo/common/devo.h"  // FIXME - Shouldn't rely on things from 'devo' here
+#define NUM_ADC_CHANNELS (INP_HAS_CALIBRATION + 2)  // Inputs + Temprature + Voltage
+#define WINDOW_SIZE 10
+#define SAMPLE_COUNT NUM_ADC_CHANNELS * WINDOW_SIZE * ADC_OVERSAMPLE_WINDOW_COUNT
 
 unsigned ADC_Read(unsigned channel);
 volatile u16 adc_array_raw[NUM_ADC_CHANNELS];
-#define WINDOW_SIZE 10
-#define SAMPLE_COUNT NUM_ADC_CHANNELS * WINDOW_SIZE * ADC_OVERSAMPLE_WINDOW_COUNT
 static volatile u16 adc_array_oversample[SAMPLE_COUNT];
+
+#if 0
+    // These are the valid ADC pins for an STM32
+    ADC_CHAN(GPIOA, GPIO0),  /* ADC123_0  */ \
+    ADC_CHAN(GPIOA, GPIO1),  /* ADC123_1  */ \
+    ADC_CHAN(GPIOA, GPIO2),  /* ADC123_2  */ \
+    ADC_CHAN(GPIOA, GPIO3),  /* ADC123_3  */ \
+    ADC_CHAN(GPIOA, GPIO4),  /* ADC12_4   */ \
+    ADC_CHAN(GPIOA, GPIO5),  /* ADC12_5   */ \
+    ADC_CHAN(GPIOA, GPIO6),  /* ADC12_6   */ \
+    ADC_CHAN(GPIOA, GPIO7),  /* ADC12_7   */ \
+    ADC_CHAN(GPIOB, GPIO0),  /* ADC12_8   */ \
+    ADC_CHAN(GPIOB, GPIO1),  /* ADC12_9   */ \
+    ADC_CHAN(GPIOF, GPIO6),  /* ADC3_4    */ \
+    ADC_CHAN(GPIOF, GPIO7),  /* ADC3_5    */ \
+    ADC_CHAN(GPIOF, GPIO8),  /* ADC3_6    */ \
+    ADC_CHAN(GPIOF, GPIO9),  /* ADC3_7    */ \
+    ADC_CHAN(GPIOF, GPIO10), /* ADC3_8    */ \
+    ADC_CHAN(GPIOC, GPIO0),  /* ADC123_10 */ \
+    ADC_CHAN(GPIOC, GPIO1),  /* ADC123_11 */ \
+    ADC_CHAN(GPIOC, GPIO2),  /* ADC123_12 */ \
+    ADC_CHAN(GPIOC, GPIO3),  /* ADC123_13 */ \
+    ADC_CHAN(GPIOC, GPIO4),  /* ADC12_14    */ \
+    ADC_CHAN(0, 16),        /* TEMPERATURE */ \
+    // End
+#endif
+
+#define ADC_CHAN(...) ADC_PIN_TO_CHAN(__VA_ARGS__)
+static const u8 adc_chan_sel[NUM_ADC_CHANNELS] = ADC_CHANNELS;
+#undef ADC_CHAN
+
+
 void ADC_Init(void)
 {
+    #define ADC_CHAN(x, y) (x ? get_rcc_from_port(x) : 0)
+    const uint32_t adc_rcc[NUM_ADC_CHANNELS] = ADC_CHANNELS;
+    #undef ADC_CHAN
+    #define ADC_CHAN(...) {__VA_ARGS__}
+    const struct mcu_pin adc_pins[NUM_ADC_CHANNELS] = ADC_CHANNELS;
+    #undef ADC_CHAN
+    for (unsigned i = 0; i < NUM_ADC_CHANNELS; i++) {
+        if (!HAS_PIN(adc_pins[i]))
+            continue;
+        rcc_periph_clock_enable(adc_rcc[i]);
+        GPIO_setup_input(adc_pins[i], ITYPE_ANALOG);
+    }
+
     rcc_periph_clock_enable(get_rcc_from_port(ADC_CFG.adc));
     adc_power_off(ADC_CFG.adc);
     ADC_reset(ADC_CFG.adc);
