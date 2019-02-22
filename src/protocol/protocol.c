@@ -19,7 +19,6 @@
 #include "config/model.h"
 #include "config/tx.h"
 #include "protospi.h"
-#include "pages.h"
 
 #include <stdlib.h>
 
@@ -332,12 +331,12 @@ const char **PROTOCOL_GetOptions()
     return data;
 }
 
-enum PageID PROTOCOL_OptionsPage()
+int PROTOCOL_OptionsPage()
 {
-    enum PageID id;
+    int id = 0;
 
-    if(Model.protocol != PROTOCOL_NONE && PROTOCOL_LOADED)
-        id = (enum PageID)PROTO_Cmds(PROTOCMD_OPTIONSPAGE);
+    if (Model.protocol != PROTOCOL_NONE && PROTOCOL_LOADED)
+        id = (int)PROTO_Cmds(PROTOCMD_OPTIONSPAGE);
     return id;
 }
 
