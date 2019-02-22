@@ -1128,7 +1128,6 @@ u8 CONFIG_WriteModel(u8 model_num) {
     if(WRITE_FULL_MODEL || m->type != 0)
         fprintf(fh, "%s=%s\n", MODEL_TYPE, MODEL_TYPE_VAL[m->type]);
     fprintf(fh, "[%s]\n", SECTION_RADIO);
-    fprintf(fh, "%s=%s\n", RADIO_PROTOCOL, PROTOCOL_GetName(m->protocol));
     write_int2(m, _secradio, ARRAYSIZE(_secradio), DEFAULTS_ZERO, 0, fh);
     fprintf(fh, "%s=%s\n", RADIO_TX_POWER, radio_tx_power_val(m->radio, m->tx_power));
     fprintf(fh, "\n");
