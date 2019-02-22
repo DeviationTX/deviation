@@ -539,9 +539,8 @@ static void increment_counts() {
     }
 }
 
-#define DELAY_POST_TX   1100
-#define DELAY_WAIT_TX    500
-#define DELAY_WAIT_RX   2000
+#define DELAY_POST_TX   1400
+#define DELAY_WAIT_RX   1700
 #define DELAY_POST_RX   2000
 #define DELAY_BIND_RST   200
 // FIFO config is one less than desired value
@@ -551,7 +550,6 @@ static void increment_counts() {
 static u16 bugs3_cb() {
     u16 packet_period = 0;
     u8 mode;
-    u8 count;
 
     // keep frequency tuning updated
     if (freq_offset != Model.proto_opts[PROTOOPTS_FREQTUNE]) {
@@ -570,17 +568,7 @@ static u16 bugs3_cb() {
         break;
 
     case BIND_2:
-        // wait here a bit for tx complete because
-        // need to start rx immediately to catch return packet
-        count = 20;
-#ifndef EMULATOR
-        while (A7105_ReadReg(A7105_00_MODE) & 0x01) {
-            if (count-- == 0) {
-                packet_period = DELAY_WAIT_TX;  // don't proceed until transmission complete
-                break;
-            }
-        }
-#endif
+//  if timing changed, ensure (A7105_ReadReg(A7105_00_MODE) & 0x01) is false here
         A7105_SetTxRxMode(RX_EN);
         A7105_WriteReg(A7105_0F_PLL_I, radio_data.channels[channel_idx] - 2);
         A7105_WriteReg(A7105_03_FIFOI, FIFO_SIZE_RX);
@@ -636,15 +624,7 @@ static u16 bugs3_cb() {
         break;
 
     case DATA_2:
-        // wait here a bit for tx complete because
-        // need to start rx immediately to catch return packet
-        count = 20;
-        while (A7105_ReadReg(A7105_00_MODE) & 0x01) {
-            if (count-- == 0) {
-                packet_period = DELAY_WAIT_TX;  // don't proceed until transmission complete
-                break;
-            }
-        }
+//  if timing changed, ensure (A7105_ReadReg(A7105_00_MODE) & 0x01) is false here
         A7105_SetTxRxMode(RX_EN);
         A7105_WriteReg(A7105_0F_PLL_I, radio_data.channels[channel_idx] - 2);
         A7105_WriteReg(A7105_03_FIFOI, FIFO_SIZE_RX);
