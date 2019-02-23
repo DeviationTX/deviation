@@ -107,11 +107,10 @@ void _scan_extra_switches()
 {
     // Write to C.6, read B
     u32 src = ~Transmitter.ignore_src;
-    gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_OPENDRAIN, GPIO6);
-    gpio_clear(GPIOC, GPIO6);
-    u32 port = gpio_port_read(GPIOB);
-    gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN, GPIO6);
-    gpio_set(GPIOC, GPIO6);
+    GPIO_setup_output(EXTRA_SWITCH_COL_OD, OTYPE_OPENDRAIN);
+    GPIO_pin_clear(EXTRA_SWITCH_COL_OD);
+    u32 port = GPIO_pin_get(BUTTON_MATRIX_ROW_OD);
+    GPIO_setup_input(EXTRA_SWITCH_COL_OD, ITYPE_PULLUP);
     if (SW_ENABLED(src, SWITCH_3x1) && !SW_ENABLED(src, SWITCH_3x2)) {
         global_extra_switches = (((~port) >> 4) & 0x04) | (((~port) >> 5) & 0x08);
     } else if SW_ENABLED(src, SWITCH_2x2) {

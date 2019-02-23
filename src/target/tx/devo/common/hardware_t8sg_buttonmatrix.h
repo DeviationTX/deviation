@@ -11,5 +11,5 @@
 
 #define BUTTON_MATRIX_ROW_OD ((struct mcu_pin){GPIOB, GPIO5 | GPIO6 | GPIO7 | GPIO8})
 #define BUTTON_MATRIX_COL_PU ((struct mcu_pin){GPIOC, GPIO6 | GPIO7 | GPIO8 | GPIO9 | GPIO10 | GPIO11})
-
+#define EXTRA_SWITCH_COL_OD ((struct mcu_pin){GPIOC, GPIO6})
 #endif  // _HARDWARE_BUTTONMATRIX_H_

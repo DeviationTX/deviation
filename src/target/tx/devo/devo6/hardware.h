@@ -12,6 +12,7 @@
     }
 #define BUTTON_MATRIX_ROW_OD ((struct mcu_pin){GPIOB, GPIO6 | GPIO7 | GPIO8 | GPIO9})
 #define BUTTON_MATRIX_COL_PU ((struct mcu_pin){GPIOE, GPIO2 | GPIO3 | GPIO4 | GPIO5 | GPIO6})
+#define EXTRA_SWITCH_COL_OD ((struct mcu_pin){GPIOE, GPIO2})
 
 // Analog inputs
 #define ADC_CHANNELS { \
