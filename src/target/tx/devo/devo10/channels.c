@@ -19,8 +19,6 @@
 #include "config/tx.h"
 #include "../common/devo.h"
 
-const u8 adc_chan_sel[NUM_ADC_CHANNELS] = {13, 12, 11, 15, 10, 4, 16, 14};
-
 void CHAN_Init()
 {
     ADC_Init();

@@ -63,8 +63,7 @@ struct dma_config {
 };
 
 #define NULL_PIN ((struct mcu_pin){0, 0})
-#define HAS_PIN(x) (x.pin)
-#define TEMPERATURE_ADC 0, 0
+#define HAS_PIN(x) (x.port)
 
 
 #if defined(STM32F1)

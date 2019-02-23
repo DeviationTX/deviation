@@ -54,10 +54,6 @@ static volatile u16 adc_array_oversample[SAMPLE_COUNT];
     // End
 #endif
 
-#define ADC_CHAN(...) ADC_PIN_TO_CHAN(__VA_ARGS__)
-static const u8 adc_chan_sel[NUM_ADC_CHANNELS] = ADC_CHANNELS;
-#undef ADC_CHAN
-
 
 void ADC_Init(void)
 {
@@ -67,13 +63,15 @@ void ADC_Init(void)
     #define ADC_CHAN(...) {__VA_ARGS__}
     const struct mcu_pin adc_pins[NUM_ADC_CHANNELS] = ADC_CHANNELS;
     #undef ADC_CHAN
+    #define ADC_CHAN(...) ADC_PIN_TO_CHAN(__VA_ARGS__)
+    static const u8 adc_chan_sel[NUM_ADC_CHANNELS] = ADC_CHANNELS;
+    #undef ADC_CHAN
     for (unsigned i = 0; i < NUM_ADC_CHANNELS; i++) {
         if (!HAS_PIN(adc_pins[i]))
             continue;
         rcc_periph_clock_enable(adc_rcc[i]);
         GPIO_setup_input(adc_pins[i], ITYPE_ANALOG);
     }
-
     rcc_periph_clock_enable(get_rcc_from_port(ADC_CFG.adc));
     adc_power_off(ADC_CFG.adc);
     ADC_reset(ADC_CFG.adc);
@@ -215,3 +213,13 @@ void ADC_ScanChannels()
         }
     }
 }
+
+/* Return milivolts */
+unsigned PWR_ReadVoltage(void)
+{
+    u32 v = adc_array_raw[NUM_ADC_CHANNELS-1];
+    /* Multily the above by 1000 to get milivolts */
+    v = v * VOLTAGE_NUMERATOR / 100 + VOLTAGE_OFFSET;
+    return v;
+}
+
