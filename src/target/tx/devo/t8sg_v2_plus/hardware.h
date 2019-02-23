@@ -26,4 +26,5 @@
         ADC_CHAN(GPIOC, GPIO4),  /* ADC12_14  */ \
         }
 #endif  // HAS_EXTRA_POTS
+
 #endif  // _DEVO7E256_HARDWARE_H_

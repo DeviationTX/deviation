@@ -134,7 +134,8 @@ void PWR_Sleep();
 enum MsecCallback {
     MEDIUM_PRIORITY,
     LOW_PRIORITY,
-    LAST_PRIORITY,
+    TARGET_PRIORITY,
+    NUM_MSEC_CALLBACKS,
 };
 
 void CLOCK_Init(void);

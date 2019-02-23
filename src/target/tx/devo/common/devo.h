@@ -11,10 +11,6 @@
 void ADC_Init(void);
 void ADC_StartCapture();
 
-enum {
-    TIMER_SOUND = LAST_PRIORITY,
-    NUM_MSEC_CALLBACKS,
-};
 void CLOCK_ClearMsecCallback(int MsecCallback);
 u32 SOUND_Callback();
 

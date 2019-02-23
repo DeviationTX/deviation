@@ -212,4 +212,4 @@
 
 /** @} */
 
-#endif // CBUF_H
+#endif  // CBUF_H

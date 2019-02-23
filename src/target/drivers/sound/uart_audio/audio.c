@@ -19,7 +19,6 @@
 #include <libopencm3/stm32/gpio.h>
 #include "common.h"
 
-#include "devo.h"
 #include "music.h"
 #include "config/tx.h"
 #include "config/model.h"

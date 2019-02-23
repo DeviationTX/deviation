@@ -18,7 +18,6 @@
 #include <libopencm3/stm32/timer.h>
 
 #include "common.h"
-#include "devo.h"
 
 #include "target/drivers/mcu/stm32/rcc.h"
 #include "target/drivers/mcu/stm32/tim.h"
