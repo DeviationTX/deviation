@@ -1,6 +1,17 @@
 #ifndef _DEVOF12E_HARDWARE_H_
 #define _DEVOF12E_HARDWARE_H_
 
+#define BUTTON_MATRIX { \
+/*         E.2              E.3              E.4              E.5              E.6          */  \
+/*PB.4*/   BUT_LEFT,        BUT_TRIM_RH_POS, BUT_TRIM_RH_NEG, BUT_ENTER,       BUT_RIGHT,       \
+/*PB.5*/   BUT_TRIM_LH_NEG, BUT_TRIM_LH_POS, BUT_EXIT,        BUT_UP,          BUT_DOWN,        \
+/*PB.6*/   BUT_TRIM_L_POS,  BUT_TRIM_L_NEG,  BUT_TRIM_R_NEG,  BUT_TRIM_R_POS,  BUT_LAST,        \
+/*PB.7*/   BUT_LAST,        BUT_TRIM_LV_POS, BUT_TRIM_RV_POS, BUT_TRIM_LV_NEG, BUT_TRIM_RV_NEG, \
+    }
+
+#define BUTTON_MATRIX_ROW_OD ((struct mcu_pin){GPIOB, GPIO4 | GPIO5 | GPIO8 | GPIO9})
+#define BUTTON_MATRIX_COL_PU ((struct mcu_pin){GPIOE, GPIO2 | GPIO3 | GPIO4 | GPIO5 | GPIO6})
+
 // Analog inputs
 #define ADC_CHANNELS { \
     ADC_CHAN(GPIOC, GPIO3),  /* ADC123_13 */ \
