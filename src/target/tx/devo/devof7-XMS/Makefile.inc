@@ -11,7 +11,6 @@ include target/tx/devo/common/Makefile.inc
 ifndef BUILD_TARGET
 
 SRC_C   += $(SDIR)/target/tx/devo/devof7/channels.c \
-           $(SDIR)/target/tx/devo/devof7/crc.c \
-           $(SDIR)/target/tx/devo/devof7/tx_buttons.c
+           $(SDIR)/target/tx/devo/devof7/crc.c
 
 endif

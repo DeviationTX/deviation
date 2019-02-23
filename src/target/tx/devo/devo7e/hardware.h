@@ -3,6 +3,18 @@
 
 #include "target/drivers/mcu/stm32/gpio.h"
 
+#define BUTTON_MATRIX { \
+/*         C.6              C.7              C.8              C.9          */  \
+/*B.5*/    BUT_TRIM_RH_POS, BUT_TRIM_RH_NEG, BUT_TRIM_RV_POS, BUT_TRIM_RV_NEG, \
+/*B.6*/    SW_10,           BUT_ENTER,       BUT_RIGHT,       BUT_LEFT,        \
+/*B.7*/    BUT_TRIM_LV_POS, BUT_TRIM_LV_NEG, BUT_TRIM_LH_NEG, BUT_TRIM_LH_POS, \
+/*B.8*/    SW_09,           BUT_DOWN,        BUT_UP,          BUT_EXIT,        \
+    }
+
+#define BUTTON_MATRIX_ROW_OD ((struct mcu_pin){GPIOB, GPIO5 | GPIO6 | GPIO7 | GPIO8})
+#define BUTTON_MATRIX_COL_PU ((struct mcu_pin){GPIOC, GPIO6 | GPIO7 | GPIO8 | GPIO9})
+#define EXTRA_SWITCH_COL_OD ((struct mcu_pin){GPIOC, GPIO6})
+
 // Analog inputs
 #define ADC_CHANNELS { \
     ADC_CHAN(GPIOC, GPIO0),  /* ADC123_10 */ \

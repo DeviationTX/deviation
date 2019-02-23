@@ -2,6 +2,7 @@
 #define _DEVO7E256_HARDWARE_H_
 
 #include "target/drivers/mcu/stm32/gpio.h"
+#include "../common/hardware_t8sg_buttonmatrix.h"
 
 // Analog inputs
 #if HAS_EXTRA_POTS
@@ -25,4 +26,5 @@
         ADC_CHAN(GPIOC, GPIO4),  /* ADC12_14  */ \
         }
 #endif  // HAS_EXTRA_POTS
+
 #endif  // _DEVO7E256_HARDWARE_H_
