@@ -24,14 +24,8 @@
 #include "target/drivers/mcu/stm32/spi.h"
 #include "target/drivers/mcu/stm32/rcc.h"
 
-
 void SPI_ProtoInit()
 {
-// If we use SPI Switch board then SPI2 is shared between RF chips
-// and flash, so it is initialized in SPIFlash.
-//#if !defined HAS_4IN1_FLASH || !HAS_4IN1_FLASH
-    if (PROTO_SPI.spi == FLASH_SPI.spi)
-        return;
     _spi_init(PROTO_SPI_CFG);
     if (HAS_PIN(PROTO_RST_PIN))
         GPIO_pin_clear(PROTO_RST_PIN);
