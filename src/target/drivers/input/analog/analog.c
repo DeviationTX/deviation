@@ -54,9 +54,6 @@ static volatile u16 adc_array_oversample[SAMPLE_COUNT];
     // End
 #endif
 
-#define ADC_CHAN(...) ADC_PIN_TO_CHAN(__VA_ARGS__)
-static const u8 adc_chan_sel[NUM_ADC_CHANNELS] = ADC_CHANNELS;
-#undef ADC_CHAN
 
 
 void ADC_Init(void)
@@ -66,6 +63,9 @@ void ADC_Init(void)
     #undef ADC_CHAN
     #define ADC_CHAN(...) {__VA_ARGS__}
     const struct mcu_pin adc_pins[NUM_ADC_CHANNELS] = ADC_CHANNELS;
+    #undef ADC_CHAN
+    #define ADC_CHAN(...) ADC_PIN_TO_CHAN(__VA_ARGS__)
+    static const u8 adc_chan_sel[NUM_ADC_CHANNELS] = ADC_CHANNELS;
     #undef ADC_CHAN
     for (unsigned i = 0; i < NUM_ADC_CHANNELS; i++) {
         if (!HAS_PIN(adc_pins[i]))
