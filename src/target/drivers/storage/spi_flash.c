@@ -207,12 +207,12 @@ void SPIFlash_Init()
 #if 0 //4IN1DEBUG
     // This code is equivalent to using SPISwitch_Init
     static const struct mcu_pin FLASH_RESET_PIN ={GPIOB, GPIO11};
-    PORT_mode_setup(FLASH_RESET_PIN,  GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_PUSHPULL);
+    GPIO_setup_output(FLASH_RESET_PIN, OTYPE_PUSHPULL);
     // And this is equivalent of using SPISwitch_UseFlashModule in CS_LO
     u8 cmd = 4;
-    PORT_pin_clear(FLASH_RESET_PIN);
+    GPIO_pin_clear(FLASH_RESET_PIN);
     spi_xfer(FLASH_SPI.spi, cmd);
-    PORT_pin_set(FLASH_RESET_PIN);
+    GPIO_pin_set(FLASH_RESET_PIN);
 #endif
 #if HAS_FLASH_DETECT
     detect_memory_type();

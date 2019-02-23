@@ -164,7 +164,7 @@ msgstr "AUX7"
 
 #: inputs.c:45
 msgid "AUX8"
-msgstr ""
+msgstr "AUX8"
 
 #: inputs.c:46 inputs.c:47
 msgid "DR"

@@ -25,19 +25,4 @@ INLINE static inline uint32_t EXTIx(struct mcu_pin pin)
     }
 }
 
-INLINE static inline uint32_t NVIC_EXTIx_IRQ(struct mcu_pin pin)
-{
-    switch (pin.pin) {
-        case GPIO1: return NVIC_EXTI1_IRQ;
-        case GPIO2: return NVIC_EXTI2_IRQ;
-        case GPIO3: return NVIC_EXTI3_IRQ;
-        case GPIO4: return NVIC_EXTI4_IRQ;
-        case GPIO5: return NVIC_EXTI9_5_IRQ;
-        case GPIO9: return NVIC_EXTI9_5_IRQ;
-        case GPIO10: return NVIC_EXTI15_10_IRQ;
-        case GPIO15: return NVIC_EXTI15_10_IRQ;
-        default: ltassert(); return 0;
-    }
-}
-
 #endif  // _DTX_STM32_EXTI_H_

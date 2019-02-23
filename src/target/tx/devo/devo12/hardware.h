@@ -16,6 +16,11 @@
     })
 
 // PWM overrides
+#define PWM_TIMER ((struct tim_config) { \
+    .tim = TIM1,           \
+    .pin = {GPIOA, GPIO8}, \
+    .ch = 1,               \
+    })
 #define PWM_DMA ((struct dma_config) { \
     .dma = DMA1,                       \
     .stream = DMA_CHANNEL2,            \
@@ -51,5 +56,9 @@
     .pin = {GPIOB, GPIO0}, \
     .ch = 3,               \
     })
+
+// Power switch override
+#define PWR_SWITCH_PIN ((struct mcu_pin) {GPIOA, GPIO4})
+#define PWR_ENABLE_PIN ((struct mcu_pin) {GPIOE, GPIO0})
 
 #endif  // _DEVO12_HARDWARE_H_

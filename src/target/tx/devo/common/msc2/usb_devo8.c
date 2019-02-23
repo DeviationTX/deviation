@@ -52,20 +52,19 @@ void MSC_Init() {
 
 void USB_Enable(unsigned use_interrupt)
 {
-    gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
-        GPIO_CNF_OUTPUT_PUSHPULL, GPIO10);
-        gpio_set(GPIOB, GPIO10);
+    GPIO_setup_output(USB_ENABLE_PIN, OTYPE_PUSHPULL);
+    GPIO_pin_set(USB_ENABLE_PIN);
     //rcc_set_usbpre(RCC_CFGR_USBPRE_PLL_CLK_DIV1_5);
-    rcc_peripheral_enable_clock(&RCC_APB1ENR, RCC_APB1ENR_USBEN);
+    rcc_periph_clock_enable(RCC_USB);
     USB_Init();
     if(use_interrupt) {
-        nvic_enable_irq(NVIC_USB_LP_CAN_RX0_IRQ);
+        nvic_enable_irq(NVIC_USB_LP_CAN_RX0_IRQ);  // NTE: This is STM32F1 only
     }
 }
 
 void USB_Disable()
 {
-    gpio_set(GPIOB, GPIO10);
+    GPIO_pin_set(USB_ENABLE_PIN);
     nvic_disable_irq(NVIC_USB_LP_CAN_RX0_IRQ);
 }
 
@@ -104,25 +103,25 @@ void USB_Connect()
 #ifdef USB_TEST
 int main(void)
 {
-	PWR_Init();
-	gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
-		GPIO_CNF_OUTPUT_OPENDRAIN, GPIO10);
-	gpio_set(GPIOB, GPIO10);
-	Delay(0x2710);
-	LCD_Init();
-        STORAGE_Init();
-        UART_Initialize();
+    PWR_Init();
+    GPIO_setup_output(USB_ENABLE_PIN, OTYPE_OPENDRAIN);
+    GPIO_pin_set(USB_ENABLE_PIN);
+    Delay(0x2710);
+    LCD_Init();
+    STORAGE_Init();
+    UART_Initialize();
 
-	LCD_Clear(0x0000);
-        LCD_PrintStringXY(40, 10, "Hello\n");
-        printf("Hello\n");
+    LCD_Clear(0x0000);
+    LCD_PrintStringXY(40, 10, "Hello\n");
+    printf("Hello\n");
 
-        USB_Enable();
-	//gpio_set(GPIOB, GPIO10);
-        STORAGE_WriteEnable(1);
-	while (1) {
-		if(PWR_CheckPowerSwitch())
-			PWR_Shutdown();
+    USB_Enable();
+
+    // GPIO_pin_set(USB_ENABLE_PIN);
+    SPI_FlashBlockWriteEnable(1);
+    while (1) {
+        if (PWR_CheckPowerSwitch())
+            PWR_Shutdown();
         }
 }
 #endif

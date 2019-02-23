@@ -25,8 +25,6 @@
 #include <stdlib.h>
 #include "protospi.h"
 
-static const struct mcu_pin AVR_RESET_PIN   = _SPI_AVR_RESET_PIN;
-
 u32 AVR_StartProgram()
 {
     u32 sync = 0;
