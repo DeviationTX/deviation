@@ -1,8 +1,19 @@
 #ifndef _DTX_STM32_HARDWARE_DEFAULT_H_
 #define _DTX_STM32_HARDWARE_DEFAULT_H_
 
-#define TARGET_PRIORITY \
-    TIMER_SOUND
+// Add additional callbacks
+#ifdef TARGET_PRIORITY
+    // A trick to concatenate macro-definitions from https://stackoverflow.com/questions/4550075/can-i-append-to-a-preprocessor-macro
+    _Pragma("push_macro(\"TARGET_PRIORITY\")")
+    #undef TARGET_PRIORITY
+    #define TARGET_PRIORITY \
+        _Pragma("pop_macro(\"TARGET_PRIORITY\")") TARGET_PRIORITY, \
+        TIMER_SOUND
+    #undef old_TARGET_PRIORITY
+#else
+    #define TARGET_PRIORITY TIMER_SOUND
+#endif
+
 
 #ifndef HAS_JTAG
     // HAS_JTAG enables the JTAG pins.  Otherwise, allow use as GPIO
