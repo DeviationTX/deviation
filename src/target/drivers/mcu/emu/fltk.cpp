@@ -498,10 +498,6 @@ void SPITouch_Calibrate(s32 xscale, s32 yscale, s32 xoff, s32 yoff)
 
 //  bug fix: msecs should be removed as Windows can't guarantee every type of Windows can set timer as short as 1ms
 //u32 msecs = 0;
-enum {
-    TIMER_ENABLE = LAST_PRIORITY,
-    NUM_MSEC_CALLBACKS,
-};
 u32 msec_cbtime[NUM_MSEC_CALLBACKS];
 u8 timer_enable;
 void ALARMhandler()

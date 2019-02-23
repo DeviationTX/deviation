@@ -13,12 +13,9 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <libopencm3/cm3/nvic.h>
-#include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/usart.h>
 
 #include "common.h"
-#include "devo.h"
 
 #include "target/drivers/mcu/stm32/rcc.h"
 #include "target/drivers/mcu/stm32/tim.h"

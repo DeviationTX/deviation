@@ -190,4 +190,5 @@
     #define AVR_RESET_PIN ((struct mcu_pin) {GPIO_BANK_JTCK_SWCLK, GPIO_JTCK_SWCLK})
 #endif
 
+#include "target/drivers/mcu/stm32/hardware.h"
 #endif  // _DEVO_DEFAULT_HARDWARE_H_

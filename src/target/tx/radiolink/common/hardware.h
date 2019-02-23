@@ -52,4 +52,5 @@
     })
 #define _USART_DMA_ISR                dma1_channel4_isr
 
+#include "target/drivers/mcu/stm32/hardware.h"
 #endif  // _RADIOLINK_HARDWARE_H_
