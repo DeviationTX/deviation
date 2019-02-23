@@ -16,15 +16,15 @@
 // Extra switch connections
 //         2x2              3x1              3x2
 //         -----            -----            -----
-//B.5                                        SW_B0
-//B.6      SW_B1            SW_A0            SW_B2
-//B.7                                        SW_A0
-//B.8      SW_A1            SW_A2            SW_A2
-//global_extra_switches:
-//  .0 == B0
-//  .1 == B2
-//  .2 == A0
-//  .3 == A2
+// B.5                                        SW_B0
+// B.6      SW_B1            SW_A0            SW_B2
+// B.7                                        SW_A0
+// B.8      SW_A1            SW_A2            SW_A2
+// global_extra_switches:
+//   .0 == B0
+//   .1 == B2
+//   .2 == A0
+//   .3 == A2
 
 #include "common.h"
 #include "config/tx.h"
@@ -105,7 +105,7 @@ u32 global_extra_switches = 0;
 // values can only be scanned if not other buttons are pressed
 void _scan_extra_switches()
 {
-    //Write to C.6, read B
+    // Write to C.6, read B
     u32 src = ~Transmitter.ignore_src;
     gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_OPENDRAIN, GPIO6);
     gpio_clear(GPIOC, GPIO6);
@@ -140,4 +140,4 @@ uint32_t ADDON_Handle_ExtraSwitches(u32 result) {
 #else  // HAS_SWITCHES_NOSTOCK
 uint32_t ADDON_Handle_ExtraSwitches(u32 result) { return result; }
 
-#endif //HAS_SWITCHES_NOSTOCK
+#endif  // HAS_SWITCHES_NOSTOCK
