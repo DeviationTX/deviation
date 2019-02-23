@@ -53,6 +53,7 @@
 #define VOLTAGE_NUMERATOR 324
 #define VOLTAGE_OFFSET    421
 
+#include "hardware.h"
 #include "../common/common_devo.h"
 
 #endif //_DEVO12E_TARGET_H_

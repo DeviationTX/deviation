@@ -87,30 +87,12 @@ enum {
 #define POT_2  ((1 << INP_AUX4) | (1 << INP_AUX5))
 #define POT_1  (1 << INP_AUX4)
 
-#if HAS_EXTRA_POTS
-  const u8 adc_chan_sel[NUM_ADC_CHANNELS] = {10, 12, 13, 11, 0, 4, 16, 14};
-#else
-  const u8 adc_chan_sel[NUM_ADC_CHANNELS] = {10, 12, 13, 11, 16, 14};
-#endif
-
 extern u32 global_extra_switches;
 void CHAN_Init()
 {
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPCEN);
-    #if HAS_EXTRA_POTS
-      rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPAEN);
-    #endif
     ADC_Init();
 
-    /* configure channels for analog */
-    gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO0);
-    gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO1);
-    gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO2);
-    gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO3);
-    #if HAS_EXTRA_POTS
-      gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO0);
-      gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO4);
-    #endif
+    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPCEN);
     /* Enable Voltage measurement */
     gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO4);
 

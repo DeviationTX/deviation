@@ -62,6 +62,7 @@
     {185, 220}, {185, 200}, {-95, 220}, {-95, 200}, {200, 180}, {-80, 180}, \
     }
 
+#include "hardware.h"
 #include "../common/common_devo.h"
 
 #endif //_DEVO8_TARGET_H_

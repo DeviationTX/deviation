@@ -28,23 +28,6 @@ void CHAN_Init()
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPFEN);
     ADC_Init();
 
-    /* Enable Voltage measurement */
-    gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO3); //ADC123_3
-
-    /* configure channels for analog */
-    gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO2); //ADC123_2
-
-    gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO0); //ADC123_10
-    gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO1); //ADC123_11
-    gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO2); //ADC123_12
-    gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO3); //ADC123_13
-
-    gpio_set_mode(GPIOF, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO6); //ADC3_4
-    gpio_set_mode(GPIOF, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO7); //ADC3_5
-    gpio_set_mode(GPIOF, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO8); //ADC3_6
-    gpio_set_mode(GPIOF, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO9); //ADC3_7
-    gpio_set_mode(GPIOF, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO10); //ADC3_8
-
     /* configure switches for digital I/O */
     //gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN, GPIO15);
     //gpio_set(GPIOA, GPIO15);

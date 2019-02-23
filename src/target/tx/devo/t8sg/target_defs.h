@@ -61,6 +61,7 @@
 #define VOLTAGE_NUMERATOR 216
 #define VOLTAGE_OFFSET    249
 
+#include "hardware.h"
 #include "../common/common_devo.h"
 
 #endif //_T8SG_TARGET_H_

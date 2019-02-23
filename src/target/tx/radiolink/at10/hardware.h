@@ -3,6 +3,20 @@
 
 #include "target/drivers/mcu/stm32/gpio.h"
 
+#define ADC_CHANNELS { \
+    ADC_CHAN(GPIOA, GPIO0),  /* ADC123_0  */ \
+    ADC_CHAN(GPIOA, GPIO1),  /* ADC123_1  */ \
+    ADC_CHAN(GPIOA, GPIO2),  /* ADC123_2  */ \
+    ADC_CHAN(GPIOA, GPIO3),  /* ADC123_3  */ \
+    ADC_CHAN(GPIOA, GPIO5),  /* ADC12_5   */ \
+    ADC_CHAN(GPIOA, GPIO6),  /* ADC12_6   */ \
+    ADC_CHAN(GPIOA, GPIO7),  /* ADC12_7   */ \
+    ADC_CHAN(GPIOB, GPIO0),  /* ADC12_8   */ \
+    ADC_CHAN(GPIOA, GPIO4),  /* ADC12_4   */ \
+    ADC_CHAN(0, 16),       /* TEMPERATURE */ \
+    ADC_CHAN(GPIOB, GPIO1),  /* ADC12_9   */ \
+    }
+
 #define LCD_RESET_PIN ((struct mcu_pin){GPIOE, GPIO0})
 
 #define FLASH_SPI ((struct spi_csn) { \

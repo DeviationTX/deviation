@@ -26,21 +26,10 @@
                    | (1 << INP_SWB0) | (1 << INP_SWB1) | (1 << INP_SWB2))
 extern u32 global_extra_switches;
 
-const u8 adc_chan_sel[NUM_ADC_CHANNELS] = {10, 12, 13, 11, 15, 16, 14};
 
 void CHAN_Init()
 {
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPCEN);
     ADC_Init();
-
-    /* configure channels for analog */
-    gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO0);
-    gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO1);
-    gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO2);
-    gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO3);
-    gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO5);
-    /* Enable Voltage measurement */
-    gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO4);
 
     // PC12, PC15 -> HOLD TRN
     // PC14 -> GEAR
@@ -48,6 +37,7 @@ void CHAN_Init()
     // PC13 -> DR
     // PB3, PB4 -> MIX
 
+    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPCEN);
     /* configure switches for digital I/O */
     gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN,
                    GPIO10 | GPIO11 | GPIO12 | GPIO13 | GPIO14 | GPIO15);

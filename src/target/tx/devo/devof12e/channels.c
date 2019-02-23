@@ -20,24 +20,10 @@
 #include "../common/devo.h"
 
 //  ADC channels for AUX4,5,6 and 7 mapped as defined in Devo F12E manual
-const u8 adc_chan_sel[NUM_ADC_CHANNELS] =   {13, 12, 11, 15, 10, 8, 4, 0, 16, 14};
 
 void CHAN_Init()
 {
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPCEN);
     ADC_Init();
-
-    /* configure channels for analog */
-    gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO0); //ADC123_10
-    gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO1); //ADC123_11
-    gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO2); //ADC123_12
-    gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO3); //ADC123_13
-    gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO5); //ADC12_15
-    gpio_set_mode(GPIOB, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO0); //ADC12_8
-    gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO0); //ADC123_0
-    gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO4); //ADC12_4
-    /* Enable Voltage measurement */
-    gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO4); //ADC12_14
 
     // PC12, PC15 -> HOLD TRN
     // PC14 -> GEAR
@@ -45,6 +31,7 @@ void CHAN_Init()
     // PC13 -> DR
     // PB3, PB4 -> MIX
 
+    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPCEN);
     /* configure switches for digital I/O */
     gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN,
                    GPIO6 | GPIO7 | GPIO8 | GPIO9
