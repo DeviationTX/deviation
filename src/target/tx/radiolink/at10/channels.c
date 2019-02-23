@@ -21,9 +21,10 @@
 
 void CHAN_Init()
 {
+    ADC_Init();
+
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPAEN);
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPCEN);
-    ADC_Init();
 
     /* configure switches for digital I/O */
     gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN,

@@ -68,6 +68,11 @@ static inline void GPIO_pin_clear(struct mcu_pin pin)
     gpio_clear(pin.port, pin.pin);
 }
 
+static inline void GPIO_pin_toggle(struct mcu_pin pin)
+{
+    gpio_toggle(pin.port, pin.pin);
+}
+
 static inline uint16_t GPIO_pin_get(struct mcu_pin pin)
 {
     return gpio_get(pin.port, pin.pin);

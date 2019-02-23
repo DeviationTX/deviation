@@ -33,4 +33,8 @@ static inline void LCD_ForceUpdate() {}
 
 #define FLASHTYPE FLASHTYPE_SPI
 
+#ifndef HAS_HARD_POWER_OFF
+#define HAS_HARD_POWER_OFF 0
+#endif
+
 #endif //_COMMON_DEVO_H_

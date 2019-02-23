@@ -14,6 +14,7 @@ LIBOPENCM3 = $(SDIR)/libopencm3/lib/libopencm3_stm32f1.a
 SRC_C    = $(wildcard $(SDIR)/target/tx/devo/$(TARGET)/*.c) \
            $(wildcard $(SDIR)/target/drivers/mcu/stm32/*.c) \
            $(wildcard $(SDIR)/target/drivers/storage/*.c) \
+           $(wildcard $(SDIR)/target/drivers/indicators/*.c) \
            $(wildcard $(SDIR)/target/tx/devo/common/*.c) \
            $(addprefix $(SDIR)/target/drivers/display/, $(DISPLAY_DRIVER)) \
            $(wildcard $(SDIR)/target/drivers/filesystems/*.c) \

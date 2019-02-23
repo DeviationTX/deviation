@@ -2,7 +2,7 @@
 #define _DTX_STM32F1_JTAG_H_
 #include "common.h"
 
-static void DisableJTAG()
+static inline void DisableJTAG()
 {
     AFIO_MAPR = (AFIO_MAPR & ~AFIO_MAPR_SWJ_MASK) | AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_OFF;
     gpio_set_mode(GPIO_BANK_JTMS_SWDIO, GPIO_MODE_OUTPUT_50_MHZ,
