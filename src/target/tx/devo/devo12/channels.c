@@ -19,8 +19,6 @@
 #include "config/tx.h"
 #include "../common/devo.h"
 
-const u8 adc_chan_sel[NUM_ADC_CHANNELS] = {2, 11, 10, 8, 5, 12, 6, 13, 4, 7, 16, 3};
-
 void CHAN_Init()
 {
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPCEN);

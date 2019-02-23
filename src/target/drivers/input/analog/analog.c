@@ -55,7 +55,6 @@ static volatile u16 adc_array_oversample[SAMPLE_COUNT];
 #endif
 
 
-
 void ADC_Init(void)
 {
     #define ADC_CHAN(x, y) (x ? get_rcc_from_port(x) : 0)
@@ -73,7 +72,6 @@ void ADC_Init(void)
         rcc_periph_clock_enable(adc_rcc[i]);
         GPIO_setup_input(adc_pins[i], ITYPE_ANALOG);
     }
-
     rcc_periph_clock_enable(get_rcc_from_port(ADC_CFG.adc));
     adc_power_off(ADC_CFG.adc);
     ADC_reset(ADC_CFG.adc);
@@ -215,3 +213,13 @@ void ADC_ScanChannels()
         }
     }
 }
+
+/* Return milivolts */
+unsigned PWR_ReadVoltage(void)
+{
+    u32 v = adc_array_raw[NUM_ADC_CHANNELS-1];
+    /* Multily the above by 1000 to get milivolts */
+    v = v * VOLTAGE_NUMERATOR / 100 + VOLTAGE_OFFSET;
+    return v;
+}
+
