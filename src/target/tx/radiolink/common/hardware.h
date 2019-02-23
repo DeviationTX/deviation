@@ -11,6 +11,8 @@
 #define CYRF_RESET_PIN   ((struct mcu_pin){GPIOB, GPIO11})
 #define AVR_RESET_PIN    ((struct mcu_pin){GPIOB, GPIO11})
 
+#define USB_ENABLE_PIN   NULL_PIN
+
 #define PROTO_SPI ((struct spi_csn) { \
     .spi = SPI2,                      \
     .csn = {GPIOB, GPIO12},           \
