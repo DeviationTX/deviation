@@ -57,7 +57,7 @@ static void CS_LO()
 }
 
 #if HAS_FLASH_DETECT
-extern uint32_t Mass_Block_Count; // see mass_mal.c
+extern uint32_t Mass_Block_Count;  // see mass_mal.c
 /*
  * Detect flash memory type and set variables controlling
  * access accordingly.

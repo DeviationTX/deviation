@@ -26,7 +26,10 @@
 #include <libopencm3/usb/usbd.h>
 #include <libopencm3/usb/msc.h>
 
-#define BUF_LENGTH 512
+#define BUF_LENGTH 64
+
+// Sector Size
+#define BLOCK_SIZE 4096
 
 #define HOST_2_DEV    0
 #define DEV_2_HOST    1
@@ -123,8 +126,8 @@ struct _usbd_mass_storage {
     const char *product_id;
     const char *product_revision_level;
 
-    int (*read_block)(uint32_t lba, uint8_t *copy_to);
-    int (*write_block)(uint32_t lba, const uint8_t *copy_from);
+    int (*read_block)(uint32_t lba, uint8_t *copy_to, uint16_t offset, uint16_t length);
+    int (*write_block)(uint32_t lba, const uint8_t *copy_from, uint16_t offset, uint16_t length);
 
     uint32_t block_count;
 
@@ -140,6 +143,7 @@ struct _usbd_mass_storage {
 
     /* current IN/OUT info */
     uint32_t block_cur;
+    uint16_t block_cur_offset;
     uint32_t block_end;
 
     /* ms cache */
@@ -318,13 +322,13 @@ static int scsi_read_format_capacities(usbd_mass_storage *ms, uint8_t *buf)
     buf[0] = 0;
     buf[1] = 0;
     buf[2] = 0;
-    buf[3] = 8; // Capacity length
+    buf[3] = 8;  // Capacity length
 
     /* Block count, MSB */
     uint32_2_msb(buf + 4, ms->block_count);
 
     /* Block size, MSB */
-    uint32_2_msb(buf + 8, 0x200);
+    uint32_2_msb(buf + 8, BLOCK_SIZE);
 
     set_sbc_status_good(ms);
     return 12;
@@ -336,7 +340,7 @@ static int scsi_read_capacity(usbd_mass_storage *ms, uint8_t *buf)
     uint32_2_msb(buf, ms->block_count - 1);
 
     /* Block size, MSB */
-    uint32_2_msb(buf + 4, 0x200);
+    uint32_2_msb(buf + 4, BLOCK_SIZE);
 
     set_sbc_status_good(ms);
     return 8;
@@ -357,10 +361,13 @@ static int scsi_read_10(usbd_mass_storage *ms, uint8_t *buf)
 
     ms->block_cur = start;
     ms->block_end = end;
-    ms->read_block(start, buf);
+
+    // read first part
+    ms->read_block(start, buf, 0, BUF_LENGTH);
+    ms->block_cur_offset = BUF_LENGTH;
 
     set_sbc_status_good(ms);
-    return 512;
+    return BUF_LENGTH;
 }
 
 static int scsi_write_10(usbd_mass_storage *ms, uint8_t *buf)
@@ -380,6 +387,7 @@ static int scsi_write_10(usbd_mass_storage *ms, uint8_t *buf)
 
     ms->block_cur = start;
     ms->block_end = end;
+    ms->block_cur_offset = 0;
 
     set_sbc_status_good(ms);
     return 0;
@@ -550,19 +558,21 @@ static void msc_do_command(usbd_mass_storage *ms)
 
 static void msc_do_recv(usbd_mass_storage *ms)
 {
-    if (ms->cache_cnt < BUF_LENGTH) {
-        return;
-    }
-
-    ms->cache_cnt = 0;
-    ms->cache_pos = 0;
-
     if (ms->block_cur < ms->block_end) {
-        if (0 != ms->write_block(ms->block_cur, ms->cache_buf)) {
+        if (0 != ms->write_block(ms->block_cur, ms->cache_buf, ms->block_cur_offset, ms->cache_cnt)) {
             msc_go_error(ms);
             return;
-        } else {
+        }
+
+        ms->block_cur_offset += ms->cache_cnt;
+        ms->cache_cnt = 0;
+        ms->cache_pos = 0;
+
+        // if completed a block
+        if (ms->block_cur_offset >= BLOCK_SIZE)
+        {
             ms->block_cur++;
+            ms->block_cur_offset = 0;
         }
     }
 
@@ -573,16 +583,24 @@ static void msc_do_recv(usbd_mass_storage *ms)
     }
 }
 
+/* Continues read block and send data out */
 static void msc_do_send(usbd_mass_storage *ms)
 {
     if (ms->state == STATE_IN) {
-        ms->block_cur++;
         if (ms->block_cur < ms->block_end) {
-            if (0 == ms->read_block(ms->block_cur, ms->cache_buf)) {
-                ms->cache_cnt = BUF_LENGTH;
-                ms->cache_pos = 0;
-            } else {
+            if (0 != ms->read_block(ms->block_cur, ms->cache_buf, ms->block_cur_offset, BUF_LENGTH)) {
                 msc_go_error(ms);
+                return;
+            }
+
+            ms->block_cur_offset += BUF_LENGTH;
+            ms->cache_cnt = BUF_LENGTH;
+            ms->cache_pos = 0;
+
+            if (ms->block_cur_offset >= BLOCK_SIZE)
+            {
+                ms->block_cur++;
+                ms->block_cur_offset = 0;
             }
         } else {
             // Data phare complete
@@ -604,7 +622,7 @@ static void msc_data_rx_cb(usbd_device *usbd_dev, uint8_t ep)
 
     if (ms->state != STATE_IDLE && ms->state != STATE_OUT) {
         msc_go_idle(ms);
-        //msc_go_error(ms);
+        // msc_go_error(ms);
         return;
     }
 
@@ -691,10 +709,8 @@ usbd_mass_storage *usb_msc_init2(usbd_device *usbd_dev,
                  const char *product_id,
                  const char *product_revision_level,
                  const uint32_t block_count,
-                 int (*read_block)(uint32_t lba,
-                           uint8_t *copy_to),
-                 int (*write_block)(uint32_t lba,
-                            const uint8_t *copy_from))
+                 int (*read_block)(uint32_t lba, uint8_t *copy_to, uint16_t offset, uint16_t length),
+                 int (*write_block)(uint32_t lba, const uint8_t *copy_from, uint16_t offset, uint16_t length))
 {
     _mass_storage.usbd_dev = usbd_dev;
 

@@ -8,6 +8,8 @@
 
 #define PACKET_SIZE 64
 
+#define BLOCK_SIZE 4096
+
 extern usbd_mass_storage *usb_msc_init2(usbd_device *usbd_dev,
                  uint8_t ep_in,
                  uint8_t ep_out,
@@ -15,10 +17,8 @@ extern usbd_mass_storage *usb_msc_init2(usbd_device *usbd_dev,
                  const char *product_id,
                  const char *product_revision_level,
                  const uint32_t block_count,
-                 int (*read_block)(uint32_t lba,
-                           uint8_t *copy_to),
-                 int (*write_block)(uint32_t lba,
-                            const uint8_t *copy_from));
+                 int (*read_block)(uint32_t lba, uint8_t *copy_to, u16 offset, u16 length),
+                 int (*write_block)(uint32_t lba, const uint8_t *copy_from, u16 offset, u16 length));
 
 static const struct usb_endpoint_descriptor msc_endp[] = {{
     .bLength = USB_DT_ENDPOINT_SIZE,
@@ -125,6 +125,7 @@ static const struct usb_config_descriptor msc_config_descr = {
     uint32_t Mass_Block_Count = FAT_OFFSET + SPIFLASH_SECTORS - SPIFLASH_SECTOR_OFFSET;
 #endif
 
+
 /*******************************************************************************
 * Function Name  : MAL_Write
 * Description    : Write sectors
@@ -132,19 +133,31 @@ static const struct usb_config_descriptor msc_config_descr = {
 * Output         : None
 * Return         : None
 *******************************************************************************/
-int MSC_Write(uint32_t lba, const uint8_t *copy_from)
+int MSC_Write(uint32_t lba, const u8 *Writebuff, uint16_t offset, uint16_t Transfer_Length)
 {
-#if EMULATE_FAT
-  if (lba < 8 * FAT_OFFSET) {
-      return 0;
-  } else {
-    lba -= 8 * FAT_OFFSET;
-  }
-#endif
-    (void)copy_from;
     (void)lba;
-//  SPIFlash_WriteBytes(lba * MSC_BLOCK_SIZE + ((SPIFLASH_SECTOR_OFFSET - FAT_OFFSET) * 0x1000),
-//      MSC_BLOCK_SIZE, copy_from);
+    (void)Writebuff;
+    (void)offset;
+    (void)Transfer_Length;
+
+//    uint32_t Memory_Offset = lba * BLOCK_SIZE + offset;
+#if EMULATE_FAT
+    if (Memory_Offset + Transfer_Length < (0x1000 * FAT_OFFSET)) {
+        return MAL_OK;
+    }
+    if (Memory_Offset < (0x1000 * FAT_OFFSET)) {
+        Transfer_Length -= ((0x1000 * FAT_OFFSET) - Memory_Offset);
+        Writebuff += ((0x1000 * FAT_OFFSET) - Memory_Offset);
+        Memory_Offset = 0x1000 * FAT_OFFSET;
+    }
+#endif
+
+#if 0
+    if (offset == 0) {
+        STORAGE_EraseSector(Memory_Offset + ((SPIFLASH_SECTOR_OFFSET - FAT_OFFSET) * 0x1000));
+    }
+    STORAGE_WriteBytes(Memory_Offset  + ((SPIFLASH_SECTOR_OFFSET - FAT_OFFSET) * 0x1000), Transfer_Length, (u8 *)Writebuff);
+#endif
 
   return 0;
 }
@@ -156,31 +169,46 @@ int MSC_Write(uint32_t lba, const uint8_t *copy_from)
 * Output         : None
 * Return         : Buffer pointer
 *******************************************************************************/
-int MSC_Read(uint32_t lba, uint8_t *copy_to)
+int MSC_Read(uint32_t lba, u8 *Readbuff, uint16_t offset, uint16_t Transfer_Length)
 {
+    uint32_t Memory_Offset;
+
+    Memory_Offset = lba * BLOCK_SIZE + offset;
+
 #if EMULATE_FAT
-    if (lba < FAT_OFFSET * 8)
-    {
-        memset(copy_to, 0, MSC_BLOCK_SIZE);
-        switch (lba) {
-        case 0:  // sector 0 is the boot sector
-            memcpy(copy_to, boot, sizeof(boot));
-            copy_to[MSC_BLOCK_SIZE - 2] = 0x55;
-            copy_to[MSC_BLOCK_SIZE - 1] = 0xAA;
-            break;
-        case 8:  // sector 1 is FAT 1st copy
-            memcpy(copy_to, fat, sizeof(fat));
-            break;
-        case 16:  // sector 3 is the directory entry
-            memcpy(copy_to, root, sizeof(root));
-            break;
-        }
-        return 0;
-    }
+      if (Memory_Offset < (FAT_OFFSET * 0x1000)) {
+          static const struct {
+              u16 addr;
+              u16 size;
+              const u8* mem;
+          } map[3] = {
+              {0, sizeof(boot), boot},
+              {4096, sizeof(fat), fat},
+              {8192, sizeof(root), root}
+          };
+          memset(Readbuff, 0, Transfer_Length);
+          for (int i = 0; i < 3; i++) {
+              u32 end = map[i].addr + map[i].size;
+              if (Memory_Offset >= map[i].addr && Memory_Offset < end) {
+                  int size = end - Memory_Offset;
+                  if (Transfer_Length < size) {
+                      size = Transfer_Length;
+                  }
+                  memcpy(Readbuff, map[i].mem + (Memory_Offset - map[i].addr), size);
+              }
+          }
+          if (0x1FE >= Memory_Offset && 0x1FE < (Memory_Offset + Transfer_Length)) {
+              // printf("Setting %06x to %02x\n", 0x1FE - Memory_Offset, 0x55);
+              ((u8 *)Readbuff)[0x1FE - Memory_Offset] = 0x55;
+          }
+          if (0x1FF >= Memory_Offset && 0x1FF < (Memory_Offset + Transfer_Length)) {
+              // printf("Setting %06x to %02x\n", 0x1FF - Memory_Offset, 0xAA);
+              ((u8 *)Readbuff)[0x1FF - Memory_Offset] = 0xAA;
+          }
+          break;
+      }
 #endif
-  SPIFlash_ReadBytes(
-    lba * MSC_BLOCK_SIZE  + ((SPIFLASH_SECTOR_OFFSET - FAT_OFFSET) * 0x1000),
-    MSC_BLOCK_SIZE, copy_to);
+      STORAGE_ReadBytes(Memory_Offset  + ((SPIFLASH_SECTOR_OFFSET - FAT_OFFSET) * 0x1000), Transfer_Length, (u8*)Readbuff);
 
   return 0;
 }
