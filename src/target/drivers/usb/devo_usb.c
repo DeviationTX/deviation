@@ -41,11 +41,14 @@ const char *usb_strings[USB_STRING_COUNT] = {
 
 void USB_Enable(unsigned use_interrupt)
 {
-    gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
-        GPIO_CNF_OUTPUT_PUSHPULL, GPIO10);
-    gpio_clear(GPIOB, GPIO10);
-
+    rcc_periph_clock_enable(RCC_GPIOA);
     rcc_periph_clock_enable(RCC_OTGFS);
+
+    GPIO_setup_input_af((struct mcu_pin){GPIOA, GPIO11 | GPIO12}, ITYPE_FLOAT, 0);
+
+    rcc_periph_clock_enable(RCC_GPIOB);
+    GPIO_setup_output((struct mcu_pin){GPIOB, GPIO10}, OTYPE_PUSHPULL);
+    gpio_clear(GPIOB, GPIO10);
 
     if (use_interrupt) {
         nvic_enable_irq(NVIC_USB_LP_CAN_RX0_IRQ);
@@ -62,7 +65,7 @@ void USB_Disable()
 
 void USB_Poll()
 {
-    usbd_poll(usbd_dev);  
+    usbd_poll(usbd_dev);
 }
 
 void usb_wakeup_isr(void)
