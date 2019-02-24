@@ -42,7 +42,6 @@ void PWR_Init(void)
         /* When Pin goes high, the user turned off the Tx */
         GPIO_setup_input(PWR_SWITCH_PIN, ITYPE_FLOAT);
     }
-
 }
 
 void PWR_Shutdown()
@@ -72,7 +71,7 @@ int PWR_CheckPowerSwitch()
             debounce = 0;
         }
 
-        if(debounce && (CLOCK_getms() - debounce) >= 100) { // 0.25 sec
+        if (debounce && (CLOCK_getms() - debounce) >= 100) {  // 0.25 sec
             return 1;
         }
     }
