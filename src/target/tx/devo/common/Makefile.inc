@@ -20,20 +20,16 @@ SRC_C    = $(wildcard $(SDIR)/target/tx/devo/$(TARGET)/*.c) \
            $(wildcard $(SDIR)/target/drivers/filesystems/*.c) \
            $(wildcard $(SDIR)/target/drivers/filesystems/petit_fat/*.c) \
            $(wildcard $(SDIR)/target/drivers/filesystems/devofs/*.c) \
-           $(wildcard $(SDIR)/target/tx/devo/common/msc2/*.c) \
-           $(wildcard $(SDIR)/target/tx/devo/common/msc2/lib/*.c) \
            $(wildcard $(SDIR)/target/drivers/input/button_matrix/*.c) \
            $(wildcard $(SDIR)/target/drivers/serial/uart/*.c) \
            $(wildcard $(SDIR)/target/drivers/serial/soft_serial/*.c) \
            $(wildcard $(SDIR)/target/drivers/sound/piezo/*.c) \
            $(wildcard $(SDIR)/target/drivers/sound/uart_audio/*.c) \
+           $(wildcard $(SDIR)/target/drivers/usb/*.c) \
            $(SDIR)/target/drivers/backlight/backlight.c \
            $(SDIR)/target/drivers/rtc/rtc_driver.c \
            $(SDIR)/target/drivers/haptic/haptic.c \
-           $(SDIR)/target/drivers/input/analog/analog.c \
-           $(SDIR)/target/drivers/usb/devo_usb.c \
-           $(SDIR)/target/drivers/usb/devo_msc.c \
-           $(SDIR)/target/drivers/usb/usb_msc.c
+           $(SDIR)/target/drivers/input/analog/analog.c
 
 ifdef MODULAR
 PROTO_EXTRA_C = $(wildcard $(SDIR)/target/tx/devo/common/protocol/*.c) \
@@ -43,8 +39,7 @@ PROTO_EXTRA_C = $(wildcard $(SDIR)/target/tx/devo/common/protocol/*.c) \
                 $(SDIR)/target/tx/devo/common/uart.c
 SRC_C   += objs/$(TARGET)/proto_stubs.c
 else
-SRC_C   += $(wildcard $(SDIR)/target/tx/devo/common/protocol/*.c) \
-           $(SDIR)/target/drivers/usb/devo_hid.c
+SRC_C   += $(wildcard $(SDIR)/target/tx/devo/common/protocol/*.c)
 endif
 
 CFLAGS   = -D"assert_param(x)=" -DSTM32F10X_HD -DSTM32F1 -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -fdata-sections -ffunction-sections -I$(SDIR)/target/tx/devo/common -I$(SDIR)/libopencm3/include -I$(SDIR)/target/drivers/filesystems -fno-builtin-printf -Os --specs=nano.specs
