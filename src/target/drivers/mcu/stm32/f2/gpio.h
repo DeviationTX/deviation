@@ -43,6 +43,8 @@ inline static unsigned _get_af(unsigned type)
         case SPI3:
         case GPIO_AF6:
             return GPIO_AF6;
+        case GPIO_AF10:
+            return GPIO_AF10;
         case GPIO_AF14:
             return GPIO_AF14;
     }
