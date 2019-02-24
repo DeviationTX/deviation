@@ -14,9 +14,9 @@
 */
 #include <libopencm3/stm32/spi.h>
 #include "common.h"
-#include "target/drivers/mcu/stm32/rcc.h"
 
 #if defined HAS_4IN1_FLASH && HAS_4IN1_FLASH
+#include "target/drivers/mcu/stm32/rcc.h"
 
 #define CS_HI() GPIO_pin_set(PROTO_RST_PIN)
 #define CS_LO() GPIO_pin_clear(PROTO_RST_PIN)
