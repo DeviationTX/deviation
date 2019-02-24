@@ -130,8 +130,6 @@ void ADC_Init(void)
     dma_set_memory_size(ADC_DMA.dma, ADC_DMA.stream, DMA_SxCR_MSIZE_16BIT);
     /* direction is from ADC to memory */
     DMA_set_transfer_mode(ADC_DMA, DMA_SxCR_DIR_PERIPHERAL_TO_MEM);
-    /* the memory pointer has to be increased, and the peripheral not */
-    dma_set_read_from_peripheral(ADC_DMA.dma, ADC_DMA.stream);
     /* no double buffering */
     DMA_disable_double_buffer_mode(ADC_DMA);
     /* continuous operation */

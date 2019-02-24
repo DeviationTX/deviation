@@ -61,7 +61,7 @@ INLINE static inline void GPIO_setup_output_af(struct mcu_pin pin, enum gpio_out
     gpio_mode_setup(pin.port, GPIO_MODE_AF,
                   GPIO_PUPD_NONE, pin.pin);
     gpio_set_output_options(pin.port, type, GPIO_OSPEED_50MHZ, pin.pin);
-    gpio_set_af(pin.port, _get_af(type), pin.pin);
+    gpio_set_af(pin.port, _get_af(af), pin.pin);
 }
 
 INLINE static inline void GPIO_setup_input(struct mcu_pin pin, enum gpio_input_type type)
@@ -78,16 +78,16 @@ INLINE static inline void GPIO_setup_input(struct mcu_pin pin, enum gpio_input_t
             cfg = GPIO_PUPD_PULLUP;
             break;
         case ITYPE_PULLDOWN:
-            cfg = GPIO_PUPD_PULLDN;
+            cfg = GPIO_PUPD_PULLDOWN;
             break;
     }
-    gpio_mode_setup(pin.port, mode, cfg, pin.pn);
+    gpio_mode_setup(pin.port, mode, cfg, pin.pin);
 }
 
 INLINE static inline void GPIO_setup_input_af(struct mcu_pin pin, enum gpio_input_type type, unsigned af)
 {
     GPIO_setup_input(pin, type);
-    gpio_set_af(pin.port, _get_af(type), pin.pin);
+    gpio_set_af(pin.port, _get_af(af), pin.pin);
 }
 
 INLINE static inline void GPIO_pin_set(struct mcu_pin pin)

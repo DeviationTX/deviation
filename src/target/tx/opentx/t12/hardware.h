@@ -6,6 +6,7 @@
 
 #define HAS_BUTTON_POWER_ON 1
 #define HAS_JR_SERIAL_MODULE 1
+#define HAS_SSER_TX 1
 
 // Buttons
 // NOTE: Button order must match capabilities.h
@@ -50,8 +51,6 @@
 //Haptic
 #define HAPTIC_PIN ((struct mcu_pin){GPIOB, GPIO8})
 
-//Ext module
-#define EXTMODULE_PIN    ((struct mcu_pin){GPIOA, GPIO7})
 
 // LCD uses SPI3
 // On STM32F2, LCD is on SPI3->APB1@30MHz ClockDiv=2, Fspi=15MHz
@@ -126,6 +125,32 @@
     .channel = DMA_SxCR_CHSEL_0,  \
     })
 
+// JREXT Module
+#define SSER_TX_TIM ((struct tim_config) { \
+    .tim = TIM8,                           \
+    .pin = {GPIOA, GPIO7},                 \
+    .ch = 1,                               \
+    .chn = 1,                              \
+    })
+#define SSER_TX_DMA ((struct dma_config) { \
+    .dma = DMA2,                         \
+    .stream = DMA_STREAM1,               \
+    .channel = DMA_SxCR_CHSEL_7,         \
+    })
+#define SSER_TX_DMA_ISR dma2_stream1_isr
+
+#define SSER_TIM ((struct tim_config) { \
+    .tim = TIM6,                        \
+    .pin = {GPIOA, GPIO10},             \
+    })
+#define PWM_TIMER ((struct tim_config) { \
+    .tim = TIM1,             \
+    .pin = {GPIOA, GPIO9},   \
+    .ch = 2,                 \
+    })
+#define PWM_TIMER_ISR exti9_5_isr    // Matches PA.9
+
+// Audio DAC
 #define AUDIODAC_DMA ((struct dma_config) { \
     .dma = DMA1,                  \
     .stream = DMA_STREAM5,        \
@@ -141,7 +166,7 @@
 #define I2C_ADDRESS_VOLUME 0x5C
 
 #define AUDIODAC_TIM TIM_CFG(2)  //TIM2
-#include "target/common/stm32/hardware_default.h"
+#include "target/drivers/mcu/stm32/hardware.h"
 
 #endif  // _HARDWARE_H_
 

@@ -17,6 +17,8 @@
 #include <libopencm3/stm32/spi.h>
 #include <libopencm3/cm3/cortex.h>
 #include "common.h"
+
+#ifdef SPIFLASH_TYPE
 #include "target/drivers/mcu/stm32/spi.h"
 
 #ifndef HAS_4IN1_FLASH

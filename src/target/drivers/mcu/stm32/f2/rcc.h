@@ -4,7 +4,13 @@
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/spi.h>
+#include <libopencm3/stm32/adc.h>
+#include <libopencm3/stm32/dma.h>
+#include <libopencm3/stm32/timer.h>
+#include <libopencm3/stm32/usart.h>
 
+#pragma GCC diagnostic push 
+#pragma GCC diagnostic ignored "-Wattributes"  // Disable warning about possible inlining
 __attribute__((always_inline)) static enum rcc_periph_clken get_rcc_from_port(u32 port)
 {
     switch (port) {
@@ -43,6 +49,7 @@ __attribute__((always_inline)) static enum rcc_periph_clken get_rcc_from_port(u3
         default:    return ltassert();  // We should never get here
     }
 }
+#pragma GCC diagnostic pop
 
 #define get_rcc_from_pin(x) get_rcc_from_port((x).port)
 //static inline  enum rcc_periph_clken get_rcc_from_pin(struct mcu_pin pin)

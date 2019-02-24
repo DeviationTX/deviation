@@ -6,10 +6,8 @@
 
 static inline void ADC_reset(uint32_t adc)
 {
-    int reset = (adc == ADC1) ? RST_ADC1
-              : (adc == ADC2) ? RST_ADC2
-              : RCC_RST3
-    rcc_periph_reset_pulse(reset);
+    (void)adc;
+    rcc_periph_reset_pulse(RST_ADC);
 }
 static void ADC_start_conversion(uint32_t adc)
 {

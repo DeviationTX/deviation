@@ -28,7 +28,6 @@ inline static void DMA_enable_direct_mode(struct dma_config dma)
 
 inline static void DMA_set_transfer_mode(struct dma_config dma, uint32_t direction)
 {
-    (void)channel;
     dma_set_transfer_mode(dma.dma, dma.stream, direction);
 }
 

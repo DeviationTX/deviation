@@ -16,11 +16,15 @@ LIBOPENCM3 = libopencm3/lib/libopencm3_stm32f2.a
 SRC_C = $(wildcard target/tx/$(FAMILY)/$(TARGET)/*.c) \
         target/drivers/display/spi/128x64x1_nt7538.c \
         $(wildcard target/drivers/mcu/stm32/*.c) \
+        $(wildcard target/drivers/serial/soft_serial/*.c) \
+        $(wildcard target/drivers/serial/usb_cdc/*.c) \
 	target/drivers/filesystems/FatFs/ff.c \
         target/drivers/filesystems/FatFs/fattime.c \
         target/drivers/filesystems/FatFs/option/ccsbcs.c \
         $(wildcard target/drivers/filesystems/*.c) \
         target/drivers/backlight/backlight.c \
+        target/drivers/haptic/haptic.c \
+        target/drivers/rtc/rtc_driver.c \
         target/drivers/input/analog/analog.c \
         target/drivers/input/button_switch/button_switch.c
 

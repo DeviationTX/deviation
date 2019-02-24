@@ -12,20 +12,19 @@
     You should have received a copy of the GNU General Public License
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include <libopencm3/stm32/rcc.h>
-#include <libopencm3/stm32/gpio.h>
 #include "common.h"
+#include "target/drivers/mcu/stm32/rcc.h"
 
 #define _BTN(...) {__VA_ARGS__}
-static const struct mcu_pin btn_pins[BTN_LAST-1] = BUTTONS;
+static const struct mcu_pin btn_pins[BUT_LAST-1] = BUTTONS;
 #undef _BTN
 
 void Initialize_ButtonMatrix()
 {
     #define _BTN(x, y) get_rcc_from_port(x)
-    const uint32_t btn_rcc[BTN_LAST-1] = BUTTONS;
+    const uint32_t btn_rcc[BUT_LAST-1] = BUTTONS;
     #undef _BTN
-    for (unsigned i = 0; i < BTN_LAST-1; i++) {
+    for (unsigned i = 0; i < BUT_LAST-1; i++) {
         rcc_periph_clock_enable(btn_rcc[i]);
         GPIO_setup_input(btn_pins[i], ITYPE_PULLUP);
     }

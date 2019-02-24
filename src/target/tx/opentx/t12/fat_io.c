@@ -48,8 +48,8 @@
 #define CMD58   (0x40+58)       /* READ_OCR */
 
 /* Card-Select Controls  (Platform dependent) */
-#define SELECT()        PORT_pin_clear(MMC_SPI.csn)    /* MMC CS = L */
-#define DESELECT()      PORT_pin_set(MMC_SPI.csn)      /* MMC CS = H */
+#define SELECT()        GPIO_pin_clear(MMC_SPI.csn)    /* MMC CS = L */
+#define DESELECT()      GPIO_pin_set(MMC_SPI.csn)      /* MMC CS = H */
 
 #if (_MAX_SS != 512) || (_FS_READONLY == 0) || (STM32_SD_DISK_IOCTRL_FORCE == 1)
 #define STM32_SD_DISK_IOCTRL   1
@@ -86,8 +86,9 @@ static const DWORD socket_state_mask_wp = (1 << 1);
 static volatile
 DSTATUS Stat = STA_NOINIT;      /* Disk status */
 
-extern volatile uint32_t msecTimer1, msecTimer2;   /* 1000Hz decrement timers */
-
+static uint32_t msecTimer1, msecTimer2;   /* 1000Hz decrement timers */
+#define CHECK_T1(target) (CLOCK_getms() - msecTimer1 >= target)
+#define CHECK_T2(target) (CLOCK_getms() - msecTimer2 >= target)
 static
 BYTE CardType;                  /* Card type flags */
 
@@ -125,7 +126,7 @@ Socket's Write-Protection Pin: high = write-protected, low = writable
 static inline DWORD socket_is_write_protected(void)
 {
     if (HAS_PIN(MMC_PROTECT))
-        return PORT_pin_get(MMC_PROTECT) ? socket_state_mask_wp : 0;
+        return GPIO_pin_get(MMC_PROTECT) ? socket_state_mask_wp : 0;
     return 0; /* fake not protected */
 }
 
@@ -143,7 +144,7 @@ Socket's Card-Present Pin: high = socket empty, low = card inserted
 static inline DWORD socket_is_empty(void)
 {
     if (HAS_PIN(MMC_PRESENT))
-        return PORT_pin_get(MMC_PRESENT) ? socket_state_mask_cp : 0;
+        return GPIO_pin_get(MMC_PRESENT) ? socket_state_mask_cp : 0;
     return 0; /* fake present */
 }
 
@@ -205,11 +206,11 @@ static BYTE wait_ready (void)
         BYTE res;
 
 
-        msecTimer2 = 500;    /* Wait for ready in timeout of 500ms */
+        msecTimer2 = CLOCK_getms();    /* Wait for ready in timeout of 500ms */
         rcvr_spi();
         do
                 res = rcvr_spi();
-        while ((res != 0xFF) && msecTimer2);
+        while ((res != 0xFF) && !CHECK_T2(500));
 
         return res;
 }
@@ -382,10 +383,10 @@ static BOOL rcvr_datablock (
         BYTE token;
 
 
-        msecTimer1 = 100;
+        msecTimer1 = CLOCK_getms();
         do {                                                    /* Wait for data packet in timeout of 100ms */
                 token = rcvr_spi();
-        } while ((token == 0xFF) && msecTimer1);
+        } while ((token == 0xFF) && !CHECK_T1(100));
         if(token != 0xFE) return FALSE; /* If not valid data token, return with error */
 
 #ifdef STM32_SD_USE_DMA
@@ -526,12 +527,12 @@ DSTATUS disk_initialize (
 
         ty = 0;
         if (send_cmd(CMD0, 0) == 1) {                   /* Enter Idle state */
-                msecTimer1 = 1000;                                           /* Initialization timeout of 1000 milliseconds */
+                msecTimer1 = CLOCK_getms();        /* Initialization timeout of 1000 milliseconds */
                 if (send_cmd(CMD8, 0x1AA) == 1) {       /* SDHC */
                         for (n = 0; n < 4; n++) ocr[n] = rcvr_spi();            /* Get trailing return value of R7 response */
                         if (ocr[2] == 0x01 && ocr[3] == 0xAA) {                         /* The card can work at VDD range of 2.7-3.6V */
-                                while (msecTimer1 && send_cmd(ACMD41, 1UL << 30));  /* Wait for leaving idle state (ACMD41 with HCS bit) */
-                                if (msecTimer1 && send_cmd(CMD58, 0) == 0) {                /* Check CCS bit in the OCR */
+                                while (!CHECK_T1(1000) && send_cmd(ACMD41, 1UL << 30));  /* Wait for leaving idle state (ACMD41 with HCS bit) */
+                                if (!CHECK_T1(1000) && send_cmd(CMD58, 0) == 0) {                /* Check CCS bit in the OCR */
                                         for (n = 0; n < 4; n++) ocr[n] = rcvr_spi();
                                         ty = (ocr[0] & 0x40) ? CT_SD2 | CT_BLOCK : CT_SD2;
                                 }
@@ -542,8 +543,8 @@ DSTATUS disk_initialize (
                         } else {
                                 ty = CT_MMC; cmd = CMD1;        /* MMC */
                         }
-                        while (msecTimer1 && send_cmd(cmd, 0));                     /* Wait for leaving idle state */
-                        if (!msecTimer1 || send_cmd(CMD16, 512) != 0)       /* Set R/W block length to 512 */
+                        while (!CHECK_T1(1000) && send_cmd(cmd, 0));                     /* Wait for leaving idle state */
+                        if (CHECK_T1(1000) || send_cmd(CMD16, 512) != 0)       /* Set R/W block length to 512 */
                                 ty = 0;
                 }
         }

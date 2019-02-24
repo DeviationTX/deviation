@@ -1,7 +1,7 @@
 #ifndef _T12_TARGET_H_
 #define _T12_TARGET_H_
 
-
+#define FLASHTYPE FLASHTYPE_NONE
 #if defined(EMULATOR) && EMULATOR == USE_NATIVE_FS
     #include "enable_native_fs.h"
 #else 
@@ -9,8 +9,6 @@
     #include "fat_io.h"
     #include "target/drivers/usb/uart/usb_uart.h"
 #endif
-
-#include "hardware.h"
 
 #define TXID 0x12
 #define VECTOR_TABLE_LOCATION 0x8000
@@ -41,6 +39,9 @@
 #define HAS_AUDIO_UART5     0         //FIXME
 #define HAS_MUSIC_CONFIG    0         //FIXME
 #define USE_4BUTTON_MODE    0
+#define HAS_AUDIO_UART      0
+#define HAS_STACKDUMP       0
+#define HAS_OLED_DISPLAY    0
 
 #ifdef BUILDTYPE_DEV
   #define DEBUG_WINDOW_SIZE 200
@@ -68,6 +69,7 @@
 #define VOLTAGE_NUMERATOR 216
 #define VOLTAGE_OFFSET    249
 
+#include "hardware.h"
 #include "x9d_ports.h"
 
 // FIXME: These should come from a common source

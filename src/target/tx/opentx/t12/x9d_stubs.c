@@ -100,5 +100,3 @@ void PPM_Enable(unsigned low_time, volatile u16 *pulses, u8 num_pulses) {
 }
 
 void PXX_Enable(u8 *packet) { (void)packet; }
-
-void init_err_handler() {}
