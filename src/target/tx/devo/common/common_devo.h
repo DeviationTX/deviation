@@ -13,6 +13,13 @@
     #include "enable_petit_fat.h"
 #endif
 
+#ifndef HAS_STACKDUMP
+    #if !defined(USE_DEVOFS) || USE_DEVOFS != 1
+        #define HAS_STACKDUMP 1
+    #else
+        #define HAS_STACKDUMP 0
+    #endif
+#endif
 #include "ports.h"
 
 //Devo does drawing with LCD_Stop so ForceUpdate isn't needed
