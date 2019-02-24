@@ -12,7 +12,6 @@ endif
 
 SRC_C   := $(wildcard $(SDIR)/target/tx/$(FAMILY)/common/*.c) \
            $(wildcard $(SDIR)/target/tx/$(FAMILY)/$(TARGET)/*.c) \
-           $(wildcard $(SDIR)/target/drivers/storage/*.c) \
            $(wildcard $(SDIR)/target/drivers/mcu/stm32/*.c) \
            $(wildcard $(SDIR)/target/drivers/filesystems/*.c) \
            $(wildcard $(SDIR)/target/drivers/filesystems/devofs/*.c) \
@@ -22,21 +21,19 @@ SRC_C   := $(wildcard $(SDIR)/target/tx/$(FAMILY)/common/*.c) \
            $(wildcard $(SDIR)/target/tx/devo/common/hid/*.c) \
            $(wildcard $(SDIR)/target/tx/devo/common/protocol/*.c) \
            $(wildcard $(SDIR)/target/drivers/serial/uart/*.c) \
+           $(SDIR)/target/drivers/storage/mcu_flash.c \
            $(SDIR)/target/drivers/backlight/backlight.c \
            $(SDIR)/target/drivers/input/analog/analog.c
 
 
-ifneq "$(HAS_4IN1_FLASH)" "1"
-SRC_C := $(filter-out $(SDIR)/target/drivers/mcu/stm32/spi_flash.c, $(SRC_C))
+ifeq "$(HAS_4IN1_FLASH)" "1"
+SRC_C   += $(SDIR)/target/drivers/storage/spi_flash.c
 endif
 
 CFLAGS   = -D"assert_param(x)=" -DSTM32F10X_HD -DSTM32F1 -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -fdata-sections -ffunction-sections -I$(SDIR)/target/tx/devo/common/msc2/lib -I$(SDIR)/target/tx/devo/common/msc2 -I$(SDIR)/libopencm3/include -I$(SDIR)/target/drivers/filesystems -I$(SDIR)/target/tx/radiolink/common  -fno-builtin-printf -Os --specs=nano.specs
 
 ifeq "$(HAS_4IN1_FLASH)" "1"
 CFLAGS  += -D"HAS_4IN1_FLASH=1"
-endif
-ifeq "$(HAS_FLASH_DETECT)" "1"
-CFLAGS  += -D"HAS_FLASH_DETECT=1"
 endif
 MODULE_FLAGS = -fno-builtin
 

@@ -1,5 +1,4 @@
 HAS_4IN1_FLASH ?= 0
-HAS_FLASH_DETECT ?= $(HAS_4IN1_FLASH)
 
 SCREENSIZE  := 320x240x16
 FONTS        = filesystem/$(FILESYSTEM)/media/15ascii.fon \
