@@ -23,8 +23,6 @@
 #include "target/drivers/mcu/stm32/dma.h"
 #include "target/drivers/mcu/stm32/nvic.h"
 
-#include "../ports.h"
-
 void __attribute__((__used__)) _PWM_DMA_ISR(void)
 {
     timer_disable_counter(PWM_TIMER.tim);
