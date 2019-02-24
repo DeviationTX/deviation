@@ -1,5 +1,5 @@
-#ifndef _DTX_STM32F2_PORTFUNCS_H_
-#define _DTX_STM32F2_PORTFUNCS_H_
+#ifndef _DTX_STM32F2_GPIO_H_
+#define _DTX_STM32F2_GPIO_H_
 
 #include <libopencm3/stm32/gpio.h> /* For GPIO* definitions */
 #include <libopencm3/stm32/spi.h>
@@ -112,4 +112,4 @@ INLINE static inline void GPIO_pin_toggle(struct mcu_pin pin)
     gpio_toggle(pin.port, pin.pin);
 }
 
-#endif  // _DTX_STM32F2_PORTFUNCS_H_
+#endif  // _DTX_STM32F2_GPIO_H_
