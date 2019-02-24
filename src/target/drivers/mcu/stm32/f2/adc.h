@@ -16,7 +16,7 @@ static void ADC_start_conversion(uint32_t adc)
 
 static void ADC_calibrate(uint32_t adc)
 {
-    ///STM32F2 auoto-calibrates
+    /// STM32F2 auoto-calibrates
     (void)adc;
 }
 

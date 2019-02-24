@@ -102,18 +102,18 @@ Sets the SPI baudrate prescaler value to either divide by 4 or divide by 256.
 */
 enum speed_setting { INTERFACE_SLOW, INTERFACE_FAST };
 
-static void interface_speed( enum speed_setting speed )
+static void interface_speed(enum speed_setting speed)
 {
-	if ( speed == INTERFACE_SLOW )
+    if (speed == INTERFACE_SLOW)
     {
-		/* Set slow clock (100k-400k) */
-		spi_set_baudrate_prescaler(MMC_SPI.spi,MMC_BAUDRATE_SLOW);
-	}
+        /* Set slow clock (100k-400k) */
+        spi_set_baudrate_prescaler(MMC_SPI.spi, MMC_BAUDRATE_SLOW);
+    }
     else
     {
-		/* Set fast clock (depends on the CSD) */
-		spi_set_baudrate_prescaler(MMC_SPI.spi,MMC_BAUDRATE_FAST);
-	}
+        /* Set fast clock (depends on the CSD) */
+        spi_set_baudrate_prescaler(MMC_SPI.spi, MMC_BAUDRATE_FAST);
+    }
 }
 
 /*---------------------------------------------------------------------------*/
@@ -167,7 +167,7 @@ static int chk_power(void)
 
 @param[in] out: BYTE value to send.
 */
-static BYTE stm32_spi_rw( BYTE out )
+static BYTE stm32_spi_rw(BYTE out)
 {
     return spi_xfer(MMC_SPI.spi, out);
 }
@@ -186,13 +186,13 @@ Sends a byte 0xFF and picks up whatever returns.
 
 @returns BYTE value received.
 */
-static BYTE rcvr_spi (void)
+static BYTE rcvr_spi(void)
 {
         return stm32_spi_rw(0xff);
 }
 
 /* Alternative macro to receive data fast */
-#define rcvr_spi_m(dst)  *(dst)=stm32_spi_rw(0xff)
+#define rcvr_spi_m(dst)  *(dst) = stm32_spi_rw(0xff)
 
 
 
@@ -201,16 +201,16 @@ static BYTE rcvr_spi (void)
 
 @returns BYTE value of a status result. 0xFF means success, otherwise timeout.
 */
-static BYTE wait_ready (void)
+static BYTE wait_ready(void)
 {
         BYTE res;
 
 
         msecTimer2 = CLOCK_getms();    /* Wait for ready in timeout of 500ms */
         rcvr_spi();
-        do
+        do {
                 res = rcvr_spi();
-        while ((res != 0xFF) && !CHECK_T2(500));
+        } while ((res != 0xFF) && !CHECK_T2(500));
 
         return res;
 }
@@ -221,7 +221,7 @@ static BYTE wait_ready (void)
 /** @brief Deselect the card and release SPI bus
 
 */
-static void release_spi (void)
+static void release_spi(void)
 {
         DESELECT();
         rcvr_spi();
@@ -235,91 +235,90 @@ static void release_spi (void)
 @param[in] btr: UINT byte count (multiple of 2 for send, 512 always for receive)
 */
 static void stm32_dma_transfer(
-	BOOL receive,		/* FALSE for buff->SPI, TRUE for SPI->buff               */
-	const BYTE *buff,	/* receive TRUE  : 512 byte data block to be transmitted
-						   receive FALSE : Data buffer to store received data    */
-	UINT btr 			/* receive TRUE  : Byte count (must be multiple of 2)
-						   receive FALSE : Byte count (must be 512)              */
+    BOOL receive,        /* FALSE for buff->SPI, TRUE for SPI->buff               */
+    const BYTE *buff,    /* receive TRUE  : 512 byte data block to be transmitted */
+                         /* receive FALSE : Data buffer to store received data    */
+    UINT btr             /* receive TRUE  : Byte count (must be multiple of 2)    */
+                         /* receive FALSE : Byte count (must be 512)              */
 )
 {
-	WORD rw_workbyte[] = { 0xffff };
+    WORD rw_workbyte[] = { 0xffff };
 
         /* Reset DMA channels*/
-	dma_stream_reset(MMC_RX_DMA.dma, MMC_RX_DMA.stream);
-	dma_stream_reset(MMC_TX_DMA.dma, MMC_TX_DMA.stream);
-	
-	/* DMA1 read channel2 configuration SPI1 RX ---------------------------------------------*/
-	dma_channel_select(MMC_RX_DMA.dma, MMC_RX_DMA.stream, MMC_RX_DMA.channel);
-	dma_set_peripheral_address(MMC_RX_DMA.dma, MMC_RX_DMA.stream, (DWORD) &SPI_DR(MMC_SPI.spi));
-	dma_set_peripheral_size(MMC_RX_DMA.dma, MMC_RX_DMA.stream, DMA_SxCR_PSIZE_8BIT);
-	dma_set_memory_size(MMC_RX_DMA.dma, MMC_RX_DMA.stream, DMA_SxCR_MSIZE_8BIT);
-	dma_disable_peripheral_increment_mode(MMC_RX_DMA.dma, MMC_RX_DMA.stream);
-	dma_set_number_of_data(MMC_RX_DMA.dma, MMC_RX_DMA.stream, btr);
-	dma_set_priority(MMC_RX_DMA.dma, MMC_RX_DMA.stream, DMA_SxCR_PL_VERY_HIGH);
-	dma_enable_fifo_mode(MMC_RX_DMA.dma, MMC_RX_DMA.stream);
-	dma_set_fifo_threshold(MMC_RX_DMA.dma, MMC_RX_DMA.stream, DMA_SxFCR_FTH_4_4_FULL);
+    dma_stream_reset(MMC_RX_DMA.dma, MMC_RX_DMA.stream);
+    dma_stream_reset(MMC_TX_DMA.dma, MMC_TX_DMA.stream);
 
-	/* DMA1 write channel3 configuration SPI1 TX ---------------------------------------------*/
-	dma_channel_select(MMC_TX_DMA.dma, MMC_TX_DMA.stream, MMC_TX_DMA.channel);
-	dma_set_peripheral_address(MMC_TX_DMA.dma, MMC_TX_DMA.stream, (DWORD) &SPI_DR(MMC_SPI.spi));
-	dma_set_peripheral_size(MMC_TX_DMA.dma, MMC_TX_DMA.stream, DMA_SxCR_PSIZE_8BIT);
-	dma_set_memory_size(MMC_TX_DMA.dma, MMC_TX_DMA.stream, DMA_SxCR_MSIZE_8BIT);
-	dma_disable_peripheral_increment_mode(MMC_TX_DMA.dma, MMC_TX_DMA.stream);
-	dma_set_number_of_data(MMC_TX_DMA.dma, MMC_TX_DMA.stream, btr);
-	dma_set_priority(MMC_TX_DMA.dma, MMC_TX_DMA.stream, DMA_SxCR_PL_VERY_HIGH);
-	dma_enable_fifo_mode(MMC_TX_DMA.dma, MMC_TX_DMA.stream);
-	dma_set_fifo_threshold(MMC_TX_DMA.dma, MMC_TX_DMA.stream, DMA_SxFCR_FTH_4_4_FULL);
+    /* DMA1 read channel2 configuration SPI1 RX ---------------------------------------------*/
+    dma_channel_select(MMC_RX_DMA.dma, MMC_RX_DMA.stream, MMC_RX_DMA.channel);
+    dma_set_peripheral_address(MMC_RX_DMA.dma, MMC_RX_DMA.stream, (DWORD) &SPI_DR(MMC_SPI.spi));
+    dma_set_peripheral_size(MMC_RX_DMA.dma, MMC_RX_DMA.stream, DMA_SxCR_PSIZE_8BIT);
+    dma_set_memory_size(MMC_RX_DMA.dma, MMC_RX_DMA.stream, DMA_SxCR_MSIZE_8BIT);
+    dma_disable_peripheral_increment_mode(MMC_RX_DMA.dma, MMC_RX_DMA.stream);
+    dma_set_number_of_data(MMC_RX_DMA.dma, MMC_RX_DMA.stream, btr);
+    dma_set_priority(MMC_RX_DMA.dma, MMC_RX_DMA.stream, DMA_SxCR_PL_VERY_HIGH);
+    dma_enable_fifo_mode(MMC_RX_DMA.dma, MMC_RX_DMA.stream);
+    dma_set_fifo_threshold(MMC_RX_DMA.dma, MMC_RX_DMA.stream, DMA_SxFCR_FTH_4_4_FULL);
 
-	//seperate RX & TX
-	if ( receive ) { //true =read 
+    /* DMA1 write channel3 configuration SPI1 TX ---------------------------------------------*/
+    dma_channel_select(MMC_TX_DMA.dma, MMC_TX_DMA.stream, MMC_TX_DMA.channel);
+    dma_set_peripheral_address(MMC_TX_DMA.dma, MMC_TX_DMA.stream, (DWORD) &SPI_DR(MMC_SPI.spi));
+    dma_set_peripheral_size(MMC_TX_DMA.dma, MMC_TX_DMA.stream, DMA_SxCR_PSIZE_8BIT);
+    dma_set_memory_size(MMC_TX_DMA.dma, MMC_TX_DMA.stream, DMA_SxCR_MSIZE_8BIT);
+    dma_disable_peripheral_increment_mode(MMC_TX_DMA.dma, MMC_TX_DMA.stream);
+    dma_set_number_of_data(MMC_TX_DMA.dma, MMC_TX_DMA.stream, btr);
+    dma_set_priority(MMC_TX_DMA.dma, MMC_TX_DMA.stream, DMA_SxCR_PL_VERY_HIGH);
+    dma_enable_fifo_mode(MMC_TX_DMA.dma, MMC_TX_DMA.stream);
+    dma_set_fifo_threshold(MMC_TX_DMA.dma, MMC_TX_DMA.stream, DMA_SxFCR_FTH_4_4_FULL);
 
-		/* DMA1 read channel configuration SPI1 RX ---------------------------------------------*/
-		dma_set_memory_address(MMC_RX_DMA.dma, MMC_RX_DMA.stream, (DWORD)buff);
-		dma_set_transfer_mode(MMC_RX_DMA.dma, MMC_RX_DMA.stream, DMA_SxCR_DIR_PERIPHERAL_TO_MEM);
-		dma_enable_memory_increment_mode(MMC_RX_DMA.dma, MMC_RX_DMA.stream);
+    // seperate RX & TX
+    if (receive) {  // true =read
+        /* DMA1 read channel configuration SPI1 RX ---------------------------------------------*/
+        dma_set_memory_address(MMC_RX_DMA.dma, MMC_RX_DMA.stream, (DWORD)buff);
+        dma_set_transfer_mode(MMC_RX_DMA.dma, MMC_RX_DMA.stream, DMA_SxCR_DIR_PERIPHERAL_TO_MEM);
+        dma_enable_memory_increment_mode(MMC_RX_DMA.dma, MMC_RX_DMA.stream);
 
-		/* DMA1 write channel configuration SPI1 TX ---------------------------------------------*/
-		dma_set_memory_address(MMC_TX_DMA.dma, MMC_TX_DMA.stream,(DWORD)rw_workbyte);
-		dma_set_transfer_mode(MMC_TX_DMA.dma, MMC_TX_DMA.stream, DMA_SxCR_DIR_MEM_TO_PERIPHERAL);
-		dma_disable_memory_increment_mode(MMC_TX_DMA.dma, MMC_TX_DMA.stream);
+        /* DMA1 write channel configuration SPI1 TX ---------------------------------------------*/
+        dma_set_memory_address(MMC_TX_DMA.dma, MMC_TX_DMA.stream, (DWORD)rw_workbyte);
+        dma_set_transfer_mode(MMC_TX_DMA.dma, MMC_TX_DMA.stream, DMA_SxCR_DIR_MEM_TO_PERIPHERAL);
+        dma_disable_memory_increment_mode(MMC_TX_DMA.dma, MMC_TX_DMA.stream);
 
-	} else {//false = write
+    } else {  // false = write
+#if _FS_READONLY == 0  // READ AND WRITE = write enabled.
+        /* DMA1 read channel configuration SPI1 RX ---------------------------------------------*/
+        dma_set_memory_address(MMC_RX_DMA.dma, MMC_RX_DMA.stream, (DWORD)rw_workbyte);
+        dma_set_transfer_mode(MMC_RX_DMA.dma, MMC_RX_DMA.stream, DMA_SxCR_DIR_PERIPHERAL_TO_MEM);
+        dma_disable_memory_increment_mode(MMC_RX_DMA.dma, MMC_RX_DMA.stream);
 
-#if _FS_READONLY == 0 //READ AND WRITE = write enabled.
-		/* DMA1 read channel configuration SPI1 RX ---------------------------------------------*/
-		dma_set_memory_address(MMC_RX_DMA.dma, MMC_RX_DMA.stream, (DWORD)rw_workbyte);
-		dma_set_transfer_mode(MMC_RX_DMA.dma, MMC_RX_DMA.stream, DMA_SxCR_DIR_PERIPHERAL_TO_MEM);
-		dma_disable_memory_increment_mode(MMC_RX_DMA.dma, MMC_RX_DMA.stream);
-
-		/* DMA1 write channel configuration SPI1 TX ---------------------------------------------*/
-		dma_set_memory_address(MMC_TX_DMA.dma, MMC_TX_DMA.stream, (DWORD)buff);
-		dma_set_transfer_mode(MMC_TX_DMA.dma, MMC_TX_DMA.stream, DMA_SxCR_DIR_MEM_TO_PERIPHERAL);
-		dma_enable_memory_increment_mode(MMC_TX_DMA.dma, MMC_TX_DMA.stream);
+        /* DMA1 write channel configuration SPI1 TX ---------------------------------------------*/
+        dma_set_memory_address(MMC_TX_DMA.dma, MMC_TX_DMA.stream, (DWORD)buff);
+        dma_set_transfer_mode(MMC_TX_DMA.dma, MMC_TX_DMA.stream, DMA_SxCR_DIR_MEM_TO_PERIPHERAL);
+        dma_enable_memory_increment_mode(MMC_TX_DMA.dma, MMC_TX_DMA.stream);
 #endif
+    }
 
-	}
+    /* Enable DMA Channels */
+    dma_enable_stream(MMC_RX_DMA.dma, MMC_RX_DMA.stream);
+    dma_enable_stream(MMC_TX_DMA.dma, MMC_TX_DMA.stream);
 
-	/* Enable DMA Channels */
-	dma_enable_stream(MMC_RX_DMA.dma, MMC_RX_DMA.stream);
-	dma_enable_stream(MMC_TX_DMA.dma, MMC_TX_DMA.stream);
+    /* Enable SPI TX/RX request */
+    spi_enable_rx_dma(MMC_SPI.spi);
+    spi_enable_tx_dma(MMC_SPI.spi);
 
-	/* Enable SPI TX/RX request */
-	spi_enable_rx_dma(MMC_SPI.spi);
-	spi_enable_tx_dma(MMC_SPI.spi);
+    /* Wait until DMA1_Channel 3 Transfer Complete */
+    while (!dma_get_interrupt_flag(MMC_TX_DMA.dma, MMC_TX_DMA.stream, DMA_TCIF))
+        continue;
 
-	/* Wait until DMA1_Channel 3 Transfer Complete */
-	while (! dma_get_interrupt_flag(MMC_TX_DMA.dma, MMC_TX_DMA.stream, DMA_TCIF));
+    /* Wait until DMA1_Channel 2 Receive Complete */
+    while (!dma_get_interrupt_flag(MMC_RX_DMA.dma, MMC_RX_DMA.stream, DMA_TCIF))
+        continue;
 
-	/* Wait until DMA1_Channel 2 Receive Complete */
-	while (! dma_get_interrupt_flag(MMC_RX_DMA.dma, MMC_RX_DMA.stream, DMA_TCIF));
+    /* Disable DMA Channels */
+    dma_disable_stream(MMC_RX_DMA.dma, MMC_RX_DMA.stream);
+    dma_disable_stream(MMC_TX_DMA.dma, MMC_TX_DMA.stream);
 
-	/* Disable DMA Channels */
-	dma_disable_stream(MMC_RX_DMA.dma, MMC_RX_DMA.stream);
-	dma_disable_stream(MMC_TX_DMA.dma, MMC_TX_DMA.stream);
-
-	/* Disable SPI RX/TX requests */
-	spi_disable_rx_dma(MMC_SPI.spi);
-	spi_disable_tx_dma(MMC_SPI.spi);
+    /* Disable SPI RX/TX requests */
+    spi_disable_rx_dma(MMC_SPI.spi);
+    spi_disable_tx_dma(MMC_SPI.spi);
 }
 #endif /* STM32_SD_USE_DMA */
 
@@ -329,24 +328,24 @@ static void stm32_dma_transfer(
 
 All peripherals are initialised and the power is turned on to the card.
 */
-static void power_on (void)
+static void power_on(void)
 {
-	volatile BYTE dummyread;
+    volatile BYTE dummyread;
 
-	spi_set_full_duplex_mode(MMC_SPI.spi);
-	spi_set_master_mode(MMC_SPI.spi);
-	spi_disable_crc(MMC_SPI.spi);
-	spi_enable_software_slave_management(MMC_SPI.spi);
-	spi_set_nss_high(MMC_SPI.spi);
+    spi_set_full_duplex_mode(MMC_SPI.spi);
+    spi_set_master_mode(MMC_SPI.spi);
+    spi_disable_crc(MMC_SPI.spi);
+    spi_enable_software_slave_management(MMC_SPI.spi);
+    spi_set_nss_high(MMC_SPI.spi);
 
-	spi_enable(MMC_SPI.spi);
+    spi_enable(MMC_SPI.spi);
 
-	/* drain SPI */
-	while (!(SPI_SR(MMC_SPI.spi) & SPI_SR_TXE))
-            ;
-	dummyread = SPI_DR(MMC_SPI.spi);
+    /* drain SPI */
+    while (!(SPI_SR(MMC_SPI.spi) & SPI_SR_TXE))
+         continue;
+    dummyread = SPI_DR(MMC_SPI.spi);
 
-	(void)dummyread;
+    (void)dummyread;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -354,17 +353,16 @@ static void power_on (void)
 
 All peripherals are disabled and the power is turned off to the card.
 */
-static void power_off (void)
+static void power_off(void)
 {
-  
-	if (!(Stat & STA_NOINIT)) {
-		SELECT();
-		wait_ready();
-		release_spi();
-	}
+    if (!(Stat & STA_NOINIT)) {
+        SELECT();
+        wait_ready();
+        release_spi();
+    }
 
-	spi_disable(MMC_SPI.spi);
-	Stat |= STA_NOINIT;		/* Set STA_NOINIT */
+    spi_disable(MMC_SPI.spi);
+    Stat |= STA_NOINIT;        /* Set STA_NOINIT */
 }
 
 /*---------------------------------------------------------------------------*/
@@ -375,7 +373,7 @@ Can be done with DMA or programmed.
 @param *buff: BYTE 512 byte data block to store received data 
 @param btr: UINT Byte count (must be multiple of 4)
 */
-static BOOL rcvr_datablock (
+static BOOL rcvr_datablock(
         BYTE *buff,                     /* Data buffer to store received data */
         UINT btr                        /* Byte count (must be multiple of 4) */
 )
@@ -387,10 +385,10 @@ static BOOL rcvr_datablock (
         do {                                                    /* Wait for data packet in timeout of 100ms */
                 token = rcvr_spi();
         } while ((token == 0xFF) && !CHECK_T1(100));
-        if(token != 0xFE) return FALSE; /* If not valid data token, return with error */
+        if (token != 0xFE) return FALSE; /* If not valid data token, return with error */
 
 #ifdef STM32_SD_USE_DMA
-        stm32_dma_transfer( TRUE, buff, btr );
+        stm32_dma_transfer(TRUE, buff, btr);
 #else
         do {                                                    /* Receive the data block into buffer */
                 rcvr_spi_m(buff++);
@@ -415,7 +413,7 @@ Only compiled if the filesystem is writeable.
 @param token: BYTE Data/Stop token
 */
 #if _FS_READONLY == 0
-static BOOL xmit_datablock (
+static BOOL xmit_datablock(
         const BYTE *buff,       /* 512 byte data block to be transmitted */
         BYTE token                      /* Data/Stop token */
 )
@@ -429,9 +427,8 @@ static BOOL xmit_datablock (
 
         xmit_spi(token);                                        /* transmit data token */
         if (token != 0xFD) {    /* Is data token */
-
 #ifdef STM32_SD_USE_DMA
-                stm32_dma_transfer( FALSE, buff, 512 );
+                stm32_dma_transfer(FALSE, buff, 512);
 #else
                 wc = 0;
                 do {                                                    /* transmit the 512 byte data block to MMC */
@@ -458,7 +455,7 @@ static BOOL xmit_datablock (
 @param arg: DWORD argument for command
 @returns BYTE response
 */
-static BYTE send_cmd (
+static BYTE send_cmd(
         BYTE cmd,               /* Command byte */
         DWORD arg               /* Argument */
 )
@@ -493,9 +490,9 @@ static BYTE send_cmd (
         if (cmd == CMD12) rcvr_spi();           /* Skip a stuff byte when stop reading */
 
         n = 10;                                                         /* Wait for a valid response in timeout of 10 attempts */
-        do
-                res = rcvr_spi();
-        while ((res & 0x80) && --n);
+        do {
+            res = rcvr_spi();
+        } while ((res & 0x80) && --n);
 
         return res;                     /* Return with the response value */
 }
@@ -512,12 +509,12 @@ static BYTE send_cmd (
 
 @param[in] drv: BYTE Physical drive number (only 0 allowed)
 */
-DSTATUS disk_initialize (
+DSTATUS disk_initialize(
         BYTE drv                /* Physical drive number (0) */
 )
 {
         BYTE n, cmd, ty, ocr[4];
-	printf("Volume: %d Stat: %d\n", drv, Stat);
+    printf("Volume: %d Stat: %d\n", drv, Stat);
         if (drv) return STA_NOINIT;                     /* Supports only single drive */
         if (Stat & STA_NODISK) return Stat;     /* No card in the socket */
 
@@ -531,7 +528,8 @@ DSTATUS disk_initialize (
                 if (send_cmd(CMD8, 0x1AA) == 1) {       /* SDHC */
                         for (n = 0; n < 4; n++) ocr[n] = rcvr_spi();            /* Get trailing return value of R7 response */
                         if (ocr[2] == 0x01 && ocr[3] == 0xAA) {                         /* The card can work at VDD range of 2.7-3.6V */
-                                while (!CHECK_T1(1000) && send_cmd(ACMD41, 1UL << 30));  /* Wait for leaving idle state (ACMD41 with HCS bit) */
+                                while (!CHECK_T1(1000) && send_cmd(ACMD41, 1UL << 30))
+                                    continue;  /* Wait for leaving idle state (ACMD41 with HCS bit) */
                                 if (!CHECK_T1(1000) && send_cmd(CMD58, 0) == 0) {                /* Check CCS bit in the OCR */
                                         for (n = 0; n < 4; n++) ocr[n] = rcvr_spi();
                                         ty = (ocr[0] & 0x40) ? CT_SD2 | CT_BLOCK : CT_SD2;
@@ -543,7 +541,8 @@ DSTATUS disk_initialize (
                         } else {
                                 ty = CT_MMC; cmd = CMD1;        /* MMC */
                         }
-                        while (!CHECK_T1(1000) && send_cmd(cmd, 0));                     /* Wait for leaving idle state */
+                        while (!CHECK_T1(1000) && send_cmd(cmd, 0))
+                            continue;                     /* Wait for leaving idle state */
                         if (CHECK_T1(1000) || send_cmd(CMD16, 512) != 0)       /* Set R/W block length to 512 */
                                 ty = 0;
                 }
@@ -557,7 +556,7 @@ DSTATUS disk_initialize (
         } else {                        /* Initialization failed */
                 power_off();
         }
-	printf("Stat2: %d\n", Stat);
+    printf("Stat2: %d\n", Stat);
         return Stat;
 }
 
@@ -567,7 +566,7 @@ DSTATUS disk_initialize (
 @param[in] drv: BYTE Physical drive number (only 0 allowed)
 @returns DSTATUS
 */
-DSTATUS disk_status (
+DSTATUS disk_status(
         BYTE drv                /* Physical drive number (0) */
 )
 {
@@ -581,7 +580,6 @@ DSTATUS disk_status (
 /* Read Sector(s)                                                        */
 /*-----------------------------------------------------------------------*/
 
-// TODO quick & dirty
 int8_t SD_ReadSectors(uint8_t *buff, uint32_t sector, uint32_t count)
 {
   if (!(CardType & CT_BLOCK)) sector *= 512;      /* Convert to byte address if needed */
@@ -610,7 +608,7 @@ int8_t SD_ReadSectors(uint8_t *buff, uint32_t sector, uint32_t count)
 @param[in] count: BYTE number of sectors to read
 @returns DRESULT success (RES_OK) or fail.
 */
-DRESULT disk_read (
+DRESULT disk_read(
         BYTE drv,                       /* Physical drive number (0) */
         BYTE *buff,                     /* Pointer to the data buffer to store read data */
         DWORD sector,           /* Start sector number (LBA) */
@@ -628,8 +626,7 @@ DRESULT disk_read (
                                 count = 0;
                         }
                 }
-        }
-        else {                          /* Multiple block read */
+        } else {                          /* Multiple block read */
                 if (send_cmd(CMD18, sector) == 0) {     /* READ_MULTIPLE_BLOCK */
                         do {
                                 if (!rcvr_datablock(buff, 512)) {
@@ -653,7 +650,6 @@ DRESULT disk_read (
 
 #if _FS_READONLY == 0
 
-// TODO quick & dirty
 int8_t SD_WriteSectors(uint8_t *buff, uint32_t sector, uint32_t count)
 {
   if (!(CardType & CT_BLOCK)) sector *= 512;      /* Convert to byte address if needed */
@@ -681,7 +677,7 @@ int8_t SD_WriteSectors(uint8_t *buff, uint32_t sector, uint32_t count)
 @param[in] count: BYTE number of sectors to read
 @returns DRESULT success (RES_OK) or fail.
 */
-DRESULT disk_write (
+DRESULT disk_write(
         BYTE drv,                       /* Physical drive number (0) */
         const BYTE *buff,       /* Pointer to the data to be written */
         DWORD sector,           /* Start sector number (LBA) */
@@ -698,8 +694,7 @@ DRESULT disk_write (
                 if ((send_cmd(CMD24, sector) == 0)      /* WRITE_BLOCK */
                         && xmit_datablock(buff, 0xFE))
                         count = 0;
-        }
-        else {                          /* Multiple block write */
+        } else {                          /* Multiple block write */
                 if (CardType & CT_SDC) send_cmd(ACMD23, count);
                 if (send_cmd(CMD25, sector) == 0) {     /* WRITE_MULTIPLE_BLOCK */
                         do {
@@ -727,7 +722,7 @@ DRESULT disk_write (
 
 @param[in] drv: BYTE Physical drive number (only 0 allowed)
 @param[in] ctrl: BYTE Control Code.
-                    CTRL_POWER (0=on,1=off,2=get setting)
+                    CTRL_POWER (0=on, 1=off, 2=get setting)
                     CTRL_SYNC wait for writes to complete
                     GET_SECTOR_COUNT iumber of sectors on disk
                     GET_SECTOR_SIZE
@@ -741,7 +736,7 @@ DRESULT disk_write (
 @returns DRESULT success (RES_OK) or fail (RES_ERROR).
 */
 #if (STM32_SD_DISK_IOCTRL == 1)
-DRESULT disk_ioctl (
+DRESULT disk_ioctl(
         BYTE drv,               /* Physical drive number (0) */
         BYTE ctrl,              /* Control code */
         void *buff              /* Buffer to send/receive control data */
@@ -773,8 +768,7 @@ DRESULT disk_ioctl (
                 default :
                         res = RES_PARERR;
                 }
-        }
-        else {
+        } else {
                 if (Stat & STA_NOINIT) return RES_NOTRDY;
 
                 switch (ctrl) {

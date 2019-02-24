@@ -9,7 +9,7 @@
 #include <libopencm3/stm32/timer.h>
 #include <libopencm3/stm32/usart.h>
 
-#pragma GCC diagnostic push 
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wattributes"  // Disable warning about possible inlining
 __attribute__((always_inline)) static enum rcc_periph_clken get_rcc_from_port(u32 port)
 {
@@ -52,9 +52,9 @@ __attribute__((always_inline)) static enum rcc_periph_clken get_rcc_from_port(u3
 #pragma GCC diagnostic pop
 
 #define get_rcc_from_pin(x) get_rcc_from_port((x).port)
-//static inline  enum rcc_periph_clken get_rcc_from_pin(struct mcu_pin pin)
-//{
+// static inline  enum rcc_periph_clken get_rcc_from_pin(struct mcu_pin pin)
+// {
 //    return get_rcc_from_port(pin.port);
-//}
+// }
 
-#endif // _DTX_STM32_F2_RCC_H_
+#endif  // _DTX_STM32_F2_RCC_H_

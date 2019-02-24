@@ -33,8 +33,8 @@ void Initialize_ButtonMatrix()
 u32 ScanButtons()
 {
     u32 result = 0;
-    for(int i = 1; i < BUT_LAST; i++) {
-        int val = ! GPIO_pin_get(btn_pins[i-1]);
+    for (int i = 1; i < BUT_LAST; i++) {
+        int val = !GPIO_pin_get(btn_pins[i-1]);
         if (val)
             result = 1 << (i-1);
     }

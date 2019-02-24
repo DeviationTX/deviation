@@ -4,26 +4,26 @@
 #define FLASHTYPE FLASHTYPE_NONE
 #if defined(EMULATOR) && EMULATOR == USE_NATIVE_FS
     #include "enable_native_fs.h"
-#else 
+#else
     #include "enable_fatfs.h"
     #include "fat_io.h"
-    #include "target/drivers/usb/uart/usb_uart.h"
+    #include "target/drivers/serial/usb_cdc/usb_uart.h"
 #endif
 
 #define TXID 0x12
 #define VECTOR_TABLE_LOCATION 0x8000
-#define SPIFLASH_SECTOR_OFFSET 54     //FIXME
-#define SPIFLASH_SECTORS 1024         //FIXME
+#define SPIFLASH_SECTOR_OFFSET 54     // FIXME
+#define SPIFLASH_SECTORS 1024         // FIXME
 
-#define DISABLE_PWM 1                 //FIXME
+#define DISABLE_PWM 1                 // FIXME
 
-#define HAS_STANDARD_GUI    0         //FIXME
+#define HAS_STANDARD_GUI    0         // FIXME
 #define HAS_ADVANCED_GUI    1
 #define HAS_PERMANENT_TIMER 1
 #define HAS_TELEMETRY       1
 #define HAS_EXTENDED_TELEMETRY 1
 #define HAS_TOUCH           0
-#define HAS_RTC             0         //FIXME
+#define HAS_RTC             0         // FIXME
 #define HAS_VIBRATINGMOTOR  1
 #define HAS_DATALOG         1
 #define HAS_SCANNER         0
@@ -35,9 +35,9 @@
 #define HAS_MULTIMOD_SUPPORT 1
 #define HAS_VIDEO           0
 #define HAS_4IN1_FLASH      0
-#define HAS_EXTENDED_AUDIO  0         //FIXME
-#define HAS_AUDIO_UART5     0         //FIXME
-#define HAS_MUSIC_CONFIG    0         //FIXME
+#define HAS_EXTENDED_AUDIO  0         // FIXME
+#define HAS_AUDIO_UART5     0         // FIXME
+#define HAS_MUSIC_CONFIG    0         // FIXME
 #define USE_4BUTTON_MODE    0
 #define HAS_AUDIO_UART      0
 #define HAS_STACKDUMP       0
@@ -81,7 +81,7 @@ u32 SOUND_Callback();
 
 extern void PROTO_Stubs(int);
 // ADC defines
-#define NUM_ADC_CHANNELS (INP_HAS_CALIBRATION + 2) //Inputs + Temprature + Voltage
+#define NUM_ADC_CHANNELS (INP_HAS_CALIBRATION + 2)  // Inputs + Temprature + Voltage
 extern const u8 adc_chan_sel[NUM_ADC_CHANNELS];
 extern volatile u16 adc_array_raw[NUM_ADC_CHANNELS];
 void ADC_Filter();
@@ -90,4 +90,4 @@ static inline void LCD_ForceUpdate() {}
 #endif
 
 
-#endif //_T12_TARGET_H_
+#endif  // _T12_TARGET_H_

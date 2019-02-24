@@ -27,7 +27,7 @@
     _BTN(GPIOD, GPIO2),  /*BUT_EXIT*/        \
     }
 
-// Analog channels    
+// Analog channels
 #define ADC_CHANNELS { \
     ADC_CHAN(GPIOA, GPIO0),  /* ADC123_0  */ \
     ADC_CHAN(GPIOA, GPIO1),  /* ADC123_1  */ \
@@ -39,16 +39,16 @@
     ADC_CHAN(GPIOC, GPIO0),  /* ADC123_10 */ \
     }
 
-//Power switch configuration
+// Power switch configuration
 #define PWR_SWITCH_PIN   ((struct mcu_pin){GPIOD, GPIO1})
 #define PWR_ENABLE_PIN   ((struct mcu_pin){GPIOD, GPIO0})
 
-//LEDs
+// LEDs
 #define LED_RED_PIN   ((struct mcu_pin){GPIOC, GPIO5})
 #define LED_GREEN_PIN ((struct mcu_pin){GPIOB, GPIO1})
 #define LED_BLUE_PIN  ((struct mcu_pin){GPIOC, GPIO4})
 
-//Haptic
+// Haptic
 #define HAPTIC_PIN ((struct mcu_pin){GPIOB, GPIO8})
 
 
@@ -56,21 +56,21 @@
 // On STM32F2, LCD is on SPI3->APB1@30MHz ClockDiv=2, Fspi=15MHz
 // On STM32F1, LCD is on SPI1->APB2@72MHz, ClockDiv=4, Fspi=18MHz
 #define SPI3_CFG ((struct spi_config) { \
-   .spi = SPI3,            \
-   .sck  = {GPIOC, GPIO10}, \
-   .miso = NULL_PIN, \
-   .mosi = {GPIOC, GPIO12}, \
-   .rate = SPI_CR1_BAUDRATE_FPCLK_DIV_2, \
-   DEFAULT_SPI_SETTINGS, \
-   .altfn = 0 })
+    .spi = SPI3,            \
+    .sck  = {GPIOC, GPIO10}, \
+    .miso = NULL_PIN, \
+    .mosi = {GPIOC, GPIO12}, \
+    .rate = SPI_CR1_BAUDRATE_FPCLK_DIV_2, \
+    DEFAULT_SPI_SETTINGS, \
+    .altfn = 0 })
 
-//SPI LCD
-//Setup CS as A.15 Data/Control = C.11
+// SPI LCD
+// Setup CS as A.15 Data/Control = C.11
 #define LCD_SPI ((struct spi_csn) { SPI3, {GPIOA, GPIO15}})
 #define LCD_SPI_MODE ((struct mcu_pin) {GPIOC, GPIO11})
 #define LCD_SPI_CFG SPI3_CFG
 
-//Setup ADC
+// Setup ADC
 // prescalar: APB2@60MHz/6 = 10MHz
 #define ADC_OVERSAMPLE_WINDOW_COUNT  1
 #define ADC_CFG ((struct adc_config){     \
@@ -85,7 +85,7 @@
     .channel = DMA_SxCR_CHSEL_0,       \
     })
 
-//Backlight
+// Backlight
 #define BACKLIGHT_TIM ((struct tim_config) { \
     .tim = TIM4,              \
     .pin =  {GPIOD, GPIO13},  \
@@ -101,19 +101,19 @@
 // On STM32F2, SPI2->APB1@30MHz ClockDiv=2, Fspi=15MHz
 // Keep SPI clock < 20MHz
 #define SPI2_CFG ((struct spi_config) { \
-   .spi = SPI2,            \
-   .sck  = {GPIOB, GPIO13}, \
-   .miso = {GPIOB, GPIO14}, \
-   .mosi = {GPIOB, GPIO15}, \
-   .rate = SPI_CR1_BAUDRATE_FPCLK_DIV_2, \
-   DEFAULT_SPI_SETTINGS, \
-   .altfn = 0 })
+    .spi = SPI2,            \
+    .sck  = {GPIOB, GPIO13}, \
+    .miso = {GPIOB, GPIO14}, \
+    .mosi = {GPIOB, GPIO15}, \
+    .rate = SPI_CR1_BAUDRATE_FPCLK_DIV_2, \
+    DEFAULT_SPI_SETTINGS, \
+    .altfn = 0 })
 #define MMC_SPI_CFG SPI2_CFG
 #define MMC_SPI ((struct spi_csn) { SPI2, {GPIOB, GPIO12}})
 #define MMC_PRESENT ((struct mcu_pin) {GPIOD, GPIO9})
 #define MMC_PROTECT NULL_PIN
-#define MMC_BAUDRATE_SLOW	SPI_CR1_BR_FPCLK_DIV_128
-#define MMC_BAUDRATE_FAST	SPI_CR1_BAUDRATE_FPCLK_DIV_4
+#define MMC_BAUDRATE_SLOW       SPI_CR1_BR_FPCLK_DIV_128
+#define MMC_BAUDRATE_FAST       SPI_CR1_BAUDRATE_FPCLK_DIV_4
 #define MMC_RX_DMA ((struct dma_config) { \
     .dma = DMA1,                  \
     .stream = DMA_STREAM3,        \
@@ -165,7 +165,7 @@
     })
 #define I2C_ADDRESS_VOLUME 0x5C
 
-#define AUDIODAC_TIM TIM_CFG(2)  //TIM2
+#define AUDIODAC_TIM TIM_CFG(2)  // TIM2
 #include "target/drivers/mcu/stm32/hardware.h"
 
 #endif  // _HARDWARE_H_

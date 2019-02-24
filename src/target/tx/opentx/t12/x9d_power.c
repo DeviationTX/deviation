@@ -50,7 +50,7 @@ void PWR_Shutdown()
     BACKLIGHT_Brightness(0);
     __disable_irq();
     GPIO_pin_clear(PWR_ENABLE_PIN);
-    while(1)  {
+    while (1)  {
         // We may be here a long time if user hold power button
         CLOCK_ResetWatchdog();
     }
@@ -62,13 +62,13 @@ int PWR_CheckPowerSwitch()
     static u32 debounce = 0;
 #endif
 
-    if(! GPIO_pin_get(PWR_SWITCH_PIN)) {
+    if (!GPIO_pin_get(PWR_SWITCH_PIN)) {
 #if HAS_BUTTON_POWER_ON
         if (debounce == 0) debounce = CLOCK_getms();
     } else {
         debounce = 0;
     }
-    if(debounce && (CLOCK_getms() - debounce) >= 1000) { // 1 sec
+    if (debounce && (CLOCK_getms() - debounce) >= 1000) {  // 1 sec
 #endif
         return 1;
     }
