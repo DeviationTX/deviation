@@ -801,9 +801,110 @@ u8 GUI_ObjectNeedsRedraw(guiObject_t *obj)
     return OBJ_IS_DIRTY(obj);
 }
 
+static void _DrawButtonBackground(u16 x, u16 y, const struct ImageMap *map, u8 idx)
+{
+    // determine size
+
+    // draw border
+    LCD_DrawFastHLine(x + 1, y,               map->width - 2, 0);
+    LCD_DrawFastHLine(x + 1, y + map->height - 1, map->width - 2, 0);
+    LCD_DrawFastVLine(x,     y + 1,           map->height - 2, 0);
+    LCD_DrawFastVLine(x + map->width - 1, y + 1, map->height - 2, 0);
+
+    // draw up/down effect
+    u16 fillcolor = 0;
+    u16 uppercolor = 0;
+    u16 bottomcolor = 0;
+
+    switch(map->x_off) {
+        case 0:
+        case 2:
+        {
+            // this is a button
+            if (idx) {
+                fillcolor = 0xffff;
+                uppercolor = 0xa534;
+                bottomcolor = 0xe73c;
+            } else {
+                fillcolor = 0xbdf7;
+                uppercolor = 0xe73c;
+                bottomcolor = 0xa534;
+            }
+        }
+        break;
+
+        case 1:
+        {
+            // this is textself
+            if (!idx) {
+                fillcolor = 0xffff;
+            } else {
+                fillcolor = 0xbdf7;
+            }
+        }
+        break;
+    }
+
+    if (map->x_off != 1) {
+        LCD_DrawFastHLine(x + 1, y + 1, map->width - 3, uppercolor);
+        LCD_DrawFastVLine(x + 1, y + 1, map->height - 3, uppercolor);
+
+        LCD_DrawFastHLine(x + 2, y + map->height - 2, map->width - 3, bottomcolor);
+        LCD_DrawFastVLine(x + map->width - 2, y + 2, map->height - 3, bottomcolor);
+
+        LCD_DrawPixelXY(x + 1, y + map->height - 2, 0xbdf7);
+        LCD_DrawPixelXY(x + map->width - 2, y + 1, 0xbdf7);
+
+        LCD_FillRect(x + 2, y + 2, map->width - 4, map->height - 4, fillcolor);
+    }
+    else
+    {
+        LCD_FillRect(x + 1, y + 1, map->width - 2, map->height - 2, fillcolor);
+    }
+
+    if (map->x_off != 2)
+        return;
+
+    u16 color = idx ? 0xf800 : 0x0000;
+    u16 x_start, y_start, x_end, y_end;
+    u16 size = map->height - 1;
+
+    // up coordinates
+    x_start = size / 4;
+    y_start = size / 3 * 2 - 1;
+    x_end = size / 2;
+    y_end = size / 3;
+
+    // draw additional arrows
+    switch(map->y_off)
+    {
+        case 1:
+            LCD_DrawLine(x + x_start, y + y_start, x + x_end, y + y_end, color);
+            LCD_DrawLine(x + x_end + 1, y + y_end, x + size - x_start, y + y_start, color);
+            break;
+        case 2:
+            LCD_DrawLine(x + x_start, y + size - y_start, x + x_end, y + size - y_end, color);
+            LCD_DrawLine(x + x_end + 1, y + size - y_end, x + size - x_start, y + size - y_start, color);
+            break;
+        case 3:
+            LCD_DrawLine(x + size - y_start, y + x_start, x + size - y_end, y + x_end, color);
+            LCD_DrawLine(x + size - y_end, y + x_end + 1, x + size - y_start, y + size - x_start, color);
+            break;
+        case 4:
+            LCD_DrawLine(x + y_start, y + x_start, x + y_end, y + x_end, color);
+            LCD_DrawLine(x + y_end, y + x_end + 1, x + y_start, y + size - x_start, color);
+            break;
+        default:
+            return;
+    }
+}
+
 void GUI_DrawImageHelper(u16 x, u16 y, const struct ImageMap *map, u8 idx)
 {
-    LCD_DrawWindowedImageFromFile(x, y, map->file, map->width, map->height,
+    if (map->file == NULL)
+        _DrawButtonBackground(x, y, map, idx);
+    else
+        LCD_DrawWindowedImageFromFile(x, y, map->file, map->width, map->height,
                                   map->x_off, map->y_off + idx * map->height);
 }
 

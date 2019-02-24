@@ -24,7 +24,8 @@ void _DrawTextSelectHelper(struct guiTextSelect *select, const char *str)
 #if HAS_RTC
     if (select->type == TEXTSELECT_VERT_64) {
         GUI_DrawImageHelper(box->x,
-                box->y + ARROW_HEIGHT, select->button, DRAW_NORMAL);
+                box->y + ARROW_HEIGHT, select->button,
+                select->enable & 0x02 ? DRAW_PRESSED : DRAW_NORMAL);
         if (select->enable & 0x01) {
             GUI_DrawImageHelper(box->x + (box->width - ARROW_WIDTH) / 2, box->y, ARROW_UP,
                     select->state & 0x02 ? DRAW_PRESSED : DRAW_NORMAL);
@@ -36,7 +37,8 @@ void _DrawTextSelectHelper(struct guiTextSelect *select, const char *str)
 #endif
     {
         GUI_DrawImageHelper(box->x + ARROW_WIDTH,
-                box->y, select->button, DRAW_NORMAL);
+                box->y, select->button,
+                select->enable & 0x02 ? DRAW_PRESSED : DRAW_NORMAL);
         if (select->enable & 0x01) {
             GUI_DrawImageHelper(box->x, box->y, ARROW_LEFT,
                     select->state & 0x01 ? DRAW_PRESSED : DRAW_NORMAL);
