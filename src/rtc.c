@@ -298,6 +298,16 @@ u32 RTC_GetDateValue(u32 time)
     return time / DAYSEC;
 }
 
+void RTC_GetTimeGTM(struct gtm *t)
+{
+    uint32_t value = RTC_GetValue();
+    t->tm_sec  = _RTC_GetSecond(value);
+    t->tm_min  = _RTC_GetMinute(value);
+    t->tm_hour = _RTC_GetHour(value);
+    t->tm_mday = _RTC_GetDay(value);
+    t->tm_year = _RTC_GetYear(value) - 1900;
+}
+
 const char *RTC_Name(char *str, int i)
 {
     sprintf(str, "%s", i == 0 ? _tr("Clock") : _tr("Date"));

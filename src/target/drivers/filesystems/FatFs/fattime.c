@@ -34,14 +34,14 @@
  *
  */
 
-#include "integer.h"
-#include "../fs_rtc.h"
+#include "common.h"
+#include "rtc.h"
 
 DWORD get_fattime(void)
 {
+#if HAS_RTC
   struct gtm t;
-
-  gettime(&t);
+  RTC_GetTimeGTM(&t);
 
   /* Pack date and time into a DWORD variable */
   return ((DWORD)(t.tm_year - 80) << 25)
@@ -50,4 +50,7 @@ DWORD get_fattime(void)
     | ((uint32_t)t.tm_hour << 11)
     | ((uint32_t)t.tm_min << 5)
     | ((uint32_t)t.tm_sec >> 1);
+#else
+  return 0;
+#endif
 }

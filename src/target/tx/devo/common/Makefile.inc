@@ -27,6 +27,7 @@ SRC_C    = $(wildcard $(SDIR)/target/tx/devo/$(TARGET)/*.c) \
            $(wildcard $(SDIR)/target/drivers/sound/piezo/*.c) \
            $(wildcard $(SDIR)/target/drivers/sound/uart_audio/*.c) \
            $(SDIR)/target/drivers/backlight/backlight.c \
+           $(SDIR)/target/drivers/rtc/rtc_driver.c \
            $(SDIR)/target/drivers/haptic/haptic.c \
            $(SDIR)/target/drivers/input/analog/analog.c
 
