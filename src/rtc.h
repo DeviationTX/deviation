@@ -9,6 +9,18 @@
 
 #define RTC_STARTYEAR 2012
 
+struct gtm
+{
+  int8_t tm_sec;                   /* Seconds.     [0-60] (1 leap second) */
+  int8_t tm_min;                   /* Minutes.     [0-59] */
+  int8_t tm_hour;                  /* Hours.       [0-23] */
+  int8_t tm_mday;                  /* Day.         [1-31] */
+  int8_t tm_mon;                   /* Month.       [0-11] */
+  int8_t tm_year;                  /* Year - 1900. Limited to the year 2115. Oh no! :P */
+  // int8_t tm_wday;                  /* Day of week. [0-6] */
+  // int16_t tm_yday;                 /* Day of year. [0-365] Needed internally for calculations */
+};
+
 enum { DAY=0, MONTH, YEAR, SECOND, MINUTE, HOUR };
 
 // initialize RTC clock
@@ -23,6 +35,7 @@ void RTC_SetDate(u16 year, u16 month, u16 day);
 
 // get date value (deviation epoch = seconds since 1.1.2012, 00:00:00)
 u32 RTC_GetValue();
+void RTC_GetTimeGTM(struct gtm *t);
 
 // get serial time (seconds since 01.01.2012, 0:00:00 - "deviation epoch")
 u32 RTC_GetSerial(int year, int month, int day, int hour, int minute, int second);
