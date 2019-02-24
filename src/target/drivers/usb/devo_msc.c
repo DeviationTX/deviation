@@ -138,7 +138,7 @@ int MSC_Write(uint32_t lba, const u8 *Writebuff, uint16_t offset, uint16_t Trans
     uint32_t Memory_Offset = lba * BLOCK_SIZE + offset;
 #if EMULATE_FAT
     if (Memory_Offset + Transfer_Length < (0x1000 * FAT_OFFSET)) {
-        return MAL_OK;
+        return 0;
     }
     if (Memory_Offset < (0x1000 * FAT_OFFSET)) {
         Transfer_Length -= ((0x1000 * FAT_OFFSET) - Memory_Offset);
@@ -198,7 +198,7 @@ int MSC_Read(uint32_t lba, u8 *Readbuff, uint16_t offset, uint16_t Transfer_Leng
               // printf("Setting %06x to %02x\n", 0x1FF - Memory_Offset, 0xAA);
               ((u8 *)Readbuff)[0x1FF - Memory_Offset] = 0xAA;
           }
-          break;
+          return 0;
       }
 #endif
       STORAGE_ReadBytes(Memory_Offset  + ((SPIFLASH_SECTOR_OFFSET - FAT_OFFSET) * 0x1000), Transfer_Length, (u8*)Readbuff);
