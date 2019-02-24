@@ -42,6 +42,10 @@ void PWR_Init(void)
     GPIO_pin_set(LED_BLUE_PIN);
     GPIO_pin_clear(LED_GREEN_PIN);
     GPIO_pin_clear(LED_RED_PIN);
+
+    if(! HAS_JTAG) {
+        DisableJTAG();
+    }
 }
 
 void PWR_Shutdown()
