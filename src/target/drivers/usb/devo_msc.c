@@ -135,12 +135,7 @@ static const struct usb_config_descriptor msc_config_descr = {
 *******************************************************************************/
 int MSC_Write(uint32_t lba, const u8 *Writebuff, uint16_t offset, uint16_t Transfer_Length)
 {
-    (void)lba;
-    (void)Writebuff;
-    (void)offset;
-    (void)Transfer_Length;
-
-//    uint32_t Memory_Offset = lba * BLOCK_SIZE + offset;
+    uint32_t Memory_Offset = lba * BLOCK_SIZE + offset;
 #if EMULATE_FAT
     if (Memory_Offset + Transfer_Length < (0x1000 * FAT_OFFSET)) {
         return MAL_OK;
@@ -152,12 +147,10 @@ int MSC_Write(uint32_t lba, const u8 *Writebuff, uint16_t offset, uint16_t Trans
     }
 #endif
 
-#if 0
     if (offset == 0) {
         STORAGE_EraseSector(Memory_Offset + ((SPIFLASH_SECTOR_OFFSET - FAT_OFFSET) * 0x1000));
     }
     STORAGE_WriteBytes(Memory_Offset  + ((SPIFLASH_SECTOR_OFFSET - FAT_OFFSET) * 0x1000), Transfer_Length, (u8 *)Writebuff);
-#endif
 
   return 0;
 }
