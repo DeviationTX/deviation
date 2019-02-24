@@ -195,3 +195,5 @@ void MCU_SerialNumber(u8 *var, int len)
     memcpy(var, data, l);
 }
 void PWR_JumpToProgrammer() {}
+
+void LED_Init() {}
