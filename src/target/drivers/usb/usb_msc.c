@@ -25,6 +25,8 @@
 #include <libopencm3/usb/usbd.h>
 #include <libopencm3/usb/msc.h>
 
+#define PACKET_SIZE 64
+
 #define MIN(x, y) (x > y ? y : x)
 /* Definitions of Mass Storage Class from:
  *
@@ -174,9 +176,7 @@ struct usb_msc_trans {
 struct _usbd_mass_storage {
     usbd_device *usbd_dev;
     uint8_t ep_in;
-    uint8_t ep_in_size;
     uint8_t ep_out;
-    uint8_t ep_out_size;
 
     const char *vendor_id;
     const char *product_id;
@@ -795,9 +795,9 @@ static void msc_set_config(usbd_device *usbd_dev, uint16_t wValue)
     (void)wValue;
 
     usbd_ep_setup(usbd_dev, ms->ep_in, USB_ENDPOINT_ATTR_BULK,
-              ms->ep_in_size, msc_data_tx_cb);
+              PACKET_SIZE, msc_data_tx_cb);
     usbd_ep_setup(usbd_dev, ms->ep_out, USB_ENDPOINT_ATTR_BULK,
-              ms->ep_out_size, msc_data_rx_cb);
+              PACKET_SIZE, msc_data_rx_cb);
 
     usbd_register_control_callback(
                 usbd_dev,
@@ -831,8 +831,8 @@ static void msc_set_config(usbd_device *usbd_dev, uint16_t wValue)
 @return Pointer to the usbd_mass_storage struct.
 */
 usbd_mass_storage *usb_msc_init2(usbd_device *usbd_dev,
-                 uint8_t ep_in, uint8_t ep_in_size,
-                 uint8_t ep_out, uint8_t ep_out_size,
+                 uint8_t ep_in,
+                 uint8_t ep_out,
                  const char *vendor_id,
                  const char *product_id,
                  const char *product_revision_level,

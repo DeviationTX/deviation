@@ -6,9 +6,11 @@
 #include "common.h"
 #include "devo_usb.h"
 
+#define PACKET_SIZE 64
+
 extern usbd_mass_storage *usb_msc_init2(usbd_device *usbd_dev,
-                 uint8_t ep_in, uint8_t ep_in_size,
-                 uint8_t ep_out, uint8_t ep_out_size,
+                 uint8_t ep_in,
+                 uint8_t ep_out,
                  const char *vendor_id,
                  const char *product_id,
                  const char *product_revision_level,
@@ -23,14 +25,14 @@ static const struct usb_endpoint_descriptor msc_endp[] = {{
     .bDescriptorType = USB_DT_ENDPOINT,
     .bEndpointAddress = 0x81,
     .bmAttributes = USB_ENDPOINT_ATTR_BULK,
-    .wMaxPacketSize = 64,
+    .wMaxPacketSize = PACKET_SIZE,
     .bInterval = 0,
 }, {
     .bLength = USB_DT_ENDPOINT_SIZE,
     .bDescriptorType = USB_DT_ENDPOINT,
     .bEndpointAddress = 0x02,
     .bmAttributes = USB_ENDPOINT_ATTR_BULK,
-    .wMaxPacketSize = 64,
+    .wMaxPacketSize = PACKET_SIZE,
     .bInterval = 0,
 }};
 
@@ -189,7 +191,7 @@ void MSC_Init()
       usb_strings, USB_STRING_COUNT,
       usbd_control_buffer, sizeof(usbd_control_buffer));
 
-    usb_msc_init2(usbd_dev, 0x81, 64, 0x02, 64, "ST", "SD Flash Disk",
+    usb_msc_init2(usbd_dev, 0x81, 0x02, "ST", "SD Flash Disk",
         "1.0", Mass_Block_Count * 8, MSC_Read, MSC_Write);
 }
 
