@@ -45,12 +45,12 @@ u8 BATTERY_Check()
         PAGE_Test();
         CONFIG_SaveModelIfNeeded();
         CONFIG_SaveTxIfNeeded();
-        SPI_FlashBlockWriteEnable(0); //Disable writing to all banks of SPIFlash
+        STORAGE_WriteEnable(0);  // Disable writing to all banks of SPIFlash
         warned |= BATTERY_CRITICAL;
         PAGE_ShowLowBattDialog();
     } else if (battery > Transmitter.batt_critical + 200) {
         warned &= ~BATTERY_CRITICAL;
-        SPI_FlashBlockWriteEnable(1); //Disable writing to all banks of SPIFlash
+        STORAGE_WriteEnable(1);  // Disable writing to all banks of SPIFlash
     }
     return warned;
 }

@@ -112,14 +112,15 @@ int main(void)
     GPIO_pin_set(USB_ENABLE_PIN);
     Delay(0x2710);
     LCD_Init();
-        SPIFlash_Init();
-        UART_Initialize();
+    STORAGE_Init();
+    UART_Initialize();
 
     LCD_Clear(0x0000);
-        LCD_PrintStringXY(40, 10, "Hello\n");
-        printf("Hello\n");
+    LCD_PrintStringXY(40, 10, "Hello\n");
+    printf("Hello\n");
 
-        USB_Enable();
+    USB_Enable();
+
     // GPIO_pin_set(USB_ENABLE_PIN);
     SPI_FlashBlockWriteEnable(1);
     while (1) {

@@ -186,7 +186,45 @@ void SPIFlash_WriteBytes(u32 writeAddress, u32 length, const u8 * buffer);
 void SPIFlash_WriteByte(u32 writeAddress, const unsigned byte);
 void SPIFlash_ReadBytes(u32 readAddress, u32 length, u8 * buffer);
 int  SPIFlash_ReadBytesStopCR(u32 readAddress, u32 length, u8 * buffer);
-void SPI_FlashBlockWriteEnable(unsigned enable);
+void SPIFlash_BlockWriteEnable(unsigned enable);
+
+void MCUFlash_Init();
+u32  MCUFlash_ReadID();
+void MCUFlash_EraseSector(u32 sectorAddress);
+void MCUFlash_BulkErase();
+void MCUFlash_WriteBytes(u32 writeAddress, u32 length, const u8 * buffer);
+void MCUFlash_WriteByte(u32 writeAddress, const unsigned byte);
+void MCUFlash_ReadBytes(u32 readAddress, u32 length, u8 * buffer);
+int  MCUFlash_ReadBytesStopCR(u32 readAddress, u32 length, u8 * buffer);
+void MCUFlash_BlockWriteEnable(unsigned enable);
+
+void PARFlash_Init();
+void PARFlash_ReadBytes(u32 readAddress, u32 length, u8 * buffer);
+int  PARFlash_ReadBytesStopCR(u32 readAddress, u32 length, u8 * buffer);
+
+#define FLASHTYPE_SPI 1
+#define FLASHTYPE_MCU 2
+
+#if FLASHTYPE == FLASHTYPE_SPI
+    #define STORAGE_Init()   SPIFlash_Init()
+    #define STORAGE_ReadID() SPIFlash_ReadID()
+    #define STORAGE_WriteEnable(enable) SPIFlash_BlockWriteEnable(enable)
+    #define STORAGE_ReadBytes SPIFlash_ReadBytes
+    #define STORAGE_ReadBytesStopCR SPIFlash_ReadBytesStopCR
+    #define STORAGE_WriteBytes SPIFlash_WriteBytes
+    #define STORAGE_EraseSector SPIFlash_EraseSector
+#elif FLASHTYPE == FLASHTYPE_MCU
+    #define STORAGE_Init()   MCUFlash_Init()
+    #define STORAGE_ReadID() MCUFlash_ReadID()
+    #define STORAGE_WriteEnable(enable) MCUFlash_BlockWriteEnable(enable)
+    #define STORAGE_ReadBytes MCUFlash_ReadBytes
+    #define STORAGE_ReadBytesStopCR MCUFlash_ReadBytesStopCR
+    #define STORAGE_WriteBytes MCUFlash_WriteBytes
+    #define STORAGE_EraseSector MCUFlash_EraseSector
+#else
+#error Define FLASHTYPE to FLASHTYPE_MCU or FLASHTYPE_SPI
+#endif
+
 
 /* Sound */
 void SOUND_Init();

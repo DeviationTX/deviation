@@ -8,6 +8,8 @@
     #include "enable_petit_fat.h"
 #endif
 
+#define FLASHTYPE FLASHTYPE_MCU
+
 #define USE_4BUTTON_MODE 1
 #define HAS_HARD_POWER_OFF  1
 

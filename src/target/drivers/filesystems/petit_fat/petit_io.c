@@ -26,9 +26,9 @@ static const struct {
 	void (*EraseSector)(u32 sectorAddress);
 	long SECTOR_OFFSET;
 } drive[] = {
-	{SPIFlash_ReadBytes, SPIFlash_ReadBytesStopCR, SPIFlash_WriteBytes, SPIFlash_EraseSector, SPIFLASH_SECTOR_OFFSET},
+    { STORAGE_ReadBytes, STORAGE_ReadBytesStopCR, STORAGE_WriteBytes, STORAGE_EraseSector, SPIFLASH_SECTOR_OFFSET },
 #ifdef MEDIA_DRIVE
-	{ MEDIA_DRIVE },
+    { MEDIA_DRIVE },
 #endif
 };
 
