@@ -6,9 +6,11 @@
     #include "enable_native_fs.h"
 #else
     #include "enable_fatfs.h"
-    #include "fat_io.h"
+    #include "target/drivers/storage/mmc_flash/fat_io.h"
     #include "target/drivers/serial/usb_cdc/usb_uart.h"
 #endif
+
+#define LCD_CONTRAST_FUNC(x) (x)
 
 #define TXID 0x12
 #define VECTOR_TABLE_LOCATION 0x8000
@@ -22,6 +24,7 @@
 #define HAS_PERMANENT_TIMER 1
 #define HAS_TELEMETRY       1
 #define HAS_EXTENDED_TELEMETRY 1
+#define HAS_LCD_FLIPPED     1
 #define HAS_TOUCH           0
 #define HAS_RTC             0         // FIXME
 #define HAS_VIBRATINGMOTOR  1
