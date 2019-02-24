@@ -57,7 +57,7 @@ static void CS_LO()
 }
 
 #if HAS_FLASH_DETECT
-extern uint32_t Mass_Block_Count[2]; // see mass_mal.c
+extern uint32_t Mass_Block_Count; // see mass_mal.c
 /*
  * Detect flash memory type and set variables controlling
  * access accordingly.
@@ -187,7 +187,7 @@ void detect_memory_type()
         SPIFLASH_USE_AAI);     
         
     printf("%d free sectors\n", spiflash_sectors - SPIFLASH_SECTOR_OFFSET);
-    Mass_Block_Count[0] = fat_offset + spiflash_sectors - SPIFLASH_SECTOR_OFFSET;
+    Mass_Block_Count = fat_offset + spiflash_sectors - SPIFLASH_SECTOR_OFFSET;
 }
 #endif
 /*
