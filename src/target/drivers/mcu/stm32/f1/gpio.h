@@ -25,7 +25,7 @@ INLINE static inline void GPIO_setup_output(struct mcu_pin pin, enum gpio_output
     gpio_set_mode(pin.port, GPIO_MODE_OUTPUT_50_MHZ, type, pin.pin);
 }
 
-INLINE static inline void GPIO_setup_output_af(struct mcu_pin pin, enum gpio_output_type type, unsigned af)
+INLINE static inline void GPIO_setup_output_af(struct mcu_pin pin, enum gpio_output_type type, uint32_t af)
 {
     (void)af;
     gpio_set_mode(pin.port, GPIO_MODE_OUTPUT_50_MHZ,
@@ -71,6 +71,11 @@ static inline void GPIO_pin_clear(struct mcu_pin pin)
 static inline uint16_t GPIO_pin_get(struct mcu_pin pin)
 {
     return gpio_get(pin.port, pin.pin);
+}
+
+INLINE static inline void GPIO_pin_toggle(struct mcu_pin pin)
+{
+    gpio_toggle(pin.port, pin.pin);
 }
 
 #endif  // _DTX_STM32F1_GPIO_H_

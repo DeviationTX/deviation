@@ -36,7 +36,7 @@ void PWR_Init(void)
     GPIO_setup_input(PWR_SWITCH_PIN, ITYPE_FLOAT);
 
     /* Disable SWD and set SWD pins as I/O for programable switch */
-#if !defined USE_JTAG || !USE_JTAG
+#if !defined(USE_JTAG) || !USE_JTAG
     DisableJTAG();
 #endif
 }
