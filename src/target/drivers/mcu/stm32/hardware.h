@@ -51,4 +51,8 @@
     #define SPI3_CFG ((struct spi_config){ .spi = 0 })
 #endif
 
+#ifndef UART_CFG
+    #define UART_CFG ((struct uart_config){ .uart = 0})
+#endif
+
 #endif  // _DTX_STM32_HARDWARE_DEFAULT_H_
