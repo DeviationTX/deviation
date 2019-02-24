@@ -21,6 +21,7 @@ SRC_C = $(wildcard target/tx/$(FAMILY)/$(TARGET)/*.c) \
 	target/drivers/filesystems/FatFs/ff.c \
         target/drivers/filesystems/FatFs/fattime.c \
         target/drivers/filesystems/FatFs/option/ccsbcs.c \
+        $(wildcard target/drivers/storage/mmc_flash/*.c) \
         $(wildcard target/drivers/filesystems/*.c) \
         target/drivers/backlight/backlight.c \
         target/drivers/haptic/haptic.c \
