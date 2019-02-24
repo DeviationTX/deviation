@@ -13,11 +13,11 @@
     #include "enable_petit_fat.h"
 #endif
 
-#ifndef HAS_STACKDUMP
+#ifndef SUPPORT_STACKDUMP
     #if !defined(USE_DEVOFS) || USE_DEVOFS != 1
-        #define HAS_STACKDUMP 1
+        #define SUPPORT_STACKDUMP 1
     #else
-        #define HAS_STACKDUMP 0
+        #define SUPPORT_STACKDUMP 0
     #endif
 #endif
 #include "ports.h"

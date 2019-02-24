@@ -11,10 +11,10 @@
 #if defined(HAS_4IN1_FLASH) && HAS_4IN1_FLASH
     #define FLASHTYPE FLASHTYPE_SPI
     #define HAS_FLASH_DETECT
-    #define HAS_STACKDUMP 1
+    #define SUPPORT_STACKDUMP 1
 #else
     #define FLASHTYPE FLASHTYPE_MCU
-    #define HAS_STACKDUMP 0
+    #define SUPPORT_STACKDUMP 0
 #endif
 
 #define USE_4BUTTON_MODE    1

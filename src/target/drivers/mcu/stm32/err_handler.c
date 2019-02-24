@@ -154,7 +154,7 @@ void __attribute__((used)) fault_handler_c (unsigned int * hardfault_args, unsig
 }
 
 void init_err_handler() {
-#if HAS_STACKDUMP
+#if SUPPORT_STACKDUMP
     //This is a hack to get the memory address of a file
     //we can't use 'fopen' because it masks the structure we need
     FATFS fat;
@@ -171,5 +171,5 @@ void init_err_handler() {
     }
     debug_addr = fat.dsect;
     fs_mount(0);
-#endif  // HAS_STACKDUMP
+#endif  // SUPPORT_STACKDUMP
 }
