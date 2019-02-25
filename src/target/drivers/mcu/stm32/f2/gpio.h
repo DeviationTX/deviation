@@ -88,7 +88,17 @@ INLINE static inline void GPIO_setup_input(struct mcu_pin pin, enum gpio_input_t
 
 INLINE static inline void GPIO_setup_input_af(struct mcu_pin pin, enum gpio_input_type type, unsigned af)
 {
-    GPIO_setup_input(pin, type);
+    int cfg = GPIO_PUPD_NONE;
+    switch (type) {
+        case ITYPE_PULLUP:
+            cfg = GPIO_PUPD_PULLUP;
+            break;
+        case ITYPE_PULLDOWN:
+            cfg = GPIO_PUPD_PULLDOWN;
+            break;
+        default: break;
+    }
+    gpio_mode_setup(pin.port, GPIO_MODE_AF, cfg, pin.pin);
     gpio_set_af(pin.port, _get_af(af), pin.pin);
 }
 
