@@ -5,7 +5,7 @@ FONTS        = filesystem/$(FILESYSTEM)/media/f12e.fon
 
 include target/drivers/mcu/emu/Makefile.inc
 
-ifndef BUILD_TARGET
+ifdef BUILD_TARGET
 
 $(TARGET).fs_wrapper: $(LAST_MODEL)
 	perl -p -i -e 's/=12normal/=f12e/' filesystem/$(FILESYSTEM)/media/config.ini
