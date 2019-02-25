@@ -38,11 +38,6 @@ static void lcd_display(u8 on)
     LCD_CMD = 0xAE | (on ? 1 : 0);
 }
 
-static void lcd_write_display_data(u8 display_data)
-{
-    LCD_DATA = display_data;
-}
-
 static void lcd_set_page_address(u8 page)
 {
     LCD_CMD = 0xB0 | (page & 0x07);
@@ -69,7 +64,7 @@ void LCD_Contrast(unsigned contrast)
 void LCD_Init()
 {
     _fsmc_init(
-        8,
+        16,
         0x10000,  /*only bit 16 of addr */
         FSMC_NOE | FSMC_NWE | FSMC_NE1,  /* Not connected */
         FSMC_BANK1,
