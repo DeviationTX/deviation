@@ -18,45 +18,45 @@
 #include "gui/gui.h"
 #include "target/drivers/mcu/stm32/fsmc.h"
 
-#define LCD_CMD_ADDR ((uint32_t)FSMC_BANK1_BASE) /* Register Address */
-#define LCD_DATA_ADDR ((uint32_t)FSMC_BANK1_BASE + 0x10000) /* Data Address */
+#define LCD_CMD_ADDR ((u32)FSMC_BANK1_BASE) /* Register Address */
+#define LCD_DATA_ADDR ((u32)FSMC_BANK1_BASE + 0x10000) /* Data Address */
 
-#define LCD_CMD *(volatile uint8_t *)(LCD_CMD_ADDR)
-#define LCD_DATA *(volatile uint8_t *)(LCD_DATA_ADDR)
+#define LCD_CMD *(volatile u8 *)(LCD_CMD_ADDR)
+#define LCD_DATA *(volatile u8 *)(LCD_DATA_ADDR)
 
 //The screen is 129 characters, but we'll only expoise 128 of them
 #define PHY_LCD_WIDTH 129
 #define LCD_PAGES 8
 static u8 img[PHY_LCD_WIDTH * LCD_PAGES];
 static u8 dirty[PHY_LCD_WIDTH];
-static unsigned int xstart, xend;  // After introducing logical view for devo10, the coordinate can be >= 5000
-static unsigned int xpos, ypos;
+static u16 xstart, xend;  // After introducing logical view for devo10, the coordinate can be >= 5000
+static u16 xpos, ypos;
 static s8 dir;
 
-void lcd_display(uint8_t on)
+static void lcd_display(u8 on)
 {
     LCD_CMD = 0xAE | (on ? 1 : 0);
 }
 
-void lcd_write_display_data(uint8_t display_data)
+static void lcd_write_display_data(u8 display_data)
 {
     LCD_DATA = display_data;
 }
 
-void lcd_set_page_address(uint8_t page)
+static void lcd_set_page_address(u8 page)
 {
     LCD_CMD = 0xB0 | (page & 0x07);
 }
 
-void lcd_set_column_address(uint8_t column)
+static void lcd_set_column_address(u8 column)
 {
     LCD_CMD = 0x10 | ((column >> 4) & 0x0F);  //MSB
     LCD_CMD = column & 0x0F;                  //LSB
 }
 
-void lcd_set_start_line(int line)
+static void lcd_set_start_line(unsigned line)
 {
-  LCD_CMD = (line & 0x3F) | 0x40; 
+    LCD_CMD = (line & 0x3F) | 0x40;
 }
 
 void LCD_Contrast(unsigned contrast)
@@ -80,8 +80,6 @@ void LCD_Init()
         FSMC_BTR_DATASTx(7) | FSMC_BTR_ADDHLDx(0) | FSMC_BTR_ADDSETx(2),
         0);
 
-
-
     // LCD bias setting (11); 0xA2; 1/9
     LCD_CMD = 0xA2;
 
@@ -90,7 +88,7 @@ void LCD_Init()
 
     //Common output mode selection (15); 0xC0; normal scan
     LCD_CMD = 0xC0;
-    Delay(5);
+    usleep(5);
 
     //Setting built-in resistance ratio (17); 0x24; default=7.50
     LCD_CMD = 0x24;
@@ -98,11 +96,11 @@ void LCD_Init()
     //Electronic volume control (18) -> LCD brightness; 0x20; default=32d
     LCD_CMD = 0x81;
     LCD_CMD = 0x25 & 0x3F; // = LCD_Contrast(5);
-    Delay(5);
+    usleep(5);
 
     //Power control setting (16); V/B, V/R, V/F are used
     LCD_CMD = 0x2F;
-    Delay(5);
+    usleep(5);
 
     // Read-Modify-Write (12); let read data does not increment column address
     LCD_CMD = 0xE0;
