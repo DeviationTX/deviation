@@ -6,17 +6,18 @@
 #include "common.h"
 #include "devo_usb.h"
 
-#define PACKET_SIZE 64
-
-#define BLOCK_SIZE 4096
+#define Block_Size 4096
 
 extern usbd_mass_storage *usb_msc_init2(usbd_device *usbd_dev,
                  uint8_t ep_in,
+                 uint8_t ep_in_size,
                  uint8_t ep_out,
+                 uint8_t ep_out_size,
                  const char *vendor_id,
                  const char *product_id,
                  const char *product_revision_level,
-                 const uint32_t block_count,
+                 uint16_t block_size,
+                 uint32_t block_count,
                  int (*read_block)(uint32_t lba, uint8_t *copy_to, u16 offset, u16 length),
                  int (*write_block)(uint32_t lba, const uint8_t *copy_from, u16 offset, u16 length));
 
@@ -25,14 +26,14 @@ static const struct usb_endpoint_descriptor msc_endp[] = {{
     .bDescriptorType = USB_DT_ENDPOINT,
     .bEndpointAddress = 0x81,
     .bmAttributes = USB_ENDPOINT_ATTR_BULK,
-    .wMaxPacketSize = PACKET_SIZE,
+    .wMaxPacketSize = 64,
     .bInterval = 0,
 }, {
     .bLength = USB_DT_ENDPOINT_SIZE,
     .bDescriptorType = USB_DT_ENDPOINT,
     .bEndpointAddress = 0x02,
     .bmAttributes = USB_ENDPOINT_ATTR_BULK,
-    .wMaxPacketSize = PACKET_SIZE,
+    .wMaxPacketSize = 64,
     .bInterval = 0,
 }};
 
@@ -209,11 +210,13 @@ int MSC_Read(uint32_t lba, u8 *Readbuff, uint16_t offset, uint16_t Transfer_Leng
 void MSC_Init()
 {
     usbd_dev = usbd_init(&st_usbfs_v1_usb_driver, &dev_descr, &msc_config_descr,
-      usb_strings, USB_STRING_COUNT,
-      usbd_control_buffer, sizeof(usbd_control_buffer));
+        usb_strings, USB_STRING_COUNT,
+        usbd_control_buffer, sizeof(usbd_control_buffer));
 
-    usb_msc_init2(usbd_dev, 0x81, 0x02, "ST", "SD Flash Disk",
-        "1.0", Mass_Block_Count * 8, MSC_Read, MSC_Write);
+    usb_msc_init2(usbd_dev, 0x81, 0x64, 0x02, 0x64,
+        "ST", "SD Flash Disk", "1.0",
+        Block_Size, Mass_Block_Count * 8,
+        MSC_Read, MSC_Write);
 }
 
 void MSC_Enable()
