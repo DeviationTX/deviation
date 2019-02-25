@@ -191,4 +191,16 @@
 #endif
 
 #include "target/drivers/mcu/stm32/hardware.h"
+
+// LED Pins
+#ifndef LED_STATUS_PIN
+#define LED_STATUS_PIN    NULL_PIN
+#endif
+#ifndef LED_RF_PIN
+#define LED_RF_PIN        NULL_PIN
+#endif
+#ifndef LED_STORAGE_PIN
+#define LED_STORAGE_PIN   NULL_PIN
+#endif
+
 #endif  // _DEVO_DEFAULT_HARDWARE_H_

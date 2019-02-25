@@ -11,7 +11,12 @@
 #define CYRF_RESET_PIN   ((struct mcu_pin){GPIOB, GPIO11})
 #define AVR_RESET_PIN    ((struct mcu_pin){GPIOB, GPIO11})
 
+#define LCD_RESET_PIN ((struct mcu_pin){GPIOE, GPIO0})
+
 #define USB_ENABLE_PIN   NULL_PIN
+
+#define PWR_ENABLE_PIN NULL_PIN
+#define PWR_SWITCH_PIN NULL_PIN
 
 #define PROTO_SPI ((struct spi_csn) { \
     .spi = SPI2,                      \
@@ -52,5 +57,22 @@
     })
 #define _USART_DMA_ISR                dma1_channel4_isr
 
+#ifndef SYSCLK_TIM
+    #define SYSCLK_TIM ((struct tim_config) { \
+        .tim = TIM4,   \
+        .ch = 1        \
+        })
+    #define SYSCLK_TIMER_ISR tim4_isr
+#endif  // SYSCLK_TIM
+
+#ifndef BACKLIGHT_TIM
+    #define BACKLIGHT_TIM ((struct tim_config) { \
+        .tim = TIM3,            \
+        .pin = {GPIOB, GPIO1},  \
+        .ch = 4,                \
+        })
+#endif  // BACKLIGHT_TIM
+
 #include "target/drivers/mcu/stm32/hardware.h"
+
 #endif  // _RADIOLINK_HARDWARE_H_

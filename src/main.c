@@ -128,6 +128,7 @@ int main() {
 #define SPI_BOOTLOADER 1
 int main() {
     PWR_Init();
+    LED_Init();
     CLOCK_Init();
     UART_Initialize();
     if(PWR_CheckPowerSwitch()) PWR_Shutdown();
@@ -150,6 +151,7 @@ int main() {
 
 void Init() {
     PWR_Init();
+    LED_Init();
     CLOCK_Init();
     UART_Initialize();
     printf("Start\n");
@@ -221,7 +223,7 @@ void EventLoop()
     debug_timing(0, 0);
 #endif
     priority_ready &= ~(1 << MEDIUM_PRIORITY);
-#if !defined(HAS_HARD_POWER_OFF) || !HAS_HARD_POWER_OFF
+#if !HAS_HARD_POWER_OFF
     if(PWR_CheckPowerSwitch()) {
         if(! (BATTERY_Check() & BATTERY_CRITICAL)) {
             PAGE_Test();
@@ -275,7 +277,7 @@ void EventLoop()
         AUDIO_CheckQueue();
 #endif
         GUI_RefreshScreen();
-#if defined(HAS_HARD_POWER_OFF) && HAS_HARD_POWER_OFF
+#if HAS_HARD_POWER_OFF
         if (PAGE_ModelDoneEditing())
             CONFIG_SaveModelIfNeeded();
         CONFIG_SaveTxIfNeeded();

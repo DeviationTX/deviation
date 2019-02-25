@@ -238,6 +238,12 @@ void VIBRATINGMOTOR_Init();
 void VIBRATINGMOTOR_Start();
 void VIBRATINGMOTOR_Stop();
 
+/* LED Driver */
+void LED_Init();
+void LED_Status(u8 on);
+void LED_RF(u8 on);
+void LED_Storage(u8 on);
+
 /* UART & Debug */
 typedef enum {
     UART_STOPBITS_1,

@@ -3,6 +3,10 @@
 
 #include "target/drivers/mcu/stm32/gpio.h"
 
+#define LED_STATUS_PIN ((struct mcu_pin){GPIOA, GPIO13})
+#define LED_RF_PIN ((struct mcu_pin){GPIOC, GPIO12})
+#define LED_STORAGE_PIN NULL_PIN
+
 #define ADC_CHANNELS { \
     ADC_CHAN(GPIOA, GPIO0),  /* ADC123_0  */ \
     ADC_CHAN(GPIOA, GPIO1),  /* ADC123_1  */ \

@@ -13,6 +13,7 @@ endif
 SRC_C   := $(wildcard $(SDIR)/target/tx/$(FAMILY)/common/*.c) \
            $(wildcard $(SDIR)/target/tx/$(FAMILY)/$(TARGET)/*.c) \
            $(wildcard $(SDIR)/target/drivers/mcu/stm32/*.c) \
+           $(wildcard $(SDIR)/target/drivers/indicators/*.c) \
            $(wildcard $(SDIR)/target/drivers/filesystems/*.c) \
            $(wildcard $(SDIR)/target/drivers/filesystems/devofs/*.c) \
            $(wildcard $(SDIR)/target/drivers/filesystems/petit_fat/*.c) \
