@@ -148,7 +148,7 @@ void PAGE_ShowModuleDialog(const char **missing)
     if (dialog)
         return;
     dialogcrc = 0;
-    sprintf(tempstring, "%s", _tr("Missing Modules:\n"));
+    tempstring_cpy(_tr("Missing Modules:\n"));
     for(int i = 0; i < TX_MODULE_LAST; i++) {
        if(missing[i]) {
            sprintf(tempstring+strlen(tempstring), "%s\n", missing[i]);

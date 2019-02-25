@@ -358,7 +358,7 @@ const u8* PROTOCOL_GetChannelMap()
                 channelmap = EATRG0;
                 break;
             default:
-                printf("Unknown channemap: %d\n", channelmap);
+                printf("Unknown channemap: %d\n", map);
         }
     }
     return channelmap;

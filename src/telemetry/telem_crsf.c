@@ -89,7 +89,7 @@ const char * _crsf_short_name(char *str, u8 telem)
     case TELEM_CRSF_TX_POWER: strcpy(str, _tr("Power")); break;
     case TELEM_CRSF_RX_QUALITY: strcpy(str, _tr("rxQual")); break;
     case TELEM_CRSF_TX_QUALITY: strcpy(str, _tr("txQual")); break;
-    case TELEM_CRSF_BATT_VOLTAGE: sprintf(str, _tr("Volt")); break;
+    case TELEM_CRSF_BATT_VOLTAGE: strcpy(str, _tr("Volt")); break;
     case TELEM_CRSF_BATT_CURRENT: strcpy(str, _tr("Curr")); break;
     case TELEM_CRSF_BATT_CAPACITY: strcpy(str, _tr("Cap")); break;
     case TELEM_CRSF_ATTITUDE_PITCH: strcpy(str, _tr("Pitch")); break;

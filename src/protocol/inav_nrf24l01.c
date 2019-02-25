@@ -85,7 +85,7 @@
 
 #ifdef EMULATOR
 #define USE_FIXED_MFGID
-#define BIND_COUNT 4.360   // 6 seconds
+#define BIND_COUNT 4      // 6 seconds
 #define FIRST_PACKET_DELAY  1
 #define dbgprintf printf
 #else

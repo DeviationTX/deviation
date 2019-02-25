@@ -189,7 +189,7 @@ const char *show_timerperm_cb(guiObject_t *obj, const void *data)
   (void)obj;
   u8 idx = (long)data;
   if (idx & 0x80)
-      snprintf(tempstring, sizeof(tempstring), _tr("Set to"));
+      tempstring_cpy(_tr("Set to"));
   else
       TIMER_SetString(tempstring,(long)Model.timer[idx & 0x7f].val);
   return tempstring;

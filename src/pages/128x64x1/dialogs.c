@@ -78,7 +78,7 @@ static const char *binding_string_cb(guiObject_t *obj, void *data)
         return tempstring;
     u32 bind_time = PROTOCOL_Binding();
     char tmp[10];
-    snprintf(tmp, 10, "%s", Model.name);
+    strlcpy(tmp, Model.name, sizeof(tmp));
     snprintf(tempstring, sizeof(tempstring), _tr("Binding %s...\nPress ENT to stop"), tmp);
     if (bind_time != 0xFFFFFFFF ) {
         int len = strlen(tempstring);
@@ -86,6 +86,7 @@ static const char *binding_string_cb(guiObject_t *obj, void *data)
     }
     return tempstring;
 }
+
 static void binding_ok_cb(u8 state, void * data)
 {
     (void)state;
@@ -175,7 +176,7 @@ void PAGE_ShowModuleDialog(const char **missing)
         return;
     dialogcrc = 0;
     int count = 0;
-    sprintf(tempstring, "%s", _tr("Missing Modules:\n"));
+    tempstring_cpy(_tr("Missing Modules:\n"));
     if(missing[MULTIMOD]) {
         sprintf(tempstring+strlen(tempstring), "%s", missing[MULTIMOD]);
     } else {

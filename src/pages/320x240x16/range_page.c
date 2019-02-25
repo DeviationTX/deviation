@@ -37,7 +37,7 @@ static const char *startstop_dlg(struct guiObject *gui, const void *data) {
 static void _draw_page(int has_pa) {
     PAGE_ShowHeader(PAGE_GetName(PAGEID_RANGE));
     if (!has_pa) {
-        snprintf(tempstring, sizeof(tempstring), _tr("No range test possible."));
+        tempstring_cpy(_tr("No range test possible."));
         GUI_CreateLabelBox(&gui->info, INFO_X, INFO_Y, 0, 0, &DEFAULT_FONT,
                            NULL, NULL, tempstring);
     } else {

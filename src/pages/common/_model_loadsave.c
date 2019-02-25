@@ -182,7 +182,7 @@ static int count_files(const char *dir, const char *ext, const char *match)
 static void press_cb(guiObject_t *obj, s8 press_type, const void *data)
 {
     (void)obj;
-    int selected = (long)data + 1;
+    int selected = (int)data + 1;
     if (press_type != -1)
         return;
 

@@ -89,7 +89,7 @@ static unsigned _action_cb_calibrate(u32 button, unsigned flags, void *data)
                     Transmitter.calibration[i].min = 0xFFFF;
                     Transmitter.calibration[i].zero = value;
                 }
-                snprintf(tempstring, sizeof(tempstring), "%s", _tr("Move sticks and knobs\nto max & min positions\nthen press ENT"));
+                tempstring_cpy(_tr("Move sticks and knobs\nto max & min positions\nthen press ENT"));
                 GUI_Redraw(&guic->msg);
                 calibrate_state = CALI_MAXMIN;
                 break;
@@ -98,7 +98,7 @@ static unsigned _action_cb_calibrate(u32 button, unsigned flags, void *data)
                     printf("Input %d: Max: %d Min: %d Zero: %d\n", i+1, Transmitter.calibration[i].max, Transmitter.calibration[i].min, Transmitter.calibration[i].zero);
                 }
                 GUI_DrawBackground(0, 0, LCD_WIDTH, LCD_HEIGHT);
-                snprintf(tempstring, sizeof(tempstring), "%s", _tr("Calibration done.\n \nPress ENT."));
+                tempstring_cpy(_tr("Calibration done.\n \nPress ENT."));
                 GUI_Redraw(&guic->msg);
                 calibrate_state = CALI_SUCCESS;
                 break;
@@ -120,7 +120,7 @@ void PAGE_CalibInit(int page)
     (void)page;
     PROTOCOL_DeInit();
     PAGE_SetActionCB(_action_cb_calibrate);
-    snprintf(tempstring, sizeof(tempstring), "%s",  _tr("Center all \nsticks and knobs\nthen press ENT"));
+    tempstring_cpy(_tr("Center all \nsticks and knobs\nthen press ENT"));
     GUI_CreateLabelBox(&guic->msg, 1, CALIB_Y, 0, 0,
             LCD_HEIGHT > 70? &NARROW_FONT:&DEFAULT_FONT, NULL, NULL, tempstring);
     memcpy(cp->calibration, Transmitter.calibration, sizeof(cp->calibration));
