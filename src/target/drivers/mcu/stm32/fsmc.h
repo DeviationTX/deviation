@@ -111,7 +111,7 @@ static inline void _fsmc_init(uint32_t data_len, uint32_t address_mask, uint32_t
                              OTYPE_PUSHPULL, AF_FSMC);
     }
     /* Extended mode, write enable, 16 bit access, bank enabled */
-    FSMC_BCR(bank) = bcr;
+    FSMC_BCR(bank) = (1 << 7) | bcr;  // Bit 7 is reserved and must be set
     FSMC_BTR(bank) = btr;
     if (bwtr)
         FSMC_BWTR(bank) = bwtr;

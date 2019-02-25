@@ -33,28 +33,23 @@ static unsigned int xstart, xend;  // After introducing logical view for devo10,
 static unsigned int xpos, ypos;
 static s8 dir;
 
-void lcd_display(uint8_t on)
+static void lcd_display(uint8_t on)
 {
     LCD_CMD = 0xAE | (on ? 1 : 0);
 }
 
-void lcd_write_display_data(uint8_t display_data)
-{
-    LCD_DATA = display_data;
-}
-
-void lcd_set_page_address(uint8_t page)
+static void lcd_set_page_address(uint8_t page)
 {
     LCD_CMD = 0xB0 | (page & 0x07);
 }
 
-void lcd_set_column_address(uint8_t column)
+static void lcd_set_column_address(uint8_t column)
 {
     LCD_CMD = 0x10 | ((column >> 4) & 0x0F);  //MSB
     LCD_CMD = column & 0x0F;                  //LSB
 }
 
-void lcd_set_start_line(int line)
+static void lcd_set_start_line(int line)
 {
   LCD_CMD = (line & 0x3F) | 0x40; 
 }
@@ -74,7 +69,7 @@ void LCD_Init()
         FSMC_NOE | FSMC_NWE | FSMC_NE1,  /* Not connected */
         FSMC_BANK1,
         /* Normal mode, write enable, 8 bit access, SRAM, bank enabled */
-        0xC0 | FSMC_BCR_MWID | FSMC_BCR_WREN | FSMC_BCR_MBKEN,
+        FSMC_BCR_FACCEN | FSMC_BCR_WREN | FSMC_BCR_MBKEN,
         /* Data Setup > 90ns, Address Setup = 2xHCLK to ensure no output collision in 6800
            mode since LCD E and !CS always active */
         FSMC_BTR_DATASTx(7) | FSMC_BTR_ADDHLDx(0) | FSMC_BTR_ADDSETx(2),
