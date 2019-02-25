@@ -61,10 +61,18 @@ void LCD_Contrast(unsigned contrast)
     LCD_CMD = data & 0x3F;
 }
 
+#define LCD_RESET_PIN ((struct mcu_pin){GPIOD, GPIO10})
+
 void LCD_Init()
 {
+    GPIO_setup_output(LCD_RESET_PIN, OTYPE_PUSHPULL);
+    GPIO_pin_clear(LCD_RESET_PIN);
+    _usleep(10);   // must be held low for at least 10us
+    GPIO_pin_set(LCD_RESET_PIN);
+    _msleep(120);  // must wait 120ms after reset
+
     _fsmc_init(
-        16,
+        8,
         0x10000,  /*only bit 16 of addr */
         FSMC_NOE | FSMC_NWE | FSMC_NE1,  /* Not connected */
         FSMC_BANK1,
