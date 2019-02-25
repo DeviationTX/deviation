@@ -6,8 +6,6 @@
 #include "common.h"
 #include "devo_usb.h"
 
-#define Block_Size 4096
-
 extern usbd_mass_storage *usb_msc_init2(usbd_device *usbd_dev,
                  uint8_t ep_in,
                  uint8_t ep_in_size,
@@ -70,7 +68,7 @@ static const struct usb_config_descriptor msc_config_descr = {
 };
 
 
-#define MSC_BLOCK_SIZE 512
+#define MSC_BLOCK_SIZE 4096
 
 #if defined USE_DEVOFS && USE_DEVOFS
     #define EMULATE_FAT 1
@@ -136,7 +134,7 @@ static const struct usb_config_descriptor msc_config_descr = {
 *******************************************************************************/
 int MSC_Write(uint32_t lba, const u8 *Writebuff, uint16_t offset, uint16_t Transfer_Length)
 {
-    uint32_t Memory_Offset = lba * BLOCK_SIZE + offset;
+    uint32_t Memory_Offset = lba * MSC_BLOCK_SIZE + offset;
 #if EMULATE_FAT
     if (Memory_Offset + Transfer_Length < (0x1000 * FAT_OFFSET)) {
         return 0;
@@ -167,7 +165,7 @@ int MSC_Read(uint32_t lba, u8 *Readbuff, uint16_t offset, uint16_t Transfer_Leng
 {
     uint32_t Memory_Offset;
 
-    Memory_Offset = lba * BLOCK_SIZE + offset;
+    Memory_Offset = lba * MSC_BLOCK_SIZE + offset;
 
 #if EMULATE_FAT
       if (Memory_Offset < (FAT_OFFSET * 0x1000)) {
@@ -215,7 +213,7 @@ void MSC_Init()
 
     usb_msc_init2(usbd_dev, 0x81, 0x64, 0x02, 0x64,
         "ST", "SD Flash Disk", "1.0",
-        Block_Size, Mass_Block_Count * 8,
+        MSC_BLOCK_SIZE, Mass_Block_Count * 8,
         MSC_Read, MSC_Write);
 }
 

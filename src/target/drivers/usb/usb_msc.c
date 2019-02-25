@@ -702,9 +702,9 @@ static void msc_set_config(usbd_device *usbd_dev, uint16_t wValue)
 
 usbd_mass_storage *usb_msc_init2(usbd_device *usbd_dev,
                  uint8_t ep_in,
-                 uint8_t ep_in_size;
+                 uint8_t ep_in_size,
                  uint8_t ep_out,
-                 uint8_t ep_out_size;
+                 uint8_t ep_out_size,
                  const char *vendor_id,
                  const char *product_id,
                  const char *product_revision_level,
