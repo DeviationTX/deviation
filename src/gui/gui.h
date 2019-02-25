@@ -34,11 +34,11 @@ enum BarGraphDirection {
 };
 
 enum TextSelectType {
+    TEXTSELECT_TEXT,  // indication for textsel specically in text/128x64 mode
     TEXTSELECT_224,
     TEXTSELECT_128,
     TEXTSELECT_64,
     TEXTSELECT_96,
-    TEXTSELECT_DEVO10, // indication for textsel specically in devo10
 // only used for RTC config in Devo12
 #if HAS_RTC
     TEXTSELECT_VERT_64, // TEXTSELECT_64 with arrows above and beyond instead of sideways

@@ -15,12 +15,8 @@
 
 const struct ImageMap *_button_image_map(enum ButtonType type)
 {
-    switch (type) {
-        case BUTTON_DEVO10: return &image_map[DRAW_BTN32_15]; break;
-        default:
-            break;
-    }
-    return NULL;
+    (void)type;
+    return &image_map[0];
 }
 
 void _DrawButton(struct guiObject *obj)

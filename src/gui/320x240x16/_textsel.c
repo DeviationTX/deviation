@@ -16,6 +16,20 @@
 #define KEY_ADJUST_Y 1 /* ensure cooridnate is within button */
 #define KEY_ADJUST_X 1
 
+static const struct ImageMap *_textself_image_map(enum ButtonType type, int enable)
+{
+        enum ImageNames fileidx;
+        switch (type) {
+            case TEXTSELECT_224: fileidx = FILE_SPIN192; /* enable ? FILE_SPIN192 : FILE_SPIN192;*/ break;
+            case TEXTSELECT_128: fileidx = enable ? FILE_SPINPRESS96 : FILE_SPIN96; break;
+            case TEXTSELECT_96:  fileidx = enable ? FILE_SPINPRESS64 : FILE_SPIN64; break;
+            case TEXTSELECT_64:  fileidx = enable ? FILE_SPINPRESS32 : FILE_SPIN32; break;
+            default: fileidx = FILE_SPIN32; break;
+        }
+
+        return &image_map[fileidx];
+}
+
 void _DrawTextSelectHelper(struct guiTextSelect *select, const char *str)
 {
     u16 x, y, w, h;

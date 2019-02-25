@@ -97,7 +97,7 @@ guiObject_t *GUI_CreateButtonPlateText(guiButton_t *button, u16 x, u16 y, u16 wi
     const char *(*strCallback)(struct guiObject *, const void *),
     void (*CallBack)(struct guiObject *obj, const void *data), const void *cb_data)
 {
-    guiObject_t *obj = GUI_CreateButton(button, x, y, BUTTON_DEVO10, strCallback, CallBack, cb_data);
+    guiObject_t *obj = GUI_CreateButton(button, x, y, DIALOG_BUTTON, strCallback, CallBack, cb_data);
     struct guiBox *box = &obj->box;
     button->desc = *desc;
     box->width = width;

@@ -16,6 +16,13 @@
 #define KEY_ADJUST_Y 1 /* ensure cooridnate is within button */
 #define KEY_ADJUST_X 1
 
+const struct ImageMap *_textself_image_map(enum ButtonType type, int enable)
+{
+    (void)type;
+    (void)enable;
+    return &image_map[0];
+}
+
 void _DrawTextSelectHelper(struct guiTextSelect *select, const char *str)
 {
     struct guiBox *box = &select->header.box;
