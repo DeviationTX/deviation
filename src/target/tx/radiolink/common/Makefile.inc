@@ -38,7 +38,22 @@ MODULE_FLAGS = -fno-builtin
 LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -lc -lnosys -L$(SDIR) -Lobjs/$(TARGET)
 LFLAGS2  = -Wl,-T$(LINKFILE)
 
+ifdef ENABLE_LTO
+CFLAGS  += -flto -ffat-lto-objects -fwhole-program -DENABLE_LTO
+endif
+
 else #BUILD_TARGET
+
+ifdef ENABLE_LTO
+CFLAGS_pwm_isr = -fno-lto
+CFLAGS_err_isr = -fno-lto
+CFLAGS_clock_isr = -fno-lto
+CFLAGS_usb_isr = -fno-lto
+CFLAGS_ppmin_isr = -fno-lto
+CFLAGS_uart_isr = -fno-lto
+CFLAGS_soft_serial_isr = -fno-lto
+CFLAGS_tx_buttons_isr = -fno-lto
+endif
 
 $(LIBOPENCM3):
 	test -s $(SDIR)/libopencm3/Makefile || { echo "Fetch libopencm3 via 'git submodule update --init'"; exit 1; }

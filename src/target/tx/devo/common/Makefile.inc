@@ -60,6 +60,11 @@ LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -lc -lno
 LINKFILE = $(SDIR)/target/tx/devo/$(TARGET)/$(TARGET).ld
 LFLAGS2  = -Wl,-T$(LINKFILE)
 
+ifdef ENABLE_LTO
+CFLAGS  += -flto -ffat-lto-objects -fwhole-program -DENABLE_LTO
+MODULE_FLAGS += -fno-lto
+endif
+
 ifdef OPTIMIZE_DFU
 LINKFILEOPT = $(SDIR)/target/tx/devo/$(TARGET)/$(TARGET)_opt.ld
 ifeq (,$(wildcard $(LINKFILEOPT)))
@@ -81,6 +86,16 @@ endif
 ALL = $(LIBOPENCM3) $(TARGET).dfu
 
 else #BUILD_TARGET
+
+ifdef ENABLE_LTO
+CFLAGS_pwm_isr = -fno-lto
+CFLAGS_err_isr = -fno-lto
+CFLAGS_clock_isr = -fno-lto
+CFLAGS_usb_isr = -fno-lto
+CFLAGS_ppmin_isr = -fno-lto
+CFLAGS_uart_isr = -fno-lto
+CFLAGS_soft_serial_isr = -fno-lto
+endif
 
 ifeq ($(OS),Windows_NT)
 	FLOCKS =
