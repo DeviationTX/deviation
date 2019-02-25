@@ -343,7 +343,7 @@ static void send_crtp_rpyt_packet()
         float pitch;
         float yaw;
         uint16_t thrust;
-    }cpkt;
+    }__attribute__((packed)) cpkt;
 
     // Channels in AETR order
     // Roll, aka aileron, float +- 50.0 in degrees

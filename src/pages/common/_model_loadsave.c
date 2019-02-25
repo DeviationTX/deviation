@@ -30,7 +30,7 @@ static int ini_handle_icon(void* user, const char* section, const char* name, co
 
 static int ini_handle_name(void* user, const char* section, const char* name, const char* value)
 {
-    int idx = (int)user;
+    long idx = (long)user;
     if(section[0] == '\0' && (strcasecmp(name, MODEL_NAME) == 0 || strcasecmp(name, MODEL_TEMPLATE) == 0)) {
         snprintf(tempstring, sizeof(tempstring), "%d: %s", abs(idx), idx < 0 ? _tr(value) : value);
         return -1;
@@ -104,7 +104,7 @@ int get_idx_filename(char *result, const char *dir, const char *ext, int idx, co
 static const char *name_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    int idx = (int)data;
+    long idx = (long)data;
     FILE *fh;
     if (mp->menu_type == LOAD_TEMPLATE) { //Template
         if (! get_idx_filename(tempstring, "template", ".ini", idx, "template/"))
@@ -131,10 +131,10 @@ static const char *name_cb(guiObject_t *obj, const void *data)
     fh = fopen(tempstring, "r");
     sprintf(tempstring, "%d: NONE", idx + 1);
     if (fh) {
-        int user = idx + 1;
+        long user = idx + 1;
         if (mp->menu_type == LOAD_TEMPLATE)
             user = -user;
-        ini_parse_file(fh, ini_handle_name, (void *)(uintptr_t)user);
+        ini_parse_file(fh, ini_handle_name, (void *)user);
         fclose(fh);
     }
     if (mp->menu_type == LOAD_LAYOUT && idx >= mp->file_state)

@@ -28,13 +28,13 @@ static u32 changed = 0;
 static const char *str_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    unsigned idx = (unsigned)data;
+    unsigned idx = (long)data;
     if (idx == 255) {
         return "";
     }
     const char *dptr = (char *)&logstr[line_pos[idx]];
     const char *w = (char *)wptr;
-    sprintf(tempstring, "%d:", (unsigned)data);
+    sprintf(tempstring, "%d:", (long)data);
     char *ptr = tempstring + strlen(tempstring);
     while(dptr != w && *dptr != 0) {
         *ptr++ = *dptr++;
