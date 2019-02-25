@@ -57,8 +57,6 @@
     })
 #define _USART_DMA_ISR                dma1_channel4_isr
 
-#include "target/drivers/mcu/stm32/hardware.h"
-
 #ifndef SYSCLK_TIM
     #define SYSCLK_TIM ((struct tim_config) { \
         .tim = TIM4,   \
@@ -74,5 +72,7 @@
         .ch = 4,                \
         })
 #endif  // BACKLIGHT_TIM
+
+#include "target/drivers/mcu/stm32/hardware.h"
 
 #endif  // _RADIOLINK_HARDWARE_H_
