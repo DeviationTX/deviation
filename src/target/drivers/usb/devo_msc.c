@@ -149,9 +149,9 @@ int MSC_Write(uint32_t lba, const u8 *Writebuff, uint16_t offset, uint16_t Trans
     if (offset == 0) {
         STORAGE_EraseSector(Memory_Offset + ((SPIFLASH_SECTOR_OFFSET - FAT_OFFSET) * 0x1000));
     }
-    STORAGE_WriteBytes(Memory_Offset  + ((SPIFLASH_SECTOR_OFFSET - FAT_OFFSET) * 0x1000), Transfer_Length, (u8 *)Writebuff);
+    STORAGE_WriteBytes(Memory_Offset + ((SPIFLASH_SECTOR_OFFSET - FAT_OFFSET) * 0x1000), Transfer_Length, (u8 *)Writebuff);
 
-  return 0;
+    return 0;
 }
 
 /*******************************************************************************
@@ -200,9 +200,9 @@ int MSC_Read(uint32_t lba, u8 *Readbuff, uint16_t offset, uint16_t Transfer_Leng
           return 0;
       }
 #endif
-      STORAGE_ReadBytes(Memory_Offset  + ((SPIFLASH_SECTOR_OFFSET - FAT_OFFSET) * 0x1000), Transfer_Length, (u8*)Readbuff);
+    STORAGE_ReadBytes(Memory_Offset + ((SPIFLASH_SECTOR_OFFSET - FAT_OFFSET) * 0x1000), Transfer_Length, (u8*)Readbuff);
 
-  return 0;
+    return 0;
 }
 
 static void MSC_Init()
