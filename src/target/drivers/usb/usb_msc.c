@@ -724,11 +724,10 @@ usbd_mass_storage *usb_msc_init2(usbd_device *usbd_dev,
     _mass_storage.product_id = product_id;
     _mass_storage.product_revision_level = product_revision_level;
 
+    _mass_storage.block_size = block_size;
     _mass_storage.block_count = block_count;
     _mass_storage.read_block = read_block;
     _mass_storage.write_block = write_block;
-
-    _mass_storage.block_size = block_size;
 
     msc_go_idle(&_mass_storage);
 
