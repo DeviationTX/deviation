@@ -10,9 +10,7 @@ static inline void _i2c_init(struct i2c_config i2c)
     unsigned ccr;
     unsigned max_trise;
 
-    rcc_periph_clock_enable(get_rcc_from_pin(i2c.scl_sca));
     rcc_periph_clock_enable(get_rcc_from_port(i2c.i2c));
-    rcc_periph_reset_pulse(get_rcc_from_port(i2c.i2c));
     i2c_peripheral_disable(i2c.i2c);
     i2c_set_clock_frequency(i2c.i2c, APB1_FREQ_MHz);
     if (i2c.fastmode) {
@@ -31,10 +29,11 @@ static inline void _i2c_init(struct i2c_config i2c)
     i2c_set_ccr(i2c.i2c, 0xfff & ccr);
     i2c_set_dutycycle(i2c.i2c, i2c.dutycycle);
     i2c_set_trise(i2c.i2c, max_trise + 1);
+    i2c_peripheral_enable(i2c.i2c);
 
+    rcc_periph_clock_enable(get_rcc_from_pin(i2c.scl_sca));
     GPIO_setup_output_af(i2c.scl_sca, OTYPE_OPENDRAIN, i2c.i2c);
 
-    i2c_peripheral_enable(i2c.i2c);
 }
 
 #endif  // _DTX_STM32_I2C_H_
