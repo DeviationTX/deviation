@@ -213,7 +213,7 @@ static void MSC_Init()
 
     usb_msc_init2(usbd_dev, 0x81, 0x64, 0x02, 0x64,
         "ST", "SD Flash Disk", "1.0",
-        MSC_BLOCK_SIZE, Mass_Block_Count * 8,
+        MSC_BLOCK_SIZE, Mass_Block_Count,
         MSC_Read, MSC_Write);
 }
 
