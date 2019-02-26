@@ -133,7 +133,7 @@ sub extract_target_strings {
         my $state = 0;
         foreach(@od) {
             my $orig = $_;
-            if(/section \.ro?data/ || /section __cstring/) {
+            if(/section (\.rel)?\.ro?data/ || /section __cstring/) {
                 $str = "";
                 $state = 1;
                 next;
