@@ -328,13 +328,15 @@ static int scsi_read_format_capacities(usbd_mass_storage *ms, uint8_t *buf)
     /* Block size, MSB */
     uint32_2_msb(buf + 8, ms->block_size);
 
+    buf[8] = 0x02;  // formatted media
+
     set_sbc_status_good(ms);
     return 12;
 }
 
 static int scsi_read_capacity(usbd_mass_storage *ms, uint8_t *buf)
 {
-    /* Block count, MSB */
+    /* last Block number, MSB */
     uint32_2_msb(buf, ms->block_count - 1);
 
     /* Block size, MSB */
@@ -361,11 +363,11 @@ static int scsi_read_10(usbd_mass_storage *ms, uint8_t *buf)
     ms->block_end = end;
 
     // read first part
-    ms->read_block(start, buf, 0, ms->ep_out_size);
-    ms->block_cur_offset = ms->ep_out_size;
+    ms->read_block(start, buf, 0, CACHE_LENGTH);
+    ms->block_cur_offset = CACHE_LENGTH;
 
     set_sbc_status_good(ms);
-    return ms->ep_out_size;
+    return CACHE_LENGTH;
 }
 
 static int scsi_write_10(usbd_mass_storage *ms, uint8_t *buf)
