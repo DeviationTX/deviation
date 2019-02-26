@@ -107,7 +107,7 @@ static const struct usb_config_descriptor hid_config_descr = {
 };
 
 
-void HID_Init()
+static void HID_Init()
 {
     usbd_dev = usbd_init(&st_usbfs_v1_usb_driver, &dev_descr, &hid_config_descr,
       usb_strings, USB_STRING_COUNT,
@@ -119,7 +119,6 @@ void HID_Write(s8 *packet, u8 num_channels)
     usbd_ep_write_packet(usbd_dev, 0x81, packet, num_channels);
 }
 
-extern void (*_HID_Init)();
 void HID_Enable() {
     HID_Init();
     USB_Enable(1);

@@ -205,7 +205,7 @@ int MSC_Read(uint32_t lba, u8 *Readbuff, uint16_t offset, uint16_t Transfer_Leng
   return 0;
 }
 
-void MSC_Init()
+static void MSC_Init()
 {
     usbd_dev = usbd_init(&st_usbfs_v1_usb_driver, &dev_descr, &msc_config_descr,
         usb_strings, USB_STRING_COUNT,

@@ -12,10 +12,6 @@ usbd_device *usbd_dev;
 
 uint8_t usbd_control_buffer[128];
 
-#ifdef ENABLE_MODULAR
-void (*_HID_Init)() = NULL;
-#endif
-
 const struct usb_device_descriptor dev_descr = {
     .bLength = USB_DT_DEVICE_SIZE,
     .bDescriptorType = USB_DT_DEVICE,
@@ -68,12 +64,3 @@ void USB_Poll()
     usbd_poll(usbd_dev);
 }
 
-void usb_wakeup_isr(void)
-{
-    usbd_poll(usbd_dev);
-}
-
-void usb_lp_can_rx0_isr(void)
-{
-    usbd_poll(usbd_dev);
-}

@@ -2,11 +2,7 @@
 #define _DEVO_USB_H_
 
 extern void MSC_Init();
-#ifdef ENABLE_MODULAR
-extern void (*_HID_Init)();
-#else
 extern void HID_Init();
-#endif
 
 extern usbd_device *usbd_dev;
 
