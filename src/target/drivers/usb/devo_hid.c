@@ -128,7 +128,8 @@ static void hid_set_config(usbd_device *dev, uint16_t wValue)
     (void)wValue;
     (void)dev;
 
-    usbd_ep_setup(dev, 0x81, USB_ENDPOINT_ATTR_INTERRUPT, 4, NULL);
+    // Max 9 data to send. 7 analog channels + 1 bytes for 8 switches
+    usbd_ep_setup(dev, 0x81, USB_ENDPOINT_ATTR_INTERRUPT, 9, NULL);
 
     usbd_register_control_callback(
                 dev,
