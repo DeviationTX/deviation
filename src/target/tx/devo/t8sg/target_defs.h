@@ -28,9 +28,10 @@
 #define HAS_AUDIO_UART     1
 #define HAS_MUSIC_CONFIG    1
 
-#define TXTYPE ((char *)0x08000150)
+#define TXTYPE ((char *)0x08003150)
 #define HAS_OLED_DISPLAY    (TXTYPE[6] == '+')
 #define LCD_CONTRAST_FUNC(x) (x)
+#define HAS_LCD_FLIPPED     1
 
 #ifdef BUILDTYPE_DEV
   #define DEBUG_WINDOW_SIZE 200

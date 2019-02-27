@@ -46,6 +46,12 @@ static void lcd_init_ports()
     rcc_periph_clock_enable(get_rcc_from_pin(LCD_SPI_MODE));
     GPIO_setup_output(LCD_SPI.csn, OTYPE_PUSHPULL);
     GPIO_setup_output(LCD_SPI_MODE, OTYPE_PUSHPULL);
+    if (HAS_OLED_DISPLAY) {	
+        // We >> 3 because spi_set_baudrate_prescaler takes a value of 0-7,
+        // Whereas spi_init_master uses SPI_CR1_BAUDRATE_FPCLK_DIV_xx which
+        // is pre-shifted
+        spi_set_baudrate_prescaler(LCD_SPI.spi, (OLED_SPI_RATE) >> 3);
+    }
 }
 
 #include "128x64x1_common.h"

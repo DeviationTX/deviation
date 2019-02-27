@@ -80,7 +80,6 @@ static guiObject_t *getobj_cb(int relrow, int col, void *data)
 
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
-    unsigned hidden = 0;
     data = NULL;
     const void *label = "";
     const void *title = NULL;
