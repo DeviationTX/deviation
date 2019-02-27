@@ -114,6 +114,16 @@ def main():
 def get_changed_lines_from_pr():
     url = 'https://api.github.com/repos/{}/pulls/{}'.format(TRAVIS_REPO_SLUG, TRAVIS_PULL_REQUEST)
     diff = get_url(url, {"Accept": "application/vnd.github.v3.diff"}).split('\n')
+    return get_changed_lines_from_diff(diff)
+
+def get_changed_lines_from_git():
+    changed = {}
+    master = "master"
+    base = system(["git", "merge-base", "HEAD", master]).rstrip()
+    diff = system(["git", "diff", base]).rstrip().split("\n")
+    return get_changed_lines_from_diff(diff)
+
+def get_changed_lines_from_diff(diff):
     filename = None
     changed = {}
     file_pos = 0
@@ -142,9 +152,11 @@ def get_changed_lines_from_pr():
     
     for filename in sorted(changed.keys()):
         logging.debug("%s: %s", filename, sorted(changed[filename].keys(), key=int))
+        if not changed[filename].keys():
+            del changed[filename]
     return changed
 
-def get_changed_lines_from_git():
+def get_changed_lines_from_git_old():
     changed = {}
     master = "master"
     base = system(["git", "merge-base", "HEAD", master]).rstrip()
