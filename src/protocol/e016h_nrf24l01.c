@@ -62,7 +62,7 @@ enum {
 
 // flags going to packet[1]
 #define FLAG_STOP   0x20
-#define FLAG_FLIP
+#define FLAG_FLIP   0x04
 
 // flags going to packet[3]
 #define FLAG_HEADLESS   0x10
@@ -130,11 +130,13 @@ static void send_packet(u8 bind)
         packet[7] = val >> 8;
         packet[8] = val & 0xff;
         // flags
+        packet[1] |= GET_FLAG(CHANNEL8, FLAG_STOP)
+                  |  GET_FLAG(CHANNEL5, FLAG_FLIP);
+        packet[3] |= GET_FLAG(CHANNEL6, FLAG_HEADLESS)
+                  |  GET_FLAG(CHANNEL7, FLAG_RTH);
+        packet[7] |= FLAG_HIGHRATE;
         
-        NRF24L01_WriteReg(NRF24L01_05_RF_CH, hopping_frequency[hopping_frequency_no++ & 0x03]);
-        
-        // memcpy(packet, (u8*)"\x00\x02\x00\x02\x00\x01\xef\x02\x00\xf6", 10);
-        
+        NRF24L01_WriteReg(NRF24L01_05_RF_CH, hopping_frequency[hopping_frequency_no++ & 0x03]);        
     }
     packet[9] = packet[0];
     for (i=1; i < E016H_PACKET_SIZE-1; i++)
