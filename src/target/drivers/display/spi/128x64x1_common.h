@@ -12,101 +12,83 @@
     You should have received a copy of the GNU General Public License
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include <libopencm3/stm32/gpio.h>
-#include <libopencm3/stm32/rcc.h>
-#include "common.h"
-#include "gui/gui.h"
-#include "target/drivers/mcu/stm32/fsmc.h"
 
-#define LCD_CMD_ADDR ((uint32_t)FSMC_BANK1_BASE) /* Register Address */
-#define LCD_DATA_ADDR ((uint32_t)FSMC_BANK1_BASE + 0x10000) /* Data Address */
-
-#define LCD_CMD *(volatile uint8_t *)(LCD_CMD_ADDR)
-#define LCD_DATA *(volatile uint8_t *)(LCD_DATA_ADDR)
+#ifndef HAS_LCD_FLIPPED
+    #define HAS_LCD_FLIPPED 0
+#endif
+#ifndef HAS_LCD_SWAPPED_PAGES
+    #define HAS_LCD_SWAPPED_PAGES 0
+#endif
+ 
+#include "128x64x1_nt7538.h"
+#include "128x64x1_oled_ssd1306.h"
 
 //The screen is 129 characters, but we'll only expoise 128 of them
 #define PHY_LCD_WIDTH 129
 #define LCD_PAGES 8
 static u8 img[PHY_LCD_WIDTH * LCD_PAGES];
 static u8 dirty[PHY_LCD_WIDTH];
-static unsigned int xstart, xend;  // After introducing logical view for devo10, the coordinate can be >= 5000
-static unsigned int xpos, ypos;
+static u16 xstart, xend;  // After introducing logical view for devo10, the coordinate can be >= 5000
+static u16 xpos, ypos;
 static s8 dir;
 
-static void lcd_display(uint8_t on)
+void lcd_display(uint8_t on)
 {
-    LCD_CMD = 0xAE | (on ? 1 : 0);
+    LCD_Cmd(0xAE | (on ? 1 : 0));
 }
 
-static void lcd_set_page_address(uint8_t page)
+void lcd_set_page_address(uint8_t page)
 {
-    LCD_CMD = 0xB0 | (page & 0x07);
+    LCD_Cmd(0xB0 | (page & 0x07));
 }
 
-static void lcd_set_column_address(uint8_t column)
+void lcd_set_column_address(uint8_t column)
 {
-    LCD_CMD = 0x10 | ((column >> 4) & 0x0F);  //MSB
-    LCD_CMD = column & 0x0F;                  //LSB
+    LCD_Cmd(0x10 | ((column >> 4) & 0x0F));  //MSB
+    LCD_Cmd(column & 0x0F);                  //LSB
 }
 
-static void lcd_set_start_line(int line)
+void lcd_set_start_line(int line)
 {
-  LCD_CMD = (line & 0x3F) | 0x40; 
+  LCD_Cmd((line & 0x3F) | 0x40); 
 }
 
 void LCD_Contrast(unsigned contrast)
 {
-    int data = 0x20 + contrast * 0xC / 10;
-    LCD_CMD = 0x81;
-    LCD_CMD = data & 0x3F;
+    //int data = 0x20 + contrast * 0xC / 10;
+    LCD_Cmd(0x81);
+    if (HAS_OLED_DISPLAY) {
+        contrast = _oled_contrast_func(contrast);
+    } else {
+        contrast = _lcd_contrast_func(contrast);
+    }
+    LCD_Cmd(contrast);
 }
 
 void LCD_Init()
 {
-    _fsmc_init(
-        8,
-        0x10000,  /*only bit 16 of addr */
-        FSMC_NOE | FSMC_NWE | FSMC_NE1,  /* Not connected */
-        FSMC_BANK1,
-        /* Normal mode, write enable, 8 bit access, SRAM, bank enabled */
-        FSMC_BCR_FACCEN | FSMC_BCR_WREN | FSMC_BCR_MBKEN,
-        /* Data Setup > 90ns, Address Setup = 2xHCLK to ensure no output collision in 6800
-           mode since LCD E and !CS always active */
-        FSMC_BTR_DATASTx(7) | FSMC_BTR_ADDHLDx(0) | FSMC_BTR_ADDSETx(2),
-        0);
-
-
-
-    // LCD bias setting (11); 0xA2; 1/9
-    LCD_CMD = 0xA2;
-
-    // ADC selection (8) -> ADdressCounter; 0xA0; inc
-    LCD_CMD = 0xA0;
-
-    //Common output mode selection (15); 0xC0; normal scan
-    LCD_CMD = 0xC0;
-    Delay(5);
-
-    //Setting built-in resistance ratio (17); 0x24; default=7.50
-    LCD_CMD = 0x24;
-
-    //Electronic volume control (18) -> LCD brightness; 0x20; default=32d
-    LCD_CMD = 0x81;
-    LCD_CMD = 0x25 & 0x3F; // = LCD_Contrast(5);
-    Delay(5);
-
-    //Power control setting (16); V/B, V/R, V/F are used
-    LCD_CMD = 0x2F;
-    Delay(5);
-
-    // Read-Modify-Write (12); let read data does not increment column address
-    LCD_CMD = 0xE0;
-
+    lcd_init_ports();
+    if (HAS_OLED_DISPLAY) {
+        _oled_reset();
+        _oled_init();
+    } else {
+        _lcd_reset();
+        _lcd_init();
+    }
+    volatile int i = 0x8000;
+    while(i) i--;
+    lcd_display(0);     // Display Off
     lcd_set_start_line(0);
-    lcd_set_page_address(0);
-    lcd_set_column_address(0);
     // Display data write (6)
+    // Clear the screen
+    for(int page = 0; page < LCD_PAGES; page++) {
+        lcd_set_page_address(page);
+        lcd_set_column_address(0);
+        for(int col = 0; col < PHY_LCD_WIDTH; col++)
+            LCD_Data(0x00);
+    }
     lcd_display(1);
+    LCD_Contrast(5);
     memset(img, 0, sizeof(img));
     memset(dirty, 0, sizeof(dirty));
 }
@@ -153,7 +135,7 @@ void LCD_DrawStop(void)
                 } else if(col+1 != c) {
                     lcd_set_column_address(c);
                 }
-                LCD_DATA = img[p * PHY_LCD_WIDTH + c];
+                LCD_Data(img[p * PHY_LCD_WIDTH + c]);
                 col = c;
             }
         }
@@ -183,31 +165,29 @@ A0 (E /RD) (R/W /WR) D7 D6 D5 D4 D3 D2 D1 D0 Hex Setting
  0    1        0      1  0  1  0  0  0  0  0 A0h Normal
                                            1 A1h Reverse
  */
-
-
 void LCD_DrawPixel(unsigned int color)
 {
-	if (xpos < LCD_WIDTH && ypos < LCD_HEIGHT) {	// both are unsigned, can not be < 0
-		int y;
-		int x = PHY_LCD_WIDTH - 1 - xpos; //We want to map 0 -> 128 and 128 -> 0
-
-		if (ypos > 31)
-			y = ypos - 32;
-		else
-			y = ypos + 32;
-
-
-		int ycol = y / 8;
-		int ybit = y & 0x07;
-		if(color) {
-			img[ycol * PHY_LCD_WIDTH + x] |= 1 << ybit;
-		} else {
-			img[ycol * PHY_LCD_WIDTH + x] &= ~(1 << ybit);
-		}
-		dirty[x] |= 1 << ycol;
-	}
-	// this must be executed to continue drawing in the next row
-	xpos++;
+    if (xpos < LCD_WIDTH && ypos < LCD_HEIGHT) {    // both are unsigned, can not be < 0
+        int y = ypos;
+        int x = xpos;
+        if (HAS_LCD_SWAPPED_PAGES) {
+            x = PHY_LCD_WIDTH - 1 - xpos; //We want to map 0 -> 128 and 128 -> 0
+            if (ypos > 31)
+                y = ypos - 32;
+            else
+                y = ypos + 32;
+        }
+        int ycol = y / 8;
+        int ybit = y & 0x07;
+        if (color) {
+            img[ycol * PHY_LCD_WIDTH + x] |= 1 << ybit;
+        } else {
+            img[ycol * PHY_LCD_WIDTH + x] &= ~(1 << ybit);
+        }
+        dirty[x] |= 1 << ycol;
+    }
+    // this must be executed to continue drawing in the next row
+    xpos++;
     if (xpos > xend) {
         xpos = xstart;
         ypos += dir;

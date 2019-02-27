@@ -52,6 +52,10 @@ static u16 current_selected = 0;  // do not put current_selected into pagemem as
 static int size_cb(int absrow, void *data)
 {
     (void)data;
+    if (absrow >= ITEM_BACKLIGHT && HAS_OLED_DISPLAY) {
+        // This will hide the backlight row
+        absrow++;
+    }
     switch(absrow) {
 #if SUPPORT_MULTI_LANGUAGE
         case ITEM_LANG:
@@ -59,11 +63,7 @@ static int size_cb(int absrow, void *data)
         case ITEM_MODE:
 #endif
         case ITEM_BUZZ:
-#if !HAS_OLED_DISPLAY
-        case ITEM_BACKLIGHT:
-#else
         case ITEM_CONTRAST:
-#endif
         case ITEM_PREALERT:
         case ITEM_TELEMTEMP:
             return 2;
@@ -80,6 +80,7 @@ static guiObject_t *getobj_cb(int relrow, int col, void *data)
 
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
+    unsigned hidden = 0;
     data = NULL;
     const void *label = "";
     const void *title = NULL;
@@ -88,6 +89,10 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     void *but_str = NULL;
     u8 x = LARGE_SEL_X_OFFSET;
 
+    if (absrow >= ITEM_BACKLIGHT && HAS_OLED_DISPLAY) {
+        // This will hide the backlight row
+        absrow++;
+    }
     switch(absrow) {
 #if SUPPORT_MULTI_LANGUAGE
         case ITEM_LANG:
@@ -142,19 +147,14 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             label = _tr_noop("PwrDn alert");
             value = _music_shutdown_cb; x = MED_SEL_X_OFFSET;
             break;
-#if !HAS_OLED_DISPLAY
-        case ITEM_BACKLIGHT:
-            title = _tr_noop("LCD settings");
-            label = _tr_noop("Backlight");
-            value = backlight_select_cb; x = SMALL_SEL_X_OFFSET;
-            break;
-#endif
         case ITEM_CONTRAST:
-#if HAS_OLED_DISPLAY
             title = _tr_noop("LCD settings");
-#endif
             label = _tr_noop("Contrast");
             value = _contrast_select_cb; x = SMALL_SEL_X_OFFSET;
+            break;
+        case ITEM_BACKLIGHT:
+            label = _tr_noop("Backlight");
+            value = backlight_select_cb; x = SMALL_SEL_X_OFFSET;
             break;
         case ITEM_DIMTIME:
             label = _tr_noop("Dimmer time");
@@ -229,9 +229,9 @@ static const char *_contrast_select_cb(guiObject_t *obj, int dir, void *data)
                                   0, 10, dir, 1, 1, &changed);
     if (changed) {
         LCD_Contrast(Transmitter.contrast);
-#if HAS_OLED_DISPLAY
-        Transmitter.backlight = Transmitter.contrast;
-#endif
+        if (HAS_OLED_DISPLAY) {
+            Transmitter.backlight = Transmitter.contrast;
+        }
     }
     if (Transmitter.contrast == 0)
         return _tr("Off");

@@ -1,5 +1,5 @@
 SCREENSIZE  := 128x64x1
-DISPLAY_DRIVER := spi/128x64x1_nt7538.c
+DISPLAY_DRIVER := spi/128x64x1.c
 FILESYSTEMS := common base_fonts 128x64x1
 DFU_ARGS    := -c 7 -b 0x08003000
 FONTS        = filesystem/$(FILESYSTEM)/media/12normal.fon \

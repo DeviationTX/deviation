@@ -1,5 +1,5 @@
 SCREENSIZE  := 128x64x1
-DISPLAY_DRIVER := spi/128x64x1_oled_ssd1306.c
+DISPLAY_DRIVER := spi/128x64x1.c
 FILESYSTEMS := common base_fonts 128x64x1
 DFU_ARGS    := -c 0 -b 0x08006000
 FONTS        = filesystem/$(FILESYSTEM)/media/12normal.fon \
