@@ -118,7 +118,7 @@ static void send_packet(u8 bind)
 {
     u16 val;
     u8 i;
-    if(bind) {
+    if (bind) {
         memcpy(packet, &rx_tx_addr[1], 4);
         memcpy(&packet[4], hopping_frequency, 4);
         packet[8] = 0x23;  // ???
@@ -172,7 +172,7 @@ static u16 E016H_callback()
     switch (phase) {
         case BIND:
             send_packet(1);
-            if(bind_count-- == 0) {
+            if (bind_count-- == 0) {
                 phase = DATA;
                 XN297_SetTXAddr(rx_tx_addr, 5);
                 PROTOCOL_SetBindState(0);
