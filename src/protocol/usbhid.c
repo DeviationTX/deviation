@@ -81,7 +81,7 @@ static void initialize()
 {
     CLOCK_StopTimer();
     num_channels = Model.num_channels;
-    PrevXferComplete = 1;
+    PrevXferComplete = 0;
     HID_Enable();
     CLOCK_StartTimer(1000, usbhid_cb);
 }

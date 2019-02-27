@@ -4,6 +4,7 @@
 #include "common.h"
 #include "devo_usb.h"
 
+extern volatile u8 PrevXferComplete;
 static const uint8_t hid_report_descriptor[] = {
     0x05, 0x01,                    // USAGE_PAGE (Generic Desktop)
     0x15, 0x81,                    // LOGICAL_MINIMUM (0)
@@ -69,7 +70,7 @@ const struct usb_endpoint_descriptor hid_endpoint = {
     .bDescriptorType = USB_DT_ENDPOINT,
     .bEndpointAddress = 0x81,
     .bmAttributes = USB_ENDPOINT_ATTR_INTERRUPT,
-    .wMaxPacketSize = 9,
+    .wMaxPacketSize = 16,
     .bInterval = 0x20,
 };
 
@@ -123,19 +124,29 @@ static enum usbd_request_return_codes hid_control_request(usbd_device *dev, stru
     return USBD_REQ_HANDLED;
 }
 
+static void hid_data_tx(usbd_device *usbd_dev, uint8_t ep)
+{
+    (void)usbd_dev;
+    (void)ep;
+
+    PrevXferComplete = 1;
+}
+
 static void hid_set_config(usbd_device *dev, uint16_t wValue)
 {
     (void)wValue;
     (void)dev;
 
     // Max 9 data to send. 7 analog channels + 1 bytes for 8 switches
-    usbd_ep_setup(dev, 0x81, USB_ENDPOINT_ATTR_INTERRUPT, 9, NULL);
+    usbd_ep_setup(dev, 0x81, USB_ENDPOINT_ATTR_INTERRUPT, 16, hid_data_tx);
 
     usbd_register_control_callback(
                 dev,
                 USB_REQ_TYPE_STANDARD | USB_REQ_TYPE_INTERFACE,
                 USB_REQ_TYPE_TYPE | USB_REQ_TYPE_RECIPIENT,
                 hid_control_request);
+
+    PrevXferComplete = 1;
 }
 
 static void HID_Init()
@@ -149,7 +160,10 @@ static void HID_Init()
 
 void HID_Write(s8 *packet, u8 num_channels)
 {
-    usbd_ep_write_packet(usbd_dev, 0x81, packet, num_channels);
+    if (PrevXferComplete == 1) {
+        PrevXferComplete = 0;
+        usbd_ep_write_packet(usbd_dev, 0x81, packet, num_channels);
+    }
 }
 
 void HID_Enable() {
