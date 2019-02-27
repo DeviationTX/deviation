@@ -1,7 +1,6 @@
 
 static void _lcd_backlight_init()
 {
-
     rcc_periph_clock_enable(get_rcc_from_pin(BACKLIGHT_TIM.pin));
     GPIO_setup_input(BACKLIGHT_TIM.pin, ITYPE_FLOAT);
 

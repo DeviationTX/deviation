@@ -40,13 +40,13 @@ static void LCD_Data(unsigned cmd) {
 
 static void lcd_init_ports()
 {
-    //Initialization is mostly done in SPI Flash
-    //Setup CS as B.0 Data/Control = C.5
+    // Initialization is mostly done in SPI Flash
+    // Setup CS as B.0 Data/Control = C.5
     rcc_periph_clock_enable(get_rcc_from_pin(LCD_SPI.csn));
     rcc_periph_clock_enable(get_rcc_from_pin(LCD_SPI_MODE));
     GPIO_setup_output(LCD_SPI.csn, OTYPE_PUSHPULL);
     GPIO_setup_output(LCD_SPI_MODE, OTYPE_PUSHPULL);
-    if (HAS_OLED_DISPLAY) {	
+    if (HAS_OLED_DISPLAY) {
         // We >> 3 because spi_set_baudrate_prescaler takes a value of 0-7,
         // Whereas spi_init_master uses SPI_CR1_BAUDRATE_FPCLK_DIV_xx which
         // is pre-shifted

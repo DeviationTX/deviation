@@ -24,7 +24,7 @@ inline static unsigned _lcd_contrast_func(unsigned contrast) {
 
 inline static void _lcd_reset()
 {
-    LCD_Cmd(0xE2);  //Reset
+    LCD_Cmd(0xE2);  // Reset
 }
 
 inline static void _lcd_init()
@@ -42,11 +42,11 @@ inline static void _lcd_init()
     }
     LCD_Cmd(0x2C);      // Power Controller:Booster ON
     i = 0x8000;
-    while(i) i--;
+    while (i) i--;
     LCD_Cmd(0x2E);      // Power Controller: VReg ON
     i = 0x8000;
-    while(i) i--;
+    while (i) i--;
     LCD_Cmd(0x2F);      // Power Controller: VFollower ON
     i = 0x8000;
-    while(i) i--;
+    while (i) i--;
 }
