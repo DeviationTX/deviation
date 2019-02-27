@@ -55,7 +55,7 @@ static const struct {
     .hid_descriptor = {
         .bLength = sizeof(hid_function),
         .bDescriptorType = USB_DT_HID,
-        .bcdHID = 0x0000,
+        .bcdHID = 0x0100,
         .bCountryCode = 0,
         .bNumDescriptors = 1,
     },
@@ -65,12 +65,12 @@ static const struct {
     }
 };
 
-const struct usb_endpoint_descriptor hid_endpoint = {
+static const struct usb_endpoint_descriptor hid_endpoint = {
     .bLength = USB_DT_ENDPOINT_SIZE,
     .bDescriptorType = USB_DT_ENDPOINT,
     .bEndpointAddress = 0x81,
     .bmAttributes = USB_ENDPOINT_ATTR_INTERRUPT,
-    .wMaxPacketSize = 16,
+    .wMaxPacketSize = 9,
     .bInterval = 0x20,
 };
 
@@ -135,10 +135,9 @@ static void hid_data_tx(usbd_device *usbd_dev, uint8_t ep)
 static void hid_set_config(usbd_device *dev, uint16_t wValue)
 {
     (void)wValue;
-    (void)dev;
 
-    // Max 9 data to send. 7 analog channels + 1 bytes for 8 switches
-    usbd_ep_setup(dev, 0x81, USB_ENDPOINT_ATTR_INTERRUPT, 16, hid_data_tx);
+    // Max 9 bytes to send. 8 analog channels + 1 bytes for 4 switches
+    usbd_ep_setup(dev, 0x81, USB_ENDPOINT_ATTR_INTERRUPT, 9, hid_data_tx);
 
     usbd_register_control_callback(
                 dev,
@@ -158,12 +157,10 @@ static void HID_Init()
     usbd_register_set_config_callback(usbd_dev, hid_set_config);
 }
 
-void HID_Write(s8 *packet, u8 num_channels)
+void HID_Write(s8 *packet, u8 size)
 {
-    if (PrevXferComplete == 1) {
-        PrevXferComplete = 0;
-        usbd_ep_write_packet(usbd_dev, 0x81, packet, num_channels);
-    }
+    PrevXferComplete = 0;
+    usbd_ep_write_packet(usbd_dev, 0x81, packet, size);
 }
 
 void HID_Enable() {

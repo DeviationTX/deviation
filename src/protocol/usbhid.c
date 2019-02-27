@@ -39,7 +39,7 @@
 static s8 packet[USBHID_ANALOG_CHANNELS + 1];
 static u8 num_channels;
 volatile u8 PrevXferComplete;
-extern void HID_Write(s8 *packet, u8 num_channels);
+extern void HID_Write(s8 *packet, u8 size);
 
 static void build_data_pkt()
 {
@@ -69,10 +69,10 @@ static void build_data_pkt()
 
 static u16 usbhid_cb()
 {
-    if(PrevXferComplete) {
+    if (PrevXferComplete) {
         build_data_pkt();
         
-        HID_Write(packet, sizeof(packet));
+        HID_Write(packet, USBHID_DIGITAL_CHANNELS + 1);
     }
     return 50000;
 }
