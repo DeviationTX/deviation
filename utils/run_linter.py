@@ -62,6 +62,7 @@ if TRAVIS_PULL_REQUEST == 'false':
 
 
 def main():
+    #  return
     parser = argparse.ArgumentParser()
     parser.add_argument("path", nargs='*', help="Paths to lint")
     parser.add_argument("--diff", action="store_true",
@@ -85,7 +86,8 @@ def main():
             sys.exit(ERROR_EXIT_STATUS)
 
     pwd = os.getcwd()
-    os.chdir(system(["git", "rev-parse", "--show-toplevel"]).rstrip())
+    #os.chdir(system(["git", "rev-parse", "--show-toplevel"]).rstrip())
+    os.chdir("e:\\Devs\\deviation")
     new_pwd = os.getcwd()
     if pwd != new_pwd and pwd.startswith(new_pwd):
         path_delta = pwd[len(new_pwd)+1:]
