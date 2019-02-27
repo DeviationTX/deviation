@@ -105,11 +105,45 @@ static const struct usb_config_descriptor hid_config_descr = {
     .interface = &hid_ifaces,
 };
 
+static enum usbd_request_return_codes hid_control_request(usbd_device *dev, struct usb_setup_data *req, uint8_t **buf, uint16_t *len,
+            void (**complete)(usbd_device *, struct usb_setup_data *))
+{
+    (void)complete;
+    (void)dev;
+
+    if ((req->bmRequestType != 0x81) ||
+        (req->bRequest != USB_REQ_GET_DESCRIPTOR) ||
+        (req->wValue != 0x2200))
+        return USBD_REQ_NOTSUPP;
+
+    /* Handle the HID report descriptor. */
+    *buf = (uint8_t *)hid_report_descriptor;
+    *len = sizeof(hid_report_descriptor);
+
+    return USBD_REQ_HANDLED;
+}
+
+static void hid_set_config(usbd_device *dev, uint16_t wValue)
+{
+    (void)wValue;
+    (void)dev;
+
+    usbd_ep_setup(dev, 0x81, USB_ENDPOINT_ATTR_INTERRUPT, 4, NULL);
+
+    usbd_register_control_callback(
+                dev,
+                USB_REQ_TYPE_STANDARD | USB_REQ_TYPE_INTERFACE,
+                USB_REQ_TYPE_TYPE | USB_REQ_TYPE_RECIPIENT,
+                hid_control_request);
+}
+
 static void HID_Init()
 {
     usbd_dev = usbd_init(&st_usbfs_v1_usb_driver, &dev_descr, &hid_config_descr,
         usb_strings, USB_STRING_COUNT,
         usbd_control_buffer, sizeof(usbd_control_buffer));
+
+    usbd_register_set_config_callback(usbd_dev, hid_set_config);
 }
 
 void HID_Write(s8 *packet, u8 num_channels)
