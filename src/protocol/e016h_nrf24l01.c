@@ -213,10 +213,11 @@ static void init_txid()
     rx_tx_addr[4] = lfsr >> 8;
     
     // rf channels
-    hopping_frequency[0] = 0x49;
-    hopping_frequency[1] = 0x3e;
-    hopping_frequency[2] = 0x33;
-    hopping_frequency[3] = 0x3a;
+    rand32_r(&lfsr, 0);
+    hopping_frequency[0] = (lfsr >> 24) % 80;
+    hopping_frequency[1] = (lfsr >> 16) % 80;
+    hopping_frequency[2] = (lfsr >>  8) % 80;
+    hopping_frequency[3] = (lfsr >>  0) % 80;
 }
 
 static void initialize()
