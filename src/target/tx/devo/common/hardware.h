@@ -190,6 +190,14 @@
     #define AVR_RESET_PIN ((struct mcu_pin) {GPIO_BANK_JTCK_SWCLK, GPIO_JTCK_SWCLK})
 #endif
 
+// USB
+#ifndef USB_ENABLE_PIN
+    #define USB_ENABLE_PIN ((struct mcu_pin) {GPIOB, GPIO10})
+#endif  // USB_ENABLE_PIN
+#ifndef USB_DETECT_PIN
+    #define USB_DETECT_PIN NULL_PIN
+#endif  // USB_DETECT_PIN
+
 #include "target/drivers/mcu/stm32/hardware.h"
 
 // LED Pins

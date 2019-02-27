@@ -5,6 +5,7 @@
 #include <libopencm3/usb/msc.h>
 
 #include "common.h"
+#include "target/drivers/mcu/stm32/rcc.h"
 
 #include "devo_usb.h"
 
@@ -42,9 +43,18 @@ void USB_Enable(unsigned use_interrupt)
 
     GPIO_setup_input_af((struct mcu_pin){GPIOA, GPIO11 | GPIO12}, ITYPE_FLOAT, 0);
 
-    rcc_periph_clock_enable(RCC_GPIOB);
-    GPIO_setup_output((struct mcu_pin){GPIOB, GPIO10}, OTYPE_PUSHPULL);
-    gpio_clear(GPIOB, GPIO10);
+    if (HAS_PIN(USB_ENABLE_PIN)) {
+        rcc_periph_clock_enable(get_rcc_from_pin(USB_ENABLE_PIN));
+        GPIO_setup_output(USB_ENABLE_PIN, OTYPE_PUSHPULL);
+        GPIO_pin_clear(USB_ENABLE_PIN);
+    } else {
+        // Hack
+    }
+
+    if (HAS_PIN(USB_DETECT_PIN)) {
+        rcc_periph_clock_enable(get_rcc_from_pin(USB_DETECT_PIN));
+        GPIO_setup_input(USB_DETECT_PIN, ITYPE_PULLUP);
+    }
 
     if (use_interrupt) {
         nvic_enable_irq(NVIC_USB_LP_CAN_RX0_IRQ);
@@ -54,7 +64,10 @@ void USB_Enable(unsigned use_interrupt)
 
 void USB_Disable()
 {
-    gpio_set(GPIOB, GPIO10);
+    if (HAS_PIN(USB_ENABLE_PIN)) {
+        GPIO_pin_set(USB_ENABLE_PIN);
+    }
+
     nvic_disable_irq(NVIC_USB_LP_CAN_RX0_IRQ);
     nvic_disable_irq(NVIC_USB_WAKEUP_IRQ);
 }
