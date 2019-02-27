@@ -64,4 +64,4 @@
 #include "hardware.h"
 #include "../common/common_devo.h"
 
-#endif //_T8SG_TARGET_H_
+#endif  // _T8SG_TARGET_H_

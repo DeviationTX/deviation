@@ -28,6 +28,11 @@
 #define HAS_AUDIO_UART     1
 #define HAS_MUSIC_CONFIG    1
 
+// TXTYPE points at a memory address inside the bootloader that
+// contains the tx model name.  Only Transmitters using deviation-bootloader
+// will have this string.  It is always located right after the jump table,
+// And is 12 bytes long.  Current valid values are:
+// T8SGV1, T8SGV2, T8SGV2+, T8SGV3, T8SGV3+
 #define TXTYPE ((char *)0x08003150)
 #define HAS_OLED_DISPLAY    (TXTYPE[6] == '+')
 #define LCD_CONTRAST_FUNC(x) (x)

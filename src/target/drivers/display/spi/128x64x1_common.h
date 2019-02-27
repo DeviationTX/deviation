@@ -19,7 +19,7 @@
 #ifndef HAS_LCD_SWAPPED_PAGES
     #define HAS_LCD_SWAPPED_PAGES 0
 #endif
- 
+
 #include "128x64x1_nt7538.h"
 #include "128x64x1_oled_ssd1306.h"
 
@@ -171,7 +171,7 @@ void LCD_DrawPixel(unsigned int color)
         int y = ypos;
         int x = xpos;
         if (HAS_LCD_SWAPPED_PAGES) {
-            x = PHY_LCD_WIDTH - 1 - xpos; //We want to map 0 -> 128 and 128 -> 0
+            x = PHY_LCD_WIDTH - 1 - xpos;  // We want to map 0 -> 128 and 128 -> 0
             if (ypos > 31)
                 y = ypos - 32;
             else

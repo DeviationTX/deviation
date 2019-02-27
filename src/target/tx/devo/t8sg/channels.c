@@ -124,7 +124,7 @@ s32 CHAN_ReadRawInput(int channel)
       if ((~Transmitter.ignore_src & SWITCH_3x1) == SWITCH_3x1) {
         switch (channel) {
           case INP_SWA0:  value = (global_extra_switches & (1 << (SW_02 - 1))); break;
-          case INP_SWA1:  value = (!global_extra_switches & (1 << (SW_01 - 1))) && !(global_extra_switches & (1 << (SW_02 - 1)))); break;
+          case INP_SWA1:  value = (!(global_extra_switches & (1 << (SW_01 - 1))) && !(global_extra_switches & (1 << (SW_02 - 1)))); break;
           case INP_SWA2:  value = (global_extra_switches & (1 << (SW_01 - 1))); break;
         }
       } else if ((~Transmitter.ignore_src & SWITCH_2x8) == SWITCH_2x8) {

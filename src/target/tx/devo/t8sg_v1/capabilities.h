@@ -47,13 +47,13 @@
 #endif
 
 #ifdef CHANMAP
-//These are legacy mappings
+// These are legacy mappings
   CHANMAP("DR",     SWD1)
   CHANMAP("RUD DR", SWD1)
   CHANMAP("ELE_DR", SWD1)
   CHANMAP("AIL_DR", SWD1)
   CHANMAP("GEAR",   SWB1)
-//Current mappings
+// Current mappings
   CHANMAP("DR0", SWD0)
   CHANMAP("DR1", SWD1)
   CHANMAP("RUD DR0", SWD0)
