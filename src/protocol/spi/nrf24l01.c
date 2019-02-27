@@ -434,6 +434,8 @@ u8 XN297_WritePayload(u8* msg, int len)
         packet[last++] = crc >> 8;
         packet[last++] = crc & 0xff;
     }
+    if (++last > 32)
+        last = 32;
     res = NRF24L01_WritePayload(packet, last);
     return res;
 }
@@ -498,6 +500,8 @@ u8 XN297_WriteEnhancedPayload(u8* msg, int len, int noack, u16 crc_xorout)
         packet[last++] = ((crc >> 8) << 6) | ((crc & 0xff) >> 2);
         packet[last++] = (crc & 0xff) << 6;
     }
+    if (++last > 32)
+        last = 32;
     res = NRF24L01_WritePayload(packet, last);
 
     pid++;
