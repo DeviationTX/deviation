@@ -56,10 +56,10 @@ const char *MCU_GetPinName(char *str, struct mcu_pin *port) {
 void PWM_Initialize() {}
 void PWM_Stop() {}
 void PPM_Enable(unsigned active_time, volatile u16 *pulses, u8 num_pulses, u8 polarity) {
-    (void)polarity;
-    (void)low_time;
+    (void)active_time;
     (void)pulses;
     (void)num_pulses;
+    (void)polarity;
 }
 void PXX_Enable(u8 *packet) { (void)packet; }
 typedef void sser_callback_t(u8 data);
