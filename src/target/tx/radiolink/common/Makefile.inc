@@ -17,21 +17,18 @@ SRC_C   := $(wildcard $(SDIR)/target/tx/$(FAMILY)/common/*.c) \
            $(wildcard $(SDIR)/target/drivers/filesystems/*.c) \
            $(wildcard $(SDIR)/target/drivers/filesystems/devofs/*.c) \
            $(wildcard $(SDIR)/target/drivers/filesystems/petit_fat/*.c) \
-           $(wildcard $(SDIR)/target/tx/devo/common/msc2/*.c) \
-           $(wildcard $(SDIR)/target/tx/devo/common/msc2/lib/*.c) \
-           $(wildcard $(SDIR)/target/tx/devo/common/hid/*.c) \
            $(wildcard $(SDIR)/target/tx/devo/common/protocol/*.c) \
            $(wildcard $(SDIR)/target/drivers/serial/uart/*.c) \
+           $(wildcard $(SDIR)/target/drivers/usb/*.c) \
            $(SDIR)/target/drivers/storage/mcu_flash.c \
            $(SDIR)/target/drivers/backlight/backlight.c \
            $(SDIR)/target/drivers/input/analog/analog.c
-
 
 ifeq "$(HAS_4IN1_FLASH)" "1"
 SRC_C   += $(SDIR)/target/drivers/storage/spi_flash.c
 endif
 
-CFLAGS   = -D"assert_param(x)=" -DSTM32F10X_HD -DSTM32F1 -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -fdata-sections -ffunction-sections -I$(SDIR)/target/tx/devo/common/msc2/lib -I$(SDIR)/target/tx/devo/common/msc2 -I$(SDIR)/libopencm3/include -I$(SDIR)/target/drivers/filesystems -I$(SDIR)/target/tx/radiolink/common  -fno-builtin-printf -Os --specs=nano.specs
+CFLAGS   = -D"assert_param(x)=" -DSTM32F10X_HD -DSTM32F1 -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -fdata-sections -ffunction-sections -I$(SDIR)/libopencm3/include -I$(SDIR)/target/drivers/filesystems -I$(SDIR)/target/tx/radiolink/common  -fno-builtin-printf -Os --specs=nano.specs
 
 ifeq "$(HAS_4IN1_FLASH)" "1"
 CFLAGS  += -D"HAS_4IN1_FLASH=1"

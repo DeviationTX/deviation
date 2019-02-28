@@ -39,7 +39,7 @@
 static s8 packet[USBHID_ANALOG_CHANNELS + 1];
 static u8 num_channels;
 volatile u8 PrevXferComplete;
-extern void HID_Write(s8 *packet, u8 num_channels);
+extern void HID_Write(s8 *packet, u8 size);
 
 static void build_data_pkt()
 {
@@ -69,19 +69,25 @@ static void build_data_pkt()
 
 static u16 usbhid_cb()
 {
-    if(PrevXferComplete) {
+    if (PrevXferComplete) {
         build_data_pkt();
         
-        HID_Write(packet, sizeof(packet));
+        HID_Write(packet, USBHID_DIGITAL_CHANNELS + 1);
     }
     return 50000;
+}
+
+static void deinit()
+{
+    CLOCK_StopTimer();
+    HID_Disable();
 }
 
 static void initialize()
 {
     CLOCK_StopTimer();
     num_channels = Model.num_channels;
-    PrevXferComplete = 1;
+    PrevXferComplete = 0;
     HID_Enable();
     CLOCK_StartTimer(1000, usbhid_cb);
 }
@@ -90,9 +96,9 @@ uintptr_t USBHID_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(); return 0;
-        case PROTOCMD_DEINIT: HID_Disable(); return 0;
+        case PROTOCMD_DEINIT: deinit(); return 0;
         case PROTOCMD_CHECK_AUTOBIND: return 1;
-        case PROTOCMD_BIND:  initialize(); return 0;
+        case PROTOCMD_BIND: return 0;
         case PROTOCMD_NUMCHAN: return USBHID_MAX_CHANNELS;
         case PROTOCMD_DEFAULT_NUMCHAN: return 6;
         case PROTOCMD_CHANNELMAP: return UNCHG;

@@ -5,11 +5,9 @@
 #define FLASH_PAGE_SIZE 2048
 #define FLASH_ADDRESS (void *)0x08040000
 
-extern uint32_t Mass_Block_Size[2];
 static u8 writable;
 
 void MCUFlash_Init() {
-    Mass_Block_Size[0] = FLASH_PAGE_SIZE;
 }
 
 u32 MCUFlash_ReadID() {
@@ -86,5 +84,8 @@ void MCUFlash_EraseSector(u32 sectorAddress) {
     if (!writable)
         return;
 
+    // Erase two pages in one call
+    // we simulate a 4KB based device
     flash_erase_page(sectorAddress);
+    flash_erase_page(sectorAddress + FLASH_PAGE_SIZE);
 }

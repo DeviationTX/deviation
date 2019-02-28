@@ -73,6 +73,14 @@
         })
 #endif  // BACKLIGHT_TIM
 
+// USB
+#ifndef USB_ENABLE_PIN
+    #define USB_ENABLE_PIN NULL_PIN
+#endif  // USB_ENABLE_PIN
+#ifndef USB_DETECT_PIN
+    #define USB_DETECT_PIN ((struct mcu_pin) {GPIOD, GPIO6})
+#endif  // USB_DETECT_PIN
+
 #include "target/drivers/mcu/stm32/hardware.h"
 
 #endif  // _RADIOLINK_HARDWARE_H_

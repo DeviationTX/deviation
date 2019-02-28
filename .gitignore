@@ -6,6 +6,7 @@
 *.list
 *.gz
 *.map
+*.dSYM
 src/objs/
 utils/genspeech/mp3
 utils/genspeech/*.ini
