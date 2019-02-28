@@ -103,7 +103,7 @@ void PPM_Enable(unsigned active_time, volatile u16 *pulses, u8 num_pulses, u8 po
     // Setup timer for PPM
     timer_set_oc_value(PWM_TIMER.tim, TIM_OCx(PWM_TIMER.ch), active_time);
     timer_set_period(PWM_TIMER.tim, 22500);
-    if (polarity == PPM_UNINVERTED)
+    if (polarity == PPM_POLARITY_NORMAL)
         timer_set_oc_polarity_low(PWM_TIMER.tim, TIM_OCx(PWM_TIMER.ch));        // output active low
     else
         timer_set_oc_polarity_high(PWM_TIMER.tim, TIM_OCx(PWM_TIMER.ch));        // output active high

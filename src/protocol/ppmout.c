@@ -38,7 +38,7 @@ static const char * const ppm_opts[] = {
   _tr_noop("Delta PW"),   "100",   "700",   STEP_SIZE, NULL,
   _tr_noop("Notch PW"),   "100",   "500",   STEP_SIZE, NULL,
   _tr_noop("Frame Size"), "10000", "30000", STEPSIZE2, NULL,
-  _tr_noop("Polarity"), _tr_noop("Uninverted"), _tr_noop("Inverted"), NULL,
+  _tr_noop("Polarity"), _tr_noop("Normal"), _tr_noop("Inverted"), NULL,
   NULL
 };
 enum {
