@@ -6,7 +6,7 @@ SECTIONS
 {
         .text : {
             KEEP(*(.rodata.protocol_type))
-            KEEP(*(.text.PROTO_Cmds))
+            KEEP(*(.text.*_Cmds))
             *(.text*)
             . = ALIGN(4);
             *(.rodata*)     /* Read-only data */
@@ -14,7 +14,7 @@ SECTIONS
         } >ram
 	.data : {
                 _data_start = .;
-		*(.data*)	   /* Read-write initialized data */
+                *(.data*)	   /* Read-write initialized data */
                 . = _data_start;   /* Ensure there is no data section, since initialization won't happen */
 	} >ram
 	.bss : {

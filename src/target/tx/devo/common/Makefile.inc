@@ -37,7 +37,6 @@ PROTO_EXTRA_C = $(wildcard $(SDIR)/target/tx/devo/common/protocol/*.c) \
                 $(wildcard $(SDIR)/protocol/spi/*.c) \
                 $(SDIR)/target/tx/devo/common/module_signature.c \
                 $(SDIR)/target/tx/devo/common/uart.c
-SRC_C   += objs/$(TARGET)/proto_stubs.c
 else
 SRC_C   += $(wildcard $(SDIR)/target/tx/devo/common/protocol/*.c)
 endif
@@ -52,17 +51,16 @@ endif
 ifeq "$(USE_JTAG)" "1"
 CFLAGS  += -D"USE_JTAG=1"
 endif
-MODULE_FLAGS = -fno-builtin
+MODULE_CFLAGS = -fno-builtin
 
 #LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -nostdlib
-LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -lc -lnosys -L$(SDIR) -Lobjs/$(TARGET) -Wl,-warn-common
+LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -lc -lnosys -L$(SDIR) -L$(SDIR)/target/tx/devo/common -Lobjs/$(TARGET) -Wl,-warn-common
 
 LINKFILE = $(SDIR)/target/tx/devo/$(TARGET)/$(TARGET).ld
 LFLAGS2  = -Wl,-T$(LINKFILE)
 
 ifdef ENABLE_LTO
-CFLAGS  += -flto -ffat-lto-objects -fwhole-program -DENABLE_LTO
-MODULE_FLAGS += -fno-lto
+EXTRA_CFLAGS  += -flto -ffat-lto-objects -DENABLE_LTO
 endif
 
 ifdef OPTIMIZE_DFU
@@ -127,15 +125,11 @@ $(TARGET).dfu: $(TARGET).bin
 ###################################
 #The protocol modules (if needed) #
 ###################################
-$(ODIR)/%.bin: $(ODIR)/%.o_ $(PROTO_LINKFILE) $(PROTO_EXTRA_OBJS) $(TARGET).bin
+$(ODIR)/%.bin: $(ODIR)/%.o_ $(SDIR)/target/tx/devo/common/exports.ld $(PROTO_LINKFILE) $(PROTO_EXTRA_OBJS) $(TARGET).bin
 	@echo " + Building '$@'"
 	$(LD) -o $(@:.bin=.elf) $< $(PROTO_EXTRA_OBJS) $(LIBOPENCM3) -gc-sections -Map=$(@:.bin=.map) \
 		--cref -T$(PROTO_LINKFILE) --just-symbols=$(SYMBOL_FILE)
 	$(DUMP) -t $(@:.bin=.elf) | grep -q _from_thumb; if [ $$? -eq 0 ]; then echo "ERROR: Bad address found"; false; else true; fi
 	$(CP) -O binary  $(@:.bin=.elf) $@
-
-.PHONY: objs/$(TARGET)/proto_stubs.c
-objs/$(TARGET)/proto_stubs.c: target/tx/devo/common/make-stubs.sh
-	sh target/tx/devo/common/make-stubs.sh > $@
 
 endif #BUILD_TARGET

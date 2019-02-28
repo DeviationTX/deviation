@@ -162,7 +162,7 @@ ifeq "$(TYPE)" "dev"
   CFLAGS   := $(CFLAGS) -DBUILDTYPE_DEV
 endif
 ifdef MODULAR
-EXTRA_CFLAGS   :=  -DMODULAR=$(MODULAR)
+MODULE_CFLAGS   :=  -DMODULAR=$(MODULAR)
 CFLAGS   +=  -DENABLE_MODULAR=$(MODULAR)
 endif
 
@@ -284,9 +284,9 @@ ifdef LINKFILE #Create an empty 'obj/$(TARGET)/optimize.ld' just in case the lin
 	echo "" > objs/$(TARGET)/optimize.ld
 endif
 ifeq ("$(SRC_CXX)", " ")
-	$(CC) -o $@ $(OBJS) $(LIBOPENCM3) $(LFLAGS) $(LFLAGS2) $(CFLAGS)
+	$(CC) -o $@ $(OBJS) $(LIBOPENCM3) $(LFLAGS) $(LFLAGS2) $(CFLAGS) $(EXTRA_CFLAGS)
 else
-	$(CXX) -o $@ $(OBJS) $(LIBOPENCM3) $(LFLAGS) $(LFLAGS2) $(CFLAGS)
+	$(CXX) -o $@ $(OBJS) $(LIBOPENCM3) $(LFLAGS) $(LFLAGS2) $(CFLAGS) $(EXTRA_CFLAGS)
 endif
 
 #################
@@ -369,7 +369,7 @@ dollar = $$
 define define_compile_rules
 $(ODIR)/%.o: $(1)%.c $(LIBOPENCM3)
 	@echo " + Compiling '$$<'"
-	$(CC) $$(CFLAGS) $$(CFLAGS_$$(basename $$(notdir $$<))) -MD -c -o $$@ $$<
+	$(CC) $$(CFLAGS) $$(CFLAGS_$$(basename $$(notdir $$<))) $$(EXTRA_CFLAGS) -MD -c -o $$@ $$<
 	@cp $(ODIR)/$$*.d $(ODIR)/$$*.P; \
             sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$(dollar)//' \
                 -e '/^$$(dollar)/ d' -e 's/$$(dollar)/ :/' < $(ODIR)/$$*.d >> $(ODIR)/$$*.P; \
@@ -377,7 +377,7 @@ $(ODIR)/%.o: $(1)%.c $(LIBOPENCM3)
 
 $(ODIR)/%.o: $(1)%.cpp $(LIBOPENCM3)
 	@echo " + Compiling '$$<'"
-	$(CXX) $$(CXXFLAGS) $$(CXXFLAGS_$$(basename $$(notdir $$<))) -MD -c -o $$@ $$<
+	$(CXX) $$(CXXFLAGS) $$(CXXFLAGS_$$(basename $$(notdir $$<))) $(EXTRA_CFLAGS) -MD -c -o $$@ $$<
 	@cp $(ODIR)/$$*.d $(ODIR)/$$*.P; \
             sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$(dollar)//' \
                 -e '/^$$(dollar)/ d' -e 's/$$(dollar)/ :/' < $(ODIR)/$$*.d >> $(ODIR)/$$*.P; \
@@ -386,7 +386,7 @@ $(ODIR)/%.o: $(1)%.cpp $(LIBOPENCM3)
 #For module building
 $(ODIR)/%.o_: $(1)%.c $(LIBOPENCM3)
 	@echo " + Compiling '$$<' as module"
-	$(CC) $$(CFLAGS) $$(CFLAGS_$$(basename $$(notdir $$<))) $$(EXTRA_CFLAGS) $$(MODULE_FLAGS) -MD -c -o $$@ $$<
+	$(CC) $$(CFLAGS) $$(CFLAGS_$$(basename $$(notdir $$<))) $$(MODULE_CFLAGS) -MD -c -o $$@ $$<
 	@cp $(ODIR)/$$*.d $(ODIR)/$$*.P; \
             sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$(dollar)//' \
                 -e '/^$$(dollar)/ d' -e 's/$$(dollar)/ :/' < $(ODIR)/$$*.d >> $(ODIR)/$$*.P; \

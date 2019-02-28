@@ -13,12 +13,6 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef MODULAR
-  //Allows the linker to properly relocate
-  #define WK2x01_Cmds PROTO_Cmds
-  #pragma long_calls
-#endif
-
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
@@ -26,7 +20,6 @@
 #include "telemetry.h"
 
 #ifdef MODULAR
-  #pragma long_calls_off
   //Force the following functions to be builtin 
   #define abs __builtin_abs
 #endif

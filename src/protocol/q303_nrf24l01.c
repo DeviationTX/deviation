@@ -13,12 +13,6 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#ifdef MODULAR
-  //Allows the linker to properly relocate
-  #define Q303_Cmds PROTO_Cmds
-  #pragma long_calls
-#endif
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
@@ -27,15 +21,7 @@
 #include "music.h"
 #include "telemetry.h"
 
-#ifdef MODULAR
-  //Some versions of gcc applythis to definitions, others to calls
-  //So just use long_calls everywhere
-  //#pragma long_calls_off
-#endif
-
 #ifdef PROTO_HAS_NRF24L01
-
-#include "iface_nrf24l01.h"
 
 #ifdef EMULATOR
     #define USE_FIXED_MFGID

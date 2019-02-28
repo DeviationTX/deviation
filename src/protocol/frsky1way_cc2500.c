@@ -13,26 +13,13 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef MODULAR
-  //Allows the linker to properly relocate
-  #define FRSKY1WAY_Cmds PROTO_Cmds
-  #pragma long_calls
-#endif
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
 #include "config/model.h"
 #include "telemetry.h"
 
-#ifdef MODULAR
-  //Some versions of gcc applythis to definitions, others to calls
-  //So just use long_calls everywhere
-  //#pragma long_calls_off
-#endif
-
 #ifdef PROTO_HAS_CC2500
-
-#include "iface_cc2500.h"
 
 static const char * const frsky_opts[] = {
   _tr_noop("Freq-Fine"),  "-127", "127", NULL,

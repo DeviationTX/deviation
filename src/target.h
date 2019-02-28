@@ -34,7 +34,7 @@ enum {
 #ifdef MODULAR
   #define MODULE_CALLTYPE __attribute__((__long_call__))
 #else
-  #define MODULE_CALLTYPE __attribute__ ((externally_visible))
+  #define MODULE_CALLTYPE
 #endif
 
 #define CHAN_ButtonMask(btn) (btn ? (1 << (btn - 1)) : 0)

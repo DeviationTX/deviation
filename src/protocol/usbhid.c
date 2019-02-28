@@ -13,20 +13,11 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef MODULAR
-  //Allows the linker to properly relocate
-  #define USBHID_Cmds PROTO_Cmds
-  #pragma long_calls
-#endif
-
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
 #include "config/model.h"
 
-#ifdef MODULAR
-  #pragma long_calls_off
-#endif
 //To change USBHID_MAX_CHANNELS you must change the Report_Descriptor in hid_usb_desc.c as well
 #define USBHID_ANALOG_CHANNELS 8
 #define USBHID_DIGITAL_CHANNELS 4

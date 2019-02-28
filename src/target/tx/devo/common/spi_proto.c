@@ -119,9 +119,6 @@ void SPI_ProtoInit()
             GPIO_pin_set(port);
         }
     }
-#ifdef ENABLE_MODULAR
-    PROTO_Stubs(0);
-#endif
 }
 
 void SPI_AVRProgramInit()

@@ -33,7 +33,7 @@ CFLAGS   = -D"assert_param(x)=" -DSTM32F10X_HD -DSTM32F1 -mcpu=cortex-m3 -mthumb
 ifeq "$(HAS_4IN1_FLASH)" "1"
 CFLAGS  += -D"HAS_4IN1_FLASH=1"
 endif
-MODULE_FLAGS = -fno-builtin
+MODULE_CFLAGS = -fno-builtin
 
 LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -lc -lnosys -L$(SDIR) -Lobjs/$(TARGET)
 LFLAGS2  = -Wl,-T$(LINKFILE)
