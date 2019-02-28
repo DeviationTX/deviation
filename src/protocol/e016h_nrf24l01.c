@@ -35,10 +35,10 @@
 #define dbgprintf printf
 #else
 #define E016H_BIND_COUNT 750  // 3 seconds
-//printf inside an interrupt handler is really dangerous
-//this shouldn't be enabled even in debug builds without explicitly
-//turning it on
-#define dbgprintf if(0) printf
+// printf inside an interrupt handler is really dangerous
+// this shouldn't be enabled even in debug builds without explicitly
+// turning it on
+#define dbgprintf if (0) printf
 #endif
 
 #define E016H_PACKET_PERIOD 4080
@@ -151,19 +151,19 @@ static void send_packet(u8 bind)
                   |  GET_FLAG(CHANNEL7, FLAG_RTH);
         packet[7] |= FLAG_HIGHRATE;
         // frequency hopping
-        NRF24L01_WriteReg(NRF24L01_05_RF_CH, hopping_frequency[hopping_frequency_no++ & 0x03]);        
+        NRF24L01_WriteReg(NRF24L01_05_RF_CH, hopping_frequency[hopping_frequency_no++ & 0x03]);
     }
     // checksum
     packet[9] = packet[0];
     for (u8 i=1; i < E016H_PACKET_SIZE-1; i++)
         packet[9] += packet[i];
-    
+
     // transmit packet
     XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
     NRF24L01_FlushTx();
     XN297_WritePayload(packet, E016H_PACKET_SIZE);
-    
+
     // keep transmit power updated
     if (tx_power != Model.tx_power) {
         tx_power = Model.tx_power;
@@ -208,14 +208,14 @@ static void init_txid()
     }
     // Pump zero bytes for LFSR to diverge more
     for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
-    
+
     // tx id
     rx_tx_addr[0] = 0xa5;
     rx_tx_addr[1] = 0x00;
     rx_tx_addr[2] = lfsr >> 24;
     rx_tx_addr[3] = lfsr >> 16;
     rx_tx_addr[4] = lfsr >> 8;
-    
+
     // rf channels
     rand32_r(&lfsr, 0);
     hopping_frequency[0] = (lfsr >> 24) % 80;
