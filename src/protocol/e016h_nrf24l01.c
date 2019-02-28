@@ -34,7 +34,7 @@
 #define E016H_BIND_COUNT 4
 #define dbgprintf printf
 #else
-#define E016H_BIND_COUNT 750   // 3 seconds
+#define E016H_BIND_COUNT 750  // 3 seconds
 //printf inside an interrupt handler is really dangerous
 //this shouldn't be enabled even in debug builds without explicitly
 //turning it on
@@ -85,7 +85,6 @@ enum {
 
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
-#define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
 
 static u16 scale_channel(s32 chanval, s32 inMin, s32 inMax, u16 destMin, u16 destMax)
 {
@@ -105,6 +104,7 @@ static void init_e016h()
     NRF24L01_FlushTx();
     NRF24L01_FlushRx();
     XN297_SetTXAddr((u8*)"\x5a\x53\x46\x30\x31", 5);  // bind address
+    NRF24L01_WriteReg(NRF24L01_05_RF_CH, E016H_BIND_CHANNEL);
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);      // Clear data ready, data sent, and retransmit
     NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);       // No Auto Acknowldgement on all data pipes
     NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0x00);  // No retransmit
@@ -114,17 +114,17 @@ static void init_e016h()
     NRF24L01_SetTxRxMode(TX_EN);
 }
 
+#define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
 static void send_packet(u8 bind)
 {
     u16 val;
-    u8 i;
     if (bind) {
         memcpy(packet, &rx_tx_addr[1], 4);
         memcpy(&packet[4], hopping_frequency, 4);
-        packet[8] = 0x23;  // ???
-        NRF24L01_WriteReg(NRF24L01_05_RF_CH, E016H_BIND_CHANNEL);
+        packet[8] = 0x23;
     } else {
-        packet[0] = 0;  // trim commands
+        // trim commands
+        packet[0] = 0;
         // aileron
         val = scale_channel(Channels[CHANNEL1], CHAN_MIN_VALUE, CHAN_MAX_VALUE, 0x3ff, 0);
         packet[1] = val >> 8;
@@ -147,11 +147,12 @@ static void send_packet(u8 bind)
         packet[3] |= GET_FLAG(CHANNEL6, FLAG_HEADLESS)
                   |  GET_FLAG(CHANNEL7, FLAG_RTH);
         packet[7] |= FLAG_HIGHRATE;
-        
+        // frequency hopping
         NRF24L01_WriteReg(NRF24L01_05_RF_CH, hopping_frequency[hopping_frequency_no++ & 0x03]);        
     }
+    // checksum
     packet[9] = packet[0];
-    for (i=1; i < E016H_PACKET_SIZE-1; i++)
+    for (u8 i=1; i < E016H_PACKET_SIZE-1; i++)
         packet[9] += packet[i];
     
     // transmit packet
@@ -160,7 +161,7 @@ static void send_packet(u8 bind)
     NRF24L01_FlushTx();
     XN297_WritePayload(packet, E016H_PACKET_SIZE);
     
-    //Keep transmit power updated
+    // keep transmit power updated
     if (tx_power != Model.tx_power) {
         tx_power = Model.tx_power;
         NRF24L01_SetPower(tx_power);
