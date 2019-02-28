@@ -7,7 +7,7 @@
 static const char * const usb_strings[] = {
     USB_Product_Name,
     "Deviation GamePad",
-    DeviationVersionr
+    DeviationVersion
 };
 
 extern volatile u8 PrevXferComplete;
