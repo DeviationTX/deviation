@@ -30,11 +30,8 @@ const struct usb_device_descriptor dev_descr = {
     .bNumConfigurations = 1,
 };
 
-const char *usb_strings[USB_STRING_COUNT] = {
-    "STMicroelectronics",
-    "STM32 Mass Storage",
-    "STM32 1.0"
-};
+const char USB_Product_Name[] = "DeviationTx";
+const char USB_Serial_Number[] = "5.0";
 
 void USB_Enable(unsigned use_interrupt)
 {

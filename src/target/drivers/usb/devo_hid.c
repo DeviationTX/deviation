@@ -4,6 +4,12 @@
 #include "common.h"
 #include "devo_usb.h"
 
+static const char * const usb_strings[] = {
+    USB_Product_Name,
+    "RC Controller",
+    USB_Serial_Number
+};
+
 extern volatile u8 PrevXferComplete;
 static const uint8_t hid_report_descriptor[] = {
     0x05, 0x01,                    // USAGE_PAGE (Generic Desktop)
@@ -143,8 +149,7 @@ static void hid_set_config(usbd_device *dev, uint16_t wValue)
 static void HID_Init()
 {
     usbd_dev = usbd_init(&st_usbfs_v1_usb_driver, &dev_descr, &hid_config_descr,
-        usb_strings, USB_STRING_COUNT,
-        usbd_control_buffer, sizeof(usbd_control_buffer));
+        usb_strings, 3, usbd_control_buffer, sizeof(usbd_control_buffer));
 
     usbd_register_set_config_callback(usbd_dev, hid_set_config);
 }

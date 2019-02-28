@@ -6,6 +6,12 @@
 #include "common.h"
 #include "devo_usb.h"
 
+static const char * const usb_strings[] = {
+    USB_Product_Name,
+    "Mass Storage",
+    USB_Serial_Number
+};
+
 extern usbd_mass_storage *usb_msc_init2(usbd_device *usbd_dev,
                  uint8_t ep_in,
                  uint8_t ep_in_size,
@@ -208,8 +214,7 @@ int MSC_Read(uint32_t lba, u8 *Readbuff, uint16_t offset, uint16_t Transfer_Leng
 static void MSC_Init()
 {
     usbd_dev = usbd_init(&st_usbfs_v1_usb_driver, &dev_descr, &msc_config_descr,
-        usb_strings, USB_STRING_COUNT,
-        usbd_control_buffer, sizeof(usbd_control_buffer));
+        usb_strings, 3, usbd_control_buffer, sizeof(usbd_control_buffer));
 
     usb_msc_init2(usbd_dev, 0x81, 0x64, 0x02, 0x64,
         "ST", "SD Flash Disk", "1.0",
