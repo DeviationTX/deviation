@@ -124,20 +124,12 @@ static enum usbd_request_return_codes hid_control_request(usbd_device *dev, stru
     return USBD_REQ_HANDLED;
 }
 
-static void hid_data_tx(usbd_device *usbd_dev, uint8_t ep)
-{
-    (void)usbd_dev;
-    (void)ep;
-
-    PrevXferComplete = 1;
-}
-
 static void hid_set_config(usbd_device *dev, uint16_t wValue)
 {
     (void)wValue;
 
     // Max 9 bytes to send. 8 analog channels + 1 bytes for 4 switches
-    usbd_ep_setup(dev, 0x81, USB_ENDPOINT_ATTR_INTERRUPT, 9, hid_data_tx);
+    usbd_ep_setup(dev, 0x81, USB_ENDPOINT_ATTR_INTERRUPT, 9, NULL);
 
     usbd_register_control_callback(
                 dev,
@@ -159,7 +151,6 @@ static void HID_Init()
 
 void HID_Write(s8 *packet, u8 size)
 {
-    PrevXferComplete = 0;
     usbd_ep_write_packet(usbd_dev, 0x81, packet, size);
 }
 

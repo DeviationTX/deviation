@@ -77,6 +77,12 @@ static u16 usbhid_cb()
     return 50000;
 }
 
+static void deinit()
+{
+    CLOCK_StopTimer();
+    HID_Disable();
+}
+
 static void initialize()
 {
     CLOCK_StopTimer();
@@ -90,9 +96,9 @@ uintptr_t USBHID_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(); return 0;
-        case PROTOCMD_DEINIT: HID_Disable(); return 0;
+        case PROTOCMD_DEINIT: deinit(); return 0;
         case PROTOCMD_CHECK_AUTOBIND: return 1;
-        case PROTOCMD_BIND:  initialize(); return 0;
+        case PROTOCMD_BIND: return 0;
         case PROTOCMD_NUMCHAN: return USBHID_MAX_CHANNELS;
         case PROTOCMD_DEFAULT_NUMCHAN: return 6;
         case PROTOCMD_CHANNELMAP: return UNCHG;
