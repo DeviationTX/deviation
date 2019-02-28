@@ -146,9 +146,10 @@ void PXX_Enable(u8 *packet) {
         printf("%02x ", packet[i]);
     printf("\n");
 }
-void PPM_Enable(unsigned low_time, volatile u16 *pulses, u8 num_pulses) {
+void PPM_Enable(unsigned active_time, volatile u16 *pulses, u8 num_pulses, u8 polarity) {
+    (void)polarity;
     int i;
-    printf("PPM: low=%d ", (int)low_time);
+    printf("PPM: low=%d ", (int)active_time);
     for(i = 0; i < num_pulses; i++)
         printf("%04d ", pulses[i]);
     printf("\n");
