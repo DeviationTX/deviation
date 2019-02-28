@@ -118,6 +118,7 @@ static void init_e016h()
 static void send_packet(u8 bind)
 {
     u16 val;
+    u8 can_flip = 0;
     if (bind) {
         memcpy(packet, &rx_tx_addr[1], 4);
         memcpy(&packet[4], hopping_frequency, 4);
@@ -127,10 +128,12 @@ static void send_packet(u8 bind)
         packet[0] = 0;
         // aileron
         val = scale_channel(Channels[CHANNEL1], CHAN_MIN_VALUE, CHAN_MAX_VALUE, 0x3ff, 0);
+        can_flip |= (val < 0x100) || (val > 0x300);
         packet[1] = val >> 8;
         packet[2] = val & 0xff;
         // elevator
         val = scale_channel(Channels[CHANNEL2], CHAN_MIN_VALUE, CHAN_MAX_VALUE, 0x3ff, 0);
+        can_flip |= (val < 0x100) || (val > 0x200);
         packet[3] = val >> 8;
         packet[4] = val & 0xff;
         // throttle
@@ -143,7 +146,7 @@ static void send_packet(u8 bind)
         packet[8] = val & 0xff;
         // flags
         packet[1] |= GET_FLAG(CHANNEL8, FLAG_STOP)
-                  |  GET_FLAG(CHANNEL5, FLAG_FLIP);
+                  |  (can_flip ? GET_FLAG(CHANNEL5, FLAG_FLIP) : 0);
         packet[3] |= GET_FLAG(CHANNEL6, FLAG_HEADLESS)
                   |  GET_FLAG(CHANNEL7, FLAG_RTH);
         packet[7] |= FLAG_HIGHRATE;
