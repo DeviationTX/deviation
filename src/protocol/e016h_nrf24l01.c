@@ -15,7 +15,7 @@
 
 #ifdef MODULAR
     // Allows the linker to properly relocate
-    #define LOLI_Cmds PROTO_Cmds
+    #define E016H_Cmds PROTO_Cmds
     #pragma long_calls
 #endif
 
