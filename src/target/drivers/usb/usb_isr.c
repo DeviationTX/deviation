@@ -8,12 +8,12 @@
 
 #include "devo_usb.h"
 
-void usb_wakeup_isr(void)
+void __attribute__((__used__)) usb_wakeup_isr(void)
 {
     usbd_poll(usbd_dev);
 }
 
-void usb_lp_can_rx0_isr(void)
+void __attribute__((__used__)) usb_lp_can_rx0_isr(void)
 {
     usbd_poll(usbd_dev);
 }

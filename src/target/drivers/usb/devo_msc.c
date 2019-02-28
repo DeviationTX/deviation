@@ -8,8 +8,8 @@
 
 static const char * const usb_strings[] = {
     USB_Product_Name,
-    "Mass Storage",
-    USB_Serial_Number
+    "Deviation Disk",
+    DeviationVersion
 };
 
 extern usbd_mass_storage *usb_msc_init2(usbd_device *usbd_dev,

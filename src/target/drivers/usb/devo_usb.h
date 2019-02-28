@@ -7,6 +7,5 @@ extern uint8_t usbd_control_buffer[128];
 
 extern const struct usb_device_descriptor dev_descr;
 extern const char USB_Product_Name[];
-extern const char USB_Serial_Number[];
 
 #endif

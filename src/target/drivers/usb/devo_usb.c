@@ -31,7 +31,6 @@ const struct usb_device_descriptor dev_descr = {
 };
 
 const char USB_Product_Name[] = "DeviationTx";
-const char USB_Serial_Number[] = "5.0";
 
 void USB_Enable(unsigned use_interrupt)
 {
@@ -44,8 +43,6 @@ void USB_Enable(unsigned use_interrupt)
         rcc_periph_clock_enable(get_rcc_from_pin(USB_ENABLE_PIN));
         GPIO_setup_output(USB_ENABLE_PIN, OTYPE_PUSHPULL);
         GPIO_pin_clear(USB_ENABLE_PIN);
-    } else {
-        // Hack
     }
 
     if (HAS_PIN(USB_DETECT_PIN)) {
