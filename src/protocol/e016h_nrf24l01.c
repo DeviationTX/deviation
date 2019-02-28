@@ -133,7 +133,7 @@ static void send_packet(u8 bind)
         packet[2] = val & 0xff;
         // elevator
         val = scale_channel(Channels[CHANNEL2], CHAN_MIN_VALUE, CHAN_MAX_VALUE, 0x3ff, 0);
-        can_flip |= (val < 0x100) || (val > 0x200);
+        can_flip |= (val < 0x100) || (val > 0x300);
         packet[3] = val >> 8;
         packet[4] = val & 0xff;
         // throttle
