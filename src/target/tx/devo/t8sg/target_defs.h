@@ -1,7 +1,7 @@
 #ifndef _T8SG_TARGET_H_
 #define _T8SG_TARGET_H_
 
-#define TXID 0x7e
+#define TXID 0x18
 #define VECTOR_TABLE_LOCATION 0x3000
 #define SPIFLASH_SECTOR_OFFSET 0
 #define SPIFLASH_SECTORS 512
