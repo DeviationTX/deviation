@@ -64,7 +64,7 @@ u8 NRF24L01_WriteReg(u8 reg, u8 data)
     CS_LO();
     u8 res = PROTOSPI_xfer(W_REGISTER | (REGISTER_MASK & reg));
     PROTOSPI_xfer(data);
-    while(GPIO_pin_get(PROTO_SPI_CFG.sck));
+    while (GPIO_pin_get(PROTO_SPI_CFG.sck)) {}
     CS_HI();
     return res;
 }
@@ -77,7 +77,7 @@ u8 NRF24L01_WriteRegisterMulti(u8 reg, const u8 data[], u8 length)
     {
         PROTOSPI_xfer(data[i]);
     }
-    while(GPIO_pin_get(PROTO_SPI_CFG.sck));
+    while (GPIO_pin_get(PROTO_SPI_CFG.sck)) {}
     CS_HI();
     return res;
 }
@@ -90,7 +90,7 @@ u8 NRF24L01_WritePayload(u8 *data, u8 length)
     {
         PROTOSPI_xfer(data[i]);
     }
-    while(GPIO_pin_get(PROTO_SPI_CFG.sck));
+    while (GPIO_pin_get(PROTO_SPI_CFG.sck)) {}
     CS_HI();
     return res;
 }
