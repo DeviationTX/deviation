@@ -369,7 +369,7 @@ dollar = $$
 define define_compile_rules
 $(ODIR)/%.o: $(1)%.c $(LIBOPENCM3)
 	@echo " + Compiling '$$<'"
-	$(CC) $$(CFLAGS) $$(CFLAGS_$$(basename $$(notdir $$<))) $$(EXTRA_CFLAGS) -MD -c -o $$@ $$<
+	$(CC) $$(CFLAGS) $$(EXTRA_CFLAGS) $$(CFLAGS_$$(basename $$(notdir $$<))) -MD -c -o $$@ $$<
 	@cp $(ODIR)/$$*.d $(ODIR)/$$*.P; \
             sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$(dollar)//' \
                 -e '/^$$(dollar)/ d' -e 's/$$(dollar)/ :/' < $(ODIR)/$$*.d >> $(ODIR)/$$*.P; \
