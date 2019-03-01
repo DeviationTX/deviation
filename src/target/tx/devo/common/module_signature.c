@@ -18,5 +18,5 @@
 
 // Referenced in devo.ld
 extern unsigned _data_loadaddr;
-const uintptr_t protocol_type = (uintptr_t)&_data_loadaddr;
+__attribute__((used)) const uintptr_t protocol_type = (uintptr_t)&_data_loadaddr;
 #endif

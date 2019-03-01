@@ -1,3 +1,5 @@
+EXTERN(protocol_type)
+
 MEMORY
 {
 	ram (rwx) : ORIGIN = 0x20004000, LENGTH = 4K
