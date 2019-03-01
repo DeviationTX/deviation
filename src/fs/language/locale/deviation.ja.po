@@ -19,7 +19,7 @@ msgstr "1-to-1"
 
 #: curves.c:222
 msgid "Fixed"
-msgstr "固定"
+msgstr "固定値"
 
 #: curves.c:223
 msgid "Min/Max"
@@ -165,7 +165,7 @@ msgstr "AUX7"
 
 #: inputs.c:45
 msgid "AUX8"
-msgstr ""
+msgstr "AUX8"
 
 #: inputs.c:46 inputs.c:47
 msgid "DR"
@@ -424,7 +424,7 @@ msgstr "値"
 #: pages/320x240x16/advanced/mixer_limits.c:81
 #: pages/320x240x16/toggle_select.c:86
 msgid "Revert"
-msgstr "戻る"
+msgstr "初期値"
 
 #: pages/128x64x1/advanced/mixer_limits.c:63 pages/128x64x1/pagelist.h:45
 #: pages/128x64x1/standard/reverse_page.c:26
