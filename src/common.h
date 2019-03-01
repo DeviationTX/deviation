@@ -36,8 +36,8 @@ typedef uint64_t u64;
 #define FLASHWORDTABLE static const u16
 #define pgm_read_word(x) (*(x))
 #define pgm_read_byte(x) (*(x))
-MODULE_CALLTYPE void PROTO_CS_HI(int module);
-MODULE_CALLTYPE void PROTO_CS_LO(int module);
+void PROTO_CS_HI(int module);
+void PROTO_CS_LO(int module);
 
 extern volatile s32 Channels[NUM_OUT_CHANNELS];
 extern const char DeviationVersion[33];
@@ -156,7 +156,7 @@ u64 PROTOCOL_CheckSafe();
 u32 PROTOCOL_Binding();
 u8 PROTOCOL_AutoBindEnabled();
 void PROTOCOL_Bind();
-MODULE_CALLTYPE void PROTOCOL_SetBindState(u32 msec);
+void PROTOCOL_SetBindState(u32 msec);
 int PROTOCOL_NumChannels();
 u8 PROTOCOL_GetTelemCapability();
 int PROTOCOL_DefaultNumChannels();
@@ -172,8 +172,8 @@ int PROTOCOL_GetTelemetryType();
 int PROTOCOL_MapChannel(int input, int default_ch);
 int PROTOCOL_HasModule(int idx);
 int PROTOCOL_HasPowerAmp(int idx);
-MODULE_CALLTYPE int PROTOCOL_SetSwitch(int module);
-MODULE_CALLTYPE int PROTOCOL_SticksMoved(int init);
+int PROTOCOL_SetSwitch(int module);
+int PROTOCOL_SticksMoved(int init);
 void PROTOCOL_InitModules();
 void PROTOCOL_ResetTelemetry();
 enum Radio PROTOCOL_GetRadio(u16 idx);
@@ -198,14 +198,14 @@ void INPUT_CheckChanges(void);
 
 /* Misc */
 void Delay(u32 count);
-MODULE_CALLTYPE u32 Crc(const void *buffer, u32 size);
+u32 Crc(const void *buffer, u32 size);
 const char *utf8_to_u32(const char *str, u32 *ch);
 int exact_atoi(const char *str); //Like atoi but will not decode a number followed by non-number
 size_t strlcpy(char* dst, const char* src, size_t bufsize);
 void tempstring_cpy(const char* src);
 int fexists(const char *file);
-MODULE_CALLTYPE u32 rand32_r(u32 *seed, u8 update);  // LFSR based PRNG
-MODULE_CALLTYPE u32 rand32();  // LFSR based PRNG
+u32 rand32_r(u32 *seed, u8 update);  // LFSR based PRNG
+u32 rand32();  // LFSR based PRNG
 extern volatile u8 priority_ready;
 void debug_timing(u32 type, int startend); //This is only defined if TIMING_DEBUG is defined
 void DEBUGLOG_Putc(char c);

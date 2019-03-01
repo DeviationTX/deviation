@@ -31,12 +31,6 @@ enum {
 };
 #undef BUTTONDEF
 
-#ifdef MODULAR
-  #define MODULE_CALLTYPE __attribute__((__long_call__))
-#else
-  #define MODULE_CALLTYPE
-#endif
-
 #define CHAN_ButtonMask(btn) (btn ? (1 << (btn - 1)) : 0)
 
 #define NUM_TX_INPUTS (INP_LAST - 1)
@@ -139,15 +133,15 @@ enum MsecCallback {
 };
 
 void CLOCK_Init(void);
-MODULE_CALLTYPE u32 CLOCK_getms(void);
-MODULE_CALLTYPE void CLOCK_StartTimer(unsigned us, u16 (*cb)(void));
-MODULE_CALLTYPE void CLOCK_StopTimer();
+u32 CLOCK_getms(void);
+void CLOCK_StartTimer(unsigned us, u16 (*cb)(void));
+void CLOCK_StopTimer();
 void CLOCK_SetMsecCallback(int cb, u32 msec);
 void CLOCK_ClearMsecCallback(int cb);
 void CLOCK_StartWatchdog();
-MODULE_CALLTYPE void CLOCK_ResetWatchdog();
-MODULE_CALLTYPE void CLOCK_RunMixer();
-MODULE_CALLTYPE void CLOCK_StartMixer();
+void CLOCK_ResetWatchdog();
+void CLOCK_RunMixer();
+void CLOCK_StartMixer();
 typedef enum {
     MIX_TIMER,
     MIX_NOT_DONE,
@@ -298,7 +292,7 @@ int FS_OpenDir(const char *path);
 int FS_ReadDir(char *path);
 void FS_CloseDir();
 
-MODULE_CALLTYPE void _usleep(u32 usec);
+void _usleep(u32 usec);
 void _msleep(u32 msec);
 #define usleep _usleep
 
@@ -315,8 +309,8 @@ u8 *BOOTLOADER_Read(int idx);
 //Ensure functions are loaded for protocol modules
 void SPI_ProtoInit();
 void SPI_AVRProgramInit();
-MODULE_CALLTYPE int SPI_ConfigSwitch(unsigned csn_high, unsigned csn_low);
-MODULE_CALLTYPE int SPI_ProtoGetPinConfig(int module, int state);
+int SPI_ConfigSwitch(unsigned csn_high, unsigned csn_low);
+int SPI_ProtoGetPinConfig(int module, int state);
 u32 AVR_StartProgram();
 int AVR_Erase();
 int AVR_Program(u32 address, u8 *data, int pagesize);
@@ -329,7 +323,7 @@ struct mcu_pin;
 void MCU_InitModules();
 int MCU_SetPin(struct mcu_pin *, const char *name);
 const char *MCU_GetPinName(char *str, struct mcu_pin *);
-MODULE_CALLTYPE void MCU_SerialNumber(u8 *var, int len);
+void MCU_SerialNumber(u8 *var, int len);
 
 #if defined HAS_4IN1_FLASH && HAS_4IN1_FLASH
 void SPISwitch_Init();

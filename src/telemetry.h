@@ -352,7 +352,7 @@ void TELEMETRY_ResetAlarm(int i);
 void TELEMETRY_MuteAlarm();
 int TELEMETRY_HasAlarm(int src);
 u32 TELEMETRY_IsUpdated(int val);
-MODULE_CALLTYPE void TELEMETRY_SetUpdated(int telem);
+void TELEMETRY_SetUpdated(int telem);
 int TELEMETRY_Type();
 void TELEMETRY_SetType(int type);
 int TELEMETRY_GetNumTelemSrc();
