@@ -19,7 +19,7 @@ INLINE static inline uint32_t TIM_DIER_CCxDE(unsigned channel)
 {
     switch (channel) {
         case 1: return TIM_DIER_CC1DE;
-        case 2: return TIM_DIER_CC1DE;
+        case 2: return TIM_DIER_CC2DE;
         default: return ltassert();
     }
 }
