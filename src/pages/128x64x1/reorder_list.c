@@ -91,7 +91,7 @@ void PAGE_ReorderInit(int page)
                     &BUTTON_FONT, _show_button_cb, press_button_cb, (void *)REMOVE);
     }
     GUI_CreateButtonPlateText(&gui->save, SAVE_X, 0, SAVE_W, LINE_HEIGHT,
-        &BUTTON_FONT, NULL, okcancel_cb, (void *)_tr("Save"));
+        &BUTTON_FONT, GUI_Localize, okcancel_cb, _tr_noop("Save"));
 
     GUI_CreateScrollable(&gui->scrollable, LABEL_X, LINE_HEIGHT, LCD_WIDTH - LABEL_X , LCD_HEIGHT-LINE_HEIGHT,
                          LINE_SPACE, rl.max, row_cb, NULL, NULL, NULL);
