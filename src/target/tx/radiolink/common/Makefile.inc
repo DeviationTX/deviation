@@ -45,14 +45,8 @@ endif
 else #BUILD_TARGET
 
 ifdef ENABLE_LTO
-CFLAGS_pwm_isr = -fno-lto
-CFLAGS_err_isr = -fno-lto
-CFLAGS_clock_isr = -fno-lto
-CFLAGS_usb_isr = -fno-lto
-CFLAGS_ppmin_isr = -fno-lto
-CFLAGS_uart_isr = -fno-lto
-CFLAGS_soft_serial_isr = -fno-lto
-CFLAGS_tx_buttons_isr = -fno-lto
+$(foreach src,$(filter %_isr.c,$(SRCS)),\
+            $(eval CFLAGS_$(basename $(notdir $(src))) = -fno-lto))
 endif
 
 $(LIBOPENCM3):
