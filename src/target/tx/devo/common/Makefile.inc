@@ -54,7 +54,7 @@ endif
 MODULE_CFLAGS = -fno-builtin
 
 #LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -nostdlib
-LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -lc -lnosys -L$(SDIR) -L$(SDIR)/target/tx/devo/common -Lobjs/$(TARGET) -Wl,-warn-common
+LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -lc -lnosys -L$(SDIR) -L$(SDIR)/protocol -Lobjs/$(TARGET) -Wl,-warn-common
 
 LINKFILE = $(SDIR)/target/tx/devo/$(TARGET)/$(TARGET).ld
 LFLAGS2  = -Wl,-T$(LINKFILE)
@@ -125,7 +125,7 @@ $(TARGET).dfu: $(TARGET).bin
 ###################################
 #The protocol modules (if needed) #
 ###################################
-$(ODIR)/%.bin: $(ODIR)/%.o_ $(SDIR)/target/tx/devo/common/exports.ld $(PROTO_LINKFILE) $(PROTO_EXTRA_OBJS) $(TARGET).bin
+$(ODIR)/%.bin: $(ODIR)/%.o_ $(SDIR)/protocol/exports.ld $(PROTO_LINKFILE) $(PROTO_EXTRA_OBJS) $(TARGET).bin
 	@echo " + Building '$@'"
 	$(LD) -o $(@:.bin=.elf) $< $(PROTO_EXTRA_OBJS) $(LIBOPENCM3) -gc-sections -Map=$(@:.bin=.map) \
 		--cref -T$(PROTO_LINKFILE) --just-symbols=$(SYMBOL_FILE)

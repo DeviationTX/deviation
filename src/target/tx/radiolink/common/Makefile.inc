@@ -35,7 +35,7 @@ CFLAGS  += -D"HAS_4IN1_FLASH=1"
 endif
 MODULE_CFLAGS = -fno-builtin
 
-LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -lc -lnosys -L$(SDIR) -Lobjs/$(TARGET)
+LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -lc -lnosys -L$(SDIR) -L$(SDIR)/protocol -Lobjs/$(TARGET)
 LFLAGS2  = -Wl,-T$(LINKFILE)
 
 ifdef ENABLE_LTO
