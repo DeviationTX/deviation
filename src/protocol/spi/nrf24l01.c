@@ -88,7 +88,6 @@ u8 NRF24L01_WritePayload(u8 *data, u8 length)
     {
         PROTOSPI_xfer(data[i]);
     }
-    usleep(1);  // makes sure SPI transfer has completed
     CS_HI();
     return res;
 }
