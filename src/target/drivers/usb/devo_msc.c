@@ -224,9 +224,8 @@ static void MSC_Init()
 
 void MSC_Enable()
 {
-    MSC_Init();
-
     USB_Enable(1);
+    MSC_Init();
 }
 
 void MSC_Disable()

@@ -160,8 +160,8 @@ void HID_Write(s8 *packet, u8 size)
 }
 
 void HID_Enable() {
-    HID_Init();
     USB_Enable(1);
+    HID_Init();
 }
 
 void HID_Disable() {
