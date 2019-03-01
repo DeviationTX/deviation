@@ -152,6 +152,7 @@ static void ReadLangV1(FILE* fh)
 {
     struct str_map *lookup = lookupmap;
     unsigned pos = 0;
+    unsigned len = 0;
 
     while (fgets(tempstring, sizeof(tempstring), fh) != NULL) {
         u16 hash;
@@ -174,7 +175,7 @@ static void ReadLangV1(FILE* fh)
                 break;
             }
             tempstring[MAX_LINE-1] = 0;
-            unsigned len = fix_crlf(tempstring) + 1;
+            len = fix_crlf(tempstring) + 1;
             if (pos + len > sizeof(strings)) {
                 printf("Out of space processing %s\n", tempstring);
                 break;
@@ -198,15 +199,12 @@ static void ReadLangV1(FILE* fh)
             lookup0->pos = pos;
 
             lookup++;
-#if !SUPPORT_DYNAMIC_LOCSTR
             pos += len;
-#endif
         }
     }
     table_size = lookup - lookupmap;
 }
 
-#if SUPPORT_LANG_V2
 static void ReadLangV2(FILE* fh)
 {
     u16 hash;
@@ -246,7 +244,6 @@ static void ReadLangV2(FILE* fh)
     }
     table_size = lookup - lookupmap;
 }
-#endif
 
 static int ReadLang(const char *file)
 {
@@ -265,25 +262,24 @@ static int ReadLang(const char *file)
     // first line of langauge name, ignore it
     fgets(tempstring, sizeof(tempstring), fh);
 
-#if SUPPORT_LANG_V2
-    // Try to detect the version
-    if (fread(tempstring, 1, 1, fh) == 1)
-    {
-        // move file cursor 1 byte back
-        fseek(fh, -1, SEEK_CUR);
-        // check the value of the next character to detect version
-        if (tempstring[0] == ':')
-            ReadLangV1(fh);
-        else
-            ReadLangV2(fh);
+    if (SUPPORT_LANG_V2) {
+        // Try to detect the version
+        if (fread(tempstring, 1, 1, fh) == 1)
+        {
+            // move file cursor 1 byte back
+            fseek(fh, -1, SEEK_CUR);
+            // check the value of the next character to detect version
+            if (tempstring[0] == ':')
+                ReadLangV1(fh);
+            else
+                ReadLangV2(fh);
+        }
+    } else {
+        ReadLangV1(fh);
     }
-#else
-    ReadLangV1(fh);
-#endif
 
-#if !SUPPORT_DYNAMIC_LOCSTR
-    fclose(fh);
-#endif
+    if (!SUPPORT_DYNAMIC_LOCSTR)
+        fclose(fh);
 
     return 1;
 }
