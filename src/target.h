@@ -150,10 +150,12 @@ typedef enum {
 extern volatile mixsync_t mixer_sync;
 
 /*PWM/PPM functions */
+#define PPM_POLARITY_NORMAL 0
+#define PPM_POLARITY_INVERTED 1
 void PWM_Initialize();
 void PWM_Stop();
 void PWM_Set(int);
-void PPM_Enable(unsigned low_time, volatile u16 *pulses, u8 num_pulses);
+void PPM_Enable(unsigned active_time, volatile u16 *pulses, u8 num_pulses, u8 polarity);
 void PXX_Enable(u8 *packet);
 
 /* PPM-In functions */

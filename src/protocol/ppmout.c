@@ -38,6 +38,7 @@ static const char * const ppm_opts[] = {
   _tr_noop("Delta PW"),   "100",   "700",   STEP_SIZE, NULL,
   _tr_noop("Notch PW"),   "100",   "500",   STEP_SIZE, NULL,
   _tr_noop("Frame Size"), "10000", "30000", STEPSIZE2, NULL,
+  _tr_noop("Polarity"), _tr_noop("Normal"), _tr_noop("Inverted"), NULL,
   NULL
 };
 enum {
@@ -45,6 +46,7 @@ enum {
     DELTA_PW,
     NOTCH_PW,
     PERIOD_PW,
+    POLARITY,
     LAST_PROTO_OPT,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
@@ -66,7 +68,7 @@ static void build_data_pkt()
 static u16 ppmout_cb()
 {
     build_data_pkt();
-    PPM_Enable(Model.proto_opts[NOTCH_PW], pulses, Model.num_channels+1);
+    PPM_Enable(Model.proto_opts[NOTCH_PW], pulses, Model.num_channels+1, Model.proto_opts[POLARITY]);
 #ifdef EMULATOR
     return 3000;
 #else

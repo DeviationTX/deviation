@@ -83,7 +83,7 @@ void PWM_Stop()
     }
 }
 
-void PPM_Enable(unsigned low_time, volatile u16 *pulses, u8 num_pulses)
+void PPM_Enable(unsigned active_time, volatile u16 *pulses, u8 num_pulses, u8 polarity)
 {
     if (!pulses || num_pulses < 1) return;
 
@@ -101,9 +101,12 @@ void PPM_Enable(unsigned low_time, volatile u16 *pulses, u8 num_pulses)
     DMA_enable_stream(PWM_DMA);    // dma ready to go
 
     // Setup timer for PPM
-    timer_set_oc_value(PWM_TIMER.tim, TIM_OCx(PWM_TIMER.ch), low_time);
+    timer_set_oc_value(PWM_TIMER.tim, TIM_OCx(PWM_TIMER.ch), active_time);
     timer_set_period(PWM_TIMER.tim, 22500);
-    timer_set_oc_polarity_low(PWM_TIMER.tim, TIM_OCx(PWM_TIMER.ch));        // output active low
+    if (polarity == PPM_POLARITY_NORMAL)
+        timer_set_oc_polarity_low(PWM_TIMER.tim, TIM_OCx(PWM_TIMER.ch));        // output active low
+    else
+        timer_set_oc_polarity_high(PWM_TIMER.tim, TIM_OCx(PWM_TIMER.ch));        // output active high
     timer_set_oc_mode(PWM_TIMER.tim, TIM_OCx(PWM_TIMER.ch), TIM_OCM_PWM1);  // output active when timer below compare
     timer_enable_oc_output(PWM_TIMER.tim, TIM_OCx(PWM_TIMER.ch));           // enable OCx to pin
     timer_enable_break_main_output(PWM_TIMER.tim);               // master output enable
