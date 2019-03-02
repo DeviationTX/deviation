@@ -67,6 +67,8 @@ enum {
     CHANNEL10,                  // Return To Home
     CHANNEL11,                  // Take Off/Landing
     CHANNEL12,                  // Emg. stop
+    CHANNEL13,                  // Analog Aux1
+    CHANNEL14,                  // Analog Aux2
 };
 #define CHANNEL_INVERTED    CHANNEL5    // inverted flight on Floureon H101
 #define CHANNEL_FLIP        CHANNEL6
@@ -76,6 +78,8 @@ enum {
 #define CHANNEL_RTH         CHANNEL10
 #define CHANNEL_TO          CHANNEL11
 #define CHANNEL_EMGSTOP     CHANNEL12
+#define CHANNEL_ANAAUX1     CHANNEL13
+#define CHANNEL_ANAAUX2     CHANNEL14
 enum {
     Bayang_INIT1 = 0,
     Bayang_BIND2,
@@ -85,6 +89,7 @@ enum {
 static const char *const bay_opts[] = {
     _tr_noop("Telemetry"), _tr_noop("Off"), _tr_noop("On"), NULL,
     _tr_noop("Format"), _tr_noop("regular"), "X16-AH", "IRDRONE", NULL,
+    _tr_noop("Analog Aux"), _tr_noop("Off"), _tr_noop("On"), NULL,
     NULL
 };
 
@@ -92,6 +97,7 @@ static const char *const bay_opts[] = {
 enum {
     PROTOOPTS_TELEMETRY = 0,
     PROTOOPTS_FORMAT = 1,
+    PROTOOPTS_ANALOGAUX = 2,
     LAST_PROTO_OPT,
 };
 
@@ -109,6 +115,7 @@ ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 static u16 counter;
 static u8 phase;
 static u8 telemetry;
+static u8 analogaux;
 static u8 packet[PACKET_SIZE];
 static u8 tx_power;
 static u8 txid[3];
@@ -159,8 +166,14 @@ static void send_packet(u8 bind)
     } chanval;
 
     if (bind) {
-        if (telemetry)
-            packet[0] = 0xa3;
+        if (telemetry) {
+            if (analogaux)
+                packet[0] = 0xa1;
+            else
+                packet[0] = 0xa3;
+        }
+        else if (analogaux)
+            packet[0] = 0xa2;
         else
             packet[0] = 0xa4;
 
@@ -191,7 +204,12 @@ static void send_packet(u8 bind)
                     packet[0] = 0xa6;
                     break;
         }
-        packet[1] = 0xfa;       // normal mode is 0xf7, expert 0xfa
+        if (analogaux) {
+            packet[1] = scale_channel(CHANNEL_ANAAUX1, 0, 0xff);
+        }
+        else {
+            packet[1] = 0xfa;       // normal mode is 0xf7, expert 0xfa
+        }
         packet[2] = GET_FLAG(CHANNEL_FLIP, 0x08)
             | GET_FLAG(CHANNEL_HEADLESS, 0x02)
             | GET_FLAG(CHANNEL_RTH, 0x01)
@@ -199,7 +217,7 @@ static void send_packet(u8 bind)
             | GET_FLAG(CHANNEL_PICTURE, 0x20);
         packet[3] = GET_FLAG(CHANNEL_INVERTED, 0x80)
             | GET_FLAG(CHANNEL_TO, 0x20)
-		    | GET_FLAG(CHANNEL_EMGSTOP, 0x04);
+            | GET_FLAG(CHANNEL_EMGSTOP, 0x04);
         chanval.value = scale_channel(CHANNEL1, 0x3ff, 0);      // aileron
         packet[4] = chanval.bytes.msb + DYNTRIM(chanval.value);
         packet[5] = chanval.bytes.lsb;
@@ -217,7 +235,12 @@ static void send_packet(u8 bind)
     switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
             case FORMAT_REGULAR:
                 packet[12] = txid[2];
-                packet[13] = 0x0a;
+                if (analogaux) {
+                    packet[13] = scale_channel(CHANNEL_ANAAUX2, 0, 0xff);
+                }
+                else {
+                    packet[13] = 0x0a;
+                }
                 break;
             case FORMAT_X16_AH:
                 packet[12] = 0x00;
@@ -480,6 +503,9 @@ static void initialize()
     telemetry_count = 0;
     telemetry = Model.proto_opts[PROTOOPTS_TELEMETRY];
 
+    // Enable analog aux channels
+    analogaux = Model.proto_opts[PROTOOPTS_ANALOGAUX];
+
     // set some initial values to show nothing has been received
     if (telemetry)
         Telemetry.value[TELEM_DSM_FLOG_VOLT1] = Telemetry.value[TELEM_DSM_FLOG_VOLT2] = 888;    //8.88V In 1/100 of Volts
@@ -508,9 +534,9 @@ uintptr_t Bayang_Cmds(enum ProtoCmds cmd)
         initialize();
         return 0;
     case PROTOCMD_NUMCHAN:
-        return 12;
+        return (analogaux ? 14 : 12);
     case PROTOCMD_DEFAULT_NUMCHAN:
-        return 12;
+        return (analogaux ? 14 : 12);
     case PROTOCMD_CURRENT_ID:
         return Model.fixed_id;
     case PROTOCMD_GETOPTIONS:
