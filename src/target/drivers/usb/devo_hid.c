@@ -10,7 +10,7 @@ static const char * const usb_strings[] = {
     DeviationVersion
 };
 
-static volatile u8 usb_configed;
+static volatile u8 usb_configured;
 static const uint8_t hid_report_descriptor[] = {
     0x05, 0x01,                    // USAGE_PAGE (Generic Desktop)
     0x15, 0x81,                    // LOGICAL_MINIMUM (0)
@@ -143,7 +143,7 @@ static void hid_set_config(usbd_device *dev, uint16_t wValue)
                 USB_REQ_TYPE_TYPE | USB_REQ_TYPE_RECIPIENT,
                 hid_control_request);
 
-    usb_configed = 1;
+    usb_configured = 1;
 }
 
 static void HID_Init()
@@ -156,13 +156,13 @@ static void HID_Init()
 
 void HID_Write(s8 *packet, u8 size)
 {
-    if (usb_configed) {
+    if (usb_configured) {
         usbd_ep_write_packet(usbd_dev, 0x81, packet, size);
     }
 }
 
 void HID_Enable() {
-    usb_configed = 0;
+    usb_configured = 0;
     HID_Init();
     USB_Enable(1);
 }
