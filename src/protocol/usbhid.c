@@ -38,7 +38,6 @@
 //if sizeof(packet) changes, must change wMaxPacketSize to match in Joystick_ConfigDescriptor
 static s8 packet[USBHID_ANALOG_CHANNELS + 1];
 static u8 num_channels;
-volatile u8 PrevXferComplete;
 extern void HID_Write(s8 *packet, u8 size);
 
 static void build_data_pkt()
@@ -69,11 +68,10 @@ static void build_data_pkt()
 
 static u16 usbhid_cb()
 {
-    if (PrevXferComplete) {
-        build_data_pkt();
+    build_data_pkt();
         
-        HID_Write(packet, USBHID_DIGITAL_CHANNELS + 1);
-    }
+    HID_Write(packet, USBHID_DIGITAL_CHANNELS + 1);
+
     return 50000;
 }
 
@@ -87,7 +85,6 @@ static void initialize()
 {
     CLOCK_StopTimer();
     num_channels = Model.num_channels;
-    PrevXferComplete = 0;
     HID_Enable();
     CLOCK_StartTimer(1000, usbhid_cb);
 }
