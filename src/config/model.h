@@ -20,7 +20,9 @@
 extern const char MODEL_NAME[];
 extern const char MODEL_ICON[];
 extern const char MODEL_TYPE[];
+extern const char MODEL_MIXERMODE[];
 extern const char MODEL_TEMPLATE[];
+extern const char MODEL_AUTOMAP[];
 #define UNKNOWN_ICON ("media/noicon" IMG_EXT)
 
 //This cannot be computed, and must be manually updated

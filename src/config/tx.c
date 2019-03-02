@@ -15,6 +15,7 @@
 
 #include "common.h"
 #include "target.h"
+#include "config.h"
 #include "gui/gui.h"
 #include "tx.h"
 #include "rtc.h"
@@ -87,80 +88,70 @@ static const char TELEM_ALERT_INTERVAL[] ="alertinterval";
 #define MATCH_VALUE(s)   strcasecmp(value,   s) == 0
 #define NUM_STR_ELEMS(s) (sizeof(s) / sizeof(char *))
 
+static const struct struct_map _secmodel[] =
+{
+    {CURRENT_MODEL,          OFFSET(struct Transmitter, current_model)},
+    {LANGUAGE,               OFFSET(struct Transmitter, language)},
+    {MUSIC_SHUTD,            OFFSET(struct Transmitter, music_shutdown)},
+    {MODE,                   OFFSET(struct Transmitter, mode)},
+    {BRIGHTNESS,             OFFSET(struct Transmitter, backlight)},
+    {CONTRAST,               OFFSET(struct Transmitter, contrast)},
+    {VOLUME,                 OFFSET(struct Transmitter, volume)},
+    {VIBRATION,              OFFSET(struct Transmitter, vibration_state)},
+    {POWER_ALARM,            OFFSET(struct Transmitter, power_alarm)},
+    {BATT_ALARM,             OFFSET(struct Transmitter, batt_alarm)},
+    {BATT_CRITICAL,          OFFSET(struct Transmitter, batt_critical)},
+    {BATT_WARNING_INTERVAL,  OFFSET(struct Transmitter, batt_warning_interval)},
+    {SPLASH_DELAY,           OFFSET(struct Transmitter, splash_delay)},
+
+#if HAS_RTC
+    {TIME_FORMAT,            OFFSET(struct Transmitter, rtc_timeformat)},
+    {DATE_FORMAT,            OFFSET(struct Transmitter, rtc_dateformat)},
+#endif
+
+#if HAS_EXTENDED_AUDIO
+    {AUDIO_VOL,              OFFSET(struct Transmitter, audio_vol)},
+#endif
+};
+
+static const struct struct_map _seccalibrate[] =
+{
+    {CALIBRATE_MAX,          OFFSET(struct StickCalibration, max)},
+    {CALIBRATE_MIN,          OFFSET(struct StickCalibration, min)},
+    {CALIBRATE_ZERO,         OFFSET(struct StickCalibration, zero)},
+};
+
+#if HAS_TOUCH
+static const struct struct_map _sectouch[] =
+{
+    {TOUCH_XSCALE,           OFFSET(struct TouchCalibration, xscale)},
+    {TOUCH_YSCALE,           OFFSET(struct TouchCalibration, yscale)},
+    {TOUCH_XOFFSET,          OFFSET(struct TouchCalibration, xoffset)},
+    {TOUCH_YOFFSET,          OFFSET(struct TouchCalibration, yoffset)},
+};
+#endif
+
+static const struct struct_map _secautodimmer[] =
+{
+    {AUTODIMMER_TIME,        OFFSET(struct AutoDimmer, timer)},
+    {AUTODIMMER_DIMVALUE,    OFFSET(struct AutoDimmer, backlight_dim_value)},
+};
+
+static const struct struct_map _sectimer[] =
+{
+    {TIMERSETTINGS_PREALERT_TIME, OFFSET(struct CountDownTimerSettings, prealert_time)},
+    {TIMERSETTINGS_PREALERT_INTERVAL, OFFSET(struct CountDownTimerSettings, prealert_interval)},
+    {TIMERSETTINGS_TIMEUP_INTERVAL, OFFSET(struct CountDownTimerSettings, timeup_interval)},
+};
+
 static int ini_handler(void* user, const char* section, const char* name, const char* value)
 {
     struct Transmitter *t = (struct Transmitter *)user;
 
     s32 value_int = atoi(value);
     if (section[0] == '\0') {
-        if (MATCH_KEY(CURRENT_MODEL)) {
-            t->current_model = value_int;
+        if (assign_int(t, _secmodel, ARRAYSIZE(_secmodel), name, value))
             return 1;
-        }
-        if (MATCH_KEY(LANGUAGE)) {
-            t->language = value_int;
-            return 1;
-        }
-	if (MATCH_KEY(MUSIC_SHUTD)) {
-            t->music_shutdown = atoi(value);
-            return 1;
-        }
-        if (MATCH_KEY(MODE)) {
-            t->mode = atoi(value);
-            return 1;
-        }
-        if (MATCH_KEY(BRIGHTNESS)) {
-            t->backlight = atoi(value);
-            return 1;
-        }
-        if (MATCH_KEY(CONTRAST)) {
-            t->contrast = atoi(value);
-            return 1;
-        }
-        if (MATCH_KEY(VOLUME)) {
-            t->volume = atoi(value);
-            return 1;
-        }
-#if HAS_EXTENDED_AUDIO
-        if (MATCH_KEY(AUDIO_VOL)) {
-            t->audio_vol = atoi(value);
-            return 1;
-        }
-#endif
-        if (MATCH_KEY(VIBRATION)) {
-            t->vibration_state = atoi(value);
-            return 1;
-        }
-        if (MATCH_KEY(POWER_ALARM)) {
-            t->power_alarm = atoi(value);
-            return 1;
-        }
-        if (MATCH_KEY(BATT_ALARM)) {
-            t->batt_alarm = atoi(value);
-            return 1;
-        }
-        if (MATCH_KEY(BATT_CRITICAL)) {
-            t->batt_critical = atoi(value);
-            return 1;
-        }
-	if (MATCH_KEY(BATT_WARNING_INTERVAL)) {
-            t->batt_warning_interval = atoi(value);
-            return 1;
-        }
-	if (MATCH_KEY(SPLASH_DELAY)) {
-            t->splash_delay = atoi(value);
-            return 1;
-        }
-    #if HAS_RTC
-        if (MATCH_KEY(TIME_FORMAT)) {
-            t->rtc_timeformat = atoi(value);
-            return 1;
-        }
-        if (MATCH_KEY(DATE_FORMAT)) {
-            t->rtc_dateformat = atoi(value);
-            return 1;
-        }
-    #endif
     }
     if(MATCH_START(section, SECTION_CALIBRATE) && strlen(section) >= sizeof(SECTION_CALIBRATE)) {
         u8 idx = atoi(section + sizeof(SECTION_CALIBRATE)-1);
@@ -173,62 +164,22 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 1;
         }
         idx--;
-        if (MATCH_KEY(CALIBRATE_MAX)) {
-            t->calibration[idx].max = value_int;
+        if (assign_int(&t->calibration[idx], _seccalibrate, ARRAYSIZE(_seccalibrate), name, value))
             return 1;
-        }
-        if (MATCH_KEY(CALIBRATE_MIN)) {
-            t->calibration[idx].min = value_int;
-            return 1;
-        }
-        if (MATCH_KEY(CALIBRATE_ZERO)) {
-            t->calibration[idx].zero = value_int;
-            return 1;
-        }
     }
-    if (HAS_TOUCH) {
-        if (MATCH_SECTION(SECTION_TOUCH)) {
-            if (MATCH_KEY(TOUCH_XSCALE)) {
-                t->touch.xscale = value_int;
-                return 1;
-            }
-            if (MATCH_KEY(TOUCH_YSCALE)) {
-                t->touch.yscale = value_int;
-                return 1;
-            }
-            if (MATCH_KEY(TOUCH_XOFFSET)) {
-                t->touch.xoffset = value_int;
-                return 1;
-            }
-            if (MATCH_KEY(TOUCH_YOFFSET)) {
-                t->touch.yoffset = value_int;
-                return 1;
-            }
-        }
+#if HAS_TOUCH
+    if (MATCH_SECTION(SECTION_TOUCH)) {
+        if (assign_int(&t->touch, _sectouch, ARRAYSIZE(_sectouch), name, value))
+            return 1;
     }
+#endif
     if (MATCH_SECTION(SECTION_AUTODIMMER)) {
-        if (MATCH_KEY(AUTODIMMER_TIME)) {
-            t->auto_dimmer.timer = value_int;
+        if (assign_int(&t->auto_dimmer, _secautodimmer, ARRAYSIZE(_secautodimmer), name, value))
             return 1;
-        }
-        if (MATCH_KEY(AUTODIMMER_DIMVALUE)) {
-            t->auto_dimmer.backlight_dim_value = value_int;
-            return 1;
-        }
     }
     if (MATCH_SECTION(SECTION_TIMERSETTINGS)) {
-        if (MATCH_KEY(TIMERSETTINGS_PREALERT_TIME)) {
-            t->countdown_timer_settings.prealert_time = value_int;
+        if (assign_int(&t->countdown_timer_settings, _sectimer, ARRAYSIZE(_sectimer), name, value))
             return 1;
-        }
-        if (MATCH_KEY(TIMERSETTINGS_PREALERT_INTERVAL)) {
-            t->countdown_timer_settings.prealert_interval = value_int;
-            return 1;
-        }
-        if (MATCH_KEY(TIMERSETTINGS_TIMEUP_INTERVAL)) {
-            t->countdown_timer_settings.timeup_interval = value_int;
-            return 1;
-        }
     }
     if (MATCH_SECTION(SECTION_TELEMETRY)) {
         if (MATCH_KEY(TELEM_TEMP)) {
@@ -260,54 +211,30 @@ void CONFIG_WriteTx()
         printf("Couldn't open tx.ini\n");
         return;
     }
-    CONFIG_EnableLanguage(0);
-    fprintf(fh, "%s=%d\n", CURRENT_MODEL, Transmitter.current_model);
-    fprintf(fh, "%s=%d\n", LANGUAGE, Transmitter.language);
-    fprintf(fh, "%s=%d\n", MUSIC_SHUTD, Transmitter.music_shutdown);
-    fprintf(fh, "%s=%d\n", MODE, Transmitter.mode);
-    fprintf(fh, "%s=%d\n", BRIGHTNESS, Transmitter.backlight);
-    fprintf(fh, "%s=%d\n", CONTRAST, Transmitter.contrast);
-    fprintf(fh, "%s=%d\n", VOLUME, Transmitter.volume);
-#if HAS_EXTENDED_AUDIO
-    fprintf(fh, "%s=%d\n", AUDIO_VOL, Transmitter.audio_vol);
-#endif
-    fprintf(fh, "%s=%d\n", VIBRATION, Transmitter.vibration_state);
-    fprintf(fh, "%s=%d\n", POWER_ALARM, Transmitter.power_alarm);
-    fprintf(fh, "%s=%d\n", BATT_ALARM, Transmitter.batt_alarm);
-    fprintf(fh, "%s=%d\n", BATT_CRITICAL, Transmitter.batt_critical);
-    fprintf(fh, "%s=%d\n", BATT_WARNING_INTERVAL, Transmitter.batt_warning_interval);
-    fprintf(fh, "%s=%d\n", SPLASH_DELAY, Transmitter.splash_delay);
-#if HAS_RTC
-    fprintf(fh, "%s=%d\n", TIME_FORMAT, Transmitter.rtc_timeformat);
-    fprintf(fh, "%s=%d\n", DATE_FORMAT, Transmitter.rtc_dateformat);
-#endif
+
+    write_int(&Transmitter, _secmodel, ARRAYSIZE(_secmodel), fh);
+
     for(i = 0; i < INP_HAS_CALIBRATION; i++) {
         fprintf(fh, "[%s%d]\n", SECTION_CALIBRATE, i+1);
-        fprintf(fh, "  %s=%d\n", CALIBRATE_MAX, t->calibration[i].max);
-        fprintf(fh, "  %s=%d\n", CALIBRATE_MIN, t->calibration[i].min);
-        fprintf(fh, "  %s=%d\n", CALIBRATE_ZERO, t->calibration[i].zero);
+        write_int(&t->calibration[i], _seccalibrate, ARRAYSIZE(_seccalibrate), fh);
     }
-    if (HAS_TOUCH) {
-        fprintf(fh, "[%s]\n", SECTION_TOUCH);
-        fprintf(fh, "  %s=%d\n", TOUCH_XSCALE, (int)t->touch.xscale);
-        fprintf(fh, "  %s=%d\n", TOUCH_YSCALE, (int)t->touch.yscale);
-        fprintf(fh, "  %s=%d\n", TOUCH_XOFFSET, (int)t->touch.xoffset);
-        fprintf(fh, "  %s=%d\n", TOUCH_YOFFSET, (int)t->touch.yoffset);
-    }
+
+#if HAS_TOUCH
+    fprintf(fh, "[%s]\n", SECTION_TOUCH);
+    write_int(&t->touch, _sectouch, ARRAYSIZE(_sectouch), fh);
+#endif
+
     fprintf(fh, "[%s]\n", SECTION_AUTODIMMER);
-    fprintf(fh, "%s=%u\n", AUTODIMMER_TIME, (unsigned int)t->auto_dimmer.timer);
-    fprintf(fh, "%s=%u\n", AUTODIMMER_DIMVALUE, t->auto_dimmer.backlight_dim_value);
+    write_int(&t->auto_dimmer, _secautodimmer, ARRAYSIZE(_secautodimmer), fh);
+
     fprintf(fh, "[%s]\n", SECTION_TIMERSETTINGS);
-    fprintf(fh, "%s=%u\n", TIMERSETTINGS_PREALERT_TIME, (unsigned int)t->countdown_timer_settings.prealert_time);
-    fprintf(fh, "%s=%u\n", TIMERSETTINGS_PREALERT_INTERVAL, t->countdown_timer_settings.prealert_interval);
-    fprintf(fh, "%s=%u\n", TIMERSETTINGS_TIMEUP_INTERVAL, t->countdown_timer_settings.timeup_interval);
+    write_int(&t->countdown_timer_settings, _sectimer, ARRAYSIZE(_sectimer), fh);
 
     fprintf(fh, "[%s]\n", SECTION_TELEMETRY);
     fprintf(fh, "%s=%s\n", TELEM_TEMP, TELEM_TEMP_VAL[(t->telem & TELEMUNIT_FAREN) ? 1 : 0]);
     fprintf(fh, "%s=%s\n", TELEM_LENGTH, TELEM_LENGTH_VAL[(t->telem & TELEMUNIT_FEET) ? 1 : 0]);
     fprintf(fh, "%s=%u\n", TELEM_ALERT_INTERVAL, t->telem_alert_interval);
 
-    CONFIG_EnableLanguage(1);
     fclose(fh);
 }
 
