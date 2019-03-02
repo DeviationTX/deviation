@@ -44,7 +44,6 @@ static const char *_mixermode_cb(guiObject_t *obj, int dir, void *data)
 void PAGE_ModelInit(int page)
 {
     (void)page;
-    u8 row;
 
     mp->last_mixermode = Model.mixer_mode;
     mp->last_txpower = Model.tx_power;
@@ -52,57 +51,42 @@ void PAGE_ModelInit(int page)
     PAGE_SetModal(0);
     PAGE_ShowHeader(PAGE_GetName(PAGEID_MODEL));
 
-    enum {
-        COL1 = (8 + ((LCD_WIDTH - 320) / 2)),
-        COL2 = (COL1 + 128),
-        COL3 = (COL1 + 228),
-        ROW1 = (44 + ((LCD_HEIGHT - 240) / 2)),
-        LABEL_WIDTH = (COL2 - COL1),
-    };
-    row = ROW1;
-    GUI_CreateLabelBox(&gui->filelbl, COL1, row, LABEL_WIDTH, 18, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("File"));
-    GUI_CreateTextSelect(&gui->file, COL2, row, TEXTSELECT_96, file_press_cb, file_val_cb, NULL);
+    BeginGridLayout(9, 8) {
+        GUI_CreateLabelBox(&gui->filelbl, Grid_XY(1, 1), Grid_WH_Span(3, 1), &LABEL_FONT, GUI_Localize, NULL, _tr_noop("File"));
+        GUI_CreateTextSelect(&gui->file, Grid_XY(1, 4), TEXTSELECT_96, file_press_cb, file_val_cb, NULL);
 
-#if HAS_STANDARD_GUI
-    row+= 20;
-    GUI_CreateLabelBox(&gui->guilbl, COL1, row, LABEL_WIDTH, 18, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Mixer GUI"));
-    GUI_CreateTextSelect(&gui->guits, COL2, row, TEXTSELECT_96, NULL, _mixermode_cb, NULL);
-#endif
+        GUI_CreateLabelBox(&gui->namelbl, Grid_XY(2, 1), Grid_WH_Span(3, 1), &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Model name"));  // use the same naming convention for devo8 and devo10
+        GUI_CreateButton(&gui->name, Grid_XY(2, 4), BUTTON_96x16, show_text_cb, _changename_cb, Model.name);
+        GUI_CreateButton(&gui->icon, Grid_XY(2, 7), BUTTON_64x16, show_text_cb, changeicon_cb, _tr("Icon"));
 
-    row += 20;
-    GUI_CreateLabelBox(&gui->namelbl, COL1, row, LABEL_WIDTH, 18, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Model name"));  // use the same naming convention for devo8 and devo10
-    GUI_CreateButton(&gui->name, COL2, row, BUTTON_96x16, show_text_cb, _changename_cb, Model.name);
-    GUI_CreateButton(&gui->icon, COL3, row, BUTTON_64x16, show_text_cb, changeicon_cb, _tr("Icon"));
+        GUI_CreateLabelBox(&gui->typelbl, Grid_XY(3, 1), Grid_WH_Span(3, 1), &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Model type"));
+        GUI_CreateTextSelect(&gui->type, Grid_XY(3, 4), TEXTSELECT_96, type_press_cb, type_val_cb, NULL);
 
-    row += 20;
-    GUI_CreateLabelBox(&gui->typelbl, COL1, row, LABEL_WIDTH, 18, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Model type"));
-    GUI_CreateTextSelect(&gui->type, COL2, row, TEXTSELECT_96, type_press_cb, type_val_cb, NULL);
+        GUI_CreateLabelBox(&gui->ppmlbl, Grid_XY(4, 1), Grid_WH_Span(3, 1), &LABEL_FONT, GUI_Localize, NULL, _tr_noop("PPM In"));
+        GUI_CreateTextSelect(&gui->ppm, Grid_XY(4, 4), TEXTSELECT_96, ppmin_press_cb, ppmin_select_cb, NULL);
 
-    row += 24;
-    GUI_CreateLabelBox(&gui->ppmlbl, COL1, row, LABEL_WIDTH, 18, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("PPM In"));
-    GUI_CreateTextSelect(&gui->ppm, COL2, row, TEXTSELECT_96, ppmin_press_cb, ppmin_select_cb, NULL);
+        GUI_CreateLabelBox(&gui->protolbl, Grid_XY(5, 1), Grid_WH_Span(3, 1), &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Protocol"));
+        GUI_CreateTextSelect(&gui->proto, Grid_XY(5, 4), TEXTSELECT_96, proto_press_cb, protoselect_cb, NULL);
 
-    row += 20;
-    GUI_CreateLabelBox(&gui->protolbl, COL1, row, LABEL_WIDTH, 18, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Protocol"));
-    GUI_CreateTextSelect(&gui->proto, COL2, row, TEXTSELECT_96, proto_press_cb, protoselect_cb, NULL);
+        GUI_CreateLabelBox(&gui->numchlbl, Grid_XY(6, 1), Grid_WH_Span(3, 1), &LABEL_FONT, GUI_Localize, NULL, _tr_noop("# Channels"));
+        GUI_CreateTextSelect(&gui->numch, Grid_XY(6, 4), TEXTSELECT_96, NULL, numchanselect_cb, NULL);
 
-    row += 20;
-    GUI_CreateLabelBox(&gui->numchlbl, COL1, row, LABEL_WIDTH, 18, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("# Channels"));
-    GUI_CreateTextSelect(&gui->numch, COL2, row, TEXTSELECT_96, NULL, numchanselect_cb, NULL);
+        GUI_CreateLabelBox(&gui->pwrlbl, Grid_XY(7, 1), Grid_WH_Span(3, 1), &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Tx power"));
+        GUI_CreateTextSelect(&gui->pwr, Grid_XY(7, 4), TEXTSELECT_96, NULL, powerselect_cb, NULL);
 
+        if (Model.fixed_id == 0)
+            strlcpy(mp->fixed_id, _tr("None"), sizeof(mp->fixed_id));
+        else
+            sprintf(mp->fixed_id, "%d", (int)Model.fixed_id);
+        GUI_CreateLabelBox(&gui->fixedidlbl, Grid_XY(8, 1), Grid_WH_Span(3, 1), &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Fixed ID"));
+        GUI_CreateButton(&gui->fixedid, Grid_XY(8, 4), BUTTON_96x16, show_text_cb, fixedid_cb, mp->fixed_id);
+        GUI_CreateButton(&gui->bind, Grid_XY(8, 7), BUTTON_64x16, show_bindtext_cb, bind_cb, NULL);
 
-    row += 24;
-    GUI_CreateLabelBox(&gui->pwrlbl, COL1, row, LABEL_WIDTH, 18, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Tx power"));
-    GUI_CreateTextSelect(&gui->pwr, COL2, row, TEXTSELECT_96, NULL, powerselect_cb, NULL);
-
-    row += 20;
-    if(Model.fixed_id == 0)
-        strlcpy(mp->fixed_id, _tr("None"), sizeof(mp->fixed_id));
-    else
-        sprintf(mp->fixed_id, "%d", (int)Model.fixed_id);
-    GUI_CreateLabelBox(&gui->fixedidlbl, COL1, row, LABEL_WIDTH, 18, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Fixed ID"));
-    GUI_CreateButton(&gui->fixedid, COL2, row, BUTTON_96x16, show_text_cb, fixedid_cb, mp->fixed_id);
-    GUI_CreateButton(&gui->bind, COL3, row, BUTTON_64x16, show_bindtext_cb, bind_cb, NULL);
+    #if HAS_STANDARD_GUI
+        GUI_CreateLabelBox(&gui->guilbl, Grid_XY(9, 1), Grid_WH_Span(3, 1), &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Mixer GUI"));
+        GUI_CreateTextSelect(&gui->guits, Grid_XY(9, 4), TEXTSELECT_96, NULL, _mixermode_cb, NULL);
+    #endif
+    }
     configure_bind_button();
 }
 

@@ -13,17 +13,4 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "common.h"
-#include "pages.h"
-#include "gui/gui.h"
-
-#define OVERRIDE_PLACEMENT
-enum {
-    ROW_1_X = 0,
-    ROW_1_Y = 1*LINE_HEIGHT,
-    ROW_2_X = 0,
-    ROW_2_Y = 4 * LINE_HEIGHT,
-    ROW_3_X = 0,
-    ROW_3_Y = 5 * LINE_HEIGHT,
-};
 #include "../128x64x1/about_page.c"

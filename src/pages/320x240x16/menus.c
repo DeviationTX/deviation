@@ -26,9 +26,6 @@ enum {
     MENU_X            = 20,
     MENU_WIDTH        = (LCD_WIDTH - MENU_X * 2),
 };
-#define HEADER_HEIGHT (LCD_HEIGHT==240 ? 37 : 40)
-#define LINE_SPACE    29
-#define LINE_HEIGHT   20
 #include "../common/_menus.c"
 
 static void menu_press_cb(guiObject_t *obj, s8 press_type, const void *data)
