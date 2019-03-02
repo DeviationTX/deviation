@@ -13,12 +13,6 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef MODULAR
-  //Allows the linker to properly relocate
-  #define TESTRF_Cmds PROTO_Cmds
-  #pragma long_calls
-#endif
-
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
@@ -26,9 +20,6 @@
 #include "config/tx.h"
 
 #if defined PROTO_HAS_CYRF6936 && defined PROTO_HAS_A7105 && defined PROTO_HAS_CC2500 && defined PROTO_HAS_NRF24L01
-#ifdef MODULAR
-  #pragma long_calls_off
-#endif
 
 static const char * const testrf_opts[] = {
   "Radio", "CYRF6936", "A7105", "CC2500", "NRF24L01", NULL,

@@ -97,7 +97,7 @@ void PPM_Enable(unsigned low_time, volatile u16 *pulses, u8 num_pulses)
     dma_set_peripheral_size(PWM_DMA.dma, PWM_DMA.stream, DMA_SxCR_PSIZE_16BIT);
     dma_set_memory_size(PWM_DMA.dma, PWM_DMA.stream, DMA_SxCR_MSIZE_16BIT);
     dma_set_priority(PWM_DMA.dma, PWM_DMA.stream, DMA_CCR_PL_VERY_HIGH);
-    DMA_channel_select(USART_DMA);
+    DMA_channel_select(PWM_DMA);
     DMA_enable_stream(PWM_DMA);    // dma ready to go
 
     // Setup timer for PPM
@@ -165,7 +165,7 @@ void PXX_Enable(u8 *packet)
     dma_set_memory_size(PWM_DMA.dma, PWM_DMA.stream, DMA_SxCR_MSIZE_8BIT);
     dma_set_priority(PWM_DMA.dma, PWM_DMA.stream, DMA_CCR_PL_VERY_HIGH);
     dma_enable_transfer_complete_interrupt(PWM_DMA.dma, PWM_DMA.stream);
-    DMA_channel_select(USART_DMA);
+    DMA_channel_select(PWM_DMA);
     DMA_enable_stream(PWM_DMA);    // dma ready to go
 
     // configure timer for PXX

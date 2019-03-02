@@ -22,7 +22,7 @@ SRC_C    = $(wildcard target/$(TARGET)/*.c) \
 SRC_C   += $(wildcard target/common/devo/protocol/*.c)
 
 CFLAGS   = -D"assert_param(x)=" -DSTM32F20X_HD -DSTM32F2 -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -fdata-sections -ffunction-sections -Ilibopencm3/include -fno-builtin-printf -Os
-MODULE_FLAGS = -fno-builtin
+MODULE_CFLAGS = -fno-builtin
 
 LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -lc
 LFLAGS2  = -Wl,-T$(LINKFILE)

@@ -13,22 +13,12 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef MODULAR
-  //Allows the linker to properly relocate
-  #define SBUS_Cmds PROTO_Cmds
-  #pragma long_calls
-#endif
-
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
 #include "config/model.h"
 #include "config/tx.h"
 #include "telemetry.h"
-
-#ifdef MODULAR
-  #pragma long_calls_off
-#endif
 
 static const char * const sbus_opts[] = {
   _tr_noop("Period (ms)"),  "6", "14", NULL,

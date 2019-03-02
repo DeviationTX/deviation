@@ -13,22 +13,12 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef MODULAR
-    //Allows the linker to properly relocate
-    #define DSM2_Cmds PROTO_Cmds
-    #pragma long_calls
-#endif
-
 #include <stdlib.h>
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
 #include "telemetry.h"
 #include "config/model.h"
-
-#ifdef MODULAR
-    #pragma long_calls_off
-#endif
 
 #ifdef PROTO_HAS_CYRF6936
 #ifdef MODULAR 
