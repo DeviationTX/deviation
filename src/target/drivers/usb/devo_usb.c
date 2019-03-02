@@ -34,6 +34,9 @@ const char USB_Product_Name[] = "DeviationTx";
 
 void USB_Enable(unsigned use_interrupt)
 {
+    rcc_periph_clock_enable(RCC_GPIOA);
+    GPIO_setup_input_af((struct mcu_pin){GPIOA, GPIO11 | GPIO12}, ITYPE_FLOAT, 0);
+
     if (HAS_PIN(USB_DETECT_PIN)) {
         rcc_periph_clock_enable(get_rcc_from_pin(USB_DETECT_PIN));
         GPIO_setup_input(USB_DETECT_PIN, ITYPE_PULLUP);
@@ -44,13 +47,9 @@ void USB_Enable(unsigned use_interrupt)
         GPIO_setup_output(USB_ENABLE_PIN, OTYPE_PUSHPULL);
         GPIO_pin_clear(USB_ENABLE_PIN);
     } else {
-        rcc_periph_clock_enable(RCC_GPIOA);
-        gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_2_MHZ,
-                GPIO_CNF_OUTPUT_PUSHPULL, GPIO12);
-        gpio_clear(GPIOA, GPIO12);
-        for (unsigned i = 0; i < 800000; i++) {
-            __asm__("nop");
-        }
+        GPIO_setup_output((struct mcu_pin){GPIOA, GPIO12}, OTYPE_PUSHPULL);
+        GPIO_pin_clear((struct mcu_pin){GPIOA, GPIO12});
+        _msleep(100);
     }
 
     if (use_interrupt) {
