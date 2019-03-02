@@ -13,23 +13,11 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef MODULAR
-    //Allows the linker to properly relocate
-    #define WFLY_Cmds PROTO_Cmds
-    #pragma long_calls
-#endif
-
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
 #include "telemetry.h"
 #include "config/model.h"
-
-#ifdef MODULAR
-    //Some versions of gcc applythis to definitions, others to calls
-    //So just use long_calls everywhere
-    //#pragma no_long_calls
-#endif
 
 #ifdef PROTO_HAS_CYRF6936
 

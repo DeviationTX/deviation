@@ -37,12 +37,11 @@ PROTO_EXTRA_C = $(wildcard $(SDIR)/target/tx/devo/common/protocol/*.c) \
                 $(wildcard $(SDIR)/protocol/spi/*.c) \
                 $(SDIR)/target/tx/devo/common/module_signature.c \
                 $(SDIR)/target/tx/devo/common/uart.c
-SRC_C   += objs/$(TARGET)/proto_stubs.c
 else
 SRC_C   += $(wildcard $(SDIR)/target/tx/devo/common/protocol/*.c)
 endif
 
-CFLAGS   = -D"assert_param(x)=" -DSTM32F10X_HD -DSTM32F1 -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -fdata-sections -ffunction-sections -I$(SDIR)/target/tx/devo/common -I$(SDIR)/libopencm3/include -I$(SDIR)/target/drivers/filesystems -fno-builtin-printf -Os --specs=nano.specs
+CFLAGS   = -D"assert_param(x)=" -DSTM32F10X_HD -DSTM32F1 -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -fdata-sections -I$(SDIR)/target/tx/devo/common -I$(SDIR)/libopencm3/include -I$(SDIR)/target/drivers/filesystems -fno-builtin-printf -Os --specs=nano.specs
 ifeq "$(HAS_4IN1_FLASH)" "1"
 CFLAGS  += -D"HAS_4IN1_FLASH=1"
 endif
@@ -52,13 +51,19 @@ endif
 ifeq "$(USE_JTAG)" "1"
 CFLAGS  += -D"USE_JTAG=1"
 endif
-MODULE_FLAGS = -fno-builtin
+MODULE_CFLAGS = -fno-builtin
 
 #LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -nostdlib
-LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -lc -lnosys -L$(SDIR) -Lobjs/$(TARGET) -Wl,-warn-common
+LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -lc -lnosys -L$(SDIR) -L$(SDIR)/protocol -Lobjs/$(TARGET) -Wl,-warn-common
 
 LINKFILE = $(SDIR)/target/tx/devo/$(TARGET)/$(TARGET).ld
 LFLAGS2  = -Wl,-T$(LINKFILE)
+
+ifdef ENABLE_LTO
+EXTRA_CFLAGS  += -flto -ffat-lto-objects -DENABLE_LTO
+else
+CFLAGS += -ffunction-sections
+endif
 
 ifdef OPTIMIZE_DFU
 LINKFILEOPT = $(SDIR)/target/tx/devo/$(TARGET)/$(TARGET)_opt.ld
@@ -81,6 +86,11 @@ endif
 ALL = $(LIBOPENCM3) $(TARGET).dfu
 
 else #BUILD_TARGET
+
+ifdef ENABLE_LTO
+$(foreach src,$(filter %_isr.c,$(SRCS)),\
+            $(eval CFLAGS_$(basename $(notdir $(src))) = -fno-lto))
+endif
 
 ifeq ($(OS),Windows_NT)
 	FLOCKS =
@@ -112,15 +122,11 @@ $(TARGET).dfu: $(TARGET).bin
 ###################################
 #The protocol modules (if needed) #
 ###################################
-$(ODIR)/%.bin: $(ODIR)/%.o_ $(PROTO_LINKFILE) $(PROTO_EXTRA_OBJS) $(TARGET).bin
+$(ODIR)/%.bin: $(ODIR)/%.o_ $(SDIR)/protocol/exports.ld $(PROTO_LINKFILE) $(PROTO_EXTRA_OBJS) $(TARGET).bin
 	@echo " + Building '$@'"
 	$(LD) -o $(@:.bin=.elf) $< $(PROTO_EXTRA_OBJS) $(LIBOPENCM3) -gc-sections -Map=$(@:.bin=.map) \
 		--cref -T$(PROTO_LINKFILE) --just-symbols=$(SYMBOL_FILE)
 	$(DUMP) -t $(@:.bin=.elf) | grep -q _from_thumb; if [ $$? -eq 0 ]; then echo "ERROR: Bad address found"; false; else true; fi
 	$(CP) -O binary  $(@:.bin=.elf) $@
-
-.PHONY: objs/$(TARGET)/proto_stubs.c
-objs/$(TARGET)/proto_stubs.c: target/tx/devo/common/make-stubs.sh
-	sh target/tx/devo/common/make-stubs.sh > $@
 
 endif #BUILD_TARGET

@@ -33,12 +33,21 @@ CFLAGS   = -D"assert_param(x)=" -DSTM32F10X_HD -DSTM32F1 -mcpu=cortex-m3 -mthumb
 ifeq "$(HAS_4IN1_FLASH)" "1"
 CFLAGS  += -D"HAS_4IN1_FLASH=1"
 endif
-MODULE_FLAGS = -fno-builtin
+MODULE_CFLAGS = -fno-builtin
 
-LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -lc -lnosys -L$(SDIR) -Lobjs/$(TARGET)
+LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -lc -lnosys -L$(SDIR) -L$(SDIR)/protocol -Lobjs/$(TARGET)
 LFLAGS2  = -Wl,-T$(LINKFILE)
 
+ifdef ENABLE_LTO
+CFLAGS  += -flto -ffat-lto-objects -fwhole-program -DENABLE_LTO
+endif
+
 else #BUILD_TARGET
+
+ifdef ENABLE_LTO
+$(foreach src,$(filter %_isr.c,$(SRCS)),\
+            $(eval CFLAGS_$(basename $(notdir $(src))) = -fno-lto))
+endif
 
 $(LIBOPENCM3):
 	test -s $(SDIR)/libopencm3/Makefile || { echo "Fetch libopencm3 via 'git submodule update --init'"; exit 1; }

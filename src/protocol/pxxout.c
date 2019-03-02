@@ -13,12 +13,6 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef MODULAR
-  //Allows the linker to properly relocate
-  #define PXXOUT_Cmds PROTO_Cmds
-  #pragma long_calls
-#endif
-
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
@@ -26,10 +20,6 @@
 #include "config/tx.h"
 #if HAS_EXTENDED_TELEMETRY
 #include "telemetry.h"
-#endif
-
-#ifdef MODULAR
-  #pragma long_calls_off
 #endif
 
 #define PXX_SEND_BIND           0x01

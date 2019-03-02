@@ -18,26 +18,13 @@
    SymaX5C protocol option compatible with Syma X5C (original) and X2.
 ***/
 
-#ifdef MODULAR
-  //Allows the linker to properly relocate
-  #define SYMAX_Cmds PROTO_Cmds
-  #pragma long_calls
-#endif
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
 #include "config/model.h"
 #include "config/tx.h" // for Transmitter
 
-#ifdef MODULAR
-  //Some versions of gcc applythis to definitions, others to calls
-  //So just use long_calls everywhere
-  //#pragma long_calls_off
-#endif
-
 #ifdef PROTO_HAS_NRF24L01
-
-#include "iface_nrf24l01.h"
 
 #ifdef EMULATOR
 #define USE_FIXED_MFGID
