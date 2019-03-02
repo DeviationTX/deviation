@@ -206,8 +206,7 @@ static void send_packet(u8 bind)
         }
         if (analogaux) {
             packet[1] = scale_channel(CHANNEL_ANAAUX1, 0, 0xff);
-        }
-        else {
+        } else {
             packet[1] = 0xfa;       // normal mode is 0xf7, expert 0xfa
         }
         packet[2] = GET_FLAG(CHANNEL_FLIP, 0x08)
@@ -237,8 +236,7 @@ static void send_packet(u8 bind)
                 packet[12] = txid[2];
                 if (analogaux) {
                     packet[13] = scale_channel(CHANNEL_ANAAUX2, 0, 0xff);
-                }
-                else {
+                } else {
                     packet[13] = 0x0a;
                 }
                 break;
@@ -534,7 +532,7 @@ uintptr_t Bayang_Cmds(enum ProtoCmds cmd)
         initialize();
         return 0;
     case PROTOCMD_NUMCHAN:
-        return (analogaux ? 14 : 12);
+        return 14;
     case PROTOCMD_DEFAULT_NUMCHAN:
         return (analogaux ? 14 : 12);
     case PROTOCMD_CURRENT_ID:
