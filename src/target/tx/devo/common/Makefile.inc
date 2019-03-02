@@ -41,7 +41,7 @@ else
 SRC_C   += $(wildcard $(SDIR)/target/tx/devo/common/protocol/*.c)
 endif
 
-CFLAGS   = -D"assert_param(x)=" -DSTM32F10X_HD -DSTM32F1 -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -fdata-sections -ffunction-sections -I$(SDIR)/target/tx/devo/common -I$(SDIR)/libopencm3/include -I$(SDIR)/target/drivers/filesystems -fno-builtin-printf -Os --specs=nano.specs
+CFLAGS   = -D"assert_param(x)=" -DSTM32F10X_HD -DSTM32F1 -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -fdata-sections -I$(SDIR)/target/tx/devo/common -I$(SDIR)/libopencm3/include -I$(SDIR)/target/drivers/filesystems -fno-builtin-printf -Os --specs=nano.specs
 ifeq "$(HAS_4IN1_FLASH)" "1"
 CFLAGS  += -D"HAS_4IN1_FLASH=1"
 endif
@@ -61,6 +61,8 @@ LFLAGS2  = -Wl,-T$(LINKFILE)
 
 ifdef ENABLE_LTO
 EXTRA_CFLAGS  += -flto -ffat-lto-objects -DENABLE_LTO
+else
+CFLAGS += -ffunction-sections
 endif
 
 ifdef OPTIMIZE_DFU
