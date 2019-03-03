@@ -66,8 +66,8 @@
             .miso = {GPIOA, GPIO6},               \
             .mosi = {GPIOA, GPIO7},               \
             .rate = HAS_OLED_DISPLAY              \
-                ? SPI_CR1_BAUDRATE_FPCLK_DIV_8    \
-                : SPI_CR1_BAUDRATE_FPCLK_DIV_4,   \
+                ? SPI_CR1_BR_FPCLK_DIV_8    \
+                : SPI_CR1_BR_FPCLK_DIV_4,   \
             DEFAULT_SPI_SETTINGS,                 \
            })
     #endif  // SPI1_CFG
@@ -87,8 +87,8 @@
             .miso = {GPIOA, GPIO6},               \
             .mosi = {GPIOA, GPIO7},               \
             .rate = HAS_OLED_DISPLAY              \
-                ? SPI_CR1_BAUDRATE_FPCLK_DIV_8    \
-                : SPI_CR1_BAUDRATE_FPCLK_DIV_4,   \
+                ? SPI_CR1_BR_FPCLK_DIV_8          \
+                : SPI_CR1_BR_FPCLK_DIV_4,         \
             DEFAULT_SPI_SETTINGS,                 \
            })
     #endif  // SPI1_CFG
@@ -106,7 +106,7 @@
             .sck = {GPIOB, GPIO13},                \
             .miso = {GPIOB, GPIO14},               \
             .mosi = {GPIOB, GPIO15},               \
-            .rate = SPI_CR1_BAUDRATE_FPCLK_DIV_16, \
+            .rate = SPI_CR1_BR_FPCLK_DIV_16,       \
             DEFAULT_SPI_SETTINGS,                  \
            })
     #endif
