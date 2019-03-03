@@ -108,7 +108,7 @@ static void show_page(CurvesMode _curve_mode, int page)
 
     set_cur_mixer();
     // PAGE_ShowHeader(_tr_noop("Mode"));
-    GUI_CreateLabelBox(&gui->title, 0, 0, HEADER1_X, HEADER_HEIGHT, &LABEL_FONT, NULL, NULL, _tr("Mode"));
+    GUI_CreateLabelBox(&gui->title, 0, 0, HEADER1_X, HEADER_HEIGHT, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Mode"));
     GUI_CreateRect(&gui->rect, 0, HEADER_WIDGET_HEIGHT, LCD_WIDTH, 1, &DEFAULT_FONT);
     
     // FIXME: need a special value for header button/textsels

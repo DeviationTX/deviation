@@ -55,7 +55,7 @@ void PAGE_GyroSenseInit(int page)
     PAGE_ShowHeader(_tr_noop("Gyro sense"));
 
     u8 y = HEADER_HEIGHT + HEADER_OFFSET;
-    GUI_CreateLabelBox(&gui->chanlbl, LABEL_X, y, LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, NULL, NULL, _tr("Channel"));
+    GUI_CreateLabelBox(&gui->chanlbl, LABEL_X, y, LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Channel"));
     GUI_CreateTextSelectPlate(&gui->chan, FIELD_X, y, FIELD_WIDTH1, LINE_HEIGHT, &TEXTSEL_FONT, NULL, gyro_output_cb, NULL);
 
     for (int i=0; i < ((INPUT_NumSwitchPos(mapped_std_channels.switches[SWITCHFUNC_GYROSENSE]) == 3) ? 3 : 2); i++) {
