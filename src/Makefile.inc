@@ -1,3 +1,13 @@
+#
+# This inc file have to be included as last include in the makefile include chain.
+# Some import variables:
+#     DRIVERS - list out the drivres which need be added.
+#     SCREENSIZE - define the screen size (type)
+#     CROSS - define if need a different compiler than default
+#     CFLAGS - define the compiler options for firmware
+#     LDFLAGS - define the linker options
+#     SRCS_C - C source files in the full path
+#     SRCS_CPP - cpp source files in the full path
 
 # We want to turn on INCLUDE_FS by default
 INCLUDE_FS ?= 1
@@ -69,7 +79,7 @@ SRCS     := $(SRC_C) $(SRC_CXX) $(SRC_S)
 #This section intermediate build files     #
 ############################################
 ODIR     = $(SDIR)/objs/$(TARGET)$(ODIREXT)
-OBJS 	 = $(addprefix $(ODIR)/, $(notdir $(SRC_C:.c=.o) $(SRC_S:.s=.o) $(SRC_CXX:.cpp=.o)))
+OBJS    := $(patsubst %.c,$(ODIR)/%.o,$(notdir $(SRCS)))
 
 ifdef MODULAR
 PROTO_OBJS  := $(addprefix $(ODIR)/, $(notdir $(PROTO_SRC_C:.c=.o)))
@@ -77,6 +87,14 @@ PROTO_LIBS  := $(addprefix $(ODIR)/, $(notdir $(PROTO_SRC_C:.c=.bin)))
 PROTO_EXTRA_OBJS := $(addprefix $(ODIR)/, $(notdir $(PROTO_EXTRA_C:.c=.o_)))
 SYMBOL_FILE := $(ODIR)/symbolfile
 endif
+
+define uniq =
+  $(eval seen :=)
+  $(foreach _,$1,$(if $(filter $_,${seen}),,$(eval seen += $_)))
+  ${seen}
+endef
+
+VPATH = $(call uniq, $(dir $(SRCS)))
 
 HGVERSION ?= $(shell $(SDIR)/../utils/get_version.pl ${TARGET})
 HGVERSION := $(HGVERSION)
@@ -289,41 +307,18 @@ filesystem/$(FILESYSTEM)/media/04b03.fon: $(SDIR)/fonts/04b03.bdf
 ##############################
 #Build rules for all .o files#
 ##############################
-## The autodependency magic below was adapeted from:
-## http://mad-scientist.net/make/autodep.html
--include $(OBJS:.o=.P)
--include $(PROTO_OBJS:.o=.P)
--include $(PROTO_EXTRA_OBJS:.o_=.P)
+$(ODIR)/%.o: %.c
+	@echo " + Compiling '$<'"
+	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) $(CFLAGS_$(basename $(notdir $<))) -c -o $@ $<
 
-dollar = $$
-define define_compile_rules
-$(ODIR)/%.o: $(1)%.c $(LIBOPENCM3)
-	@echo " + Compiling '$$<'"
-	$(CC) $$(CFLAGS) $$(EXTRA_CFLAGS) $$(CFLAGS_$$(basename $$(notdir $$<))) -MD -c -o $$@ $$<
-	@cp $(ODIR)/$$*.d $(ODIR)/$$*.P; \
-            sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$(dollar)//' \
-                -e '/^$$(dollar)/ d' -e 's/$$(dollar)/ :/' < $(ODIR)/$$*.d >> $(ODIR)/$$*.P; \
-            rm -f $(ODIR)/$$*.d
-
-$(ODIR)/%.o: $(1)%.cpp $(LIBOPENCM3)
-	@echo " + Compiling '$$<'"
-	$(CXX) $$(CXXFLAGS) $(EXTRA_CFLAGS) $$(CXXFLAGS_$$(basename $$(notdir $$<))) -MD -c -o $$@ $$<
-	@cp $(ODIR)/$$*.d $(ODIR)/$$*.P; \
-            sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$(dollar)//' \
-                -e '/^$$(dollar)/ d' -e 's/$$(dollar)/ :/' < $(ODIR)/$$*.d >> $(ODIR)/$$*.P; \
-            rm -f $(ODIR)/$$*.d
+$(ODIR)/%.o: %.cpp
+	@echo " + Compiling '$<'"
+	$(CXX) $(CXXFLAGS) $(EXTRA_CFLAGS) $(CXXFLAGS_$(basename $(notdir $<))) -c -o $@ $<
 
 #For module building
-$(ODIR)/%.o_: $(1)%.c $(LIBOPENCM3)
-	@echo " + Compiling '$$<' as module"
-	$(CC) $$(CFLAGS) $$(MODULE_CFLAGS) $$(CFLAGS_$$(basename $$(notdir $$<))) -MD -c -o $$@ $$<
-	@cp $(ODIR)/$$*.d $(ODIR)/$$*.P; \
-            sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$(dollar)//' \
-                -e '/^$$(dollar)/ d' -e 's/$$(dollar)/ :/' < $(ODIR)/$$*.d >> $(ODIR)/$$*.P; \
-            rm -f $(ODIR)/$$*.d
-
-endef
-$(foreach directory,$(sort $(dir $(SRCS) $(PROTO_EXTRA_C))),$(eval $(call define_compile_rules,$(directory))))
+$(ODIR)/%.o_: %.c
+	@echo " + Compiling '$<' as module"
+	$(CC) $(CFLAGS) $(MODULE_CFLAGS) $(CFLAGS_$(basename $(notdir $<))) -c -o $@ $<
 
 ##############################
 #Ensure version is up to date#

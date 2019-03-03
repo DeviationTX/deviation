@@ -125,3 +125,4 @@ $(ODIR)/%.bin: $(ODIR)/%.o_ $(SDIR)/protocol/exports.ld $(PROTO_LINKFILE) $(PROT
 		--cref -T$(PROTO_LINKFILE) --just-symbols=$(SYMBOL_FILE)
 	$(DUMP) -t $(@:.bin=.elf) | grep -q _from_thumb; if [ $$? -eq 0 ]; then echo "ERROR: Bad address found"; false; else true; fi
 	$(CP) -O binary  $(@:.bin=.elf) $@
+
