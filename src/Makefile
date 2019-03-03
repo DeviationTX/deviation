@@ -66,7 +66,7 @@ all_$1:
 endef
 
 # Now generate all the convenience targets
-$(foreach t,$(ALLTARGETS),$(eval $(call make-target,$t,$(notdir $(patsubst %/,%,$(dir $(wildcard target/tx/*/$(TARGET))))))))
+$(foreach t,$(ALLTARGETS),$(eval $(call make-target,$t,$(notdir $(patsubst %/,%,$(dir $(wildcard target/tx/*/$(t))))))))
 
 .PHONY: distclean
 distclean:
