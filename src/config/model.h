@@ -77,8 +77,8 @@ struct Model {
 #endif
 };
 extern struct Model Model;
+u8 radio_tx_power_int(enum Radio, enum TxPower);
 const char * radio_tx_power_val(enum Radio, enum TxPower);
-extern const u8 RADIO_TX_POWER_COUNT[TX_MODULE_LAST];
 
 u8 CONFIG_ReadModel(u8 model_num);
 u8 CONFIG_WriteModel(u8 model_num);
