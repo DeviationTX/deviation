@@ -534,7 +534,7 @@ uintptr_t Bayang_Cmds(enum ProtoCmds cmd)
     case PROTOCMD_NUMCHAN:
         return 14;
     case PROTOCMD_DEFAULT_NUMCHAN:
-        return (analogaux ? 14 : 12);
+        return 14;
     case PROTOCMD_CURRENT_ID:
         return Model.fixed_id;
     case PROTOCMD_GETOPTIONS:
