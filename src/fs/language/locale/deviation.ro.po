@@ -550,12 +550,12 @@ msgstr ""
 #: pages/320x240x16/usb_page.c:39 pages/320x240x16/usb_page.c:41
 #: pages/common/standard/_curves_page.c:109
 #: pages/common/standard/_throhold_page.c:40 pages/common/_tx_configure.c:376
-#: protocol/bayang_nrf24l01.c:98 protocol/cg023_nrf24l01.c:58
-#: protocol/dsm2_cyrf6936.c:47 protocol/dsm2_cyrf6936.c:50
-#: protocol/dsm2_cyrf6936.c:51 protocol/frsky2way_cc2500.c:38
-#: protocol/fy326_nrf24l01.c:57 protocol/hubsan_a7105.c:124
+#: protocol/bayang_nrf24l01.c:86 protocol/cg023_nrf24l01.c:44
+#: protocol/dsm2_cyrf6936.c:37 protocol/dsm2_cyrf6936.c:40
+#: protocol/dsm2_cyrf6936.c:41 protocol/frsky2way_cc2500.c:25
+#: protocol/fy326_nrf24l01.c:45 protocol/hubsan_a7105.c:124
 #: protocol/inav_nrf24l01.c:180 protocol/kn_nrf24l01.c:170
-#: protocol/symax_nrf24l01.c:107 protocol/yd717_nrf24l01.c:109
+#: protocol/symax_nrf24l01.c:94 protocol/yd717_nrf24l01.c:95
 #: telemetry/telem_dsm.c:147
 msgid "On"
 msgstr "Pornit"
@@ -572,14 +572,14 @@ msgstr "Pornit"
 #: pages/common/_tx_configure.c:250 pages/common/_tx_configure.c:265
 #: pages/common/_tx_configure.c:278 pages/common/_tx_configure.c:305
 #: pages/common/_tx_configure.c:374 pages/common/_tx_configure.c:390
-#: pages/common/_tx_configure.c:412 protocol/bayang_nrf24l01.c:98
-#: protocol/cflie_nrf24l01.c:198 protocol/cg023_nrf24l01.c:58
-#: protocol/devo_cyrf6936.c:52 protocol/dsm2_cyrf6936.c:47
-#: protocol/dsm2_cyrf6936.c:50 protocol/dsm2_cyrf6936.c:51
-#: protocol/flysky_a7105.c:46 protocol/frsky2way_cc2500.c:38
-#: protocol/fy326_nrf24l01.c:57 protocol/hubsan_a7105.c:124
+#: pages/common/_tx_configure.c:412 protocol/bayang_nrf24l01.c:86
+#: protocol/cflie_nrf24l01.c:185 protocol/cg023_nrf24l01.c:44
+#: protocol/devo_cyrf6936.c:40 protocol/dsm2_cyrf6936.c:37
+#: protocol/dsm2_cyrf6936.c:40 protocol/dsm2_cyrf6936.c:41
+#: protocol/flysky_a7105.c:36 protocol/frsky2way_cc2500.c:25
+#: protocol/fy326_nrf24l01.c:45 protocol/hubsan_a7105.c:124
 #: protocol/inav_nrf24l01.c:180 protocol/kn_nrf24l01.c:170
-#: protocol/symax_nrf24l01.c:107 protocol/yd717_nrf24l01.c:109
+#: protocol/symax_nrf24l01.c:94 protocol/yd717_nrf24l01.c:95
 msgid "Off"
 msgstr "Oprit"
 
@@ -622,7 +622,7 @@ msgstr ""
 "\n"
 "%d secunde stânga"
 
-#: pages/128x64x1/dialogs.c:132
+#: pages/128x64x1/dialogs.c:133
 msgid ""
 "Battery too low,\n"
 "can't save!"
@@ -630,7 +630,7 @@ msgstr ""
 "Nivel baterie scăzut,\n"
 "nu pot salva!"
 
-#: pages/128x64x1/dialogs.c:139
+#: pages/128x64x1/dialogs.c:140
 msgid ""
 "Model needs reset\n"
 "for standard mixer"
@@ -638,7 +638,7 @@ msgstr ""
 "Modelul trebuie să fie\n"
 " resetat pentru mixerul standard"
 
-#: pages/128x64x1/dialogs.c:153
+#: pages/128x64x1/dialogs.c:154
 msgid ""
 "Bad/missing\n"
 "protocol modules!"
@@ -646,7 +646,7 @@ msgstr ""
 "Module protocol\n"
 "lipsă sau corupte!"
 
-#: pages/128x64x1/dialogs.c:178 pages/320x240x16/dialogs.c:151
+#: pages/128x64x1/dialogs.c:179 pages/320x240x16/dialogs.c:151
 msgid "Missing Modules:\n"
 msgstr ""
 
@@ -695,7 +695,7 @@ msgid "AIL Inv"
 msgstr "AIL Inv."
 
 #: pages/128x64x1/model_config.c:69 pages/320x240x16/model_config.c:50
-#: protocol/wk2x01.c:78
+#: protocol/wk2x01.c:71
 msgid "COL Inv"
 msgstr "Colectiv inv."
 
@@ -705,7 +705,7 @@ msgstr "Colectiv inv."
 msgid "ELE Mix"
 msgstr "ELE Mix"
 
-#: pages/128x64x1/model_config.c:77 pages/128x64x1/standard/swash_page.c:50
+#: pages/128x64x1/model_config.c:77 pages/128x64x1/standard/swash_page.c:46
 #: pages/320x240x16/model_config.c:56
 #: pages/320x240x16/standard/swash_page.c:50
 msgid "AIL Mix"
@@ -787,7 +787,7 @@ msgstr "Apasa ENT pentru copiere"
 msgid "Press ENT to load"
 msgstr "Apasă ENT pentru incarcare"
 
-#: pages/128x64x1/model_page.c:38 protocol/wk2x01.c:77
+#: pages/128x64x1/model_page.c:38 protocol/wk2x01.c:70
 msgid "Heli"
 msgstr "Elic."
 
@@ -1061,7 +1061,7 @@ msgstr "Mod"
 msgid "Channel"
 msgstr "Canal"
 
-#: pages/128x64x1/standard/swash_page.c:54
+#: pages/128x64x1/standard/swash_page.c:46
 #: pages/320x240x16/standard/swash_page.c:55
 msgid "PIT Mix"
 msgstr "Mix PIT"
@@ -1531,7 +1531,7 @@ msgstr "Manual"
 msgid "Auto"
 msgstr "Auto"
 
-#: pages/320x240x16/standard/curves_page.c:127 protocol/frskyx_cc2500.c:45
+#: pages/320x240x16/standard/curves_page.c:127 protocol/frskyx_cc2500.c:31
 msgid "Enabled"
 msgstr "Activat"
 
@@ -1560,7 +1560,7 @@ msgstr "Trim"
 msgid "Touch screen"
 msgstr "Ecran tactil"
 
-#: pages/320x240x16/tx_configure.c:127 rtc.c:303
+#: pages/320x240x16/tx_configure.c:127 rtc.c:313
 msgid "Clock"
 msgstr "Ceas"
 
@@ -1635,19 +1635,19 @@ msgstr "Poz."
 msgid "Neg"
 msgstr "Neg."
 
-#: pages/common/advanced/_mixer_curves.c:157 protocol/dsm2_cyrf6936.c:48
-#: protocol/esky150_nrf24l01.c:148 protocol/kn_nrf24l01.c:167
-#: protocol/kn_nrf24l01.c:168 protocol/v202_nrf24l01.c:126
-#: protocol/v202_nrf24l01.c:127 protocol/v202_nrf24l01.c:129
-#: protocol/yd717_nrf24l01.c:107
+#: pages/common/advanced/_mixer_curves.c:157 protocol/dsm2_cyrf6936.c:38
+#: protocol/esky150_nrf24l01.c:137 protocol/kn_nrf24l01.c:167
+#: protocol/kn_nrf24l01.c:168 protocol/v202_nrf24l01.c:113
+#: protocol/v202_nrf24l01.c:114 protocol/v202_nrf24l01.c:116
+#: protocol/yd717_nrf24l01.c:93
 msgid "Yes"
 msgstr "Da"
 
-#: pages/common/advanced/_mixer_curves.c:157 protocol/dsm2_cyrf6936.c:48
-#: protocol/esky150_nrf24l01.c:148 protocol/kn_nrf24l01.c:167
-#: protocol/kn_nrf24l01.c:168 protocol/v202_nrf24l01.c:126
-#: protocol/v202_nrf24l01.c:127 protocol/v202_nrf24l01.c:129
-#: protocol/yd717_nrf24l01.c:107
+#: pages/common/advanced/_mixer_curves.c:157 protocol/dsm2_cyrf6936.c:38
+#: protocol/esky150_nrf24l01.c:137 protocol/kn_nrf24l01.c:167
+#: protocol/kn_nrf24l01.c:168 protocol/v202_nrf24l01.c:113
+#: protocol/v202_nrf24l01.c:114 protocol/v202_nrf24l01.c:116
+#: protocol/yd717_nrf24l01.c:93
 msgid "No"
 msgstr "Nu"
 
@@ -1664,7 +1664,8 @@ msgstr "Inversat"
 
 #: pages/common/advanced/_mixer_limits.c:208 pages/common/_model_config.c:36
 #: pages/common/standard/_common_standard.c:67
-#: pages/common/standard/_reverse_page.c:28 protocol/wk2x01.c:78
+#: pages/common/standard/_reverse_page.c:28 protocol/ppmout.c:41
+#: protocol/wk2x01.c:71
 msgid "Normal"
 msgstr "Normal"
 
@@ -1794,7 +1795,7 @@ msgstr "Încarcă"
 msgid "Menu"
 msgstr "Meniu"
 
-#: pages/common/_model_config.c:37 protocol/wk2x01.c:78
+#: pages/common/_model_config.c:37 protocol/ppmout.c:41 protocol/wk2x01.c:71
 msgid "Inverted"
 msgstr "Inversat"
 
@@ -1837,10 +1838,10 @@ msgid "Template.."
 msgstr "Șablon..."
 
 #: pages/common/_pages.c:110 pages/common/_pages.c:117
-#: protocol/bayang_nrf24l01.c:98 protocol/cflie_nrf24l01.c:198
-#: protocol/devo_cyrf6936.c:52 protocol/dsm2_cyrf6936.c:47
-#: protocol/frsky2way_cc2500.c:38 protocol/hubsan_a7105.c:124
-#: protocol/inav_nrf24l01.c:180 protocol/yd717_nrf24l01.c:109
+#: protocol/bayang_nrf24l01.c:86 protocol/cflie_nrf24l01.c:185
+#: protocol/devo_cyrf6936.c:40 protocol/dsm2_cyrf6936.c:37
+#: protocol/frsky2way_cc2500.c:25 protocol/hubsan_a7105.c:124
+#: protocol/inav_nrf24l01.c:180 protocol/yd717_nrf24l01.c:95
 msgid "Telemetry"
 msgstr "Telemetrie"
 
@@ -2008,128 +2009,128 @@ msgstr ""
 msgid "Deviation"
 msgstr ""
 
-#: protocol/bayang_nrf24l01.c:99 protocol/corona_cc2500.c:39
-#: protocol/cx10_nrf24l01.c:67 protocol/fq777_nrf24l01.c:81
-#: protocol/frskyx_cc2500.c:43 protocol/fy326_nrf24l01.c:56
+#: protocol/bayang_nrf24l01.c:87 protocol/corona_cc2500.c:25
+#: protocol/cx10_nrf24l01.c:53 protocol/fq777_nrf24l01.c:68
+#: protocol/frskyx_cc2500.c:29 protocol/fy326_nrf24l01.c:44
 #: protocol/h8_3d_nrf24l01.c:61 protocol/hisky_nrf24l01.c:71
 #: protocol/hitec_cc2500.c:60 protocol/hontai_nrf24l01.c:60
 #: protocol/hubsan_a7105.c:122 protocol/kn_nrf24l01.c:169
 #: protocol/mjxq_nrf24l01.c:58 protocol/mt99xx_nrf24l01.c:125
-#: protocol/q303_nrf24l01.c:74 protocol/slt_nrf24l01.c:83
-#: protocol/v202_nrf24l01.c:125 protocol/yd717_nrf24l01.c:106
+#: protocol/q303_nrf24l01.c:60 protocol/slt_nrf24l01.c:69
+#: protocol/v202_nrf24l01.c:112 protocol/yd717_nrf24l01.c:92
 msgid "Format"
 msgstr ""
 
-#: protocol/bayang_nrf24l01.c:99
+#: protocol/bayang_nrf24l01.c:87
 msgid "regular"
 msgstr ""
 
-#: protocol/bugs3_a7105.c:242 protocol/flysky_afhds2a_a7105.c:78
+#: protocol/bugs3_a7105.c:237 protocol/flysky_afhds2a_a7105.c:68
 #: protocol/hubsan_a7105.c:125 protocol/joysway_a7105.c:53
 msgid "Freq Tune"
 msgstr ""
 
-#: protocol/bugs3mini_nrf24l01.c:131
+#: protocol/bugs3mini_nrf24l01.c:117
 msgid "RX Id"
 msgstr ""
 
-#: protocol/cflie_nrf24l01.c:198
+#: protocol/cflie_nrf24l01.c:185
 msgid "ACKPKT"
 msgstr ""
 
-#: protocol/cflie_nrf24l01.c:198
+#: protocol/cflie_nrf24l01.c:185
 msgid "CRTPLOG"
 msgstr ""
 
-#: protocol/cflie_nrf24l01.c:199
+#: protocol/cflie_nrf24l01.c:186
 msgid "CRTP Mode"
 msgstr ""
 
-#: protocol/cflie_nrf24l01.c:199
+#: protocol/cflie_nrf24l01.c:186
 msgid "RPYT"
 msgstr ""
 
-#: protocol/cflie_nrf24l01.c:199
+#: protocol/cflie_nrf24l01.c:186
 msgid "CPPM"
 msgstr ""
 
-#: protocol/corona_cc2500.c:40 protocol/frsky1way_cc2500.c:38
-#: protocol/frsky2way_cc2500.c:39 protocol/frskyx_cc2500.c:42
-#: protocol/hitec_cc2500.c:61 protocol/sfhss_cc2500.c:40
+#: protocol/corona_cc2500.c:26 protocol/frsky1way_cc2500.c:25
+#: protocol/frsky2way_cc2500.c:26 protocol/frskyx_cc2500.c:28
+#: protocol/hitec_cc2500.c:61 protocol/sfhss_cc2500.c:27
 msgid "Freq-Fine"
 msgstr ""
 
-#: protocol/cx10_nrf24l01.c:67
+#: protocol/cx10_nrf24l01.c:53
 msgid "Green"
 msgstr ""
 
-#: protocol/cx10_nrf24l01.c:67
+#: protocol/cx10_nrf24l01.c:53
 msgid "Blue-A"
 msgstr ""
 
-#: protocol/devo_cyrf6936.c:52
+#: protocol/devo_cyrf6936.c:40
 msgid "Std"
 msgstr ""
 
-#: protocol/devo_cyrf6936.c:52
+#: protocol/devo_cyrf6936.c:40
 msgid "X350"
 msgstr ""
 
-#: protocol/dsm2_cyrf6936.c:48
+#: protocol/dsm2_cyrf6936.c:38
 msgid "OrangeRx"
 msgstr ""
 
-#: protocol/dsm2_cyrf6936.c:50
+#: protocol/dsm2_cyrf6936.c:40
 msgid "HighSpeed"
 msgstr ""
 
-#: protocol/dsm2_cyrf6936.c:51
+#: protocol/dsm2_cyrf6936.c:41
 msgid "F.Log filter"
 msgstr ""
 
-#: protocol/esky150_nrf24l01.c:148 protocol/kn_nrf24l01.c:167
-#: protocol/v202_nrf24l01.c:126
+#: protocol/esky150_nrf24l01.c:137 protocol/kn_nrf24l01.c:167
+#: protocol/v202_nrf24l01.c:113
 msgid "Re-bind"
 msgstr ""
 
-#: protocol/flysky_afhds2a_a7105.c:75
+#: protocol/flysky_afhds2a_a7105.c:65
 msgid "Outputs"
 msgstr ""
 
-#: protocol/flysky_afhds2a_a7105.c:76
+#: protocol/flysky_afhds2a_a7105.c:66
 msgid "Servo Hz"
 msgstr ""
 
-#: protocol/flysky_afhds2a_a7105.c:77
+#: protocol/flysky_afhds2a_a7105.c:67
 msgid "LQI output"
 msgstr ""
 
-#: protocol/frsky1way_cc2500.c:39 protocol/frsky2way_cc2500.c:40
-#: protocol/sfhss_cc2500.c:41
+#: protocol/frsky1way_cc2500.c:26 protocol/frsky2way_cc2500.c:27
+#: protocol/sfhss_cc2500.c:28
 msgid "Freq-Coarse"
 msgstr ""
 
-#: protocol/frsky2way_cc2500.c:41 protocol/frskyx_cc2500.c:41
+#: protocol/frsky2way_cc2500.c:28 protocol/frskyx_cc2500.c:27
 msgid "AD2GAIN"
 msgstr ""
 
-#: protocol/frsky2way_cc2500.c:42 protocol/frskyx_cc2500.c:44
+#: protocol/frsky2way_cc2500.c:29 protocol/frskyx_cc2500.c:30
 msgid "RSSIChan"
 msgstr ""
 
-#: protocol/frskyx_cc2500.c:40 protocol/pxxout.c:46
+#: protocol/frskyx_cc2500.c:26 protocol/pxxout.c:36
 msgid "Failsafe"
 msgstr ""
 
-#: protocol/frskyx_cc2500.c:45
+#: protocol/frskyx_cc2500.c:31
 msgid "S.PORT Out"
 msgstr ""
 
-#: protocol/frskyx_cc2500.c:45
+#: protocol/frskyx_cc2500.c:31
 msgid "Disabled"
 msgstr ""
 
-#: protocol/fy326_nrf24l01.c:57
+#: protocol/fy326_nrf24l01.c:45
 msgid "Expert"
 msgstr ""
 
@@ -2185,51 +2186,55 @@ msgstr "Depres. PW"
 msgid "Frame Size"
 msgstr "Dim. pachet"
 
-#: protocol/pxxout.c:47
+#: protocol/ppmout.c:41
+msgid "Polarity"
+msgstr ""
+
+#: protocol/pxxout.c:37
 msgid "Country"
 msgstr ""
 
-#: protocol/pxxout.c:48
+#: protocol/pxxout.c:38
 msgid "Rx PWM out"
 msgstr ""
 
-#: protocol/pxxout.c:49
+#: protocol/pxxout.c:39
 msgid "Rx Telem"
 msgstr ""
 
-#: protocol/sbus_uart.c:34
+#: protocol/sbus_uart.c:24
 msgid "Period (ms)"
 msgstr ""
 
-#: protocol/v202_nrf24l01.c:127
+#: protocol/v202_nrf24l01.c:114
 msgid "250kbps"
 msgstr ""
 
-#: protocol/v202_nrf24l01.c:129
+#: protocol/v202_nrf24l01.c:116
 msgid "Blink"
 msgstr ""
 
-#: protocol/wk2x01.c:77
+#: protocol/wk2x01.c:70
 msgid "Chan mode"
 msgstr "Mod canale"
 
-#: protocol/wk2x01.c:77
+#: protocol/wk2x01.c:70
 msgid "5+1"
 msgstr "5+1"
 
-#: protocol/wk2x01.c:77
+#: protocol/wk2x01.c:70
 msgid "6+1"
 msgstr "6+1"
 
-#: protocol/wk2x01.c:79
+#: protocol/wk2x01.c:72
 msgid "COL Limit"
 msgstr "COL Limită"
 
-#: protocol/yd717_nrf24l01.c:107
+#: protocol/yd717_nrf24l01.c:93
 msgid "USE A.ACK"
 msgstr ""
 
-#: rtc.c:303
+#: rtc.c:313
 msgid "Date"
 msgstr "Dată"
 
