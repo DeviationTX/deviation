@@ -1,6 +1,10 @@
 #ifndef _DTX_STM32F1_PWR_H_
 #define _DTX_STM32F1_PWR_H_
 
+#include <libopencm3/stm32/rcc.h>
+#include <libopencm3/stm32/flash.h>
+#include <libopencm3/cm3/scb.h>
+
 static const struct rcc_clock_scale hse_12mhz_3v3 =
 {
     /* sysclk frequency = XTAL * plln / pllm / pllp = 60 MHz */

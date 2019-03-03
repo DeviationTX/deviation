@@ -43,8 +43,10 @@
 #define HAS_MUSIC_CONFIG    0         // FIXME
 #define USE_4BUTTON_MODE    0
 #define HAS_AUDIO_UART      0
-#define HAS_STACKDUMP       0
 #define HAS_OLED_DISPLAY    0
+#define HAS_HARD_POWER_OFF  0
+
+#define SUPPORT_STACKDUMP       0
 
 #ifdef BUILDTYPE_DEV
   #define DEBUG_WINDOW_SIZE 200

@@ -47,6 +47,9 @@
 #define LED_RED_PIN   ((struct mcu_pin){GPIOC, GPIO5})
 #define LED_GREEN_PIN ((struct mcu_pin){GPIOB, GPIO1})
 #define LED_BLUE_PIN  ((struct mcu_pin){GPIOC, GPIO4})
+#define LED_STATUS_PIN     LED_BLUE_PIN
+#define LED_RF_PIN         LED_GREEN_PIN
+#define LED_STORAGE_PIN    LED_RED_PIN
 
 // Haptic
 #define HAPTIC_PIN ((struct mcu_pin){GPIOB, GPIO8})
@@ -105,7 +108,7 @@
     .sck  = {GPIOB, GPIO13}, \
     .miso = {GPIOB, GPIO14}, \
     .mosi = {GPIOB, GPIO15}, \
-    .rate = SPI_CR1_BAUDRATE_FPCLK_DIV_2, \
+    .rate = SPI_CR1_BR_FPCLK_DIV_2, \
     DEFAULT_SPI_SETTINGS, \
     .altfn = 0 })
 #define MMC_SPI_CFG SPI2_CFG
@@ -113,7 +116,7 @@
 #define MMC_PRESENT ((struct mcu_pin) {GPIOD, GPIO9})
 #define MMC_PROTECT NULL_PIN
 #define MMC_BAUDRATE_SLOW       SPI_CR1_BR_FPCLK_DIV_128
-#define MMC_BAUDRATE_FAST       SPI_CR1_BAUDRATE_FPCLK_DIV_4
+#define MMC_BAUDRATE_FAST       SPI_CR1_BR_FPCLK_DIV_2
 #define MMC_RX_DMA ((struct dma_config) { \
     .dma = DMA1,                  \
     .stream = DMA_STREAM3,        \
@@ -164,6 +167,8 @@
     .speed = i2c_speed_sm_100k, \
     })
 #define I2C_ADDRESS_VOLUME 0x5C
+
+#define PROTO_SPI_CFG ((struct spi_config) {})
 
 #define AUDIODAC_TIM TIM_CFG(2)  // TIM2
 #include "target/drivers/mcu/stm32/hardware.h"
