@@ -8,7 +8,6 @@ u8 PROTOSPI_read3wire();
 
 #define PROTOSPI_pin_set(io) GPIO_pin_set(io)
 #define PROTOSPI_pin_clear(io) GPIO_pin_clear(io)
-#define PROTOSPI_pin_get(io) GPIO_pin_get(io)
 #define PROTOSPI_xfer(byte) spi_xfer(PROTO_SPI.spi, byte)
 #define _NOP()  asm volatile ("nop")
 
