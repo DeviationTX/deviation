@@ -15,8 +15,12 @@ INLINE static inline void _spi_init(struct spi_config spi_cfg)
         GPIO_setup_input(spi_cfg.miso, ITYPE_FLOAT);
     }
     // spi_reset(spi_cfg.spi);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
+    ctassert(spi_cfg.rate < 8, use_SPI_CR1_BR_FPCLK_DIV_xx_not_SPI_CR1_BAUDRATE_FPCLK_DIV_2);
+#pragma GCC diagnostic pop
     spi_init_master(spi_cfg.spi,
-                    spi_cfg.rate,
+                    spi_cfg.rate << 3,  // spi_init_master takes a different value than spi_set_baudrate_prescalar
                     spi_cfg.cpol,
                     spi_cfg.cpha,
                     spi_cfg.dff,
