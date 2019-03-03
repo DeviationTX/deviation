@@ -1,6 +1,7 @@
 HAS_4IN1_FLASH ?= 0
 HAS_FLASH_DETECT ?= 0
 USE_JTAG ?= 0
+DFU_STRING ?= "$(HGVERSION) Firmware"
 
 ifndef BUILD_TARGET
 
@@ -117,7 +118,7 @@ $(LIBOPENCM3):
 	+$(FLOCKS) $(MAKE) -C $(SDIR)/libopencm3 TARGETS=stm32/f1 lib
 
 $(TARGET).dfu: $(TARGET).bin
-	$(SDIR)/../utils/dfu.py --name "$(HGVERSION) Firmware" $(DFU_ARGS):$< $@
+	$(SDIR)/../utils/dfu.py --name $(DFU_STRING) $(DFU_ARGS):$< $@
 	$(SDIR)/../utils/get_mem_usage.pl $(TARGET).map
 
 ###################################
