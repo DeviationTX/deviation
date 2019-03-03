@@ -2,8 +2,7 @@ HAS_4IN1_FLASH ?= 0
 HAS_FLASH_DETECT ?= 0
 USE_JTAG ?= 0
 
-ifndef BUILD_TARGET
-
+FAMILY=devo
 CROSS    = arm-none-eabi-
 EXTRA_MAKEFILES := $(EXTRA_MAKEFILES) $(SDIR)/target/tx/devo/common/Makefile.inc
 
@@ -85,8 +84,6 @@ endif
 
 ALL = $(LIBOPENCM3) $(TARGET).dfu
 
-else #BUILD_TARGET
-
 ifdef ENABLE_LTO
 $(foreach src,$(filter %_isr.c,$(SRCS)),\
             $(eval CFLAGS_$(basename $(notdir $(src))) = -fno-lto))
@@ -128,5 +125,3 @@ $(ODIR)/%.bin: $(ODIR)/%.o_ $(SDIR)/protocol/exports.ld $(PROTO_LINKFILE) $(PROT
 		--cref -T$(PROTO_LINKFILE) --just-symbols=$(SYMBOL_FILE)
 	$(DUMP) -t $(@:.bin=.elf) | grep -q _from_thumb; if [ $$? -eq 0 ]; then echo "ERROR: Bad address found"; false; else true; fi
 	$(CP) -O binary  $(@:.bin=.elf) $@
-
-endif #BUILD_TARGET

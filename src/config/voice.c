@@ -17,7 +17,7 @@
 #include <string.h>
 #include "common.h"
 #include "model.h"
-#include "../music.h"
+#include "music.h"
 #include "extended_audio.h"
 #include "tx.h"
 #include "voice.h"

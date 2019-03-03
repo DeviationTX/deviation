@@ -1,9 +1,7 @@
-ifndef BUILD_TARGET
-
-SRC_CXX  = $(wildcard target/tx/$(FAMILY)/$(TARGET)/*.cpp) \
-           $(wildcard target/drivers/mcu/emu/*.cpp)
-SRC_C  = $(wildcard target/tx/$(FAMILY)/$(TARGET)/*.c) \
-         $(wildcard target/drivers/mcu/emu/*.c) \
+SRC_CXX  = $(wildcard $(SDIR)/target/tx/$(FAMILY)/$(TARGET)/*.cpp) \
+           $(wildcard $(SDIR)/target/drivers/mcu/emu/*.cpp)
+SRC_C  = $(wildcard $(SDIR)/target/tx/$(FAMILY)/$(TARGET)/*.c) \
+         $(wildcard $(SDIR)/target/drivers/mcu/emu/*.c) \
          $(wildcard $(SDIR)/target/drivers/filesystems/*.c)
 
 ifeq ("$(SCREENSIZE)", "128x64x1")
@@ -20,9 +18,9 @@ else
 CFLAGS = -DEMULATOR=USE_NATIVE_FS
 endif
 
-CFLAGS += -Itarget/drivers/mcu/emu -I$(SDIR)/target/drivers/filesystems
+CFLAGS += -I$(SDIR)/target/drivers/mcu/emu -I$(SDIR)/target/drivers/filesystems
 
-ALL = $(TARGET).$(EXEEXT)
+ALL += $(TARGET).$(EXEEXT)
 
 TYPE ?= dev
 
@@ -44,6 +42,7 @@ ifdef WINDOWS
     EXEEXT = exe
     ODIREXT = -w32
 else
+    EXEEXT = 
     CFLAGS := $(CFLAGS) $(shell fltk-config --cflags)
     LFLAGS := $(LFLAGS) $(shell fltk-config --ldflags)
     ifndef SOUND
@@ -52,7 +51,7 @@ else
         LFLAGS := $(LFLAGS) -lportaudio
     endif
 endif
-else #BUILD_TARGET
+
 CFLAGS += -DFILESYSTEM_DIR="\"filesystem/$(FILESYSTEM)\""
 
 $(TARGET).zip: $(TARGET).$(EXEEXT) $(TARGET).fs_wrapper
@@ -66,5 +65,3 @@ ifeq "$(INCLUDE_FS)" "1"
 	zip -ur deviation-$(HGVERSION).zip filesystem/$(FILESYSTEM)
 endif
 	rm -f deviation-$(HGVERSION).$(EXEEXT)
-
-endif #BUILD_TARGET

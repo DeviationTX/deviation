@@ -1,4 +1,3 @@
-ifndef BUILD_TARGET
 CROSS    = arm-none-eabi-
 
 LINKFILE = $(SDIR)/target/tx/$(FAMILY)/$(TARGET)/$(TARGET).ld
@@ -42,8 +41,6 @@ ifdef ENABLE_LTO
 CFLAGS  += -flto -ffat-lto-objects -fwhole-program -DENABLE_LTO
 endif
 
-else #BUILD_TARGET
-
 ifdef ENABLE_LTO
 $(foreach src,$(filter %_isr.c,$(SRCS)),\
             $(eval CFLAGS_$(basename $(notdir $(src))) = -fno-lto))
@@ -55,5 +52,3 @@ $(LIBOPENCM3):
 
 $(ODIR)/devo.fs: $(LAST_MODEL) $(PRE_FS) $(TARGET).fs_wrapper
 	target/drivers/filesystems/devofs/buildfs.py -c -i -f $@ -d filesystem/$(FILESYSTEM)
-
-endif #BUILD_TARGET
