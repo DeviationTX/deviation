@@ -11,7 +11,6 @@ uint8_t spi_xfer8(uint32_t spi, uint8_t data);
 #define spi_xfer             DO_NOT_USE
 #define PROTOSPI_pin_set     PORT_pin_set
 #define PROTOSPI_pin_clear   PORT_pin_clear
-#define PROTOSPI_pin_get     PORT_pin_get
 #define PROTOSPI_xfer(byte)  spi_xfer8(SPI2, byte)
 
 #define _NOP()  asm volatile ("nop")
