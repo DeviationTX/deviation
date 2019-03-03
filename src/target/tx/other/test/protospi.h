@@ -3,8 +3,8 @@
 
 u8 PROTOSPI_read3wire();
 u8 PROTOSPI_xfer(u8 byte);
-#define PROTOSPI_pin_set(io) if(0) {}
-#define PROTOSPI_pin_clear(io) if(0) {}
+#define PROTOSPI_pin_set(io) if (0) {}
+#define PROTOSPI_pin_clear(io) if (0) {}
 #define _NOP() if(0) {}
 
 #define _SPI_CYRF_RESET_PIN {0, 0}
