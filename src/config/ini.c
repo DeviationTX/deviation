@@ -13,7 +13,7 @@ http://code.google.com/p/inih/
 
 #include "ini.h"
 
-#define MAX_LINE 200
+#define MAX_INI_LINE_LENGTH 200
 #define MAX_SECTION 50
 #define MAX_NAME 50
 
@@ -56,7 +56,7 @@ int ini_parse_file(FILE* file,
                    void* user)
 {
     /* Uses a fair bit of stack (use heap instead if you need to) */
-    char line[MAX_LINE];
+    char line[MAX_INI_LINE_LENGTH];
     char section[MAX_SECTION] = "";
     char prev_name[MAX_NAME] = "";
 
