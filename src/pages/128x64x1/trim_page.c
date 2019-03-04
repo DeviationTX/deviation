@@ -60,7 +60,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     GUI_CreateTextSelectPlate(&gui->item[relrow], TEXTSEL_X, y,
             TEXTSEL_WIDTH, LINE_HEIGHT, &TINY_FONT,  NULL, set_trimstep_cb, (void *)(long)(absrow + 0x000)); //0x000: Use Model.trims
     GUI_CreateLabelBox(&gui->name[relrow], LABEL_X, y, LABEL_WIDTH, LINE_HEIGHT,
-            &TINY_FONT, NULL, NULL,  (void *)INPUT_ButtonName(trim[absrow].pos));
+            &TINY_FONT, GUI_Localize, NULL,  (void *)INPUT_ButtonName(trim[absrow].pos));
     return 2;
 }
 
