@@ -69,6 +69,8 @@ const char * radio_tx_power_val(enum Radio radio, enum TxPower power) {
         return nrf_powers[power];
     case R9M:
         return r9m_powers[power];
+    case TX_MODULE_LAST:
+        return "";
     default:
         return NULL;    // never reached, silence warning
     }
