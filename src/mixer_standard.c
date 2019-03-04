@@ -164,9 +164,15 @@ unsigned STDMIXER_ValidateTraditionModel()
     return 1;
 }
 
+static const char * ModeNames[] =
+{
+    _tr_noop("Advanced"),
+    _tr_noop("Standard"),
+};
+
 const char *STDMIXER_ModeName(int mode)
 {
-    return mode == MIXER_ADVANCED ? _tr("Advanced") : _tr("Standard");
+    return ModeNames[mode - 0x01];
 }
 
 void STDMIXER_InitSwitches()

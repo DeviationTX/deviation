@@ -352,6 +352,6 @@ static const char *mixermode_cb(guiObject_t *obj, int dir, void *data)
             STDMIXER_SaveSwitches();
         }
     }
-    return STDMIXER_ModeName(Model.mixer_mode);
+    return _tr(STDMIXER_ModeName(Model.mixer_mode));
 }
 #endif //HAS_STANDARD_GUI
