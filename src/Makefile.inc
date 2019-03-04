@@ -94,7 +94,7 @@ define uniq =
   ${seen}
 endef
 
-VPATH = $(call uniq, $(dir $(SRCS)))
+VPATH = $(call uniq, $(dir $(SRCS))) $(SDIR)
 
 HGVERSION ?= $(shell $(SDIR)/../utils/get_version.pl ${TARGET})
 HGVERSION := $(HGVERSION)
@@ -149,7 +149,10 @@ ALL += $(TARGET).fs_wrapper
 ############################################
 #this section includes build targets       #
 ############################################
-all : $(ALL)
+default: $(TARGET)
+	echo "Done"
+
+all : $(OBJS) $(ALL)
 
 ####################################
 # recompile if the Makefile changes#
@@ -170,7 +173,7 @@ clean:
 		filesystem/$(FILESYSYTEM) 2> /dev/null || true
 
 language:
-	../utils/extract_strings.pl -po > $(SDIR)/fs/language/deviation.po
+	$(SDIR)/../utils/extract_strings.pl -po > $(SDIR)/fs/language/deviation.po
 
 
 zip: $(TARGET).zip
@@ -226,7 +229,7 @@ $(MODELDIR):
 ######################
 #The main executable #
 ######################
-$(TARGET).$(EXEEXT): $(LINKFILE) $(OBJS) $(LIBOPENCM3)
+$(SDIR)/$(TARGET).$(EXEEXT): $(LINKFILE) $(OBJS) $(LIBOPENCM3)
 	@echo " + Building '$@'"
 ifdef LINKFILE #Create an empty 'obj/$(TARGET)/optimize.ld' just in case the linker script needs it
 	echo "" > $(ODIR)/optimize.ld
@@ -237,72 +240,6 @@ else
 	$(CXX) -o $@ $(OBJS) $(LIBOPENCM3) $(LFLAGS) $(LFLAGS2) $(CFLAGS) $(EXTRA_CFLAGS)
 endif
 
-#################
-#The filesystem #
-#################
-%.fs_wrapper: $(LAST_MODEL)
-	true
-
-.PHONY: $(PRE_FS) $(LAST_MODEL)
-$(LAST_MODEL): $(SDIR)/model_template.ini $(SDIR)/tx_template.ini $(FONTS) $(PRE_FS)
-	@echo " + Copying template files for $(FILESYSTEM)"
-	mkdir -p filesystem/$(FILESYSTEM) || true
-	for i in $(FILESYSTEMS); do cp -prf $(SDIR)/fs/$$i/* filesystem/$(FILESYSTEM)/; done
-	rm filesystem/$(FILESYSTEM)/*/.ignore 2>/dev/null || true
-	cp $(SDIR)/tx_template.ini filesystem/$(FILESYSTEM)/tx.ini
-	echo 'empty' > filesystem/$(FILESYSTEM)/errors.txt
-	mkdir filesystem/$(FILESYSTEM)/models 2> /dev/null || true
-	echo 'name=Model1' > filesystem/$(FILESYSTEM)/models/model1.ini \
-		&& cat $(SDIR)/model_template.ini >> filesystem/$(FILESYSTEM)/models/model1.ini
-	cp $(SDIR)/model_template.ini filesystem/$(FILESYSTEM)/models/default.ini
-ifdef LANGUAGE
-	mkdir filesystem/$(FILESYSTEM)/language 2> /dev/null; \
-               $(SDIR)/../utils/extract_strings.pl -po -fs filesystem/$(FILESYSTEM)/language -targets $(LANGUAGE) -update -objdir $(ODIR)
-endif
-	export tx=$(FILESYSTEM); \
-	number=2 ; while [ $$number -le $(NUM_MODELS) ] ; do \
-		cp $(SDIR)/model_template.ini filesystem/$$tx/models/model$$number.ini; \
-		number=`expr $$number + 1`; \
-		done
-	@echo " + Checking string list length for $(FILESYSTEM)"
-ifeq "$(TYPE)" "dev"
-	$(SDIR)/../utils/check_string_size.pl -target $(FILESYSTEM) -objdir $(ODIR)
-else
-	$(SDIR)/../utils/check_string_size.pl -target $(FILESYSTEM) -objdir $(ODIR) -quiet
-endif
-	$(SDIR)/../utils/run_linter.py --diff --skip-github --no-fail
-
-######################
-#Necessary Font files#
-######################
-filesystem/$(FILESYSTEM)/media/12normal.fon: $(SDIR)/fonts/12normal.bdf
-	mkdir -p filesystem/$(FILESYSTEM)/media/
-	$(SDIR)/../utils/font/bdf_to_font.pl -maxsize 12 -mode bin $< -out $@ -minspace 10
-
-filesystem/$(FILESYSTEM)/media/15normal.fon: $(SDIR)/fonts/15normal.bdf
-	mkdir -p filesystem/$(FILESYSTEM)/media/
-	$(SDIR)/../utils/font/bdf_to_font.pl -maxsize 15 -mode bin $< -out $@ -minspace 8
-
-# special font for f12e with 18x12 char size
-filesystem/$(FILESYSTEM)/media/f12e.fon: $(SDIR)/fonts/f12e.bdf
-	mkdir -p filesystem/$(FILESYSTEM)/media/
-	$(SDIR)/../utils/font/bdf_to_font.pl -maxsize 18 -mode bin $< -out $@ -minspace 8
-
-filesystem/$(FILESYSTEM)/media/12ascii.fon: $(SDIR)/fonts/12normal.bdf
-	mkdir -p filesystem/$(FILESYSTEM)/media/
-	$(SDIR)/../utils/font/bdf_to_font.pl -maxsize 12 -mode bin $< -out $@ -minspace 10 -ascii
-
-filesystem/$(FILESYSTEM)/media/15ascii.fon: $(SDIR)/fonts/15normal.bdf
-	mkdir -p filesystem/$(FILESYSTEM)/media/
-	$(SDIR)/../utils/font/bdf_to_font.pl -maxsize 15 -mode bin $< -out $@ -minspace 8 -ascii
-
-filesystem/$(FILESYSTEM)/media/23bold.fon: $(SDIR)/fonts/23bold.bdf
-	mkdir -p filesystem/$(FILESYSTEM)/media/
-	$(SDIR)/../utils/font/bdf_to_font.pl -maxsize 23 -mode bin $< -out $@ -minspace 8
-
-filesystem/$(FILESYSTEM)/media/04b03.fon: $(SDIR)/fonts/04b03.bdf
-	mkdir -p filesystem/$(FILESYSTEM)/media/
-	$(SDIR)/../utils/font/bdf_to_font.pl -maxsize 5 -mode bin $< -out $@ -minspace 5
 
 ##############################
 #Build rules for all .o files#
@@ -329,7 +266,8 @@ $(ODIR)/version.o: $(ODIR)/hgstamp
 $(ODIR)/hgstamp:
 	echo $(HGVERSION) > $(ODIR)/hgstamp
 
-BUILD_TARGET := 1
 ifdef MODULAR
 include protocol/Makefile.inc
 endif
+
+include fs/Makefile.inc

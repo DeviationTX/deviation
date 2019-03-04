@@ -1,5 +1,3 @@
-ifndef BUILD_TARGET
-
 PROTO_MODULES += $(ODIR)/protocol/devo.mod
 PROTO_MODULES += $(ODIR)/protocol/dsm2.mod
 PROTO_MODULES += $(ODIR)/protocol/dsmx.mod
@@ -292,5 +290,3 @@ $(ODIR)/protocol/pxx.mod : $(ODIR)/pxxout.bin
 $(ODIR)/protocol/loli.mod : $(ODIR)/loli_nrf24l01.bin
 	@echo Building 'loli' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
-
-endif #BUILD_TARGET

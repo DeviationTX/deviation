@@ -53,7 +53,7 @@ endif
 MODULE_CFLAGS = -fno-builtin
 
 #LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -nostdlib
-LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -lc -lnosys -L$(SDIR) -L$(SDIR)/protocol -Lobjs/$(TARGET) -Wl,-warn-common
+LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -lc -lnosys -L$(SDIR) -L$(SDIR)/protocol -L$(SDIR)/objs/$(TARGET) -Wl,-warn-common
 
 LINKFILE = $(SDIR)/target/tx/devo/$(TARGET)/$(TARGET).ld
 LFLAGS2  = -Wl,-T$(LINKFILE)
@@ -82,7 +82,7 @@ endif
 
 #-lnosys
 
-ALL = $(LIBOPENCM3) $(TARGET).dfu
+ALL = $(LIBOPENCM3) $(SDIR)/$(TARGET).dfu
 
 ifdef ENABLE_LTO
 $(foreach src,$(filter %_isr.c,$(SRCS)),\
@@ -95,11 +95,11 @@ else
 	FLOCKS = flock objs/.lock
 endif
 
-$(TARGET).bin: $(TARGET).elf
+$(SDIR)/$(TARGET).bin: $(SDIR)/$(TARGET).elf
 ifdef OPTIMIZE_DFU
-	$(CP) $(TARGET).elf objs/$(TARGET)/$(TARGET).elf
+	$(CP) $(SDIR)/$(TARGET).elf $(SDIR)/objs/$(TARGET)/$(TARGET).elf
 	@echo " + Optimizing placement and re-linking"
-	$(SDIR)/../utils/repack_ld.pl -mapfile $(TARGET).map -linkfile $(LINKFILE) > objs/$(TARGET)/optimize.ld
+	$(SDIR)/../utils/repack_ld.pl -mapfile $(TARGET).map -linkfile $(LINKFILE) > $(SDIR)/objs/$(TARGET)/optimize.ld
 	$(CC) -o $< $(OBJS) $(LIBOPENCM3) $(LFLAGS) $(LFLAGS2OPT) $(CFLAGS)
 endif
 ifdef MODULAR # the following builds a symbol file with thumb addresses (address+1 for functions, address+0 for variables)
@@ -112,7 +112,7 @@ $(LIBOPENCM3):
 	test -s $(SDIR)/libopencm3/Makefile || { echo "Fetch libopencm3 via 'git submodule update --init'"; exit 1; }
 	+$(FLOCKS) $(MAKE) -C $(SDIR)/libopencm3 TARGETS=stm32/f1 lib
 
-$(TARGET).dfu: $(TARGET).bin
+$(SDIR)/$(TARGET).dfu: $(SDIR)/$(TARGET).bin
 	$(SDIR)/../utils/dfu.py --name "$(HGVERSION) Firmware" $(DFU_ARGS):$< $@
 	$(SDIR)/../utils/get_mem_usage.pl $(TARGET).map
 
