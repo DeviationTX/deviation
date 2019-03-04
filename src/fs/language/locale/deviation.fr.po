@@ -331,8 +331,8 @@ msgstr "GAUCHE_H"
 #: pages/320x240x16/datalog_page.c:92 pages/320x240x16/model_page.c:100
 #: pages/320x240x16/trim_page.c:46 pages/common/advanced/_mixer_setup.c:400
 #: pages/common/_main_config.c:177 pages/common/_main_config.c:181
-#: pages/common/_model_config.c:132 pages/common/_model_page.c:221
-#: pages/common/_model_page.c:272 pages/common/_pages.c:152
+#: pages/common/_model_config.c:132 pages/common/_model_page.c:223
+#: pages/common/_model_page.c:274 pages/common/_pages.c:152
 #: pages/common/standard/_failsafe_page.c:33
 #: pages/common/standard/_reverse_page.c:21
 #: pages/common/standard/_swash_page.c:65 pages/common/_trim_page.c:56
@@ -550,13 +550,13 @@ msgstr ""
 #: pages/320x240x16/usb_page.c:39 pages/320x240x16/usb_page.c:41
 #: pages/common/standard/_curves_page.c:109
 #: pages/common/standard/_throhold_page.c:40 pages/common/_tx_configure.c:376
-#: protocol/bayang_nrf24l01.c:86 protocol/cg023_nrf24l01.c:44
-#: protocol/dsm2_cyrf6936.c:37 protocol/dsm2_cyrf6936.c:40
-#: protocol/dsm2_cyrf6936.c:41 protocol/frsky2way_cc2500.c:25
-#: protocol/fy326_nrf24l01.c:45 protocol/hubsan_a7105.c:124
-#: protocol/inav_nrf24l01.c:180 protocol/kn_nrf24l01.c:170
-#: protocol/symax_nrf24l01.c:94 protocol/yd717_nrf24l01.c:95
-#: telemetry/telem_dsm.c:147
+#: protocol/bayang_nrf24l01.c:90 protocol/bayang_nrf24l01.c:92
+#: protocol/cg023_nrf24l01.c:44 protocol/dsm2_cyrf6936.c:37
+#: protocol/dsm2_cyrf6936.c:40 protocol/dsm2_cyrf6936.c:41
+#: protocol/frsky2way_cc2500.c:25 protocol/fy326_nrf24l01.c:45
+#: protocol/hubsan_a7105.c:124 protocol/inav_nrf24l01.c:180
+#: protocol/kn_nrf24l01.c:170 protocol/symax_nrf24l01.c:94
+#: protocol/yd717_nrf24l01.c:95 telemetry/telem_dsm.c:147
 msgid "On"
 msgstr "Marche"
 
@@ -572,14 +572,15 @@ msgstr "Marche"
 #: pages/common/_tx_configure.c:250 pages/common/_tx_configure.c:265
 #: pages/common/_tx_configure.c:278 pages/common/_tx_configure.c:305
 #: pages/common/_tx_configure.c:374 pages/common/_tx_configure.c:390
-#: pages/common/_tx_configure.c:412 protocol/bayang_nrf24l01.c:86
-#: protocol/cflie_nrf24l01.c:185 protocol/cg023_nrf24l01.c:44
-#: protocol/devo_cyrf6936.c:40 protocol/dsm2_cyrf6936.c:37
-#: protocol/dsm2_cyrf6936.c:40 protocol/dsm2_cyrf6936.c:41
-#: protocol/flysky_a7105.c:36 protocol/frsky2way_cc2500.c:25
-#: protocol/fy326_nrf24l01.c:45 protocol/hubsan_a7105.c:124
-#: protocol/inav_nrf24l01.c:180 protocol/kn_nrf24l01.c:170
-#: protocol/symax_nrf24l01.c:94 protocol/yd717_nrf24l01.c:95
+#: pages/common/_tx_configure.c:412 protocol/bayang_nrf24l01.c:90
+#: protocol/bayang_nrf24l01.c:92 protocol/cflie_nrf24l01.c:185
+#: protocol/cg023_nrf24l01.c:44 protocol/devo_cyrf6936.c:40
+#: protocol/dsm2_cyrf6936.c:37 protocol/dsm2_cyrf6936.c:40
+#: protocol/dsm2_cyrf6936.c:41 protocol/flysky_a7105.c:36
+#: protocol/frsky2way_cc2500.c:25 protocol/fy326_nrf24l01.c:45
+#: protocol/hubsan_a7105.c:124 protocol/inav_nrf24l01.c:180
+#: protocol/kn_nrf24l01.c:170 protocol/symax_nrf24l01.c:94
+#: protocol/yd717_nrf24l01.c:95
 msgid "Off"
 msgstr "Arrêt"
 
@@ -1058,7 +1059,7 @@ msgstr ""
 
 #: pages/128x64x1/standard/gyrosense_page.c:58
 #: pages/320x240x16/standard/gyrosense_page.c:64
-#: pages/common/_model_page.c:223
+#: pages/common/_model_page.c:225
 msgid "Channel"
 msgstr "Canaux"
 
@@ -1129,7 +1130,7 @@ msgid "TX"
 msgstr ""
 
 #: pages/128x64x1/timer_page.c:62 pages/320x240x16/timer_page.c:60
-#: pages/common/_datalog_page.c:63 pages/common/_model_page.c:298
+#: pages/common/_datalog_page.c:63 pages/common/_model_page.c:300
 msgid "Reset"
 msgstr "RàZ"
 
@@ -1821,28 +1822,28 @@ msgstr "Réinit."
 msgid "Bind"
 msgstr "Appairer"
 
-#: pages/common/_model_page.c:225
+#: pages/common/_model_page.c:227
 msgid "Stick"
 msgstr "Manche"
 
-#: pages/common/_model_page.c:227
+#: pages/common/_model_page.c:229
 msgid "Extend"
 msgstr "Etendu"
 
-#: pages/common/_model_page.c:292
+#: pages/common/_model_page.c:294
 msgid "Load..."
 msgstr "Charger..."
 
-#: pages/common/_model_page.c:294
+#: pages/common/_model_page.c:296
 msgid "Copy To..."
 msgstr "Copier..."
 
-#: pages/common/_model_page.c:296
+#: pages/common/_model_page.c:298
 msgid "Template.."
 msgstr "Gabarit..."
 
 #: pages/common/_pages.c:110 pages/common/_pages.c:117
-#: protocol/bayang_nrf24l01.c:86 protocol/cflie_nrf24l01.c:185
+#: protocol/bayang_nrf24l01.c:90 protocol/cflie_nrf24l01.c:185
 #: protocol/devo_cyrf6936.c:40 protocol/dsm2_cyrf6936.c:37
 #: protocol/frsky2way_cc2500.c:25 protocol/hubsan_a7105.c:124
 #: protocol/inav_nrf24l01.c:180 protocol/yd717_nrf24l01.c:95
@@ -2013,7 +2014,7 @@ msgstr ""
 msgid "Deviation"
 msgstr ""
 
-#: protocol/bayang_nrf24l01.c:87 protocol/corona_cc2500.c:25
+#: protocol/bayang_nrf24l01.c:91 protocol/corona_cc2500.c:25
 #: protocol/cx10_nrf24l01.c:53 protocol/fq777_nrf24l01.c:68
 #: protocol/frskyx_cc2500.c:29 protocol/fy326_nrf24l01.c:44
 #: protocol/h8_3d_nrf24l01.c:61 protocol/hisky_nrf24l01.c:71
@@ -2025,8 +2026,12 @@ msgstr ""
 msgid "Format"
 msgstr ""
 
-#: protocol/bayang_nrf24l01.c:87
+#: protocol/bayang_nrf24l01.c:91
 msgid "regular"
+msgstr ""
+
+#: protocol/bayang_nrf24l01.c:92
+msgid "Analog Aux"
 msgstr ""
 
 #: protocol/bugs3_a7105.c:237 protocol/flysky_afhds2a_a7105.c:68
