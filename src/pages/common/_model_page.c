@@ -76,6 +76,11 @@ const char *show_text_cb(guiObject_t *obj, const void *data)
     return tempstring;
 }
 
+const char *show_text_cb_loc(guiObject_t *obj, const void *data)
+{
+    return show_text_cb(obj, _tr(data));
+}
+
 const char *show_bindtext_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
