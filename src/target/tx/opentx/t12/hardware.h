@@ -33,8 +33,8 @@
     ADC_CHAN(GPIOA, GPIO1),  /* ADC123_1  */ \
     ADC_CHAN(GPIOA, GPIO2),  /* ADC123_2  */ \
     ADC_CHAN(GPIOA, GPIO3),  /* ADC123_3  */ \
-    ADC_CHAN(GPIOF, GPIO6),  /* ADC3_4    */ \
     ADC_CHAN(GPIOB, GPIO0),  /* ADC12_8   */ \
+    ADC_CHAN(GPIOA, GPIO6),  /* ADC12_6   */ \
     ADC_CHAN(0, 16),       /* TEMPERATURE */ \
     ADC_CHAN(GPIOC, GPIO0),  /* ADC123_10 */ \
     }
