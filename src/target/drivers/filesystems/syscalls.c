@@ -26,8 +26,12 @@
 
 #if ! defined(EMULATOR) || EMULATOR == USE_INTERNAL_FS
 extern void printstr(char *, int);
-//#define dbgprintf(args...) printf(args)
-#define dbgprintf(args...) 
+
+#define DEBUG_SYSCALLS 0
+// #define DEBUG_SYSCALLS 1
+#define dbgprintf(args...) if (DEBUG_SYSCALLS) printf(args)
+#define dbgMsec()          ((DEBUG_SYSCALLS) ? CLOCK_getms() : 0)
+
 static DIR   dir;
 #ifdef MEDIA_DRIVE
 static FATFS fat[2];
@@ -140,7 +144,7 @@ intptr_t _open_r(FIL *r, const char *file, int flags, int mode) {
             r = &fil[0];
     }
     if(fs_is_open(r)) {
-        dbgprintf("_open_r(%p): file already open.\n", r);
+        dbgprintf("_open_r(%08lx): file already open.\n", r);
         return -1;
     } else {
         fs_switchfile(r);
@@ -150,7 +154,7 @@ intptr_t _open_r(FIL *r, const char *file, int flags, int mode) {
             dbgprintf("_open_r(%08lx): fs_open (%s) flags: %d, mode: %d ok\r\n", r, file, flags, mode);
             if (flags & O_CREAT)
                 fs_maximize_file_size();
-            return (long)r;
+            return (intptr_t)r;
         } else {
             dbgprintf("_open_r(%08lx): fs_open (%s) failed: %d\r\n", r, file, res);
             return -1;
@@ -160,8 +164,8 @@ intptr_t _open_r(FIL *r, const char *file, int flags, int mode) {
 
 int _close_r(FIL *r) {
     if(r) {
-       fs_close(r);
-       dbgprintf("_close_r(%p): file closed.\r\n", r);
+       int res = fs_close(r);
+       dbgprintf("_close_r(%08lx): ret (%d) file_still_open: %08lx.\r\n", r, res, fs_is_open(r));
     }
     return 0;
 }
@@ -173,8 +177,9 @@ int _read_r(FIL *r, char * ptr, int len)
             unsigned  bytes_read = 0;
             fs_switchfile(r);
             _drive_num = fs_get_drive_num(r);
+            uint32_t start = dbgMsec();
             int res = fs_read(r, ptr, len, &bytes_read);
-            dbgprintf("_read_r: len %d, bytes_read %d, result %d\r\n", len, bytes_read, res); 
+            dbgprintf("_read_r(%08lx): len %d, bytes_read %d, result %d time: %d\r\n", r, len, bytes_read, res, dbgMsec() - start);
             if (res == FR_OK) return bytes_read;
         }
     }    
