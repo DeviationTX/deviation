@@ -27,6 +27,9 @@ EXTERN (vector_table)
 /* Define the entry point of the output file. */
 ENTRY(reset_handler)
 
+/* Keep CRC */
+EXTERN(CRC)
+
 INCLUDE exports.ld
 
 /* Define sections. */
