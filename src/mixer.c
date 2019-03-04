@@ -884,7 +884,7 @@ const char *MIXER_TemplateName(enum TemplateType template)
 const char *MIXER_SwashType(enum SwashType swash_type)
 {
     switch(swash_type) {
-        case SWASH_TYPE_NONE: return _tr("None");
+        case SWASH_TYPE_NONE: return _tr_noop("None");
         case SWASH_TYPE_120:  return "120";
         case SWASH_TYPE_120X: return "120X";
         case SWASH_TYPE_140:  return "140";

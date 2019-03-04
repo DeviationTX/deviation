@@ -22,7 +22,7 @@ static const char *swash_val_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     (void)data;
     Model.swash_type = GUI_TextSelectHelper(Model.swash_type, 0 , SWASH_TYPE_90, dir, 1, 1, NULL);
-    return MIXER_SwashType(Model.swash_type);
+    return _tr(MIXER_SwashType(Model.swash_type));
 }
 
 static const char *swashinv_val_cb(guiObject_t *obj, int dir, void *data)
