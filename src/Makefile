@@ -162,8 +162,8 @@ ifeq "$(TYPE)" "dev"
   CFLAGS   := $(CFLAGS) -DBUILDTYPE_DEV
 endif
 ifdef MODULAR
-MODULE_CFLAGS   :=  -DMODULAR=$(MODULAR)
-CFLAGS   +=  -DENABLE_MODULAR=$(MODULAR)
+MODULE_CFLAGS   := $(MODULE_CFLAGS) -DMODULAR=$(MODULAR)
+CFLAGS   := $(CFLAGS) -DENABLE_MODULAR=$(MODULAR)
 endif
 
 CFLAGS   := $(CFLAGS) -g -Wall -Wextra -Werror=undef -I. -D$(PROGMODE) -std=gnu99 -Itarget/tx/$(FAMILY)/$(TARGET) -Igui/$(SCREENSIZE) \
