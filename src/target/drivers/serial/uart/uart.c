@@ -181,3 +181,8 @@ void UART_SetDuplex(uart_duplex duplex)
     else
         USART_CR3(UART_CFG.uart) |= USART_CR3_HDSEL;
 }
+
+void UART_SendByte(u8 x)
+{
+    usart_send_blocking(UART_CFG.uart, x);
+}
