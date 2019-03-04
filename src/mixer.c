@@ -870,14 +870,14 @@ unsigned MIXER_SourceHasTrim(unsigned src)
 const char *MIXER_TemplateName(enum TemplateType template)
 {
     switch(template) {
-    case MIXERTEMPLATE_NONE :   return _tr("None");
-    case MIXERTEMPLATE_SIMPLE:  return _tr("Simple");
-    case MIXERTEMPLATE_EXPO_DR: return _tr("Expo&DR");
-    case MIXERTEMPLATE_COMPLEX: return _tr("Complex");
-    case MIXERTEMPLATE_CYC1:    return _tr("Cyclic1");
-    case MIXERTEMPLATE_CYC2:    return _tr("Cyclic2");
-    case MIXERTEMPLATE_CYC3:    return _tr("Cyclic3");
-    default:                    return _tr("Unknown");
+    case MIXERTEMPLATE_NONE :   return _tr_noop("None");
+    case MIXERTEMPLATE_SIMPLE:  return _tr_noop("Simple");
+    case MIXERTEMPLATE_EXPO_DR: return _tr_noop("Expo&DR");
+    case MIXERTEMPLATE_COMPLEX: return _tr_noop("Complex");
+    case MIXERTEMPLATE_CYC1:    return _tr_noop("Cyclic1");
+    case MIXERTEMPLATE_CYC2:    return _tr_noop("Cyclic2");
+    case MIXERTEMPLATE_CYC3:    return _tr_noop("Cyclic3");
+    default:                    return _tr_noop("Unknown");
     }
 }
 

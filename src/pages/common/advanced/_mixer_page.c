@@ -90,10 +90,8 @@ static const char *template_name_cb(guiObject_t *obj, const void *data)
     (void)obj;
     u8 ch = (long)data;
     enum TemplateType template = MIXER_GetTemplate(ch);
-    return MIXER_TemplateName(template);
+    return _tr(MIXER_TemplateName(template));
 }
-
-
 
 void show_chantest_cb(guiObject_t *obj, const void *data)
 {
