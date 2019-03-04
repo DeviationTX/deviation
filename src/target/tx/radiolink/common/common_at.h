@@ -19,5 +19,6 @@
 
 #define USE_4BUTTON_MODE    1
 #define HAS_HARD_POWER_OFF  1
+#define HAS_PWR_SWITCH_INVERTED 0
 
 #include "hardware.h"

@@ -37,4 +37,7 @@ static inline void LCD_ForceUpdate() {}
 #define HAS_HARD_POWER_OFF 0
 #endif
 
+#ifndef HAS_PWR_SWITCH_INVERTED
+#define HAS_PWR_SWITCH_INVERTED 0
+#endif
 #endif //_COMMON_DEVO_H_
