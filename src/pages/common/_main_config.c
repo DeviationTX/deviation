@@ -46,7 +46,7 @@ int elem_get_count(int type)
     return 0;
 }
 
-const char *_GetBoxSource(char *str, int src, int real)
+static const char *_GetBoxSource(char *str, int src)
 {
     if (src) {
 #if HAS_RTC
@@ -58,25 +58,20 @@ const char *_GetBoxSource(char *str, int src, int real)
         else if( src - NUM_RTC - NUM_TIMERS <= NUM_TELEM)
             return TELEMETRY_Name(str, src - NUM_RTC - NUM_TIMERS);
     }
-    if (real) {
-        return INPUT_SourceNameReal(str, src
-               ? src - (NUM_TELEM + NUM_TIMERS + NUM_RTC) + NUM_INPUTS
-               : 0);
-    } else {
-        return INPUT_SourceName(str, src
-               ? src - (NUM_TELEM + NUM_TIMERS + NUM_RTC) + NUM_INPUTS
-               : 0);
-    }
+
+    return INPUT_SourceNameReal(str, src
+           ? src - (NUM_TELEM + NUM_TIMERS + NUM_RTC) + NUM_INPUTS
+           : 0);
 }
 
 const char *GetBoxSource(char *str, int src)
 {
-    return _GetBoxSource(str, src, 0);
+    return _tr(_GetBoxSource(str, src));
 }
 
 const char *GetBoxSourceReal(char *str, int src)
 {
-    return _GetBoxSource(str, src, 1);
+    return _GetBoxSource(str, src);
 }
 
 const char *GetElemName(int type)

@@ -22,7 +22,7 @@ u32 remaining;
 const char *source_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    return _tr(DATALOG_Source(tempstring, (long)data));
+    return _tr(DATALOG_Source(tempstring, (uintptr_t)data));
 }
 
 static const char *ratesel_cb(guiObject_t *obj, int dir, void *data)
