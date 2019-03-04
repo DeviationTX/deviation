@@ -346,7 +346,7 @@ void usb_vcp_send_strn_cooked(const char *str, size_t len) {
     }
 }
 
-static int usb_putc(void *out_param, int ch) {
+static inline int usb_putc(void *out_param, int ch) {
     (void)out_param;
     if (ch == '\n') {
         usb_vcp_send_byte('\r');
@@ -400,7 +400,7 @@ void usb_vcp_init(void) {
     // A11 - USB D-
     // A12 - USB D+
 
-    GPIO_setup_input_af((struct mcu_pin){GPIOA, GPIO9 | GPIO11 | GPIO12}, ITYPE_FLOAT, GPIO_AF10);
+    GPIO_setup_output_af((struct mcu_pin){GPIOA, GPIO9 | GPIO11 | GPIO12}, OTYPE_PUSHPULL, GPIO_AF10);
 
     fill_usb_serial();
 
@@ -412,4 +412,40 @@ void usb_vcp_init(void) {
     usbd_register_sof_callback(g_usbd_dev, cdcacm_sof_callback);
 
     nvic_enable_irq(NVIC_OTG_FS_IRQ);
+}
+
+// This is a crude spin-loop to wait until user has connected USB UART
+// To ensure that all messages are displayed
+static inline void wait_for_uart()
+{
+    Initialize_ButtonMatrix();
+    uint32_t lastms = CLOCK_getms();
+    while (1) {
+        u32 buttons = ScanButtons();
+        if (CHAN_ButtonIsPressed(buttons, BUT_EXIT))
+            break;
+        if (CLOCK_getms() - lastms < 250) {
+            continue;
+        }
+        lastms = CLOCK_getms();
+        printf("hello\n");
+        gpio_toggle(GPIOC, GPIO4);
+    }
+}
+
+void UART_Initialize()
+{
+#if defined BUILDTYPE_DEV
+    usb_vcp_init();
+    wait_for_uart();
+#endif
+}
+
+void UART_Stop()
+{
+}
+
+void UART_SendByte(u8 x)
+{
+    usb_vcp_send_byte(x);
 }

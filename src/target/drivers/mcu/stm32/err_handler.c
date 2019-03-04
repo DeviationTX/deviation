@@ -44,7 +44,7 @@ static u32 debug_addr = 0;
 void write_byte(u8 x) {
     if(debug_addr)
         disk_writep(&x, 1);
-    usart_send_blocking(USART1,(x));
+    UART_SendByte(x);
 }
 void write_long(unsigned int val)
 {
