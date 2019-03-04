@@ -316,6 +316,7 @@ const char * const RTCNames[] =
 };
 const char *RTC_Name(char *str, int i)
 {
-    return RTC_Names[i];
+    (void)str;
+    return RTCNames[i];
 }
 #endif //HAS_RTC
