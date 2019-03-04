@@ -105,6 +105,8 @@ def main():
             changed = get_changed_lines_from_pr()
         else:
             changed = get_changed_lines_from_git()
+        if not changed:
+            sys.exit(0)
 
     paths = filter_paths(args.path, changed, pwd)
     violations = run_lint(paths, changed, path_delta)
@@ -188,7 +190,7 @@ def filter_paths(paths, changed, pwd):
     paths = [_p if _p.startswith(".") else os.path.join(relpath, _p) for _p in paths]
     if not changed:
         if not paths:
-            return relpath
+            return [relpath]
         return paths
     if not paths:
         return sorted(changed.keys())
@@ -214,7 +216,7 @@ def run_lint(paths, changed, path_delta):
     violations = {}
     count = {}
     errors = {}
-    
+
     cmd = 'find {} -name "*.[ch]"'.format(" ".join(paths))
     if EXCLUDE_PATHS:
         cmd += " | grep -v -E '({})'".format("|".join(EXCLUDE_PATHS))
