@@ -55,6 +55,7 @@ PROTO_MODULES += $(ODIR)/protocol/ncc1701.mod
 PROTO_MODULES += $(ODIR)/protocol/v911s.mod
 PROTO_MODULES += $(ODIR)/protocol/gd00x.mod
 PROTO_MODULES += $(ODIR)/protocol/loli.mod
+PROTO_MODULES += $(ODIR)/protocol/e016h.mod
 
 ALL += $(PROTO_MODULES)
 else #BUILD_TARGET
@@ -276,6 +277,10 @@ $(ODIR)/protocol/gd00x.mod : $(ODIR)/gd00x_nrf24l01.bin
 
 $(ODIR)/protocol/loli.mod : $(ODIR)/loli_nrf24l01.bin
 	@echo Building 'loli' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
+
+$(ODIR)/protocol/e016h.mod : $(ODIR)/e016h_nrf24l01.bin
+	@echo Building 'e016h' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
 endif #BUILD_TARGET
