@@ -198,8 +198,12 @@ void PARFlash_Init();
 void PARFlash_ReadBytes(u32 readAddress, u32 length, u8 * buffer);
 int  PARFlash_ReadBytesStopCR(u32 readAddress, u32 length, u8 * buffer);
 
+void MMC_Init();
+
+#define FLASHTYPE_NONE 0
 #define FLASHTYPE_SPI 1
 #define FLASHTYPE_MCU 2
+#define FLASHTYPE_MMC 3
 
 #if FLASHTYPE == FLASHTYPE_SPI
     #define STORAGE_Init()   SPIFlash_Init()
@@ -217,8 +221,11 @@ int  PARFlash_ReadBytesStopCR(u32 readAddress, u32 length, u8 * buffer);
     #define STORAGE_ReadBytesStopCR MCUFlash_ReadBytesStopCR
     #define STORAGE_WriteBytes MCUFlash_WriteBytes
     #define STORAGE_EraseSector MCUFlash_EraseSector
+#elif FLASHTYPE == FLASHTYPE_NONE
+    #define STORAGE_WriteEnable(enable) if (0) {}
+    #define STORAGE_Init() MMC_Init()
 #else
-#error Define FLASHTYPE to FLASHTYPE_MCU or FLASHTYPE_SPI
+#error Define FLASHTYPE to FLASHTYPE_MCU or FLASHTYPE_SPI or FLASHTYPE_MMC
 #endif
 
 
