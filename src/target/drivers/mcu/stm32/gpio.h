@@ -54,6 +54,7 @@ struct tim_config {
     unsigned tim;
     struct mcu_pin pin;
     unsigned ch;          // Timer channel
+    unsigned chn;         // Used for CH1N/CH2N
 };
 
 struct dma_config {

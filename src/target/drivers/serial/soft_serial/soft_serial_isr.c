@@ -18,7 +18,6 @@
 #include <libopencm3/stm32/usart.h>
 
 #include "common.h"
-#include "target/drivers/mcu/stm32/rcc.h"
 #include "target/drivers/mcu/stm32/tim.h"
 #include "target/drivers/mcu/stm32/exti.h"
 #include "target/drivers/mcu/stm32/nvic.h"
@@ -79,4 +78,18 @@ void __attribute__((__used__)) SSER_TIM_ISR(void) {
     if (!value) data_byte |= (1 << bit_pos);
     bit_pos += 1;
 }
-#endif
+
+#ifdef HAS_SSER_TX
+extern volatile u8 sser_transmitting;
+void __attribute__((__used__)) SSER_TX_DMA_ISR(void)
+{
+    timer_disable_counter(SSER_TX_TIM.tim);
+    nvic_disable_irq(NVIC_DMA2_STREAM1_IRQ);
+    dma_clear_interrupt_flags(SSER_TX_DMA.dma, SSER_TX_DMA.stream, DMA_TCIF);
+    dma_disable_transfer_complete_interrupt(SSER_TX_DMA.dma, SSER_TX_DMA.stream);
+    dma_disable_stream(SSER_TX_DMA.dma, SSER_TX_DMA.stream);
+    sser_transmitting = 0;
+}
+#endif  // HAS_SSER_TX
+
+#endif  // MODULAR
