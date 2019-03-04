@@ -45,6 +45,7 @@
 #define HAS_AUDIO_UART      0
 #define HAS_OLED_DISPLAY    0
 #define HAS_HARD_POWER_OFF  0
+#define HAS_PWR_SWITCH_INVERTED 1
 
 #define SUPPORT_STACKDUMP       0
 
