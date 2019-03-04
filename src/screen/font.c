@@ -16,7 +16,7 @@
 #include "gui/gui.h"
 #include "font.h"
 
-static FIL FontFH;
+static FSHANDLE FontFH;
 
 #define RANGE_TABLE_SIZE 20
 
@@ -97,9 +97,7 @@ u8 open_font(const char* fontname)
     close_font();
 
     sprintf(filename, "media/%s.fon", fontname);
-#ifdef FIL
     finit(&FontFH, "media");
-#endif
     font.fh = fopen2(&FontFH, filename, "rb");
     if (! font.fh) {
         printf("Couldn't open font file: %s\n", filename);

@@ -200,7 +200,6 @@ int  PARFlash_ReadBytesStopCR(u32 readAddress, u32 length, u8 * buffer);
 
 void MMC_Init();
 
-#define FLASHTYPE_NONE 0
 #define FLASHTYPE_SPI 1
 #define FLASHTYPE_MCU 2
 #define FLASHTYPE_MMC 3
@@ -221,7 +220,7 @@ void MMC_Init();
     #define STORAGE_ReadBytesStopCR MCUFlash_ReadBytesStopCR
     #define STORAGE_WriteBytes MCUFlash_WriteBytes
     #define STORAGE_EraseSector MCUFlash_EraseSector
-#elif FLASHTYPE == FLASHTYPE_NONE
+#elif FLASHTYPE == FLASHTYPE_MMC
     #define STORAGE_WriteEnable(enable) if (0) {}
     #define STORAGE_Init() MMC_Init()
 #else
@@ -296,6 +295,7 @@ void MSC_Enable();
 void MSC_Disable();
 
 /* Filesystem */
+int FS_Init();
 int FS_Mount(void *FAT, const char *drive);
 void FS_Unmount();
 int FS_OpenDir(const char *path);
