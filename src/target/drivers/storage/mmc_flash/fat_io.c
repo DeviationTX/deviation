@@ -106,11 +106,13 @@ static void interface_speed(enum speed_setting speed)
     {
         /* Set slow clock (100k-400k) */
         spi_set_baudrate_prescaler(MMC_SPI.spi, MMC_BAUDRATE_SLOW);
+        printf("Using slow MMC rate\n");
     }
     else
     {
         /* Set fast clock (depends on the CSD) */
         spi_set_baudrate_prescaler(MMC_SPI.spi, MMC_BAUDRATE_FAST);
+        printf("Using fast MMC rate\n");
     }
 }
 
