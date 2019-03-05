@@ -3,7 +3,7 @@
 
 #include "rcc.h"
 
-static void _spi_init(struct spi_config spi_cfg)
+INLINE static inline void _spi_init(struct spi_config spi_cfg)
 {
     rcc_periph_clock_enable(get_rcc_from_port(spi_cfg.spi));
     rcc_periph_clock_enable(get_rcc_from_pin(spi_cfg.sck));  // Assume sck, mosi, miso all on same port
