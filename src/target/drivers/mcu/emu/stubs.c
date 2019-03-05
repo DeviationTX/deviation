@@ -61,6 +61,7 @@ void CLOCK_ResetWatchdog() {
 u32  SPIFlash_ReadID() { return 0x12345678; }
 void SPIFlash_BlockWriteEnable(unsigned enable) {(void)enable;}
 void SPITouch_Init() {}
+void PARFlash_Init() {}
 
 u8 *BOOTLOADER_Read(int idx) {
     static u8 str[3][80] = {
