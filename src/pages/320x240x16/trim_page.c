@@ -45,7 +45,7 @@ static const char *negtrim_str(guiObject_t *obj, const void *data)
     if(Model.trims[i].step == TRIM_MOMENTARY || Model.trims[i].step == TRIM_TOGGLE)
         return _tr("None");
     struct Trim *trim = MIXER_GetAllTrims();
-    return INPUT_ButtonName(trim[i].neg);
+    return _tr(INPUT_ButtonName(trim[i].neg));
 }
 
 static int row_cb(int absrow, int relrow, int y, void *data)
@@ -55,7 +55,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     GUI_CreateButton(&gui->src[relrow], PCOL1, y, BUTTON_64x16,
         trimsource_name_cb, edit_trim_cb, (void *)((long)absrow));
     GUI_CreateLabel(&gui->neg[relrow], PCOL2 + 6, y, negtrim_str, DEFAULT_FONT, (void *)(long)absrow);
-    GUI_CreateLabel(&gui->pos[relrow], PCOL3 + 6, y, NULL, DEFAULT_FONT, (void *)INPUT_ButtonName(trim[absrow].pos));
+    GUI_CreateLabel(&gui->pos[relrow], PCOL3 + 6, y, GUI_Localize, DEFAULT_FONT, (void *)INPUT_ButtonName(trim[absrow].pos));
     GUI_CreateTextSelect(&gui->step[relrow], PCOL4 + 6, y, TEXTSELECT_96, NULL,
                          set_trimstep_cb, (void *)(long)(absrow + 0x000)); //0x000: Use Model.trims
     return 2;

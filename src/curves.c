@@ -218,23 +218,23 @@ s32 CURVE_Evaluate(s32 xval, struct Curve *curve)
 const char *CURVE_GetName(char *str, struct Curve *curve)
 {
     switch (CURVE_TYPE(curve)) {
-        case CURVE_NONE: return _tr("1-to-1");
-        case CURVE_FIXED: return _tr("Fixed");
-        case CURVE_MIN_MAX:  return _tr("Min/Max");
-        case CURVE_ZERO_MAX: return _tr("Zero/Max");
+        case CURVE_NONE: return _tr_noop("1-to-1");
+        case CURVE_FIXED: return _tr_noop("Fixed");
+        case CURVE_MIN_MAX:  return _tr_noop("Min/Max");
+        case CURVE_ZERO_MAX: return _tr_noop("Zero/Max");
         case CURVE_GT_ZERO:  return "> 0"; //Don't translate these
         case CURVE_LT_ZERO:  return "< 0"; //Don't translate these
-        case CURVE_ABSVAL:   return _tr("ABSVAL");
-        case CURVE_EXPO:     sprintf(str, _tr("EXPO %d"), curve->points[0]); return str;
-        case CURVE_DEADBAND: return _tr("Deadband");
-        case CURVE_3POINT:   return _tr("3 Point");
-        case CURVE_5POINT:   return _tr("5 Point");
-        case CURVE_7POINT:   return _tr("7 Point");
-        case CURVE_9POINT:   return _tr("9 Point");
-        case CURVE_11POINT:  return _tr("11 Point");
-        case CURVE_13POINT:  return _tr("13 Point");
+        case CURVE_ABSVAL:   return _tr_noop("ABSVAL");
+        case CURVE_EXPO:     sprintf(str, _tr_noop("EXPO %d"), curve->points[0]); return str;
+        case CURVE_DEADBAND: return _tr_noop("Deadband");
+        case CURVE_3POINT:   return _tr_noop("3 Point");
+        case CURVE_5POINT:   return _tr_noop("5 Point");
+        case CURVE_7POINT:   return _tr_noop("7 Point");
+        case CURVE_9POINT:   return _tr_noop("9 Point");
+        case CURVE_11POINT:  return _tr_noop("11 Point");
+        case CURVE_13POINT:  return _tr_noop("13 Point");
     }
-    return _tr("Unknown");
+    return _tr_noop("Unknown");
 }
 
 unsigned CURVE_NumPoints(struct Curve *curve)

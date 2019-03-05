@@ -77,7 +77,7 @@ const char *set_trim_cb(guiObject_t *obj, int dir, void *data)
     do {
       *button = GUI_TextSelectHelper(*button, 0, NUM_TX_BUTTONS, dir, 1, 1, NULL);
     } while ((1 << *button) & Transmitter.ignore_buttons);
-    return INPUT_ButtonName(*button);
+    return _tr(INPUT_ButtonName(*button));
 }
 
 static const char *set_trimstep_cb(guiObject_t *obj, int dir, void *data)

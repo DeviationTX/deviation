@@ -89,28 +89,24 @@
 #define INPNAME_SWH0(x,y)      x = _tr_noop("SW H"); y = 0
 #define INPNAME_SWH1(x,y)      x = _tr_noop("SW H"); y = 1
 
-#define SWITCH_NAME_GEAR0 _tr("GEAR")
-#define SWITCH_NAME_GEAR1 _tr("GEAR")
-#define SWITCH_NAME_GEAR0 _tr("GEAR")
-
-#define BUTNAME_TRIM_LV_NEG _tr("TRIMLV-")
-#define BUTNAME_TRIM_LV_POS _tr("TRIMLV+")
-#define BUTNAME_TRIM_RV_NEG _tr("TRIMRV-")
-#define BUTNAME_TRIM_RV_POS _tr("TRIMRV+")
-#define BUTNAME_TRIM_LH_NEG _tr("TRIMLH-")
-#define BUTNAME_TRIM_LH_POS _tr("TRIMLH+")
-#define BUTNAME_TRIM_RH_NEG _tr("TRIMRH-")
-#define BUTNAME_TRIM_RH_POS _tr("TRIMRH+")
-#define BUTNAME_TRIM_L_NEG  _tr("TRIM_L-")
-#define BUTNAME_TRIM_L_POS  _tr("TRIM_L+")
-#define BUTNAME_TRIM_R_NEG  _tr("TRIM_R-")
-#define BUTNAME_TRIM_R_POS  _tr("TRIM_R+")
-#define BUTNAME_LEFT        _tr("Left")
-#define BUTNAME_RIGHT       _tr("Right")
-#define BUTNAME_DOWN        _tr("Down")
-#define BUTNAME_UP          _tr("Up")
-#define BUTNAME_ENTER       _tr("Enter")
-#define BUTNAME_EXIT        _tr("Exit")
+#define BUTNAME_TRIM_LV_NEG _tr_noop("TRIMLV-")
+#define BUTNAME_TRIM_LV_POS _tr_noop("TRIMLV+")
+#define BUTNAME_TRIM_RV_NEG _tr_noop("TRIMRV-")
+#define BUTNAME_TRIM_RV_POS _tr_noop("TRIMRV+")
+#define BUTNAME_TRIM_LH_NEG _tr_noop("TRIMLH-")
+#define BUTNAME_TRIM_LH_POS _tr_noop("TRIMLH+")
+#define BUTNAME_TRIM_RH_NEG _tr_noop("TRIMRH-")
+#define BUTNAME_TRIM_RH_POS _tr_noop("TRIMRH+")
+#define BUTNAME_TRIM_L_NEG  _tr_noop("TRIM_L-")
+#define BUTNAME_TRIM_L_POS  _tr_noop("TRIM_L+")
+#define BUTNAME_TRIM_R_NEG  _tr_noop("TRIM_R-")
+#define BUTNAME_TRIM_R_POS  _tr_noop("TRIM_R+")
+#define BUTNAME_LEFT        _tr_noop("Left")
+#define BUTNAME_RIGHT       _tr_noop("Right")
+#define BUTNAME_DOWN        _tr_noop("Down")
+#define BUTNAME_UP          _tr_noop("Up")
+#define BUTNAME_ENTER       _tr_noop("Enter")
+#define BUTNAME_EXIT        _tr_noop("Exit")
 
 const char * const tx_stick_names[4] = {
     _tr_noop("RIGHT_H"),
@@ -251,11 +247,10 @@ const char *INPUT_MapSourceName(unsigned idx, unsigned *val)
     return NULL;
 }
 
-
 const char *INPUT_ButtonName(unsigned button)
 {
     if (! button) {
-        return _tr("None");
+        return "None";
     }
     #define BUTTONDEF(x) case BUT_##x : return BUTNAME_##x;
     switch(button) {

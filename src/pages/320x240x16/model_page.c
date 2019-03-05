@@ -72,7 +72,7 @@ void PAGE_ModelInit(int page)
     row += 20;
     GUI_CreateLabelBox(&gui->namelbl, COL1, row, LABEL_WIDTH, 18, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Model name"));  // use the same naming convention for devo8 and devo10
     GUI_CreateButton(&gui->name, COL2, row, BUTTON_96x16, show_text_cb, _changename_cb, Model.name);
-    GUI_CreateButton(&gui->icon, COL3, row, BUTTON_64x16, show_text_cb, changeicon_cb, _tr("Icon"));
+    GUI_CreateButton(&gui->icon, COL3, row, BUTTON_64x16, show_text_cb_loc, changeicon_cb, _tr_noop("Icon"));
 
     row += 20;
     GUI_CreateLabelBox(&gui->typelbl, COL1, row, LABEL_WIDTH, 18, &LABEL_FONT, GUI_Localize, NULL, _tr_noop("Model type"));

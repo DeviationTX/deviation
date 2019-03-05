@@ -124,7 +124,7 @@ static const char *templatetype_cb(guiObject_t *obj, int dir, void *data)
         MIXPAGE_ChangeTemplate(0);
         return "";
     }
-    return MIXER_TemplateName(mp->cur_template);
+    return _tr(MIXER_TemplateName(mp->cur_template));
 }
 
 static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data);
@@ -495,7 +495,7 @@ static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data)
         MIXPAGE_RedrawGraphs();
     }
     GUI_TextSelectEnablePress((guiTextSelect_t *)obj, type > CURVE_FIXED);
-    return CURVE_GetName(tempstring, &mix->curve);
+    return _tr(CURVE_GetName(tempstring, &mix->curve));
 }
 
 void sourceselect_cb(guiObject_t *obj, void *data)

@@ -76,6 +76,11 @@ const char *show_text_cb(guiObject_t *obj, const void *data)
     return tempstring;
 }
 
+const char *show_text_cb_loc(guiObject_t *obj, const void *data)
+{
+    return show_text_cb(obj, _tr(data));
+}
+
 const char *show_bindtext_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
@@ -347,6 +352,6 @@ static const char *mixermode_cb(guiObject_t *obj, int dir, void *data)
             STDMIXER_SaveSwitches();
         }
     }
-    return STDMIXER_ModeName(Model.mixer_mode);
+    return _tr(STDMIXER_ModeName(Model.mixer_mode));
 }
 #endif //HAS_STANDARD_GUI

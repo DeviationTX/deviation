@@ -166,7 +166,7 @@ unsigned STDMIXER_ValidateTraditionModel()
 
 const char *STDMIXER_ModeName(int mode)
 {
-    return mode == MIXER_ADVANCED ? _tr("Advanced") : _tr("Standard");
+    return mode == MIXER_ADVANCED ? _tr_noop("Advanced") : _tr_noop("Standard");
 }
 
 void STDMIXER_InitSwitches()

@@ -57,7 +57,7 @@ static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data)
             GUI_Redraw(&gui->point);
         }
     }
-    return CURVE_GetName(tempstring, curve);
+    return _tr(CURVE_GetName(tempstring, curve));
 }
 static void okcancel_cb(guiObject_t *obj, const void *data)
 {
