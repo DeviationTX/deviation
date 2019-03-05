@@ -505,7 +505,7 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
                 return 1;
 #if HAS_RTC
             for(i = 0; i < NUM_RTC; i++) {
-                if(mapstrcasecmp(ptr, RTC_Name(str, i)) == 0) {
+                if (mapstrcasecmp(ptr, RTC_Name(i)) == 0) {
                     src = i + 1;
                     break;
                 }

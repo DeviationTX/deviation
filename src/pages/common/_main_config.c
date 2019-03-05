@@ -51,7 +51,7 @@ const char *_GetBoxSource(char *str, int src, int real)
     if (src) {
 #if HAS_RTC
         if (src <= NUM_RTC)
-            return _tr(RTC_Name(str, src - 1));
+            return _tr(RTC_Name(src - 1));
 #endif
         if (src - NUM_RTC <= NUM_TIMERS)
             return TIMER_Name(str, src - NUM_RTC - 1);

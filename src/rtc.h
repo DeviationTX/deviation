@@ -63,5 +63,5 @@ void RTC_GetDateFormattedBigbox(char *str, u32 date); // only this fits in big b
 void RTC_GetDateFormattedOrder(unsigned index, u8 *left, u8 *middle, u8 *right); // for ordering the input fields
 
 //return RTC name
-const char *RTC_Name(char *str, int i);
+const char *RTC_Name(int i);
 #endif

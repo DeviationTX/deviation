@@ -308,15 +308,8 @@ void RTC_GetTimeGTM(struct gtm *t)
     t->tm_year = _RTC_GetYear(value) - 1900;
 }
 
-
-const char * const RTCNames[] =
+const char *RTC_Name(int i)
 {
-    _tr_noop("Clock"),
-    _tr_noop("Date"),
-};
-const char *RTC_Name(char *str, int i)
-{
-    (void)str;
-    return RTCNames[i];
+    return i == 0 ? _tr_noop("Clock") : _tr_noop("Date");
 }
 #endif //HAS_RTC
