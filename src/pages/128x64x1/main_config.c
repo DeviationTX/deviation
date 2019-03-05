@@ -96,7 +96,7 @@ static const char *cfglabel_cb(guiObject_t *obj, const void *data)
         str = _tr("Toggle");
         break;
     default:
-        str = GetElemName(type);
+        str = _tr(GetElemName(type));
         break;
     }
     sprintf(tempstring,"%s%d", str, idx+1);
