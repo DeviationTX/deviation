@@ -221,7 +221,7 @@ void MMC_Init();
     #define STORAGE_WriteBytes MCUFlash_WriteBytes
     #define STORAGE_EraseSector MCUFlash_EraseSector
 #elif FLASHTYPE == FLASHTYPE_MMC
-    #define STORAGE_WriteEnable(enable) if (0) {}
+    #define STORAGE_WriteEnable(enable) do {} while (0)
     #define STORAGE_Init() MMC_Init()
 #else
 #error Define FLASHTYPE to FLASHTYPE_MCU or FLASHTYPE_SPI or FLASHTYPE_MMC
