@@ -1,7 +1,7 @@
 #ifndef _T12_TARGET_H_
 #define _T12_TARGET_H_
 
-#define FLASHTYPE FLASHTYPE_NONE
+#define FLASHTYPE FLASHTYPE_MMC
 #if defined(EMULATOR) && EMULATOR == USE_NATIVE_FS
     #include "enable_native_fs.h"
 #else
