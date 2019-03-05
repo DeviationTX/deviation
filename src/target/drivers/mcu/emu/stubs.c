@@ -96,11 +96,15 @@ void fempty(FILE *fh)
     fseek(fh, 0, SEEK_SET);
 }
 
+int FS_Init() {
+    printf("Changing directory to: '%s'\n", FILESYSTEM_DIR);
+    return ! chdir(FILESYSTEM_DIR);
+}
+
 int FS_Mount(void *FAT, const char *drive) {
     (void)FAT;
     (void)drive;
-    printf("Changing directory to: '%s'\n", FILESYSTEM_DIR);
-    return ! chdir(FILESYSTEM_DIR);
+    return 1;
 }
 
 static DIR *dh;
