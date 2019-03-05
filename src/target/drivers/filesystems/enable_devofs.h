@@ -3,7 +3,12 @@
 
     #include "devofs/devofs.h"
 
-    #define FIL FATFS
+    typedef union {
+        FATFS fat;
+        FATFS fil;
+    } DRIVE;
+    #define FSHANDLE FATFS
+
     #define fs_mount      df_mount
     #define fs_open(ptr, path, flags, mode)   df_open(path, flags)
     #define fs_read(r, ptr, len, br)          df_read(ptr, len, (u16 *)(br))
@@ -20,6 +25,11 @@
     #define fs_filesize(x)                    (((x)->file_header.size1 << 8) | (x)->file_header.size2)
     #define fs_ltell(x)                       ((x)->file_cur_pos)
     #define fs_is_initialized(x)              (((FATFS *)(x))->start_sector != ((FATFS *)(x))->compact_sector)
-    #define fs_add_file_descriptor(x, y)      df_add_file_descriptor((FATFS *)(x))
+    static inline void fs_init(FSHANDLE * fh, const char *drive)
+    {
+        (void)drive;
+        if (!fs_is_initialized(fh))
+            df_add_file_descriptor((FATFS *)fh);
+    }
 
 #endif //_ENABLE_DEVOFS_H_

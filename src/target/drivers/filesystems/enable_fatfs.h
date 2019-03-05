@@ -2,6 +2,13 @@
 #define _ENABLE_FATFS_H_
 
 #include "FatFs/ff.h"
+
+    typedef struct {
+        FATFS fat;
+        FIL fil;
+    } DRIVE;
+    #define FSHANDLE FIL
+
     inline static int fs_mount(FATFS *fat) {
         int res = f_mount(fat, "", 1);
         if (res == FR_OK)
@@ -24,4 +31,8 @@
     #define fs_close                  f_close
     #define fs_filesize(x)            (x)->obj.objsize
     #define fs_switchfile(x)          (void)(x)
+    static inline void fs_init(FSHANDLE * fh, const char *drive) {
+        (void)fh;
+        (void)drive;
+    }
 #endif  // _ENABLE_FATFS_H

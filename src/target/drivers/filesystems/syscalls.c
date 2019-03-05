@@ -33,17 +33,13 @@ extern void printstr(char *, int);
 #define dbgMsec()          ((DEBUG_SYSCALLS) ? CLOCK_getms() : 0)
 
 static DIR   dir;
+
 #ifdef MEDIA_DRIVE
-static FATFS fat[2];
+static DRIVE drive[2];
 #else
-static FATFS fat[1];
+static DRIVE drive[1];
 #endif
 
-#ifdef FIL  // If FIL is #defined, it maps to FATFS
-    #define fil fat
-#else
-    static FIL fil[1];
-#endif
 extern u8 _drive_num;
 
 extern void init_err_handler();
@@ -51,31 +47,33 @@ extern void init_err_handler();
 int FS_Mount();
 void FS_Unmount();
 
-intptr_t _open_r(FIL *r, const char *file, int flags, int mode);
-int _close_r(FIL *r);
+intptr_t _open_r(FSHANDLE *r, const char *file, int flags, int mode);
+int _close_r(FSHANDLE *r);
 
 
-int _read_r(FIL *r, char * ptr, int len);
-int _write_r(FIL *r, char * ptr, int len);
-int _lseek_r(FIL *r, int ptr, int dir);
+int _read_r(FSHANDLE *r, char * ptr, int len);
+int _write_r(FSHANDLE *r, char * ptr, int len);
+int _lseek_r(FSHANDLE *r, int ptr, int dir);
 
+
+int FS_Init()
+{
+#ifdef MEDIA_DRIVE
+    int res = (FS_Mount(&drive[0].fat, "")  && FS_Mount(&drive[1].fat, "media"));
+#else 
+    int res = FS_Mount(&drive[0].fat, "");
+#endif
+    if (res) {
+        init_err_handler();
+        fs_switchfile(&drive[0].fat);
+        return 1;
+    }
+    return 0;
+}
 
 int FS_Mount(void *_f, const char *drive)
 {
     (void)drive;
-    if(! _f) {
-#ifdef MEDIA_DRIVE
-        int res = (FS_Mount(&fat[0], "")  && FS_Mount(&fat[1], "media"));
-#else 
-        int res = FS_Mount(&fat[0], "");
-#endif
-        if (res) {
-            init_err_handler();
-            fs_switchfile(&fat[0]);
-            return 1;
-        }
-        return 0;
-    }
     FATFS *f = (FATFS *)_f;
     _drive_num = 0;
 #ifdef MEDIA_DRIVE
@@ -97,10 +95,10 @@ void FS_Unmount()
 
 int FS_OpenDir(const char *path)
 {
-    FATFS *ptr = &fat[0];
+    FATFS *ptr = &drive[0].fat;
 #ifdef MEDIA_DRIVE
     if (strncmp(path, "media", 5) == 0) {
-        ptr = &fat[1];
+        ptr = &drive[1].fat;
     }
 #endif
     fs_switchfile(ptr);
@@ -131,17 +129,17 @@ void FS_CloseDir()
 {
 }
 
-intptr_t _open_r(FIL *r, const char *file, int flags, int mode) {
+intptr_t _open_r(FSHANDLE *r, const char *file, int flags, int mode) {
     (void)flags;
     (void)mode;
 
     if(!r) {
 #ifdef MEDIA_DRIVE
         if (strncmp(file, "media/", 6) == 0)
-            r = &fil[1];
+            r = (FSHANDLE *)&drive[1].fil;
         else
 #endif
-            r = &fil[0];
+            r = (FSHANDLE *)&drive[0].fil;
     }
     if(fs_is_open(r)) {
         dbgprintf("_open_r(%08lx): file already open.\n", r);
@@ -162,7 +160,7 @@ intptr_t _open_r(FIL *r, const char *file, int flags, int mode) {
     }
 }
 
-int _close_r(FIL *r) {
+int _close_r(FSHANDLE *r) {
     if(r) {
        int res = fs_close(r);
        dbgprintf("_close_r(%08lx): ret (%d) file_still_open: %08lx.\r\n", r, res, fs_is_open(r));
@@ -170,7 +168,7 @@ int _close_r(FIL *r) {
     return 0;
 }
 
-int _read_r(FIL *r, char * ptr, int len)
+int _read_r(FSHANDLE *r, char * ptr, int len)
 {
     if((unsigned long)r>2 && fs_is_open(r)) {
         if(len <= 0xffff) {
@@ -188,7 +186,7 @@ int _read_r(FIL *r, char * ptr, int len)
     return -1;
 }
 
-int _write_r(FIL *r, char * ptr, int len)
+int _write_r(FSHANDLE *r, char * ptr, int len)
 {  
     if((unsigned long)r==1 || (unsigned long)r==2) {
         printstr(ptr, len);
@@ -207,7 +205,7 @@ int _write_r(FIL *r, char * ptr, int len)
     return -1;
 }
 
-int _ltell_r(FIL *r)
+int _ltell_r(FSHANDLE *r)
 {
     if ((intptr_t)r > 2 && fs_is_open(r)) {
         return (int)fs_ltell(r);
@@ -215,7 +213,7 @@ int _ltell_r(FIL *r)
     return -1;
 }
 
-int _lseek_r(FIL *r, int ptr, int dir)
+int _lseek_r(FSHANDLE *r, int ptr, int dir)
 {
     (void)r;
     

@@ -3,10 +3,14 @@
 
     #include "petit_fat/petit_fat.h"
 
-    #define FIL FATFS
+    typedef union {
+        FATFS fat;
+        FATFS fil;
+    } DRIVE;
+    #define FSHANDLE FATFS
+
     #define fs_mount                        pf_mount
     #define fs_is_initialized(x)            (((char *)(x))[0] != 0)
-    #define fs_add_file_descriptor(x, y)    FS_Mount(x, y)
     #ifdef O_CREAT
         inline int fs_open(void *ptr, char *file, unsigned flags, int mode) {
             (void) ptr;
@@ -31,4 +35,10 @@
     #define fs_is_open(x)             ((x)->flag & FA_OPENED)
     #define fs_close(x)               (x)->flag = 0
     #define fs_filesize(x)            (x)->fsize
+    int FS_Mount(void *FAT, const char *drive);
+    static inline void fs_init(FSHANDLE * fh, const char *drive)
+    {
+        if (!fs_is_initialized(fh))
+            FS_Mount(fh, drive);
+    }
 #endif //_ENABLE_PETIT_FAT_H_
