@@ -1,11 +1,11 @@
 # Translators:
 # PhracturedBlue <rc2012@pblue.org>, 2019
-# Howard Su <howard0su@gmail.com>, 2019
 # Screwdriver_Plus <996371375@qq.com>, 2019
+# Howard Su <howard0su@gmail.com>, 2019
 # 
 msgid ""
 msgstr ""
-"Last-Translator: Screwdriver_Plus <996371375@qq.com>, 2019\n"
+"Last-Translator: Howard Su <howard0su@gmail.com>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/deviationtx/teams/73329/zh_CN/)\n"
 "Language: zh_CN\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -1764,11 +1764,11 @@ msgstr ""
 
 #: pages/common/_main_config.c:85
 msgid "Small-box"
-msgstr ""
+msgstr "小框"
 
 #: pages/common/_main_config.c:86
 msgid "Big-box"
-msgstr ""
+msgstr "大框"
 
 #: pages/common/_main_config.c:88
 msgid "Bargraph"
@@ -1776,11 +1776,11 @@ msgstr ""
 
 #: pages/common/_main_config.c:89
 msgid "V-trim"
-msgstr ""
+msgstr "竖条"
 
 #: pages/common/_main_config.c:90
 msgid "H-trim"
-msgstr ""
+msgstr "横条"
 
 #: pages/common/_main_config.c:92
 msgid "Battery"
@@ -2025,7 +2025,7 @@ msgstr "Deviation"
 #: protocol/q303_nrf24l01.c:60 protocol/slt_nrf24l01.c:69
 #: protocol/v202_nrf24l01.c:112 protocol/yd717_nrf24l01.c:92
 msgid "Format"
-msgstr ""
+msgstr "格式"
 
 #: protocol/bayang_nrf24l01.c:91
 msgid "regular"
@@ -2198,7 +2198,7 @@ msgstr "总脉宽"
 
 #: protocol/ppmout.c:41
 msgid "Polarity"
-msgstr ""
+msgstr "极性"
 
 #: protocol/pxxout.c:37
 msgid "Country"
