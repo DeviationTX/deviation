@@ -35,7 +35,7 @@ void SOUND_Init()
     timer_set_period(SOUND_TIM.tim, 65535);
 
     /* Prescaler */
-    timer_set_prescaler(SOUND_TIM.tim, TIM_FREQ_MHz(SOUND_TIM.tim) / 6 - 1);
+    timer_set_prescaler(SOUND_TIM.tim, TIM_FREQ_MHz(SOUND_TIM.tim) / 12 - 1);
     timer_generate_event(SOUND_TIM.tim, TIM_EGR_UG);
 
     /* ---- */

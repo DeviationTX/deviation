@@ -54,7 +54,7 @@ INLINE static inline uint32_t TIM_FREQ_MHz(uint32_t tim)
         case TIM9:
         case TIM10:
         case TIM11:
-            return APB2_FREQ_MHz;
+            return (APB2_FREQ_MHz == AHB_FREQ_MHz) ? APB2_FREQ_MHz : 2 * APB2_FREQ_MHz;
         case TIM2:
         case TIM3:
         case TIM4:
@@ -64,7 +64,7 @@ INLINE static inline uint32_t TIM_FREQ_MHz(uint32_t tim)
         case TIM12:
         case TIM13:
         case TIM14:
-            return APB1_FREQ_MHz;
+            return (APB1_FREQ_MHz == AHB_FREQ_MHz) ? APB1_FREQ_MHz : 2 * APB1_FREQ_MHz;
         default: return ltassert();
     }
 }
