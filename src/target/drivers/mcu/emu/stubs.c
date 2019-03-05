@@ -98,7 +98,7 @@ void fempty(FILE *fh)
 
 int FS_Init() {
     printf("Changing directory to: '%s'\n", FILESYSTEM_DIR);
-    return ! chdir(FILESYSTEM_DIR);
+    return !chdir(FILESYSTEM_DIR);
 }
 
 int FS_Mount(void *FAT, const char *drive) {
