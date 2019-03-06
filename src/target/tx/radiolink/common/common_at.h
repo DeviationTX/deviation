@@ -8,7 +8,7 @@
     #include "enable_petit_fat.h"
 #endif
 
-#if defined(HAS_4IN1_FLASH) && HAS_4IN1_FLASH
+#if (defined(HAS_4IN1_FLASH) && HAS_4IN1_FLASH) || defined(EMULATOR)
     #define FLASHTYPE FLASHTYPE_SPI
     #define HAS_FLASH_DETECT
     #define SUPPORT_STACKDUMP 1
