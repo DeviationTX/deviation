@@ -93,6 +93,7 @@ void SPI_ProtoInit()
 // If we use SPI Switch board then SPI2 is shared between RF chips
 // and flash, so it is initialized in SPIFlash.
     if (HAS_PIN(PROTO_RST_PIN)) {
+        rcc_periph_clock_enable(get_rcc_from_pin(PROTO_RST_PIN));
         GPIO_setup_output(PROTO_RST_PIN, OTYPE_PUSHPULL);
         GPIO_pin_set(PROTO_RST_PIN);
         usleep(10);
