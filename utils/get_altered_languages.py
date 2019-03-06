@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import subprocess
 import re
@@ -9,7 +9,7 @@ cmd = ['git', 'status']
 msg = sys.argv[1]
 
 res = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-lines = [line.rstrip() for line in res.stdout]
+lines = [line.decode('utf-8').rstrip() for line in res.stdout]
 
 languages = {}
 
@@ -26,4 +26,4 @@ if english:
     lang.insert(0, "en")
 if lang:
     msg += " (Languages: " + " ".join(lang) + ")"
-print msg
+print(msg)

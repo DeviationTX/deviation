@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """Run cpplint linter on C code
 
 Usage:
@@ -12,7 +12,7 @@ import os
 import re
 import sys
 import json
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import zlib
 import argparse
 import subprocess
@@ -85,7 +85,7 @@ def main():
             sys.exit(ERROR_EXIT_STATUS)
 
     pwd = os.getcwd()
-    os.chdir(system(["git", "rev-parse", "--show-toplevel"]).rstrip())
+    os.chdir(system(["git", "rev-parse", "--show-toplevel"]).decode('utf-8').rstrip())
     new_pwd = os.getcwd()
     if pwd != new_pwd and pwd.startswith(new_pwd):
         path_delta = pwd[len(new_pwd)+1:]
@@ -121,8 +121,8 @@ def get_changed_lines_from_pr():
 def get_changed_lines_from_git():
     changed = {}
     master = "master"
-    base = system(["git", "merge-base", "HEAD", master]).rstrip()
-    diff = system(["git", "diff", base]).rstrip().split("\n")
+    base = system(["git", "merge-base", "HEAD", master]).decode('utf-8').rstrip()
+    diff = system(["git", "diff", base]).decode('utf-8').rstrip().split("\n")
     return get_changed_lines_from_diff(diff)
 
 def get_changed_lines_from_diff(diff):
@@ -153,21 +153,21 @@ def get_changed_lines_from_diff(diff):
         file_pos += 1
     
     for filename in sorted(changed.keys()):
-        logging.debug("%s: %s", filename, sorted(changed[filename].keys(), key=int))
-        if not changed[filename].keys():
+        logging.debug("%s: %s", filename, sorted(list(changed[filename].keys()), key=int))
+        if not list(changed[filename].keys()):
             del changed[filename]
     return changed
 
 def get_changed_lines_from_git_old():
     changed = {}
     master = "master"
-    base = system(["git", "merge-base", "HEAD", master]).rstrip()
+    base = system(["git", "merge-base", "HEAD", master]).decode('utf-8').rstrip()
     cmd = ["git", "diff", "--name-only", "--diff-filter", "AM", base]
     sha1s = ["000000000"];
     # Find all sha's on this branch
-    sha1s += [commit[:9] for commit in system(["git", "rev-list", base + "..HEAD"]).rstrip().split('\n') if commit]
+    sha1s += [commit[:9] for commit in system(["git", "rev-list", base + "..HEAD"]).decode('utf-8').rstrip().split('\n') if commit]
     logging.debug("Mathing SHA1s: %s", sha1s)
-    files = system(cmd).rstrip().split("\n")
+    files = system(cmd).decode('utf-8').rstrip().split("\n")
     for _file in files:
         changed[_file] = {}
         _p = subprocess.Popen(["git", "blame", "--abbrev=8", _file], stdout=subprocess.PIPE)
@@ -179,7 +179,7 @@ def get_changed_lines_from_git_old():
             if not match:
                 continue
             changed[_file][int(match.group(1))] = 1
-        logging.debug("%s: %s", _file, sorted(changed[_file].keys(), key=int))
+        logging.debug("%s: %s", _file, sorted(list(changed[_file].keys()), key=int))
     return changed
 
 def filter_paths(paths, changed, pwd):
@@ -200,7 +200,7 @@ def filter_paths(paths, changed, pwd):
     logging.debug("Running: " + " ".join(cmd))
     _p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
     for line in _p.stdout:
-        line = line.rstrip()
+        line = line.decode('utf-8').rstrip()
         if line.startswith("./"):
             line = line[2:]
         if line in changed:
@@ -224,7 +224,7 @@ def run_lint(paths, changed, path_delta):
     logging.debug("Running: " + cmd)
     _p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
     for line in _p.stdout:
-        line = line.rstrip()
+        line = line.decode('utf-8').rstrip()
         match = re.search("(\S+):(\d+):\s+(.*\S)\s+\[(\S+)\]\s\[\d\]$", line)
         if match:
             filename = match.group(1)
@@ -236,7 +236,7 @@ def run_lint(paths, changed, path_delta):
                 continue
             if not changed or linenum not in changed[filename]:
                 continue
-            print cleanup_line(line, path_delta)
+            print(cleanup_line(line, path_delta))
             if filename not in errors:
                 errors[filename] = 0
             errors[filename] += 1
@@ -250,9 +250,9 @@ def run_lint(paths, changed, path_delta):
             violations[filename][linenum].append(line)
 
     if count:
-        print "\nSummary\n-------";
+        print("\nSummary\n-------");
         for err in sorted(count.keys()):
-            print "{:30s}: {}".format(err, count[err])
+            print("{:30s}: {}".format(err, count[err]))
     return violations
 
 def update_github_status(violations):
@@ -375,8 +375,8 @@ def get_url(url, headers=None):
     key = get_cache_key(url, headers)
     if key not in URL_CACHE:
         headers['Authorization'] = 'token ' + get_token()
-        request = urllib2.Request(url, None, headers)
-        res = urllib2.urlopen(request)
+        request = urllib.request.Request(url, None, headers)
+        res = urllib.request.urlopen(request)
         raise_for_status(url, res)
         URL_CACHE[key] = res.read()
     return URL_CACHE[key]
@@ -403,8 +403,8 @@ def post_status(state, context, description):
 
     logging.debug("POST: " + url)
     logging.debug("Data: " + json.dumps(data))
-    request = urllib2.Request(url, json.dumps(data), headers)
-    res = urllib2.urlopen(request)
+    request = urllib.request.Request(url, json.dumps(data), headers)
+    res = urllib.request.urlopen(request)
     raise_for_status(url, res)
 
 
@@ -421,12 +421,12 @@ def post_pull_comment(filename, offset, message):
     logging.debug("Data: " + json.dumps(data))
 
     try:
-        request = urllib2.Request(url, json.dumps(data), headers)
-        res = urllib2.urlopen(request)
+        request = urllib.request.Request(url, json.dumps(data), headers)
+        res = urllib.request.urlopen(request)
         raise_for_status(url, res)
-    except urllib2.HTTPError as e:
-        print e
-        print e.read()
+    except urllib.error.HTTPError as e:
+        print(e)
+        print(e.read())
         sys.exit(ERROR_EXIT_STATUS)
     time.sleep(1.0)
 
@@ -441,8 +441,8 @@ def post_issue_comment(message):
     logging.debug("Data: " + json.dumps(data))
 
     if True:
-        request = urllib2.Request(url, json.dumps(data), headers)
-        res = urllib2.urlopen(request)
+        request = urllib.request.Request(url, json.dumps(data), headers)
+        res = urllib.request.urlopen(request)
         raise_for_status(url, res)
 
 def delete_comment(_type, _id):
@@ -452,13 +452,13 @@ def delete_comment(_type, _id):
     logging.debug("DELETE: " + url)
 
     try:
-        request = urllib2.Request(url, None, headers)
+        request = urllib.request.Request(url, None, headers)
         request.get_method = lambda: 'DELETE'
-        res = urllib2.urlopen(request)
+        res = urllib.request.urlopen(request)
         raise_for_status(url, res)
-    except urllib2.HTTPError as e:
-        print e
-        print e.read()
+    except urllib.error.HTTPError as e:
+        print(e)
+        print(e.read())
         sys.exit(ERROR_EXIT_STATUS)
 
 

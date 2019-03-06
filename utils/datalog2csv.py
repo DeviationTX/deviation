@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import os
 import sys
@@ -33,7 +33,7 @@ class Capture(object):
             item.append(self.format_data(i, data[idx:]))
             idx += size
         if idx != self.capture_size:
-            print "Size mismatch"
+            print("Size mismatch")
             sys.exit(1)
         self.data.append(item)
     def to_model(self, value):
@@ -44,7 +44,7 @@ class Capture(object):
         telem_extra_items = 49
         telem_extra = []
         for i in range(telem_extra_items):
-            telem_extra.append("TELEM_" + `i`)
+            telem_extra.append("TELEM_" + repr(i))
         inp    = []
         outch  = ["Channel1", "Channel2", "Channel3", "Channel4",
                   "Channel5", "Channel6", "Channel7", "Channel8",
@@ -227,10 +227,10 @@ def main():
                       help="write outcpature # <value>")
     (opt, args) = parser.parse_args()
     if not opt.bin:
-        print "Must specify --bin"
+        print("Must specify --bin")
         return
     if not os.path.exists(opt.bin):
-        print "Could not locate bin file: " + opt.bin
+        print("Could not locate bin file: " + opt.bin)
         return
     if opt.clear:
         stat = os.stat(opt.bin)
@@ -269,9 +269,7 @@ def main():
         for o in out:
             printf("%s", o)
 def parse_file(bin):
-    data = []
-    for i in open(bin,'rb').read() :
-        data.append(ord(i))
+    data = open(bin,'rb').read()
     idx = 0
     size = 1
     info = []
