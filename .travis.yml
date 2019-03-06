@@ -17,6 +17,7 @@ matrix:
       - env: MAKETARGET=zip_t8sg
       - env: MAKETARGET=zip_at9
       - env: MAKETARGET=zip_devof7
+      - env: MAKETARGET=zip_t12
       - env: MAKETARGET=zip_win_emu_devo8
       - env: MAKETARGET=zip_emu_devo8
       - env: MAKETARGET=test
