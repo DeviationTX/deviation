@@ -22,7 +22,6 @@
 
 static struct mainlayout_obj * const gui = &gui_objs.u.mainlayout;
 static struct layout_page    * const lp  = &pagemem.u.layout_page;
-static struct PageCfg2       * const pc  = &Model.pagecfg2;
 
 static void draw_elements();
 static const char *newelem_cb(guiObject_t *obj, int dir, void *data);
@@ -319,7 +318,7 @@ void show_config()
         FullRedraw = draw_mode;
     }
     if(lp->selected_for_move >= 0) {
-        type = ELEM_TYPE(pc->elem[lp->selected_for_move]);
+        type = Model.elem[lp->selected_for_move].type;
         row_idx = elem_abs_to_rel(lp->selected_for_move);
         count = elem_get_count(type);
     }

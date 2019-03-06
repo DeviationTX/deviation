@@ -405,18 +405,6 @@ static int parse_int_list(const char *ptr, void *vals, int max_count, int type)
     return max_count - count;
 }
 
-static void create_element(struct elem *elem, int type, s16 *data)
-{
-    //int x, int y, int src, int e0, int e1, int e2)
-    ELEM_SET_X(*elem, data[0]);
-    ELEM_SET_Y(*elem, data[1]);
-    ELEM_SET_TYPE(*elem, type);
-    elem->src = data[5];
-    elem->extra[0] = data[2];
-    elem->extra[1] = data[3];
-    elem->extra[2] = data[4];
-}
-
 static int layout_ini_handler(void* user, const char* section, const char* name, const char* value)
 {
     struct Model *m = (struct Model *)user;
@@ -433,7 +421,7 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
         int max = PAGE_GetNumPages();
         for(i = 0; i < max; i++) {
             if(mapstrcasecmp(PAGE_GetName(i), value) == 0) {
-                m->pagecfg2.quickpage[idx] = i;
+                m->quickpage[idx] = i;
                 return 1;
             }
         }
@@ -448,7 +436,7 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
     };
     if (! MATCH_SECTION(SECTION_GUI)) {
         if(MATCH_SECTION("gui-320x240")
-           && (! ELEM_USED(Model.pagecfg2.elem[0]) || seen_res != HIRES))
+           && (Model.elem[0].type == 0 || seen_res != HIRES))
         {
             seen_res = LOWRES;
             offset_x = (LCD_WIDTH - 320) / 2;
@@ -457,7 +445,7 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
             return 1;
     } else {
         if (seen_res == LOWRES) {
-            memset(&Model.pagecfg2.elem, 0, sizeof(Model.pagecfg2.elem));
+            memset(&Model.elem, 0, sizeof(Model.elem));
         }
         seen_res = HIRES;
     }
@@ -466,20 +454,22 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
         return 1;
 #endif
     for (idx = 0; idx < NUM_ELEMS; idx++) {
-        if (! ELEM_USED(Model.pagecfg2.elem[idx]))
+        if (Model.elem[idx].type == ELEM_NONE)
             break;
     }
-
     if (idx == NUM_ELEMS) {
         printf("No free element available (max = %d)\n", NUM_ELEMS);
         return 1;
     }
+
     int type;
-    for (type = 0; type < ELEM_LAST; type++)
+    for (type = ELEM_NONE + 1; type < ELEM_LAST; type++) {
         if(mapstrcasecmp(name, GetElemName(type)) == 0)
             break;
+    }
     if (type == ELEM_LAST)
         return 1;
+
     int count = 5;
     s16 data[6] = {0};
     const char *ptr = parse_partial_int_list(value, data, &count, S16);
@@ -489,12 +479,20 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
         printf("Could not parse coordinates from %s=%s\n", name,value);
         return 1;
     }
+
+    struct elem *cur_elem;
+    cur_elem = &Model.elem[idx];
+
+    memset(cur_elem, 0, sizeof(struct elem));
+    cur_elem->x = data[0];
+    cur_elem->y = data[1];
+    cur_elem->type = type;
+
     switch(type) {
         //case ELEM_MODEL:  //x, y
         case ELEM_VTRIM:  //x, y, src
         case ELEM_HTRIM:  //x, y, src
-            data[5] = data[2];
-            data[2] = 0;
+            cur_elem->src = data[2];
             break;
         case ELEM_SMALLBOX: //x, y, src
         case ELEM_BIGBOX:   //x. y. src
@@ -535,7 +533,7 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
             }
             if (src == -1)
                 src = 0;
-            data[5] = src;
+            cur_elem->src = src;
             break;
         }
         case ELEM_BAR: //x, y, src
@@ -545,24 +543,28 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
             u8 src = get_source(section, ptr);
             if (src < NUM_INPUTS)
                 src = 0;
-            data[5] = src - NUM_INPUTS;
+            cur_elem->src = src - NUM_INPUTS;
             break;
         }
         case ELEM_TOGGLE: //x, y, tgl0, tgl1, tgl2, src
         {
             if(count)
                 return 1;
+            cur_elem->extra.ico[0] = data[2];
+            cur_elem->extra.ico[1] = data[3];
+            cur_elem->extra.ico[2] = data[4];
+
             for (int j = 0; j <= NUM_SOURCES; j++) {
                 char cmp[10];
                 if(mapstrcasecmp(INPUT_SourceNameAbbrevSwitchReal(cmp, j), ptr+1) == 0) {
-                    data[5] = j;
+                    cur_elem->src = j;
                     break;
                 }
             }
             break;
         }
     }
-    create_element(&m->pagecfg2.elem[idx], type, data);
+
     return 1;
 }
 
@@ -1391,12 +1393,13 @@ u8 CONFIG_WriteModel(u8 model_num) {
     }
     fprintf(fh, "[%s]\n", SECTION_GUI);
     for(idx = 0; idx < NUM_ELEMS; idx++) {
-        if (! ELEM_USED(Model.pagecfg2.elem[idx]))
+        struct elem *cur_elem = &Model.elem[idx];
+        if (cur_elem->type == ELEM_NONE)
             break;
-        int src = Model.pagecfg2.elem[idx].src;
-        int x = ELEM_X(Model.pagecfg2.elem[idx]);
-        int y = ELEM_Y(Model.pagecfg2.elem[idx]);
-        int type = ELEM_TYPE(Model.pagecfg2.elem[idx]);
+        int src = cur_elem->src;
+        int x = cur_elem->x;
+        int y = cur_elem->y;
+        int type = cur_elem->type;
         const char *elename = GetElemName(type);
         switch(type) {
             case ELEM_SMALLBOX:
@@ -1409,9 +1412,9 @@ u8 CONFIG_WriteModel(u8 model_num) {
                 break;
             case ELEM_TOGGLE:
                 fprintf(fh, "%s=%d,%d,%d,%d,%d,%s\n", elename, x, y,
-                        Model.pagecfg2.elem[idx].extra[0],
-                        Model.pagecfg2.elem[idx].extra[1],
-                        INPUT_NumSwitchPos(src) == 2 ? 0 : Model.pagecfg2.elem[idx].extra[2],
+                        cur_elem->extra.ico[0],
+                        cur_elem->extra.ico[1],
+                        INPUT_NumSwitchPos(src) == 2 ? 0 : cur_elem->extra.ico[2],
                         INPUT_SourceNameAbbrevSwitchReal(file, src));
                 break;
             case ELEM_HTRIM:
@@ -1424,8 +1427,8 @@ u8 CONFIG_WriteModel(u8 model_num) {
         }
     }
     for(idx = 0; idx < NUM_QUICKPAGES; idx++) {
-        if (WRITE_FULL_MODEL || m->pagecfg2.quickpage[idx]) {
-            u8 val = m->pagecfg2.quickpage[idx];
+        if (WRITE_FULL_MODEL || m->quickpage[idx]) {
+            u8 val = m->quickpage[idx];
             fprintf(fh, "%s%d=%s\n", GUI_QUICKPAGE, idx+1, PAGE_GetName(val));
         }
     }
@@ -1507,7 +1510,7 @@ u8 CONFIG_ReadModel(u8 model_num) {
     if (CONFIG_IniParse(file, ini_handler, &Model)) {
         printf("Failed to parse Model file: %s\n", file);
     }
-    if (! ELEM_USED(Model.pagecfg2.elem[0]))
+    if (Model.elem[0].type == ELEM_NONE)
         CONFIG_ReadLayout("layout/default.ini");
     if(! PROTOCOL_HasPowerAmp(Model.protocol))
         Model.tx_power = TXPOWER_150mW;
@@ -1634,7 +1637,7 @@ u8 CONFIG_ReadTemplate(const char *filename) {
 }
 
 u8 CONFIG_ReadLayout(const char *filename) {
-    memset(&Model.pagecfg2, 0, sizeof(Model.pagecfg2));
+    memset(&Model.elem, 0, sizeof(Model.elem));
     if (CONFIG_IniParse(filename, layout_ini_handler, &Model)) {
         printf("Failed to parse Layout file: %s\n", filename);
         return 0;

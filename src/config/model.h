@@ -65,7 +65,8 @@ struct Model {
     struct Mixer mixers[NUM_MIXERS];
     struct Limit limits[NUM_OUT_CHANNELS];
     struct Timer timer[NUM_TIMERS];
-    struct PageCfg2 pagecfg2;
+    struct elem elem[NUM_ELEMS];
+    u8 quickpage[NUM_QUICKPAGES];
 #if HAS_DATALOG
     struct datalog datalog;
 #endif

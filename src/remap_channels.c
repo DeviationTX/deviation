@@ -106,16 +106,16 @@ void RemapChannelsForProtocol(const u8 *oldmap)
     }
     //Map display
     for(i = 0; i < NUM_ELEMS; i++) {
-        switch(ELEM_TYPE(Model.pagecfg2.elem[i])) {
+        switch (Model.elem[i].type) {
             case ELEM_SMALLBOX:
             case ELEM_BIGBOX:
-                _map_inp(chmap, &Model.pagecfg2.elem[i].src, NUM_TELEM + NUM_TIMERS + NUM_RTC+1);
+                _map_inp(chmap, &Model.elem[i].src, NUM_TELEM + NUM_TIMERS + NUM_RTC+1);
                 break;
             case ELEM_BAR:
-                _map_inp(chmap, &Model.pagecfg2.elem[i].src, 1);
+                _map_inp(chmap, &Model.elem[i].src, 1);
                 break;
             case ELEM_TOGGLE:
-                map_inp(chmap, &Model.pagecfg2.elem[i].src);
+                map_inp(chmap, &Model.elem[i].src);
                 break;
         }
     }

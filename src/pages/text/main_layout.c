@@ -22,7 +22,6 @@
 #if HAS_LAYOUT_EDITOR
 
 static struct layout_page    * const lp  = &pagemem.u.layout_page;
-static struct PageCfg2       * const pc  = &Model.pagecfg2;
 static struct mainlayout_obj * const gui = &gui_objs.u.mainlayout;
 
 #define NUMERIC_LABELS

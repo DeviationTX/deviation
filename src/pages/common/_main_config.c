@@ -17,7 +17,7 @@
 
 int elem_abs_to_rel(int idx)
 {
-    unsigned type = ELEM_TYPE(pc->elem[idx]);
+    unsigned type = Model.elem[idx].type;
     int nxt = -1;
     for (int i = 0; i < NUM_ELEMS-1; i++) {
         nxt = MAINPAGE_FindNextElem(type, nxt+1);
@@ -109,7 +109,7 @@ int create_element()
     int i;
     u16 x,y,w,h;
     for (i = 0; i < NUM_ELEMS; i++)
-        if (! ELEM_USED(pc->elem[i]))
+        if (Model.elem[i].type == ELEM_NONE)
             break;
     if (i == NUM_ELEMS)
         return -1;
@@ -117,10 +117,10 @@ int create_element()
     GetElementSize(lp->newelem, &w, &h);
     x = (LCD_WIDTH - w) / 2;
     y = (((LCD_HEIGHT - HEADER_Y) - h) / 2) + HEADER_Y;
-    memset(&pc->elem[i], 0, sizeof(struct elem));
-    ELEM_SET_X(pc->elem[i], x);
-    ELEM_SET_Y(pc->elem[i], y);
-    ELEM_SET_TYPE(pc->elem[i], lp->newelem);
+    memset(&Model.elem[i], 0, sizeof(struct elem));
+    Model.elem[i].x = x;
+    Model.elem[i].y = y;
+    Model.elem[i].type = lp->newelem;
     return i;
 }
 
@@ -150,32 +150,32 @@ static const char *dlgts_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     int idx = (long)data;
-    int type = ELEM_TYPE(pc->elem[idx]);
+    int type = Model.elem[idx].type;
     switch (type) {
         case ELEM_SMALLBOX:
         case ELEM_BIGBOX:
         {
             u8 changed = 0;
-            pc->elem[idx].src = GUI_TextSelectHelper(pc->elem[idx].src, 0, NUM_RTC + NUM_TELEM + NUM_TIMERS + NUM_CHANNELS, dir, 1, 1, &changed);
+            Model.elem[idx].src = GUI_TextSelectHelper(Model.elem[idx].src, 0, NUM_RTC + NUM_TELEM + NUM_TIMERS + NUM_CHANNELS, dir, 1, 1, &changed);
             if(changed && dir) {
-                pc->elem[idx].src = _adjust_src_for_telemetry(pc->elem[idx].src, dir);
+                Model.elem[idx].src = _adjust_src_for_telemetry(Model.elem[idx].src, dir);
             }
-            return GetBoxSource(tempstring, pc->elem[idx].src);
+            return GetBoxSource(tempstring, Model.elem[idx].src);
         }
         case ELEM_BAR:
-            pc->elem[idx].src = GUI_TextSelectHelper(pc->elem[idx].src, 0, NUM_CHANNELS, dir, 1, 1, NULL);
-            return INPUT_SourceName(tempstring, pc->elem[idx].src ? pc->elem[idx].src + NUM_INPUTS : 0);
+            Model.elem[idx].src = GUI_TextSelectHelper(Model.elem[idx].src, 0, NUM_CHANNELS, dir, 1, 1, NULL);
+            return INPUT_SourceName(tempstring, Model.elem[idx].src ? Model.elem[idx].src + NUM_INPUTS : 0);
         case ELEM_TOGGLE:
         {
-            pc->elem[idx].src = INPUT_SelectAbbrevSource(pc->elem[idx].src, dir);
-            return INPUT_SourceNameAbbrevSwitch(tempstring, pc->elem[idx].src);
+            Model.elem[idx].src = INPUT_SelectAbbrevSource(Model.elem[idx].src, dir);
+            return INPUT_SourceNameAbbrevSwitch(tempstring, Model.elem[idx].src);
         }
         case ELEM_HTRIM:
         case ELEM_VTRIM:
-            pc->elem[idx].src = GUI_TextSelectHelper(pc->elem[idx].src, 0, NUM_TRIMS, dir, 1, 1, NULL);
-            if (pc->elem[idx].src == 0)
+            Model.elem[idx].src = GUI_TextSelectHelper(Model.elem[idx].src, 0, NUM_TRIMS, dir, 1, 1, NULL);
+            if (Model.elem[idx].src == 0)
                 return _tr("None");
-            snprintf(tempstring, sizeof(tempstring), "%s%d", _tr("Trim"),pc->elem[idx].src);
+            snprintf(tempstring, sizeof(tempstring), "%s%d", _tr("Trim"), Model.elem[idx].src);
             return tempstring;
     }
     return _tr("None");
@@ -195,7 +195,7 @@ static void dlgbut_cb(struct guiObject *obj, const void *data)
         FullRedraw = draw_mode;
     }
     //Erase object
-    GetWidgetLoc(&pc->elem[idx], &x, &y, &w, &h);
+    GetWidgetLoc(&Model.elem[idx], &x, &y, &w, &h);
     if (x > 0) {
         x -= 1;
         w += 2;
@@ -213,14 +213,14 @@ static void dlgbut_cb(struct guiObject *obj, const void *data)
     GUI_DrawBackground(x, y, w, h);
 #endif
     //Remove object
-    int type = ELEM_TYPE(pc->elem[idx]);
+    int type = Model.elem[idx].type;
     for(i = idx+1; i < NUM_ELEMS; i++) {
-        if (! ELEM_USED(pc->elem[i]))
+        if (Model.elem[i].type == ELEM_NONE)
             break;
-        pc->elem[i-1] = pc->elem[i];
+        Model.elem[i-1] = Model.elem[i];
     }
-         ELEM_SET_X(pc->elem[i-1], 0);
-         ELEM_SET_Y(pc->elem[i-1], 0);
+    Model.elem[i-1].x = 0;
+    Model.elem[i-1].y = 0;
     idx = MAINPAGE_FindNextElem(type, 0);
     set_selected_for_move(idx);
     //close the dialog and reopen with new elements
@@ -242,14 +242,14 @@ const char *menusel_cb(guiObject_t *obj, int dir, void *data)
     int i = (long)data;
     int max_pages = PAGE_GetNumPages();
     int start_page = PAGE_GetStartPage();
-    int page = GUI_TextSelectHelper(pc->quickpage[i], start_page, max_pages -1, dir, 1, 1, NULL);
-    if (page != pc->quickpage[i]) {
-        int increment = (page > pc->quickpage[i]) ? 1 : -1;
+    int page = GUI_TextSelectHelper(Model.quickpage[i], start_page, max_pages -1, dir, 1, 1, NULL);
+    if (page != Model.quickpage[i]) {
+        int increment = (page > Model.quickpage[i]) ? 1 : -1;
         while (page >= start_page && page != max_pages && ! PAGE_IsValidQuickPage(page)) {
             page = (page + increment);
         }
         if (page >= start_page && page != max_pages)
-            pc->quickpage[i] = page;
+            Model.quickpage[i] = page;
     }
-    return PAGE_GetName(pc->quickpage[i]);
+    return PAGE_GetName(Model.quickpage[i]);
 }
