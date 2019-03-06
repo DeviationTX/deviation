@@ -55,7 +55,7 @@
 #define ADDRESS_LENGTH     5
 
 static const char * const mjxq_opts[] = {
-  _tr_noop("Format"), "WLH08", "X600", "X800", "H26D", "H26WH", "E010", NULL,
+  _tr_noop("Format"), "WLH08", "X600", "X800", "H26D", "H26WH", "E010", "Phoenix", NULL,
   NULL
 };
 enum {
@@ -69,6 +69,7 @@ enum {
     FORMAT_H26D,
     FORMAT_H26WH,
     FORMAT_E010,
+    FORMAT_PHOENIX,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
@@ -212,6 +213,7 @@ static void send_packet(u8 bind)
         /* FALLTHROUGH */
     case FORMAT_WLH08:
     case FORMAT_E010:
+    case FORMAT_PHOENIX:
         packet[10] += GET_FLAG(CHANNEL_RTH, 0x02)
                     | GET_FLAG(CHANNEL_HEADLESS, 0x01);
         if (!bind) {
@@ -220,7 +222,8 @@ static void send_packet(u8 bind)
                        | GET_FLAG(CHANNEL_PICTURE, 0x08)
                        | GET_FLAG(CHANNEL_VIDEO, 0x10)
                        | GET_FLAG_INV(CHANNEL_LED, 0x20); // air/ground mode
-            if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H26WH) {
+            if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H26WH ||
+                Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_PHOENIX ) {
                 packet[10] |= 0x40;  // high rate
                 packet[14] &= ~0x24; // unset air/ground & arm flags
                 packet[14] |= GET_FLAG(CHANNEL_ARM, 0x02);
@@ -303,6 +306,7 @@ static void mjxq_init()
         case FORMAT_H26D:
         case FORMAT_H26WH:
         case FORMAT_E010:
+        case FORMAT_PHOENIX:
             memcpy(rf_channels, "\x36\x3e\x46\x2e", sizeof(rf_channels));
             break;
         default:
@@ -352,6 +356,7 @@ static void mjxq_init2()
             memcpy(rf_channels, "\x47\x42\x37\x32", sizeof(rf_channels));
             break;
         case FORMAT_E010:
+        case FORMAT_PHOENIX:
             memcpy(rf_channels, e010_tx_rf_map[Model.fixed_id % (sizeof(e010_tx_rf_map)/sizeof(e010_tx_rf_map[0]))].rfchan, sizeof(rf_channels));
             break;
         case FORMAT_H26D:
@@ -419,6 +424,7 @@ static void initialize_txid()
             memcpy(txid, "\xa4\x03\x00", sizeof(txid));
             break;
         case FORMAT_E010:
+        case FORMAT_PHOENIX:
             memcpy(txid, e010_tx_rf_map[Model.fixed_id % (sizeof(e010_tx_rf_map)/sizeof(e010_tx_rf_map[0]))].txid, 2);
             txid[2] = 0x00;
             break;
