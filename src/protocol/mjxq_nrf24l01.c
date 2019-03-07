@@ -338,7 +338,8 @@ static void mjxq_init()
     NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x01);
     NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0x00); // no retransmits
     NRF24L01_WriteReg(NRF24L01_11_RX_PW_P0, PACKET_SIZE);
-    if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_E010)
+    if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_E010 
+     || Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_PHOENIX)
         NRF24L01_SetBitrate(NRF24L01_BR_250K);             // 250kbps
     else
         NRF24L01_SetBitrate(NRF24L01_BR_1M);             // 1Mbps
