@@ -18,6 +18,8 @@ import argparse
 import subprocess
 import time
 import logging
+import binascii
+
 from collections import namedtuple
 
 
@@ -85,7 +87,7 @@ def main():
             sys.exit(ERROR_EXIT_STATUS)
 
     pwd = os.getcwd()
-    os.chdir(system(["git", "rev-parse", "--show-toplevel"]).decode('utf-8').rstrip())
+    os.chdir(system(["git", "rev-parse", "--show-toplevel"]).rstrip())
     new_pwd = os.getcwd()
     if pwd != new_pwd and pwd.startswith(new_pwd):
         path_delta = pwd[len(new_pwd)+1:]
@@ -115,14 +117,14 @@ def main():
 
 def get_changed_lines_from_pr():
     url = 'https://api.github.com/repos/{}/pulls/{}'.format(TRAVIS_REPO_SLUG, TRAVIS_PULL_REQUEST)
-    diff = get_url(url, {"Accept": "application/vnd.github.v3.diff"}).split('\n')
+    diff = get_url(url, {"Accept": "application/vnd.github.v3.diff"}).decode('utf-8').split('\n')
     return get_changed_lines_from_diff(diff)
 
 def get_changed_lines_from_git():
     changed = {}
     master = "master"
-    base = system(["git", "merge-base", "HEAD", master]).decode('utf-8').rstrip()
-    diff = system(["git", "diff", base]).decode('utf-8').rstrip().split("\n")
+    base = system(["git", "merge-base", "HEAD", master]).rstrip()
+    diff = system(["git", "diff", base]).rstrip().split("\n")
     return get_changed_lines_from_diff(diff)
 
 def get_changed_lines_from_diff(diff):
@@ -161,13 +163,13 @@ def get_changed_lines_from_diff(diff):
 def get_changed_lines_from_git_old():
     changed = {}
     master = "master"
-    base = system(["git", "merge-base", "HEAD", master]).decode('utf-8').rstrip()
+    base = system(["git", "merge-base", "HEAD", master]).rstrip()
     cmd = ["git", "diff", "--name-only", "--diff-filter", "AM", base]
     sha1s = ["000000000"];
     # Find all sha's on this branch
-    sha1s += [commit[:9] for commit in system(["git", "rev-list", base + "..HEAD"]).decode('utf-8').rstrip().split('\n') if commit]
+    sha1s += [commit[:9] for commit in system(["git", "rev-list", base + "..HEAD"]).rstrip().split('\n') if commit]
     logging.debug("Mathing SHA1s: %s", sha1s)
-    files = system(cmd).decode('utf-8').rstrip().split("\n")
+    files = system(cmd).rstrip().split("\n")
     for _file in files:
         changed[_file] = {}
         _p = subprocess.Popen(["git", "blame", "--abbrev=8", _file], stdout=subprocess.PIPE)
@@ -261,7 +263,7 @@ def update_github_status(violations):
     url = 'https://api.github.com/repos/{}/pulls/{}'.format(TRAVIS_REPO_SLUG, TRAVIS_PULL_REQUEST)
     # _pr = json.loads(get_url(url))
     #status_url = _pr['statuses_url']
-    diff = get_url(url, {"Accept": "application/vnd.github.v3.diff"}).split('\n')
+    diff = get_url(url, {"Accept": "application/vnd.github.v3.diff"}).decode('utf-8').split('\n')
     unassigned = []
     count = 0
     for _file in violations:
@@ -383,10 +385,10 @@ def get_url(url, headers=None):
 
 def get_token():
     """Return github token"""
-    token = zlib.decompress(GITHUB_TOKEN.decode("hex"))
+    token = zlib.decompress(binascii.unhexlify(GITHUB_TOKEN))
     length = len(token)
-    return ''.join(chr(ord(a) ^ ord(b))
-                   for a, b in zip(token, (TRAVIS_REPO_SLUG * length)[:length]))
+    return ''.join(chr(a ^ b)
+                   for a, b in zip(token, (TRAVIS_REPO_SLUG.encode('utf-8') * length)[:length]))
 
 
 def post_status(state, context, description):
@@ -465,9 +467,9 @@ def delete_comment(_type, _id):
 def system(cmd):
     logging.debug("Running: " + " ".join(cmd))
     if isinstance(cmd, list):
-        return subprocess.check_output(cmd)
+        return subprocess.check_output(cmd).decode('utf-8')
     else:
-        return subprocess.check_output(cmd, shell=True)
+        return subprocess.check_output(cmd, shell=True).decode('utf-8')
 
 
 main()
