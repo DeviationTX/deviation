@@ -18,6 +18,8 @@
 #include "mixer.h"
 #include "config/model.h"
 #include "config/tx.h"
+#include "crsf.h"
+#include "pages.h"
 #if HAS_EXTENDED_TELEMETRY
 #include "telemetry.h"
 #endif
@@ -348,6 +350,7 @@ uintptr_t CRSF_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_NUMCHAN: return 16;
         case PROTOCMD_DEFAULT_NUMCHAN: return 8;
         case PROTOCMD_CHANNELMAP: return UNCHG;
+        case PROTOCMD_OPTIONSPAGE: return PAGEID_CRSFCFG;
 #if HAS_EXTENDED_TELEMETRY
         case PROTOCMD_TELEMETRYSTATE:
             return PROTO_TELEM_ON;

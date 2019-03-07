@@ -19,6 +19,7 @@
 #include "config/model.h"
 #include "config/tx.h"
 #include "protospi.h"
+#include "pages.h"
 
 #include <stdlib.h>
 
@@ -329,6 +330,15 @@ const char **PROTOCOL_GetOptions()
     if(Model.protocol != PROTOCOL_NONE && PROTOCOL_LOADED)
         data = (const char **)PROTO_Cmds(PROTOCMD_GETOPTIONS);
     return data;
+}
+
+enum PageID PROTOCOL_OptionsPage()
+{
+    enum PageID id;
+
+    if(Model.protocol != PROTOCOL_NONE && PROTOCOL_LOADED)
+        id = (enum PageID)PROTO_Cmds(PROTOCMD_OPTIONSPAGE);
+    return id;
 }
 
 void PROTOCOL_SetOptions()
