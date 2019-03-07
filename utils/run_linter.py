@@ -19,6 +19,7 @@ import subprocess
 import time
 import logging
 import binascii
+import shutils
 
 from collections import namedtuple
 
@@ -81,10 +82,9 @@ def main():
         global ERROR_EXIT_STATUS
         ERROR_EXIT_STATUS = 0
 
-    with open(os.devnull, 'w') as devnull:
-        if subprocess.call(["which", "cpplint"], stdout=devnull):
-            print("Please install cpplint via 'pip install cpplint' or equivalent")
-            sys.exit(ERROR_EXIT_STATUS)
+    if shutils.which('cpplint'):
+        print("Please install cpplint via 'pip install cpplint' or equivalent")
+        sys.exit(ERROR_EXIT_STATUS)
 
     pwd = os.getcwd()
     os.chdir(system(["git", "rev-parse", "--show-toplevel"]).rstrip())
@@ -117,7 +117,7 @@ def main():
 
 def get_changed_lines_from_pr():
     url = 'https://api.github.com/repos/{}/pulls/{}'.format(TRAVIS_REPO_SLUG, TRAVIS_PULL_REQUEST)
-    diff = get_url(url, {"Accept": "application/vnd.github.v3.diff"}).decode('utf-8').split('\n')
+    diff = get_url(url, {"Accept": "application/vnd.github.v3.diff"}).split('\n')
     return get_changed_lines_from_diff(diff)
 
 def get_changed_lines_from_git():
@@ -263,7 +263,7 @@ def update_github_status(violations):
     url = 'https://api.github.com/repos/{}/pulls/{}'.format(TRAVIS_REPO_SLUG, TRAVIS_PULL_REQUEST)
     # _pr = json.loads(get_url(url))
     #status_url = _pr['statuses_url']
-    diff = get_url(url, {"Accept": "application/vnd.github.v3.diff"}).decode('utf-8').split('\n')
+    diff = get_url(url, {"Accept": "application/vnd.github.v3.diff"}).split('\n')
     unassigned = []
     count = 0
     for _file in violations:
@@ -380,7 +380,7 @@ def get_url(url, headers=None):
         request = urllib.request.Request(url, None, headers)
         res = urllib.request.urlopen(request)
         raise_for_status(url, res)
-        URL_CACHE[key] = res.read()
+        URL_CACHE[key] = res.read().decode('utf-8')
     return URL_CACHE[key]
 
 def get_token():
