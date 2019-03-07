@@ -46,6 +46,8 @@ addons:
       - mingw32-runtime
       - libfltk1.3-dev
       - gcovr
+      - python3
+      - python3-pip
 
 language: minimal
 #Do NOT set these.  They set 'CC' which breaks the build
