@@ -273,7 +273,8 @@ static const char *protoselect_cb(guiObject_t *obj, int dir, void *data)
             RemapChannelsForProtocol(oldmap);
         configure_bind_button();
     }
-    GUI_TextSelectEnablePress((guiTextSelect_t *)obj, PROTOCOL_GetOptions() ? 1 : 0);
+    GUI_TextSelectEnablePress((guiTextSelect_t *)obj,
+                              (PROTOCOL_GetOptions() || PROTOCOL_OptionsPage())  ? 1 : 0);
 
     if (Model.protocol == 0)
         return _tr("None");
@@ -286,7 +287,11 @@ void proto_press_cb(guiObject_t *obj, void *data)
 {
     (void)data;
     (void)obj;
-    if(PROTOCOL_GetOptions()) {
+    enum PageID id = PROTOCOL_OptionsPage();
+
+    if (id) {
+        PAGE_PushByID(id, 0);
+    } else if (PROTOCOL_GetOptions()) {
         PAGE_PushByID(PAGEID_PROTOCFG, 0);
     }
 }
