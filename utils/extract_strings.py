@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-
-# Extract translatable strings out of object files and
-# compare/convert to po translation files
+"""Extract translatable strings out of object files and
+   compare/convert to po translation files or Deviation language files
+"""
 
 import argparse
 import os
@@ -15,7 +15,9 @@ PO_LANGUAGE_STRING = "->Translated Language Name<-"
 TARGETS = ["devo8", "devo10", "devo12"]
 CROSS = os.environ.get("CROSS", "")
 
+
 def main():
+    """Main routine"""
     parser = argparse.ArgumentParser()
     parser.add_argument("-update", action="store_true",
                         help="Update existing po files with modified string lists")
@@ -53,12 +55,15 @@ def main():
              else glob.glob("fs/language/locale/*.po"))
     for filename in files:
         (ext, language, translation) = parse_po_file(filename, uniq)
-        if not write_lang_file("{}/lang.{}".format(args.fs, ext), args.targets, language, translation):
+        if not write_lang_file("{}/lang.{}".format(args.fs, ext),
+                               args.targets, language, translation):
             return False
     return True
 
+
 def print_po_strings(uniq):
-    print('msgid "{}"\nmsgstr ""\n'.format(PO_LANGUAGE_STRING));
+    """Generate po file containing all translatable strings"""
+    print('msgid "{}"\nmsgstr ""\n'.format(PO_LANGUAGE_STRING))
     for string in uniq['__ORDER__']:
         # Match same syntax used by getopt
         print('\n'.join(uniq[string]))  # Comment
@@ -72,11 +77,15 @@ def print_po_strings(uniq):
         print('msgstr ""')
         print('')
 
+
 def print_strings(uniq):
+    """Generate deviation lang file containing all translatable strings"""
     for string in uniq['__ORDER__']:
         print(":{}".format(string))
 
+
 def get_strings(path):
+    """Get the full list of translatable strings, pitentially filtered by target"""
     strings = extract_all_strings()
     if path:
         strings = extract_target_strings(path, strings)
@@ -86,15 +95,19 @@ def get_strings(path):
         if _m:
             if _m.group(1) not in strings:
                 strings['__ORDER__'].append(_m.group(1))
-            strings[_m.group(1)] = ["#: Model template"];
+            strings[_m.group(1)] = ["#: Model template"]
     return strings
 
+
 def extract_all_strings():
-    lines = system("/usr/bin/find . -name '*.[hc]' | grep -v libopencm3 | sort | xargs xgettext -o - --omit-header -k --keyword=_tr --keyword=_tr_noop --no-wrap").split('\n')
-    idx = 0
-    strings = { "__ORDER__": [] }
+    """Extaract full list of translatable strings from source-code"""
+    lines = system(
+        "/usr/bin/find . -name '*.[hc]' | grep -v libopencm3 | sort "
+        "| xargs xgettext -o - --omit-header -k --keyword=_tr "
+        "--keyword=_tr_noop --no-wrap").split('\n')
+    strings = {"__ORDER__": []}
     while lines:
-        msgid, msgstr, comment = parse_gettext(lines)
+        msgid, _msgstr, comment = parse_gettext(lines)
         if not msgid:
             continue
         if msgid not in strings:
@@ -102,11 +115,13 @@ def extract_all_strings():
         strings[msgid] = comment
     return strings
 
+
 def extract_target_strings(path, valid_strings):
+    """Extract all strings from target object files"""
     strings = {}
     files = glob.glob(os.path.join(path, "*.o"))
 
-    for filename in files:
+    for filename in files:   # pylint: disable=too-many-nested-blocks
         # Parse all strings from the object files and add to the allstr hash
         objdump = system(CROSS + "objdump -s " + filename).split('\n')
         _str = ""
@@ -138,7 +153,9 @@ def extract_target_strings(path, valid_strings):
     strings['__ORDER__'] = [_x for _x in valid_strings['__ORDER__'] if _x in strings]
     return strings
 
+
 def fnv_16(data, init_value=0x811c9dc5):
+    """Generate a FNV32 hash, and fold it into a 16bit value"""
     data = data.encode('utf-8')
     fnv_32_prime = 0x01000193
     hval = init_value
@@ -146,10 +163,11 @@ def fnv_16(data, init_value=0x811c9dc5):
     for _ch in data:
         hval = (hval * fnv_32_prime) & 0xffffffff
         hval = (hval ^ _ch) & 0xffffffff
-    return (hval >> 16) ^ (hval & 0xffff);
+    return (hval >> 16) ^ (hval & 0xffff)
 
 
 def write_lang_file(outf, targets, language, translation):
+    """Write Deviation lang file for selected language"""
     strings = {}
     hashvalues = {}
 
@@ -176,9 +194,10 @@ def write_lang_file(outf, targets, language, translation):
                     continue
                 _fh.write(":{}\n{}\n".format(key, value))
     except OSError:
-        logging.error("Can't write " + outf)
+        logging.error("Can't write %s", outf)
         return False
     return True
+
 
 def parse_gettext(lines):
     """Parse next gettext element for string list"""
@@ -206,10 +225,11 @@ def parse_gettext(lines):
                 msgid = _str
             elif _type == "msgstr":
                 if msgid is None:
-                    logging.error("no msgid for msgstr '%s'.  Ignoring", msgstr)
+                    logging.error("no msgid for msgstr '%s'.  Ignoring", _str)
                     continue
                 return(msgid, _str, comment or "#")
     return (None, None, None)
+
 
 def parse_po_file(filename, uniq):
     """Parse .po file into dictionary"""
@@ -220,7 +240,7 @@ def parse_po_file(filename, uniq):
 
     lines = open(filename, "r", encoding='utf-8').read().splitlines()
     while lines:
-        msgid, msgstr, comment = parse_gettext(lines)
+        msgid, msgstr, _comment = parse_gettext(lines)
         if msgstr:
             msgstr = re.sub(r'\\([^n])', r'\1', msgstr)  # Fix escaped characters
         if not msgstr:
@@ -235,11 +255,11 @@ def parse_po_file(filename, uniq):
             continue
         if msgid == PO_LANGUAGE_STRING:
             # Add UTF-8 BOM
-            language = '\ufeff' + msgstr + "\n";
+            language = '\ufeff' + msgstr + "\n"
             continue
         if msgid not in uniq:
             continue
-  
+
         values = re.split(r'\\n(?=(?:{})?:)'.format(re_target), msgstr)
         for value in values:
             _m = re.search(r'(?:({}):)?(.*)'.format(re_target), value)
@@ -253,11 +273,12 @@ def parse_po_file(filename, uniq):
                 strings['DEFAULT'][msgid] = target_str
     return (ext, language, strings)
 
+
 def system(cmd):
-    logging.debug("Running: " + " ".join(cmd))
+    """Wrapper to easily call system functions"""
+    logging.debug("Running: %s", " ".join(cmd))
     if isinstance(cmd, list):
         return subprocess.check_output(cmd).decode('utf-8').rstrip()
-    else:
-        return subprocess.check_output(cmd, shell=True).decode('utf-8').rstrip()
+    return subprocess.check_output(cmd, shell=True).decode('utf-8').rstrip()
 
 sys.exit(0 if main() else 1)
