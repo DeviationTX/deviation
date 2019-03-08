@@ -69,7 +69,7 @@ foreach my $target_dir (@dirs) {
         $target_count = $count if($count > $target_count);
         $target_line_length = $line_length if($line_length > $target_line_length);
     }
-    my $cmd = "../utils/extract_strings.pl -target $target";
+    my $cmd = "../utils/extract_strings.py -target $target";
     $cmd .= " -objdir $objdir" if($objdir);
     $cmd .= " -elffile $elffile" if($elffile);
     print $cmd;

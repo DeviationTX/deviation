@@ -222,7 +222,7 @@ distclean:
 	rm -rf deviation*.zip
 
 language:
-	../utils/extract_strings.pl -po > fs/language/deviation.po
+	../utils/extract_strings.py -po > fs/language/deviation.po
 
 
 zip: $(TARGET).zip
@@ -309,7 +309,7 @@ $(LAST_MODEL): model_template.ini tx_template.ini $(FONTS) $(PRE_FS)
 	cp model_template.ini filesystem/$(FILESYSTEM)/models/default.ini
 ifdef LANGUAGE
 	mkdir filesystem/$(FILESYSTEM)/language 2> /dev/null; \
-               ../utils/extract_strings.pl -po -fs filesystem/$(FILESYSTEM)/language -targets $(LANGUAGE) -update -objdir $(ODIR)
+               ../utils/extract_strings.py -po -fs filesystem/$(FILESYSTEM)/language -targets $(LANGUAGE) -update -objdir $(ODIR)
 endif
 	export tx=$(FILESYSTEM); \
 	number=2 ; while [ $$number -le $(NUM_MODELS) ] ; do \

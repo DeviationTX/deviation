@@ -19,7 +19,7 @@ import subprocess
 import time
 import logging
 import binascii
-import shutils
+import shutil
 
 from collections import namedtuple
 
@@ -82,8 +82,8 @@ def main():
         global ERROR_EXIT_STATUS
         ERROR_EXIT_STATUS = 0
 
-    if shutils.which('cpplint'):
-        print("Please install cpplint via 'pip install cpplint' or equivalent")
+    if not shutil.which('cpplint'):
+        print("Please install cpplint via 'pip3 install cpplint' or equivalent")
         sys.exit(ERROR_EXIT_STATUS)
 
     pwd = os.getcwd()
