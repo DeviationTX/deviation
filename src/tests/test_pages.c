@@ -19,6 +19,7 @@ void TestAllPages(CuTest* t)
     CONFIG_ReadTemplate("heli_std.ini");
     Transmitter.audio_player = AUDIO_AUDIOFX;
     Transmitter.current_model = 1;
+    voice_map_entries = 0;
 
     PAGE_Init();
     for (int i = 0; i < PAGEID_LAST; i++) {
