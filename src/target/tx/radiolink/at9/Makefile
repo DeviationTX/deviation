@@ -21,7 +21,7 @@ endif
 .PHONY: default
 default: $(SDIR)$(TARGET).dfu
 
-ALL = $(LIBOPENCM3) $(SDIR).dfu $(EXTRA_DFUS)
+ALL = $(LIBOPENCM3) $(SDIR)$(TARGET).dfu $(EXTRA_DFUS)
 
 SRC_C   += $(SDIR)target/drivers/display/8080/320x240x16.c \
            $(wildcard $(SDIR)target/drivers/input/rotary/*.c)
