@@ -101,7 +101,7 @@ struct Voice {
 #endif
 };
 
-extern u16 voice_map_entries;
+extern s16 voice_map_entries;
 
 struct QueueEntry {
     u16 id;
