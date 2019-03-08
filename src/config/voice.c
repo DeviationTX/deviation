@@ -57,7 +57,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         if ( req_id == MAX_VOICEMAP_ENTRIES ) {
             if (MATCH_SECTION(SECTION_VOICE_GLOBAL)) {
                 voice_map_entries = 0;
-            } 
+            }
             if (MATCH_SECTION(SECTION_VOICE_CUSTOM)) {
                 // Initial count of custom voicemap entries
                 voice_map_entries++;
