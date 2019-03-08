@@ -1,26 +1,29 @@
-SRC_CXX  = $(wildcard $(SDIR)/target/tx/$(FAMILY)/$(TARGET)/*.cpp) \
-           $(wildcard $(SDIR)/target/drivers/mcu/emu/*.cpp)
-SRC_C  = $(wildcard $(SDIR)/target/tx/$(FAMILY)/$(TARGET)/*.c) \
-         $(wildcard $(SDIR)/target/drivers/mcu/emu/*.c) \
-         $(wildcard $(SDIR)/target/drivers/filesystems/*.c)
+ifneq ("$(TARGET)", "test")
+SRC_CXX  = $(wildcard $(SDIR)target/tx/$(FAMILY)/$(TARGET)/*.cpp) \
+           $(wildcard $(SDIR)target/drivers/mcu/emu/*.cpp)
+endif
+
+SRC_C  = $(wildcard $(SDIR)target/tx/$(FAMILY)/$(TARGET)/*.c) \
+         $(wildcard $(SDIR)target/drivers/mcu/emu/*.c) \
+         $(wildcard $(SDIR)target/drivers/filesystems/*.c)
 
 ifeq ("$(SCREENSIZE)", "128x64x1")
-SRC_C  += $(SDIR)/target/drivers/display/emu/emu_monochrome.c
+SRC_C  += $(SDIR)target/drivers/display/emu/emu_monochrome.c
 else ifneq ("$(SCREENSIZE)", "text")
-SRC_C  += $(SDIR)/target/drivers/display/emu/emu_color.c
+SRC_C  += $(SDIR)target/drivers/display/emu/emu_color.c
 endif
 
 ifdef USE_INTERNAL_FS
-SRC_C  += $(wildcard $(SDIR)/target/drivers/filesystems/devofs/*.c) \
-          $(wildcard $(SDIR)/target/drivers/filesystems/petit_fat/*.c)
+SRC_C  += $(wildcard $(SDIR)target/drivers/filesystems/devofs/*.c) \
+          $(wildcard $(SDIR)target/drivers/filesystems/petit_fat/*.c)
 CFLAGS = -DEMULATOR=USE_INTERNAL_FS
 else
 CFLAGS = -DEMULATOR=USE_NATIVE_FS
 endif
 
-CFLAGS += -I$(SDIR)/target/drivers/mcu/emu -I$(SDIR)/target/drivers/filesystems
+CFLAGS += -I$(SDIR)target/drivers/mcu/emu -I$(SDIR)target/drivers/filesystems
 
-ALL += $(TARGET).$(EXEEXT)
+ALL +=  $(SDIR)$(TARGET).$(EXEEXT)
 
 TYPE ?= dev
 
@@ -51,6 +54,8 @@ else
         LFLAGS := $(LFLAGS) -lportaudio
     endif
 endif
+
+default: $(SDIR)$(TARGET).$(EXEEXT)
 
 CFLAGS += -DFILESYSTEM_DIR="\"filesystem/$(FILESYSTEM)\""
 

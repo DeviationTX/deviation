@@ -12,9 +12,6 @@
 # We want to turn on INCLUDE_FS by default
 INCLUDE_FS ?= 1
 
-# Use VERBOSE=1 to enable verbose make
-PROGMODE ?= STATUS_SCREEN
-
 NUM_MODELS ?= 30
 TYPE     ?= prd
 
@@ -95,7 +92,6 @@ define uniq =
 endef
 
 VPATH = $(call uniq, $(dir $(SRCS)))
-$(warning $(VPATH))
 HGVERSION ?= $(shell $(SDIR)../utils/get_version.pl ${TARGET})
 HGVERSION := $(HGVERSION)
 
@@ -122,7 +118,7 @@ MODULE_CFLAGS   :=  -DMODULAR=$(MODULAR)
 CFLAGS   +=  -DENABLE_MODULAR=$(MODULAR)
 endif
 
-CFLAGS   := $(CFLAGS) -g -Wall -Wextra -Werror=undef -I$(SDIR) -D$(PROGMODE) -std=gnu99 \
+CFLAGS   := $(CFLAGS) -g -Wall -Wextra -Werror=undef -I$(SDIR) -std=gnu99 \
             -I$(SDIR)target/tx/$(FAMILY)/$(TARGET) -I$(SDIR)gui/$(SCREENSIZE) \
             -I$(SDIR)pages/$(SCREENSIZE) \
             -DHGVERSION="\"${HGVERSION}\""
@@ -173,18 +169,17 @@ clean:
 language:
 	$(SDIR)../utils/extract_strings.pl -po > $(SDIR)fs/language/deviation.po
 
+zip: $(SDIR)$(TARGET).zip
 
-zip: $(TARGET).zip
-
-%.zip: $(ALL) $(TARGET).dfu $(PROTO_MODULES)
+$(SDIR)%.zip: $(ALL) $(PROTO_MODULES)
 	#This is not an emulator build (emulator is hanled in target/common/emu/Makefile.inc)
-	cp -f $(TARGET).dfu deviation-$(HGVERSION).dfu
-	rm -f deviation-$(HGVERSION).zip
-	rm -f debug-$(HGVERSION).zip
-	zip debug-$(HGVERSION).zip $(TARGET).elf
+	cp -f $(SDIR)$(TARGET).dfu $(SDIR)deviation-$(HGVERSION).dfu
+	rm -f $(SDIR)deviation-$(HGVERSION).zip
+	rm -f $(SDIR)debug-$(HGVERSION).zip
+	zip $(SDIR)debug-$(HGVERSION).zip $(SDIR)$(TARGET).elf
 	# $(MAKE) zipping more compatible with other distributions
 	export p=`pwd`; cd $(ODIR) && test -e devo.fs && zip -u $$p/deviation-$(HGVERSION).zip devo.fs && rm devo.fs || true
-	zip deviation-$(HGVERSION).zip deviation-$(HGVERSION).dfu UPDATING.md
+	zip $(SDIR)deviation-$(HGVERSION).zip $(SDIR)deviation-$(HGVERSION).dfu $(SDIR)UPDATING.md
 ifdef MODULAR
 	export p=`pwd`; cd $(ODIR) && zip -ur $$p/deviation-$(HGVERSION).zip protocol/*.mod
 	export p=`pwd`; cd $(ODIR) && zip -u $$p/debug-$(HGVERSION).zip *.elf
@@ -193,9 +188,9 @@ endif
 ifeq "$(INCLUDE_FS)" "1"
 	export p=`pwd`; cd filesystem/$(FILESYSTEM) && zip -ur $$p/deviation-$(HGVERSION).zip  *
 endif
-	zip -u deviation-$(HGVERSION).zip debug-$(HGVERSION).zip
-	rm -f debug-$(HGVERSION).zip
-	rm -f deviation-$(HGVERSION).dfu
+	zip -u $(SDIR)deviation-$(HGVERSION).zip $(SDIR)debug-$(HGVERSION).zip
+	rm -f $(SDIR)debug-$(HGVERSION).zip
+	rm -f $(SDIR)deviation-$(HGVERSION).dfu
 
 fs: $(TARGET).fs
 
@@ -218,11 +213,11 @@ $(MODELDIR):
 #The main executable #
 ######################
 $(SDIR)$(TARGET).$(EXEEXT): $(LINKFILE) $(OBJS) $(LIBOPENCM3)
-	@echo " + Building '$@'"
+	@echo " + Building '$@' '$(SRC_CXX)'"
 ifdef LINKFILE #Create an empty 'obj/$(TARGET)/optimize.ld' just in case the linker script needs it
 	echo "" > $(ODIR)optimize.ld
 endif
-ifeq ("$(SRC_CXX)", " ")
+ifeq ("$(SRC_CXX)", "")
 	$(CC) -o $@ $(OBJS) $(LIBOPENCM3) $(LFLAGS) $(CFLAGS) $(EXTRA_CFLAGS)
 else
 	$(CXX) -o $@ $(OBJS) $(LIBOPENCM3) $(LFLAGS) $(CFLAGS) $(EXTRA_CFLAGS)

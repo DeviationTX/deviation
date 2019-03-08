@@ -5,6 +5,7 @@
 # Prints to stdout.
 # Author: Asim Jalis
 # Date: 01/08/2003
+echo $PWD
 FILES=`find tests/ -name '*.c' | sort`
 echo '
 
