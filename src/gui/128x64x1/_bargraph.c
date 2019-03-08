@@ -52,8 +52,10 @@ void _bargraph_trim_horizontal(int x, int y, int width, int height, s32 val, u32
     s32 center = (graph->max + graph->min) / 2;
     if (val == center) {
         LCD_FillRect(xpos - 1, box->y, 3, box->height, 1);
-    } else {
-        LCD_DrawFastVLine(xpos, box->y , box->height, 1);
+    } else if (val > center) {
+        LCD_FillRect(box->x + xboxw / 2, box->y, xpos - (box->x + xboxw / 2), box->height, 1);
+    } else {  // val < center
+        LCD_FillRect(xpos, box->y, (box->x + xboxw / 2) - xpos, box->height, 1);
     }
 }
 
