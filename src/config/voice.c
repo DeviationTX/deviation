@@ -55,6 +55,9 @@ static int ini_handler(void* user, const char* section, const char* name, const 
     }
     if (HAS_MUSIC_CONFIG) {
         if ( req_id == MAX_VOICEMAP_ENTRIES ) {
+            if (MATCH_SECTION(SECTION_VOICE_GLOBAL)) {
+                voice_map_entries = 0;
+            } 
             if (MATCH_SECTION(SECTION_VOICE_CUSTOM)) {
                 // Initial count of custom voicemap entries
                 voice_map_entries++;
@@ -86,9 +89,9 @@ const char* CONFIG_VoiceParse(unsigned id)
     if (id == MAX_VOICEMAP_ENTRIES) {  // initial parse of voice.ini
         if (CONFIG_IniParse(filename, ini_handler, &id))
             tempstring[0] = '\0';
-        if (voice_map_entries == 0) {
+        if (voice_map_entries < 0) {
             printf("Failed to parse voice.ini\n");
-            Transmitter.audio_player = AUDIO_NONE;  // disable external voice when no custom voices are found in voice.ini
+            Transmitter.audio_player = AUDIO_NONE;  // disable external voice when no global voices are found in voice.ini
         }
     }
     if ( (id < MAX_VOICEMAP_ENTRIES) ) {
