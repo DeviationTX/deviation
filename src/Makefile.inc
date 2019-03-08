@@ -140,7 +140,7 @@ MODELDIR = filesystem/$(FILESYSTEM)/models
 
 LAST_MODEL := $(MODELDIR)/model$(NUM_MODELS).ini
 
-ALL += $(TARGET).fs_wrapper
+ALL := $(ODIR) $(TARGET).fs_wrapper
 
 ############################################
 #END SECTION                               #
@@ -150,7 +150,7 @@ ALL += $(TARGET).fs_wrapper
 #this section includes build targets       #
 ############################################
 .PHONY: all
-all : $(warning $(ALL)) $(ALL) $(OBJS)
+all : $(ALL) $(OBJS)
 
 ####################################
 # recompile if the Makefile changes#
@@ -202,14 +202,6 @@ fs: $(TARGET).fs
 %.fs:
 	rm -f deviation-fs-$(HGVERSION).zip; zip -r deviation-fs-$(HGVERSION).zip filesystem/$(FILESYSTEM)
 
-coverity:
-	rm -rf cov-int 2>/dev/null; $(MAKE) distclean
-	cov-build --dir cov-int make TARGET=devo8
-	cov-build --dir cov-int make TARGET=devo10
-	tar -cvzf coverity-$(HGVERSION).tgz cov-int
-
-lint:
-	$(SDIR)../utils/run_linter.py --diff --debug
 
 ##########################################
 #Ensure necessary directories are created#

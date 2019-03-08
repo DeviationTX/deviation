@@ -6,8 +6,7 @@ MAKEFLAGS += --no-builtin-rules
 
 # Setup common folder structure variables
 mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
-SDIR = $(dir $(mkfile_path))
-export
+export SDIR = $(dir $(mkfile_path))
 
 ###########################################
 ## Provide some convenient make targets  ##
@@ -21,6 +20,11 @@ TXS ?= devo6 devo7e devo7e-256 devo8 devo10 devo12e devo12 devof7 devof7-XMS dev
 #Filter non-existant emus
 EMUS = $(foreach dir,$(TXS:%=emu_%),$(if $(wildcard target/$(dir)),$(dir),))
 ALLEMUS = $(foreach dir,$(ALLTXS:%=emu_%),$(if $(wildcard target/$(dir)),$(dir),))
+
+default:
+	@echo specify the target to build. target can be one of
+	@echo $(TXS)
+	@echo $(addprefix emu_, $(TXS))
 
 .PHONY: txs emus both fss zips emuzips winzips release everything
 txs: $(TXS)
@@ -69,10 +73,19 @@ endef
 # Now generate all the convenience targets
 $(foreach t,$(ALLTARGETS),$(eval $(call make-target,$t,$(notdir $(patsubst %/,%,$(dir $(wildcard target/tx/*/$(t))))))))
 
-.PHONY: distclean
+.PHONY: distclean coverity lint
 distclean:
 	rm -f *.$(EXEEXT) *.exe *.bin *.dfu *.list *.map
 	rm -rf objs
 	rm -rf  filesystem
 	$(MAKE) -C libopencm3 clean > /dev/null
 	rm -rf deviation*.zip
+
+coverity:
+	rm -rf cov-int 2>/dev/null; $(MAKE) distclean
+	cov-build --dir cov-int make -C target/tx/devo/devo8
+	cov-build --dir cov-int make -C target/tx/devo/devo10
+	tar -cvzf coverity-$(HGVERSION).tgz cov-int
+
+lint:
+	$(SDIR)../utils/run_linter.py --diff --debug
