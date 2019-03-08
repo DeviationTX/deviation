@@ -49,26 +49,26 @@ DUMP ?= objdump
 #error please define SCREENSIZE
 #endif
 
-SRC_C    +=  $(wildcard $(SDIR)/*.c) \
-             $(wildcard $(SDIR)/misc/*.c) \
-             $(wildcard $(SDIR)/screen/*.c) \
-             $(wildcard $(SDIR)/screen/$(SCREENSIZE)/*.c) \
-             $(wildcard $(SDIR)/gui/*.c) \
-             $(wildcard $(SDIR)/pages/$(SCREENSIZE)/*.c) \
-             $(wildcard $(SDIR)/config/*.c)
+SRC_C    +=  $(wildcard $(SDIR)*.c) \
+             $(wildcard $(SDIR)misc/*.c) \
+             $(wildcard $(SDIR)screen/*.c) \
+             $(wildcard $(SDIR)screen/$(SCREENSIZE)/*.c) \
+             $(wildcard $(SDIR)gui/*.c) \
+             $(wildcard $(SDIR)pages/$(SCREENSIZE)/*.c) \
+             $(wildcard $(SDIR)config/*.c)
 
 ifdef MODULAR
-   SRC_C    += $(SDIR)/protocol/protocol.c
-   PROTO_SRC_C := $(filter-out $(SDIR)/protocol/protocol.c, $(wildcard $(SDIR)/protocol/*.c) $(wildcard $(SDIR)/protocol/spi/*.c))
+   SRC_C    += $(SDIR)protocol/protocol.c
+   PROTO_SRC_C := $(filter-out $(SDIR)protocol/protocol.c, $(wildcard $(SDIR)protocol/*.c) $(wildcard $(SDIR)protocol/spi/*.c))
 else
-   SRC_C    := $(SRC_C) $(wildcard $(SDIR)/protocol/*.c) $(wildcard $(SDIR)/protocol/spi/*.c)
+   SRC_C    += $(wildcard $(SDIR)protocol/*.c) $(wildcard $(SDIR)protocol/spi/*.c)
 endif
 
-SRC_C    := $(SRC_C) $(wildcard $(SDIR)/pages/$(SCREENSIZE)/standard/*.c)
-SRC_C    := $(SRC_C) $(wildcard $(SDIR)/pages/$(SCREENSIZE)/advanced/*.c)
+SRC_C    += $(wildcard $(SDIR)pages/$(SCREENSIZE)/standard/*.c)
+SRC_C    += $(wildcard $(SDIR)pages/$(SCREENSIZE)/advanced/*.c)
 
-SRC_S    := $(SRC_S) $(wildcard *.s)
-SRC_CXX  := $(SRC_CXX) $(wildcard *.cpp)
+SRC_S    += $(wildcard *.s)
+SRC_CXX  += $(wildcard *.cpp)
 SRCS     := $(SRC_C) $(SRC_CXX) $(SRC_S)
 ############################################
 #END SECTION                               #
@@ -78,14 +78,14 @@ SRCS     := $(SRC_C) $(SRC_CXX) $(SRC_S)
 ############################################
 #This section intermediate build files     #
 ############################################
-ODIR     = $(SDIR)/objs/$(TARGET)$(ODIREXT)
-OBJS    := $(patsubst %.c,$(ODIR)/%.o,$(notdir $(SRCS)))
+ODIR     = $(SDIR)objs/$(TARGET)$(ODIREXT)/
+OBJS    := $(patsubst %.c,$(ODIR)%.o,$(notdir $(SRCS)))
 
 ifdef MODULAR
-PROTO_OBJS  := $(addprefix $(ODIR)/, $(notdir $(PROTO_SRC_C:.c=.o)))
-PROTO_LIBS  := $(addprefix $(ODIR)/, $(notdir $(PROTO_SRC_C:.c=.bin)))
-PROTO_EXTRA_OBJS := $(addprefix $(ODIR)/, $(notdir $(PROTO_EXTRA_C:.c=.o_)))
-SYMBOL_FILE := $(ODIR)/symbolfile
+PROTO_OBJS  := $(addprefix $(ODIR), $(notdir $(PROTO_SRC_C:.c=.o)))
+PROTO_LIBS  := $(addprefix $(ODIR), $(notdir $(PROTO_SRC_C:.c=.bin)))
+PROTO_EXTRA_OBJS := $(addprefix $(ODIR), $(notdir $(PROTO_EXTRA_C:.c=.o_)))
+SYMBOL_FILE := $(ODIR)symbolfile
 endif
 
 define uniq =
@@ -94,9 +94,9 @@ define uniq =
   ${seen}
 endef
 
-VPATH = $(call uniq, $(dir $(SRCS))) $(SDIR)
-
-HGVERSION ?= $(shell $(SDIR)/../utils/get_version.pl ${TARGET})
+VPATH = $(call uniq, $(dir $(SRCS)))
+$(warning $(VPATH))
+HGVERSION ?= $(shell $(SDIR)../utils/get_version.pl ${TARGET})
 HGVERSION := $(HGVERSION)
 
 # Rebuild on hg version change.
@@ -104,9 +104,9 @@ HGVERSION := $(HGVERSION)
 # We need to always run this code, as opposed to running it from a prerequisite
 # The HGTEST variable is not used
 HGTEST := $(shell mkdir -p $(ODIR); \
-	[ -f $(ODIR)/hgstamp ] || touch $(ODIR)/hgstamp; \
-	echo $(HGVERSION) | cmp -s $(ODIR)/hgstamp - \
-	|| echo $(HGVERSION) > $(ODIR)/hgstamp)
+	[ -f $(ODIR)hgstamp ] || touch $(ODIR)hgstamp; \
+	echo $(HGVERSION) | cmp -s $(ODIR)hgstamp - \
+	|| echo $(HGVERSION) > $(ODIR)hgstamp)
 ############################################
 #END SECTION                               #
 ############################################
@@ -123,8 +123,8 @@ CFLAGS   +=  -DENABLE_MODULAR=$(MODULAR)
 endif
 
 CFLAGS   := $(CFLAGS) -g -Wall -Wextra -Werror=undef -I$(SDIR) -D$(PROGMODE) -std=gnu99 \
-            -I$(SDIR)/target/tx/$(FAMILY)/$(TARGET) -I$(SDIR)/gui/$(SCREENSIZE) \
-            -I$(SDIR)/pages/$(SCREENSIZE) \
+            -I$(SDIR)target/tx/$(FAMILY)/$(TARGET) -I$(SDIR)gui/$(SCREENSIZE) \
+            -I$(SDIR)pages/$(SCREENSIZE) \
             -DHGVERSION="\"${HGVERSION}\""
 CXXFLAGS := $(CXXFLAGS) $(patsubst -std=gnu99,,$(CFLAGS))
 EXEEXT   ?= elf
@@ -149,10 +149,8 @@ ALL += $(TARGET).fs_wrapper
 ############################################
 #this section includes build targets       #
 ############################################
-default: $(TARGET)
-	echo "Done"
-
-all : $(OBJS) $(ALL)
+.PHONY: all
+all : $(warning $(ALL)) $(ALL) $(OBJS)
 
 ####################################
 # recompile if the Makefile changes#
@@ -169,11 +167,11 @@ $(VERBOSE).SILENT:
 
 clean:
 	rm -f $(TARGET).$(EXEEXT) $(TARGET).exe $(TARGET).bin $(TARGET).dfu $(TARGET).list \
-		$(TARGET).map $(ODIR)/*.o $(ODIR)/*.o_ $(ODIR)/*.P  $(ODIR)/*.bin \
+		$(TARGET).map $(ODIR)*.o $(ODIR)*.o_ $(ODIR)*.P  $(ODIR)*.bin \
 		filesystem/$(FILESYSYTEM) 2> /dev/null || true
 
 language:
-	$(SDIR)/../utils/extract_strings.pl -po > $(SDIR)/fs/language/deviation.po
+	$(SDIR)../utils/extract_strings.pl -po > $(SDIR)fs/language/deviation.po
 
 
 zip: $(TARGET).zip
@@ -190,7 +188,7 @@ zip: $(TARGET).zip
 ifdef MODULAR
 	export p=`pwd`; cd $(ODIR) && zip -ur $$p/deviation-$(HGVERSION).zip protocol/*.mod
 	export p=`pwd`; cd $(ODIR) && zip -u $$p/debug-$(HGVERSION).zip *.elf
-	rm -rf $(ODIR)/protocol
+	rm -rf $(ODIR)protocol
 endif
 ifeq "$(INCLUDE_FS)" "1"
 	export p=`pwd`; cd filesystem/$(FILESYSTEM) && zip -ur $$p/deviation-$(HGVERSION).zip  *
@@ -204,8 +202,6 @@ fs: $(TARGET).fs
 %.fs:
 	rm -f deviation-fs-$(HGVERSION).zip; zip -r deviation-fs-$(HGVERSION).zip filesystem/$(FILESYSTEM)
 
-release:  $(TXS:%=zip_%) $(EMUS:%=zip_win_%) $(TXS:%=fs_%)
-
 coverity:
 	rm -rf cov-int 2>/dev/null; $(MAKE) distclean
 	cov-build --dir cov-int make TARGET=devo8
@@ -213,7 +209,7 @@ coverity:
 	tar -cvzf coverity-$(HGVERSION).tgz cov-int
 
 lint:
-	$(SDIR)/../utils/run_linter.py --diff --debug
+	$(SDIR)../utils/run_linter.py --diff --debug
 
 ##########################################
 #Ensure necessary directories are created#
@@ -229,31 +225,31 @@ $(MODELDIR):
 ######################
 #The main executable #
 ######################
-$(SDIR)/$(TARGET).$(EXEEXT): $(LINKFILE) $(OBJS) $(LIBOPENCM3)
+$(SDIR)$(TARGET).$(EXEEXT): $(LINKFILE) $(OBJS) $(LIBOPENCM3)
 	@echo " + Building '$@'"
 ifdef LINKFILE #Create an empty 'obj/$(TARGET)/optimize.ld' just in case the linker script needs it
-	echo "" > $(ODIR)/optimize.ld
+	echo "" > $(ODIR)optimize.ld
 endif
 ifeq ("$(SRC_CXX)", " ")
-	$(CC) -o $@ $(OBJS) $(LIBOPENCM3) $(LFLAGS) $(LFLAGS2) $(CFLAGS) $(EXTRA_CFLAGS)
+	$(CC) -o $@ $(OBJS) $(LIBOPENCM3) $(LFLAGS) $(CFLAGS) $(EXTRA_CFLAGS)
 else
-	$(CXX) -o $@ $(OBJS) $(LIBOPENCM3) $(LFLAGS) $(LFLAGS2) $(CFLAGS) $(EXTRA_CFLAGS)
+	$(CXX) -o $@ $(OBJS) $(LIBOPENCM3) $(LFLAGS) $(CFLAGS) $(EXTRA_CFLAGS)
 endif
 
 
 ##############################
 #Build rules for all .o files#
 ##############################
-$(ODIR)/%.o: %.c
+$(ODIR)%.o: %.c
 	@echo " + Compiling '$<'"
 	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) $(CFLAGS_$(basename $(notdir $<))) -c -o $@ $<
 
-$(ODIR)/%.o: %.cpp
+$(ODIR)%.o: %.cpp
 	@echo " + Compiling '$<'"
 	$(CXX) $(CXXFLAGS) $(EXTRA_CFLAGS) $(CXXFLAGS_$(basename $(notdir $<))) -c -o $@ $<
 
 #For module building
-$(ODIR)/%.o_: %.c
+$(ODIR)%.o_: %.c
 	@echo " + Compiling '$<' as module"
 	$(CC) $(CFLAGS) $(MODULE_CFLAGS) $(CFLAGS_$(basename $(notdir $<))) -c -o $@ $<
 
@@ -261,13 +257,9 @@ $(ODIR)/%.o_: %.c
 #Ensure version is up to date#
 ##############################
 # Rebuild on hg version change.
-$(ODIR)/version.o: $(ODIR)/hgstamp
+$(ODIR)version.o: $(ODIR)hgstamp
 
-$(ODIR)/hgstamp:
-	echo $(HGVERSION) > $(ODIR)/hgstamp
+$(ODIR)hgstamp:
+	echo $(HGVERSION) > $(ODIR)hgstamp
 
-ifdef MODULAR
-include protocol/Makefile.inc
-endif
-
-include fs/Makefile.inc
+include $(SDIR)fs/Makefile.inc

@@ -12,8 +12,6 @@ export
 ###########################################
 ## Provide some convenient make targets  ##
 ###########################################
-TARGET   ?= devo8
-default: $(TARGET)
 
 ALLTARGETS = $(filter-out common,$(notdir $(wildcard target/tx/*/*)))
 
@@ -24,6 +22,7 @@ TXS ?= devo6 devo7e devo7e-256 devo8 devo10 devo12e devo12 devof7 devof7-XMS dev
 EMUS = $(foreach dir,$(TXS:%=emu_%),$(if $(wildcard target/$(dir)),$(dir),))
 ALLEMUS = $(foreach dir,$(ALLTXS:%=emu_%),$(if $(wildcard target/$(dir)),$(dir),))
 
+.PHONY: txs emus both fss zips emuzips winzips release everything
 txs: $(TXS)
 emus: $(EMUS)
 both: txs emus
@@ -31,10 +30,12 @@ fss: $(TXS:%=fs_%)
 zips: $(TXS:%=zip_%)
 emuzips: $(EMUS:%=zip_%)
 winzips: $(EMUS:%=zip_win_%)
+release:  $(TXS:%=zip_%) $(EMUS:%=zip_win_%) $(TXS:%=fs_%)
 everything: txs emus fss
 
 # Generate the targets for a transmitter.
 define make-target
+.PHONY: $1 win_$1 fs_$1 both_$1 zip_$1 zip_win_$1 release_$1 all_$1
 $1:
 	+$(MAKE) -C target/tx/$2/$1
 win_$1:
