@@ -406,6 +406,7 @@ void show_elements()
             {
 #ifdef HAS_CHAR_ICONS
                 GUI_CreateLabelBox(&gui->elem[i].box, x, y, 2, 2, &DEFAULT_FONT, TGLICO_font_cb, NULL, (void *)(long)ELEM_ICO(pc->elem[i], 0));
+                GUI_SetHidden((guiObject_t *)&gui->elem[i], 1);
 #else
                 struct ImageMap img = TGLICO_GetImage(ELEM_ICO(pc->elem[i], 0)); //We'll set this properly down below
                 GUI_CreateImageOffset(&gui->elem[i].img, x, y, w, h,

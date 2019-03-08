@@ -76,6 +76,11 @@ const char *show_text_cb(guiObject_t *obj, const void *data)
     return tempstring;
 }
 
+const char *show_text_cb_loc(guiObject_t *obj, const void *data)
+{
+    return show_text_cb(obj, _tr(data));
+}
+
 const char *show_bindtext_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
@@ -179,7 +184,9 @@ static const char *powerselect_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     if(! PROTOCOL_HasPowerAmp(Model.protocol))
         return _tr("Default");
-    Model.tx_power = GUI_TextSelectHelper(Model.tx_power, TXPOWER_100uW, RADIO_TX_POWER_COUNT[Model.radio]-1, dir, 1, 1, NULL);
+    Model.tx_power = GUI_TextSelectHelper(Model.tx_power,
+                       TXPOWER_100uW, radio_tx_power_int(Model.radio, TXPOWER_LAST),
+                       dir, 1, 1, NULL);
     mp->last_txpower = Model.tx_power;
     return radio_tx_power_val(Model.radio, Model.tx_power);
 }
@@ -250,7 +257,7 @@ static const char *protoselect_cb(guiObject_t *obj, int dir, void *data)
         // Load() the new protocol
         Model.protocol = new_protocol;
         Model.radio = PROTOCOL_GetRadio(new_protocol);
-        Model.tx_power = RADIO_TX_POWER_COUNT[Model.radio]-1;
+        Model.tx_power = radio_tx_power_int(Model.radio, TXPOWER_LAST);
         PROTOCOL_Load(1);
         Model.num_channels = PROTOCOL_DefaultNumChannels();
         memset(Model.proto_opts, 0, sizeof(Model.proto_opts));
@@ -345,6 +352,6 @@ static const char *mixermode_cb(guiObject_t *obj, int dir, void *data)
             STDMIXER_SaveSwitches();
         }
     }
-    return STDMIXER_ModeName(Model.mixer_mode);
+    return _tr(STDMIXER_ModeName(Model.mixer_mode));
 }
 #endif //HAS_STANDARD_GUI

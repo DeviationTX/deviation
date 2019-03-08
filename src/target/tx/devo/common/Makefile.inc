@@ -50,7 +50,7 @@ endif
 ifeq "$(USE_JTAG)" "1"
 CFLAGS  += -D"USE_JTAG=1"
 endif
-MODULE_CFLAGS = -fno-builtin
+MODULE_CFLAGS := -fno-builtin
 
 #LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -nostdlib
 LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(SDIR)$(TARGET).map,--cref -lc -lnosys -L$(SDIR) -L$(SDIR)protocol -L$(SDIR)objs/$(TARGET) -Wl,-warn-common
@@ -59,7 +59,8 @@ LINKFILE = $(SDIR)target/tx/devo/$(TARGET)/$(TARGET).ld
 LFLAGS2  = -Wl,-T$(LINKFILE)
 
 ifdef ENABLE_LTO
-EXTRA_CFLAGS  += -flto -ffat-lto-objects -DENABLE_LTO
+EXTRA_CFLAGS  := $(EXTRA_CFLAGS) -flto -ffat-lto-objects -DENABLE_LTO
+MODULE_CFLAGS := $(MODULE_CFLAGS) -ffunction-sections
 else
 CFLAGS += -ffunction-sections
 endif

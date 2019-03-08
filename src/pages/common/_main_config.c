@@ -51,7 +51,7 @@ const char *_GetBoxSource(char *str, int src, int real)
     if (src) {
 #if HAS_RTC
         if (src <= NUM_RTC)
-            return RTC_Name(str, src - 1);
+            return _tr(RTC_Name(src - 1));
 #endif
         if (src - NUM_RTC <= NUM_TIMERS)
             return TIMER_Name(str, src - NUM_RTC - 1);
@@ -82,15 +82,15 @@ const char *GetBoxSourceReal(char *str, int src)
 const char *GetElemName(int type)
 {
     switch(type) {
-        case ELEM_SMALLBOX: return _tr("Small-box");
-        case ELEM_BIGBOX:   return _tr("Big-box");
-        case ELEM_TOGGLE:   return _tr("Toggle");
-        case ELEM_BAR:      return _tr("Bargraph");
-        case ELEM_VTRIM:    return _tr("V-trim");
-        case ELEM_HTRIM:    return _tr("H-trim");
-        case ELEM_MODELICO: return _tr("Model");
-        case ELEM_BATTERY:  return _tr("Battery");
-        case ELEM_TXPOWER:  return _tr("TxPower");
+        case ELEM_SMALLBOX: return _tr_noop("Small-box");
+        case ELEM_BIGBOX:   return _tr_noop("Big-box");
+        case ELEM_TOGGLE:   return _tr_noop("Toggle");
+        case ELEM_BAR:      return _tr_noop("Bargraph");
+        case ELEM_VTRIM:    return _tr_noop("V-trim");
+        case ELEM_HTRIM:    return _tr_noop("H-trim");
+        case ELEM_MODELICO: return _tr_noop("Model");
+        case ELEM_BATTERY:  return _tr_noop("Battery");
+        case ELEM_TXPOWER:  return _tr_noop("TxPower");
     }
     return "";
 }
@@ -101,7 +101,7 @@ const char *newelem_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     const int last_elem = (HAS_TOUCH) ? ELEM_BATTERY : ELEM_LAST; //FIXME
     lp->newelem = GUI_TextSelectHelper(lp->newelem, 0, last_elem-1, dir, 1, 1, NULL);
-    return GetElemName(lp->newelem);
+    return _tr(GetElemName(lp->newelem));
 }
 
 int create_element()

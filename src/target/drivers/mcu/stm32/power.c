@@ -65,8 +65,13 @@ int PWR_CheckPowerSwitch()
     {
         static u32 debounce = 0;
 
-        if (GPIO_pin_get(PWR_SWITCH_PIN)) {
-            if (debounce == 0) debounce = CLOCK_getms();
+        u32 value = GPIO_pin_get(PWR_SWITCH_PIN);
+        if ((HAS_PWR_SWITCH_INVERTED && !value)
+            || (!HAS_PWR_SWITCH_INVERTED && value))
+        {
+            if (debounce == 0) {
+                debounce = CLOCK_getms();
+            }
         } else {
             debounce = 0;
         }

@@ -35,19 +35,21 @@ const char USB_Product_Name[] = "DeviationTx";
 void USB_Enable(unsigned use_interrupt)
 {
     rcc_periph_clock_enable(RCC_GPIOA);
-    rcc_periph_clock_enable(RCC_OTGFS);
-
     GPIO_setup_input_af((struct mcu_pin){GPIOA, GPIO11 | GPIO12}, ITYPE_FLOAT, 0);
+
+    if (HAS_PIN(USB_DETECT_PIN)) {
+        rcc_periph_clock_enable(get_rcc_from_pin(USB_DETECT_PIN));
+        GPIO_setup_input(USB_DETECT_PIN, ITYPE_PULLUP);
+    }
 
     if (HAS_PIN(USB_ENABLE_PIN)) {
         rcc_periph_clock_enable(get_rcc_from_pin(USB_ENABLE_PIN));
         GPIO_setup_output(USB_ENABLE_PIN, OTYPE_PUSHPULL);
         GPIO_pin_clear(USB_ENABLE_PIN);
-    }
-
-    if (HAS_PIN(USB_DETECT_PIN)) {
-        rcc_periph_clock_enable(get_rcc_from_pin(USB_DETECT_PIN));
-        GPIO_setup_input(USB_DETECT_PIN, ITYPE_PULLUP);
+    } else {
+        GPIO_setup_output((struct mcu_pin){GPIOA, GPIO12}, OTYPE_PUSHPULL);
+        GPIO_pin_clear((struct mcu_pin){GPIOA, GPIO12});
+        _msleep(100);
     }
 
     if (use_interrupt) {
@@ -58,12 +60,16 @@ void USB_Enable(unsigned use_interrupt)
 
 void USB_Disable()
 {
-    if (HAS_PIN(USB_ENABLE_PIN)) {
-        GPIO_pin_set(USB_ENABLE_PIN);
-    }
-
     nvic_disable_irq(NVIC_USB_LP_CAN_RX0_IRQ);
     nvic_disable_irq(NVIC_USB_WAKEUP_IRQ);
+
+    if (HAS_PIN(USB_ENABLE_PIN)) {
+        GPIO_pin_set(USB_ENABLE_PIN);
+    } else {
+        gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_2_MHZ,
+                GPIO_CNF_OUTPUT_PUSHPULL, GPIO12);
+        gpio_clear(GPIOA, GPIO12);
+    }
 }
 
 void USB_Poll()

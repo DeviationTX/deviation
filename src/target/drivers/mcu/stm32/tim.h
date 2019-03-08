@@ -15,6 +15,16 @@ INLINE static inline uint32_t TIM_OCx(unsigned channel)
     }
 }
 
+INLINE static inline uint32_t TIM_OCxN(unsigned channel)
+{
+    switch (channel) {
+        case 1: return TIM_OC1N;
+        case 2: return TIM_OC2N;
+        default: return ltassert();
+    }
+}
+
+
 INLINE static inline uint32_t TIM_DIER_CCxDE(unsigned channel)
 {
     switch (channel) {
@@ -41,7 +51,6 @@ INLINE static inline uint32_t RST_TIMx(uint32_t tim)
         case TIM12: return RST_TIM12;
         case TIM13: return RST_TIM13;
         case TIM14: return RST_TIM14;
-        case TIM15: return RST_TIM15;
         default: return ltassert();
     }
 }
@@ -54,7 +63,7 @@ INLINE static inline uint32_t TIM_FREQ_MHz(uint32_t tim)
         case TIM9:
         case TIM10:
         case TIM11:
-            return APB2_FREQ_MHz;
+            return (APB2_FREQ_MHz == AHB_FREQ_MHz) ? APB2_FREQ_MHz : 2 * APB2_FREQ_MHz;
         case TIM2:
         case TIM3:
         case TIM4:
@@ -64,7 +73,7 @@ INLINE static inline uint32_t TIM_FREQ_MHz(uint32_t tim)
         case TIM12:
         case TIM13:
         case TIM14:
-            return APB1_FREQ_MHz;
+            return (APB1_FREQ_MHz == AHB_FREQ_MHz) ? APB1_FREQ_MHz : 2 * APB1_FREQ_MHz;
         default: return ltassert();
     }
 }

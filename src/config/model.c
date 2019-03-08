@@ -29,24 +29,35 @@ struct Model Model;
 static u32 crc32;
 
 const char * const MODEL_TYPE_VAL[MODELTYPE_LAST] = { "heli", "plane", "multi" };
-const u8 RADIO_TX_POWER_COUNT[TX_MODULE_LAST] = {  // number of power settings
-     8,    //   CYRF6936,
-     7,    //   A7105,
-     8,    //   CC2500,
-     4,    //   NRF24L01,
-     8,    //   MULTIMOD,
-     4,    //   R9M (FCC/EU),
-};
+
+// entries in this list must match order in enum TxPower definition
+static const char * const std_powers[TXPOWER_LAST] = {
+    "100uW", "300uW", "1mW", "3mW", "10mW", "30mW", "100mW", "150mW"};
+static const char * const nrf_powers[] = { "1mW", "6mW", "25mW", "100mW"};
+static const char * const r9m_powers[] = { "10/25mW", "100/25mW", "500/500", "Auto/200" };
+
+#define STD_POWER_COUNT   (sizeof std_powers / sizeof (char *))
+#define A7105_POWER_COUNT (STD_POWER_COUNT - 1)
+#define NRF_POWER_COUNT   (sizeof nrf_powers / sizeof (char *))
+#define R9M_POWER_COUNT   (sizeof r9m_powers / sizeof (char *))
+
+u8 radio_tx_power_int(enum Radio radio, enum TxPower power) {
+    const u8 RADIO_TX_POWER_COUNT[TX_MODULE_LAST] = {  // number of power settings
+         STD_POWER_COUNT,     // CYRF6936,
+         A7105_POWER_COUNT,   // A7105,
+         STD_POWER_COUNT,     // CC2500,
+         NRF_POWER_COUNT,     // NRF24L01,
+         STD_POWER_COUNT,     // MULTIMOD,
+         R9M_POWER_COUNT,     // R9M (FCC/EU),
+    };
+
+    if (radio >= TX_MODULE_LAST) return 0;
+    if (power >= RADIO_TX_POWER_COUNT[radio]) return RADIO_TX_POWER_COUNT[radio]-1;
+    return power;
+}
 
 const char * radio_tx_power_val(enum Radio radio, enum TxPower power) {
-    // entries in this list must match order in enum TxPower definition
-    static const char * const std_powers[TXPOWER_LAST] = {
-        "100uW", "300uW", "1mW", "3mW", "10mW", "30mW", "100mW", "150mW"};
-    static const char * const nrf_powers[] = { "1mW", "6mW", "25mW", "100mW"};
-    static const char * const r9m_powers[] = { "10/25mW", "100/25mW", "500/500", "Auto/200" };
-
-    if (radio >= TX_MODULE_LAST) return NULL;
-    if (power >= RADIO_TX_POWER_COUNT[radio]) power = RADIO_TX_POWER_COUNT[radio]-1;
+    power = radio_tx_power_int(radio, power);
 
     switch (radio) {
     case CYRF6936:
@@ -58,6 +69,8 @@ const char * radio_tx_power_val(enum Radio radio, enum TxPower power) {
         return nrf_powers[power];
     case R9M:
         return r9m_powers[power];
+    case TX_MODULE_LAST:
+        return "";
     default:
         return NULL;    // never reached, silence warning
     }
@@ -492,7 +505,7 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
                 return 1;
 #if HAS_RTC
             for(i = 0; i < NUM_RTC; i++) {
-                if(mapstrcasecmp(ptr, RTC_Name(str, i)) == 0) {
+                if (mapstrcasecmp(ptr, RTC_Name(i)) == 0) {
                     src = i + 1;
                     break;
                 }
@@ -704,18 +717,14 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
         if(assign_int(&Model, _secradio, MAPSIZE(_secradio)))
             return 1;
         if (MATCH_KEY(RADIO_TX_POWER)) {
-            if (m->radio == TX_MODULE_LAST) {
-                m->tx_power = TXPOWER_150mW;
-                return 1;
-            }
-            for (i = 0; i < RADIO_TX_POWER_COUNT[m->radio]; i++) {
+            m->tx_power = radio_tx_power_int(m->radio, TXPOWER_LAST);  // default to radio maximum
+            for (i = 0; i <= m->tx_power; i++) {
                 if (MATCH_VALUE(radio_tx_power_val(m->radio, i))) {
                     m->tx_power = i;
                     return 1;
                 }
             }
             printf("Unknown Tx power: %s\n", value);
-            m->tx_power = RADIO_TX_POWER_COUNT[m->radio]-1;  // default to radio maximum
             return 1;
         }
         printf("Unknown Radio Key: %s\n", name);

@@ -54,7 +54,6 @@ static volatile u16 adc_array_oversample[SAMPLE_COUNT];
     // End
 #endif
 
-
 void ADC_Init(void)
 {
     #define ADC_CHAN(x, y) (x ? get_rcc_from_port(x) : 0)
@@ -116,6 +115,13 @@ void ADC_Init(void)
     dma_set_number_of_data(ADC_DMA.dma, ADC_DMA.stream, SAMPLE_COUNT);
     /* 5) Select dma channel*/
     DMA_channel_select(ADC_DMA);
+    /* 6) Let the DMA controller manage flow-control (required for cirular mode) */
+    DMA_set_dma_flow_control(ADC_DMA);
+    /* 7) priority = Very High */
+    DMA_set_priority(ADC_DMA, DMA_SxCR_PL_VERY_HIGH);
+    /* 8) Enable direct-mode (disable FIFO) */
+    DMA_enable_direct_mode(ADC_DMA);
+    /* 9) Setup everything else */
     /* the memory pointer has to be increased, and the peripheral not */
     dma_enable_memory_increment_mode(ADC_DMA.dma, ADC_DMA.stream);
     /* ADC_DR is only 16bit wide in this mode */
@@ -123,7 +129,9 @@ void ADC_Init(void)
     /*destination memory is also 16 bit wide */
     dma_set_memory_size(ADC_DMA.dma, ADC_DMA.stream, DMA_SxCR_MSIZE_16BIT);
     /* direction is from ADC to memory */
-    dma_set_read_from_peripheral(ADC_DMA.dma, ADC_DMA.stream);
+    DMA_set_transfer_mode(ADC_DMA, DMA_SxCR_DIR_PERIPHERAL_TO_MEM);
+    /* no double buffering */
+    DMA_disable_double_buffer_mode(ADC_DMA);
     /* continuous operation */
     dma_enable_circular_mode(ADC_DMA.dma, ADC_DMA.stream);
     /* we want an interrupt after the adc is finished */
@@ -133,6 +141,7 @@ void ADC_Init(void)
     DMA_enable_stream(ADC_DMA);
 
     adc_enable_dma(ADC_CFG.adc);
+    adc_set_dma_continue(ADC_CFG.adc);
     adc_set_regular_sequence(ADC_CFG.adc, NUM_ADC_CHANNELS, (u8 *)adc_chan_sel);
     adc_set_continuous_conversion_mode(ADC_CFG.adc);
     ADC_start_conversion(ADC_CFG.adc);
@@ -149,7 +158,7 @@ unsigned ADC_Read(unsigned channel)
      * If the ADC_CR2_ON bit is already set -> setting it another time
      * starts the conversion.
      */
-    adc_start_conversion_direct(ADC_CFG.adc);
+    ADC_start_conversion(ADC_CFG.adc);
 
     /* Wait for end of conversion. */
     while (!adc_eoc(ADC_CFG.adc))
@@ -160,7 +169,7 @@ unsigned ADC_Read(unsigned channel)
 void ADC_StartCapture()
 {
     //while (!(ADC_SR(_ADC) & ADC_SR_EOC));
-    adc_start_conversion_direct(ADC_CFG.adc);
+    ADC_start_conversion(ADC_CFG.adc);
 }
 
 void ADC_Filter()

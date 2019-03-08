@@ -150,10 +150,12 @@ typedef enum {
 extern volatile mixsync_t mixer_sync;
 
 /*PWM/PPM functions */
+#define PPM_POLARITY_NORMAL 0
+#define PPM_POLARITY_INVERTED 1
 void PWM_Initialize();
 void PWM_Stop();
 void PWM_Set(int);
-void PPM_Enable(unsigned low_time, volatile u16 *pulses, u8 num_pulses);
+void PPM_Enable(unsigned active_time, volatile u16 *pulses, u8 num_pulses, u8 polarity);
 void PXX_Enable(u8 *packet);
 
 /* PPM-In functions */
@@ -196,8 +198,11 @@ void PARFlash_Init();
 void PARFlash_ReadBytes(u32 readAddress, u32 length, u8 * buffer);
 int  PARFlash_ReadBytesStopCR(u32 readAddress, u32 length, u8 * buffer);
 
+void MMC_Init();
+
 #define FLASHTYPE_SPI 1
 #define FLASHTYPE_MCU 2
+#define FLASHTYPE_MMC 3
 
 #if FLASHTYPE == FLASHTYPE_SPI
     #define STORAGE_Init()   SPIFlash_Init()
@@ -215,8 +220,11 @@ int  PARFlash_ReadBytesStopCR(u32 readAddress, u32 length, u8 * buffer);
     #define STORAGE_ReadBytesStopCR MCUFlash_ReadBytesStopCR
     #define STORAGE_WriteBytes MCUFlash_WriteBytes
     #define STORAGE_EraseSector MCUFlash_EraseSector
+#elif FLASHTYPE == FLASHTYPE_MMC
+    #define STORAGE_WriteEnable(enable) do {} while (0)
+    #define STORAGE_Init() MMC_Init()
 #else
-#error Define FLASHTYPE to FLASHTYPE_MCU or FLASHTYPE_SPI
+#error Define FLASHTYPE to FLASHTYPE_MCU or FLASHTYPE_SPI or FLASHTYPE_MMC
 #endif
 
 
@@ -268,6 +276,7 @@ typedef void usart_callback_t(u8 ch, u8 status);
 void UART_StartReceive(usart_callback_t isr_callback);
 void UART_StopReceive();
 void UART_SetDuplex(uart_duplex duplex);
+void UART_SendByte(u8 x);
 typedef void sser_callback_t(u8 data);
 void SSER_StartReceive(sser_callback_t isr_callback);
 void SSER_Initialize();
@@ -286,6 +295,7 @@ void MSC_Enable();
 void MSC_Disable();
 
 /* Filesystem */
+int FS_Init();
 int FS_Mount(void *FAT, const char *drive);
 void FS_Unmount();
 int FS_OpenDir(const char *path);

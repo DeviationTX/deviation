@@ -22,7 +22,7 @@ u32 remaining;
 const char *source_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    return DATALOG_Source(tempstring, (long)data);
+    return _tr(DATALOG_Source(tempstring, (uintptr_t)data));
 }
 
 static const char *ratesel_cb(guiObject_t *obj, int dir, void *data)
@@ -30,7 +30,7 @@ static const char *ratesel_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     (void)data;
     dlog->rate = GUI_TextSelectHelper(dlog->rate, 0, DLOG_RATE_LAST-1, dir, 1, 1, NULL);
-    return DATALOG_RateString(dlog->rate);
+    return _tr(DATALOG_RateString(dlog->rate));
 }
 
 static const char *sourcesel_cb(guiObject_t *obj, int dir, void *data)

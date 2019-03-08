@@ -61,6 +61,7 @@ void CLOCK_ResetWatchdog() {
 u32  SPIFlash_ReadID() { return 0x12345678; }
 void SPIFlash_BlockWriteEnable(unsigned enable) {(void)enable;}
 void SPITouch_Init() {}
+void PARFlash_Init() {}
 
 u8 *BOOTLOADER_Read(int idx) {
     static u8 str[3][80] = {
@@ -96,11 +97,15 @@ void fempty(FILE *fh)
     fseek(fh, 0, SEEK_SET);
 }
 
+int FS_Init() {
+    printf("Changing directory to: '%s'\n", FILESYSTEM_DIR);
+    return !chdir(FILESYSTEM_DIR);
+}
+
 int FS_Mount(void *FAT, const char *drive) {
     (void)FAT;
     (void)drive;
-    printf("Changing directory to: '%s'\n", FILESYSTEM_DIR);
-    return ! chdir(FILESYSTEM_DIR);
+    return 1;
 }
 
 static DIR *dh;

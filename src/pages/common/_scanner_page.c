@@ -139,5 +139,6 @@ void PAGE_ScannerEvent()
 
 void PAGE_ScannerExit()
 {
-    _scan_enable(0);
+    if (sp->enable)
+        _scan_enable(0);
 }

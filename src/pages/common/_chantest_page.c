@@ -42,7 +42,7 @@ const char *button_str_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     int button = (long)data;
-    return INPUT_ButtonName(button + 1);
+    return _tr(INPUT_ButtonName(button + 1));
 }
 
 unsigned button_capture_cb(u32 button, unsigned flags, void *data)

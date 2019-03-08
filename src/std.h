@@ -35,7 +35,7 @@
     size_t devo_fwrite(void *ptr, size_t size, size_t nmemb, FILE *stream);
     void devo_setbuf(FILE *stream, char *buf);
     long devo_ftell(FILE *stream);
-    void devo_finit(void *FAT, const char *str);
+    void devo_finit(FSHANDLE *fh, const char *str);
     void fempty(FILE *fh);
 
     #undef stdout

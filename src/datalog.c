@@ -43,7 +43,7 @@ const u32 sample_rate[DLOG_RATE_LAST] = {
     [DLOG_RATE_1MIN]  = 60000,
 };
 
-static FIL DatalogFAT;
+static FSHANDLE DatalogFAT;
 static FILE *fh;
 static u32 next_update;
 static u32 dlog_pos;
@@ -54,11 +54,11 @@ u16 data_size;
 const char *DATALOG_RateString(int idx)
 {
     switch(idx) {
-        case 0: return _tr("1 sec");
-        case 1: return _tr("5 sec");
-        case 2: return _tr("10 sec");
-        case 3: return _tr("30 sec");
-        case 4: return _tr("60 sec");
+        case 0: return _tr_noop("1 sec");
+        case 1: return _tr_noop("5 sec");
+        case 2: return _tr_noop("10 sec");
+        case 3: return _tr_noop("30 sec");
+        case 4: return _tr_noop("60 sec");
     }
     return "";
 }
@@ -67,17 +67,17 @@ const char *DATALOG_Source(char *str, int idx)
 {
 #if HAS_RTC
     if (idx == DLOG_TIME) {
-        strcpy(str, _tr("RTC Time"));
+        strcpy(str, _tr_noop("RTC Time"));
     } else
 #endif
     if (idx == DLOG_GPSTIME) {
-        strcpy(str, _tr("GPS Time"));
+        strcpy(str, _tr_noop("GPS Time"));
     } else if (idx == DLOG_GPSLOC) {
-        strcpy(str, _tr("GPS Coords"));
+        strcpy(str, _tr_noop("GPS Coords"));
     } else if (idx == DLOG_GPSALT) {
-        strcpy(str, _tr("GPS Alt."));
+        strcpy(str, _tr_noop("GPS Alt."));
     } else if (idx == DLOG_GPSSPEED) {
-        strcpy(str, _tr("GPS Speed"));
+        strcpy(str, _tr_noop("GPS Speed"));
     } else if (idx >= DLOG_INPUTS) {
         return INPUT_SourceName(str, idx - DLOG_INPUTS + 1);
     } else if (idx >= DLOG_TELEMETRY) {
