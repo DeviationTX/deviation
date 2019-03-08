@@ -8,12 +8,14 @@ LANGUAGE    := devo8,devo12
 
 OPTIMIZE_DFU := 1
 
-include $(SDIR)/target/tx/devo/common/Makefile.inc
+TARGET=devo12
 
-ifndef BUILD_TARGET
+include $(SDIR)/target/tx/devo/common/Makefile.inc
+include $(SDIR)/Makefile.inc
+
 ALL += $(TARGET)-lib.dfu
 MEDIA_FILES = 
-else
+
 $(TARGET)-lib.dfu: $(LAST_MODEL) $(TARGET).dfu $(PRE_FS)
 	/bin/rm -rf $(ODIR)/filesystem 2> /dev/null; true
 	/bin/mkdir $(ODIR)/filesystem
@@ -41,5 +43,3 @@ endif
 	zip -u deviation-$(HGVERSION).zip debug-$(HGVERSION).zip
 	rm -f debug-$(HGVERSION).zip
 	rm -f deviation-$(HGVERSION).dfu
-
-endif #BUILD_TARGET

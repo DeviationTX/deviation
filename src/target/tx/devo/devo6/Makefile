@@ -6,7 +6,7 @@ FONTS        = filesystem/$(FILESYSTEM)/media/15normal.fon \
                filesystem/$(FILESYSTEM)/media/23bold.fon
 LANGUAGE    := devo8
 
-include $(SDIR)/target/tx/devo/common/Makefile.inc
+TARGET=devo6
 
-ifndef BUILD_TARGET
-endif
+include $(SDIR)/target/tx/devo/common/Makefile.inc
+include $(SDIR)/Makefile.inc

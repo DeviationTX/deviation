@@ -1,8 +1,5 @@
 
-ifndef BUILD_TARGET
 ALL += $(ODIR)/devo.fs
-
-else
 
 ifdef MODULAR
 DEFAULT_PROTOCOLS = devo.mod dsm2.mod
@@ -18,5 +15,3 @@ ifneq "$(REQUIRED_PROTOCOLS)" ""
 	cp -pf $(REQUIRED_PROTOCOLS) $(ODIR)/tmpfs/protocol/
 endif
 	target/drivers/filesystems/devofs/buildfs.py -c -f $@ -d $(ODIR)/tmpfs
-
-endif

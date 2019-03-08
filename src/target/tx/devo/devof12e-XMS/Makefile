@@ -7,18 +7,16 @@ FONTS        = filesystem/$(FILESYSTEM)/media/f12e.fon
 
 OPTIMIZE_DFU := 1
 
-include $(SDIR)/target/tx/devo/common/Makefile.inc
+SRC_C   += $(SDIR)target/tx/devo/devof12e/channels.c \
+           $(SDIR)target/tx/devo/devof12e/crc.c \
+           $(SDIR)target/tx/devo/devof12e/lcd.c \
+           $(SDIR)target/tx/devo/devof12e/mapped_gfx.c
 
-ifndef BUILD_TARGET
+TARGET=devof12e-XMS
 
-SRC_C   += $(SDIR)/target/tx/devo/devof12e/channels.c \
-           $(SDIR)/target/tx/devo/devof12e/crc.c \
-           $(SDIR)/target/tx/devo/devof12e/lcd.c \
-           $(SDIR)/target/tx/devo/devof12e/mapped_gfx.c
-
-else
+include $(SDIR)target/tx/devo/common/Makefile.inc
+include $(SDIR)Makefile.inc
 
 $(TARGET).fs_wrapper: $(LAST_MODEL)
 	perl -p -i -e 's/=12normal/=f12e/' filesystem/$(FILESYSTEM)/media/config.ini
 
-endif

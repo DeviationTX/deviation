@@ -10,10 +10,10 @@ MODULAR          := 0x20004000
 DFU_ARGS         := -c 7 -b 0x08003000
 ENABLE_LTO       := 1
 
-include $(SDIR)/target/tx/devo/common/Makefile.inc
+TARGET=devo7e
 
-ifdef BUILD_TARGET
+include $(SDIR)/target/tx/devo/common/Makefile.inc
+include $(SDIR)/Makefile.inc
+
 $(TARGET).fs_wrapper: $(LAST_MODEL)
 	perl -p -i -e 's/; has_pa-cyrf6936 = 1/  has_pa-cyrf6936 = 0/' filesystem/$(FILESYSTEM)/hardware.ini
-
-endif

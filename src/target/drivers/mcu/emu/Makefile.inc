@@ -16,9 +16,9 @@ endif
 ifdef USE_INTERNAL_FS
 SRC_C  += $(wildcard $(SDIR)target/drivers/filesystems/devofs/*.c) \
           $(wildcard $(SDIR)target/drivers/filesystems/petit_fat/*.c)
-CFLAGS = -DEMULATOR=USE_INTERNAL_FS
+CFLAGS += -DEMULATOR=USE_INTERNAL_FS
 else
-CFLAGS = -DEMULATOR=USE_NATIVE_FS
+CFLAGS += -DEMULATOR=USE_NATIVE_FS
 endif
 
 CFLAGS += -I$(SDIR)target/drivers/mcu/emu -I$(SDIR)target/drivers/filesystems
@@ -45,7 +45,7 @@ ifdef WINDOWS
     EXEEXT = exe
     ODIREXT = -w32
 else
-    EXEEXT = 
+    EXEEXT = elf
     CFLAGS := $(CFLAGS) $(shell fltk-config --cflags)
     LFLAGS := $(LFLAGS) $(shell fltk-config --ldflags)
     ifndef SOUND

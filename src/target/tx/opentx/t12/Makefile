@@ -5,7 +5,8 @@ FONTS        = filesystem/$(FILESYSTEM)/media/12normal.fon \
                filesystem/$(FILESYSTEM)/media/04b03.fon
 LANGUAGE    := devo10
 
-ifndef BUILD_TARGET
+FAMILY = opentx
+TARGET = t12
 
 CROSS    = arm-none-eabi-
 
@@ -18,7 +19,7 @@ SRC_C = $(wildcard target/tx/$(FAMILY)/$(TARGET)/*.c) \
         $(wildcard target/drivers/mcu/stm32/*.c) \
         $(wildcard target/drivers/serial/soft_serial/*.c) \
         $(wildcard target/drivers/serial/usb_cdc/*.c) \
-	target/drivers/filesystems/FatFs/ff.c \
+        target/drivers/filesystems/FatFs/ff.c \
         target/drivers/filesystems/FatFs/fattime.c \
         target/drivers/filesystems/FatFs/option/ccsbcs.c \
         $(wildcard target/drivers/storage/mmc_flash/*.c) \
@@ -41,17 +42,14 @@ LFLAGS2OPT  = -Wl,-Ttarget/$(TARGET)/$(TARGET)_opt.ld
 
 ALL = $(TARGET).dfu
 
-else #BUILD_TARGET
-
 $(TARGET).bin: $(TARGET).elf
 	$(CP) -O binary $< $@
 	$(DUMP) -S $< > $(TARGET).list
 
-$(LIBOPENCM3):
-	make -C libopencm3 TARGETS=stm32/f2 lib
+$(SDIR)$(LIBOPENCM3): $(ODIR)
+    test -s $(SDIR)libopencm3/Makefile || { echo "Fetch libopencm3 via 'git submodule update --init'"; exit 1; }
+    +$(FLOCKS) $(MAKE) -C $(SDIR)libopencm3 TARGETS=stm32/f2 lib
 
 $(TARGET).dfu: $(TARGET).bin
 	../utils/dfu.py --name "$(HGVERSION) Firmware" $(DFU_ARGS):$< $@
 	../utils/get_mem_usage.pl $(TARGET).map
-
-endif #BUILD_TARGET

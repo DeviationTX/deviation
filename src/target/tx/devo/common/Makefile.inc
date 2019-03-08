@@ -2,6 +2,8 @@ HAS_4IN1_FLASH ?= 0
 HAS_FLASH_DETECT ?= 0
 USE_JTAG ?= 0
 
+ODIR = $(SDIR)objs/$(TARGET)
+
 FAMILY=devo
 CROSS    = arm-none-eabi-
 EXTRA_MAKEFILES := $(EXTRA_MAKEFILES) $(SDIR)target/tx/devo/common/Makefile.inc
@@ -10,7 +12,7 @@ PROTO_LINKFILE = $(SDIR)target/tx/devo/$(TARGET)/protocol.ld
 
 LIBOPENCM3 = $(SDIR)libopencm3/lib/libopencm3_stm32f1.a
 
-SRC_C    = $(wildcard $(SDIR)target/tx/devo/$(TARGET)/*.c) \
+SRC_C    += $(wildcard $(SDIR)target/tx/devo/$(TARGET)/*.c) \
            $(wildcard $(SDIR)target/drivers/mcu/stm32/*.c) \
            $(wildcard $(SDIR)target/drivers/storage/*.c) \
            $(wildcard $(SDIR)target/drivers/indicators/*.c) \
@@ -31,7 +33,7 @@ SRC_C    = $(wildcard $(SDIR)target/tx/devo/$(TARGET)/*.c) \
            $(SDIR)target/drivers/input/analog/analog.c
 
 ifdef MODULAR
-PROTO_EXTRA_C = $(wildcard $(SDIR)target/tx/devo/common/protocol/*.c) \
+PROTO_EXTRA_C += $(wildcard $(SDIR)target/tx/devo/common/protocol/*.c) \
                 $(SDIR)target/drivers/usb/devo_hid.c \
                 $(wildcard $(SDIR)protocol/spi/*.c) \
                 $(SDIR)target/tx/devo/common/module_signature.c \
@@ -40,7 +42,7 @@ else
 SRC_C   += $(wildcard $(SDIR)target/tx/devo/common/protocol/*.c)
 endif
 
-CFLAGS   = -D"assert_param(x)=" -DSTM32F10X_HD -DSTM32F1 -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -fdata-sections -I$(SDIR)target/tx/devo/common -I$(SDIR)libopencm3/include -I$(SDIR)target/drivers/filesystems -fno-builtin-printf -Os --specs=nano.specs
+CFLAGS   += -D"assert_param(x)=" -DSTM32F10X_HD -DSTM32F1 -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -fdata-sections -I$(SDIR)target/tx/devo/common -I$(SDIR)libopencm3/include -I$(SDIR)target/drivers/filesystems -fno-builtin-printf -Os --specs=nano.specs
 ifeq "$(HAS_4IN1_FLASH)" "1"
 CFLAGS  += -D"HAS_4IN1_FLASH=1"
 endif
@@ -53,7 +55,7 @@ endif
 MODULE_CFLAGS := -fno-builtin
 
 #LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -nostdlib
-LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(SDIR)$(TARGET).map,--cref -lc -lnosys -L$(SDIR) -L$(SDIR)protocol -L$(SDIR)objs/$(TARGET) -Wl,-warn-common
+LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(SDIR)$(TARGET).map,--cref -lc -lnosys -L$(SDIR) -L$(SDIR)protocol -L$(ODIR) -Wl,-warn-common
 
 LINKFILE = $(SDIR)target/tx/devo/$(TARGET)/$(TARGET).ld
 LFLAGS2  = -Wl,-T$(LINKFILE)

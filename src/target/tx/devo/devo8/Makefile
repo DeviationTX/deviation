@@ -1,4 +1,3 @@
-TARGET=devo8
 FILESYSTEMS := common base_fonts 320x240x16
 SCREENSIZE  := 320x240x16
 DISPLAY_DRIVER := 8080/320x240x16.c
@@ -8,6 +7,8 @@ FONTS        = filesystem/$(FILESYSTEM)/media/15normal.fon \
 LANGUAGE    := devo8
 
 OPTIMIZE_DFU := 1
+
+TARGET=devo8
 
 include $(SDIR)/target/tx/devo/common/Makefile.inc
 include $(SDIR)/Makefile.inc

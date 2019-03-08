@@ -9,17 +9,16 @@ DFU_ARGS         := -c 7 -b 0x08003000
 
 PRE_FS = $(ODIR)/.pre_fs
 
-INCLUDE_FS := 0
-
-include target/tx/devo/common/Makefile.inc
-include target/tx/devo/common/Makefile.devofs.inc
-
-ifndef BUILD_TARGET
-
 MEDIA_FILES = 
 NUM_MODELS ?= 10
 
-else
+INCLUDE_FS := 0
+
+TARGET=devof7
+
+include $(SDIR)target/tx/devo/common/Makefile.inc
+include $(SDIR)target/tx/devo/common/Makefile.devofs.inc
+include $(SDIR)Makefile.inc
 
 #$(TARGET)-lib.dfu: $(wildcard filesystem/devof7/media/*.*) $(TARGET).dfu $(PRE_FS) $(TARGET).fs_wrapper
 #	target/tx/devo/common/devofs/buildfs.pl -invert filesystem/devof7 > $(ODIR)/$(TARGET)-lib.bin
@@ -29,4 +28,3 @@ else
 
 $(TARGET).fs_wrapper: $(LAST_MODEL)
 	rm filesystem/$(FILESYSTEM)/datalog.bin
-endif

@@ -9,10 +9,7 @@ FILESYSTEMS := common base_fonts 320x240x16
 else
 FILESYSTEMS := common base_fonts 320x240x1
 endif
-
-include $(SDIR)/target/tx/radiolink/common/Makefile.inc
-
-ifndef BUILD_TARGET
+TARGET = at10
 
 ALL = $(LIBOPENCM3) $(TARGET).bin $(TARGET).mac
 
@@ -23,11 +20,16 @@ ifneq "$(HAS_4IN1_FLASH)" "1"
 SRC_C := $(filter-out $(SDIR)/target/common/stm32/spi_flash.c, $(SRC_C))
 endif
 
-else #BUILD_TARGET
-$(TARGET).mac: $(TARGET).bin
+.PHONY: default
+default: $(SDIR)$(TARGET).mac
+
+include $(SDIR)target/tx/radiolink/common/Makefile.inc
+include $(SDIR)/Makefile.inc
+
+$(SDIR)$(TARGET).mac: $(SDIR)$(TARGET).bin
 	cat $(SDIR)/target/tx/radiolink/at10/header.mac $(TARGET).bin > $@
 
-$(TARGET).bin: $(TARGET).elf $(ODIR)/devo.fs
+$(SDIR)$(TARGET).bin: $(SDIR)  $(TARGET).elf $(ODIR)/devo.fs
 	$(CP) -O binary $(TARGET).elf $(ODIR)/$@
 	$(DUMP) -S $(TARGET).elf > $(TARGET).list
 	$(SDIR)/../utils/get_mem_usage.pl $(TARGET).map
@@ -42,7 +44,7 @@ $(TARGET).fs_wrapper: $(LAST_MODEL)
 	perl -p -i -e 's/drawn_background=0/drawn_background=1/' filesystem/$(FILESYSTEM)/media/config.ini
 	rm filesystem/$(FILESYSTEM)/datalog.bin
 
-$(TARGET).zip: $(ALL)
+$(SDIR)$(TARGET).zip: $(ALL)
 	cp -f $(TARGET).bin deviation-$(HGVERSION).bin
 	cp -f $(TARGET).mac deviation-$(HGVERSION).mac
 	rm -f deviation-$(HGVERSION).zip
@@ -52,5 +54,3 @@ $(TARGET).zip: $(ALL)
 	zip deviation-$(HGVERSION).zip deviation-$(HGVERSION).mac deviation-$(HGVERSION).bin $(EXTRA_DFUS)
 	zip -u deviation-$(HGVERSION).zip debug-$(HGVERSION).zip
 	rm -f debug-$(HGVERSION).zip
-
-endif #BUILD_TARGET

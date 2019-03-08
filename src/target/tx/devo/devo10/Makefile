@@ -8,4 +8,7 @@ LANGUAGE   := devo10
 
 OPTIMIZE_DFU := 1
 
+TARGET=devo10
+
 include $(SDIR)/target/tx/devo/common/Makefile.inc
+include $(SDIR)/Makefile.inc

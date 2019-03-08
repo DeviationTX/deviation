@@ -6,11 +6,10 @@ OPTIMIZE_DFU     := 1
 MODULAR          := 0x20004000
 DFU_ARGS         := -c 7 -b 0x08003000
 
-include target/tx/devo/common/Makefile.inc
-
-ifndef BUILD_TARGET
-
 SRC_C   += $(SDIR)/target/tx/devo/devof7/channels.c \
            $(SDIR)/target/tx/devo/devof7/crc.c
 
-endif
+TARGET=devof7-XMS
+
+include $(SDIR)/target/tx/devo/common/Makefile.inc
+include $(SDIR)/Makefile.inc

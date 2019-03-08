@@ -18,8 +18,8 @@ ALLTARGETS = $(filter-out common,$(notdir $(wildcard target/tx/*/*)))
 TXS ?= devo6 devo7e devo7e-256 devo8 devo10 devo12e devo12 devof7 devof7-XMS devof4 devof4-XMS devof12e devof12e-XMS at9 at10 t8sg t8sg_v2 t8sg_v2_plus ir8m
 
 #Filter non-existant emus
-EMUS = $(foreach dir,$(TXS:%=emu_%),$(if $(wildcard target/$(dir)),$(dir),))
-ALLEMUS = $(foreach dir,$(ALLTXS:%=emu_%),$(if $(wildcard target/$(dir)),$(dir),))
+EMUS = $(addprefix emu_, $(TXS))
+ALLEMUS = $(addprefix emu_, $(ALLTXS))
 
 default:
 	@echo specify the target to build. target can be one of

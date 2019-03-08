@@ -76,7 +76,9 @@ SRCS     := $(SRC_C) $(SRC_CXX) $(SRC_S)
 #This section intermediate build files     #
 ############################################
 ODIR     = $(SDIR)objs/$(TARGET)$(ODIREXT)/
-OBJS    := $(patsubst %.c,$(ODIR)%.o,$(notdir $(SRCS)))
+OBJS    := $(patsubst %.c,$(ODIR)%.o,$(notdir $(SRC_C))) $(patsubst %.cpp,$(ODIR)%.o,$(notdir $(SRC_CXX)))
+
+$(warning $(OBJS))
 
 ifdef MODULAR
 PROTO_OBJS  := $(addprefix $(ODIR), $(notdir $(PROTO_SRC_C:.c=.o)))
@@ -213,31 +215,30 @@ $(MODELDIR):
 #The main executable #
 ######################
 $(SDIR)$(TARGET).$(EXEEXT): $(LINKFILE) $(OBJS) $(LIBOPENCM3)
-	@echo " + Building '$@' '$(SRC_CXX)'"
+	@echo " + Building '$(notdir $@)'"
 ifdef LINKFILE #Create an empty 'obj/$(TARGET)/optimize.ld' just in case the linker script needs it
 	echo "" > $(ODIR)optimize.ld
 endif
 ifeq ("$(SRC_CXX)", "")
-	$(CC) -o $@ $(OBJS) $(LIBOPENCM3) $(LFLAGS) $(CFLAGS) $(EXTRA_CFLAGS)
+	$(CC) -o $@ $(OBJS) $(LIBOPENCM3) $(LFLAGS) $(LFLAGS2) $(CFLAGS) $(EXTRA_CFLAGS)
 else
-	$(CXX) -o $@ $(OBJS) $(LIBOPENCM3) $(LFLAGS) $(CFLAGS) $(EXTRA_CFLAGS)
+	$(CXX) -o $@ $(OBJS) $(LIBOPENCM3) $(LFLAGS) $(LFLAGS2) $(CFLAGS) $(EXTRA_CFLAGS)
 endif
-
 
 ##############################
 #Build rules for all .o files#
 ##############################
 $(ODIR)%.o: %.c
-	@echo " + Compiling '$<'"
-	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) $(CFLAGS_$(basename $(notdir $<))) -c -o $@ $<
+	@echo " + Compiling '$(notdir $<)'"
+	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) $(CFLAGS_$(basename $(notdir $<))) -MT $@ -MD -MP -MF $(@:.o=.d) -c -o $@ $<
 
 $(ODIR)%.o: %.cpp
-	@echo " + Compiling '$<'"
-	$(CXX) $(CXXFLAGS) $(EXTRA_CFLAGS) $(CXXFLAGS_$(basename $(notdir $<))) -c -o $@ $<
+	@echo " + Compiling '$(notdir $<)'"
+	$(CXX) $(CXXFLAGS) $(EXTRA_CFLAGS) $(CXXFLAGS_$(basename $(notdir $<))) -MD -MP -MF $(@:.o=.d) -c -o $@ $<
 
 #For module building
 $(ODIR)%.o_: %.c
-	@echo " + Compiling '$<' as module"
+	@echo " + Compiling '$(notdir $<)' as module"
 	$(CC) $(CFLAGS) $(MODULE_CFLAGS) $(CFLAGS_$(basename $(notdir $<))) -c -o $@ $<
 
 ##############################
@@ -250,3 +251,4 @@ $(ODIR)hgstamp:
 	echo $(HGVERSION) > $(ODIR)hgstamp
 
 include $(SDIR)fs/Makefile.inc
+-include $(OBJS:.o=.d)

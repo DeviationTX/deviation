@@ -12,20 +12,21 @@ endif
 
 DFU_ARGS    := -D 0x0483:0xdf12 -b 0x08003000
 
-include $(SDIR)/target/tx/radiolink/common/Makefile.inc
-
-ifndef BUILD_TARGET
 
 ifneq "$(HAS_4IN1_FLASH)" "1"
 EXTRA_DFUS = $(TARGET)-fs.dfu
 endif
 
-ALL = $(LIBOPENCM3) $(TARGET).dfu $(EXTRA_DFUS)
+.PHONY: default
+default: $(SDIR)$(TARGET).dfu
+
+ALL = $(LIBOPENCM3) $(SDIR).dfu $(EXTRA_DFUS)
 
 SRC_C   += $(SDIR)/target/drivers/display/8080/320x240x16.c \
            $(wildcard $(SDIR)/target/drivers/input/rotary/*.c)
 
-else #BUILD_TARGET
+include $(SDIR)/target/tx/radiolink/common/Makefile.inc
+include $(SDIR)/Makefile.inc
 
 $(TARGET).bin: $(TARGET).elf
 	$(CP) -O binary $< $@
@@ -52,5 +53,3 @@ $(TARGET).zip: $(ALL)
 	zip -u deviation-$(HGVERSION).zip debug-$(HGVERSION).zip
 	rm -f debug-$(HGVERSION).zip
 	rm -f deviation-$(HGVERSION).dfu
-
-endif #BUILD_TARGET
