@@ -47,9 +47,11 @@ $(TARGET).bin: $(TARGET).elf
 	$(DUMP) -S $< > $(TARGET).list
 
 $(SDIR)$(LIBOPENCM3): $(ODIR)
-    test -s $(SDIR)libopencm3/Makefile || { echo "Fetch libopencm3 via 'git submodule update --init'"; exit 1; }
-    +$(FLOCKS) $(MAKE) -C $(SDIR)libopencm3 TARGETS=stm32/f2 lib
+	test -s $(SDIR)libopencm3/Makefile || { echo "Fetch libopencm3 via 'git submodule update --init'"; exit 1; }
+	+$(FLOCKS) $(MAKE) -C $(SDIR)libopencm3 TARGETS=stm32/f2 lib
 
 $(TARGET).dfu: $(TARGET).bin
 	../utils/dfu.py --name "$(HGVERSION) Firmware" $(DFU_ARGS):$< $@
 	../utils/get_mem_usage.pl $(TARGET).map
+
+include $(SDIR)/Makefile.inc

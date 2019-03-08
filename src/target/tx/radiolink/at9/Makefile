@@ -12,6 +12,7 @@ endif
 
 DFU_ARGS    := -D 0x0483:0xdf12 -b 0x08003000
 
+TARGET       = at9
 
 ifneq "$(HAS_4IN1_FLASH)" "1"
 EXTRA_DFUS = $(TARGET)-fs.dfu
@@ -22,28 +23,28 @@ default: $(SDIR)$(TARGET).dfu
 
 ALL = $(LIBOPENCM3) $(SDIR).dfu $(EXTRA_DFUS)
 
-SRC_C   += $(SDIR)/target/drivers/display/8080/320x240x16.c \
-           $(wildcard $(SDIR)/target/drivers/input/rotary/*.c)
+SRC_C   += $(SDIR)target/drivers/display/8080/320x240x16.c \
+           $(wildcard $(SDIR)target/drivers/input/rotary/*.c)
 
-include $(SDIR)/target/tx/radiolink/common/Makefile.inc
-include $(SDIR)/Makefile.inc
+include $(SDIR)target/tx/radiolink/common/Makefile.inc
+include $(SDIR)Makefile.inc
 
-$(TARGET).bin: $(TARGET).elf
+$(SDIR)$(TARGET).bin: $(SDIR)$(TARGET).elf
 	$(CP) -O binary $< $@
-	$(DUMP) -S $< > $(TARGET).list
+	$(DUMP) -S $< > $(SDIR)$(TARGET).list
 
-$(TARGET).dfu: $(TARGET).bin
-	$(SDIR)/../utils/dfu.py --name "$(HGVERSION) Firmware" $(DFU_ARGS):$< $@
-	$(SDIR)/../utils/get_mem_usage.pl $(TARGET).map
+$(SDIR)$(TARGET).dfu: $(SDIR)$(TARGET).bin
+	$(SDIR)../utils/dfu.py --name "$(HGVERSION) Firmware" $(DFU_ARGS):$< $@
+	$(SDIR)../utils/get_mem_usage.pl $(SDIR)$(TARGET).map
 
-$(TARGET)-fs.dfu: $(ODIR)/devo.fs
-	$(SDIR)/../utils/dfu.py --name "$(HGVERSION) Filesystem" -D 0x0483:0xdf12 -b 0x08040000:$< $@
+$(SDIR)$(TARGET)-fs.dfu: $(ODIR)/devo.fs
+	$(SDIR)../utils/dfu.py --name "$(HGVERSION) Filesystem" -D 0x0483:0xdf12 -b 0x08040000:$< $@
 
 $(TARGET).fs_wrapper: $(LAST_MODEL)
 	perl -p -i -e 's/=15normal/=15ascii/' filesystem/$(FILESYSTEM)/media/config.ini
 	rm filesystem/$(FILESYSTEM)/datalog.bin
 
-$(TARGET).zip: $(ALL)
+$(SDIR)$(TARGET).zip: $(ALL)
 	cp -f $(TARGET).dfu deviation-$(HGVERSION).dfu
 	rm -f deviation-$(HGVERSION).zip
 	rm -f debug-$(HGVERSION).zip

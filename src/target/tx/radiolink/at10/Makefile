@@ -13,26 +13,26 @@ TARGET = at10
 
 ALL = $(LIBOPENCM3) $(TARGET).bin $(TARGET).mac
 
-SRC_C   += $(SDIR)/target/drivers/display/8080/320x240x16.c \
-           $(wildcard $(SDIR)/target/drivers/input/rotary/*.c)
+SRC_C   += $(SDIR)target/drivers/display/8080/320x240x16.c \
+           $(wildcard $(SDIR)target/drivers/input/rotary/*.c)
 
 ifneq "$(HAS_4IN1_FLASH)" "1"
-SRC_C := $(filter-out $(SDIR)/target/common/stm32/spi_flash.c, $(SRC_C))
+SRC_C := $(filter-out $(SDIR)target/common/stm32/spi_flash.c, $(SRC_C))
 endif
 
 .PHONY: default
 default: $(SDIR)$(TARGET).mac
 
 include $(SDIR)target/tx/radiolink/common/Makefile.inc
-include $(SDIR)/Makefile.inc
+include $(SDIR)Makefile.inc
 
 $(SDIR)$(TARGET).mac: $(SDIR)$(TARGET).bin
-	cat $(SDIR)/target/tx/radiolink/at10/header.mac $(TARGET).bin > $@
+	cat $(SDIR)target/tx/radiolink/at10/header.mac $(TARGET).bin > $@
 
-$(SDIR)$(TARGET).bin: $(SDIR)  $(TARGET).elf $(ODIR)/devo.fs
+$(SDIR)$(TARGET).bin: $(SDIR) $(TARGET).elf $(ODIR)/devo.fs
 	$(CP) -O binary $(TARGET).elf $(ODIR)/$@
 	$(DUMP) -S $(TARGET).elf > $(TARGET).list
-	$(SDIR)/../utils/get_mem_usage.pl $(TARGET).map
+	$(SDIR)../utils/get_mem_usage.pl $(TARGET).map
 ifneq "$(HAS_4IN1_FLASH)" "1"
 	# padding firmware to 216KB
 	truncate --size=216K $(ODIR)/$@

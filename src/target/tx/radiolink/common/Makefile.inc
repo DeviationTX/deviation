@@ -44,7 +44,7 @@ CFLAGS  += -D"HAS_4IN1_FLASH=1"
 endif
 MODULE_CFLAGS = -fno-builtin
 
-LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -lc -lnosys -L$(SDIR) -L$(SDIR)protocol -L$(ODIR)
+LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(SDIR)$(TARGET).map,--cref -lc -lnosys -L$(SDIR) -L$(SDIR)protocol -L$(ODIR)
 LFLAGS2  = -Wl,-T$(LINKFILE)
 
 ifdef ENABLE_LTO
@@ -57,9 +57,6 @@ ifdef ENABLE_LTO
 $(foreach src,$(filter %_isr.c,$(SRCS)),\
 						$(eval CFLAGS_$(basename $(notdir $(src))) = -fno-lto))
 endif
-
-TARGET       := t12
-include $(SDIR)/Makefile.inc
 
 $(SDIR)$(LIBOPENCM3): $(ODIR)
 	test -s $(SDIR)libopencm3/Makefile || { echo "Fetch libopencm3 via 'git submodule update --init'"; exit 1; }
