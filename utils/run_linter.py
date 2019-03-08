@@ -412,7 +412,7 @@ def post_status(state, context, description):
 
     logging.debug("POST: %s", url)
     logging.debug("Data: %s", json.dumps(data))
-    request = urllib.request.Request(url, json.dumps(data), headers)
+    request = urllib.request.Request(url, json.dumps(data).encode('utf-8'), headers)
     res = urllib.request.urlopen(request)
     raise_for_status(url, res)
 
@@ -432,7 +432,7 @@ def post_pull_comment(filename, offset, message):
     logging.debug("Data: %s", json.dumps(data))
 
     try:
-        request = urllib.request.Request(url, json.dumps(data), headers)
+        request = urllib.request.Request(url, json.dumps(data).encode('utf-8'), headers)
         res = urllib.request.urlopen(request)
         raise_for_status(url, res)
     except urllib.error.HTTPError as _e:
