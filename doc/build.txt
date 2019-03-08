@@ -1,0 +1,60 @@
+Design Document for build system
+
+Build system is using make.
+
+src/Makefile - this is meta Makefile which has the logic to find the right target under target/ folder and build it by invoke another make. It defines each target as a build target, each family as a build target. In addition to zip_<target> etc to build zip package for certain target.
+    Exported Variables:
+        SDIR = the full path src folder
+
+src/Makefile.inc - this is core of the build logic. This makefile compose the final build steps and execute them. This file should included as last one in Makefile.
+    Import Variables:
+    	TARGET = the target name, can be devo10 or emu_devo10
+    	FAMILY = the family name
+    	EXEEXT = the default exe extention name
+    	
+    	CROSS = set this to prefix of cross-compiler. otherwise leave it as empty
+
+    	SRCS_C = the c files to be compiled
+    	SRCS_CPP = the cpp files to be compiled
+    	CFLAGS = the C compile flags
+    	CXXFLAGS = the C++ compile flags
+    	LDFLAGS = the link flags
+    	INCLUDES = the folder to includes
+    	DEFINES = the macro definitions
+
+    	MOD_SRCS_C = the c files for module
+    	MOD_CFLAGS = the c compile flags for module
+    	MOD_LDFLAGS = the link flags for modules
+    	
+    	ALL = Additional targets beside $(TARGET).$(EXEEXT)
+
+src/fs/Makefile.inc - this contains the logic to create filesystem folder for certain target
+	Import Variables:
+		TARGET = the target name
+		FILESYSTEM = the filesystem to be choosed between different predefined sets
+		FONTS = the fonts to be includes
+
+src/target/<family>/<target>/Makefile - this file is entry point for build for target. It normally includes other makefile.inc to compose the build. Normally this file will includes src/target/<family>/common/Makefile.inc.
+	Export Variables:
+		TARGET = the target name
+		SRCS = default the files
+		ODIR = ODIR is defined as $(SDIR)/objs/$(TARGET)
+
+	Import Variables:
+		SDIR
+
+src/target/<family>/common/Makefile.inc - this contains the logic to abstract common from a Tx family
+	Import Variables:
+		TARGET
+		DTU_PARAM
+
+	Export Variables:
+
+
+src/drivres/mcu/<mcu>/Makefile.inc - this contains the logic for certain platform. For example, stm32 contains the logic for cross-compile and the logic to build libopencm3. x86 contains the logic to build tx on PC platform.
+
+a typical include chain is like the following
+	target/<family>/<target>/Makefile <-    target/<family>/common/Makefile.inc <- target/drivres/mcu/<mcu>/Makefile.inc
+	                                                                            <- target/drivres/<other_drivers_type>/<driver>/Makefile.inc
+	                                                                            <- fs/Makefile.inc
+	                                                                            <- Makefile.inc

@@ -4,12 +4,13 @@ unexport LANGUAGE
 MAKEFLAGS += --no-builtin-rules
 .SUFFIXES:
 
+# Setup common folder structure variables
+mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
+export SDIR = $(dir $(mkfile_path))
+
 ###########################################
 ## Provide some convenient make targets  ##
 ###########################################
-ifndef  TARGET
-TARGET   ?= devo8
-default: $(TARGET)
 
 ALLTARGETS = $(filter-out common,$(notdir $(wildcard target/tx/*/*)))
 
@@ -17,9 +18,15 @@ ALLTARGETS = $(filter-out common,$(notdir $(wildcard target/tx/*/*)))
 TXS ?= devo6 devo7e devo7e-256 devo8 devo10 devo12e devo12 devof7 devof7-XMS devof4 devof4-XMS devof12e devof12e-XMS at9 at10 t8sg t8sg_v2 t8sg_v2_plus ir8m
 
 #Filter non-existant emus
-EMUS = $(foreach dir,$(TXS:%=emu_%),$(if $(wildcard target/$(dir)),$(dir),))
-ALLEMUS = $(foreach dir,$(ALLTXS:%=emu_%),$(if $(wildcard target/$(dir)),$(dir),))
+EMUS = $(addprefix emu_, $(TXS))
+ALLEMUS = $(addprefix emu_, $(ALLTXS))
 
+default:
+	@echo specify the target to build. target can be one of
+	@echo $(TXS)
+	@echo $(addprefix emu_, $(TXS))
+
+.PHONY: txs emus both fss zips emuzips winzips release everything
 txs: $(TXS)
 emus: $(EMUS)
 both: txs emus
@@ -27,193 +34,46 @@ fss: $(TXS:%=fs_%)
 zips: $(TXS:%=zip_%)
 emuzips: $(EMUS:%=zip_%)
 winzips: $(EMUS:%=zip_win_%)
+release:  $(TXS:%=zip_%) $(EMUS:%=zip_win_%) $(TXS:%=fs_%)
 everything: txs emus fss
 
 # Generate the targets for a transmitter.
 define make-target
+.PHONY: $1 win_$1 fs_$1 both_$1 zip_$1 zip_win_$1 release_$1 all_$1
 $1:
-	+$(MAKE) TARGET=$1
+	+$(MAKE) -C target/tx/$2/$1
 win_$1:
 ifeq ($(OS),Windows_NT)
 	# This builds Windows emulators on a Windows system
-	+$(MAKE) TARGET=$1 WINDOWS=1
+	+$(MAKE) -C target/tx/$2/$1 WINDOWS=1
 else
 	# This builds Windows emulators on a Linux system
-	+$(MAKE) TARGET=$1 WINDOWS=1 CROSS=i586-mingw32msvc-
+	+$(MAKE) -C target/tx/$2/$1 WINDOWS=1 CROSS=i586-mingw32msvc-
 endif
 fs_$1:
 ifneq "$(INCLUDE_FS)" "1"
-	+$(MAKE) TARGET=$1 fs
+	+$(MAKE) -C target/tx/$2/$1 fs
 endif
 both_$1: $1 emu_$1
 zip_$1:
-	+$(MAKE) TARGET=$1 zip
+	+$(MAKE) -C target/tx/$2/$1 zip
 zip_win_$1:
 ifeq ($(OS),Windows_NT)
 	# This builds Windows emulators on a Windows system
-	+$(MAKE) TARGET=$1 WINDOWS=1 zip
+	+$(MAKE) -C target/tx/$2/$1 WINDOWS=1 zip
 else
 	# This builds Windows emulators on a Linux system
-	+$(MAKE) TARGET=$1 WINDOWS=1 CROSS=i586-mingw32msvc- zip
+	+$(MAKE) -C target/tx/$2/$1 WINDOWS=1 CROSS=i586-mingw32msvc- zip
 endif
 release_$1: zip_$1 zip_win_emu_$1 fs_$1
 all_$1:
-	+$(MAKE) TARGET=$1 all
+	+$(MAKE) -C target/tx/$2/$1 all
 endef
 
 # Now generate all the convenience targets
-$(foreach t,$(ALLTARGETS),$(eval $(call make-target,$t)))
-endif
+$(foreach t,$(ALLTARGETS),$(eval $(call make-target,$t,$(notdir $(patsubst %/,%,$(dir $(wildcard target/tx/*/$(t))))))))
 
-# Determine the directory above the target directory
-FAMILY = $(notdir $(patsubst %/,%,$(dir $(wildcard target/tx/*/$(TARGET)))))
-
-# We want to turn on INCLUDE_FS by default
-INCLUDE_FS ?= 1
-
-# Use VERBOSE=1 to enable verbose make
-PROGMODE ?= STATUS_SCREEN
-SDIR := .
-include target/tx/$(FAMILY)/$(TARGET)/Makefile.inc
-
-NUM_MODELS ?= 30
-TYPE     ?= prd
-
-###############################################
-#This section defines binaries needed to build#
-###############################################
-ifdef CROSS
-    CC   = $(CROSS)gcc
-    CXX  = $(CROSS)g++
-    LD   = $(CROSS)ld
-    AR   = $(CROSS)ar
-    AS   = $(CROSS)as
-    CP   = $(CROSS)objcopy
-    DUMP = $(CROSS)objdump
-    NM   = $(CROSS)nm
-endif
-CC   ?= gcc
-CXX  ?= g++
-LD   ?= ld
-AR   ?= ar
-AS   ?= as
-CP   ?= objcopy
-DUMP ?= objdump
-###############################################
-#END SECTION                                  #
-###############################################
-
-############################################
-#This section defines the source files used#
-############################################
-SRC_C    +=  $(wildcard *.c) $(wildcard misc/*.c) $(wildcard screen/*.c) $(wildcard screen/$(SCREENSIZE)/*.c) \
-             $(wildcard gui/*.c) $(wildcard pages/$(SCREENSIZE)/*.c) $(wildcard config/*.c)
-
-ifdef MODULAR
-   SRC_C    += protocol/protocol.c
-   PROTO_SRC_C := $(filter-out protocol/protocol.c, $(wildcard protocol/*.c) $(wildcard protocol/spi/*.c))
-else
-   SRC_C    := $(SRC_C) $(wildcard protocol/*.c) $(wildcard protocol/spi/*.c)
-endif
-
-SRC_C    := $(SRC_C) $(wildcard pages/$(SCREENSIZE)/standard/*.c)
-SRC_C    := $(SRC_C) $(wildcard pages/$(SCREENSIZE)/advanced/*.c)
-
-SRC_S    := $(SRC_S) $(wildcard *.s)
-SRC_CXX  := $(SRC_CXX) $(wildcard *.cpp)
-SRCS     := $(SRC_C) $(SRC_CXX) $(SRC_S)
-############################################
-#END SECTION                               #
-############################################
-
-
-############################################
-#This section intermediate build files     #
-############################################
-ODIR     = objs/$(TARGET)$(ODIREXT)
-OBJS 	 = $(addprefix $(ODIR)/, $(notdir $(SRC_C:.c=.o) $(SRC_S:.s=.o) $(SRC_CXX:.cpp=.o)))
-
-ifdef MODULAR
-PROTO_OBJS  := $(addprefix $(ODIR)/, $(notdir $(PROTO_SRC_C:.c=.o)))
-PROTO_LIBS  := $(addprefix $(ODIR)/, $(notdir $(PROTO_SRC_C:.c=.bin)))
-PROTO_EXTRA_OBJS := $(addprefix $(ODIR)/, $(notdir $(PROTO_EXTRA_C:.c=.o_)))
-SYMBOL_FILE := $(ODIR)/symbolfile
-endif
-
-HGVERSION ?= $(shell ../utils/get_version.pl ${TARGET})
-HGVERSION := $(HGVERSION)
-
-# Rebuild on hg version change.
-# Based on http://mercurial.selenic.com/wiki/VersioningWithMake
-# We need to always run this code, as opposed to running it from a prerequisite
-# The HGTEST variable is not used
-HGTEST := $(shell mkdir -p $(ODIR); \
-	[ -f $(ODIR)/hgstamp ] || touch $(ODIR)/hgstamp; \
-	echo $(HGVERSION) | cmp -s $(ODIR)/hgstamp - \
-	|| echo $(HGVERSION) > $(ODIR)/hgstamp)
-############################################
-#END SECTION                               #
-############################################
-
-##################################################
-#This section contains switches used for building#
-##################################################
-ifeq "$(TYPE)" "dev"
-  CFLAGS   := $(CFLAGS) -DBUILDTYPE_DEV
-endif
-ifdef MODULAR
-MODULE_CFLAGS   := $(MODULE_CFLAGS) -DMODULAR=$(MODULAR)
-CFLAGS   := $(CFLAGS) -DENABLE_MODULAR=$(MODULAR)
-endif
-
-CFLAGS   := $(CFLAGS) -g -Wall -Wextra -Werror=undef -I. -D$(PROGMODE) -std=gnu99 -Itarget/tx/$(FAMILY)/$(TARGET) -Igui/$(SCREENSIZE) \
-            -Ipages/$(SCREENSIZE) \
-            -DHGVERSION="\"${HGVERSION}\""
-CXXFLAGS := $(CXXFLAGS) $(patsubst -std=gnu99,,$(CFLAGS))
-EXEEXT   ?= elf
-##################################################
-#END SECTION                                     #
-##################################################
-
-############################################
-#this section defines final build files    #
-############################################
-FILESYSTEM = $(subst emu_,,$(TARGET))
-MODELDIR = filesystem/$(FILESYSTEM)/models
-
-LAST_MODEL := $(MODELDIR)/model$(NUM_MODELS).ini
-
-ALL += $(TARGET).fs_wrapper
-ifdef MODULAR
-include protocol/Makefile.inc
-endif
-############################################
-#END SECTION                               #
-############################################
-
-############################################
-#this section includes build targets       #
-############################################
-all : $(ALL)
-
-####################################
-# recompile if the Makefile changes#
-####################################
-$(OBJS) $(PROTO_OBJS) ($PROTO_EXTRA_OBJS): Makefile target/tx/$(FAMILY)/$(TARGET)/Makefile.inc $(EXTRA_MAKEFILES)
-
-##################################################################################
-# The following enables quiet output unless you use VERBOSE=1                    #
-# Note that this must be after the 1st rule so that it doesn't execute by default#
-##################################################################################
-$(VERBOSE).SILENT:
-
-.PHONY: clean distclean language lint
-
-clean:
-	rm -f $(TARGET).$(EXEEXT) $(TARGET).exe $(TARGET).bin $(TARGET).dfu $(TARGET).list \
-		$(TARGET).map $(ODIR)/*.o $(ODIR)/*.o_ $(ODIR)/*.P  $(ODIR)/*.bin \
-		filesystem/$(FILESYSYTEM) 2> /dev/null || true
-
+.PHONY: distclean coverity lint
 distclean:
 	rm -f *.$(EXEEXT) *.exe *.bin *.dfu *.list *.map
 	rm -rf objs
@@ -221,191 +81,11 @@ distclean:
 	$(MAKE) -C libopencm3 clean > /dev/null
 	rm -rf deviation*.zip
 
-language:
-	../utils/extract_strings.pl -po > fs/language/deviation.po
-
-
-zip: $(TARGET).zip
-
-%.zip: $(ALL) $(TARGET).dfu $(PROTO_MODULES)
-	#This is not an emulator build (emulator is hanled in target/common/emu/Makefile.inc)
-	cp -f $(TARGET).dfu deviation-$(HGVERSION).dfu
-	rm -f deviation-$(HGVERSION).zip
-	rm -f debug-$(HGVERSION).zip
-	zip debug-$(HGVERSION).zip $(TARGET).elf
-	# $(MAKE) zipping more compatible with other distributions
-	export p=`pwd`; cd $(ODIR) && test -e devo.fs && zip -u $$p/deviation-$(HGVERSION).zip devo.fs && rm devo.fs || true
-	zip deviation-$(HGVERSION).zip deviation-$(HGVERSION).dfu UPDATING.md
-ifdef MODULAR
-	export p=`pwd`; cd $(ODIR) && zip -ur $$p/deviation-$(HGVERSION).zip protocol/*.mod
-	export p=`pwd`; cd $(ODIR) && zip -u $$p/debug-$(HGVERSION).zip *.elf
-	rm -rf $(ODIR)/protocol
-endif
-ifeq "$(INCLUDE_FS)" "1"
-	export p=`pwd`; cd filesystem/$(FILESYSTEM) && zip -ur $$p/deviation-$(HGVERSION).zip  *
-endif
-	zip -u deviation-$(HGVERSION).zip debug-$(HGVERSION).zip
-	rm -f debug-$(HGVERSION).zip
-	rm -f deviation-$(HGVERSION).dfu
-
-fs: $(TARGET).fs
-
-%.fs:
-	rm -f deviation-fs-$(HGVERSION).zip; zip -r deviation-fs-$(HGVERSION).zip filesystem/$(FILESYSTEM)
-
-release:  $(TXS:%=zip_%) $(EMUS:%=zip_win_%) $(TXS:%=fs_%)
-
 coverity:
 	rm -rf cov-int 2>/dev/null; $(MAKE) distclean
-	cov-build --dir cov-int make TARGET=devo8
-	cov-build --dir cov-int make TARGET=devo10
+	cov-build --dir cov-int make -C target/tx/devo/devo8
+	cov-build --dir cov-int make -C target/tx/devo/devo10
 	tar -cvzf coverity-$(HGVERSION).tgz cov-int
 
 lint:
-	../utils/run_linter.py --diff --debug
-
-##########################################
-#Ensure necessary directories are created#
-##########################################
-$(OBJS): | $(ODIR)
-
-$(ODIR):
-	@mkdir -p $@
-
-$(MODELDIR):
-	@mkdir -p $@
-
-######################
-#The main executable #
-######################
-$(TARGET).$(EXEEXT): $(LINKFILE) $(OBJS) $(LIBOPENCM3)
-	@echo " + Building '$@'"
-ifdef LINKFILE #Create an empty 'obj/$(TARGET)/optimize.ld' just in case the linker script needs it
-	echo "" > objs/$(TARGET)/optimize.ld
-endif
-ifeq ("$(SRC_CXX)", " ")
-	$(CC) -o $@ $(OBJS) $(LIBOPENCM3) $(LFLAGS) $(LFLAGS2) $(CFLAGS) $(EXTRA_CFLAGS)
-else
-	$(CXX) -o $@ $(OBJS) $(LIBOPENCM3) $(LFLAGS) $(LFLAGS2) $(CFLAGS) $(EXTRA_CFLAGS)
-endif
-
-#################
-#The filesystem #
-#################
-%.fs_wrapper: $(LAST_MODEL)
-	true
-
-.PHONY: $(PRE_FS) $(LAST_MODEL)
-$(LAST_MODEL): model_template.ini tx_template.ini $(FONTS) $(PRE_FS)
-	@echo " + Copying template files for $(FILESYSTEM)"
-	mkdir -p filesystem/$(FILESYSTEM) || true
-	for i in $(FILESYSTEMS); do cp -prf fs/$$i/* filesystem/$(FILESYSTEM)/; done
-	rm filesystem/$(FILESYSTEM)/*/.ignore 2>/dev/null || true
-	cp tx_template.ini filesystem/$(FILESYSTEM)/tx.ini
-	echo 'empty' > filesystem/$(FILESYSTEM)/errors.txt
-	mkdir filesystem/$(FILESYSTEM)/models 2> /dev/null || true
-	echo 'name=Model1' > filesystem/$(FILESYSTEM)/models/model1.ini \
-		&& cat model_template.ini >> filesystem/$(FILESYSTEM)/models/model1.ini
-	cp model_template.ini filesystem/$(FILESYSTEM)/models/default.ini
-ifdef LANGUAGE
-	mkdir filesystem/$(FILESYSTEM)/language 2> /dev/null; \
-               ../utils/extract_strings.pl -po -fs filesystem/$(FILESYSTEM)/language -targets $(LANGUAGE) -update -objdir $(ODIR)
-endif
-	export tx=$(FILESYSTEM); \
-	number=2 ; while [ $$number -le $(NUM_MODELS) ] ; do \
-		cp model_template.ini filesystem/$$tx/models/model$$number.ini; \
-		number=`expr $$number + 1`; \
-		done
-	@echo " + Checking string list length for $(FILESYSTEM)"
-ifeq "$(TYPE)" "dev"
-	../utils/check_string_size.pl -target $(FILESYSTEM) -objdir $(ODIR)
-else
-	../utils/check_string_size.pl -target $(FILESYSTEM) -objdir $(ODIR) -quiet
-endif
-	../utils/run_linter.py --diff --skip-github --no-fail
-
-######################
-#Necessary Font files#
-######################
-filesystem/$(FILESYSTEM)/media/12normal.fon: fonts/12normal.bdf
-	mkdir -p filesystem/$(FILESYSTEM)/media/
-	../utils/font/bdf_to_font.pl -maxsize 12 -mode bin $< -out $@ -minspace 10
-
-filesystem/$(FILESYSTEM)/media/15normal.fon: fonts/15normal.bdf
-	mkdir -p filesystem/$(FILESYSTEM)/media/
-	../utils/font/bdf_to_font.pl -maxsize 15 -mode bin $< -out $@ -minspace 8
-
-# special font for f12e with 18x12 char size
-filesystem/$(FILESYSTEM)/media/f12e.fon: fonts/f12e.bdf
-	mkdir -p filesystem/$(FILESYSTEM)/media/
-	../utils/font/bdf_to_font.pl -maxsize 18 -mode bin $< -out $@ -minspace 8
-
-filesystem/$(FILESYSTEM)/media/12ascii.fon: fonts/12normal.bdf
-	mkdir -p filesystem/$(FILESYSTEM)/media/
-	../utils/font/bdf_to_font.pl -maxsize 12 -mode bin $< -out $@ -minspace 10 -ascii
-
-filesystem/$(FILESYSTEM)/media/15ascii.fon: fonts/15normal.bdf
-	mkdir -p filesystem/$(FILESYSTEM)/media/
-	../utils/font/bdf_to_font.pl -maxsize 15 -mode bin $< -out $@ -minspace 8 -ascii
-
-filesystem/$(FILESYSTEM)/media/23bold.fon: fonts/23bold.bdf
-	mkdir -p filesystem/$(FILESYSTEM)/media/
-	../utils/font/bdf_to_font.pl -maxsize 23 -mode bin $< -out $@ -minspace 8
-
-filesystem/$(FILESYSTEM)/media/04b03.fon: fonts/04b03.bdf
-	mkdir -p filesystem/$(FILESYSTEM)/media/
-	../utils/font/bdf_to_font.pl -maxsize 5 -mode bin $< -out $@ -minspace 5
-
-##############################
-#Build rules for all .o files#
-##############################
-## The autodependency magic below was adapeted from:
-## http://mad-scientist.net/make/autodep.html
--include $(OBJS:.o=.P)
--include $(PROTO_OBJS:.o=.P)
--include $(PROTO_EXTRA_OBJS:.o_=.P)
-
-dollar = $$
-define define_compile_rules
-$(ODIR)/%.o: $(1)%.c $(LIBOPENCM3)
-	@echo " + Compiling '$$<'"
-	$(CC) $$(CFLAGS) $$(EXTRA_CFLAGS) $$(CFLAGS_$$(basename $$(notdir $$<))) -MD -c -o $$@ $$<
-	@cp $(ODIR)/$$*.d $(ODIR)/$$*.P; \
-            sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$(dollar)//' \
-                -e '/^$$(dollar)/ d' -e 's/$$(dollar)/ :/' < $(ODIR)/$$*.d >> $(ODIR)/$$*.P; \
-            rm -f $(ODIR)/$$*.d
-
-$(ODIR)/%.o: $(1)%.cpp $(LIBOPENCM3)
-	@echo " + Compiling '$$<'"
-	$(CXX) $$(CXXFLAGS) $(EXTRA_CFLAGS) $$(CXXFLAGS_$$(basename $$(notdir $$<))) -MD -c -o $$@ $$<
-	@cp $(ODIR)/$$*.d $(ODIR)/$$*.P; \
-            sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$(dollar)//' \
-                -e '/^$$(dollar)/ d' -e 's/$$(dollar)/ :/' < $(ODIR)/$$*.d >> $(ODIR)/$$*.P; \
-            rm -f $(ODIR)/$$*.d
-
-#For module building
-$(ODIR)/%.o_: $(1)%.c $(LIBOPENCM3)
-	@echo " + Compiling '$$<' as module"
-	$(CC) $$(CFLAGS) $$(MODULE_CFLAGS) $$(CFLAGS_$$(basename $$(notdir $$<))) -MD -c -o $$@ $$<
-	@cp $(ODIR)/$$*.d $(ODIR)/$$*.P; \
-            sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$(dollar)//' \
-                -e '/^$$(dollar)/ d' -e 's/$$(dollar)/ :/' < $(ODIR)/$$*.d >> $(ODIR)/$$*.P; \
-            rm -f $(ODIR)/$$*.d
-
-endef
-$(foreach directory,$(sort $(dir $(SRCS) $(PROTO_EXTRA_C))),$(eval $(call define_compile_rules,$(directory))))
-
-##############################
-#Ensure version is up to date#
-##############################
-# Rebuild on hg version change.
-$(ODIR)/version.o: $(ODIR)/hgstamp
-
-$(ODIR)/hgstamp:
-	echo $(HGVERSION) > $(ODIR)/hgstamp
-
-BUILD_TARGET := 1
-include target/tx/$(FAMILY)/$(TARGET)/Makefile.inc
-ifdef MODULAR
-include protocol/Makefile.inc
-endif
+	$(SDIR)../utils/run_linter.py --diff --debug

@@ -1,5 +1,3 @@
-ifndef BUILD_TARGET
-
 PROTO_MODULES += $(ODIR)/protocol/devo.mod
 PROTO_MODULES += $(ODIR)/protocol/dsm2.mod
 PROTO_MODULES += $(ODIR)/protocol/dsmx.mod

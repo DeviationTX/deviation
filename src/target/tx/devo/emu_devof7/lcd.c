@@ -21,6 +21,7 @@
 #include "lcd.h"
 #include "ia9211_font.h"
 #include "ia9211_bigfont.h"
+#include "ia9211_map.h"
 
 struct rgb {
     u8 r;
