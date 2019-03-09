@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """Track changes in the size of an image using Travis-CI and GitHub statuses.
 
 This code is adapted from https://github.com/danvk/travis-weigh-in
@@ -18,7 +18,7 @@ import os
 import re
 import sys
 import json
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import zlib
 from collections import namedtuple
 
@@ -64,18 +64,18 @@ def post_status(url, state, context, description):
     }
     headers = {'Authorization': 'token ' + get_token()}
 
-    request = urllib2.Request(url, json.dumps(data), headers)
-    res = urllib2.urlopen(request)
+    request = urllib.request.Request(url, json.dumps(data), headers)
+    res = urllib.request.urlopen(request)
     raise_for_status(url, res)
 
-    print 'Posted %s' % json.dumps(data)
+    print('Posted %s' % json.dumps(data))
 
 
 def get_status(url, context):
     """Request status for previous build from GitHub"""
     headers = {'Authorization': 'token ' + get_token()}
-    request = urllib2.Request(url, None, headers)
-    res = urllib2.urlopen(request)
+    request = urllib.request.Request(url, None, headers)
+    res = urllib.request.urlopen(request)
     raise_for_status(url, res)
 
     data = json.loads(res.read())
@@ -93,8 +93,8 @@ def get_pr_info(slug, pull_number):
     """Retireve pull-request info"""
     url = 'https://api.github.com/repos/%s/pulls/%s' % (slug, pull_number)
     headers = {'Authorization': 'token ' + get_token()}
-    request = urllib2.Request(url, None, headers)
-    res = urllib2.urlopen(request)
+    request = urllib.request.Request(url, None, headers)
+    res = urllib.request.urlopen(request)
     raise_for_status(url, res)
     return json.loads(res.read())
 
@@ -127,8 +127,8 @@ def format_description(current_size, previous_size):
         rom_delta = current_size.rom - previous_size.rom
         ram_delta = current_size.ram - previous_size.ram
         return (
-            u'ROM: {:,.0f} \u0394: {:+,.0f}b/{:+0.2f}% '
-            u'RAM: {:,.0f} \u0394: {:+,.0f}b/{:+0.2f}%'.format(
+            'ROM: {:,.0f} \u0394: {:+,.0f}b/{:+0.2f}% '
+            'RAM: {:,.0f} \u0394: {:+,.0f}b/{:+0.2f}%'.format(
                 current_size.rom, rom_delta, 100.0 * rom_delta /  current_size.rom,
                 current_size.ram, ram_delta, 100.0 * ram_delta /  current_size.ram))
 
@@ -204,7 +204,7 @@ def main():
 
     filename = sys.argv[1].replace("zip_", "").replace("win_", "") + ".map"
     if not os.path.exists(filename):
-        print "No map file generated ({}): {}".format(sys.argv[1], filename)
+        print("No map file generated ({}): {}".format(sys.argv[1], filename))
         return
 
     check_environment()
@@ -212,16 +212,16 @@ def main():
     current_size = get_image_size(filename)
     previous_size = get_base_size(filename)
 
-    print '%s Current:  ROM: %s RAM: %s' % (filename, current_size.rom, current_size.ram)
+    print('%s Current:  ROM: %s RAM: %s' % (filename, current_size.rom, current_size.ram))
     if previous_size:
-        print '%s Previous: ROM: %s RAM: %s' % (filename, previous_size.rom, previous_size.ram)
+        print('%s Previous: ROM: %s RAM: %s' % (filename, previous_size.rom, previous_size.ram))
 
     if TRAVIS_STATUS_URL:
         url = TRAVIS_STATUS_URL
     else:
         url = 'https://api.github.com/repos/%s/statuses/%s' % (TRAVIS_REPO_SLUG, TRAVIS_COMMIT)
 
-    print 'POSTing to %s' % url
+    print('POSTing to %s' % url)
     post_status(url, 'success', get_context(filename),
                 format_description(current_size, previous_size))
 

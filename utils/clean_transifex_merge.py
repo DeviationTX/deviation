@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import os
 import subprocess
@@ -9,7 +9,7 @@ if len(sys.argv) > 1:
     cmd += sys.argv[1:]
 
 res = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-lines = [line.rstrip() for line in res.stdout]
+lines = [line.decode('utf-8').rstrip() for line in res.stdout]
 lines.append("diff") # Crude way to ensure final file is handled
 
 filename = None

@@ -1,6 +1,6 @@
-#!/usr/bin/env python
-import urllib
-import urllib2
+#!/usr/bin/env python3
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
 import sys
 import os
 import json
@@ -12,14 +12,14 @@ TRAVIS_BRANCH = os.environ.get('TRAVIS_BRANCH')
 
 def main():
     if not TRAVIS or not TRAVIS_REPO_SLUG:
-        print "Not a Travis environment.  No rebuild needed"
+        print("Not a Travis environment.  No rebuild needed")
         sys.exit(1)
-    sha = subprocess.check_output(['git', 'rev-parse', 'HEAD']).rstrip()
+    sha = subprocess.check_output(['git', 'rev-parse', 'HEAD']).decode('utf-8').rstrip()
     if not sha:
-        print "Could not determine current git commit.  No rebuild needed"
+        print("Could not determine current git commit.  No rebuild needed")
         sys.exit(1)
     builds_url = ('https://api.travis-ci.org/repo/'
-                  + urllib.quote_plus(TRAVIS_REPO_SLUG)
+                  + urllib.parse.quote_plus(TRAVIS_REPO_SLUG)
                   + "/builds?limit=5&state=passed&branch.name="
                   + TRAVIS_BRANCH
                   + "&event_type=")
@@ -28,20 +28,20 @@ def main():
     for event in ['cron']:  # 'api'  Only checking cron jobs.  api jobs will force a rebuild
         url = builds_url + event
         try:
-            request = urllib2.Request(url, None, headers)
-            res = urllib2.urlopen(request)
+            request = urllib.request.Request(url, None, headers)
+            res = urllib.request.urlopen(request)
             raise_for_status(url, res)
             data = json.loads(res.read())
         except:
-            print "Couldn't fetch build data.  Assuming rebuild needed"
+            print("Couldn't fetch build data.  Assuming rebuild needed")
             sys.exit(0)
         if not data or not isinstance(data.get('builds'), list):
-            print "Couldn't parse build data.  Assuming rebuild needed"
+            print("Couldn't parse build data.  Assuming rebuild needed")
             sys.exit(0)
         if any(build['commit']['sha'] == sha for build in data['builds']):
-            print "Found previous nightly build for {}.  Skipping rebuild".format(sha[:8])
+            print("Found previous nightly build for {}.  Skipping rebuild".format(sha[:8]))
             sys.exit(1)
-    print "No nightly builds matched {}.  Assuming rebuild needed".format(sha[:8])
+    print("No nightly builds matched {}.  Assuming rebuild needed".format(sha[:8]))
 
 def raise_for_status(url, response):
     """Raise exception on URL error"""

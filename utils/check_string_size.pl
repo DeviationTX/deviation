@@ -9,8 +9,9 @@ my $target;
 my $quiet;
 my $objdir;
 my $elffile;
+my @language;
 my $log = "";
-GetOptions("target=s" => \$target, "quiet" => \$quiet, "objdir=s" => \$objdir, "elffile=s" => \$elffile);
+GetOptions("target=s" => \$target, "quiet" => \$quiet, "objdir=s" => \$objdir, "elffile=s" => \$elffile, "language=s{1,}" => \@language);
 
 my @dirs = grep {$_ !~ /common/ && (! $target || $_ =~ /$target/)} glob("filesystem/*");
 my $max_line_length = 0;
@@ -69,7 +70,7 @@ foreach my $target_dir (@dirs) {
         $target_count = $count if($count > $target_count);
         $target_line_length = $line_length if($line_length > $target_line_length);
     }
-    my $cmd = "../utils/extract_strings.pl -target $target";
+    my $cmd = "../utils/extract_strings.py -target @language";
     $cmd .= " -objdir $objdir" if($objdir);
     $cmd .= " -elffile $elffile" if($elffile);
     print $cmd;

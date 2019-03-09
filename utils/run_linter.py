@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """Run cpplint linter on C code
 
 Usage:
@@ -12,13 +12,16 @@ import os
 import re
 import sys
 import json
-import urllib2
 import zlib
 import argparse
 import subprocess
 import time
 import logging
-from collections import namedtuple
+import binascii
+import shutil
+import urllib.request
+import urllib.error
+import urllib.parse
 
 
 LINT_RULES = (
@@ -34,14 +37,14 @@ EXCLUDE_PATHS = ('libopencm3/', 'FatFs/', 'pnglite')
 # Disregard specific messages in a class
 POST_FILTER = {
     "whitespace/braces": [
-       '{ should almost always be at the end of the previous line',
-       ],
+        '{ should almost always be at the end of the previous line',
+        ],
     "whitespace/newline": [
-       'An else should appear on the same line as the preceding }',
-       ],
+        'An else should appear on the same line as the preceding }',
+        ],
     "runtime/printf": [
-       'Never use sprintf. Use snprintf instead.',
-       'Almost always, snprintf is better than strcpy',
+        'Never use sprintf. Use snprintf instead.',
+        'Almost always, snprintf is better than strcpy',
     ]
     }
 
@@ -62,6 +65,7 @@ if TRAVIS_PULL_REQUEST == 'false':
 
 
 def main():
+    """Main function"""
     parser = argparse.ArgumentParser()
     parser.add_argument("path", nargs='*', help="Paths to lint")
     parser.add_argument("--diff", action="store_true",
@@ -76,13 +80,12 @@ def main():
     if args.debug:
         logging.basicConfig(level=logging.DEBUG)
     if args.no_fail:
-        global ERROR_EXIT_STATUS
+        global ERROR_EXIT_STATUS  # pylint: disable=global-statement
         ERROR_EXIT_STATUS = 0
 
-    with open(os.devnull, 'w') as devnull:
-        if subprocess.call(["which", "cpplint"], stdout=devnull):
-            print("Please install cpplint via 'pip install cpplint' or equivalent")
-            sys.exit(ERROR_EXIT_STATUS)
+    if not shutil.which('cpplint'):
+        print("Please install cpplint via 'pip3 install cpplint' or equivalent")
+        sys.exit(ERROR_EXIT_STATUS)
 
     pwd = os.getcwd()
     os.chdir(system(["git", "rev-parse", "--show-toplevel"]).rstrip())
@@ -92,8 +95,8 @@ def main():
     else:
         path_delta = None
 
-    logging.debug("TRAVIS_PULL_REQUEST:     %s",  TRAVIS_PULL_REQUEST)
-    logging.debug("TRAVIS_PULL_REQUEST_SHA: %s",  TRAVIS_PULL_REQUEST_SHA)
+    logging.debug("TRAVIS_PULL_REQUEST:     %s", TRAVIS_PULL_REQUEST)
+    logging.debug("TRAVIS_PULL_REQUEST_SHA: %s", TRAVIS_PULL_REQUEST_SHA)
     logging.debug("TRAVIS_BRANCH:           %s", TRAVIS_BRANCH)
     logging.debug("TRAVIS_REPO_SLUG:        %s", TRAVIS_REPO_SLUG)
     changed = {}
@@ -113,19 +116,25 @@ def main():
     if GITHUB_TOKEN and TRAVIS_PULL_REQUEST and not args.skip_github:
         update_github_status(violations)
 
+
 def get_changed_lines_from_pr():
-    url = 'https://api.github.com/repos/{}/pulls/{}'.format(TRAVIS_REPO_SLUG, TRAVIS_PULL_REQUEST)
+    """Read patch from TravisCI and determine line-numbers that have changed"""
+    url = 'https://api.github.com/repos/{}/pulls/{}'.format(TRAVIS_REPO_SLUG,
+                                                            TRAVIS_PULL_REQUEST)
     diff = get_url(url, {"Accept": "application/vnd.github.v3.diff"}).split('\n')
     return get_changed_lines_from_diff(diff)
 
+
 def get_changed_lines_from_git():
-    changed = {}
+    """Compute diff from current vs master and determine line-numbers that have changed"""
     master = "master"
     base = system(["git", "merge-base", "HEAD", master]).rstrip()
     diff = system(["git", "diff", base]).rstrip().split("\n")
     return get_changed_lines_from_diff(diff)
 
+
 def get_changed_lines_from_diff(diff):
+    """Read diff data and generate a list of changed-lines per file"""
     filename = None
     changed = {}
     file_pos = 0
@@ -139,7 +148,7 @@ def get_changed_lines_from_diff(diff):
         if any(line.startswith(pat) for pat in ["index", "---", "+++"]):
             continue
         if line.startswith("@@"):
-            match = re.search(" \+(\d+),(\d+) @@", line)
+            match = re.search(r" \+(\d+),(\d+) @@", line)
             if match:
                 file_pos = int(match.group(1))
             else:
@@ -151,38 +160,16 @@ def get_changed_lines_from_diff(diff):
         if line.startswith("+"):
             changed[filename][file_pos] = 1
         file_pos += 1
-    
+
     for filename in sorted(changed.keys()):
-        logging.debug("%s: %s", filename, sorted(changed[filename].keys(), key=int))
-        if not changed[filename].keys():
+        logging.debug("%s: %s", filename, sorted(list(changed[filename].keys()), key=int))
+        if not list(changed[filename].keys()):
             del changed[filename]
     return changed
 
-def get_changed_lines_from_git_old():
-    changed = {}
-    master = "master"
-    base = system(["git", "merge-base", "HEAD", master]).rstrip()
-    cmd = ["git", "diff", "--name-only", "--diff-filter", "AM", base]
-    sha1s = ["000000000"];
-    # Find all sha's on this branch
-    sha1s += [commit[:9] for commit in system(["git", "rev-list", base + "..HEAD"]).rstrip().split('\n') if commit]
-    logging.debug("Mathing SHA1s: %s", sha1s)
-    files = system(cmd).rstrip().split("\n")
-    for _file in files:
-        changed[_file] = {}
-        _p = subprocess.Popen(["git", "blame", "--abbrev=8", _file], stdout=subprocess.PIPE)
-        for line in _p.stdout:
-            sha = line[:9]
-            if sha not in sha1s:
-                continue
-            match = re.search("^[^\(]*\([^\)]*\s(\d+)\)", line)
-            if not match:
-                continue
-            changed[_file][int(match.group(1))] = 1
-        logging.debug("%s: %s", _file, sorted(changed[_file].keys(), key=int))
-    return changed
 
 def filter_paths(paths, changed, pwd):
+    """apply ignore-list to list of changed files"""
     ret = []
     root = os.getcwd()  # We already cd'd to GIT_ROOT
     common = os.path.commonprefix([root, pwd])
@@ -197,22 +184,26 @@ def filter_paths(paths, changed, pwd):
     cmd = "find {} -type f".format(" ".join(paths))
     if EXCLUDE_PATHS:
         cmd += " | grep -v -E '({})'".format("|".join(EXCLUDE_PATHS))
-    logging.debug("Running: " + " ".join(cmd))
+    logging.debug("Running: %s", " ".join(cmd))
     _p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
     for line in _p.stdout:
-        line = line.rstrip()
+        line = line.decode('utf-8').rstrip()
         if line.startswith("./"):
             line = line[2:]
         if line in changed:
             ret += line
     return ret
 
+
 def cleanup_line(line, path_delta):
+    """Convert filename to be relative to CWD in output string"""
     if path_delta and line.startswith(path_delta):
         return line[len(path_delta)+1:]
     return line
 
+
 def run_lint(paths, changed, path_delta):
+    """Run cpplint, and apply post-processing exclusions"""
     violations = {}
     count = {}
     errors = {}
@@ -221,11 +212,11 @@ def run_lint(paths, changed, path_delta):
     if EXCLUDE_PATHS:
         cmd += " | grep -v -E '({})'".format("|".join(EXCLUDE_PATHS))
     cmd += " | xargs cpplint --extensions=c,h --filter={} 2>&1".format(",".join(LINT_RULES))
-    logging.debug("Running: " + cmd)
+    logging.debug("Running: %s", cmd)
     _p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
     for line in _p.stdout:
-        line = line.rstrip()
-        match = re.search("(\S+):(\d+):\s+(.*\S)\s+\[(\S+)\]\s\[\d\]$", line)
+        line = line.decode('utf-8').rstrip()
+        match = re.search(r"(\S+):(\d+):\s+(.*\S)\s+\[(\S+)\]\s\[\d\]$", line)
         if match:
             filename = match.group(1)
             linenum = int(match.group(2))
@@ -236,7 +227,7 @@ def run_lint(paths, changed, path_delta):
                 continue
             if not changed or linenum not in changed[filename]:
                 continue
-            print cleanup_line(line, path_delta)
+            print(cleanup_line(line, path_delta))
             if filename not in errors:
                 errors[filename] = 0
             errors[filename] += 1
@@ -250,12 +241,14 @@ def run_lint(paths, changed, path_delta):
             violations[filename][linenum].append(line)
 
     if count:
-        print "\nSummary\n-------";
+        print("\nSummary\n-------")
         for err in sorted(count.keys()):
-            print "{:30s}: {}".format(err, count[err])
+            print("{:30s}: {}".format(err, count[err]))
     return violations
 
+
 def update_github_status(violations):
+    """Remove old status and push new status messages to github with any found issues"""
     clean_old_comments()
 
     url = 'https://api.github.com/repos/{}/pulls/{}'.format(TRAVIS_REPO_SLUG, TRAVIS_PULL_REQUEST)
@@ -281,29 +274,36 @@ def update_github_status(violations):
     else:
         post_status("success", "linter", "Linter had no errors")
 
+
 def format_msg(header, msgs, skipfile=False):
+    """Format lint-issue message for github"""
     outmsg = header + "```\n"
     for msg in msgs:
-       _file, linenum, _str= msg.split(":", 2)
-       _str = re.sub('\[[^\[]+\]\s+\[\d+\]\s*$', '', _str)
-       if skipfile:
-           outmsg += linenum + ":" + _str + "\n"
-       else:
-           outmsg += _file + ':' + linenum + ":" + _str + '\n'
+        _file, linenum, _str = msg.split(":", 2)
+        _str = re.sub(r'\[[^\[]+\]\s+\[\d+\]\s*$', '', _str)
+        if skipfile:
+            outmsg += linenum + ":" + _str + "\n"
+        else:
+            outmsg += _file + ':' + linenum + ":" + _str + '\n'
     outmsg += "```"
     return outmsg
 
+
 def clean_old_comments():
-    url = 'https://api.github.com/repos/{}/pulls/{}/comments'.format(TRAVIS_REPO_SLUG, TRAVIS_PULL_REQUEST)
+    """Remove old lint messages from github PR"""
+    url = 'https://api.github.com/repos/{}/pulls/{}/comments'.format(
+        TRAVIS_REPO_SLUG, TRAVIS_PULL_REQUEST)
     comments = json.loads(get_url(url))
     for comment in comments:
         if comment['body'].startswith(LINT_ERROR):
             delete_comment("pulls", comment['id'])
-    url = 'https://api.github.com/repos/{}/issues/{}/comments'.format(TRAVIS_REPO_SLUG, TRAVIS_PULL_REQUEST)
+    url = 'https://api.github.com/repos/{}/issues/{}/comments'.format(
+        TRAVIS_REPO_SLUG, TRAVIS_PULL_REQUEST)
     comments = json.loads(get_url(url))
     for comment in comments:
         if comment['body'].startswith(UNMATCHED_LINT_ERROR):
             delete_comment("issues", comment['id'])
+
 
 def group_lines(line_err):
     """Try to group into groups of 4 lines for github"""
@@ -320,7 +320,9 @@ def group_lines(line_err):
         group["msgs"] += line_err[num]
     return groups
 
+
 def compute_offset(diff, filename, group):
+    """Compte github line-number of lint failure"""
     filename = filename
     in_file = False
     seen_at = False
@@ -343,18 +345,19 @@ def compute_offset(diff, filename, group):
                 if not seen_at:
                     seen_at = True
                     pos = 0
-                match = re.search(" \+(\d+),(\d+) @@", line)
+                match = re.search(r" \+(\d+),(\d+) @@", line)
                 if match:
                     file_pos = int(match.group(1))
                 continue
             if line[0] != '+' and line[0] != ' ':
                 continue
-            if file_pos >= group['start'] and file_pos <= group['end']:
+            if group['start'] <= file_pos <= group['end']:
                 offset = pos
             elif offset is not None:
                 return offset
             file_pos += 1
     return None
+
 
 def raise_for_status(url, response):
     """Raise exception on URL error"""
@@ -363,35 +366,41 @@ def raise_for_status(url, response):
         sys.stderr.write('\n')
         raise Exception('Request for %s failed: %s' % (url, response.getcode()))
 
+
 def get_cache_key(url, headers=None):
+    """Generate a tuple of URL + Headers"""
     if not headers:
         headers = {}
     return (url, json.dumps(headers))
 
+
 def get_url(url, headers=None):
+    """Download contents of URL"""
     logging.debug("GET: %s HEADERS: %s", url, headers)
     if not headers:
         headers = {}
     key = get_cache_key(url, headers)
     if key not in URL_CACHE:
         headers['Authorization'] = 'token ' + get_token()
-        request = urllib2.Request(url, None, headers)
-        res = urllib2.urlopen(request)
+        request = urllib.request.Request(url, None, headers)
+        res = urllib.request.urlopen(request)
         raise_for_status(url, res)
-        URL_CACHE[key] = res.read()
+        URL_CACHE[key] = res.read().decode('utf-8')
     return URL_CACHE[key]
+
 
 def get_token():
     """Return github token"""
-    token = zlib.decompress(GITHUB_TOKEN.decode("hex"))
+    token = zlib.decompress(binascii.unhexlify(GITHUB_TOKEN))
     length = len(token)
-    return ''.join(chr(ord(a) ^ ord(b))
-                   for a, b in zip(token, (TRAVIS_REPO_SLUG * length)[:length]))
+    return ''.join(chr(a ^ b)
+                   for a, b in zip(token, (TRAVIS_REPO_SLUG.encode('utf-8') * length)[:length]))
 
 
 def post_status(state, context, description):
     """Send status update to GitHub"""
-    url = 'https://api.github.com/repos/{}/pulls/{}'.format(TRAVIS_REPO_SLUG, TRAVIS_PULL_REQUEST)
+    url = 'https://api.github.com/repos/{}/pulls/{}'.format(
+        TRAVIS_REPO_SLUG, TRAVIS_PULL_REQUEST)
     _pr = json.loads(get_url(url))
     url = _pr['statuses_url']
     data = {
@@ -401,15 +410,17 @@ def post_status(state, context, description):
     }
     headers = {'Authorization': 'token ' + get_token()}
 
-    logging.debug("POST: " + url)
-    logging.debug("Data: " + json.dumps(data))
-    request = urllib2.Request(url, json.dumps(data), headers)
-    res = urllib2.urlopen(request)
+    logging.debug("POST: %s", url)
+    logging.debug("Data: %s", json.dumps(data))
+    request = urllib.request.Request(url, json.dumps(data).encode('utf-8'), headers)
+    res = urllib.request.urlopen(request)
     raise_for_status(url, res)
 
 
 def post_pull_comment(filename, offset, message):
-    url = 'https://api.github.com/repos/{}/pulls/{}/comments'.format(TRAVIS_REPO_SLUG, TRAVIS_PULL_REQUEST)
+    """Send updated comment to github PR for specfifc failure"""
+    url = 'https://api.github.com/repos/{}/pulls/{}/comments'.format(
+        TRAVIS_REPO_SLUG, TRAVIS_PULL_REQUEST)
     data = {
         'commit_id': TRAVIS_PULL_REQUEST_SHA,
         'path': filename,
@@ -417,57 +428,60 @@ def post_pull_comment(filename, offset, message):
         'body': message,
         }
     headers = {'Authorization': 'token ' + get_token()}
-    logging.debug("POST: " + url)
-    logging.debug("Data: " + json.dumps(data))
+    logging.debug("POST: %s", url)
+    logging.debug("Data: %s", json.dumps(data))
 
     try:
-        request = urllib2.Request(url, json.dumps(data), headers)
-        res = urllib2.urlopen(request)
+        request = urllib.request.Request(url, json.dumps(data).encode('utf-8'), headers)
+        res = urllib.request.urlopen(request)
         raise_for_status(url, res)
-    except urllib2.HTTPError as e:
-        print e
-        print e.read()
+    except urllib.error.HTTPError as _e:
+        logging.error(_e)
+        logging.error(_e.read())
         sys.exit(ERROR_EXIT_STATUS)
     time.sleep(1.0)
 
 
 def post_issue_comment(message):
-    url = 'https://api.github.com/repos/{}/issues/{}/comments'.format(TRAVIS_REPO_SLUG, TRAVIS_PULL_REQUEST)
+    """Send lint status to github PR"""
+    url = 'https://api.github.com/repos/{}/issues/{}/comments'.format(
+        TRAVIS_REPO_SLUG, TRAVIS_PULL_REQUEST)
     data = {
         'body': message,
         }
     headers = {'Authorization': 'token ' + get_token()}
-    logging.debug("POST: " + url)
-    logging.debug("Data: " + json.dumps(data))
+    logging.debug("POST: %s", url)
+    logging.debug("Data: %s", json.dumps(data))
 
-    if True:
-        request = urllib2.Request(url, json.dumps(data), headers)
-        res = urllib2.urlopen(request)
-        raise_for_status(url, res)
+    request = urllib.request.Request(url, json.dumps(data), headers)
+    res = urllib.request.urlopen(request)
+    raise_for_status(url, res)
+
 
 def delete_comment(_type, _id):
+    """Delete a single comment from a github PR"""
     url = 'https://api.github.com/repos/{}/{}/comments/{}'.format(
-          TRAVIS_REPO_SLUG, _type, _id)
+        TRAVIS_REPO_SLUG, _type, _id)
     headers = {'Authorization': 'token ' + get_token()}
-    logging.debug("DELETE: " + url)
+    logging.debug("DELETE: %s", url)
 
     try:
-        request = urllib2.Request(url, None, headers)
+        request = urllib.request.Request(url, None, headers)
         request.get_method = lambda: 'DELETE'
-        res = urllib2.urlopen(request)
+        res = urllib.request.urlopen(request)
         raise_for_status(url, res)
-    except urllib2.HTTPError as e:
-        print e
-        print e.read()
+    except urllib.error.HTTPError as _e:
+        logging.error(_e)
+        logging.error(_e.read())
         sys.exit(ERROR_EXIT_STATUS)
 
 
 def system(cmd):
-    logging.debug("Running: " + " ".join(cmd))
+    """Helper for executing commands"""
+    logging.debug("Running: %s", " ".join(cmd))
     if isinstance(cmd, list):
-        return subprocess.check_output(cmd)
-    else:
-        return subprocess.check_output(cmd, shell=True)
+        return subprocess.check_output(cmd).decode('utf-8')
+    return subprocess.check_output(cmd, shell=True).decode('utf-8')
 
 
 main()
