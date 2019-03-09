@@ -17,7 +17,6 @@ static struct scanner_page * const sp = &pagemem.u.scanner_page;
 
 static void _draw_page(u8 enable);
 static void _draw_channels(void);
-static u16 scan_cb();
 
 #ifdef ENABLE_MODULAR
 #error "Not supported in MODULAR build"
@@ -28,67 +27,11 @@ static void _scan_enable(int enable)
 {
     if (enable) {
         PROTOCOL_DeInit();
-        DEVO_Cmds(0);  //Switch to DEVO configuration
-        PROTOCOL_SetBindState(0); //Disable binding message
-        CLOCK_StopTimer();
-        CYRF_SetTxRxMode(RX_EN); //Receive mode
-        CLOCK_StartTimer(1250, scan_cb);
+        SCANNER_CYRF_Cmds(0);  // Switch to SCANNER_CYRF configuration
+        PROTOCOL_SetBindState(0);  // Disable binding message
     } else {
         PROTOCOL_Init(0);
     }
-}
-
-static void _scan_next()
-{
-    CYRF_ConfigRFChannel(sp->channel + MIN_RADIOCHANNEL);
-    if(sp->attenuator) {
-        CYRF_WriteRegister(CYRF_06_RX_CFG, 0x0A);
-    } else {
-        CYRF_WriteRegister(CYRF_06_RX_CFG, 0x4A);
-    }
-}
-
-static int _scan_rssi()
-{
-    if ( !(CYRF_ReadRegister(CYRF_05_RX_CTRL) & 0x80)) {
-        CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x80); //Prepare to receive
-        Delay(10);
-        CYRF_ReadRegister(CYRF_13_RSSI); //dummy read
-        Delay(15);
-    }
-#ifdef EMULATOR
-    return rand32() % 0x1F;
-#else
-    return CYRF_ReadRegister(CYRF_13_RSSI) & 0x1F;
-#endif
-}
-
-u16 scan_cb()
-{
-    int delay;
-    if(sp->scanState == 0) {
-        if(sp->time_to_scan == 0) {
-            _scan_next();
-            sp->time_to_scan = 1;
-        }
-        sp->scanState = 1;
-        delay = 300; //slow channel require 270usec for synthesizer to settle
-    } else {
-        int rssi = _scan_rssi();
-        if(sp->scan_mode) {
-            sp->channelnoise[sp->channel] = (sp->channelnoise[sp->channel] + rssi) / 2;
-        } else {
-            if(rssi > sp->channelnoise[sp->channel])
-                sp->channelnoise[sp->channel] = rssi;
-        }
-        sp->scanState++;
-        delay = 300;
-        if(sp->scanState == 5) {
-            sp->scanState = 0;
-            delay = 50;
-        }
-    }
-    return delay;
 }
 
 static void press_enable_cb(guiObject_t *obj, const void *data)
@@ -129,12 +72,6 @@ void PAGE_ScannerEvent()
 
     // draw the channels
     _draw_channels();
-
-    sp->channel++;
-    if(sp->channel == (MAX_RADIOCHANNEL - MIN_RADIOCHANNEL + 1))
-        sp->channel = 0;
-    sp->channelnoise[sp->channel] = 0;
-    sp->time_to_scan = 0;
 }
 
 void PAGE_ScannerExit()

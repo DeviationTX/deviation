@@ -55,12 +55,17 @@ static void _draw_page(u8 enable)
 void _draw_channels()
 {
     const unsigned offset = HEADER_HEIGHT + LINE_HEIGHT;
-    // draw a line
-    int col = (LCD_WIDTH - (MAX_RADIOCHANNEL - MIN_RADIOCHANNEL)) / 2 + sp->channel;
-    int height = sp->channelnoise[sp->channel] * (LCD_HEIGHT - offset) / 0x1F;
+    int col, height;
+    int num_chan = sp->chan_max - sp->chan_min;
+ 
+    // draw rssi values
+    for(int i = 0; i < num_chan; i++) {
+        col = (LCD_WIDTH - (num_chan)) / 2 + i;
+        height = sp->rssi[i] * (LCD_HEIGHT - offset) / 0x1F;
 
-    LCD_DrawFastVLine(col, offset, LCD_HEIGHT - offset - height, 0);
-    LCD_DrawFastVLine(col, LCD_HEIGHT - height, height, Display.xygraph.grid_color);
-}
+        LCD_DrawFastVLine(col, offset, LCD_HEIGHT - offset - height, 0);
+        LCD_DrawFastVLine(col, LCD_HEIGHT - height, height, Display.xygraph.grid_color);
+    }
+ }
 
 #endif //HAS_SCANNER
