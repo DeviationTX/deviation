@@ -69,7 +69,7 @@ def print_po_strings(uniq):
         print('\n'.join(uniq[string]))  # Comment
         # we need to split on '\\n' but preserver it as part of the previous line
         # python doesn't offer 'split' based on zero-length look-behind
-        msg = [x for x in re.sub(r'\\n', r'\\n\n', string).split('\n') if x]
+        msg = [x for x in string.replace('\\n', '\\n\n').split('\n') if x]
         if len(msg) > 1:
             print('msgid ""\n"{}"'.format('"\n"'.join(msg)))
         else:
@@ -80,18 +80,19 @@ def print_po_strings(uniq):
 
 def print_strings(uniq):
     """Generate deviation lang file containing all translatable strings"""
-    for string in uniq['__ORDER__']:
+    for string in sorted(uniq['__ORDER__']):
         print(":{}".format(string))
 
 
 def get_strings(path):
-    """Get the full list of translatable strings, pitentially filtered by target"""
+    """Get the full list of translatable strings, potentially filtered by target"""
     strings = extract_all_strings()
     if path:
         strings = extract_target_strings(path, strings)
     # append template names
+    _re = re.compile(r'template=(.*?)\s*$')
     for line in system("head -n 1 fs/common/template/*.ini").split('\n'):
-        _m = re.search(r'template=(.*?)\s*$', line)
+        _m = _re.search(line)
         if _m:
             if _m.group(1) not in strings:
                 strings['__ORDER__'].append(_m.group(1))
@@ -101,13 +102,15 @@ def get_strings(path):
 
 def extract_all_strings():
     """Extaract full list of translatable strings from source-code"""
-    lines = system(
-        "/usr/bin/find . -name '*.[hc]' | grep -v libopencm3 | sort "
-        "| xargs xgettext -o - --omit-header -k --keyword=_tr "
-        "--keyword=_tr_noop --no-wrap").split('\n')
     strings = {"__ORDER__": []}
-    while lines:
-        msgid, _msgstr, comment = parse_gettext(lines)
+    cmd = ("/usr/bin/find . -name '*.[hc]' | grep -v libopencm3 | sort "
+           "| xargs xgettext -o - --omit-header -k --keyword=_tr "
+           "--keyword=_tr_noop --no-wrap")
+    _p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+    while True:
+        msgid, _msgstr, comment = parse_gettext(_p.stdout)
+        if msgid is None:
+            break
         if not msgid:
             continue
         if msgid not in strings:
@@ -119,37 +122,36 @@ def extract_all_strings():
 def extract_target_strings(path, valid_strings):
     """Extract all strings from target object files"""
     strings = {}
-    files = glob.glob(os.path.join(path, "*.o"))
 
-    for filename in files:   # pylint: disable=too-many-nested-blocks
-        # Parse all strings from the object files and add to the allstr hash
-        objdump = system(CROSS + "objdump -s " + filename).split('\n')
-        _str = ""
-        state = 0
-        for line in objdump:
-            if re.search(r'section (?:(?:(\.rel)?\.ro?data)|__cstring)', line):
-                _str = ""
+    cmd = CROSS + "objdump -s " + os.path.join(path, "*.o")
+    _p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+    _str = ""
+    state = 0
+    for line in _p.stdout:
+        line = line.decode('utf-8')
+        if not line.startswith(' '):
+            state = 0
+            _str = ""
+            if line.startswith("Contents") and any(x in line for x in [
+                    "section .rel.rdata", "section .rel.rodata",
+                    "section .rdata", "section .rodata", "section __cstring"]):
                 state = 1
+            continue
+        if not state:
+            continue
+        line = re.sub(r'^\s+\S+\s', r'', line, 1)
+        line = re.sub(r'\s\s.*', r'', line, 1)
+        line = re.sub(r'\s', '', line)
+        for _ch in re.findall(r'\S\S', line):
+            if _ch == "00":
+                # NULL termination
+                if _str:
+                    _str = _str.replace('\n', '\\n')
+                    if _str in valid_strings:
+                        strings[_str] = valid_strings[_str]
+                    _str = ""
                 continue
-            if re.search(r'Contents', line) or re.search(r'\.ro?data', line):
-                _str = ""
-                state = 0
-                continue
-            if not state:
-                continue
-            line = re.sub(r'^\s+\S+\s', r'', line, 1)
-            line = re.sub(r'\s\s.*', r'', line, 1)
-            line = re.sub(r'\s', '', line)
-            for _ch in re.findall(r'\S\S', line):
-                if _ch == "00":
-                    # NULL termination
-                    if _str:
-                        _str = _str.replace('\n', '\\n')
-                        if _str in valid_strings:
-                            strings[_str] = valid_strings[_str]
-                        _str = ""
-                    continue
-                _str += chr(int(_ch, 16))
+            _str += chr(int(_ch, 16))
     strings['__ORDER__'] = [_x for _x in valid_strings['__ORDER__'] if _x in strings]
     return strings
 
@@ -199,48 +201,58 @@ def write_lang_file(outf, targets, language, translation):
     return True
 
 
-def parse_gettext(lines):
+def parse_gettext(_fh):
     """Parse next gettext element for string list"""
 
     msgid = None
     comment = []
+    in_multiline = False
+    re_msg = re.compile(r'^\s*(msgid|msgstr)\s+"(.*)"\s*$')
+    re_quoted = re.compile(r'^\s*"(.*)"\s*$')
+    _str = ""
+    _type = ""
+    # import pdb; pdb.set_trace()
     while True:
-        line = lines.pop(0)
-        if re.search(r'^#[:,]', line):
-            comment.append(line)
-            continue
-        _m = re.search(r'^\s*(msgid|msgstr)\s+"(.*)"\s*$', line)
-        if _m:
-            _type = _m.group(1)
-            _str = _m.group(2)
-            while lines:
-                _m = re.search(r'^\s*"(.*)"\s*$', lines[0])
-                if not _m:
-                    break
+        line = _fh.readline().decode('utf-8')
+        if in_multiline:
+            _m = re_quoted.search(line)
+            if _m:
                 _str += _m.group(1)
-                lines.pop(0)
+                continue
+            in_multiline = False
             if _type == "msgid":
                 if msgid:
                     logging.error("msgid '%s' missing msgstr.  Ignoring", msgid)
                 msgid = _str
             elif _type == "msgstr":
-                if msgid is None:
-                    logging.error("no msgid for msgstr '%s'.  Ignoring", _str)
-                    continue
-                return(msgid, _str, comment or "#")
+                if msgid is not None:
+                    return(msgid, _str, comment or "#")
+                logging.error("no msgid for msgstr '%s'.  Ignoring", _str)
+        if not line:
+            break
+        if line.startswith('#:') or line.startswith('#,'):
+            comment.append(line.rstrip())
+            continue
+        _m = re_msg.search(line)
+        if _m:
+            _type = _m.group(1)
+            _str = _m.group(2)
+            in_multiline = True
     return (None, None, None)
 
 
-def parse_po_file(filename, uniq):
+def parse_po_file(filename, uniq):    # pylint: disable=too-many-branches
     """Parse .po file into dictionary"""
     strings = {'DEFAULT': {}}
     language = "Unknown"
     ext = None
     re_target = "|".join(TARGETS)
 
-    lines = open(filename, "r", encoding='utf-8').read().splitlines()
-    while lines:
-        msgid, msgstr, _comment = parse_gettext(lines)
+    _fh = open(filename, "rb")
+    while True:
+        msgid, msgstr, _comment = parse_gettext(_fh)
+        if msgid is None:
+            break
         if msgstr:
             msgstr = re.sub(r'\\([^n])', r'\1', msgstr)  # Fix escaped characters
         if not msgstr:
