@@ -87,6 +87,10 @@ def read_target(target_dir):
     """Read all language files for a target and calculate max usage"""
     target = os.path.basename(target_dir)
     langfiles = glob.glob(os.path.join(target_dir, "language", "*"))
+    if not langfiles:
+        print("WARNING: No language files found for {}.  Assuming no language support"
+              .format(target))
+        sys.exit(0)
     target_bytes = MaxVal()
     target_line_count = MaxVal()
     target_max_line_length = MaxVal()
