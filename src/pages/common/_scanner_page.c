@@ -42,11 +42,16 @@ static void press_enable_cb(guiObject_t *obj, const void *data)
     GUI_Redraw(obj);
 }
 
-static void press_attenuator_cb(guiObject_t *obj, const void *data)
+static const char *attenuator_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)data;
-    sp->attenuator ^= 1;
-    GUI_Redraw(obj);
+    GUI_TextSelectEnablePress((guiTextSelect_t *)obj, sp->attenuator);
+    sp->attenuator = GUI_TextSelectHelper(sp->attenuator, 0, 2, dir, 1, 1, NULL);
+    switch (sp->attenuator) {
+        case 0: return "0 dB";
+        case 1: return "-20dB";
+        default: return "-50 dB";
+    }
 }
 static const char *average_cb(guiObject_t *obj, int dir, void *data)
 {

@@ -123,7 +123,7 @@ struct reorder_obj {
 struct scanner_obj {
     guiButton_t enable;
     guiTextSelect_t averaging;
-    guiButton_t attenuator;
+    guiTextSelect_t attenuator;
 };
 
 struct telemcfg_obj {

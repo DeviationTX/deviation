@@ -27,7 +27,7 @@
 
 static struct scanner_page * const sp = &pagemem.u.scanner_page;
 static int averages;
-static long rssi_sum;
+static u32 rssi_sum;
 
 enum ScanStates {
     SCAN_CHANNEL_CHANGE = 0,
@@ -59,10 +59,10 @@ static void cyrf_init()
 static void _scan_next()
 {
     CYRF_ConfigRFChannel(sp->channel + sp->chan_min);
-    if (sp->attenuator) {
-        CYRF_WriteRegister(CYRF_06_RX_CFG, 0x0A);
-    } else {
-        CYRF_WriteRegister(CYRF_06_RX_CFG, 0x4A);
+    switch (sp->attenuator) {
+        case 0: CYRF_WriteRegister(CYRF_06_RX_CFG, 0x4A); break;  // LNA on, ATT off
+        case 1: CYRF_WriteRegister(CYRF_06_RX_CFG, 0x0A); break;  // LNA off, ATT off
+        default:  CYRF_WriteRegister(CYRF_06_RX_CFG, 0x2A); break;  // LNA off, no ATT on
     }
 }
 
