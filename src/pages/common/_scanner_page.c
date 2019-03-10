@@ -44,8 +44,8 @@ static void press_enable_cb(guiObject_t *obj, const void *data)
 
 static const char *attenuator_cb(guiObject_t *obj, int dir, void *data)
 {
+    (void)obj;
     (void)data;
-    GUI_TextSelectEnablePress((guiTextSelect_t *)obj, sp->attenuator);
     sp->attenuator = GUI_TextSelectHelper(sp->attenuator, 0, 2, dir, 1, 1, NULL);
     switch (sp->attenuator) {
         case 0: return "0 dB";
@@ -55,8 +55,8 @@ static const char *attenuator_cb(guiObject_t *obj, int dir, void *data)
 }
 static const char *average_cb(guiObject_t *obj, int dir, void *data)
 {
+    (void)obj;
     (void)data;
-    GUI_TextSelectEnablePress((guiTextSelect_t *)obj, sp->averaging);
     sp->averaging = GUI_TextSelectHelper(sp->averaging, 0, 255, dir, 1, 10, NULL);
     if (sp->averaging == 0)
         strcpy(tempstring, _tr("Peak"));
