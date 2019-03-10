@@ -50,8 +50,8 @@ void _draw_channels()
         const unsigned int height = LCD_HEIGHT - 78;
         int width = LCD_WIDTH / (sp->chan_max - sp->chan_min + 1);
         int xoffset = (LCD_WIDTH - width * ((sp->chan_max - sp->chan_min) + 1))/2;
-        for(int i = 0; i < (sp->chan_max - sp->chan_min); i++) {
-            GUI_CreateBarGraph(&gui->bar[i], xoffset + i * width, 70, width, height, 2, 31, BAR_VERTICAL, show_bar_cb, (void *)((long)i));
+        for (int i = 0; i < (sp->chan_max - sp->chan_min); i++) {
+            GUI_CreateBarGraph(&gui->bar[i], xoffset + i * width, 70, width, height, 2, 31, BAR_VERTICAL, show_bar_cb, (void *)(uintptr_t)i);
         }
         sp->bars_valid = 1;
     }
