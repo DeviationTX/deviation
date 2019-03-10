@@ -11,5 +11,6 @@ struct scanner_page {
     u8 enable;
     u8 scan_mode;
     u8 attenuator;
+    u8 averaging;
 };
 #endif

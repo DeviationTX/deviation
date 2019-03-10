@@ -20,18 +20,18 @@
 #ifdef PROTO_HAS_CYRF6936
 
 #define MIN_RADIOCHANNEL    0x00
-#define MAX_RADIOCHANNEL    0x4F
+#define MAX_RADIOCHANNEL    0x62
 #define CHANNEL_LOCK_TIME   300  // slow channel requires 270 usec for synthesizer to settle
-#define NUM_AVERAGE         5
-#define AVERAGE_INTVL       300
+#define INTERNAL_AVERAGE         3
+#define AVERAGE_INTVL       50
 
 static struct scanner_page * const sp = &pagemem.u.scanner_page;
 static int averages;
+static long rssi_sum;
 
 enum ScanStates {
     SCAN_CHANNEL_CHANGE = 0,
     SCAN_GET_RSSI = 1,
-    SCAN_AVG_FINISHED = 2,
 };
 
 static void cyrf_init()
@@ -83,9 +83,10 @@ static int _scan_rssi()
 
 static u16 scan_cb()
 {
-    int rssi_update;
+    int rssi_value;
     switch (sp->scanState) {
         case SCAN_CHANNEL_CHANGE:
+            rssi_sum = 0;
             averages = 0;
             sp->channel++;
             if (sp->channel == (sp->chan_max - sp->chan_min + 1))
@@ -95,17 +96,20 @@ static u16 scan_cb()
             sp->scanState = SCAN_GET_RSSI;
             return CHANNEL_LOCK_TIME;
         case SCAN_GET_RSSI:
-            rssi_update = _scan_rssi();
-            if (sp->scan_mode) {
-                sp->rssi[sp->channel] = (sp->rssi[sp->channel] + rssi_update) / 2;
+            rssi_value = _scan_rssi();
+            if (sp->averaging > 0) {
+                rssi_sum += rssi_value;
+                if (averages >= INTERNAL_AVERAGE * sp->averaging)
+                    rssi_sum -= sp->rssi[sp->channel];
+                else
+                    averages++;
+                sp->rssi[sp->channel] = (rssi_sum + averages / 2) / averages;  // exponential smoothing
             } else {
-                if (rssi_update > sp->rssi[sp->channel])
-                    sp->rssi[sp->channel] = rssi_update;
+                if (rssi_value > sp->rssi[sp->channel])
+                    sp->rssi[sp->channel] = rssi_value;
             }
-            if (averages < NUM_AVERAGE) {
-                averages++;
+            if (averages < INTERNAL_AVERAGE * sp->averaging)
                 return AVERAGE_INTVL;
-            }
             sp->scanState = SCAN_CHANNEL_CHANGE;
     }
     return 50;
@@ -121,6 +125,8 @@ static void initialize()
 {
     sp->chan_min = MIN_RADIOCHANNEL;
     sp->chan_max = MAX_RADIOCHANNEL;
+    rssi_sum = 0;
+    averages = 0;
     CYRF_Reset();
     cyrf_init();
     CYRF_SetTxRxMode(RX_EN);  // Receive mode

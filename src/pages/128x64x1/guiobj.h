@@ -122,7 +122,7 @@ struct reorder_obj {
 
 struct scanner_obj {
     guiButton_t enable;
-    guiButton_t scan_mode;
+    guiTextSelect_t averaging;
     guiButton_t attenuator;
 };
 

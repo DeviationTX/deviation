@@ -42,18 +42,22 @@ static void press_enable_cb(guiObject_t *obj, const void *data)
     GUI_Redraw(obj);
 }
 
-static void press_mode_cb(guiObject_t *obj, const void *data)
-{
-    (void)data;
-    sp->scan_mode ^= 1;
-    GUI_Redraw(obj);
-}
-
 static void press_attenuator_cb(guiObject_t *obj, const void *data)
 {
     (void)data;
     sp->attenuator ^= 1;
     GUI_Redraw(obj);
+}
+static const char *average_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void)data;
+    GUI_TextSelectEnablePress((guiTextSelect_t *)obj, sp->averaging);
+    sp->averaging = GUI_TextSelectHelper(sp->averaging, 0, 255, dir, 1, 10, NULL);
+    if (sp->averaging == 0)
+        strcpy(tempstring, _tr("Peak"));
+    else
+        snprintf(tempstring, 8, "Avg %d", sp->averaging);
+    return tempstring;
 }
 
 void PAGE_ScannerInit(int page)

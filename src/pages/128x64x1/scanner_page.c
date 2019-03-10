@@ -29,13 +29,6 @@ static const char *enablestr_cb(guiObject_t *obj, const void *data)
     return sp->enable ? _tr("On") : _tr("Off");
 }
 
-static const char *modestr_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    (void)data;
-    return sp->scan_mode ? _tr("Average") : _tr("Peak");
-}
-
 static const char *attstr_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
@@ -48,7 +41,7 @@ static void _draw_page(u8 enable)
     (void)enable;
     PAGE_ShowHeader(PAGE_GetName(PAGEID_SCANNER));
     GUI_CreateButtonPlateText(&gui->enable, 0, HEADER_HEIGHT, 40, LINE_HEIGHT, &BUTTON_FONT, enablestr_cb, press_enable_cb, NULL);
-    GUI_CreateButtonPlateText(&gui->scan_mode, LCD_WIDTH/2 - 23, HEADER_HEIGHT, 46, LINE_HEIGHT, &BUTTON_FONT, modestr_cb, press_mode_cb, NULL);
+    GUI_CreateTextSelectPlate(&gui->averaging, LCD_WIDTH/2 - 23, HEADER_HEIGHT, 46, LINE_HEIGHT, &TEXTSEL_FONT, NULL, average_cb, NULL);
     GUI_CreateButtonPlateText(&gui->attenuator, LCD_WIDTH - 40, HEADER_HEIGHT, 40, LINE_HEIGHT, &BUTTON_FONT, attstr_cb, press_attenuator_cb, NULL);
 }
 
