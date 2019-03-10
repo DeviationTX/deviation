@@ -22,7 +22,7 @@
 #define MIN_RADIOCHANNEL    0x00
 #define MAX_RADIOCHANNEL    0x62
 #define CHANNEL_LOCK_TIME   300  // slow channel requires 270 usec for synthesizer to settle
-#define INTERNAL_AVERAGE         3
+#define INTERNAL_AVERAGE    3
 #define AVERAGE_INTVL       50
 
 static struct scanner_page * const sp = &pagemem.u.scanner_page;
@@ -109,7 +109,7 @@ static u16 scan_cb()
                     sp->rssi[sp->channel] = rssi_value;
             }
             if (averages < INTERNAL_AVERAGE * sp->averaging)
-                return AVERAGE_INTVL;
+                return AVERAGE_INTVL + rand32() % 50;  // make measurements slightly random in time
             sp->scanState = SCAN_CHANNEL_CHANGE;
     }
     return 50;
