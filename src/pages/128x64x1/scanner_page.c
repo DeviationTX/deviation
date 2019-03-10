@@ -18,7 +18,7 @@
 #include "pages.h"
 #include "config/model.h"
 
-#if HAS_SCANNER
+#if SUPPORT_SCANNER
 #include "../common/_scanner_page.c"
 
 static struct scanner_obj * const gui = &gui_objs.u.scanner;
@@ -54,4 +54,4 @@ void _draw_channels()
     }
 }
 
-#endif //HAS_SCANNER
+#endif //SUPPORT_SCANNER

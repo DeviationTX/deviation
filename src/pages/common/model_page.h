@@ -21,10 +21,10 @@ struct model_page {
     enum ModelType modeltype;
 };
 
-#if HAS_SCANNER
+#if SUPPORT_SCANNER
 #define PROTOCOL_SCANNERS 1
 #else
 #define PROTOCOL_SCANNERS 0
-#endif  // HAS_SCANNER
+#endif  // SUPPORT_SCANNER
 
 #endif

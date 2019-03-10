@@ -61,7 +61,7 @@ static const char *average_cb(guiObject_t *obj, int dir, void *data)
     if (sp->averaging == 0)
         strcpy(tempstring, _tr("Peak"));
     else
-        snprintf(tempstring, 8, "Avg %d", sp->averaging);
+        snprintf(tempstring, sizeof(tempstring), "Avg %d", sp->averaging);
     return tempstring;
 }
 

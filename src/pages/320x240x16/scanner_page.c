@@ -19,7 +19,7 @@
 #include "config/model.h"
 
 
-#if HAS_SCANNER
+#if SUPPORT_SCANNER
 #include "../common/_scanner_page.c"
 static struct scanner_obj * const gui = &gui_objs.u.scanner;
 static s32 show_bar_cb(void *data)
@@ -59,4 +59,4 @@ void _draw_channels()
         GUI_Redraw(&gui->bar[i]);
 }
 
-#endif //HAS_SCANNER
+#endif //SUPPORT_SCANNER
