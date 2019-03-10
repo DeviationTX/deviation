@@ -249,7 +249,7 @@ static const char *protoselect_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     u8 changed;
     enum Protocols new_protocol;
-    new_protocol = GUI_TextSelectHelper(Model.protocol, PROTOCOL_NONE, PROTOCOL_COUNT-PROTOCOL_SCANNERS-1, dir, 1, 1, &changed);
+    new_protocol = GUI_TextSelectHelper(Model.protocol, PROTOCOL_NONE, PROTOCOL_COUNT - SUPPORT_SCANNER - 1, dir, 1, 1, &changed);
     if (changed) {
         const u8 *oldmap = CurrentProtocolChannelMap;
     	// DeInit() the old protocol (Model.protocol unchanged)
