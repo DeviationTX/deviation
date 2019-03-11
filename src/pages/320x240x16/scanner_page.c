@@ -59,4 +59,4 @@ void _draw_channels()
         GUI_Redraw(&gui->bar[i]);
 }
 
-#endif //SUPPORT_SCANNER
+#endif  // SUPPORT_SCANNER

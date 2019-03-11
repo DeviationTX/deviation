@@ -54,4 +54,4 @@ void _draw_channels()
     }
 }
 
-#endif // SUPPORT_SCANNER
+#endif  // SUPPORT_SCANNER
