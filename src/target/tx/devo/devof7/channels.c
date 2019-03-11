@@ -85,37 +85,6 @@ s32 CHAN_ReadRawInput(int channel)
     }
     return value;
 }
-s32 CHAN_ReadInput(int channel)
-{
-    s32 value = CHAN_ReadRawInput(channel);
-    if(channel <= INP_HAS_CALIBRATION) {
-        s32 max = Transmitter.calibration[channel - 1].max;
-        s32 min = Transmitter.calibration[channel - 1].min;
-        s32 zero = Transmitter.calibration[channel - 1].zero;
-        if(! zero) {
-            //If this input doesn't have a zero, calculate from max/min
-            zero = ((u32)max + min) / 2;
-        }
-        // Derate min and max by 1% to ensure we can get all the way to 100%
-        max = (max - zero) * 99 / 100;
-        min = (min - zero) * 99 / 100;
-        if(value >= zero) {
-            value = (value - zero) * CHAN_MAX_VALUE / max;
-        } else {
-            value = (value - zero) * CHAN_MIN_VALUE / min;
-        }
-        //Bound output
-        if (value > CHAN_MAX_VALUE)
-            value = CHAN_MAX_VALUE;
-        if (value < CHAN_MIN_VALUE)
-            value = CHAN_MIN_VALUE;
-    } else {
-        value = value ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
-    }
-    if (channel == INP_THROTTLE || channel == INP_RUDDER)
-        value = -value;
-    return value;
-}
 
 void CHAN_SetSwitchCfg(const char *str)
 {
