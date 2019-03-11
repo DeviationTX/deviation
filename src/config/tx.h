@@ -47,6 +47,12 @@ enum ExtraHardware {
 // bitmap for rtcflags:
 #define CLOCK12HR 0x01  //0b00000001
 
+#ifdef HAS_MORE_THAN_32_INPUTS
+typedef u64 srcsize_t;
+#else
+typedef u32 srcsize_t;
+#endif
+
 struct Transmitter {
     u8 current_model;
     u8 language;
@@ -79,11 +85,7 @@ struct Transmitter {
     u8 padding_1[1];
 #endif
 
-    #ifdef HAS_MORE_THAN_32_INPUTS
-        u64 ignore_src;
-    #else
-        u32 ignore_src;
-    #endif
+    srcsize_t ignore_src;
     u32 ignore_buttons;
     struct mcu_pin module_enable[TX_MODULE_LAST];
     u8 module_config[TX_MODULE_LAST];
@@ -99,5 +101,7 @@ extern struct Transmitter Transmitter;
 
 void CONFIG_LoadTx();
 void CONFIG_LoadHardware();
+
+#define TX_HAS_SRC(x) ((~Transmitter.ignore_src & (((srcsize_t)1) << x)) == (((srcsize_t)1) << x))
 
 #endif

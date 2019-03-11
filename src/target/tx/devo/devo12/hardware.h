@@ -16,16 +16,16 @@
 
 // Analog inputs
 #define ADC_CHANNELS { \
-    ADC_CHAN(GPIOA, GPIO2),  /* ADC123_2  */ \
-    ADC_CHAN(GPIOC, GPIO1),  /* ADC123_11 */ \
-    ADC_CHAN(GPIOC, GPIO0),  /* ADC123_10 */ \
-    ADC_CHAN(GPIOF, GPIO10), /* ADC3_8    */ \
-    ADC_CHAN(GPIOF, GPIO7),  /* ADC3_5    */ \
-    ADC_CHAN(GPIOC, GPIO2),  /* ADC123_12 */ \
-    ADC_CHAN(GPIOF, GPIO8),  /* ADC3_6    */ \
-    ADC_CHAN(GPIOC, GPIO3),  /* ADC123_13 */ \
-    ADC_CHAN(GPIOF, GPIO6),  /* ADC3_4    */ \
-    ADC_CHAN(GPIOF, GPIO9),  /* ADC3_7    */ \
+    ADC_CHAN(GPIOF, GPIO10), /* ADC3_8    - INP_AIL */ \
+    ADC_CHAN(GPIOC, GPIO0),  /* ADC123_10 - INP_ELE */ \
+    ADC_CHAN(GPIOA, GPIO2),  /* ADC123_2  - INP_THR */ \
+    ADC_CHAN(GPIOC, GPIO1),  /* ADC123_11 - INP_RUD */ \
+    ADC_CHAN(GPIOF, GPIO6),  /* ADC3_4    - INP_AUX2 */ \
+    ADC_CHAN(GPIOF, GPIO9),  /* ADC3_7    - INP_AUX3 */ \
+    ADC_CHAN(GPIOF, GPIO8),  /* ADC3_6    - INP_AUX4 */ \
+    ADC_CHAN(GPIOC, GPIO3),  /* ADC123_13 - INP_AUX5 */ \
+    ADC_CHAN(GPIOF, GPIO7),  /* ADC3_5    - INP_AUX6 */ \
+    ADC_CHAN(GPIOC, GPIO2),  /* ADC123_12 - INP_AUX7 */ \
     ADC_CHAN(0, 0),        /* TEMPERATURE */ \
     ADC_CHAN(GPIOA, GPIO3),  /* ADC123_3  */ \
     }

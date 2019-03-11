@@ -102,6 +102,10 @@ void CHAN_Init()
 s32 CHAN_ReadRawInput(int channel)
 {
     s32 value = 0;
+    if (channel < INP_HAS_CALIBRATION) {
+        return ADC_ReadRawInput(channel);
+    }
+
     if ((~Transmitter.ignore_src & SWITCH_STOCK) == SWITCH_STOCK) {
       switch(channel) {
         case INP_HOLD0:    value = gpio_get(GPIOC, GPIO11); break;
@@ -192,22 +196,6 @@ s32 CHAN_ReadRawInput(int channel)
           case INP_SWH1:  value = (global_extra_switches & (1 << (SW_10 - 1))); break;
         }
       }
-    }
-    if ((~Transmitter.ignore_src & POT_1) == POT_1) {
-      switch(channel) {
-        case INP_AUX4: value = adc_array_raw[4]; break;
-      }
-    }
-    if ((~Transmitter.ignore_src & POT_2) == POT_2) {
-      switch(channel) {
-        case INP_AUX5:  value = adc_array_raw[5]; break;
-      }
-    }
-    switch(channel) {
-      case INP_THROTTLE: value = adc_array_raw[0]; break;  // bug fix: right vertical
-      case INP_AILERON:   value = adc_array_raw[1]; break;  // bug fix: right horizon
-      case INP_RUDDER: value = adc_array_raw[2]; break;  // bug fix: left horizon
-      case INP_ELEVATOR:  value = adc_array_raw[3]; break;  // bug fix: left vertical
     }
     return value;
 }
