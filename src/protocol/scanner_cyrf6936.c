@@ -18,6 +18,7 @@
 #include "pages/128x64x1/pages.h"
 
 #ifdef PROTO_HAS_CYRF6936
+#if SUPPORT_SCANNER
 
 #define MIN_RADIOCHANNEL    0x00
 #define MAX_RADIOCHANNEL    0x62
@@ -163,4 +164,5 @@ uintptr_t SCANNER_CYRF_Cmds(enum ProtoCmds cmd)
     return 0;
 }
 
-#endif
+#endif  // SUPPORT_SCANNER
+#endif  // PROTO_CYRF_6936
