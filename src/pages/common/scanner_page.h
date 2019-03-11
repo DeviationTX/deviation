@@ -10,5 +10,6 @@ struct scanner_page {
     u8 attenuator;
     u8 averaging;
     u8 bars_valid;
+    enum Protocols model_protocol;
 };
 #endif

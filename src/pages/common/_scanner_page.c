@@ -18,18 +18,17 @@ static struct scanner_page * const sp = &pagemem.u.scanner_page;
 static void _draw_page(u8 enable);
 static void _draw_channels(void);
 
-#ifdef ENABLE_MODULAR
-#error "Not supported in MODULAR build"
-#endif
-
-// The high level interface to do the scan
 static void _scan_enable(int enable)
 {
     if (enable) {
         PROTOCOL_DeInit();
-        SCANNER_CYRF_Cmds(0);  // Switch to SCANNER_CYRF configuration
+        sp->model_protocol = Model.protocol;  // Save protocol used in current Model file
+        Model.protocol = PROTOCOL_SCANNER_CYRF;
+        PROTOCOL_Init(1);  // Switch to scanner configuration and ignore safety
         PROTOCOL_SetBindState(0);  // Disable binding message
     } else {
+        PROTOCOL_DeInit();
+        Model.protocol = sp->model_protocol;
         PROTOCOL_Init(0);
     }
 }

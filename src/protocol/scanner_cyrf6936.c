@@ -13,6 +13,12 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef MODULAR
+    // Allows the linker to properly relocate
+    #define SCANNER_CYRF_Cmds PROTO_Cmds
+    #pragma long_calls
+#endif
+
 #include "common.h"
 #include "interface.h"
 #include "pages/128x64x1/pages.h"
@@ -71,9 +77,9 @@ static int _scan_rssi()
 {
     if ( !(CYRF_ReadRegister(CYRF_05_RX_CTRL) & 0x80) ) {
         CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x80);  // Prepare to receive
-        Delay(10);
+        usleep(1);
         CYRF_ReadRegister(CYRF_13_RSSI);  // dummy read
-        Delay(15);
+        usleep(1);
     }
 #ifdef EMULATOR
     return rand32() % 0x1F;
