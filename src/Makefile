@@ -318,9 +318,9 @@ endif
 		done
 	@echo " + Checking string list length for $(FILESYSTEM)"
 ifeq "$(TYPE)" "dev"
-	../utils/check_string_size.pl -target $(FILESYSTEM) -objdir $(ODIR) -language $(LANGUAGE)
+	../utils/check_string_size.py -target $(FILESYSTEM)
 else
-	../utils/check_string_size.pl -target $(FILESYSTEM) -objdir $(ODIR) -quiet -language $(LANGUAGE)
+	../utils/check_string_size.py -target $(FILESYSTEM) -quiet
 endif
 	../utils/run_linter.py --diff --skip-github --no-fail
 
