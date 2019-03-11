@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 import os
 import sys
@@ -33,23 +33,23 @@ def main():
                       help="directory to read/write")
     (opt, args) = parser.parse_args()
     if not opt.dir:
-        print "Must specify --dir"
+        print("Must specify --dir")
         return
     if not opt.fs:
-        print "Must specify --fs"
+        print("Must specify --fs")
         return
     if opt.create == opt.extract:
-        print "Must specify either --extract or --create"
+        print("Must specify either --extract or --create")
         return
     if opt.create:
         data = read_dir(opt.dir);
-	write_fs(opt.fs, data, opt.size, opt.invert)
+        write_fs(opt.fs, data, opt.size, opt.invert)
     if opt.extract:
         data = bytearray(open(opt.fs, "rb").read())
         if opt.invert:
             data = bytearray(map(lambda x: 0xff-x, data))
         data = align_data(data)
-	build_dirs(opt.dir, data)
+        build_dirs(opt.dir, data)
 
 def read_dir(dir):
     fs = []
@@ -99,9 +99,9 @@ def add_file(filename, parent, data):
 
 def write_fs(filename, data, fs_size, invert):
     if len(data) > 1024 * fs_size - 4096:
-        print "ERROR: Requested filesystem size: {} is too large for {}kB filesystem".format(len(data), fs_size)
+        print("ERROR: Requested filesystem size: {} is too large for {}kB filesystem".format(len(data), fs_size))
         sys.exit(1)
-    print "Filesystem will use {}kB of {}kB filesystem".format((len(data) + 512) / 1024, fs_size)
+    print("Filesystem will use {}kB of {}kB filesystem".format((len(data) + 512) / 1024, fs_size))
     f = open(filename, "wb")
     data.reverse() # Enables 'pop'
     next_sec = START_SECTOR
@@ -151,24 +151,24 @@ def build_dirs(dir, data):
            filename += "." + ext.split('\x00')[0]
        parent_dir = dirs[parent_id]
        if type == FILEOBJ_DIR:
-           print "MKDIR: " + os.path.join(dir, parent_dir, filename)
+           print("MKDIR: " + os.path.join(dir, parent_dir, filename))
            os.mkdir(os.path.join(dir, parent_dir, filename))
            dirs[size1] = os.path.join(parent_dir, filename)
            continue
        if type == FILEOBJ_DELDIR:
-           print "DELETED DIR: " + os.path.join(dir, parent_dir, filename)
+           print("DELETED DIR: " + os.path.join(dir, parent_dir, filename))
            continue
        size = (size1 << 16) + (size2 << 8) + size3
        filedata = data[pos:pos+size]
        pos += size
        if type == FILEOBJ_FILE:
-           print "MKFILE ({}): {}".format(size, os.path.join(dir, parent_dir, filename))
+           print("MKFILE ({}): {}".format(size, os.path.join(dir, parent_dir, filename)))
            fh = open(os.path.join(dir, parent_dir, filename), "wb")
            fh.write(filedata)
            fh.close()
            continue
        if type == FILEOBJ_DELFILE:
-           print "DELETED FILE ({}): {}".format(size, os.path.join(dir, parent_dir, filename))
+           print("DELETED FILE ({}): {}".format(size, os.path.join(dir, parent_dir, filename)))
            continue
 
 main()
