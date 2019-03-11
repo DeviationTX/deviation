@@ -8,14 +8,14 @@
 #define LED_STORAGE_PIN NULL_PIN
 
 #define ADC_CHANNELS { \
-    ADC_CHAN(GPIOA, GPIO0),  /* ADC123_0  */ \
-    ADC_CHAN(GPIOA, GPIO1),  /* ADC123_1  */ \
-    ADC_CHAN(GPIOA, GPIO2),  /* ADC123_2  */ \
-    ADC_CHAN(GPIOA, GPIO3),  /* ADC123_3  */ \
-    ADC_CHAN(GPIOA, GPIO5),  /* ADC12_5   */ \
-    ADC_CHAN(GPIOA, GPIO6),  /* ADC12_6   */ \
-    ADC_CHAN(GPIOB, GPIO0),  /* ADC12_8   */ \
-    ADC_CHAN(GPIOA, GPIO4),  /* ADC12_4   */ \
+    ADC_CHAN(GPIOA, GPIO0),  /* ADC123_0 - INP_AIL */ \
+    ADC_CHAN(GPIOA, GPIO1),  /* ADC123_1 - INP_ELE */ \
+    ADC_CHAN(GPIOA, GPIO2),  /* ADC123_2 - INP_THR */ \
+    ADC_CHAN(GPIOA, GPIO3),  /* ADC123_3 - INP_RUD */ \
+    ADC_CHAN(GPIOA, GPIO5),  /* ADC12_5  - INP_AUX4 */ \
+    ADC_CHAN(GPIOA, GPIO6),  /* ADC12_6  - INP_AUX5 */ \
+    ADC_CHAN(GPIOB, GPIO0),  /* ADC12_8  - INP_AUX6 */ \
+    ADC_CHAN(GPIOA, GPIO4),  /* ADC12_4  - INP_AUX7 */ \
     ADC_CHAN(0, 16),       /* TEMPERATURE */ \
     ADC_CHAN(GPIOB, GPIO1),  /* ADC12_9   */ \
     }
