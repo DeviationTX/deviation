@@ -26,7 +26,7 @@
 #define AVERAGE_INTVL       50
 
 static struct scanner_page * const sp = &pagemem.u.scanner_page;
-static int averages;
+static int averages, channel, scan_state;
 static u32 rssi_sum;
 
 enum ScanStates {
@@ -58,7 +58,7 @@ static void cyrf_init()
 
 static void _scan_next()
 {
-    CYRF_ConfigRFChannel(sp->channel + sp->chan_min);
+    CYRF_ConfigRFChannel(channel + sp->chan_min);
     switch (sp->attenuator) {
         case 0: CYRF_WriteRegister(CYRF_06_RX_CFG, 0x4A); break;  // LNA on, ATT off
         case 1: CYRF_WriteRegister(CYRF_06_RX_CFG, 0x0A); break;  // LNA off, ATT off
@@ -84,33 +84,34 @@ static int _scan_rssi()
 static u16 scan_cb()
 {
     int rssi_value;
-    switch (sp->scanState) {
+    switch (scan_state) {
         case SCAN_CHANNEL_CHANGE:
             rssi_sum = 0;
             averages = 0;
-            sp->channel++;
-            if (sp->channel == (sp->chan_max - sp->chan_min + 1))
-                sp->channel = 0;
-            sp->rssi[sp->channel] = 0;
+            channel++;
+            if (channel == (sp->chan_max - sp->chan_min + 1))
+                channel = 0;
+            if (sp->averaging)
+                sp->rssi[channel] = 0;
             _scan_next();
-            sp->scanState = SCAN_GET_RSSI;
+            scan_state = SCAN_GET_RSSI;
             return CHANNEL_LOCK_TIME;
         case SCAN_GET_RSSI:
             rssi_value = _scan_rssi();
-            if (sp->averaging > 0) {
+            if (sp->averaging) {
                 rssi_sum += rssi_value;
                 if (averages >= INTERNAL_AVERAGE * sp->averaging)
-                    rssi_sum -= sp->rssi[sp->channel];
+                    rssi_sum -= sp->rssi[channel];
                 else
                     averages++;
-                sp->rssi[sp->channel] = (rssi_sum + averages / 2) / averages;  // exponential smoothing
+                sp->rssi[channel] = (rssi_sum + averages / 2) / averages;  // exponential smoothing
             } else {
-                if (rssi_value > sp->rssi[sp->channel])
-                    sp->rssi[sp->channel] = rssi_value;
+                if (rssi_value > sp->rssi[channel])
+                    sp->rssi[channel] = rssi_value;
             }
             if (averages < INTERNAL_AVERAGE * sp->averaging)
                 return AVERAGE_INTVL + rand32() % 50;  // make measurements slightly random in time
-            sp->scanState = SCAN_CHANNEL_CHANGE;
+            scan_state = SCAN_CHANNEL_CHANGE;
     }
     return 50;
 }
@@ -127,6 +128,9 @@ static void initialize()
     sp->chan_max = MAX_RADIOCHANNEL;
     rssi_sum = 0;
     averages = 0;
+    channel = 0;
+    scan_state = SCAN_CHANNEL_CHANGE;
+    memset(sp->rssi, 0, sizeof(sp->rssi));  // clear old rssi values
     CYRF_Reset();
     cyrf_init();
     CYRF_SetTxRxMode(RX_EN);  // Receive mode
