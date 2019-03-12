@@ -20,6 +20,7 @@ import sys
 import json
 import urllib.request, urllib.error, urllib.parse
 import zlib
+import binascii
 from collections import namedtuple
 
 TRAVIS = os.environ.get('TRAVIS')
@@ -49,10 +50,10 @@ def raise_for_status(url, response):
 
 def get_token():
     """Return github token"""
-    token = zlib.decompress(GITHUB_TOKEN.decode("hex"))
+    token = zlib.decompress(binascii.unhexlify(GITHUB_TOKEN))
     length = len(token)
-    return ''.join(chr(ord(a) ^ ord(b))
-                   for a, b in zip(token, (TRAVIS_REPO_SLUG * length)[:length]))
+    return ''.join(chr(a ^ b)
+                   for a, b in zip(token, (TRAVIS_REPO_SLUG.encode('utf-8') * length)[:length]))
 
 
 def post_status(url, state, context, description):
@@ -64,7 +65,7 @@ def post_status(url, state, context, description):
     }
     headers = {'Authorization': 'token ' + get_token()}
 
-    request = urllib.request.Request(url, json.dumps(data), headers)
+    request = urllib.request.Request(url, json.dumps(data).encode('utf-8'), headers)
     res = urllib.request.urlopen(request)
     raise_for_status(url, res)
 
@@ -78,7 +79,7 @@ def get_status(url, context):
     res = urllib.request.urlopen(request)
     raise_for_status(url, res)
 
-    data = json.loads(res.read())
+    data = json.loads(res.read().decode('utf-8'))
     for status in data:
         if status['context'] == context:
             return status['description']
@@ -96,7 +97,7 @@ def get_pr_info(slug, pull_number):
     request = urllib.request.Request(url, None, headers)
     res = urllib.request.urlopen(request)
     raise_for_status(url, res)
-    return json.loads(res.read())
+    return json.loads(res.read().decode('utf-8'))
 
 
 def get_context(filename):
