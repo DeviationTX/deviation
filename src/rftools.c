@@ -18,6 +18,8 @@
 
 #if SUPPORT_SCANNER
 
+#ifndef MODULAR
 struct Scanner Scanner;
+#endif
 
 #endif

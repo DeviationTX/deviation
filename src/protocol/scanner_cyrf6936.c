@@ -27,6 +27,10 @@
 #ifdef PROTO_HAS_CYRF6936
 #if SUPPORT_SCANNER
 
+#ifdef MODULAR
+    struct Scanner Scanner;
+#endif
+
 #define MIN_RADIOCHANNEL    0x00
 #define MAX_RADIOCHANNEL    0x62
 #define CHANNEL_LOCK_TIME   300  // slow channel requires 270 usec for synthesizer to settle
