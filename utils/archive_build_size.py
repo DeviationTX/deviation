@@ -79,7 +79,7 @@ def get_status(url, context):
     res = urllib.request.urlopen(request)
     raise_for_status(url, res)
 
-    data = json.loads(res.read().decode'utf-8'))
+    data = json.loads(res.read().decode('utf-8'))
     for status in data:
         if status['context'] == context:
             return status['description']
