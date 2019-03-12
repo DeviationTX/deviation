@@ -51,7 +51,7 @@ static const char *attenuator_cb(guiObject_t *obj, int dir, void *data)
     Scanner.attenuator = GUI_TextSelectHelper(Scanner.attenuator, 0, 2, dir, 1, 1, NULL);
     switch (Scanner.attenuator) {
         case 0: return "0 dB";
-        case 1: return "-20dB";
+        case 1: return "-20 dB";
         default: return "-50 dB";
     }
 }
