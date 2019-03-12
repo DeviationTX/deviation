@@ -154,7 +154,7 @@ uintptr_t SCANNER_CYRF_Cmds(enum ProtoCmds cmd)
             return (CYRF_Reset() ? 1 : -1);
         case PROTOCMD_CHECK_AUTOBIND: return 0;
         case PROTOCMD_BIND: return 0;
-        case PROTOCMD_NUMCHAN: return 1;
+        case PROTOCMD_NUMCHAN: return 16;
         case PROTOCMD_DEFAULT_NUMCHAN: return 1;
         case PROTOCMD_CURRENT_ID:  return 0;
         case PROTOCMD_GETOPTIONS:
@@ -164,7 +164,7 @@ uintptr_t SCANNER_CYRF_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_TELEMETRYSTATE:
             return PROTO_TELEM_UNSUPPORTED;
         case PROTOCMD_CHANNELMAP:
-            return EATRG;
+            return UNCHG;
         default: break;
     }
     return 0;
