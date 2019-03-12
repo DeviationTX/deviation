@@ -20,6 +20,7 @@ import sys
 import json
 import urllib.request, urllib.error, urllib.parse
 import zlib
+import binascii
 from collections import namedtuple
 
 TRAVIS = os.environ.get('TRAVIS')
