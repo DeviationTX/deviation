@@ -16,6 +16,8 @@
 #include "mixer.h"
 #include "config/tx.h"
 
+#ifndef EMULATOR  // FIXME
+
 s32 CHAN_ReadInput(int channel)
 {
     if (channel <= INP_HAS_CALIBRATION) {
@@ -25,3 +27,5 @@ s32 CHAN_ReadInput(int channel)
     value = value ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
     return value;
 }
+
+#endif  // EMULATOR
