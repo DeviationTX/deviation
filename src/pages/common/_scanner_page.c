@@ -13,6 +13,9 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "protocol/interface.h"
+#include "rftools.h"
+
 static struct scanner_page * const sp = &pagemem.u.scanner_page;
 
 static void _draw_page(u8 enable);
@@ -45,8 +48,8 @@ static const char *attenuator_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     (void)data;
-    sp->attenuator = GUI_TextSelectHelper(sp->attenuator, 0, 2, dir, 1, 1, NULL);
-    switch (sp->attenuator) {
+    Scanner.attenuator = GUI_TextSelectHelper(Scanner.attenuator, 0, 2, dir, 1, 1, NULL);
+    switch (Scanner.attenuator) {
         case 0: return "0 dB";
         case 1: return "-20dB";
         default: return "-50 dB";
@@ -56,11 +59,11 @@ static const char *average_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     (void)data;
-    sp->averaging = GUI_TextSelectHelper(sp->averaging, 0, 255, dir, 1, 10, NULL);
-    if (sp->averaging == 0)
+    Scanner.averaging = GUI_TextSelectHelper(Scanner.averaging, 0, 255, dir, 1, 10, NULL);
+    if (Scanner.averaging == 0)
         strcpy(tempstring, _tr("Peak"));
     else
-        snprintf(tempstring, sizeof(tempstring), "Avg %d", sp->averaging);
+        snprintf(tempstring, sizeof(tempstring), "Avg %d", Scanner.averaging);
     return tempstring;
 }
 

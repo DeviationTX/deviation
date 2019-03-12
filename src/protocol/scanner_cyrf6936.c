@@ -21,7 +21,8 @@
 
 #include "common.h"
 #include "interface.h"
-#include "pages/128x64x1/pages.h"
+#include "rftools.h"
+#include "telemetry.h"
 
 #ifdef PROTO_HAS_CYRF6936
 #if SUPPORT_SCANNER
@@ -32,7 +33,6 @@
 #define INTERNAL_AVERAGE    3
 #define AVERAGE_INTVL       50
 
-static struct scanner_page * const sp = &pagemem.u.scanner_page;
 static int averages, channel, scan_state;
 static u32 rssi_sum;
 
@@ -65,8 +65,8 @@ static void cyrf_init()
 
 static void _scan_next()
 {
-    CYRF_ConfigRFChannel(channel + sp->chan_min);
-    switch (sp->attenuator) {
+    CYRF_ConfigRFChannel(channel + Scanner.chan_min);
+    switch (Scanner.attenuator) {
         case 0: CYRF_WriteRegister(CYRF_06_RX_CFG, 0x4A); break;  // LNA on, ATT off
         case 1: CYRF_WriteRegister(CYRF_06_RX_CFG, 0x0A); break;  // LNA off, ATT off
         default:  CYRF_WriteRegister(CYRF_06_RX_CFG, 0x2A); break;  // LNA off, no ATT on
@@ -96,27 +96,27 @@ static u16 scan_cb()
             rssi_sum = 0;
             averages = 0;
             channel++;
-            if (channel == (sp->chan_max - sp->chan_min + 1))
+            if (channel == (Scanner.chan_max - Scanner.chan_min + 1))
                 channel = 0;
-            if (sp->averaging)
-                sp->rssi[channel] = 0;
+            if (Scanner.averaging)
+                Scanner.rssi[channel] = 0;
             _scan_next();
             scan_state = SCAN_GET_RSSI;
             return CHANNEL_LOCK_TIME;
         case SCAN_GET_RSSI:
             rssi_value = _scan_rssi();
-            if (sp->averaging) {
+            if (Scanner.averaging) {
                 rssi_sum += rssi_value;
-                if (averages >= INTERNAL_AVERAGE * sp->averaging)
-                    rssi_sum -= sp->rssi[channel];
+                if (averages >= INTERNAL_AVERAGE * Scanner.averaging)
+                    rssi_sum -= Scanner.rssi[channel];
                 else
                     averages++;
-                sp->rssi[channel] = (rssi_sum + averages / 2) / averages;  // exponential smoothing
+                Scanner.rssi[channel] = (rssi_sum + averages / 2) / averages;  // exponential smoothing
             } else {
-                if (rssi_value > sp->rssi[channel])
-                    sp->rssi[channel] = rssi_value;
+                if (rssi_value > Scanner.rssi[channel])
+                    Scanner.rssi[channel] = rssi_value;
             }
-            if (averages < INTERNAL_AVERAGE * sp->averaging)
+            if (averages < INTERNAL_AVERAGE * Scanner.averaging)
                 return AVERAGE_INTVL + rand32() % 50;  // make measurements slightly random in time
             scan_state = SCAN_CHANNEL_CHANGE;
     }
@@ -131,13 +131,13 @@ static void scan_start()
 
 static void initialize()
 {
-    sp->chan_min = MIN_RADIOCHANNEL;
-    sp->chan_max = MAX_RADIOCHANNEL;
+    Scanner.chan_min = MIN_RADIOCHANNEL;
+    Scanner.chan_max = MAX_RADIOCHANNEL;
     rssi_sum = 0;
     averages = 0;
     channel = 0;
     scan_state = SCAN_CHANNEL_CHANGE;
-    memset(sp->rssi, 0, sizeof(sp->rssi));  // clear old rssi values
+    memset(Scanner.rssi, 0, sizeof(Scanner.rssi));  // clear old rssi values
     CYRF_Reset();
     cyrf_init();
     CYRF_SetTxRxMode(RX_EN);  // Receive mode

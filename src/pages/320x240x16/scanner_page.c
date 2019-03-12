@@ -14,18 +14,17 @@
  */
 
 #include "common.h"
-#include "protocol/interface.h"
 #include "pages.h"
 #include "config/model.h"
 
-
 #if SUPPORT_SCANNER
 #include "../common/_scanner_page.c"
+
 static struct scanner_obj * const gui = &gui_objs.u.scanner;
 static s32 show_bar_cb(void *data)
 {
     long ch = (long)data;
-    return sp->rssi[ch];
+    return Scanner.rssi[ch];
 }
 
 static const char *enablestr_cb(guiObject_t *obj, const void *data)
@@ -48,14 +47,14 @@ void _draw_channels()
 {
     if (!sp->bars_valid) {
         const unsigned int height = LCD_HEIGHT - 78;
-        int width = LCD_WIDTH / (sp->chan_max - sp->chan_min + 1);
-        int xoffset = (LCD_WIDTH - width * ((sp->chan_max - sp->chan_min) + 1))/2;
-        for (int i = 0; i < (sp->chan_max - sp->chan_min); i++) {
+        int width = LCD_WIDTH / (Scanner.chan_max - Scanner.chan_min + 1);
+        int xoffset = (LCD_WIDTH - width * ((Scanner.chan_max - Scanner.chan_min) + 1))/2;
+        for (int i = 0; i < (Scanner.chan_max - Scanner.chan_min); i++) {
             GUI_CreateBarGraph(&gui->bar[i], xoffset + i * width, 70, width, height, 2, 31, BAR_VERTICAL, show_bar_cb, (void *)(uintptr_t)i);
         }
         sp->bars_valid = 1;
     }
-    for (int i = 0; i < (sp->chan_max - sp->chan_min); i++)
+    for (int i = 0; i < (Scanner.chan_max - Scanner.chan_min); i++)
         GUI_Redraw(&gui->bar[i]);
 }
 
