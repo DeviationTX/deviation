@@ -1,12 +1,13 @@
-#ifndef _T8SG_V2_PLUS_TARGET_H_
-#define _T8SG_V2_PLUS_TARGET_H_
+#ifndef _T8SG_TARGET_H_
+#define _T8SG_TARGET_H_
 
 #define TXID 0x18
 #define VECTOR_TABLE_LOCATION 0x3000
-#define HAS_FLASH_DETECT 1
 #define SPIFLASH_SECTOR_OFFSET 0
+#define SPIFLASH_SECTORS 512
 
-#define HAS_LCD_OLED 1
+#define HAS_LCD_FLIPPED     1
+#define LCD_CONTRAST_FUNC(x) (x)
 
 #define HAS_STANDARD_GUI    1
 #define HAS_ADVANCED_GUI    1
@@ -29,7 +30,6 @@
 #define HAS_EXTENDED_AUDIO  1
 #define HAS_AUDIO_UART     1
 #define HAS_MUSIC_CONFIG    1
-#define HAS_OLED_DISPLAY    1
 
 #ifdef BUILDTYPE_DEV
   #define DEBUG_WINDOW_SIZE 200
@@ -38,8 +38,8 @@
 #endif
 
 #define MIN_BRIGHTNESS 0
-#define DEFAULT_BATTERY_ALARM 4100
-#define DEFAULT_BATTERY_CRITICAL 3900
+#define DEFAULT_BATTERY_ALARM 7400
+#define DEFAULT_BATTERY_CRITICAL 7100
 #define MAX_BATTERY_ALARM 12000
 #define MIN_BATTERY_ALARM 3300
 #define MAX_POWER_ALARM 60
@@ -64,4 +64,4 @@
 #include "hardware.h"
 #include "../common/common_devo.h"
 
-#endif //_T8SG_V2_PLUS_TARGET_H_
+#endif  // _T8SG_TARGET_H_
