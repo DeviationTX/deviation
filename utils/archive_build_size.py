@@ -49,7 +49,7 @@ def raise_for_status(url, response):
 
 def get_token():
     """Return github token"""
-    token = zlib.decompress(GITHUB_TOKEN.decode("hex"))
+    token = zlib.decompress(binascii.unhexlify(GITHUB_TOKEN))
     length = len(token)
     return ''.join(chr(ord(a) ^ ord(b))
                    for a, b in zip(token, (TRAVIS_REPO_SLUG * length)[:length]))
