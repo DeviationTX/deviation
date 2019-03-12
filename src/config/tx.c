@@ -338,6 +338,7 @@ void CONFIG_LoadTx()
 #if HAS_EXTENDED_AUDIO
     Transmitter.audio_player = AUDIO_NONE;
     Transmitter.audio_vol = 10;
+    Transmitter.voice_ini_entries = VOICE_INI_EMPTY;
 #endif
 #if HAS_AUDIO_UART
     Transmitter.audio_uart = 0;

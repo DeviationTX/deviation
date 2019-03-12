@@ -85,7 +85,10 @@ enum {
     VOICE_UNIT_TOTAL
 };
 
-
+enum {
+    VOICE_INI_EMPTY = -1,
+    VOICE_INI_GLOBAL_ONLY = 0,
+};
 
 struct CustomVoice {
     u16 music;
@@ -100,8 +103,6 @@ struct Voice {
     struct CustomVoice aux[NUM_AUX_KNOBS * 2]; //two per knob for up and down
 #endif
 };
-
-extern s16 voice_map_entries;
 
 struct QueueEntry {
     u16 id;

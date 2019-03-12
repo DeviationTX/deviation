@@ -26,7 +26,6 @@
 #endif // EMULATOR
 
 #if HAS_EXTENDED_AUDIO
-s16 voice_map_entries = -1;
 struct QueueEntry current_voice_mapping;
 struct QueueEntry audio_queue[AUDIO_QUEUE_LENGTH];
 u8 next_audio;

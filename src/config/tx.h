@@ -58,6 +58,7 @@ struct Transmitter {
 #if HAS_EXTENDED_AUDIO
     enum AudioPlayers audio_player;
     u8 audio_vol;
+    s16 voice_ini_entries;
 #endif
 #if HAS_AUDIO_UART
     u8 audio_uart;

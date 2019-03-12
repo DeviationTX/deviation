@@ -147,7 +147,7 @@ static const char *voiceid_cb(guiObject_t *obj, int dir, void *data)
         return strcpy(tempstring, _tr("None"));
     }
     vpt->music = GUI_TextSelectHelper(vpt->music - CUSTOM_ALARM_ID + 1,  // Relabling so voice in menu starts with 1
-        1, voice_map_entries, dir, 1, 10, NULL) + CUSTOM_ALARM_ID - 1;
+        1, Transmitter.voice_ini_entries, dir, 1, 10, NULL) + CUSTOM_ALARM_ID - 1;
 
     if (voiceconfig_getsrctype(idx) == VOICE_SRC_TIMER) {  // Setting duration for custom timer alarms
         CONFIG_VoiceParse(vpt->music);
