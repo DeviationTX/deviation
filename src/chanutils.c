@@ -17,13 +17,26 @@
 #include "config/tx.h"
 
 #ifndef EMULATOR  // FIXME
+void CHAN_Init()
+{
+    ADC_Init();
+    SWITCH_Init();
+}
+
+s32 CHAN_ReadRawInput(int channel)
+{
+    if (channel < INP_HAS_CALIBRATION) {
+        return ADC_ReadRawInput(channel);
+    }
+    return SWITCH_ReadRawInput(channel);
+}
 
 s32 CHAN_ReadInput(int channel)
 {
     if (channel <= INP_HAS_CALIBRATION) {
        return ADC_NormalizeChannel(channel);
     }
-    s32 value = CHAN_ReadRawInput(channel);
+    s32 value = SWITCH_ReadRawInput(channel);
     value = value ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
     return value;
 }
