@@ -97,7 +97,7 @@ def get_pr_info(slug, pull_number):
     request = urllib.request.Request(url, None, headers)
     res = urllib.request.urlopen(request)
     raise_for_status(url, res)
-    return json.loads(res.read())
+    return json.loads(res.read().decode('utf-8'))
 
 
 def get_context(filename):
