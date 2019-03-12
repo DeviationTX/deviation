@@ -52,8 +52,8 @@ def get_token():
     """Return github token"""
     token = zlib.decompress(binascii.unhexlify(GITHUB_TOKEN))
     length = len(token)
-    return ''.join(chr(ord(a) ^ ord(b))
-                   for a, b in zip(token, (TRAVIS_REPO_SLUG * length)[:length]))
+    return ''.join(chr(a ^ b)
+                   for a, b in zip(token, (TRAVIS_REPO_SLUG.encode('utf-8') * length)[:length]))
 
 
 def post_status(url, state, context, description):
@@ -65,7 +65,7 @@ def post_status(url, state, context, description):
     }
     headers = {'Authorization': 'token ' + get_token()}
 
-    request = urllib.request.Request(url, json.dumps(data), headers)
+    request = urllib.request.Request(url, json.dumps(data).encode('utf-8'), headers)
     res = urllib.request.urlopen(request)
     raise_for_status(url, res)
 
