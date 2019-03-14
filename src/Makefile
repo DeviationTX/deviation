@@ -83,6 +83,7 @@ TYPE     ?= prd
 #This section defines binaries needed to build#
 ###############################################
 ifdef CROSS
+    export CROSS
     CC   = $(CROSS)gcc
     CXX  = $(CROSS)g++
     LD   = $(CROSS)ld
