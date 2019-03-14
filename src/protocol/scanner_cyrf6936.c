@@ -102,8 +102,8 @@ static u16 scan_cb()
             channel++;
             if (channel == (Scanner.chan_max - Scanner.chan_min + 1))
                 channel = 0;
-            if (Scanner.averaging)
-                Scanner.rssi[channel] = 0;
+            //if (Scanner.averaging)
+            //    Scanner.rssi[channel] = 0;
             _scan_next();
             scan_state = SCAN_GET_RSSI;
             return CHANNEL_LOCK_TIME;
