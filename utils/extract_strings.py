@@ -188,13 +188,13 @@ def write_lang_file(outf, targets, language, translation):
             return False
         hashvalues[hval] = value
     try:
-        with open(outf, "w") as _fh:
-            _fh.write(language)
+        with open(outf, "wb") as _fh:
+            _fh.write(language.encode('utf-8'))
             for key in sorted(strings.keys()):
                 value = strings[key]
                 if key == value:
                     continue
-                _fh.write(":{}\n{}\n".format(key, value))
+                _fh.write(":{}\n{}\n".format(key, value).encode('utf-8'))
     except OSError:
         logging.error("Can't write %s", outf)
         return False
