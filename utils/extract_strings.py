@@ -103,7 +103,7 @@ def get_strings(path):
 def extract_all_strings():
     """Extaract full list of translatable strings from source-code"""
     strings = {"__ORDER__": []}
-    cmd = ("/usr/bin/find . -name '*.[hc]' | grep -v libopencm3 | sort "
+    cmd = ("find . -name '*.[hc]' | grep -v libopencm3 | sort "
            "| xargs xgettext -o - --omit-header -k --keyword=_tr "
            "--keyword=_tr_noop --no-wrap")
     _p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
