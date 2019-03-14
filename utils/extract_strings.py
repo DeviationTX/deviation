@@ -103,7 +103,7 @@ def get_strings(path):
 def extract_all_strings():
     """Extaract full list of translatable strings from source-code"""
     strings = {"__ORDER__": []}
-    cmd = ("/usr/bin/find . -name '*.[hc]' | grep -v libopencm3 | sort "
+    cmd = ("find . -name '*.[hc]' | grep -v libopencm3 | sort "
            "| xargs xgettext -o - --omit-header -k --keyword=_tr "
            "--keyword=_tr_noop --no-wrap")
     _p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
@@ -188,13 +188,13 @@ def write_lang_file(outf, targets, language, translation):
             return False
         hashvalues[hval] = value
     try:
-        with open(outf, "w") as _fh:
-            _fh.write(language)
+        with open(outf, "wb") as _fh:
+            _fh.write(language.encode('utf-8'))
             for key in sorted(strings.keys()):
                 value = strings[key]
                 if key == value:
                     continue
-                _fh.write(":{}\n{}\n".format(key, value))
+                _fh.write(":{}\n{}\n".format(key, value).encode('utf-8'))
     except OSError:
         logging.error("Can't write %s", outf)
         return False

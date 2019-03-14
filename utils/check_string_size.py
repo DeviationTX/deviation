@@ -48,8 +48,10 @@ class MaxVal:
 def main():
     """Main routine"""
     parser = argparse.ArgumentParser()
-    parser.add_argument("-target",
+    parser.add_argument("-target", required=True,
                         help="Transmitter target")
+    parser.add_argument("-objdir", required=True,
+                        help="Directory containing obj files")
     parser.add_argument("-quiet", action="store_true",
                         help="Silence all output except errors")
     args = parser.parse_args()
@@ -61,7 +63,7 @@ def main():
     max_bytes = MaxVal()
     max_count = MaxVal()
     for target_dir in dirs:
-        _bytes, count, line_length = read_target(target_dir)
+        _bytes, count, line_length = read_target(target_dir, args.objdir)
         max_bytes.update(_bytes)
         max_count.update(count)
         max_line_length.update(line_length)
@@ -83,7 +85,7 @@ def main():
     return not get_error()
 
 
-def read_target(target_dir):
+def read_target(target_dir, objdir):
     """Read all language files for a target and calculate max usage"""
     target = os.path.basename(target_dir)
     langfiles = glob.glob(os.path.join(target_dir, "language", "*"))
@@ -105,7 +107,6 @@ def read_target(target_dir):
         target_line_count.update(line_count)
         target_max_line_length.update(max_line_length)
     language = get_language(target)
-    objdir = os.path.join("objs", target)
     cmd = (os.path.join(SCRIPT_DIR, "extract_strings.py")
            + " -target " + language
            + " -objdir " + objdir)
