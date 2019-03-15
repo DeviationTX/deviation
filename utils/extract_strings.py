@@ -14,7 +14,7 @@ import glob
 PO_LANGUAGE_STRING = "->Translated Language Name<-"
 TARGETS = ["devo8", "devo10", "devo12"]
 CROSS = os.environ.get("CROSS", "")
-
+os.environ['LANG'] = 'en_US.UTF-8'  # We need English to be able to regex parse cmd output
 
 def main():
     """Main routine"""
