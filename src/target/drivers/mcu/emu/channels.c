@@ -36,7 +36,7 @@
 s32 ADC_ReadRawInput(int channel)
 {
     s32 step = (CHAN_MAX_VALUE - CHAN_MIN_VALUE) / 10;
-    switch(channel) {
+    switch (channel) {
         case 0:            return 0;
         case INP_THROTTLE: return CHAN_MIN_VALUE + step * gui.throttle;
         case INP_RUDDER:   return CHAN_MIN_VALUE + step * gui.rudder;
@@ -67,7 +67,7 @@ s32 SWITCH_ReadRawInput(int channel)
         case inp ## 0:  return (KEY_ ## inp % 3)  == 0 ? 1 : 0; \
         case inp ## 1:  return (KEY_ ## inp % 3)  == 1 ? 1 : 0; \
         case inp ## 2:  return (KEY_ ## inp % 3)  == 2 ? 1 : 0;
-    switch(channel) {
+    switch (channel) {
         SWITCHES
     }
     return 0;
