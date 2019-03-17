@@ -114,7 +114,8 @@ void HID_Write(s8 *pkt, u8 size) {
 void Initialize_ButtonMatrix() {}
 void PWR_Init(void) {}
 unsigned  PWR_ReadVoltage() { return (DEFAULT_BATTERY_ALARM + 1000); }
-void CHAN_Init() {}
+void ADC_Init() {}
+void SWITCH_Init() {}
 
 void CLOCK_StartWatchdog() {}
 void CLOCK_ResetWatchdog() {}
