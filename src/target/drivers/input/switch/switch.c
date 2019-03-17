@@ -14,7 +14,10 @@
 */
 
 #include "common.h"
+#include "config/tx.h"
 #include "target/drivers/mcu/stm32/rcc.h"
+
+extern s32 ADDON_ReadRawInput(int channel);
 
 #define TO_PIN(...) (struct mcu_pin) { __VA_ARGS__ }
 
@@ -52,19 +55,23 @@ void SWITCH_Init()
 
 s32 SWITCH_ReadRawInput(int channel)
 {
-    s32 value = 0;
     #define CHAN_INVERT !
     #define CHAN_NONINV
     #define THREE_WAY(ch, pin0, pin2, inv) \
-        case ch##0: value = inv GPIO_pin_get(TO_PIN pin0); break; \
-        case ch##1: value = !(inv GPIO_pin_get(TO_PIN pin0) || inv GPIO_pin_get(TO_PIN pin2)) ; break; \
-        case ch##2: value = inv GPIO_pin_get(TO_PIN pin2); break;
+        case ch##0: return inv GPIO_pin_get(TO_PIN pin0); \
+        case ch##1: return !(inv GPIO_pin_get(TO_PIN pin0) || inv GPIO_pin_get(TO_PIN pin2)); \
+        case ch##2: return inv GPIO_pin_get(TO_PIN pin2);
     #define TWO_WAY(ch, pin, inv) \
-        case ch##0: value = !inv GPIO_pin_get(TO_PIN pin); break; \
-        case ch##1: value = inv GPIO_pin_get(TO_PIN pin); break;
-
-    switch (channel) {
-        SWITCHES
+        case ch##0: return !inv GPIO_pin_get(TO_PIN pin); \
+        case ch##1: return inv GPIO_pin_get(TO_PIN pin);
+    if (TX_HAS_SRC(channel)) {
+        switch (channel) {
+            SWITCHES
+        }
     }
-    return value;
+    #if defined(HAS_EXTRA_SWITCHES) && HAS_EXTRA_SWITCHES
+        return ADDON_ReadRawInput(channel);
+    #else
+        return 0;
+    #endif
 }
