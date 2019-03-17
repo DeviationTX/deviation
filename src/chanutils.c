@@ -23,6 +23,7 @@ void CHAN_Init()
     SWITCH_Init();
 }
 
+#ifndef EMULATOR  // FIXME: Emulator needs refactoring
 s32 CHAN_ReadRawInput(int channel)
 {
     if (channel < INP_HAS_CALIBRATION) {
@@ -40,5 +41,4 @@ s32 CHAN_ReadInput(int channel)
     value = value ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
     return value;
 }
-
 #endif  // EMULATOR

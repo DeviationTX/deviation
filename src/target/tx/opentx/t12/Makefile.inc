@@ -28,7 +28,8 @@ SRC_C = $(wildcard target/tx/$(FAMILY)/$(TARGET)/*.c) \
         target/drivers/rtc/rtc_driver.c \
         target/drivers/input/analog/analog.c \
         target/drivers/indicators/led.c \
-        target/drivers/input/button_switch/button_switch.c
+        target/drivers/input/button_switch/button_switch.c \
+        target/drivers/input/switch/switch.c
 
 CFLAGS   = -D"assert_param(x)=" -DSTM32F20X_HD -DSTM32F2 -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -fdata-sections -ffunction-sections -Ilibopencm3/include -fno-builtin-printf -Os -I$(SDIR)/target/drivers/filesystems
 MODULE_FLAGS = -fno-builtin

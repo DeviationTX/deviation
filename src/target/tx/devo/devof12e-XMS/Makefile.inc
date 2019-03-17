@@ -11,8 +11,7 @@ include $(SDIR)/target/tx/devo/common/Makefile.inc
 
 ifndef BUILD_TARGET
 
-SRC_C   += $(SDIR)/target/tx/devo/devof12e/channels.c \
-           $(SDIR)/target/tx/devo/devof12e/crc.c \
+SRC_C   += $(SDIR)/target/tx/devo/devof12e/crc.c \
            $(SDIR)/target/tx/devo/devof12e/lcd.c \
            $(SDIR)/target/tx/devo/devof12e/mapped_gfx.c
 

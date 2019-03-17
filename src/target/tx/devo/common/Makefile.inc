@@ -22,8 +22,9 @@ SRC_C    = $(wildcard $(SDIR)/target/tx/devo/$(TARGET)/*.c) \
            $(wildcard $(SDIR)/target/drivers/filesystems/petit_fat/*.c) \
            $(wildcard $(SDIR)/target/drivers/filesystems/devofs/*.c) \
            $(wildcard $(SDIR)/target/drivers/input/button_matrix/*.c) \
-           $(SDIR)/target/drivers/input/analog/analog.c \
-           $(SDIR)/target/drivers/input/switch/switch.c \
+           $(wildcard $(SDIR)/target/drivers/input/analog/*.c) \
+           $(wildcard $(SDIR)/target/drivers/input/switch/*.c) \
+           $(wildcard $(SDIR)/target/drivers/input/addon_switch/*.c) \
            $(wildcard $(SDIR)/target/drivers/serial/uart/*.c) \
            $(wildcard $(SDIR)/target/drivers/serial/soft_serial/*.c) \
            $(wildcard $(SDIR)/target/drivers/sound/piezo/*.c) \

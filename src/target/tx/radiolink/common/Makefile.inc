@@ -22,7 +22,8 @@ SRC_C   := $(wildcard $(SDIR)/target/tx/$(FAMILY)/common/*.c) \
            $(wildcard $(SDIR)/target/drivers/usb/*.c) \
            $(SDIR)/target/drivers/storage/mcu_flash.c \
            $(SDIR)/target/drivers/backlight/backlight.c \
-           $(SDIR)/target/drivers/input/analog/analog.c
+           $(SDIR)/target/drivers/input/analog/analog.c \
+           $(SDIR)/target/drivers/input/switch/switch.c
 
 ifeq "$(HAS_4IN1_FLASH)" "1"
 SRC_C   += $(SDIR)/target/drivers/storage/spi_flash.c
