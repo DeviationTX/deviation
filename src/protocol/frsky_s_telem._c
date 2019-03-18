@@ -258,10 +258,10 @@ static void frsky_parse_sport_stream(u8 data) {
         break;
     } // switch
 
-    if (sportRxBufferCount >= FRSKY_SPORT_PACKET_SIZE
-     && data == sport_crc(sportRxBuffer)) {
-        processSportPacket(sportRxBuffer);
+    if (sportRxBufferCount >= FRSKY_SPORT_PACKET_SIZE) {
         dataState = STATE_DATA_IDLE;
+        if (data == sport_crc(sportRxBuffer))
+            processSportPacket(sportRxBuffer);
     }
 }
 
