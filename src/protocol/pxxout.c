@@ -20,6 +20,7 @@
 #include "config/tx.h"
 #if HAS_EXTENDED_TELEMETRY
 #include "telemetry.h"
+#include "errno.h"
 #endif
 
 #define PXX_SEND_BIND           0x01
@@ -231,38 +232,13 @@ static enum {
 #ifndef EMULATOR
   PXX_BIND_DONE = 600,
 #else
-  PXX_BIND_DONE = 50,
+  PXX_BIND_DONE = 5,
 #endif
   PXX_DATA1,
   PXX_DATA2,
 } state;
 
 static u16 mixer_runtime;
-
-static u16 pxxout_cb()
-{
-    switch (state) {
-    default: // binding
-        build_data_pkt(1);
-        PXX_Enable(packet);
-        state++;
-        return 9000;
-    case PXX_BIND_DONE:
-        PROTOCOL_SetBindState(0);
-        state++;
-        // intentional fall-through
-    case PXX_DATA1:
-        CLOCK_RunMixer();    // clears mixer_sync, which is then set when mixer update complete
-        state = PXX_DATA2;
-        return mixer_runtime;
-    case PXX_DATA2:
-        if (mixer_sync != MIX_DONE && mixer_runtime < 2000) mixer_runtime += 50;
-        build_data_pkt(0);
-        PXX_Enable(packet);
-        state = PXX_DATA1;
-        return 9000 - mixer_runtime;
-    }
-}
 
 #if HAS_EXTENDED_TELEMETRY
 // Support S.Port telemetry on RX pin
@@ -272,6 +248,48 @@ static void serial_echo(u8 *packet) {(void)packet;}
 #include "frsky_d_telem._c"
 #include "frsky_s_telem._c"
 #endif // HAS_EXTENDED_TELEMETRY
+
+#ifndef EMULATOR
+#define STD_DELAY   9000
+#else
+#define STD_DELAY   300
+static FILE *spdata;
+static char spdatabuf[256];
+#endif
+static u16 pxxout_cb()
+{
+    switch (state) {
+    default: // binding
+        build_data_pkt(1);
+        PXX_Enable(packet);
+        state++;
+        return STD_DELAY;
+    case PXX_BIND_DONE:
+        PROTOCOL_SetBindState(0);
+        state++;
+        // intentional fall-through
+    case PXX_DATA1:
+        CLOCK_RunMixer();    // clears mixer_sync, which is then set when mixer update complete
+#ifdef EMULATOR
+if (spdata) {
+    int cnt = fread(spdatabuf, 1, 150, spdata);
+    for (int i=0; i < cnt; i++) {
+        frsky_parse_sport_stream(spdatabuf[i]);
+    }
+    printf("\n");
+    if (cnt < 150) fseek(spdata, 0, SEEK_SET);
+}
+#endif
+        state = PXX_DATA2;
+        return mixer_runtime;
+    case PXX_DATA2:
+//TODO        if (mixer_sync != MIX_DONE && mixer_runtime < 2000) mixer_runtime += 50;
+        build_data_pkt(0);
+        PXX_Enable(packet);
+        state = PXX_DATA1;
+        return STD_DELAY - mixer_runtime;
+    }
+}
 
 static void initialize(u8 bind)
 {
@@ -288,6 +306,9 @@ static void initialize(u8 bind)
 #if HAS_EXTENDED_TELEMETRY
     SSER_Initialize(); // soft serial receiver
     SSER_StartReceive(frsky_parse_sport_stream);
+#ifdef EMULATOR
+    spdata = fopen("/home/jplotky/radiocontrol/deviation/joeclone_qlrs_sport.bin", "r");
+#endif
 #endif
 
     PWM_Initialize();

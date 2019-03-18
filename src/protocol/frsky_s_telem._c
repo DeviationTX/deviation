@@ -218,6 +218,7 @@ static void frsky_parse_sport_stream(u8 data) {
     static u8 sportRxBufferCount;
     static u8 sportRxBuffer[FRSKY_SPORT_PACKET_SIZE];   // Receive buffer. 8 bytes (full packet)
 
+printf("%02x", data);
     switch (dataState) {
     case STATE_DATA_START:
         if (data == START_STOP) {
