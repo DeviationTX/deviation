@@ -48,7 +48,7 @@
 #define START_STOP              0x7e
 #define BYTESTUFF               0x7d
 #define STUFF_MASK              0x20
-#define FRSKY_SPORT_PACKET_SIZE    8
+#define FRSKY_SPORT_PACKET_SIZE    9
 
 static void serial_echo(u8 *packet);
 
@@ -60,6 +60,16 @@ static void serial_echo(u8 *packet);
 #define SPORT_DATA_U32(packet)  (*((uint32_t *)(packet+4)))
 #define HUB_DATA_U16(packet)    (*((uint16_t *)(packet+4)))
 
+
+static u8 sport_crc(u8 *data) {
+    u16 crc = 0;
+    for (int i=1; i < FRSKY_SPORT_PACKET_SIZE-1; ++i) {
+        crc += data[i];
+        crc += crc >> 8;
+        crc &= 0x00ff;
+    }
+    return 0x00ff - crc;
+}
 
 static void processSportPacket(u8 *packet) {
 //    u8  instance = (packet[0] & 0x1F) + 1;    // all instances of same sensor write to same telemetry value
@@ -248,7 +258,8 @@ static void frsky_parse_sport_stream(u8 data) {
         break;
     } // switch
 
-    if (sportRxBufferCount >= FRSKY_SPORT_PACKET_SIZE) {
+    if (sportRxBufferCount >= FRSKY_SPORT_PACKET_SIZE
+     && data == sport_crc(sportRxBuffer)) {
         processSportPacket(sportRxBuffer);
         dataState = STATE_DATA_IDLE;
     }
