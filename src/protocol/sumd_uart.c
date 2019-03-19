@@ -145,7 +145,7 @@ uintptr_t SUMD_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_BIND:  initialize(); return 0;
         case PROTOCMD_NUMCHAN: return 16;
         case PROTOCMD_DEFAULT_NUMCHAN: return 8;
-    case PROTOCMD_CHANNELMAP: return UNCHG;
+        case PROTOCMD_CHANNELMAP: return UNCHG;
         case PROTOCMD_TELEMETRYSTATE: return PROTO_TELEM_UNSUPPORTED;
         case PROTOCMD_GETOPTIONS:
             if (!Model.proto_opts[PROTO_OPTS_PERIOD])
