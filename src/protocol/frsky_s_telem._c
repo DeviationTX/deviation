@@ -71,6 +71,17 @@ static u8 sport_crc(u8 *data) {
     return 0x00ff - crc;
 }
 
+#define APID_PITCH              0x0430 
+#define APID_ROLL               0x0440 
+#define APID_MAV_BASE_MODE      0x04A0 
+#define APID_MAV_SYS_STATUS     0x04A1 
+#define APID_MAV_CUSTOM_MODE    0x04A2 
+#define APID_CUST_RSSI          0x04B0 
+#define APID_RX_RSSI_REG_VAL    0x04B1 
+#define APID_RX_SNR_REG_VAL     0x04B2 
+#define APID_RX_PACKET_LOST_VAL 0x04B3 
+
+
 static void processSportPacket(u8 *packet) {
 //    u8  instance = (packet[0] & 0x1F) + 1;    // all instances of same sensor write to same telemetry value
     u8  prim = packet[1];
@@ -107,6 +118,32 @@ static void processSportPacket(u8 *packet) {
     }
 
     s32 data = SPORT_DATA_S32(packet);
+
+    // sensor ids from Qlrs
+    switch (id) {
+        case APID_MAV_BASE_MODE:
+            set_telemetry(TELEM_FRSKY_CELL4, data);
+            break;
+        case APID_MAV_SYS_STATUS:
+            set_telemetry(TELEM_FRSKY_CELL5, data);
+            break;
+        case APID_MAV_CUSTOM_MODE:
+            set_telemetry(TELEM_FRSKY_CELL6, data);
+            break;
+        case APID_CUST_RSSI:
+            set_telemetry(TELEM_FRSKY_ALL_CELL, data);
+            break;
+        case APID_RX_RSSI_REG_VAL:
+            set_telemetry(TELEM_FRSKY_CELL1, data);
+            break;
+        case APID_RX_SNR_REG_VAL:
+            set_telemetry(TELEM_FRSKY_CELL2, data);
+            break;
+        case APID_RX_PACKET_LOST_VAL:
+            set_telemetry(TELEM_FRSKY_CELL3, data);
+            break;
+    }
+
     switch (id & 0xfff0) {
     case ALT_FIRST_ID & 0xfff0:
         if (Model.ground_level == 0) Model.ground_level = data;
