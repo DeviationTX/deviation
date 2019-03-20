@@ -2033,7 +2033,7 @@ msgstr "regular"
 
 #: protocol/bayang_nrf24l01.c:92
 msgid "Analog Aux"
-msgstr ""
+msgstr "Aux Analógico"
 
 #: protocol/bugs3_a7105.c:237 protocol/flysky_afhds2a_a7105.c:68
 #: protocol/hubsan_a7105.c:125 protocol/joysway_a7105.c:53
@@ -2198,7 +2198,7 @@ msgstr "Taman. frame"
 
 #: protocol/ppmout.c:41
 msgid "Polarity"
-msgstr ""
+msgstr "Polaridade"
 
 #: protocol/pxxout.c:37
 msgid "Country"
