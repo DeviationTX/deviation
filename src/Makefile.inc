@@ -87,13 +87,7 @@ PROTO_EXTRA_OBJS := $(addprefix $(ODIR), $(notdir $(PROTO_EXTRA_C:.c=.o_)))
 SYMBOL_FILE := $(ODIR)symbolfile
 endif
 
-define uniq =
-  $(eval seen :=)
-  $(foreach _,$1,$(if $(filter $_,${seen}),,$(eval seen += $_)))
-  ${seen}
-endef
-
-VPATH = $(call uniq, $(dir $(SRCS)))
+VPATH = $(dir $(SRCS))
 HGVERSION ?= $(shell $(SDIR)../utils/get_version.pl ${TARGET})
 HGVERSION := $(HGVERSION)
 
