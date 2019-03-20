@@ -59,11 +59,14 @@ static const char *average_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     (void)data;
-    Scanner.averaging = GUI_TextSelectHelper(Scanner.averaging, 0, 255, dir, 1, 10, NULL);
+    Scanner.averaging = GUI_TextSelectHelper(Scanner.averaging, -127, 127, dir, 1, 10, NULL);
     if (Scanner.averaging == 0)
         strcpy(tempstring, _tr("Peak"));
+    else if (Scanner.averaging < 0)
+        snprintf(tempstring, sizeof(tempstring), "Peak %d", Scanner.averaging);
     else
-        snprintf(tempstring, sizeof(tempstring), "Avg %d", Scanner.averaging);
+        snprintf(tempstring, sizeof(tempstring), "Avg %d", abs(Scanner.averaging));
+    memset(Scanner.rssi, 0, sizeof(Scanner.rssi));  // clear old rssi values
     return tempstring;
 }
 
@@ -71,7 +74,6 @@ void PAGE_ScannerInit(int page)
 {
     (void)page;
     memset(sp, 0, sizeof(struct scanner_page));
-
     PAGE_SetModal(0);
     _draw_page(1);
 }

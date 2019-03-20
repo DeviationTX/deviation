@@ -23,6 +23,7 @@
 #include "interface.h"
 #include "rftools.h"
 #include "telemetry.h"
+#include "stdlib.h"
 
 #ifdef PROTO_HAS_CYRF6936
 #if SUPPORT_SCANNER
@@ -109,7 +110,7 @@ static u16 scan_cb()
             return CHANNEL_LOCK_TIME;
         case SCAN_GET_RSSI:
             rssi_value = _scan_rssi();
-            if (Scanner.averaging) {
+            if (Scanner.averaging > 0) {
                 rssi_sum += rssi_value;
                 if (averages >= INTERNAL_AVERAGE * Scanner.averaging)
                     rssi_sum -= Scanner.rssi[channel];
@@ -117,11 +118,13 @@ static u16 scan_cb()
                     averages++;
                 Scanner.rssi[channel] = (rssi_sum + averages / 2) / averages;  // exponential smoothing
             } else {
-                if (rssi_value > Scanner.rssi[channel])
+                if (rssi_value > Scanner.rssi[channel]) {
                     Scanner.rssi[channel] = rssi_value;
+                    averages++;
+                }
             }
-            if (averages < INTERNAL_AVERAGE * Scanner.averaging)
-                return AVERAGE_INTVL + rand32() % 50;  // make measurements slightly random in time
+            if (averages < (INTERNAL_AVERAGE * abs(Scanner.averaging)))
+                return AVERAGE_INTVL + rand32() % 10;  // make measurements slightly random in time
             scan_state = SCAN_CHANNEL_CHANGE;
     }
     return 50;
