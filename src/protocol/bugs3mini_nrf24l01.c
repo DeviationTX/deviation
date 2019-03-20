@@ -235,12 +235,11 @@ static void send_packet(u8 bind)
         packet[9] = 0x20 | (elevator << 7);
         packet[10]= 0x20 | (rudder << 7);
         packet[11]= 0x40 | (throttle << 7);
-        packet[12]= 0x80 | (packet[12] ^ 0x40) // bugs 3 H doesn't have 0x80 ?
+        packet[12]= 0x80 | ((packet[12] ^ 0x40) & 0x40)  // bugs 3 H doesn't have 0x80 ?
                   | FLAG_MODE
                   | GET_FLAG(CHANNEL_PICTURE, FLAG_PICTURE)
-                  | GET_FLAG(CHANNEL_VIDEO, FLAG_VIDEO);
-        if(armed)
-            packet[12] |= GET_FLAG(CHANNEL_FLIP, FLAG_FLIP);
+                  | GET_FLAG(CHANNEL_VIDEO, FLAG_VIDEO)
+                  | GET_FLAG(CHANNEL_FLIP, FLAG_FLIP);
         packet[13] = arm_flags
                    | GET_FLAG(CHANNEL_LED, FLAG_LED)
                    | GET_FLAG(CHANNEL_ANGLE, FLAG_ANGLE);
