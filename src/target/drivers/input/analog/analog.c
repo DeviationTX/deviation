@@ -190,7 +190,7 @@ void ADC_Filter()
 s32 ADC_ReadRawInput(int channel)
 {
     if TX_HAS_SRC(channel)
-        return adc_array_raw[channel];
+        return adc_array_raw[channel-1];
     return 0;
 }
 
