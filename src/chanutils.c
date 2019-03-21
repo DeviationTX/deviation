@@ -16,7 +16,6 @@
 #include "mixer.h"
 #include "config/tx.h"
 
-#ifndef EMULATOR  // FIXME
 void CHAN_Init()
 {
     ADC_Init();
