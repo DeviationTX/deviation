@@ -224,7 +224,7 @@ s32 ADC_NormalizeChannel(int channel)
     #define ADC_CHAN(x, y, z) (z)
     const s8 chan_inverted[NUM_ADC_CHANNELS] = ADC_CHANNELS;
     #undef ADC_CHAN
-    value = value * chan_inverted[channel];
+    value = value * chan_inverted[channel - 1];
     return value;
 }
 
