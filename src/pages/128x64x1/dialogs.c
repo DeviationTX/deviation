@@ -195,7 +195,7 @@ void PAGE_ShowModuleDialog(const char **missing)
     PAGE_ShowWarning(NULL, tempstring);
 }
 
-#if HAS_CRSF_CONFIG
+#if SUPPORT_CRSF_CONFIG
 /*********************************/
 /*   CRSF configuration dialog   */
 /*********************************/
@@ -233,4 +233,4 @@ void PAGE_CRSFdialogClose() {
         DialogClose(dialog, 0);
     }
 }
-#endif  // HAS_CRSF_CONFIG
+#endif  // SUPPORT_CRSF_CONFIG

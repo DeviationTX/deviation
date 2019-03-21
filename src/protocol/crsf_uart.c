@@ -187,7 +187,7 @@ static void processCrossfireTelemetryData(u8 data, u8 status) {
     if (checkCrossfireTelemetryFrameCRC()) {
       if (telemetryRxBuffer[2] < TYPE_PING_DEVICES) {
         processCrossfireTelemetryFrame();     // Broadcast frame
-#if HAS_CRSF_CONFIG
+#if SUPPORT_CRSF_CONFIG
       } else {
         CRSF_serial_rcv(telemetryRxBuffer+2, telemetryRxBuffer[1]-1);  // Extended frame
 #endif
@@ -275,7 +275,7 @@ static u16 serial_cb()
 
     case ST_DATA2:
         if (mixer_sync != MIX_DONE && mixer_runtime < 2000) mixer_runtime += 50;
-#if HAS_CRSF_CONFIG
+#if SUPPORT_CRSF_CONFIG
         length = CRSF_serial_txd(packet, sizeof packet);
         if (length == 0) {
             length = build_rcdata_pkt();
@@ -327,9 +327,9 @@ uintptr_t CRSF_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_NUMCHAN: return 16;
         case PROTOCMD_DEFAULT_NUMCHAN: return 8;
         case PROTOCMD_CHANNELMAP: return UNCHG;
-#if HAS_CRSF_CONFIG
+#if SUPPORT_CRSF_CONFIG
         case PROTOCMD_OPTIONSPAGE: return PAGEID_CRSFCFG;
-#endif  // HAS_CRSF_CONFIG
+#endif  // SUPPORT_CRSF_CONFIG
 #if HAS_EXTENDED_TELEMETRY
         case PROTOCMD_TELEMETRYSTATE:
             return PROTO_TELEM_ON;

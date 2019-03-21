@@ -236,7 +236,7 @@ struct voiceconfig_obj {
 };
 #endif
 
-#if HAS_CRSF_CONFIG
+#if SUPPORT_CRSF_CONFIG
 struct crsfconfig_obj {
     guiLabel_t msg;
     guiScrollable_t scrollable;
@@ -412,7 +412,7 @@ struct _gui_objs {
 #ifdef HAS_MUSIC_CONFIG
         struct voiceconfig_obj voiceconfig;
 #endif
-#if HAS_CRSF_CONFIG
+#if SUPPORT_CRSF_CONFIG
         struct crsfconfig_obj crsfconfig;
         struct crsfdevice_obj crsfdevice;
 #endif

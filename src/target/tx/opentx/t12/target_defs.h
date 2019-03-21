@@ -41,7 +41,6 @@
 #define HAS_EXTENDED_AUDIO  0         // FIXME
 #define HAS_AUDIO_UART5     0         // FIXME
 #define HAS_MUSIC_CONFIG    0         // FIXME
-#define HAS_CRSF_CONFIG      0
 #define USE_4BUTTON_MODE    0
 #define HAS_AUDIO_UART      0
 #define HAS_OLED_DISPLAY    0

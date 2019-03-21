@@ -30,7 +30,7 @@ enum {
 };
 #endif
 
-#if HAS_CRSF_CONFIG
+#if SUPPORT_CRSF_CONFIG
 
 #include "../common/_crsfdevice_page.c"
 

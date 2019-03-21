@@ -66,7 +66,7 @@ PAGEDEF(PAGEID_MAINCFG,  PAGE_MainLayoutInit,  NULL,                  NULL,     
 #if HAS_MUSIC_CONFIG
 PAGEDEF(PAGEID_VOICECFG, PAGE_VoiceconfigInit, NULL,                  NULL,               MODEL_MENU,  _tr_noop("Voice config"))
 #endif
-#if HAS_CRSF_CONFIG
+#if SUPPORT_CRSF_CONFIG
 PAGEDEF(PAGEID_CRSFCFG,  PAGE_CrsfconfigInit,  PAGE_CRSFConfigEvent,  NULL,               0,           _tr_noop("CRSF config"))
 PAGEDEF(PAGEID_CRSFDEVICE, PAGE_CrsfdeviceInit, PAGE_CRSFDeviceEvent, NULL,               0,           _tr_noop("CRSF device config"))
 #endif

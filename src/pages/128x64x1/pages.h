@@ -24,7 +24,7 @@ struct pagemem {
 #if HAS_MUSIC_CONFIG
         struct voiceconfig_page voiceconfig_page;
 #endif
-#if HAS_CRSF_CONFIG
+#if SUPPORT_CRSF_CONFIG
         struct crsfconfig_page crsfconfig_page;
         struct crsfdevice_page crsfdevice_page;
 #endif

@@ -37,7 +37,7 @@
 
 #define TELEMETRY_RX_PACKET_SIZE   64
 
-#if HAS_CRSF_CONFIG
+#if SUPPORT_CRSF_CONFIG
 
 #define CRSF_MAX_DEVICES       4
 #define CRSF_MAX_NAME_LEN      16
@@ -120,6 +120,6 @@ void CRSF_read_param(u8 device, u8 id, u8 chunk);
 void CRSF_set_param(crsf_param_t *param, u32 value);
 void CRSF_send_command(crsf_param_t *param, enum cmd_status status);
 
-#endif  // HAS_CRSF_CONFIG
+#endif  // SUPPORT_CRSF_CONFIG
 
 #endif

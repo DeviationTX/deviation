@@ -13,7 +13,7 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if HAS_CRSF_CONFIG
+#if SUPPORT_CRSF_CONFIG
 
 #include "crsf.h"
 
