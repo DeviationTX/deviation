@@ -16,6 +16,23 @@
 #include "emu.h"
 #include "mixer.h"
 
+#define KEY_INP_SWA gui.rud_dr
+#define KEY_INP_SWB gui.ele_dr
+#define KEY_INP_SWC gui.ail_dr
+#define KEY_INP_SWD gui.gear
+#define KEY_INP_SWE gui.mix
+#define KEY_INP_SWF gui.fmod
+#define KEY_INP_SWG gui.hold
+#define KEY_INP_SWH gui.trn
+#define KEY_INP_RUD_DR    gui.rud_dr
+#define KEY_INP_ELE_DR    gui.ele_dr
+#define KEY_INP_AIL_DR    gui.ail_dr
+#define KEY_INP_GEAR      gui.gear
+#define KEY_INP_MIX       gui.mix
+#define KEY_INP_FMOD      gui.fmod
+#define KEY_INP_HOLD      gui.hold
+#define KEY_INP_TRN       gui.trn
+
 void TEST_CHAN_SetChannelValue(int channel, s32 value)
 {
     s32 step = (CHAN_MAX_VALUE - CHAN_MIN_VALUE) / 100;
@@ -48,38 +65,42 @@ void TEST_CHAN_SetChannelValue(int channel, s32 value)
     return;
 }
 
-s32 CHAN_ReadInput(int channel)
+s32 ADC_ReadRawInput(int channel)
 {
     s32 step = (CHAN_MAX_VALUE - CHAN_MIN_VALUE) / 100;
-    switch(channel) {
+    switch (channel) {
+        case 0:            return 0;
         case INP_THROTTLE: return CHAN_MIN_VALUE + step * gui.throttle;
         case INP_RUDDER:   return CHAN_MIN_VALUE + step * gui.rudder;
         case INP_ELEVATOR: return CHAN_MIN_VALUE + step * gui.elevator;
         case INP_AILERON:  return CHAN_MIN_VALUE + step * gui.aileron;
 
-        case INP_RUD_DR0:  return (gui.rud_dr % 2) ? CHAN_MIN_VALUE : CHAN_MAX_VALUE;
-        case INP_RUD_DR1:  return (gui.rud_dr % 2) ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
-
-        case INP_ELE_DR0:  return (gui.ele_dr % 2) ? CHAN_MIN_VALUE : CHAN_MAX_VALUE;
-        case INP_ELE_DR1:  return (gui.ele_dr % 2) ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
-
-        case INP_AIL_DR0:  return (gui.ail_dr % 2) ? CHAN_MIN_VALUE : CHAN_MAX_VALUE;
-        case INP_AIL_DR1:  return (gui.ail_dr % 2) ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
-
-        case INP_GEAR0:    return (gui.gear % 2)  ? CHAN_MIN_VALUE : CHAN_MAX_VALUE;
-        case INP_GEAR1:    return (gui.gear % 2)  ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
-
-        case INP_MIX0:     return (gui.mix % 3) == 0  ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
-        case INP_MIX1:     return (gui.mix % 3) == 1  ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
-        case INP_MIX2:     return (gui.mix % 3) == 2  ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
-
-        case INP_FMOD0:    return (gui.fmod % 3) == 0 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
-        case INP_FMOD1:    return (gui.fmod % 3) == 1 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
-        case INP_FMOD2:    return (gui.fmod % 3) == 2 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case 5:            return CHAN_MIN_VALUE + step * gui.aux2;
+        case 6:            return CHAN_MIN_VALUE + step * gui.aux3;
+        case 7:            return CHAN_MIN_VALUE + step * gui.aux4;
+        case 8:            return CHAN_MIN_VALUE + step * gui.aux5;
+        case 9:            return CHAN_MIN_VALUE + step * gui.aux6;
+        case 10:            return CHAN_MIN_VALUE + step * gui.aux7;
     }
     return 0;
 }
-s32 CHAN_ReadRawInput(int channel)
+
+s32 ADC_NormalizeChannel(int channel)
 {
-    return CHAN_ReadInput(channel);
+    return ADC_ReadRawInput(channel);
+}
+
+s32 SWITCH_ReadRawInput(int channel)
+{
+    #define TWO_WAY(inp, p1, dir) \
+        case inp ## 0:  return (KEY_ ## inp % 2)  == 0 ? 1 : 0; \
+        case inp ## 1:  return (KEY_ ## inp % 2)  == 1 ? 1 : 0;
+    #define THREE_WAY(inp, p1, p2, dir) \
+        case inp ## 0:  return (KEY_ ## inp % 3)  == 0 ? 1 : 0; \
+        case inp ## 1:  return (KEY_ ## inp % 3)  == 1 ? 1 : 0; \
+        case inp ## 2:  return (KEY_ ## inp % 3)  == 2 ? 1 : 0;
+    switch (channel) {
+        SWITCHES
+    }
+    return 0;
 }
