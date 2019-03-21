@@ -53,10 +53,7 @@ static char *recv_param_ptr;
 static u8 send_msg_buffer[SEND_MSG_BUF_SIZE];
 static volatile int send_msg_buf_count;     // tx data available semaphore with CRSF protocol
 
-#define CRSF_MAX_STRING_BYTES  2200     // max observed is 2010 in Nano RX
-#define CRSF_STRING_BYTES_AVAIL(current)  (CRSF_MAX_STRING_BYTES-((char *)(current)-strings))
-static char strings[CRSF_MAX_STRING_BYTES];
-static char *next_string = strings;
+static char *next_string;
 
 
 static void crsfdevice_init() {
@@ -65,7 +62,7 @@ static void crsfdevice_init() {
     recv_param_ptr = recv_param_buffer;
 #ifndef EMULATOR
     params_loaded = 0;
-    next_string = strings;
+    next_string = mp->strings;
     memset(crsf_params, 0, sizeof crsf_params);
 #endif
 }
