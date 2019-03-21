@@ -78,8 +78,6 @@ SRCS     := $(SRC_C) $(SRC_CXX) $(SRC_S)
 ODIR     = $(SDIR)objs/$(TARGET)$(ODIREXT)/
 OBJS    := $(patsubst %.c,$(ODIR)%.o,$(notdir $(SRC_C))) $(patsubst %.cpp,$(ODIR)%.o,$(notdir $(SRC_CXX)))
 
-$(warning $(OBJS))
-
 ifdef MODULAR
 PROTO_OBJS  := $(addprefix $(ODIR), $(notdir $(PROTO_SRC_C:.c=.o)))
 PROTO_LIBS  := $(addprefix $(ODIR), $(notdir $(PROTO_SRC_C:.c=.bin)))
@@ -128,11 +126,12 @@ EXEEXT   ?= elf
 #this section defines final build files    #
 ############################################
 FILESYSTEM = $(subst emu_,,$(TARGET))
-MODELDIR = filesystem/$(FILESYSTEM)/models
+FS_ROOT = $(SDIR)filesystem/$(FILESYSTEM)
+MODELDIR = $(FS_ROOT)/models
 
 LAST_MODEL := $(MODELDIR)/model$(NUM_MODELS).ini
 
-ALL := $(ODIR) $(TARGET).fs_wrapper
+ALL += $(ODIR) $(TARGET).fs_wrapper $(OBJS)
 
 ############################################
 #END SECTION                               #
@@ -142,7 +141,7 @@ ALL := $(ODIR) $(TARGET).fs_wrapper
 #this section includes build targets       #
 ############################################
 .PHONY: all
-all : $(ALL) $(OBJS)
+all : $(ALL)
 
 ####################################
 # recompile if the Makefile changes#
@@ -160,38 +159,38 @@ $(VERBOSE).SILENT:
 clean:
 	rm -f $(TARGET).$(EXEEXT) $(TARGET).exe $(TARGET).bin $(TARGET).dfu $(TARGET).list \
 		$(TARGET).map $(ODIR)*.o $(ODIR)*.o_ $(ODIR)*.P  $(ODIR)*.bin \
-		filesystem/$(FILESYSYTEM) 2> /dev/null || true
+		$(FS_ROOT) 2> /dev/null || true
 
 language:
-	$(SDIR)../utils/extract_strings.pl -po > $(SDIR)fs/language/deviation.po
+	../utils/extract_strings.pl -po > fs/language/deviation.po
 
-zip: $(SDIR)$(TARGET).zip
+zip: $(TARGET).zip
 
-$(SDIR)%.zip: $(ALL) $(PROTO_MODULES)
+%.zip: $(ALL) $(PROTO_MODULES)
 	#This is not an emulator build (emulator is hanled in target/common/emu/Makefile.inc)
-	cp -f $(SDIR)$(TARGET).dfu $(SDIR)deviation-$(HGVERSION).dfu
-	rm -f $(SDIR)deviation-$(HGVERSION).zip
-	rm -f $(SDIR)debug-$(HGVERSION).zip
-	zip $(SDIR)debug-$(HGVERSION).zip $(SDIR)$(TARGET).elf
+	cp -f $(TARGET).dfu deviation-$(HGVERSION).dfu
+	rm -f deviation-$(HGVERSION).zip
+	rm -f debug-$(HGVERSION).zip
+	zip debug-$(HGVERSION).zip $(TARGET).elf
 	# $(MAKE) zipping more compatible with other distributions
 	export p=`pwd`; cd $(ODIR) && test -e devo.fs && zip -u $$p/deviation-$(HGVERSION).zip devo.fs && rm devo.fs || true
-	zip $(SDIR)deviation-$(HGVERSION).zip $(SDIR)deviation-$(HGVERSION).dfu $(SDIR)UPDATING.md
+	zip deviation-$(HGVERSION).zip deviation-$(HGVERSION).dfu UPDATING.md
 ifdef MODULAR
 	export p=`pwd`; cd $(ODIR) && zip -ur $$p/deviation-$(HGVERSION).zip protocol/*.mod
 	export p=`pwd`; cd $(ODIR) && zip -u $$p/debug-$(HGVERSION).zip *.elf
 	rm -rf $(ODIR)protocol
 endif
 ifeq "$(INCLUDE_FS)" "1"
-	export p=`pwd`; cd filesystem/$(FILESYSTEM) && zip -ur $$p/deviation-$(HGVERSION).zip  *
+	export p=`pwd`; cd $(FS_ROOT) && zip -ur $$p/deviation-$(HGVERSION).zip  *
 endif
-	zip -u $(SDIR)deviation-$(HGVERSION).zip $(SDIR)debug-$(HGVERSION).zip
-	rm -f $(SDIR)debug-$(HGVERSION).zip
-	rm -f $(SDIR)deviation-$(HGVERSION).dfu
+	zip -u deviation-$(HGVERSION).zip debug-$(HGVERSION).zip
+	rm -f debug-$(HGVERSION).zip
+	rm -f deviation-$(HGVERSION).dfu
 
 fs: $(TARGET).fs
 
 %.fs:
-	rm -f deviation-fs-$(HGVERSION).zip; zip -r deviation-fs-$(HGVERSION).zip filesystem/$(FILESYSTEM)
+	rm -f deviation-fs-$(HGVERSION).zip; zip -r deviation-fs-$(HGVERSION).zip $(FS_ROOT)
 
 
 ##########################################

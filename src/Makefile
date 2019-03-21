@@ -41,7 +41,7 @@ everything: txs emus fss
 define make-target
 .PHONY: $1 win_$1 fs_$1 both_$1 zip_$1 zip_win_$1 release_$1 all_$1
 $1:
-	+$(MAKE) -C target/tx/$2/$1
+	+$(MAKE) -f target/tx/$2/$1/Makefile
 win_$1:
 ifeq ($(OS),Windows_NT)
 	# This builds Windows emulators on a Windows system
@@ -88,4 +88,4 @@ coverity:
 	tar -cvzf coverity-$(HGVERSION).tgz cov-int
 
 lint:
-	$(SDIR)../utils/run_linter.py --diff --debug
+	../utils/run_linter.py --diff --debug
