@@ -49,7 +49,7 @@ static struct {
 static char recv_param_buffer[CRSF_MAX_CHUNKS * CRSF_MAX_CHUNK_SIZE];
 static char *recv_param_ptr;
 
-#define SEND_MSG_BUF_SIZE  16
+#define SEND_MSG_BUF_SIZE  64      // don't send more than one chunk
 static u8 send_msg_buffer[SEND_MSG_BUF_SIZE];
 static volatile int send_msg_buf_count;     // tx data available semaphore with CRSF protocol
 
@@ -147,7 +147,7 @@ void show_page(int folder);
 void PAGE_CRSFDeviceEvent() {
     // update page as parameter info is received
     // until all parameters loaded
-    if (CLOCK_getms() - last_update > 500) {
+    if (CLOCK_getms() - last_update > 2000) {
         u8 params_count = count_params_loaded();
         if (params_loaded != params_count) {
             params_loaded = params_count;
@@ -160,7 +160,7 @@ void PAGE_CRSFDeviceEvent() {
     // commands may require interaction through dialog
     if (command.time && (CLOCK_getms() - command.time > command.param->timeout * 100)) {
         if (command.param->u.status != READY) {
-            CRSF_set_param(command.param, POLL);
+            CRSF_send_command(command.param, POLL);
             command.time = CLOCK_getms();
         } else {
             PAGE_CRSFdialogClose();
@@ -208,16 +208,49 @@ void CRSF_read_param(u8 device, u8 id, u8 chunk) {
     }
 }
 
-void CRSF_set_param(crsf_param_t *param, u32 value) {
+void CRSF_set_param(crsf_param_t *param) {
     if (!send_msg_buf_count) {
         next_param = param->id;    // device responds with parameter info so prepare to receive
         next_chunk = 0;
         recv_param_ptr = recv_param_buffer;
 
         param_msg_header(TYPE_SETTINGS_WRITE, crsf_devices[param->device].address, param->id);
-        send_msg_buffer[6] = value;
-        send_msg_buffer[7] = crsf_crc8(&send_msg_buffer[2], send_msg_buffer[1]-1);
-        send_msg_buf_count = 8;
+
+        int i = 6;
+        switch (param->type) {
+        case UINT8:
+            send_msg_buffer[i++] = (u8)(u32)param->value;
+            break;
+        case INT8:
+            send_msg_buffer[i++] = (s8)(u32)param->value;
+            break;
+        case UINT16:
+            send_msg_buffer[i++] = (u16)(u32)param->value >> 8;
+            send_msg_buffer[i++] = (u16)(u32)param->value;
+            break;
+        case INT16:
+            send_msg_buffer[i++] = (s16)(u32)param->value >> 8;
+            send_msg_buffer[i++] = (s16)(u32)param->value;
+            break;
+        case FLOAT:
+            send_msg_buffer[i++] = (s32)param->value >> 24;
+            send_msg_buffer[i++] = (s32)param->value >> 16;
+            send_msg_buffer[i++] = (s32)param->value >> 8;
+            send_msg_buffer[i++] = (s32)param->value;
+            break;
+        case TEXT_SELECTION:
+            send_msg_buffer[i++] = (u8)param->u.text_sel;
+            break;
+        case STRING:
+            i += strlcpy((char *)&send_msg_buffer[i], (char *)param->value, SEND_MSG_BUF_SIZE);
+        case OUT_OF_RANGE:
+        default:
+            break;
+        }
+
+        send_msg_buffer[1] = i - 1;
+        send_msg_buffer[i++] = crsf_crc8(&send_msg_buffer[2], send_msg_buffer[1]-1);
+        send_msg_buf_count = i;
         read_timeout = CLOCK_getms();
     }
 }

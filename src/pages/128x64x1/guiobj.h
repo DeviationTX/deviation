@@ -245,6 +245,7 @@ struct crsfconfig_obj {
 
 struct crsfdevice_obj {
     guiLabel_t msg;
+    guiKeyboard_t keyboard;
     guiScrollable_t scrollable;
     guiLabel_t name[10];
     union {

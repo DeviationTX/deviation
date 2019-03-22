@@ -56,7 +56,7 @@ void button_press(guiObject_t *obj, const void *data)
     else
         param->u.text_sel = param->min_value;
 
-    CRSF_set_param(param, param->u.text_sel);
+    CRSF_set_param(param);
 }
 
 static void command_press(guiObject_t *obj, s8 press_type, const void *data)
@@ -70,7 +70,7 @@ static void command_press(guiObject_t *obj, s8 press_type, const void *data)
     crsf_param_t *param = (crsf_param_t *)data;
 
     if (param->u.status == READY) {
-        CRSF_set_param(param, START);
+        CRSF_send_command(param, START);
     }
 }
 
@@ -84,11 +84,44 @@ static const char *value_textsel(guiObject_t *obj, int dir, void *data)
                             param->min_value, param->max_value,
                             dir, 1, 1, &changed);
 
-    if (changed) CRSF_set_param(param, param->u.text_sel);
+    if (changed) CRSF_set_param(param);
     return current_text(param);
 }
 
-static void press_cb(struct guiObject *obj, s8 press_type, const void *data)
+static const char *value_numsel(guiObject_t *obj, int dir, void *data)
+{
+    (void)obj;
+    crsf_param_t *param = (crsf_param_t *)data;
+    u8 changed = 0;
+
+    param->value = (void *)GUI_TextSelectHelper((int)param->value,
+                                param->min_value, param->max_value,
+                                dir, param->step, 10*param->step, &changed);
+
+    if (changed) CRSF_set_param(param);
+
+    snprintf(tempstring, sizeof tempstring, "%d", (int)param->value);
+    if (param->type == FLOAT && param->u.point > 0) {
+        int pos = strlen(tempstring) - param->u.point;
+        memmove(&tempstring[pos+1], &tempstring[pos], param->u.point);
+        tempstring[pos] = '.';
+    }
+    return tempstring;
+}
+
+static void stredit_done_cb(guiObject_t *obj, void *data)  // devo8 doesn't handle cancel/discard properly,
+{
+    crsf_param_t *param = (crsf_param_t *)data;
+
+    GUI_RemoveObj(obj);
+    if (param) {  // Keyboard sets to null if changes discarded
+        strlcpy((char *)param->value, (const char *)tempstring, sizeof((char *)param->value));
+        CRSF_set_param(param);
+    }
+    show_page(current_folder);
+}
+
+static void stredit_cb(struct guiObject *obj, s8 press_type, const void *data)
 {
     (void)obj;
     if (press_type != -1) {
@@ -97,22 +130,24 @@ static void press_cb(struct guiObject *obj, s8 press_type, const void *data)
 
     crsf_param_t *param = (crsf_param_t *)data;
 
-    switch (param->type) {
-    case FOLDER:
-        current_folder = param->id;
-        show_page(current_folder);
-        break;
-    case UINT8:
-    case UINT16:
-    case FLOAT:
-    case INT8:
-    case INT16:
-    case STRING:
-    case INFO:
-    case OUT_OF_RANGE:
-    default:
-        break;
+    PAGE_SetModal(1);
+    PAGE_RemoveAllObjects();
+    tempstring_cpy((const char *)param->value);
+    GUI_CreateKeyboard(&gui->keyboard, KEYBOARD_ALPHA, tempstring, param->u.string_max_len,
+            stredit_done_cb, param);
+}
+
+static void folder_cb(struct guiObject *obj, s8 press_type, const void *data)
+{
+    (void)obj;
+    if (press_type != -1) {
+        return;
     }
+
+    crsf_param_t *param = (crsf_param_t *)data;
+
+    current_folder = param->id;
+    show_page(current_folder);
 }
 
 static int row_cb(int absrow, int relrow, int y, void *data) {
@@ -150,20 +185,29 @@ static int row_cb(int absrow, int relrow, int y, void *data) {
         break;
     case FOLDER:
         GUI_CreateLabelBox(&gui->name[relrow], LABEL_X, y,
-            LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, crsf_name_cb, press_cb, (void *)param);
+            LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, crsf_name_cb, folder_cb, (void *)param);
         break;
-
-    // TODO(Hexfet)  implement
     case UINT8:
     case UINT16:
-    case FLOAT:
     case INT8:
     case INT16:
+    case FLOAT:
+        GUI_CreateLabelBox(&gui->name[relrow], LABEL_X, y,
+            EDIT_LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT,
+            crsf_name_cb, NULL, (void *)param);
+        GUI_CreateTextSelectPlate(&gui->value[relrow].ts, EDIT_VALUE_X, y,
+            EDIT_VALUE_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT,
+            NULL, value_numsel, (void *)param);
+        break;
     case STRING:
+        GUI_CreateLabelBox(&gui->name[relrow], LABEL_X, y,
+            EDIT_LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT,
+            crsf_name_cb, NULL, (void *)param);
+        GUI_CreateLabelBox(&gui->value[relrow].lbl, EDIT_VALUE_X, y,
+            EDIT_VALUE_WIDTH, LINE_HEIGHT, &LABEL_FONT,
+            crsf_value_cb, stredit_cb, (void *)param);
+        break;
     case OUT_OF_RANGE:
-    default:
-        GUI_CreateLabelBox(&gui->value[relrow].lbl, LABEL_X, y,
-            EDIT_LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, crsf_name_cb, press_cb, (void *)param);
         break;
     }
     return 1;

@@ -117,7 +117,7 @@ u8 CRSF_number_of_devices();
 u8 CRSF_number_of_params();
 void CRSF_add_param(u8 *buffer, u8 max_len);
 void CRSF_read_param(u8 device, u8 id, u8 chunk);
-void CRSF_set_param(crsf_param_t *param, u32 value);
+void CRSF_set_param(crsf_param_t *param);
 void CRSF_send_command(crsf_param_t *param, enum cmd_status status);
 
 #endif  // SUPPORT_CRSF_CONFIG
