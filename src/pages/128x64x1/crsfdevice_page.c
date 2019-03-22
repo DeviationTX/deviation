@@ -231,7 +231,7 @@ void show_page(int folder) {
     if (count_params_loaded() == crsf_devices[device_idx].number_of_params) {
         PAGE_ShowHeader(crsf_devices[device_idx].name);
     } else {
-        snprintf(tempstring, sizeof tempstring, "%s LOADING", crsf_devices[device_idx].name);
+        snprintf(tempstring, sizeof tempstring, "%s %s", crsf_devices[device_idx].name, _tr_noop("LOADING"));
         PAGE_ShowHeader(tempstring);
     }
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH,
