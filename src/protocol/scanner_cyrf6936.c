@@ -103,25 +103,24 @@ static u16 scan_cb()
             channel++;
             if (channel == (Scanner.chan_max - Scanner.chan_min + 1))
                 channel = 0;
-            //if (Scanner.averaging)
-            //    Scanner.rssi[channel] = 0;
+            if (Scanner.averaging < 0)
+                Scanner.rssi[channel] = 0;  // Reset value for peak scans after channel change
             _scan_next();
             scan_state = SCAN_GET_RSSI;
             return CHANNEL_LOCK_TIME;
         case SCAN_GET_RSSI:
             rssi_value = _scan_rssi();
-            if (Scanner.averaging > 0) {
+            if (Scanner.averaging > 0) {  // Average mode
                 rssi_sum += rssi_value;
                 if (averages >= INTERNAL_AVERAGE * Scanner.averaging)
                     rssi_sum -= Scanner.rssi[channel];
                 else
                     averages++;
                 Scanner.rssi[channel] = (rssi_sum + averages / 2) / averages;  // exponential smoothing
-            } else {
-                if (rssi_value > Scanner.rssi[channel]) {
+            } else {  // Peak mode
+                if (rssi_value > Scanner.rssi[channel])
                     Scanner.rssi[channel] = rssi_value;
-                    averages++;
-                }
+                averages++;
             }
             if (averages < (INTERNAL_AVERAGE * abs(Scanner.averaging)))
                 return AVERAGE_INTVL + rand32() % 10;  // make measurements slightly random in time
