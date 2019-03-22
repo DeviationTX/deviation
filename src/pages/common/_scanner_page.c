@@ -61,7 +61,7 @@ static const char *average_cb(guiObject_t *obj, int dir, void *data)
     (void)data;
     Scanner.averaging = GUI_TextSelectHelper(Scanner.averaging, -127, 127, dir, 1, 10, NULL);
     if (Scanner.averaging == 0)
-        strcpy(tempstring, _tr("Pk Hold"));
+        strcpy(tempstring, _tr("Peak"));
     else if (Scanner.averaging < 0)
         snprintf(tempstring, sizeof(tempstring), "Pk %d", abs(Scanner.averaging));
     else
