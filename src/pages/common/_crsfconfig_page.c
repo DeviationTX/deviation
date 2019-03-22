@@ -45,8 +45,6 @@ crsf_device_t crsf_devices[] = {
 static struct crsfconfig_page * const mp = &pagemem.u.crsfconfig_page;
 static struct crsfconfig_obj * const gui = &gui_objs.u.crsfconfig;
 static u16 current_selected = 0;
-
-static u32 last_update;
 static u8 number_of_devices;    // total known
 
 
@@ -68,8 +66,8 @@ u8 CRSF_number_of_devices() {
 
 void PAGE_CRSFConfigEvent()
 {
-    if (CLOCK_getms() - last_update > 500) {
-        last_update = CLOCK_getms();
+    if (CLOCK_getms() - mp->last_update > 500) {
+        mp->last_update = CLOCK_getms();
         u8 device_count = CRSF_number_of_devices();
         if (number_of_devices != device_count) {
             number_of_devices = device_count;
@@ -77,7 +75,7 @@ void PAGE_CRSFConfigEvent()
                 GUI_Redraw(&gui->name[i]);
         }
     }
-    last_update = CLOCK_getms();
+    mp->last_update = CLOCK_getms();
 }
 
 #endif
