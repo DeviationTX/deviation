@@ -24,7 +24,7 @@ extern s32 ADDON_ReadRawInput(int channel);
 #ifndef STOCK_INPUTS
     #ifdef SWITCH_STOCK
         #define STOCK_INPUTS SWITCH_STOCK
-    #else 
+    #else
         #define STOCK_INPUTS -1
     #endif
 #endif
