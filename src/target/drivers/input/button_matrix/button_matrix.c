@@ -65,7 +65,7 @@ u32 ScanButtons()
             idx++;
         }
     }
-#if defined(HAS_EXTRA_SWITCHES) && HAS_EXTRA_SWITCHES
+#if defined(EXTRA_SWITCHES)
         result = ADDON_Handle_ExtraSwitches(result);
 #endif
     return result;
