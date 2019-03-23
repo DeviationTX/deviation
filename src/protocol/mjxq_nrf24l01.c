@@ -90,7 +90,7 @@ enum {
     CHANNEL12,    // Camera tilt
 };
 #define CHANNEL_LED         CHANNEL5
-#define CHANNEL_ARM         CHANNEL5  // H26WH
+#define CHANNEL_ARM         CHANNEL5  // H26WH - TDR Phoenix mini
 #define CHANNEL_FLIP        CHANNEL6
 #define CHANNEL_PICTURE     CHANNEL7
 #define CHANNEL_VIDEO       CHANNEL8
@@ -222,8 +222,11 @@ static void send_packet(u8 bind)
                        | GET_FLAG(CHANNEL_PICTURE, 0x08)
                        | GET_FLAG(CHANNEL_VIDEO, 0x10)
                        | GET_FLAG_INV(CHANNEL_LED, 0x20); // air/ground mode
-            if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H26WH ||
-                Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_PHOENIX ) {
+            if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_PHOENIX) {
+                packet[10] |= GET_FLAG(CHANNEL_ARM, 0x80);
+                packet[14] &= ~0x24;
+            }
+            if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H26WH) {
                 packet[10] |= 0x40;  // high rate
                 packet[14] &= ~0x24; // unset air/ground & arm flags
                 packet[14] |= GET_FLAG(CHANNEL_ARM, 0x02);
@@ -338,7 +341,7 @@ static void mjxq_init()
     NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x01);
     NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0x00); // no retransmits
     NRF24L01_WriteReg(NRF24L01_11_RX_PW_P0, PACKET_SIZE);
-    if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_E010 
+    if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_E010
      || Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_PHOENIX)
         NRF24L01_SetBitrate(NRF24L01_BR_250K);             // 250kbps
     else
