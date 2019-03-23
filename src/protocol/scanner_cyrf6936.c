@@ -35,11 +35,9 @@
 #define MIN_RADIOCHANNEL    0x00
 #define MAX_RADIOCHANNEL    0x62
 #define CHANNEL_LOCK_TIME   300  // slow channel requires 270 usec for synthesizer to settle
-#define INTERNAL_AVERAGE    3
-#define AVERAGE_INTVL       50
+#define AVERAGE_INTVL       20
 
 static int averages, channel, scan_state;
-static u32 rssi_sum;
 
 enum ScanStates {
     SCAN_CHANNEL_CHANGE = 0,
@@ -98,35 +96,26 @@ static u16 scan_cb()
     int rssi_value;
     switch (scan_state) {
         case SCAN_CHANNEL_CHANGE:
-            rssi_sum = 0;
             averages = 0;
             channel++;
             if (channel == (Scanner.chan_max - Scanner.chan_min + 1))
                 channel = 0;
-            if (Scanner.averaging < 0)
-                Scanner.rssi[channel] = 0;  // Reset value for peak scans after channel change
+            if (!Scanner.averaging)
+                Scanner.rssi_peak[channel] = 0;  // Reset value for peak mode scans after channel change
             _scan_next();
             scan_state = SCAN_GET_RSSI;
             return CHANNEL_LOCK_TIME;
         case SCAN_GET_RSSI:
             rssi_value = _scan_rssi();
-            if (Scanner.averaging > 0) {  // Average mode
-                rssi_sum += rssi_value;
-                if (averages >= INTERNAL_AVERAGE * Scanner.averaging)
-                    rssi_sum -= Scanner.rssi[channel];
-                else
-                    averages++;
-                Scanner.rssi[channel] = (rssi_sum + averages / 2) / averages;  // exponential smoothing
-            } else {  // Peak mode
-                if (rssi_value > Scanner.rssi[channel])
-                    Scanner.rssi[channel] = rssi_value;
-                averages++;
-            }
-            if (averages < (INTERNAL_AVERAGE * abs(Scanner.averaging)))
+            Scanner.rssi[channel] = (rssi_value + 9 * Scanner.rssi[channel]) / 10;  // fast exponential smoothing with alpha 0.1
+            if (rssi_value > Scanner.rssi_peak[channel])
+                    Scanner.rssi_peak[channel] = rssi_value;
+            averages++;
+            if (averages < (abs(Scanner.averaging)))
                 return AVERAGE_INTVL + rand32() % 10;  // make measurements slightly random in time
             scan_state = SCAN_CHANNEL_CHANGE;
     }
-    return 50;
+    return 20;
 }
 
 static void scan_start()
@@ -139,11 +128,11 @@ static void initialize()
 {
     Scanner.chan_min = MIN_RADIOCHANNEL;
     Scanner.chan_max = MAX_RADIOCHANNEL;
-    rssi_sum = 0;
     averages = 0;
     channel = 0;
     scan_state = SCAN_CHANNEL_CHANGE;
     memset(Scanner.rssi, 0, sizeof(Scanner.rssi));  // clear old rssi values
+    memset(Scanner.rssi_peak, 0, sizeof(Scanner.rssi_peak));  // clear old rssi peak values
     CYRF_Reset();
     cyrf_init();
     CYRF_SetTxRxMode(RX_EN);  // Receive mode

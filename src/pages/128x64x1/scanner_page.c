@@ -44,11 +44,20 @@ void _draw_channels()
 
     // draw rssi values
     for (int i = 0; i < Scanner.chan_max - Scanner.chan_min; i++) {
+        if (Scanner.averaging > 0) {
+            height = Scanner.rssi[i] * (LCD_HEIGHT - offset) / 0x1F;
+        } else {
+            height = Scanner.rssi_peak[i] * (LCD_HEIGHT - offset) / 0x1F;
+        }
         col = (LCD_WIDTH - (Scanner.chan_max - Scanner.chan_min)) / 2 + i;
-        height = Scanner.rssi[i] * (LCD_HEIGHT - offset) / 0x1F;
 
         LCD_DrawFastVLine(col, offset, LCD_HEIGHT - offset - height, 0);
-        LCD_DrawFastVLine(col, LCD_HEIGHT - height, height, Display.xygraph.grid_color);
+        LCD_DrawFastVLine(col, LCD_HEIGHT - height, height, 1);
+
+        if (Scanner.averaging > 0) {
+            height = Scanner.rssi_peak[i] * (LCD_HEIGHT - offset) / 0x1F;
+            LCD_DrawPixelXY(col, LCD_HEIGHT - height, 1);
+        }
     }
 }
 

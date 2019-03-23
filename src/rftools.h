@@ -5,10 +5,11 @@
 
 struct Scanner {
     u8 rssi[255];
+    u8 rssi_peak[255];
     u8 chan_min;
     u8 chan_max;
     u8 attenuator;
-    s8 averaging;
+    s16 averaging;
 };
 
 extern struct Scanner Scanner;

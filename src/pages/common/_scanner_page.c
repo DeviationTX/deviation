@@ -59,7 +59,7 @@ static const char *average_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     (void)data;
-    Scanner.averaging = GUI_TextSelectHelper(Scanner.averaging, -127, 127, dir, 1, 10, NULL);
+    Scanner.averaging = GUI_TextSelectHelper(Scanner.averaging, -8192, 8192, dir, 1, 50, NULL);
     if (Scanner.averaging == 0)
         strcpy(tempstring, _tr("Peak"));
     else if (Scanner.averaging < 0)
@@ -67,6 +67,7 @@ static const char *average_cb(guiObject_t *obj, int dir, void *data)
     else
         snprintf(tempstring, sizeof(tempstring), "Avg %d", Scanner.averaging);
     memset(Scanner.rssi, 0, sizeof(Scanner.rssi));  // clear old rssi values when changing mode
+    memset(Scanner.rssi_peak, 0, sizeof(Scanner.rssi_peak));  // clear old rssi peak values when changing mode
     return tempstring;
 }
 
