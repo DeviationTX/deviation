@@ -39,7 +39,7 @@ static void _draw_page(u8 enable)
     (void)enable;
     PAGE_ShowHeader(PAGE_GetName(PAGEID_SCANNER));
     GUI_CreateButton(&gui->enable, LCD_WIDTH/2 - 152, 40, BUTTON_96, enablestr_cb, press_enable_cb, NULL);
-    GUI_CreateTextSelect(&gui->averaging, LCD_WIDTH/2 - 48, 44, TEXTSELECT_96, NULL, average_cb, NULL);
+    GUI_CreateTextSelect(&gui->averaging, LCD_WIDTH/2 - 48, 44, TEXTSELECT_96, avg_mode_cb, average_cb, NULL);
     GUI_CreateTextSelect(&gui->attenuator, LCD_WIDTH/2 + 56, 44, TEXTSELECT_96, NULL, attenuator_cb, NULL);
 }
 
