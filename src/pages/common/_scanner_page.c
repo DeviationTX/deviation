@@ -64,11 +64,18 @@ static const char *average_cb(guiObject_t *obj, int dir, void *data)
         strcpy(tempstring, _tr("Peak"));
     else if (Scanner.averaging < 0)
         snprintf(tempstring, sizeof(tempstring), "Pk %d", abs(Scanner.averaging));
+    else if (sp->peak_hold)
+        snprintf(tempstring, sizeof(tempstring), "PA %d", Scanner.averaging);
     else
-        snprintf(tempstring, sizeof(tempstring), "Avg %d", Scanner.averaging);
+        snprintf(tempstring, sizeof(tempstring), "Av %d", Scanner.averaging);
     memset(Scanner.rssi, 0, sizeof(Scanner.rssi));  // clear old rssi values when changing mode
     memset(Scanner.rssi_peak, 0, sizeof(Scanner.rssi_peak));  // clear old rssi peak values when changing mode
     return tempstring;
+}
+static void avg_mode_cb(guiObject_t *obj, void *data) {
+    (void) obj;
+    (void) data;
+    sp->peak_hold ^= 1;
 }
 
 void PAGE_ScannerInit(int page)
