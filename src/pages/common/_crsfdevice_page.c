@@ -249,7 +249,7 @@ static void stredit_cb(struct guiObject *obj, s8 press_type, const void *data)
 void PAGE_CRSFDeviceEvent() {
     // update page as parameter info is received
     // until all parameters loaded
-    if (CLOCK_getms() - last_update > 2000) {
+    if (CLOCK_getms() - last_update > 300) {
         u8 params_count = count_params_loaded();
         if (params_loaded != params_count) {
             params_loaded = params_count;
