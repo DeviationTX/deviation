@@ -65,7 +65,7 @@ static const char *average_cb(guiObject_t *obj, int dir, void *data)
     else if (Scanner.averaging < 0)
         snprintf(tempstring, sizeof(tempstring), "Pk %d", abs(Scanner.averaging));
     else if (sp->peak_hold)
-        snprintf(tempstring, sizeof(tempstring), "PA %d", Scanner.averaging);
+        snprintf(tempstring, sizeof(tempstring), "AP %d", Scanner.averaging);
     else
         snprintf(tempstring, sizeof(tempstring), "Av %d", Scanner.averaging);
     memset(Scanner.rssi, 0, sizeof(Scanner.rssi));  // clear old rssi values when changing mode

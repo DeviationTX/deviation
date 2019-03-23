@@ -35,7 +35,7 @@
 #define MIN_RADIOCHANNEL    0x00
 #define MAX_RADIOCHANNEL    0x62
 #define CHANNEL_LOCK_TIME   300  // slow channel requires 270 usec for synthesizer to settle
-#define AVERAGE_INTVL       20
+#define AVERAGE_INTVL       30
 
 static int averages, channel, scan_state;
 
@@ -115,7 +115,7 @@ static u16 scan_cb()
                 return AVERAGE_INTVL + rand32() % 10;  // make measurements slightly random in time
             scan_state = SCAN_CHANNEL_CHANGE;
     }
-    return 20;
+    return 30;
 }
 
 static void scan_start()
