@@ -156,7 +156,7 @@ static void crsf_confirm_cb(u8 state, void *data) {
     if (param->u.status == CONFIRMATION_NEEDED) {
         CRSF_send_command(param, state == 1 ? CONFIRM : CANCEL);
     } else if (param->u.status == PROGRESS && state == 0) {
-        param->u.status = READY;
+        CRSF_send_command(param, CANCEL);
     }
 }
 #endif  // SUPPORT_CRSF_CONFIG
