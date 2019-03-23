@@ -39,7 +39,8 @@ void TestAllPages(CuTest* t)
         if (i == PAGEID_DEBUGLOG ||
             i == PAGEID_USB ||
             i == PAGEID_SPLASH ||
-            i == PAGEID_LANGUAGE)
+            i == PAGEID_LANGUAGE ||
+            i == PAGEID_VOICECFG)
             continue;
 
         if (pages[i].pageName == NULL || pages[i].pageName[0] == '\0')
