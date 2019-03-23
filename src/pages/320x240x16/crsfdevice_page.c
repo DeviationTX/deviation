@@ -38,19 +38,6 @@ enum {
 
 #include "../common/_crsfdevice_page.c"
 
-static void folder_cb(struct guiObject *obj, s8 press_type, const void *data)
-{
-    (void)obj;
-    if (press_type != -1) {
-        return;
-    }
-
-    crsf_param_t *param = (crsf_param_t *)data;
-
-    current_folder = param->id;
-    show_page(current_folder);
-}
-
 static int row_cb(int absrow, int relrow, int y, void *data) {
     (void)data;
 

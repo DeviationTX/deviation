@@ -218,6 +218,19 @@ static const char *value_numsel(guiObject_t *obj, int dir, void *data)
 
 void show_page(int folder);
 
+static void folder_cb(struct guiObject *obj, s8 press_type, const void *data)
+{
+    (void)obj;
+    if (press_type != -1) {
+        return;
+    }
+
+    crsf_param_t *param = (crsf_param_t *)data;
+
+    current_folder = param->id;
+    show_page(current_folder);
+}
+
 static void stredit_done_cb(guiObject_t *obj, void *data)  // devo8 doesn't handle cancel/discard properly,
 {
     crsf_param_t *param = (crsf_param_t *)data;
