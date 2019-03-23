@@ -22,6 +22,9 @@ SRC_C    = $(wildcard $(SDIR)/target/tx/devo/$(TARGET)/*.c) \
            $(wildcard $(SDIR)/target/drivers/filesystems/petit_fat/*.c) \
            $(wildcard $(SDIR)/target/drivers/filesystems/devofs/*.c) \
            $(wildcard $(SDIR)/target/drivers/input/button_matrix/*.c) \
+           $(wildcard $(SDIR)/target/drivers/input/analog/*.c) \
+           $(wildcard $(SDIR)/target/drivers/input/switch/*.c) \
+           $(wildcard $(SDIR)/target/drivers/input/addon_switch/*.c) \
            $(wildcard $(SDIR)/target/drivers/serial/uart/*.c) \
            $(wildcard $(SDIR)/target/drivers/serial/soft_serial/*.c) \
            $(wildcard $(SDIR)/target/drivers/sound/piezo/*.c) \
@@ -29,8 +32,7 @@ SRC_C    = $(wildcard $(SDIR)/target/tx/devo/$(TARGET)/*.c) \
            $(wildcard $(SDIR)/target/drivers/usb/*.c) \
            $(SDIR)/target/drivers/backlight/backlight.c \
            $(SDIR)/target/drivers/rtc/rtc_driver.c \
-           $(SDIR)/target/drivers/haptic/haptic.c \
-           $(SDIR)/target/drivers/input/analog/analog.c
+           $(SDIR)/target/drivers/haptic/haptic.c
 
 ifdef MODULAR
 PROTO_EXTRA_C = $(wildcard $(SDIR)/target/tx/devo/common/protocol/*.c) \
