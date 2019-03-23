@@ -24,6 +24,10 @@
 #define CMD_MODE() GPIO_pin_clear(LCD_SPI_MODE)
 #define DATA_MODE() GPIO_pin_set(LCD_SPI_MODE)
 
+#ifndef OLED_SPI_RATE
+    #define OLED_SPI_RATE 0
+#endif
+
 static void LCD_Cmd(unsigned cmd) {
     CMD_MODE();
     CS_LO();
