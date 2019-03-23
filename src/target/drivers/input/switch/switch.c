@@ -21,8 +21,12 @@ extern s32 ADDON_ReadRawInput(int channel);
 
 #define TO_PIN(...) (struct mcu_pin) { __VA_ARGS__ }
 
-#ifndef SWITCH_STOCK
-    #define SWITCH_STOCK -1
+#ifndef STOCK_INPUTS
+    #ifdef SWITCH_STOCK
+        #define STOCK_INPUTS SWITCH_STOCK
+    #else 
+        #define STOCK_INPUTS -1
+    #endif
 #endif
 
 void SWITCH_Init()
@@ -46,7 +50,7 @@ void SWITCH_Init()
     #undef THREE_WAY
     #undef TWO_WAY
 
-    Transmitter.ignore_src = ~SWITCH_STOCK;
+    Transmitter.ignore_src = ~STOCK_INPUTS;
 }
 
 s32 SWITCH_ReadRawInput(int channel)

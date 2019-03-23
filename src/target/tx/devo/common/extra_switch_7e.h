@@ -14,7 +14,6 @@
 //   .2 == A0
 //   .3 == A2
 
-#define IGNORE_MASK ((1 << INP_AILERON) | (1 << INP_ELEVATOR) | (1 << INP_THROTTLE) | (1 << INP_RUDDER) | (1 << INP_NONE) | (1 << INP_LAST))
 #define SWITCH_3x4  ((1 << INP_SWA0) | (1 << INP_SWA1) | (1 << INP_SWA2) \
                    | (1 << INP_SWB0) | (1 << INP_SWB1) | (1 << INP_SWB2) \
                    | (1 << INP_SWC0) | (1 << INP_SWC1) | (1 << INP_SWC2) \
@@ -63,7 +62,9 @@
 #define SWITCH_2x1  ((1 << INP_SWH0) | (1 << INP_SWH1))
 
 #define SWITCH_STOCK ((1 << INP_HOLD0) | (1 << INP_HOLD1) \
-                    | (1 << INP_FMOD0) | (1 << INP_FMOD1) \
+                    | (1 << INP_FMOD0) | (1 << INP_FMOD1))
+
+#define STOCK_INPUTS (SWITCH_STOCK \
                     | (1 << INP_AILERON) | (1 << INP_ELEVATOR) \
                     | (1 << INP_THROTTLE) | (1 << INP_RUDDER))
 

@@ -70,6 +70,11 @@ void CHAN_SetSwitchCfg(const char *str)
         return;                                \
     }
     ADDON_SWITCH_CFG;
+    #undef ADDON_SWITCH
+    u32 mask = 0;
+    #define ADDON_SWITCH(x, and_mask, or_mask) mask |= (and_mask);
+    ADDON_SWITCH_CFG;
+    Transmitter.ignore_src = mask;
 }
 
 #endif  // HAS_EXTRA_SWITCHES
