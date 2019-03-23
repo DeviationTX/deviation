@@ -32,6 +32,10 @@ enum {
 
 #if SUPPORT_CRSF_CONFIG
 
+#define LINE_HEIGHT    18
+#define HEADER_HEIGHT  40
+#define LINE_SPACE     20
+
 #include "../common/_crsfdevice_page.c"
 
 static void folder_cb(struct guiObject *obj, s8 press_type, const void *data)
@@ -53,32 +57,22 @@ static int row_cb(int absrow, int relrow, int y, void *data) {
     crsf_param_t *param = current_param(absrow);
     void (*lbl_press_cb)(struct guiObject *obj, s8 press_type, const void *data) = NULL;
 
-    // draw name first so value on top
-    if (param->type == COMMAND) lbl_press_cb = command_press;
-    else if (param->type == FOLDER) lbl_press_cb = folder_cb;
-    GUI_CreateLabelBox(&gui->name[relrow], LABEL_X, y,
-        LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT,
-        crsf_name_cb, lbl_press_cb, (void *)param);
-
     switch (param->type) {
     case TEXT_SELECTION:
         if (param->max_value - param->min_value > 1) {
-            GUI_CreateTextSelectPlate(&gui->value[relrow].ts, EDIT_VALUE_X, y,
-                EDIT_VALUE_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT,
-                NULL, value_textsel, (void *)param);
+            GUI_CreateTextSelect(&gui->value[relrow].ts, LCD_WIDTH - 199, y,
+                TEXTSELECT_128, NULL, value_textsel, (void *)param);
         } else {
-            GUI_CreateButtonPlateText(&gui->value[relrow].but, EDIT_VALUE_X, y,
-                EDIT_VALUE_WIDTH, LINE_HEIGHT, &BUTTON_FONT,
-                crsf_value_cb, button_press, (void *)param);
+            GUI_CreateButton(&gui->value[relrow].but, LCD_WIDTH - 199 + ARROW_WIDTH, y,
+                BUTTON_96x16, crsf_value_cb, button_press, (void *)param);
         }
         break;
     case COMMAND:
         lbl_press_cb = command_press;
         break;
     case INFO:
-        GUI_CreateLabelBox(&gui->value[relrow].lbl, EDIT_VALUE_X, y,
-            EDIT_VALUE_WIDTH, LINE_HEIGHT, &LABEL_FONT,
-            crsf_value_cb, NULL, (void *)param);
+        GUI_CreateLabelBox(&gui->value[relrow].lbl, LCD_WIDTH - 199, y,
+            199, LINE_HEIGHT, &LABEL_FONT, crsf_value_cb, NULL, (void *)param);
         break;
     case FOLDER:
         lbl_press_cb = folder_cb;
@@ -88,18 +82,20 @@ static int row_cb(int absrow, int relrow, int y, void *data) {
     case INT8:
     case INT16:
     case FLOAT:
-        GUI_CreateTextSelectPlate(&gui->value[relrow].ts, EDIT_VALUE_X, y,
-            EDIT_VALUE_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT,
-            NULL, value_numsel, (void *)param);
+        GUI_CreateTextSelect(&gui->value[relrow].ts, LCD_WIDTH - 199, y,
+            TEXTSELECT_96, NULL, value_numsel, (void *)param);
         break;
     case STRING:
-        GUI_CreateLabelBox(&gui->value[relrow].lbl, EDIT_VALUE_X, y,
-            EDIT_VALUE_WIDTH, LINE_HEIGHT, &LABEL_FONT,
-            crsf_value_cb, stredit_cb, (void *)param);
+        GUI_CreateLabelBox(&gui->value[relrow].lbl, LCD_WIDTH - 199, y,
+            199, LINE_HEIGHT, &LABEL_FONT, crsf_value_cb, stredit_cb, (void *)param);
         break;
     case OUT_OF_RANGE:
         break;
     }
+
+    GUI_CreateLabelBox(&gui->name[relrow], 15, y,
+        LCD_WIDTH - 215, LINE_HEIGHT, &LABEL_FONT,
+        crsf_name_cb, lbl_press_cb, (void *)param);
 
     return 1;
 }
@@ -126,8 +122,8 @@ void show_page(int folder) {
         PAGE_ShowHeader(tempstring);
     }
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH,
-        LCD_HEIGHT - HEADER_HEIGHT, LINE_SPACE, folder_rows(folder),
-        row_cb, NULL, NULL, NULL);
+                     LISTBOX_ITEMS * LINE_HEIGHT, LINE_HEIGHT,
+                     folder_rows(folder), row_cb, NULL, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
 }
 

@@ -199,24 +199,6 @@ void PAGE_ShowModuleDialog(const char **missing)
 /*********************************/
 /*   CRSF configuration dialog   */
 /*********************************/
-static const char *cmd_info_cb(guiObject_t *obj, void *data) {
-    (void)obj;
-    crsf_param_t *param = (crsf_param_t *)data;
-
-    return (const char *)param->s.info;
-}
-
-static void crsf_confirm_cb(u8 state, void *data) {
-    crsf_param_t *param = (crsf_param_t *)data;
-
-    dialog = NULL;
-    if (param->u.status == CONFIRMATION_NEEDED) {
-        CRSF_send_command(param, state == 1 ? CONFIRM : CANCEL);
-    } else if (param->u.status == PROGRESS && state == 0) {
-        param->u.status = READY;
-    }
-}
-
 void PAGE_CRSFdialog(int status, void *param) {
     if (dialog) {
         GUI_Redraw(dialog);

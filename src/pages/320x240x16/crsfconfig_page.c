@@ -29,14 +29,18 @@ enum {
 
 #if SUPPORT_CRSF_CONFIG
 
+#define LINE_HEIGHT    18
+#define HEADER_HEIGHT  40
+#define LINE_SPACE     20
+
 #include "../common/_crsfconfig_page.c"
 
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
 
-    GUI_CreateLabelBox(&gui->name[relrow], LABEL_X, y,
-            LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, crsfconfig_str_cb, press_cb, (void *)absrow);
+    GUI_CreateLabelBox(&gui->name[relrow], LCD_WIDTH/2-100, y,
+            200 - ARROW_WIDTH, LINE_HEIGHT, &LABEL_FONT, crsfconfig_str_cb, press_cb, (void *)absrow);
     return 1;
 }
 
@@ -53,9 +57,9 @@ void PAGE_CrsfconfigInit(int page)
 #endif
 
     PAGE_ShowHeader(PAGE_GetName(PAGEID_CRSFCFG));
-    GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
-                     LINE_SPACE, CRSF_MAX_DEVICES,
-                     row_cb, NULL, NULL, NULL);
+    GUI_CreateScrollable(&gui->scrollable, LCD_WIDTH/2-100, HEADER_HEIGHT, LCD_WIDTH,
+                     LISTBOX_ITEMS * LINE_HEIGHT, LINE_HEIGHT,
+                     CRSF_MAX_DEVICES, row_cb, NULL, NULL, NULL);
     PAGE_SetScrollable(&gui->scrollable, &current_selected);
 }
 #endif

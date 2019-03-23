@@ -48,6 +48,15 @@ static u16 current_selected = 0;
 static u8 number_of_devices;    // total known
 
 
+static void press_cb(struct guiObject *obj, s8 press_type, const void *data)
+{
+    (void)obj;
+    if (press_type != -1) {
+        return;
+    }
+    PAGE_PushByID(PAGEID_CRSFDEVICE, (int)data);
+}
+
 static const char *crsfconfig_str_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;

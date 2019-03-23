@@ -62,6 +62,11 @@ PAGEDEF(PAGEID_MAINCFG,  PAGE_MainLayoutInit,  PAGE_MainLayoutEvent,  PAGE_MainL
 #if HAS_MUSIC_CONFIG
 PAGEDEF(PAGEID_VOICECFG, PAGE_VoiceconfigInit, NULL,                  NULL,               MODEL_MENU,  _tr_noop("Voice config"))
 #endif
+#if SUPPORT_CRSF_CONFIG
+PAGEDEF(PAGEID_CRSFCFG,  PAGE_CrsfconfigInit,  PAGE_CRSFConfigEvent,  NULL,               0,           _tr_noop("CRSF config"))
+PAGEDEF(PAGEID_CRSFDEVICE, PAGE_CrsfdeviceInit, PAGE_CRSFDeviceEvent, NULL,               0,           _tr_noop("CRSF device config"))
+#endif
+
 // Transmitter menu
 //-----------------
 PAGEDEF(PAGEID_TXCFG,    PAGE_TxConfigureInit, NULL,                  NULL,               TX_MENU,     _tr_noop("Transmitter config"))

@@ -142,7 +142,109 @@ static u8 count_params_loaded() {
     return i;
 }
 
+static int folder_rows(int folder) {
+    int count = 0;
+    crsf_param_t *param = crsf_params;
+
+    while (param->id) {
+        if (param->parent == folder && !param->hidden) count += 1;
+        param += 1;
+    }
+    return count;
+}
+
+void button_press(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    crsf_param_t *param = (crsf_param_t *)data;
+
+    if (param->u.text_sel == param->min_value)
+        param->u.text_sel = param->max_value;
+    else
+        param->u.text_sel = param->min_value;
+
+    CRSF_set_param(param);
+}
+
+static void command_press(guiObject_t *obj, s8 press_type, const void *data)
+{
+    (void)obj;
+
+    if (press_type != -1) {
+        return;
+    }
+
+    crsf_param_t *param = (crsf_param_t *)data;
+
+    if (param->u.status == READY) {
+        CRSF_send_command(param, START);
+    }
+}
+
+static const char *value_textsel(guiObject_t *obj, int dir, void *data)
+{
+    (void)obj;
+    crsf_param_t *param = (crsf_param_t *)data;
+    u8 changed = 0;
+
+    param->u.text_sel = GUI_TextSelectHelper(param->u.text_sel,
+                            param->min_value, param->max_value,
+                            dir, 1, 1, &changed);
+
+    if (changed) CRSF_set_param(param);
+    return current_text(param);
+}
+
+static const char *value_numsel(guiObject_t *obj, int dir, void *data)
+{
+    (void)obj;
+    crsf_param_t *param = (crsf_param_t *)data;
+    u8 changed = 0;
+
+    param->value = (void *)GUI_TextSelectHelper((int)param->value,
+                                param->min_value, param->max_value,
+                                dir, param->step, 10*param->step, &changed);
+
+    if (changed) CRSF_set_param(param);
+
+    snprintf(tempstring, sizeof tempstring, "%d", (int)param->value);
+    if (param->type == FLOAT && param->u.point > 0) {
+        int pos = strlen(tempstring) - param->u.point;
+        memmove(&tempstring[pos+1], &tempstring[pos], param->u.point);
+        tempstring[pos] = '.';
+    }
+    return tempstring;
+}
+
 void show_page(int folder);
+
+static void stredit_done_cb(guiObject_t *obj, void *data)  // devo8 doesn't handle cancel/discard properly,
+{
+    crsf_param_t *param = (crsf_param_t *)data;
+
+    GUI_RemoveObj(obj);
+    if (param) {  // Keyboard sets to null if changes discarded
+        strlcpy((char *)param->value, (const char *)tempstring, sizeof((char *)param->value));
+        CRSF_set_param(param);
+    }
+    show_page(current_folder);
+}
+
+static void stredit_cb(struct guiObject *obj, s8 press_type, const void *data)
+{
+    (void)obj;
+    if (press_type != -1) {
+        return;
+    }
+
+    crsf_param_t *param = (crsf_param_t *)data;
+
+    PAGE_SetModal(1);
+    PAGE_RemoveAllObjects();
+    tempstring_cpy((const char *)param->value);
+    GUI_CreateKeyboard(&gui->keyboard, KEYBOARD_ALPHA, tempstring, param->u.string_max_len,
+            stredit_done_cb, param);
+}
 
 void PAGE_CRSFDeviceEvent() {
     // update page as parameter info is received
