@@ -1,5 +1,5 @@
 SCREENSIZE  := 128x64x1
-DISPLAY_DRIVER := spi/128x64x1_oled_ssd1306.c
+DISPLAY_DRIVER := spi/128x64x1.c
 FILESYSTEMS := common base_fonts 128x64x1
 ifdef NEW_BOOTLOADER
     DFU_ARGS    := -c 0 -b 0x08003000
