@@ -15,12 +15,12 @@
 #define BUTTON_MATRIX_COL_PU ((struct mcu_pin){GPIOC, GPIO6 | GPIO7 | GPIO8 | GPIO9})
 #define EXTRA_SWITCH_COL_OD ((struct mcu_pin){GPIOC, GPIO6})
 
-// Analog inputs
+// Analog inputs must be in same order as in CHANDEF
 #define ADC_CHANNELS { \
-    ADC_CHAN(GPIOC, GPIO0),  /* ADC123_10 */ \
-    ADC_CHAN(GPIOC, GPIO2),  /* ADC123_12 */ \
-    ADC_CHAN(GPIOC, GPIO3),  /* ADC123_13 */ \
-    ADC_CHAN(GPIOC, GPIO1),  /* ADC123_11 */ \
+    ADC_CHAN(GPIOC, GPIO2),  /* ADC123_12 - INP_AIL */ \
+    ADC_CHAN(GPIOC, GPIO1),  /* ADC123_11 - INP_ELE */ \
+    ADC_CHAN(GPIOC, GPIO0),  /* ADC123_10 - INP_THR */ \
+    ADC_CHAN(GPIOC, GPIO3),  /* ADC123_13 - INP_THR */ \
     ADC_CHAN(0, 16),       /* TEMPERATURE */ \
     ADC_CHAN(GPIOC, GPIO4),  /* ADC12_14  */ \
     }

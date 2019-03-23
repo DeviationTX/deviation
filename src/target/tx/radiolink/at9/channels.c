@@ -39,15 +39,11 @@ void CHAN_Init()
 s32 CHAN_ReadRawInput(int channel)
 {
     s32 value;
+    if (channel < INP_HAS_CALIBRATION) {
+        return ADC_ReadRawInput(channel);
+    }
+
     switch (channel) {
-    case INP_AILERON:  value = adc_array_raw[0]; break;
-    case INP_ELEVATOR: value = adc_array_raw[1]; break;
-    case INP_THROTTLE: value = adc_array_raw[2]; break;
-    case INP_RUDDER:   value = adc_array_raw[3]; break;
-    case INP_AUX4:     value = adc_array_raw[4]; break;
-    case INP_AUX5:     value = adc_array_raw[5]; break;
-    case INP_AUX6:     value = adc_array_raw[6]; break;
-    case INP_AUX7:     value = adc_array_raw[7]; break;
     case INP_SWA0:     value = gpio_get(GPIOC, GPIO0); break;
     case INP_SWA1:     value = !gpio_get(GPIOC, GPIO0); break;
     case INP_SWB0:     value = gpio_get(GPIOC, GPIO1); break;

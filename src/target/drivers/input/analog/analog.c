@@ -13,6 +13,7 @@
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "common.h"
+#include "config/tx.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include "target/drivers/mcu/stm32/adc.h"
@@ -184,6 +185,13 @@ void ADC_Filter()
         result /= ADC_OVERSAMPLE_WINDOW_COUNT * WINDOW_SIZE;
         adc_array_raw[i] = result;
     }
+}
+
+s32 ADC_ReadRawInput(int channel)
+{
+    if TX_HAS_SRC(channel)
+        return adc_array_raw[channel-1];
+    return 0;
 }
 
 void ADC_ScanChannels()
