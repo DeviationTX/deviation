@@ -21,6 +21,7 @@ crsf_param_t rx_crsf_params[] = {
   .min_value = 0,
   .max_value = 7,
   .value = "A\000B\000E\000Airwave\000Race\000Lo Race\000User Freq",
+  .max_str = "User Freq",
   .u.text_sel = 0,
 },
 {
@@ -33,6 +34,7 @@ crsf_param_t rx_crsf_params[] = {
   .min_value = 0,
   .max_value = 7,
   .value = "1\0002\0003\0004\0005\0006\0007\0008",
+  .max_str = "1",
   .u.text_sel = 0,
 },
 {
@@ -57,6 +59,7 @@ crsf_param_t rx_crsf_params[] = {
   .min_value = 0,
   .max_value = 3,
   .value = "25\000200\000500\000800",
+  .max_str = "200",
   .u.text_sel = 0,
 },
 {
@@ -69,6 +72,7 @@ crsf_param_t rx_crsf_params[] = {
   .min_value = 0,
   .max_value = 4,
   .value = "0\00025\000100\000400\000Max Pwr",
+  .max_str = "Max Pwr",
   .u.text_sel = 0,
 },
 {
@@ -81,6 +85,7 @@ crsf_param_t rx_crsf_params[] = {
   .min_value = 0,
   .max_value = 2,
   .value = "Disable\000in-Band\000out-Band",
+  .max_str = "out-Band",
   .u.text_sel = 0,
 },
 {
@@ -118,6 +123,7 @@ crsf_param_t rx_crsf_params[] = {
   .min_value = 0,
   .max_value = 1,
   .value = "8 Ch.\00012 Ch.",
+  .max_str = "12 Ch.",
   .u.text_sel = 0,
 },
 {
@@ -130,6 +136,7 @@ crsf_param_t rx_crsf_params[] = {
   .min_value = 0,
   .max_value = 1,
   .value = "On\000Off",
+  .max_str = "off",
   .u.text_sel = 0,
 },
 {
@@ -142,6 +149,7 @@ crsf_param_t rx_crsf_params[] = {
   .min_value = 0,
   .max_value = 1,
   .value = "Off\000On",
+  .max_str = "off",
   .u.text_sel = 0,
 },
 {
@@ -154,6 +162,7 @@ crsf_param_t rx_crsf_params[] = {
   .min_value = 0,
   .max_value = 1,
   .value = "FS. Pos.\000Cut",
+  .max_str = "FS. Pos.",
   .u.text_sel = 0,
 },
 {
@@ -166,6 +175,7 @@ crsf_param_t rx_crsf_params[] = {
   .min_value = 0,
   .max_value = 1,
   .value = "Off\000On",
+  .max_str = "Off",
   .u.text_sel = 1,
 },
 {
@@ -190,6 +200,7 @@ crsf_param_t rx_crsf_params[] = {
   .min_value = 0,
   .max_value = 4,
   .value = "PPM\000SBUS\000n.i.SBUS\000CRSF TX\000DSMX",
+  .max_str = "n.i.SBUS",
   .u.text_sel = 1,
 },
 {
@@ -202,6 +213,7 @@ crsf_param_t rx_crsf_params[] = {
   .min_value = 0,
   .max_value = 21,
   .value = "CH1\000CH2\000CH3\000CH4\000CH5\000CH6\000CH7\000CH8\000CH9\000CH10\000CH11\000CH12\000RSSI\000LQ\000RSSI/LQ\000PPM\000SBUS\000n.i.SBUS\000CRSF TX\000MAVL. TX\000SmartAudio\000DSMX",
+  .max_str = "SmartAudio",
   .u.text_sel = 16,
 },
 {
@@ -214,6 +226,7 @@ crsf_param_t rx_crsf_params[] = {
   .min_value = 0,
   .max_value = 17,
   .value = "CH1\000CH2\000CH3\000CH4\000CH5\000CH6\000CH7\000CH8\000CH9\000CH10\000CH11\000CH12\000RSSI\000LQ\000RSSI/LQ\000CRSF RX\000Serial RTS\000MAVL. RX",
+  .max_str = "Serial RTS",
   .u.text_sel = 1,
 },
 {
@@ -226,6 +239,7 @@ crsf_param_t rx_crsf_params[] = {
   .min_value = 0,
   .max_value = 17,
   .value = "CH1\000CH2\000CH3\000CH4\000CH5\000CH6\000CH7\000CH8\000CH9\000CH10\000CH11\000CH12\000RSSI\000LQ\000RSSI/LQ\000CRSF RX\000Serial RX\000MAVL. RX",
+  .max_str = "Serial RTS",
   .u.text_sel = 2,
 },
 {
@@ -238,6 +252,7 @@ crsf_param_t rx_crsf_params[] = {
   .min_value = 0,
   .max_value = 21,
   .value = "CH1\000CH2\000CH3\000CH4\000CH5\000CH6\000CH7\000CH8\000CH9\000CH10\000CH11\000CH12\000RSSI\000LQ\000RSSI/LQ\000SBUS\000n.i.SBUS\000CRSF TX\000Serial TX\000MAVL. TX\000SmartAudio\000DSMX",
+  .max_str = "Serial RTS",
   .u.text_sel = 20,
 },
 {
@@ -250,6 +265,7 @@ crsf_param_t rx_crsf_params[] = {
   .min_value = 0,
   .max_value = 15,
   .value = "CH1\000CH2\000CH3\000CH4\000CH5\000CH6\000CH7\000CH8\000CH9\000CH10\000CH11\000CH12\000RSSI\000LQ\000RSSI/LQ\000BST SDA",
+  .max_str = "Serial RTS",
   .u.text_sel = 15,
 },
 {
@@ -262,6 +278,7 @@ crsf_param_t rx_crsf_params[] = {
   .min_value = 0,
   .max_value = 15,
   .value = "CH1\000CH2\000CH3\000CH4\000CH5\000CH6\000CH7\000CH8\000CH9\000CH10\000CH11\000CH12\000RSSI\000LQ\000RSSI/LQ\000BST SCL",
+  .max_str = "Serial RTS",
   .u.text_sel = 15,
 },
 {
@@ -286,6 +303,7 @@ crsf_param_t rx_crsf_params[] = {
   .min_value = 0,
   .max_value = 14,
   .value = "CH1\000CH2\000CH3\000CH4\000CH5\000CH6\000CH7\000CH8\000CH9\000CH10\000CH11\000CH12\000RSSI\000LQ\000RSSI/LQ",
+  .max_str = "RSSI/LQ",
   .u.text_sel = 0,
 },
 {
@@ -298,6 +316,7 @@ crsf_param_t rx_crsf_params[] = {
   .min_value = 0,
   .max_value = 14,
   .value = "CH1\000CH2\000CH3\000CH4\000CH5\000CH6\000CH7\000CH8\000CH9\000CH10\000CH11\000CH12\000RSSI\000LQ\000RSSI/LQ",
+  .max_str = "RSSI/LQ",
   .u.text_sel = 1,
 },
 {
@@ -310,6 +329,7 @@ crsf_param_t rx_crsf_params[] = {
   .min_value = 0,
   .max_value = 14,
   .value = "CH1\000CH2\000CH3\000CH4\000CH5\000CH6\000CH7\000CH8\000CH9\000CH10\000CH11\000CH12\000RSSI\000LQ\000RSSI/LQ",
+  .max_str = "RSSI/LQ",
   .u.text_sel = 2,
 },
 {
@@ -322,6 +342,7 @@ crsf_param_t rx_crsf_params[] = {
   .min_value = 0,
   .max_value = 14,
   .value = "CH1\000CH2\000CH3\000CH4\000CH5\000CH6\000CH7\000CH8\000CH9\000CH10\000CH11\000CH12\000RSSI\000LQ\000RSSI/LQ",
+  .max_str = "RSSI/LQ",
   .u.text_sel = 3,
 },
 {
@@ -334,6 +355,7 @@ crsf_param_t rx_crsf_params[] = {
   .min_value = 0,
   .max_value = 14,
   .value = "CH1\000CH2\000CH3\000CH4\000CH5\000CH6\000CH7\000CH8\000CH9\000CH10\000CH11\000CH12\000RSSI\000LQ\000RSSI/LQ",
+  .max_str = "RSSI/LQ",
   .u.text_sel = 4,
 },
 {
@@ -346,6 +368,7 @@ crsf_param_t rx_crsf_params[] = {
   .min_value = 0,
   .max_value = 14,
   .value = "CH1\000CH2\000CH3\000CH4\000CH5\000CH6\000CH7\000CH8\000CH9\000CH10\000CH11\000CH12\000RSSI\000LQ\000RSSI/LQ",
+  .max_str = "RSSI/LQ",
   .u.text_sel = 5,
 },
 {
@@ -358,6 +381,7 @@ crsf_param_t rx_crsf_params[] = {
   .min_value = 0,
   .max_value = 14,
   .value = "CH1\000CH2\000CH3\000CH4\000CH5\000CH6\000CH7\000CH8\000CH9\000CH10\000CH11\000CH12\000RSSI\000LQ\000RSSI/LQ",
+  .max_str = "RSSI/LQ",
   .u.text_sel = 6,
 },
 {
@@ -370,6 +394,7 @@ crsf_param_t rx_crsf_params[] = {
   .min_value = 0,
   .max_value = 14,
   .value = "CH1\000CH2\000CH3\000CH4\000CH5\000CH6\000CH7\000CH8\000CH9\000CH10\000CH11\000CH12\000RSSI\000LQ\000RSSI/LQ",
+  .max_str = "RSSI/LQ",
   .u.text_sel = 7,
 },
 {
@@ -382,6 +407,7 @@ crsf_param_t rx_crsf_params[] = {
   .min_value = 0,
   .max_value = 14,
   .value = "CH1\000CH2\000CH3\000CH4\000CH5\000CH6\000CH7\000CH8\000CH9\000CH10\000CH11\000CH12\000RSSI\000LQ\000RSSI/LQ",
+  .max_str = "RSSI/LQ",
   .u.text_sel = 8,
 },
 {
@@ -394,6 +420,7 @@ crsf_param_t rx_crsf_params[] = {
   .min_value = 0,
   .max_value = 14,
   .value = "CH1\000CH2\000CH3\000CH4\000CH5\000CH6\000CH7\000CH8\000CH9\000CH10\000CH11\000CH12\000RSSI\000LQ\000RSSI/LQ",
+  .max_str = "RSSI/LQ",
   .u.text_sel = 9,
 },
 {
@@ -406,6 +433,7 @@ crsf_param_t rx_crsf_params[] = {
   .min_value = 0,
   .max_value = 14,
   .value = "CH1\000CH2\000CH3\000CH4\000CH5\000CH6\000CH7\000CH8\000CH9\000CH10\000CH11\000CH12\000RSSI\000LQ\000RSSI/LQ",
+  .max_str = "RSSI/LQ",
   .u.text_sel = 10,
 },
 {
@@ -418,6 +446,7 @@ crsf_param_t rx_crsf_params[] = {
   .min_value = 0,
   .max_value = 14,
   .value = "CH1\000CH2\000CH3\000CH4\000CH5\000CH6\000CH7\000CH8\000CH9\000CH10\000CH11\000CH12\000RSSI\000LQ\000RSSI/LQ",
+  .max_str = "RSSI/LQ",
   .u.text_sel = 11,
 },
 {

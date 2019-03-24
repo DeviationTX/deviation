@@ -523,7 +523,19 @@ static void add_param(u8 *buffer, u8 num_bytes) {
                                          (const char *)recv_param_ptr,
                                          CRSF_STRING_BYTES_AVAIL(parameter->value)) + 1;
                     // put null between selection options
-                    for (char *p = (char *)parameter->value; *p;) { if (*p == ';') { *p = '\0';} p++; }
+                    // find max choice string length to adjust textselectplate size
+                    char *start = (char *)parameter->value;
+                    int max_len = 0;
+                    for (char *p = (char *)parameter->value; *p; p++) {
+                        if (*p == ';') {
+                            *p = '\0';
+                            if (p - start > max_len) {
+                                parameter->max_str = start;
+                                max_len = p - start;
+                            }
+                            start = p+1;
+                        }
+                    }
                 } else {
                     recv_param_ptr += strlen(recv_param_ptr) + 1;
                 }

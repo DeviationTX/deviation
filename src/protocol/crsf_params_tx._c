@@ -47,6 +47,7 @@ crsf_param_t tx_crsf_params[] = {
   .min_value = 0,
   .max_value = 3,
   .value = "Open\000FCC\000C-Tick\000CE",
+  .max_str = "C-Tick",
   .u.text_sel = 0,
 },
 {
@@ -59,6 +60,7 @@ crsf_param_t tx_crsf_params[] = {
   .min_value = 0,
   .max_value = 5,
   .value = "10mW\00025mW\000100mW\000500mW\0001W\0002W",
+  .max_str = "500mW",
   .u.text_sel = 1,
 },
 {
@@ -71,6 +73,7 @@ crsf_param_t tx_crsf_params[] = {
   .min_value = 0,
   .max_value = 4,
   .value = "10mW\00025mW\000100mW\000500mW\0001W",
+  .max_str = "500mW",
   .u.text_sel = 1,
 },
 {
@@ -83,6 +86,7 @@ crsf_param_t tx_crsf_params[] = {
   .min_value = 0,
   .max_value = 1,
   .value = "10mW\00025mW",
+  .max_str = "50mW",
   .u.text_sel = 1,
 },
 {
@@ -95,6 +99,7 @@ crsf_param_t tx_crsf_params[] = {
   .min_value = 0,
   .max_value = 1,
   .value = "Off\000On",
+  .max_str = "Off",
   .u.text_sel = 1,
 },
 {
@@ -107,6 +112,7 @@ crsf_param_t tx_crsf_params[] = {
   .min_value = 0,
   .max_value = 3,
   .value = "868 MHz\000915 MHz\000915 AU\000868 CE",
+  .max_str = "915 mhz",
   .u.text_sel = 0,
 },
 {
@@ -119,6 +125,7 @@ crsf_param_t tx_crsf_params[] = {
   .min_value = 0,
   .max_value = 1,
   .value = "Force Tel.\000Normal",
+  .max_str = "Force Tel.",
   .u.text_sel = 1,
 },
 {
@@ -144,6 +151,7 @@ crsf_param_t tx_crsf_params[] = {
   .min_value = 0,
   .max_value = 4,
   .value = "Off\000MAV Emu\000Bridge\000MAVLink",
+  .max_str = "MAVLink",
   .u.text_sel = 1,
 },
 {
@@ -168,6 +176,7 @@ crsf_param_t tx_crsf_params[] = {
   .min_value = 0,
   .max_value = 12,
   .value = "Off\000CH1\000CH2\000CH3\000CH4\000CH5\000CH6\000CH7\000CH8\000CH9\000CH10\000CH11\000CH12",
+  .max_str = "CH12",
   .u.text_sel = 0,
 },
 {
@@ -180,6 +189,7 @@ crsf_param_t tx_crsf_params[] = {
   .min_value = 0,
   .max_value = 12,
   .value = "Off\000CH1\000CH2\000CH3\000CH4\000CH5\000CH6\000CH7\000CH8\000CH9\000CH10\000CH11\000CH12",
+  .max_str = "CH12",
   .u.text_sel = 0,
 },
 {
@@ -192,6 +202,7 @@ crsf_param_t tx_crsf_params[] = {
   .min_value = 0,
   .max_value = 12,
   .value = "Off\000CH1\000CH2\000CH3\000CH4\000CH5\000CH6\000CH7\000CH8\000CH9\000CH10\000CH11\000CH12",
+  .max_str = "CH12",
   .u.text_sel = 0,
 },
 {
@@ -204,6 +215,7 @@ crsf_param_t tx_crsf_params[] = {
   .min_value = 0,
   .max_value = 12,
   .value = "Off\000CH1\000CH2\000CH3\000CH4\000CH5\000CH6\000CH7\000CH8\000CH9\000CH10\000CH11\000CH12",
+  .max_str = "CH12",
   .u.text_sel = 0,
 },
 {
@@ -216,6 +228,7 @@ crsf_param_t tx_crsf_params[] = {
   .min_value = 0,
   .max_value = 12,
   .value = "Off\000CH1\000CH2\000CH3\000CH4\000CH5\000CH6\000CH7\000CH8\000CH9\000CH10\000CH11\000CH12",
+  .max_str = "CH12",
   .u.text_sel = 0,
 },
 {
@@ -228,6 +241,7 @@ crsf_param_t tx_crsf_params[] = {
   .min_value = 0,
   .max_value = 12,
   .value = "Off\000CH1\000CH2\000CH3\000CH4\000CH5\000CH6\000CH7\000CH8\000CH9\000CH10\000CH11\000CH12",
+  .max_str = "CH12",
   .u.text_sel = 0,
 },
 {

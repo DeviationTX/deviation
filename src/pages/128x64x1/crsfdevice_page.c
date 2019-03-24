@@ -36,6 +36,7 @@ enum {
 
 static int row_cb(int absrow, int relrow, int y, void *data) {
     (void)data;
+    u16 width, height;
 
     crsf_param_t *param = current_param(absrow);
     void (*lbl_press_cb)(struct guiObject *obj, s8 press_type, const void *data) = NULL;
@@ -49,13 +50,16 @@ static int row_cb(int absrow, int relrow, int y, void *data) {
 
     switch (param->type) {
     case TEXT_SELECTION:
+        LCD_GetStringDimensions((const u8 *)param->max_str, &width, &height);
         if (param->max_value - param->min_value > 1) {
-            GUI_CreateTextSelectPlate(&gui->value[relrow].ts, EDIT_VALUE_X, y,
-                EDIT_VALUE_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT,
+            GUI_CreateTextSelectPlate(&gui->value[relrow].ts,
+                LCD_WIDTH - width - 18, y,
+                width + 13, LINE_HEIGHT, &TEXTSEL_FONT,
                 NULL, value_textsel, (void *)param);
         } else {
-            GUI_CreateButtonPlateText(&gui->value[relrow].but, EDIT_VALUE_X, y,
-                EDIT_VALUE_WIDTH, LINE_HEIGHT, &BUTTON_FONT,
+            GUI_CreateButtonPlateText(&gui->value[relrow].but,
+                LCD_WIDTH - width - 18, y,
+                width + 13, LINE_HEIGHT, &TEXTSEL_FONT,
                 crsf_value_cb, button_press, (void *)param);
         }
         break;

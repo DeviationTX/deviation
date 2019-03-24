@@ -95,6 +95,7 @@ typedef struct {
     s32 max_value;        // not sent for string type
     s32 step;             // Step size ( type float only otherwise this entry is not sent )
     u8 timeout;           // COMMAND timeout (100ms/count)
+    char *max_str;        // Longest choice length for text select
     union {
         u8 point;             // Decimal point ( type float only otherwise this entry is not sent )
         u8 text_sel;          // current value index for TEXT_SELECTION type
