@@ -13,6 +13,7 @@
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "common.h"
+#include "config/tx.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include "target/drivers/mcu/stm32/adc.h"
@@ -22,6 +23,9 @@
 #define NUM_ADC_CHANNELS (INP_HAS_CALIBRATION + 2)  // Inputs + Temprature + Voltage
 #define WINDOW_SIZE 10
 #define SAMPLE_COUNT NUM_ADC_CHANNELS * WINDOW_SIZE * ADC_OVERSAMPLE_WINDOW_COUNT
+
+#define CHAN_INVERT -1
+#define CHAN_NONINV  1
 
 unsigned ADC_Read(unsigned channel);
 volatile u16 adc_array_raw[NUM_ADC_CHANNELS];
@@ -56,13 +60,13 @@ static volatile u16 adc_array_oversample[SAMPLE_COUNT];
 
 void ADC_Init(void)
 {
-    #define ADC_CHAN(x, y) (x ? get_rcc_from_port(x) : 0)
+    #define ADC_CHAN(x, y, z) (x ? get_rcc_from_port(x) : 0)
     const uint32_t adc_rcc[NUM_ADC_CHANNELS] = ADC_CHANNELS;
     #undef ADC_CHAN
-    #define ADC_CHAN(...) {__VA_ARGS__}
+    #define ADC_CHAN(x, y, z) {(x), (y)}
     const struct mcu_pin adc_pins[NUM_ADC_CHANNELS] = ADC_CHANNELS;
     #undef ADC_CHAN
-    #define ADC_CHAN(...) ADC_PIN_TO_CHAN(__VA_ARGS__)
+    #define ADC_CHAN(x, y, z) ADC_PIN_TO_CHAN((x), (y))
     static const u8 adc_chan_sel[NUM_ADC_CHANNELS] = ADC_CHANNELS;
     #undef ADC_CHAN
     for (unsigned i = 0; i < NUM_ADC_CHANNELS; i++) {
@@ -184,6 +188,44 @@ void ADC_Filter()
         result /= ADC_OVERSAMPLE_WINDOW_COUNT * WINDOW_SIZE;
         adc_array_raw[i] = result;
     }
+}
+
+s32 ADC_ReadRawInput(int channel)
+{
+    if TX_HAS_SRC(channel)
+        return adc_array_raw[channel-1];
+    return 0;
+}
+
+s32 ADC_NormalizeChannel(int channel)
+{
+    s32 value = ADC_ReadRawInput(channel);
+    s32 max = Transmitter.calibration[channel - 1].max;
+    s32 min = Transmitter.calibration[channel - 1].min;
+    s32 zero = Transmitter.calibration[channel - 1].zero;
+    if (!zero) {
+        // If this input doesn't have a zero, calculate from max/min
+        zero = ((u32)max + min) / 2;
+    }
+    // Derate min and max by 1% to ensure we can get all the way to 100%
+    max = (max - zero) * 99 / 100;
+    min = (min - zero) * 99 / 100;
+    if (value >= zero) {
+        value = (value - zero) * CHAN_MAX_VALUE / max;
+    } else {
+        value = (value - zero) * CHAN_MIN_VALUE / min;
+    }
+    // Bound output
+    if (value > CHAN_MAX_VALUE)
+        value = CHAN_MAX_VALUE;
+    if (value < CHAN_MIN_VALUE)
+        value = CHAN_MIN_VALUE;
+
+    #define ADC_CHAN(x, y, z) (z)
+    const s8 chan_inverted[NUM_ADC_CHANNELS] = ADC_CHANNELS;
+    #undef ADC_CHAN
+    value = value * chan_inverted[channel - 1];
+    return value;
 }
 
 void ADC_ScanChannels()

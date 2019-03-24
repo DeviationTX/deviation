@@ -49,7 +49,14 @@ void AUDIO_Init() {
         printf("Voice: UART5 already initialized\n");
         return;
     }
+    else
 #endif
+    {
+#if defined BUILDTYPE_DEV
+        printf("Voice: Dev mode enabled, no audio output\n");
+        return;
+#endif
+    }
 
 #ifndef _DEVO12_TARGET_H_
     if ( PPMin_Mode() || Model.protocol == PROTOCOL_PPM ) {
@@ -139,6 +146,16 @@ static int AUDIO_Play(u16 id) {
 }
 
 void AUDIO_SetVolume() {
+#if defined BUILDTYPE_DEV
+#if HAS_AUDIO_UART
+    if (!Transmitter.audio_uart)
+#endif
+    {
+        printf("Voice: Dev mode enabled, cannot set volume\n");
+        return;
+    }
+#endif  // BUILDTYPE_DEV
+
 #ifndef _DEVO12_TARGET_H_
 #if HAS_AUDIO_UART
     if ( !Transmitter.audio_uart && (PPMin_Mode() || Model.protocol == PROTOCOL_PPM) ) {  // don't send volume command when using PPM port
@@ -171,7 +188,7 @@ void AUDIO_SetVolume() {
 static void AUDIO_ResetQueue() {
     num_audio = 0;
     next_audio = 0;
-    printf("Voice: Queue finished, resetting.\n");
+    printf("Voice: Resetting queue.\n");
 }
 
 void AUDIO_CheckQueue() {
@@ -183,12 +200,23 @@ void AUDIO_CheckQueue() {
             next_audio++;
         }
     } else if (num_audio && t > audio_queue_time) {
+        printf("Voice: Queue finished.")
         AUDIO_ResetQueue();
         AUDIO_SetVolume();
     }
 }
 
 static int AUDIO_VoiceAvailable() {
+#if defined BUILDTYPE_DEV
+#if HAS_AUDIO_UART
+    if (!Transmitter.audio_uart)
+#endif
+    {
+        printf("Voice: Dev mode enabled, cannot set volume\n");
+        AUDIO_ResetQueue();
+        return 0;
+    }
+#endif  // BUILDTYPE_DEV
 #ifndef _DEVO12_TARGET_H_
 #if HAS_AUDIO_UART
     if ( !Transmitter.audio_uart && (PPMin_Mode() || Model.protocol == PROTOCOL_PPM) ) {  // don't send play command when using PPM port

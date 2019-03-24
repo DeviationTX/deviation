@@ -40,4 +40,9 @@ static inline void LCD_ForceUpdate() {}
 #ifndef HAS_PWR_SWITCH_INVERTED
 #define HAS_PWR_SWITCH_INVERTED 0
 #endif
+
+#ifndef HAS_OLED_DISPLAY
+    #define HAS_OLED_DISPLAY 0
+    #define TXTYPE ""
+#endif
 #endif //_COMMON_DEVO_H_
