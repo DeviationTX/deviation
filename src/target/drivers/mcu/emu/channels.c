@@ -72,3 +72,8 @@ s32 SWITCH_ReadRawInput(int channel)
     }
     return 0;
 }
+
+void CHAN_SetSwitchCfg(const char *str)
+{
+    (void)str;
+}
