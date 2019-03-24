@@ -496,6 +496,7 @@ static void add_param(u8 *buffer, u8 num_bytes) {
             } else {
                 recv_param_ptr += strlen(recv_param_ptr) + 1;
             }
+            int count;
             switch (parameter->type) {
             case UINT8:
             case INT8:
@@ -526,6 +527,7 @@ static void add_param(u8 *buffer, u8 num_bytes) {
                     // find max choice string length to adjust textselectplate size
                     char *start = (char *)parameter->value;
                     int max_len = 0;
+                    count = 0;
                     for (char *p = (char *)parameter->value; *p; p++) {
                         if (*p == ';') {
                             *p = '\0';
@@ -534,14 +536,16 @@ static void add_param(u8 *buffer, u8 num_bytes) {
                                 max_len = p - start;
                             }
                             start = p+1;
+                            count += 1;
                         }
                     }
+                    parameter->max_value = count;   // bug fix for incorrect max from device
                 } else {
                     recv_param_ptr += strlen(recv_param_ptr) + 1;
                 }
                 parse_bytes(UINT8, &recv_param_ptr, &parameter->u.text_sel);
                 parse_bytes(UINT8, &recv_param_ptr, &parameter->min_value);
-                parse_bytes(UINT8, &recv_param_ptr, &parameter->max_value);
+                parse_bytes(UINT8, &recv_param_ptr, &count);  // don't use incorrect parameter->max_value
                 parse_bytes(UINT8, &recv_param_ptr, &parameter->default_value);
                 break;
 

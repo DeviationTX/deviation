@@ -59,7 +59,7 @@ static int row_cb(int absrow, int relrow, int y, void *data) {
         } else {
             GUI_CreateButtonPlateText(&gui->value[relrow].but,
                 LCD_WIDTH - width - 18, y,
-                width + 13, LINE_HEIGHT, &TEXTSEL_FONT,
+                width + 13, LINE_HEIGHT, &BUTTON_FONT,
                 crsf_value_cb, button_press, (void *)param);
         }
         break;
