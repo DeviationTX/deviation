@@ -49,6 +49,10 @@
         })
 #endif
 
+// This will be overridden by the OLED driver if needed
+#define LCD_SPI_RATE SPI_CR1_BR_FPCLK_DIV_4
+#define OLED_SPI_RATE SPI_CR1_BR_FPCLK_DIV_8
+
 #ifndef FLASH_SPI
     #define FLASH_SPI ((struct spi_csn) { \
         .spi = SPI1, \
@@ -65,9 +69,7 @@
             .sck = {GPIOA, GPIO5},                \
             .miso = {GPIOA, GPIO6},               \
             .mosi = {GPIOA, GPIO7},               \
-            .rate = HAS_OLED_DISPLAY              \
-                ? SPI_CR1_BR_FPCLK_DIV_8    \
-                : SPI_CR1_BR_FPCLK_DIV_4,   \
+            .rate = LCD_SPI_RATE,                 \
             DEFAULT_SPI_SETTINGS,                 \
            })
     #endif  // SPI1_CFG
@@ -86,9 +88,7 @@
             .sck = {GPIOA, GPIO5},                \
             .miso = {GPIOA, GPIO6},               \
             .mosi = {GPIOA, GPIO7},               \
-            .rate = HAS_OLED_DISPLAY              \
-                ? SPI_CR1_BR_FPCLK_DIV_8          \
-                : SPI_CR1_BR_FPCLK_DIV_4,         \
+            .rate = LCD_SPI_RATE                  \
             DEFAULT_SPI_SETTINGS,                 \
            })
     #endif  // SPI1_CFG

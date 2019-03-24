@@ -13,27 +13,16 @@
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "common.h"
+/* These are defined in 128x64x1_oled_ssd1306.h */
+void OLED_Backlight();
+void OLED_Backlight_Brightness(unsigned brightness);
 
-#include "target/drivers/mcu/stm32/rcc.h"
-#include "target/drivers/mcu/stm32/tim.h"
-#include "oled.h"
-#include "lcd.h"
-
-void BACKLIGHT_Init()
+static void _oled_backlight_init()
 {
-    if (HAS_OLED_DISPLAY) {
-        _oled_backlight_init();
-    } else {
-        _lcd_backlight_init();
-    }
+    OLED_Backlight();
 }
 
-void BACKLIGHT_Brightness(unsigned brightness)
+static void _oled_backlight_brightness(unsigned brightness)
 {
-    if (HAS_OLED_DISPLAY) {
-        _oled_backlight_brightness(brightness);
-    } else {
-        _lcd_backlight_brightness(brightness);
-    }
+    OLED_Backlight_Brightness(brightness);
 }
