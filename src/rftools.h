@@ -9,7 +9,7 @@ struct Scanner {
     u8 chan_min;
     u8 chan_max;
     u8 attenuator;
-    s16 averaging;
+    u16 averaging;
 };
 
 extern struct Scanner Scanner;

@@ -23,7 +23,6 @@
 #include "interface.h"
 #include "rftools.h"
 #include "telemetry.h"
-#include "stdlib.h"
 
 #ifdef PROTO_HAS_CYRF6936
 #if SUPPORT_SCANNER
@@ -100,8 +99,7 @@ static u16 scan_cb()
             channel++;
             if (channel == (Scanner.chan_max - Scanner.chan_min + 1))
                 channel = 0;
-            if (!Scanner.averaging)
-                Scanner.rssi_peak[channel] = 0;  // Reset value for peak mode scans after channel change
+            Scanner.rssi_peak[channel] = 0;  // Reset value for peak after channel change
             _scan_next();
             scan_state = SCAN_GET_RSSI;
             return CHANNEL_LOCK_TIME;
@@ -111,7 +109,7 @@ static u16 scan_cb()
             if (rssi_value > Scanner.rssi_peak[channel])
                     Scanner.rssi_peak[channel] = rssi_value;
             averages++;
-            if (averages < (abs(Scanner.averaging)))
+            if (averages < Scanner.averaging)
                 return AVERAGE_INTVL + rand32() % 10;  // make measurements slightly random in time
             scan_state = SCAN_CHANNEL_CHANGE;
     }

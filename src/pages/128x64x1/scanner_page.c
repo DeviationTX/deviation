@@ -33,7 +33,7 @@ static void _draw_page(u8 enable)
     (void)enable;
     PAGE_ShowHeader(PAGE_GetName(PAGEID_SCANNER));
     GUI_CreateButtonPlateText(&gui->enable, 0, HEADER_HEIGHT, 40, LINE_HEIGHT, &BUTTON_FONT, enablestr_cb, press_enable_cb, NULL);
-    GUI_CreateTextSelectPlate(&gui->averaging, LCD_WIDTH/2 - 23, HEADER_HEIGHT, 46, LINE_HEIGHT, &TEXTSEL_FONT, avg_mode_cb, average_cb, NULL);
+    GUI_CreateTextSelectPlate(&gui->averaging, LCD_WIDTH/2 - 23, HEADER_HEIGHT, 46, LINE_HEIGHT, &TEXTSEL_FONT, mode_cb, average_cb, NULL);
     GUI_CreateTextSelectPlate(&gui->attenuator, LCD_WIDTH - 40, HEADER_HEIGHT, 40, LINE_HEIGHT, &TEXTSEL_FONT, NULL, attenuator_cb, NULL);
 }
 
@@ -45,15 +45,15 @@ void _draw_channels()
     // draw rssi values
     for (int i = 0; i < Scanner.chan_max - Scanner.chan_min; i++) {
         col = (LCD_WIDTH - (Scanner.chan_max - Scanner.chan_min)) / 2 + i;
-        if (Scanner.averaging > 0) {
-            height = Scanner.rssi[i] * (LCD_HEIGHT - offset) / 0x1F;
-        } else {
+        if (sp->mode == PEAK_MODE) {
             height = Scanner.rssi_peak[i] * (LCD_HEIGHT - offset) / 0x1F;
+        } else {
+            height = Scanner.rssi[i] * (LCD_HEIGHT - offset) / 0x1F;
         }
         LCD_DrawFastVLine(col, offset, LCD_HEIGHT - offset - height, 0);
         LCD_DrawFastVLine(col, LCD_HEIGHT - height, height, 1);
 
-        if (Scanner.averaging > 0 && sp->peak_hold) {
+        if (sp->mode == PEAK_HOLD_AVERAGE_MODE) {
             height = Scanner.rssi_peak[i] * (LCD_HEIGHT - offset) / 0x1F;
             LCD_DrawPixelXY(col, LCD_HEIGHT - height, 1);
         }
