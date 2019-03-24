@@ -42,6 +42,7 @@ static struct {
     crsf_param_t *param;
     u32 time;
     u16 timeout;
+    u8  dialog;
 } command;
 
 #define CRSF_MAX_CHUNK_SIZE   58   // 64 - header - type - destination - origin
@@ -273,6 +274,13 @@ void PAGE_CRSFDeviceEvent() {
     }
 
     // commands may require interaction through dialog
+    if (command.dialog == 1) {
+        command.dialog = 0;
+        PAGE_CRSFdialog(command.param->u.status, (void *)command.param);
+    } else if (command.dialog == 2) {
+        command.dialog = 0;
+        PAGE_CRSFdialogClose();
+    }
     if (command.time && (CLOCK_getms() - command.time > command.param->timeout * 100)) {
         if (command.param->u.status != READY) {
             CRSF_send_command(command.param, POLL);
@@ -583,10 +591,10 @@ static void add_param(u8 *buffer, u8 num_bytes) {
                     command.time = CLOCK_getms();
                     // FALLTHROUGH
                 case CONFIRMATION_NEEDED:
-                    PAGE_CRSFdialog(parameter->u.status, (void *)parameter);
+                    command.dialog = 1;
                     break;
                 case READY:
-                    PAGE_CRSFdialogClose();
+                    command.dialog = 2;
                     break;
                 }
                 break;
