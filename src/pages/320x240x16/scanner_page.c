@@ -24,7 +24,10 @@ static struct scanner_obj * const gui = &gui_objs.u.scanner;
 static s32 show_bar_cb(void *data)
 {
     long ch = (long)data;
-    return Scanner.rssi[ch];
+    if (sp->mode == PEAK_MODE)
+        return Scanner.rssi_peak[ch];
+    else
+        return Scanner.rssi[ch];
 }
 
 static const char *enablestr_cb(guiObject_t *obj, const void *data)
@@ -32,6 +35,34 @@ static const char *enablestr_cb(guiObject_t *obj, const void *data)
     (void)obj;
     (void)data;
     return sp->enable ? _tr("Turn Off") : _tr("Turn On");
+}
+
+static const char *average_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void)obj;
+    (void)data;
+    Scanner.averaging = GUI_TextSelectHelper(Scanner.averaging, 1, 8192, dir, 1, 50, NULL);
+    switch (sp->mode) {
+        case PEAK_MODE:
+            snprintf(tempstring, sizeof(tempstring), "Peak %d", Scanner.averaging); break;
+        case AVERAGE_MODE:
+            snprintf(tempstring, sizeof(tempstring), "Avg %d", Scanner.averaging); break;
+        case PEAK_HOLD_AVERAGE_MODE:
+        case LAST_MODE:
+            break;
+    }
+
+    memset(Scanner.rssi, 0, sizeof(Scanner.rssi));  // clear old rssi values when changing mode
+    memset(Scanner.rssi_peak, 0, sizeof(Scanner.rssi_peak));  // clear old rssi peak values when changing mode
+    return tempstring;
+}
+
+static void mode_cb(guiObject_t *obj, void *data) {
+    (void) obj;
+    (void) data;
+    sp->mode++;
+    if (sp->mode == PEAK_HOLD_AVERAGE_MODE)  // peak hold not supported with bargraphs
+        sp->mode = PEAK_MODE;
 }
 
 static void _draw_page(u8 enable)

@@ -55,33 +55,6 @@ static const char *attenuator_cb(guiObject_t *obj, int dir, void *data)
         default: return "-50 dB";
     }
 }
-static const char *average_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void)obj;
-    (void)data;
-    Scanner.averaging = GUI_TextSelectHelper(Scanner.averaging, 1, 8192, dir, 1, 50, NULL);
-    switch (sp->mode) {
-        case PEAK_MODE:
-            snprintf(tempstring, sizeof(tempstring), "Pk %d", Scanner.averaging); break;
-        case AVERAGE_MODE:
-            snprintf(tempstring, sizeof(tempstring), "Av %d", Scanner.averaging); break;
-        case PEAK_HOLD_AVERAGE_MODE:
-            snprintf(tempstring, sizeof(tempstring), "AP %d", Scanner.averaging); break;
-        case LAST_MODE:
-            break;
-    }
-
-    memset(Scanner.rssi, 0, sizeof(Scanner.rssi));  // clear old rssi values when changing mode
-    memset(Scanner.rssi_peak, 0, sizeof(Scanner.rssi_peak));  // clear old rssi peak values when changing mode
-    return tempstring;
-}
-static void mode_cb(guiObject_t *obj, void *data) {
-    (void) obj;
-    (void) data;
-    sp->mode++;
-    if (sp->mode == LAST_MODE)
-        sp->mode = PEAK_MODE;
-}
 
 void PAGE_ScannerInit(int page)
 {
