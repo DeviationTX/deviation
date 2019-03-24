@@ -200,7 +200,7 @@ void AUDIO_CheckQueue() {
             next_audio++;
         }
     } else if (num_audio && t > audio_queue_time) {
-        printf("Voice: Queue finished.")
+        printf("Voice: Queue finished.\n");
         AUDIO_ResetQueue();
         AUDIO_SetVolume();
     }
