@@ -269,7 +269,6 @@ void PAGE_CRSFDeviceEvent() {
         if (params_loaded != params_count) {
             params_loaded = params_count;
             show_page(current_folder);
-//TODO            GUI_RedrawAllObjects();
         }
         last_update = CLOCK_getms();
     }
