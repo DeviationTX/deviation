@@ -56,6 +56,7 @@ static volatile int send_msg_buf_count;     // tx data available semaphore with 
 
 static char *next_string;
 
+#define MIN(a,b) ((a) < (b) ? a : b)
 
 static void crsfdevice_init() {
     next_param = 1;
@@ -238,7 +239,7 @@ static void stredit_done_cb(guiObject_t *obj, void *data)  // devo8 doesn't hand
 
     GUI_RemoveObj(obj);
     if (param) {  // Keyboard sets to null if changes discarded
-        strlcpy((char *)param->value, (const char *)tempstring, sizeof((char *)param->value));
+        strlcpy((char *)param->value, (const char *)tempstring, param->u.string_max_len);
         CRSF_set_param(param);
     }
     show_page(current_folder);
@@ -268,7 +269,7 @@ void PAGE_CRSFDeviceEvent() {
         if (params_loaded != params_count) {
             params_loaded = params_count;
             show_page(current_folder);
-            GUI_RedrawAllObjects();
+//TODO            GUI_RedrawAllObjects();
         }
         last_update = CLOCK_getms();
     }
@@ -567,15 +568,23 @@ static void add_param(u8 *buffer, u8 num_bytes) {
                 break;
 
             case STRING:
-                if (!update) parameter->value = alloc_string(strlen(recv_param_ptr)+1);
-                recv_param_ptr += strlcpy(parameter->value,
-                                         (const char *)recv_param_ptr,
-                                         CRSF_STRING_BYTES_AVAIL(parameter->value)) + 1;
-                if (!update) parameter->default_value = alloc_string(strlen(recv_param_ptr)+1);
-                recv_param_ptr += strlcpy(parameter->default_value,
-                                         (const char *)recv_param_ptr,
-                                         CRSF_STRING_BYTES_AVAIL(parameter->default_value)) + 1;
-                parse_bytes(UINT8, &recv_param_ptr, &parameter->u.string_max_len);
+                {
+                    const char *value, *default_value;
+                    value = recv_param_ptr;
+                    recv_param_ptr += strlen(value) + 1;
+                    default_value = recv_param_ptr;
+                    recv_param_ptr += strlen(default_value) + 1;
+                    parse_bytes(UINT8, &recv_param_ptr, &parameter->u.string_max_len);
+
+                    // No string re-sizing so allocate max length for value
+                    if (!update) parameter->value = alloc_string(parameter->u.string_max_len+1);
+                    strlcpy(parameter->value, value,
+                            MIN(parameter->u.string_max_len+1,
+                                CRSF_STRING_BYTES_AVAIL(parameter->value)));
+                    if (!update) parameter->default_value = alloc_string(strlen(default_value)+1);
+                    strlcpy(parameter->default_value, default_value,
+                            CRSF_STRING_BYTES_AVAIL(parameter->default_value));
+                }
                 break;
 
             case COMMAND:
