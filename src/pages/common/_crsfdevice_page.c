@@ -56,7 +56,7 @@ static volatile int send_msg_buf_count;     // tx data available semaphore with 
 
 static char *next_string;
 
-#define MIN(a,b) ((a) < (b) ? a : b)
+#define MIN(a, b) ((a) < (b) ? a : b)
 
 static void crsfdevice_init() {
     next_param = 1;
