@@ -211,7 +211,7 @@ static const char *value_numsel(guiObject_t *obj, int dir, void *data)
     snprintf(tempstring, sizeof tempstring, "%d", (int)param->value);
     if (param->type == FLOAT && param->u.point > 0) {
         int pos = strlen(tempstring) - param->u.point;
-        memmove(&tempstring[pos+1], &tempstring[pos], param->u.point);
+        memmove(&tempstring[pos+1], &tempstring[pos], param->u.point+1);
         tempstring[pos] = '.';
     }
     return tempstring;
