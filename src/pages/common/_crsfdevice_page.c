@@ -31,9 +31,7 @@ static struct crsfdevice_obj * const gui = &gui_objs.u.crsfdevice;
 
 static u32 last_update;
 static u32 read_timeout;
-static u16 current_selected = 0;
 static u8 current_folder = 0;
-static u8 current_folder_count;
 static u8 params_loaded;     // if not zero, number displayed so far for current device
 static u8 device_idx;   // current device index
 static u8 next_param;   // parameter and chunk currently being read
@@ -44,7 +42,6 @@ static struct {
     u32 time;
     u16 timeout;
     u8  dialog;
-    u8  redraw;
 } command;
 
 #define CRSF_MAX_CHUNK_SIZE   58   // 64 - header - type - destination - origin
@@ -291,10 +288,6 @@ void PAGE_CRSFDeviceEvent() {
             PAGE_CRSFdialogClose();
             command.time = 0;
         }
-    }
-    if (command.redraw) {   // handle changes to number of menu items in folder
-        command.redraw = 0;
-        show_page(current_folder);
     }
 
     // spec calls for 2 second timeout on requests. Retry on timeout.
@@ -638,12 +631,6 @@ static void add_param(u8 *buffer, u8 num_bytes) {
         CRSF_read_param(device_idx, next_param, next_chunk);
     } else {
         next_param = 0;
-
-    // after all params loaded, schedule redraw if number of menu items changed
-        int count = folder_rows(current_folder);
-        if (count != current_folder_count) {
-            command.redraw = 1;
-        }
     }
 }
 
