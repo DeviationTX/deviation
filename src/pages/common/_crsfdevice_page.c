@@ -33,6 +33,7 @@ static u32 last_update;
 static u32 read_timeout;
 static u16 current_selected = 0;
 static u8 current_folder = 0;
+static u8 current_folder_count;
 static u8 params_loaded;     // if not zero, number displayed so far for current device
 static u8 device_idx;   // current device index
 static u8 next_param;   // parameter and chunk currently being read
@@ -43,6 +44,7 @@ static struct {
     u32 time;
     u16 timeout;
     u8  dialog;
+    u8  redraw;
 } command;
 
 #define CRSF_MAX_CHUNK_SIZE   58   // 64 - header - type - destination - origin
@@ -165,7 +167,7 @@ void button_press(guiObject_t *obj, const void *data)
     else
         param->u.text_sel = param->min_value;
 
-    CRSF_set_param(param);
+    param->changed = 1;
 }
 
 static void command_press(guiObject_t *obj, s8 press_type, const void *data)
@@ -193,7 +195,7 @@ static const char *value_textsel(guiObject_t *obj, int dir, void *data)
                             param->min_value, param->max_value,
                             dir, 1, 1, &changed);
 
-    if (changed) CRSF_set_param(param);
+    if (changed) param->changed = 1;
     return current_text(param);
 }
 
@@ -207,7 +209,7 @@ static const char *value_numsel(guiObject_t *obj, int dir, void *data)
                                 param->min_value, param->max_value,
                                 dir, param->step, 10*param->step, &changed);
 
-    if (changed) CRSF_set_param(param);
+    if (changed) param->changed = 1;
 
     snprintf(tempstring, sizeof tempstring, "%d", (int)param->value);
     if (param->type == FLOAT && param->u.point > 0) {
@@ -240,7 +242,7 @@ static void stredit_done_cb(guiObject_t *obj, void *data)  // devo8 doesn't hand
     GUI_RemoveObj(obj);
     if (param) {  // Keyboard sets to null if changes discarded
         strlcpy((char *)param->value, (const char *)tempstring, param->u.string_max_len);
-        CRSF_set_param(param);
+        param->changed = 1;
     }
     show_page(current_folder);
 }
@@ -289,6 +291,10 @@ void PAGE_CRSFDeviceEvent() {
             PAGE_CRSFdialogClose();
             command.time = 0;
         }
+    }
+    if (command.redraw) {   // handle changes to number of menu items in folder
+        command.redraw = 0;
+        show_page(current_folder);
     }
 
     // spec calls for 2 second timeout on requests. Retry on timeout.
@@ -629,6 +635,12 @@ static void add_param(u8 *buffer, u8 num_bytes) {
         CRSF_read_param(device_idx, next_param, next_chunk);
     } else {
         next_param = 0;
+
+    // after all params loaded, schedule redraw if number of menu items changed
+        int count = folder_rows(current_folder);
+        if (count != current_folder_count) {
+            command.redraw = 1;
+        }
     }
 }
 

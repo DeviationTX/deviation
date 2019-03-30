@@ -116,14 +116,30 @@ void show_page(int folder) {
         snprintf(tempstring, sizeof tempstring, "%s %s", crsf_devices[device_idx].name, _tr_noop("LOADING"));
         PAGE_ShowHeader(tempstring);
     }
+    current_folder_count = folder_rows(folder);
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH,
-        LCD_HEIGHT - HEADER_HEIGHT, LINE_SPACE, folder_rows(folder),
+        LCD_HEIGHT - HEADER_HEIGHT, LINE_SPACE, current_folder_count,
         row_cb, NULL, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
 }
 
 static unsigned action_cb(u32 button, unsigned flags, void *data)
 {
+    if (((flags & BUTTON_PRESS) && !(flags & BUTTON_LONGPRESS))
+     && (CHAN_ButtonIsPressed(button, BUT_EXIT)
+        || CHAN_ButtonIsPressed(button, BUT_DOWN)
+        || CHAN_ButtonIsPressed(button, BUT_UP)))
+    {
+        int idx = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
+        int absrow = (idx >> 8) + (idx & 0xff);
+        crsf_param_t *param = current_param(absrow);
+
+        if (param->type <= STRING && param->changed) {
+            param->changed = 0;
+            CRSF_set_param(param);
+        }
+    }
+
     if (current_folder != 0 && CHAN_ButtonIsPressed(button, BUT_EXIT)) {
         if (flags & BUTTON_RELEASE) {
             current_folder = param_by_id(current_folder)->parent;
