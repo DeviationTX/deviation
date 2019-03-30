@@ -224,7 +224,7 @@ static void send_packet(u8 bind)
                        | GET_FLAG_INV(CHANNEL_LED, 0x20); // air/ground mode
             if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_PHOENIX) {
                 packet[10] |= GET_FLAG(CHANNEL_ARM, 0x80);
-                packet[14] &= ~0x24;
+                packet[14] &= ~0x20;
             }
             if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H26WH) {
                 packet[10] |= 0x40;  // high rate
