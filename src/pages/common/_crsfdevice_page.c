@@ -502,12 +502,15 @@ static void add_param(u8 *buffer, u8 num_bytes) {
             parameter->id = buffer[3];
             parameter->parent = *recv_param_ptr++;
             parameter->type = *recv_param_ptr & 0x7f;
-            parameter->hidden = *recv_param_ptr++ & 0x80;
             if (!update) {
+                parameter->hidden = *recv_param_ptr++ & 0x80;
                 parameter->name = alloc_string(strlen(recv_param_ptr)+1);
                 recv_param_ptr += strlcpy(parameter->name, (const char *)recv_param_ptr,
                                       CRSF_STRING_BYTES_AVAIL(parameter->name)) + 1;
             } else {
+                if (parameter->hidden != (*recv_param_ptr & 0x80))
+                    params_loaded = 0;   // if item becomes hidden others may also, so reload all params
+                parameter->hidden = *recv_param_ptr++ & 0x80;
                 recv_param_ptr += strlen(recv_param_ptr) + 1;
             }
             int count;
@@ -626,8 +629,8 @@ static void add_param(u8 *buffer, u8 num_bytes) {
     recv_param_ptr = recv_param_buffer;
     next_chunk = 0;
 
-    // read all params when device selected
-    if (count_params_loaded() < crsf_devices[device_idx].number_of_params) {
+    // read all params when needed
+    if (params_loaded < crsf_devices[device_idx].number_of_params) {
         if (next_param < crsf_devices[device_idx].number_of_params)
             next_param += 1;
         else
