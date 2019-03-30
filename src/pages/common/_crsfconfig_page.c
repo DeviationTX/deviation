@@ -48,13 +48,23 @@ static u16 current_selected = 0;
 static u8 number_of_devices;    // total known
 
 
+static u8 CRSF_number_of_devices() {
+    int i;
+    for (i=0; i < CRSF_MAX_DEVICES; i++)
+        if (crsf_devices[i].address == 0) break;
+
+    return i;
+}
+
+
 static void press_cb(struct guiObject *obj, s8 press_type, const void *data)
 {
     (void)obj;
     if (press_type != -1) {
         return;
     }
-    PAGE_PushByID(PAGEID_CRSFDEVICE, (int)data);
+    if ((int)data < CRSF_number_of_devices())
+        PAGE_PushByID(PAGEID_CRSFDEVICE, (int)data);
 }
 
 static const char *crsfconfig_str_cb(guiObject_t *obj, const void *data)
@@ -63,14 +73,6 @@ static const char *crsfconfig_str_cb(guiObject_t *obj, const void *data)
     int idx = (int)data;
 
     return crsf_devices[idx].address ? crsf_devices[idx].name : "";
-}
-
-u8 CRSF_number_of_devices() {
-    int i;
-    for (i=0; i < CRSF_MAX_DEVICES; i++)
-        if (crsf_devices[i].address == 0) break;
-
-    return i;
 }
 
 void PAGE_CRSFConfigEvent()
