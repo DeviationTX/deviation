@@ -108,11 +108,11 @@ static const char *crsf_value_cb(guiObject_t *obj, const void *data)
     case UINT8:
     case UINT16:
     case FLOAT:
-        snprintf(tempstring, sizeof tempstring, "%d", (unsigned)param->value);
+        snprintf(tempstring, sizeof tempstring, "%d", (uintptr_t)param->value);
         break;
     case INT8:
     case INT16:
-        snprintf(tempstring, sizeof tempstring, "%d", (int)param->value);
+        snprintf(tempstring, sizeof tempstring, "%d", (intptr_t)param->value);
         break;
     case TEXT_SELECTION:
         return current_text(param);
@@ -202,13 +202,13 @@ static const char *value_numsel(guiObject_t *obj, int dir, void *data)
     crsf_param_t *param = (crsf_param_t *)data;
     u8 changed = 0;
 
-    param->value = (void *)GUI_TextSelectHelper((int)param->value,
-                                param->min_value, param->max_value,
-                                dir, param->step, 10*param->step, &changed);
+    param->value = (void *)(intptr_t)GUI_TextSelectHelper((intptr_t)param->value,
+                                        param->min_value, param->max_value,
+                                        dir, param->step, 10*param->step, &changed);
 
     if (changed) param->changed = 1;
 
-    snprintf(tempstring, sizeof tempstring, "%d", (int)param->value);
+    snprintf(tempstring, sizeof tempstring, "%d", (intptr_t)param->value);
     if (param->type == FLOAT && param->u.point > 0) {
         int pos = strlen(tempstring) - param->u.point;
         memmove(&tempstring[pos+1], &tempstring[pos], param->u.point+1);
@@ -341,24 +341,24 @@ void CRSF_set_param(crsf_param_t *param) {
         int i = 6;
         switch (param->type) {
         case UINT8:
-            send_msg_buffer[i++] = (u8)(u32)param->value;
+            send_msg_buffer[i++] = (u8)(uintptr_t)param->value;
             break;
         case INT8:
-            send_msg_buffer[i++] = (s8)(u32)param->value;
+            send_msg_buffer[i++] = (s8)(intptr_t)param->value;
             break;
         case UINT16:
-            send_msg_buffer[i++] = (u16)(u32)param->value >> 8;
-            send_msg_buffer[i++] = (u16)(u32)param->value;
+            send_msg_buffer[i++] = (u16)(uintptr_t)param->value >> 8;
+            send_msg_buffer[i++] = (u16)(uintptr_t)param->value;
             break;
         case INT16:
-            send_msg_buffer[i++] = (s16)(u32)param->value >> 8;
-            send_msg_buffer[i++] = (s16)(u32)param->value;
+            send_msg_buffer[i++] = (s16)(intptr_t)param->value >> 8;
+            send_msg_buffer[i++] = (s16)(intptr_t)param->value;
             break;
         case FLOAT:
-            send_msg_buffer[i++] = (s32)param->value >> 24;
-            send_msg_buffer[i++] = (s32)param->value >> 16;
-            send_msg_buffer[i++] = (s32)param->value >> 8;
-            send_msg_buffer[i++] = (s32)param->value;
+            send_msg_buffer[i++] = (intptr_t)param->value >> 24;
+            send_msg_buffer[i++] = (intptr_t)param->value >> 16;
+            send_msg_buffer[i++] = (intptr_t)param->value >> 8;
+            send_msg_buffer[i++] = (intptr_t)param->value;
             break;
         case TEXT_SELECTION:
             send_msg_buffer[i++] = (u8)param->u.text_sel;

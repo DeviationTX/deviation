@@ -63,14 +63,14 @@ static void press_cb(struct guiObject *obj, s8 press_type, const void *data)
     if (press_type != -1) {
         return;
     }
-    if ((int)data < CRSF_number_of_devices())
-        PAGE_PushByID(PAGEID_CRSFDEVICE, (int)data);
+    if ((intptr_t)data < CRSF_number_of_devices())
+        PAGE_PushByID(PAGEID_CRSFDEVICE, (intptr_t)data);
 }
 
 static const char *crsfconfig_str_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    int idx = (int)data;
+    int idx = (intptr_t)data;
 
     return crsf_devices[idx].address ? crsf_devices[idx].name : "";
 }

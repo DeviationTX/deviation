@@ -36,7 +36,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     (void)data;
 
     GUI_CreateLabelBox(&gui->name[relrow], LABEL_X, y,
-            LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, crsfconfig_str_cb, press_cb, (void *)absrow);
+            LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT, crsfconfig_str_cb, press_cb, (void *)(uint64_t)absrow);
     return 1;
 }
 

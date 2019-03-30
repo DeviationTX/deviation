@@ -47,7 +47,7 @@ crsf_param_t rx_crsf_params[] = {
   .min_value = 136,
   .max_value = 100,
   .value = 0,
-  .default_value = 233,
+  .default_value = (void *)233,
 },
 {
   .device = 1,
