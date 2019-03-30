@@ -116,6 +116,7 @@ u8 CRSF_serial_txd(u8 *buffer, u8 max_len);
 u8 crsf_crc8(const u8 *ptr, u8 len);
 void CRSF_ping_devices();
 void CRSF_read_param(u8 device, u8 id, u8 chunk);
+void CRSF_set_param(crsf_param_t *param);
 void CRSF_send_command(crsf_param_t *param, enum cmd_status status);
 
 #endif  // SUPPORT_CRSF_CONFIG

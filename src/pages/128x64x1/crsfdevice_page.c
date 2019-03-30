@@ -95,19 +95,6 @@ static int row_cb(int absrow, int relrow, int y, void *data) {
     return 1;
 }
 
-static crsf_param_t *param_by_id(int id) {
-    crsf_param_t *param = crsf_params;
-
-    while (param->id) {
-        if (param->id == id)
-            return param;
-        param++;
-    }
-    return NULL;
-}
-
-static unsigned action_cb(u32 button, unsigned flags, void *data);
-
 void show_page(int folder) {
     GUI_RemoveAllObjects();
     if (count_params_loaded() == crsf_devices[device_idx].number_of_params) {
@@ -120,33 +107,6 @@ void show_page(int folder) {
         LCD_HEIGHT - HEADER_HEIGHT, LINE_SPACE, folder_rows(folder),
         row_cb, NULL, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
-}
-
-static unsigned action_cb(u32 button, unsigned flags, void *data)
-{
-    if (((flags & BUTTON_PRESS) && !(flags & BUTTON_LONGPRESS))
-     && (CHAN_ButtonIsPressed(button, BUT_EXIT)
-        || CHAN_ButtonIsPressed(button, BUT_DOWN)
-        || CHAN_ButtonIsPressed(button, BUT_UP)))
-    {
-        int idx = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
-        int absrow = (idx >> 8) + (idx & 0xff);
-        crsf_param_t *param = current_param(absrow);
-
-        if (param->type <= STRING && param->changed) {
-            param->changed = 0;
-            CRSF_set_param(param);
-        }
-    }
-
-    if (current_folder != 0 && CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-        if (flags & BUTTON_RELEASE) {
-            current_folder = param_by_id(current_folder)->parent;
-            show_page(current_folder);
-        }
-        return 1;
-    }
-    return default_button_action_cb(button, flags, data);
 }
 
 void PAGE_CrsfdeviceInit(int page)

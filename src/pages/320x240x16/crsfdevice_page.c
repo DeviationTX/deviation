@@ -87,19 +87,6 @@ static int row_cb(int absrow, int relrow, int y, void *data) {
     return 1;
 }
 
-static crsf_param_t *param_by_id(int id) {
-    crsf_param_t *param = crsf_params;
-
-    while (param->id) {
-        if (param->id == id)
-            return param;
-        param++;
-    }
-    return NULL;
-}
-
-static unsigned action_cb(u32 button, unsigned flags, void *data);
-
 void show_page(int folder) {
     GUI_RemoveAllObjects();
     if (count_params_loaded() == crsf_devices[device_idx].number_of_params) {
@@ -111,20 +98,9 @@ void show_page(int folder) {
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH,
                      LISTBOX_ITEMS * LINE_HEIGHT, LINE_HEIGHT,
                      folder_rows(folder), row_cb, NULL, NULL, NULL);
-    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
+    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
 }
 
-static unsigned action_cb(u32 button, unsigned flags, void *data)
-{
-    if (current_folder != 0 && CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-        if (flags & BUTTON_RELEASE) {
-            current_folder = param_by_id(current_folder)->parent;
-            show_page(current_folder);
-        }
-        return 1;
-    }
-    return default_button_action_cb(button, flags, data);
-}
 
 void PAGE_CrsfdeviceInit(int page)
 {
@@ -134,7 +110,6 @@ void PAGE_CrsfdeviceInit(int page)
     params_loaded = crsf_devices[device_idx].number_of_params;
 #endif
     crsfdevice_init();
-    current_selected = 0;
     current_folder = 0;
     CRSF_read_param(device_idx, next_param, next_chunk);
 
