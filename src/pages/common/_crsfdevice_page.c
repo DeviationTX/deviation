@@ -466,9 +466,10 @@ static void parse_bytes(enum data_type type, char **buffer, void *dest) {
     }
 }
 
-char *alloc_string(u32 bytes) {
-//    if ((next_string - recv_param_buffer) + bytes >= sizeof recv_param_buffer)
-//        return NULL;
+static char *alloc_string(s32 bytes) {
+    if (CRSF_STRING_BYTES_AVAIL(next_string) < bytes)
+        return NULL;
+
     char *p = next_string;
     next_string += bytes;
     return p;
