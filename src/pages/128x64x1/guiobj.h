@@ -122,8 +122,8 @@ struct reorder_obj {
 
 struct scanner_obj {
     guiButton_t enable;
-    guiButton_t scan_mode;
-    guiButton_t attenuator;
+    guiTextSelect_t averaging;
+    guiTextSelect_t attenuator;
 };
 
 struct telemcfg_obj {
@@ -373,7 +373,7 @@ struct _gui_objs {
         struct modelload_obj modelload;
         struct modelpage_obj modelpage;
         struct reorder_obj reorder;
-#if HAS_SCANNER
+#if SUPPORT_SCANNER
         struct scanner_obj scanner;
 #endif
         struct telemcfg_obj telemcfg;

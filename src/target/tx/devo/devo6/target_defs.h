@@ -16,7 +16,7 @@
 #define HAS_RTC             0
 #define HAS_VIBRATINGMOTOR  OPTIONAL
 #define HAS_DATALOG         1
-#define HAS_SCANNER         1
+#define SUPPORT_SCANNER         1
 #define HAS_MULTIMOD_SUPPORT 1
 #define HAS_EXTRA_SWITCHES  1
 #define HAS_EXTRA_BUTTONS   1
