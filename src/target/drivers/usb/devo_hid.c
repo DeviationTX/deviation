@@ -10,7 +10,8 @@ static const char * const usb_strings[] = {
     DeviationVersion
 };
 
-static volatile u8 usb_configured;
+static volatile u8 usb_preXferComplete;
+
 static const uint8_t hid_report_descriptor[] = {
     0x05, 0x01,                    // USAGE_PAGE (Generic Desktop)
     0x15, 0x81,                    // LOGICAL_MINIMUM (0)
@@ -130,12 +131,20 @@ static enum usbd_request_return_codes hid_control_request(usbd_device *dev, stru
     return USBD_REQ_HANDLED;
 }
 
+static void hid_callback(usbd_device *usbd_dev, uint8_t ep)
+{
+    (void)usbd_dev;
+    (void)ep;
+
+    usb_preXferComplete = 1;
+}
+
 static void hid_set_config(usbd_device *dev, uint16_t wValue)
 {
     (void)wValue;
 
     // Max 9 bytes to send. 8 analog channels + 1 bytes for 4 switches
-    usbd_ep_setup(dev, 0x81, USB_ENDPOINT_ATTR_INTERRUPT, 9, NULL);
+    usbd_ep_setup(dev, 0x81, USB_ENDPOINT_ATTR_INTERRUPT, 9, hid_callback);
 
     usbd_register_control_callback(
                 dev,
@@ -143,7 +152,7 @@ static void hid_set_config(usbd_device *dev, uint16_t wValue)
                 USB_REQ_TYPE_TYPE | USB_REQ_TYPE_RECIPIENT,
                 hid_control_request);
 
-    usb_configured = 1;
+    usb_preXferComplete = 1;
 }
 
 static void HID_Init()
@@ -156,13 +165,14 @@ static void HID_Init()
 
 void HID_Write(s8 *packet, u8 size)
 {
-    if (usb_configured) {
+    if (usb_preXferComplete) {
+        usb_preXferComplete = 0;
         usbd_ep_write_packet(usbd_dev, 0x81, packet, size);
     }
 }
 
 void HID_Enable() {
-    usb_configured = 0;
+    usb_preXferComplete = 0;
     USB_Enable(1);
     HID_Init();
 }
