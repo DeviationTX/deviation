@@ -23,3 +23,7 @@ struct Scanner Scanner;
 #endif
 
 #endif
+
+#ifndef MODULAR
+struct Xn297dump xn297dump;
+#endif

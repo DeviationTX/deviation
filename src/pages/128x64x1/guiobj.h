@@ -126,6 +126,13 @@ struct scanner_obj {
     guiTextSelect_t attenuator;
 };
 
+struct xn297dump_obj {
+    guiButton_t enable;
+    guiTextSelect_t channel;
+    guiTextSelect_t pkt_len;
+    guiLabel_t packetdata[4];
+};
+
 struct telemcfg_obj {
     guiLabel_t msg;
     guiLabel_t idx[7];
@@ -376,6 +383,7 @@ struct _gui_objs {
 #if SUPPORT_SCANNER
         struct scanner_obj scanner;
 #endif
+        struct xn297dump_obj xn297dump;
         struct telemcfg_obj telemcfg;
         struct telemtest_obj telemtest1;
         struct timer_obj timer;

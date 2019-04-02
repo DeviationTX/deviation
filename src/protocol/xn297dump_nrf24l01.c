@@ -1,0 +1,157 @@
+/*
+ This project is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ Deviation is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include "common.h"
+#include "interface.h"
+#include "config/model.h"
+#include "rftools.h"
+
+#ifdef PROTO_HAS_NRF24L01
+
+
+#ifdef MODULAR
+    struct Xn297dump xn297dump;
+#endif
+
+#ifdef EMULATOR
+#define dbgprintf printf
+#else
+//printf inside an interrupt handler is really dangerous
+//this shouldn't be enabled even in debug builds without explicitly
+//turning it on
+#define dbgprintf if(0) printf
+#endif
+
+#define INITIAL_WAIT       500
+#define ADDRESS_LENGTH     2
+#define DUMP_PERIOD        100
+#define PACKET_SIZE        32
+
+// Bit vector from bit position
+#define BV(bit) (1 << bit)
+
+enum {
+    XN297DUMP_CHANNEL_CHANGE = 0,
+    XN297DUMP_DUMP,
+    XN297DUMP_SYNC
+};
+
+static u8 phase, channel;
+
+/*static u8 checksum()
+{
+    u8 sum = packet[0];
+    for (int i = 1; i < PACKET_SIZE - 1; i++)
+        sum += packet[i];
+    return sum;
+}
+*/
+
+static void check_rx(void)
+{
+    if (xn297dump.channel != channel) {
+        NRF24L01_WriteReg(NRF24L01_05_RF_CH, xn297dump.channel);
+        channel = xn297dump.channel;
+    }
+    if (NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR)) {
+        // Data received
+        XN297_ReadPayload(xn297dump.packet, xn297dump.pkt_len);
+        NRF24L01_WriteReg(NRF24L01_07_STATUS, 255);
+        NRF24L01_FlushRx();
+    }
+}
+
+static void xn297dump_init()
+{
+    u8 rx_addr[] = { 0x0f, 0x71 };  // premable is 0x550f71 for XN297, but nrf24l01 already expects the 0x55 as preamble
+    
+    NRF24L01_Initialize();
+    NRF24L01_SetTxRxMode(RX_EN);
+
+    
+    NRF24L01_FlushRx();
+    NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x03);            // Disable CRC check for dumps
+    NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);             // No Auto Acknowldgement on all data pipes
+    NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x01);
+    NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x00);          // "illegal" 2-byte RX/TX address
+    NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, rx_addr, 2);     // set up RX address to xn297 preamble
+    NRF24L01_WriteReg(NRF24L01_11_RX_PW_P0, xn297dump.pkt_len);
+    NRF24L01_SetBitrate(NRF24L01_BR_1M);                    // 1Mbps
+    NRF24L01_Activate(0x73);                                // Activate feature register
+    NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 0x00);             // Disable dynamic payload length on all pipes
+    NRF24L01_WriteReg(NRF24L01_1D_FEATURE, 0x01);
+    NRF24L01_Activate(0x73);
+    NRF24L01_WriteReg(NRF24L01_05_RF_CH, channel);             // Start dumping on channel 0x00
+}
+
+
+
+static u16 xn297dump_callback()
+{
+    switch (phase) {
+    case XN297DUMP_CHANNEL_CHANGE:
+        xn297dump.channel++;
+        phase = XN297DUMP_DUMP;
+        break;
+    case XN297DUMP_DUMP:
+            check_rx();
+        break;
+    case XN297DUMP_SYNC:
+        break;
+    }
+    return DUMP_PERIOD;
+}
+
+
+static void initialize()
+{
+    CLOCK_StopTimer();
+    xn297dump_init();
+    phase = XN297DUMP_DUMP;
+    CLOCK_StartTimer(INITIAL_WAIT, xn297dump_callback);
+}
+
+uintptr_t XN297Dump_Cmds(enum ProtoCmds cmd)
+{
+    switch (cmd) {
+    case PROTOCMD_INIT:
+        initialize();
+        return 0;
+    case PROTOCMD_DEINIT:
+    case PROTOCMD_RESET:
+        CLOCK_StopTimer();
+        return (NRF24L01_Reset()? 1 : -1);
+    case PROTOCMD_CHECK_AUTOBIND:
+        return 1;     // always Autobind
+    case PROTOCMD_BIND:
+        initialize();
+        return 0;
+    case PROTOCMD_NUMCHAN:
+        return NUM_CHANNELS;
+    case PROTOCMD_DEFAULT_NUMCHAN:
+        return NUM_CHANNELS;
+    case PROTOCMD_CURRENT_ID:
+    case PROTOCMD_GETOPTIONS:
+        return 0;
+    case PROTOCMD_TELEMETRYSTATE:
+        return PROTO_TELEM_UNSUPPORTED;
+    case PROTOCMD_CHANNELMAP:
+        return UNCHG;
+    default:
+        break;
+    }
+    return 0;
+}
+#endif  // PROTO_HAS_NRF24L01
