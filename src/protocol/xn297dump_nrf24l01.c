@@ -25,19 +25,11 @@
     struct Xn297dump xn297dump;
 #endif
 
-#ifdef EMULATOR
-#define dbgprintf printf
-#else
-//printf inside an interrupt handler is really dangerous
-//this shouldn't be enabled even in debug builds without explicitly
-//turning it on
-#define dbgprintf if(0) printf
-#endif
-
 #define INITIAL_WAIT       500
-#define ADDRESS_LENGTH     2
+#define ADDRESS_LENGTH     5
 #define DUMP_PERIOD        100
 #define PACKET_SIZE        32
+#define CRC_LENGTH         2
 
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
@@ -66,8 +58,41 @@ static void check_rx(void)
         channel = xn297dump.channel;
     }
     if (NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR)) {
-        // Data received
-        XN297_ReadPayload(xn297dump.packet, xn297dump.pkt_len);
+        // Receive Data, decrypt payload and check crc
+        // undo encryption for 5 byte adress and reverse packet order
+        int i;
+        u16 packet_crc = 0;
+        u16 crc = 0xb5d2;
+        NRF24L01_ReadPayload(xn297dump.packet, xn297dump.pkt_len);
+        
+        // unscramble address and reverse order
+        for (i = 0; i < ADDRESS_LENGTH; i++) {
+            crc = crc16_update(crc, xn297dump.packet[i], 8);
+            xn297dump.packet[i] ^= xn297_scramble[i];
+        }
+        u8 buf[5];
+        memcpy(buf, xn297dump.packet, 5);
+        for (i = 0; i < 5; i++) {
+            xn297dump.packet[i] = buf[4-i];
+        }
+
+        // unscramble payload
+        for (i = ADDRESS_LENGTH; i < xn297dump.pkt_len - CRC_LENGTH; i++) {
+            crc = crc16_update(crc, xn297dump.packet[i], 8);
+            xn297dump.packet[i] = bit_reverse(xn297dump.packet[i]);
+            xn297dump.packet[i] ^= bit_reverse(xn297_scramble[i]);
+            
+        }
+        
+        // check crc
+        packet_crc |= (uint16_t)xn297dump.packet[xn297dump.pkt_len - 2] << 8;
+        packet_crc |= (uint16_t)xn297dump.packet[xn297dump.pkt_len - 1];
+        crc ^= xn297_crc_xorout_scrambled[xn297dump.pkt_len-3];
+        if (packet_crc == crc)
+            xn297dump.crc_valid = 1;
+        else
+            xn297dump.crc_valid = 0;
+
         NRF24L01_WriteReg(NRF24L01_07_STATUS, 255);
         NRF24L01_FlushRx();
     }
@@ -75,18 +100,17 @@ static void check_rx(void)
 
 static void xn297dump_init()
 {
-    u8 rx_addr[] = { 0x0f, 0x71 };  // premable is 0x550f71 for XN297, but nrf24l01 already expects the 0x55 as preamble
-    
+    u8 rx_addr[] = { 0x55, 0x0f, 0x71 };  // preamble is 0x550f71 for XN297
+
     NRF24L01_Initialize();
     NRF24L01_SetTxRxMode(RX_EN);
 
-    
     NRF24L01_FlushRx();
     NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x03);            // Disable CRC check for dumps
     NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);             // No Auto Acknowldgement on all data pipes
     NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x01);
     NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x00);          // "illegal" 2-byte RX/TX address
-    NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, rx_addr, 2);     // set up RX address to xn297 preamble
+    NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, rx_addr, 3);     // set up RX address to xn297 preamble
     NRF24L01_WriteReg(NRF24L01_11_RX_PW_P0, xn297dump.pkt_len);
     NRF24L01_SetBitrate(NRF24L01_BR_1M);                    // 1Mbps
     NRF24L01_Activate(0x73);                                // Activate feature register

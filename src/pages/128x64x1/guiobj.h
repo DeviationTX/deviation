@@ -131,6 +131,7 @@ struct xn297dump_obj {
     guiTextSelect_t channel;
     guiTextSelect_t pkt_len;
     guiLabel_t packetdata[4];
+    guiLabel_t status;
 };
 
 struct telemcfg_obj {

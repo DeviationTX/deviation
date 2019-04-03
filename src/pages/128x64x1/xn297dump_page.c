@@ -34,7 +34,7 @@ static const char *channel_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     (void)data;
     xn297dump.channel = GUI_TextSelectHelper(xn297dump.channel, 0, 125, dir, 1, 10, NULL);
-    snprintf(tempstring,7, "Ch %d", xn297dump.channel);
+    snprintf(tempstring, 7, "Ch %d", xn297dump.channel);
     memset(xn297dump.packet, 0, sizeof(xn297dump.packet));  // clear old packet data
     return tempstring;
 }
@@ -44,9 +44,16 @@ static const char *pktlen_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     (void)data;
     xn297dump.pkt_len = GUI_TextSelectHelper(xn297dump.pkt_len, 1, 32, dir, 1, 5, NULL);
-    snprintf(tempstring,7, "Len %d", xn297dump.pkt_len);
+    snprintf(tempstring, 7, "Len %d", xn297dump.pkt_len);
     memset(xn297dump.packet, 0, sizeof(xn297dump.packet));  // clear old packet data
     return tempstring;
+}
+
+static const char *status_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    (void)data;
+    return xn297dump.crc_valid ? _tr("CRC valid") : _tr("CRC invalid");
 }
 
 static void _draw_page(u8 enable)
@@ -57,6 +64,7 @@ static void _draw_page(u8 enable)
     GUI_CreateTextSelectPlate(&gui->channel, LCD_WIDTH/2 - 23, HEADER_HEIGHT, 46, LINE_HEIGHT, &TEXTSEL_FONT, NULL, channel_cb, NULL);
     GUI_CreateTextSelectPlate(&gui->pkt_len, LCD_WIDTH - 40, HEADER_HEIGHT, 46, LINE_HEIGHT, &TEXTSEL_FONT, NULL, pktlen_cb, NULL);
     for (int i = 0; i < 4; i++) {
-        GUI_CreateLabelBox(&gui->packetdata[i], 0, HEADER_HEIGHT + 20 + 7 * i, LCD_WIDTH, 7, &TINY_FONT, packetdata_cb, NULL, (void *)(uintptr_t)i);
+        GUI_CreateLabelBox(&gui->packetdata[i], 0, HEADER_HEIGHT + 18 + 7 * i, LCD_WIDTH, 7, &TINY_FONT, packetdata_cb, NULL, (void *)(uintptr_t)i);
     }
+    GUI_CreateLabelBox(&gui->status, 0, HEADER_HEIGHT + 46, LCD_WIDTH, 7, &TINY_FONT, status_cb, NULL, NULL);
 }

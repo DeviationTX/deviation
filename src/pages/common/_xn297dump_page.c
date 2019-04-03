@@ -68,7 +68,7 @@ void PAGE_XN297DumpInit(int page)
 
 void PAGE_XN297DumpEvent()
 {
-    if(! xp->enable)
+    if (!xp->enable)
         return;
     for (int i = 0; i < 4; i++) {
         GUI_Redraw(&gui->packetdata[i]);
