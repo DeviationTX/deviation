@@ -79,14 +79,12 @@ static void check_rx(void)
         // unscramble payload
         for (i = ADDRESS_LENGTH; i < xn297dump.pkt_len - CRC_LENGTH; i++) {
             crc = crc16_update(crc, xn297dump.packet[i], 8);
-            xn297dump.packet[i] = bit_reverse(xn297dump.packet[i]);
-            xn297dump.packet[i] ^= bit_reverse(xn297_scramble[i]);
-            
+            xn297dump.packet[i] = bit_reverse(xn297dump.packet[i] ^ xn297_scramble[i]);
         }
         
         // check crc
-        packet_crc |= (uint16_t)xn297dump.packet[xn297dump.pkt_len - 2] << 8;
-        packet_crc |= (uint16_t)xn297dump.packet[xn297dump.pkt_len - 1];
+        packet_crc |= (uint16_t)xn297dump.packet[xn297dump.pkt_len - 3] << 8;
+        packet_crc |= (uint16_t)xn297dump.packet[xn297dump.pkt_len - 2];
         crc ^= xn297_crc_xorout_scrambled[xn297dump.pkt_len-3];
         if (packet_crc == crc)
             xn297dump.crc_valid = 1;
