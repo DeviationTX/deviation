@@ -36,6 +36,7 @@ static const char *channel_cb(guiObject_t *obj, int dir, void *data)
     xn297dump.channel = GUI_TextSelectHelper(xn297dump.channel, 0, 125, dir, 1, 10, NULL);
     snprintf(tempstring, 7, "Ch %d", xn297dump.channel);
     memset(xn297dump.packet, 0, sizeof(xn297dump.packet));  // clear old packet data
+    xn297dump.crc_valid = 0;
     return tempstring;
 }
 
