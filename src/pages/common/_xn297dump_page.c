@@ -73,6 +73,7 @@ void PAGE_XN297DumpEvent()
     for (int i = 0; i < 4; i++) {
         GUI_Redraw(&gui->packetdata[i]);
     }
+    GUI_Redraw(&gui->status);
 }
 
 void PAGE_XN297DumpExit()
