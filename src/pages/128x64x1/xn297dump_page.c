@@ -46,6 +46,7 @@ static const char *pktlen_cb(guiObject_t *obj, int dir, void *data)
     xn297dump.pkt_len = GUI_TextSelectHelper(xn297dump.pkt_len, 1, 32, dir, 1, 5, NULL);
     snprintf(tempstring, 7, "Len %d", xn297dump.pkt_len);
     memset(xn297dump.packet, 0, sizeof(xn297dump.packet));  // clear old packet data
+    xn297dump.crc_valid = 0;
     return tempstring;
 }
 
