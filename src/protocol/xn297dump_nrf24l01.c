@@ -71,9 +71,9 @@ static void check_rx(void)
             xn297dump.packet[i] ^= xn297_scramble[i];
         }
         u8 buf[5];
-        memcpy(buf, xn297dump.packet, 5);
-        for (i = 0; i < 5; i++) {
-            xn297dump.packet[i] = buf[4-i];
+        memcpy(buf, xn297dump.packet, ADDRESS_LENGTH);
+        for (i = 0; i < ADDRESS_LENGTH; i++) {
+            xn297dump.packet[i] = buf[ADDRESS_LENGTH-1-i];
         }
 
         // unscramble payload
@@ -83,9 +83,18 @@ static void check_rx(void)
         }
         
         // check crc
-        packet_crc |= (uint16_t)xn297dump.packet[xn297dump.pkt_len - 3] << 8;
-        packet_crc |= (uint16_t)xn297dump.packet[xn297dump.pkt_len - 2];
-        crc ^= xn297_crc_xorout_scrambled[xn297dump.pkt_len-3];
+        packet_crc = ((u16)(xn297dump.packet[xn297dump.pkt_len - 2]) << 8)
+                   | ((u16)(xn297dump.packet[xn297dump.pkt_len - 1]) & 0xff);
+        
+        crc ^= xn297_crc_xorout_scrambled[xn297dump.pkt_len-(ADDRESS_LENGTH-2+CRC_LENGTH)];
+        
+        // debug
+        //xn297dump.packet[27] = packet_crc >> 8;
+        //xn297dump.packet[28] = packet_crc & 0xff;
+        //xn297dump.packet[30] = crc >> 8;
+        //xn297dump.packet[31] = crc & 0xff;
+        //
+
         if (packet_crc == crc)
             xn297dump.crc_valid = 1;
         else
@@ -107,7 +116,7 @@ static void xn297dump_init()
     NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x03);            // Disable CRC check for dumps
     NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);             // No Auto Acknowldgement on all data pipes
     NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x01);
-    NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x00);          // "illegal" 2-byte RX/TX address
+    NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x01);          // 3 byte RX/TX address
     NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, rx_addr, 3);     // set up RX address to xn297 preamble
     NRF24L01_WriteReg(NRF24L01_11_RX_PW_P0, xn297dump.pkt_len);
     NRF24L01_SetBitrate(NRF24L01_BR_1M);                    // 1Mbps
