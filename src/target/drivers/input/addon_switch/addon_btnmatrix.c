@@ -44,7 +44,7 @@ void _scan_extra_switches()
 
 uint32_t ADDON_Handle_ExtraSwitches(u32 result) {
     uint32_t button_mask = 0;
-    #define BUTTONDEF(x) button_mask |= (1 << (BUT_ ## x));
+    #define BUTTONDEF(x) button_mask |= (1 << ((BUT_ ## x) - 1));
     #include "capabilities.h"
     #undef BUTTONDEF
     if (!(result & button_mask)) {
