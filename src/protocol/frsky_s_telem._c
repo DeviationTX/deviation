@@ -121,6 +121,23 @@ static void processSportPacket(u8 *packet) {
 
     // sensor ids from Qlrs
     switch (id) {
+        case APID_PITCH:
+            set_telemetry(TELEM_FRSKY_CELL1, data);
+            break;
+        case APID_ROLL:
+            set_telemetry(TELEM_FRSKY_CELL2, data);
+            break;
+#if 0
+        case APID_RX_RSSI_REG_VAL:
+            set_telemetry(TELEM_FRSKY_CELL1, data);
+            break;
+        case APID_RX_SNR_REG_VAL:
+            set_telemetry(TELEM_FRSKY_CELL2, data);
+            break;
+#endif
+        case APID_RX_PACKET_LOST_VAL:
+            set_telemetry(TELEM_FRSKY_CELL3, data);
+            break;
         case APID_MAV_BASE_MODE:
             set_telemetry(TELEM_FRSKY_CELL4, data);
             break;
@@ -132,15 +149,6 @@ static void processSportPacket(u8 *packet) {
             break;
         case APID_CUST_RSSI:
             set_telemetry(TELEM_FRSKY_ALL_CELL, data);
-            break;
-        case APID_RX_RSSI_REG_VAL:
-            set_telemetry(TELEM_FRSKY_CELL1, data);
-            break;
-        case APID_RX_SNR_REG_VAL:
-            set_telemetry(TELEM_FRSKY_CELL2, data);
-            break;
-        case APID_RX_PACKET_LOST_VAL:
-            set_telemetry(TELEM_FRSKY_CELL3, data);
             break;
     }
 

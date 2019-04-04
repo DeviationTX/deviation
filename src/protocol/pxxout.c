@@ -247,7 +247,7 @@ static void serial_echo(u8 *packet) {(void)packet;}
 #define PROTO_OPTS_AD2GAIN 0
 #include "frsky_d_telem._c"
 #include "frsky_s_telem._c"
-#endif // HAS_EXTENDED_TELEMETRY
+#endif  // HAS_EXTENDED_TELEMETRY
 
 #ifndef EMULATOR
 #define STD_DELAY   9000
@@ -283,7 +283,7 @@ if (spdata) {
         state = PXX_DATA2;
         return mixer_runtime;
     case PXX_DATA2:
-//TODO        if (mixer_sync != MIX_DONE && mixer_runtime < 2000) mixer_runtime += 50;
+        if (mixer_sync != MIX_DONE && mixer_runtime < 2000) mixer_runtime += 50;
         build_data_pkt(0);
         PXX_Enable(packet);
         state = PXX_DATA1;
