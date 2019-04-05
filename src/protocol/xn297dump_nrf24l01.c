@@ -28,7 +28,6 @@
 #define INITIAL_WAIT       500
 #define ADDRESS_LENGTH     5
 #define PERIOD_DUMP        100
-#define PERIOD_CHANNEL_CHANGE 170  // 130 us to switch from stby to rx + 40 µs for RPD register to settle
 #define MAX_PACKET_LEN     32
 #define CRC_LENGTH         2
 #define MAX_RF_CHANNEL     125
@@ -38,8 +37,7 @@
 #define BV(bit) (1 << bit)
 
 enum {
-    XN297DUMP_CHANNEL_CHANGE = 0,
-    XN297DUMP_GET_PACKET,
+    XN297DUMP_GET_PACKET = 0,
     XN297DUMP_PROCESS_PACKET
 };
 
@@ -99,7 +97,7 @@ static void process_packet(void)
     } else {
         xn297dump.crc_valid = 0;
     }
-    
+
     // clear invalid packets
     for (i = xn297dump.pkt_len; i < MAX_PACKET_LEN; i++)
         xn297dump.packet[i] = 0;
@@ -118,13 +116,22 @@ static void xn297dump_init()
     NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x01);
     NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x01);          // 3 byte RX/TX address
     NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, rx_addr, 3);     // set up RX address to xn297 preamble
-    NRF24L01_WriteReg(NRF24L01_11_RX_PW_P0, xn297dump.pkt_len);
-    NRF24L01_SetBitrate(NRF24L01_BR_1M);                    // 1Mbps
+    NRF24L01_WriteReg(NRF24L01_11_RX_PW_P0, MAX_PACKET_LEN);
+
+    switch(xn297dump.mode) {
+        case XN297DUMP_1MBPS:
+            NRF24L01_SetBitrate(NRF24L01_BR_1M); break;
+        case XN297DUMP_250KBPS:
+            NRF24L01_SetBitrate(NRF24L01_BR_250K); break;
+        case XN297DUMP_2MBPS:
+            NRF24L01_SetBitrate(NRF24L01_BR_2M);
+    }
+    
     NRF24L01_Activate(0x73);                                // Activate feature register
     NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 0x00);             // Disable dynamic payload length on all pipes
     NRF24L01_WriteReg(NRF24L01_1D_FEATURE, 0x01);
     NRF24L01_Activate(0x73);
-    NRF24L01_WriteReg(NRF24L01_05_RF_CH, xn297dump.channel);
+    NRF24L01_WriteReg(NRF24L01_05_RF_CH, 0x00);
 }
 
 
@@ -132,18 +139,12 @@ static void xn297dump_init()
 static u16 xn297dump_callback()
 {
     switch (phase) {
-        case XN297DUMP_CHANNEL_CHANGE:
-            if (xn297dump.scan) {
-                xn297dump.channel++;
-                phase = XN297DUMP_GET_PACKET;
-            }
-            /* FALLTHROUGH */
         case XN297DUMP_GET_PACKET:
             if (xn297dump.scan == XN297DUMP_SCAN_ON) {
                 dumps++;
                 if (dumps > DUMP_RETRIES) {
                     dumps = 0;
-                    phase = XN297DUMP_CHANNEL_CHANGE;
+                    xn297dump.channel++;
                     return PERIOD_DUMP;
                 }
             }

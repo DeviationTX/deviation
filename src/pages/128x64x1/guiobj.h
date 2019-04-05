@@ -127,7 +127,7 @@ struct scanner_obj {
 };
 
 struct xn297dump_obj {
-    guiButton_t enable;
+    guiTextSelect_t mode;
     guiTextSelect_t channel;
     guiTextSelect_t pkt_len;
     guiLabel_t packetdata[4];

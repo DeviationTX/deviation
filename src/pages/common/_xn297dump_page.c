@@ -18,7 +18,7 @@
 
 static struct xn297dump_page * const xp = &pagemem.u.xn297dump_page;
 
-static void _draw_page(u8 enable);
+static void _draw_page();
 
 static void _dump_enable(int enable)
 {
@@ -33,14 +33,6 @@ static void _dump_enable(int enable)
         Model.protocol = xp->model_protocol;
         PROTOCOL_Init(0);
     }
-}
-
-static void press_enable_cb(guiObject_t *obj, const void *data)
-{
-    (void)data;
-    xp->enable ^= 1;
-    _dump_enable(xp->enable);
-    GUI_Redraw(obj);
 }
 
 static const char *packetdata_cb(guiObject_t *obj, const void *data)
@@ -69,6 +61,16 @@ static void scan_cb(guiObject_t *obj, void *data)
     GUI_Redraw(obj);
 }
 
+static const char *status_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    (void)data;
+    if (xn297dump.scan) {
+        return _tr("Scanning channels and length...");
+    }
+    return xn297dump.crc_valid ? _tr("Valid CRC found!") : _tr("CRC invalid");
+}
+
 void PAGE_XN297DumpInit(int page)
 {
     (void)page;
@@ -76,12 +78,12 @@ void PAGE_XN297DumpInit(int page)
     xn297dump.pkt_len = 32;
     xn297dump.channel = 0;
     PAGE_SetModal(0);
-    _draw_page(1);
+    _draw_page();
 }
 
 void PAGE_XN297DumpEvent()
 {
-    if (!xp->enable)
+    if (!xn297dump.mode)
         return;
     for (int i = 0; i < 4; i++) {
         GUI_Redraw(&gui->packetdata[i]);
@@ -97,6 +99,6 @@ void PAGE_XN297DumpEvent()
 
 void PAGE_XN297DumpExit()
 {
-    if (xp->enable)
+    if (xn297dump.mode)
         _dump_enable(0);
 }

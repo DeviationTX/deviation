@@ -21,12 +21,17 @@ static struct xn297dump_obj * const gui = &gui_objs.u.xn297dump;
 
 #include "../common/_xn297dump_page.c"
 
-
-static const char *enablestr_cb(guiObject_t *obj, const void *data)
+static const char *mode_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     (void)data;
-    return xp->enable ? _tr("On") : _tr("Off");
+    xn297dump.mode = GUI_TextSelectHelper(xn297dump.mode, 0, 3, dir, 1, 1, NULL);
+    if (xn297dump.mode > XN297DUMP_2MBPS)
+        xn297dump.mode = XN297DUMP_OFF;
+    _dump_enable(xn297dump.mode);
+    
+    const void * modelbl[4] = { "Off", "1M", "250K", "2M" };
+    return modelbl[xn297dump.mode];
 }
 
 static const char *channel_cb(guiObject_t *obj, int dir, void *data)
@@ -49,21 +54,10 @@ static const char *pktlen_cb(guiObject_t *obj, int dir, void *data)
     return tempstring;
 }
 
-static const char *status_cb(guiObject_t *obj, const void *data)
+static void _draw_page()
 {
-    (void)obj;
-    (void)data;
-    if (xn297dump.scan) {
-        return _tr("Scanning channels and length...");
-    }
-    return xn297dump.crc_valid ? _tr("Valid CRC found!") : _tr("CRC invalid");
-}
-
-static void _draw_page(u8 enable)
-{
-    (void)enable;
     PAGE_ShowHeader(PAGE_GetName(PAGEID_XN297DUMP));
-    GUI_CreateButtonPlateText(&gui->enable, 0, HEADER_HEIGHT, 40, LINE_HEIGHT, &BUTTON_FONT, enablestr_cb, press_enable_cb, NULL);
+    GUI_CreateTextSelectPlate(&gui->mode, 0, HEADER_HEIGHT, 40, LINE_HEIGHT, &TEXTSEL_FONT, NULL, mode_cb, NULL);
     GUI_CreateTextSelectPlate(&gui->channel, LCD_WIDTH/2 - 23, HEADER_HEIGHT, 42, LINE_HEIGHT, &TEXTSEL_FONT, scan_cb, channel_cb, NULL);
     GUI_CreateTextSelectPlate(&gui->pkt_len, LCD_WIDTH - 44, HEADER_HEIGHT, 44, LINE_HEIGHT, &TEXTSEL_FONT, NULL, pktlen_cb, NULL);
     for (int i = 0; i < 4; i++) {
