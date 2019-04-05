@@ -38,7 +38,7 @@ static const char *channel_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     (void)data;
-    xn297dump.channel = GUI_TextSelectHelper(xn297dump.channel, 0, 125, dir, 1, 10, NULL);
+    xn297dump.channel = GUI_TextSelectHelper(xn297dump.channel, 0, 84, dir, 1, 10, NULL);
     snprintf(tempstring, 7, "Ch %d", xn297dump.channel);
     memset(xn297dump.packet, 0, sizeof(xn297dump.packet));  // clear old packet data
     return tempstring;

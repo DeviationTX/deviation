@@ -30,7 +30,7 @@
 #define PERIOD_DUMP        100
 #define MAX_PACKET_LEN     32
 #define CRC_LENGTH         2
-#define MAX_RF_CHANNEL     125
+#define MAX_RF_CHANNEL     84
 #define DUMP_RETRIES       10  // stay on channels long enough to capture packets
 
 // Bit vector from bit position
@@ -126,7 +126,7 @@ static void xn297dump_init()
         case XN297DUMP_2MBPS:
             NRF24L01_SetBitrate(NRF24L01_BR_2M);
     }
-    
+
     NRF24L01_Activate(0x73);                                // Activate feature register
     NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 0x00);             // Disable dynamic payload length on all pipes
     NRF24L01_WriteReg(NRF24L01_1D_FEATURE, 0x01);
