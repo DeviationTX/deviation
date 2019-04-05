@@ -134,8 +134,6 @@ static void xn297dump_init()
     NRF24L01_WriteReg(NRF24L01_05_RF_CH, 0x00);
 }
 
-
-
 static u16 xn297dump_callback()
 {
     switch (phase) {
@@ -174,6 +172,7 @@ static void initialize()
     CLOCK_StopTimer();
     xn297dump_init();
     cur_channel = xn297dump.channel;
+    xn297dump.crc_valid = 0;
     dumps = 0;
     new_packet = 0;
     memset(raw_packet, 0, MAX_PACKET_LEN);
