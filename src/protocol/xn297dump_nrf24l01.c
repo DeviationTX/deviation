@@ -27,82 +27,82 @@
 
 #define INITIAL_WAIT       500
 #define ADDRESS_LENGTH     5
-#define DUMP_PERIOD        100
-#define PACKET_SIZE        32
+#define PERIOD_DUMP        100
+#define PERIOD_CHANNEL_CHANGE 170  // 130 us to switch from stby to rx + 40 µs for RPD register to settle
+#define MAX_PACKET_LEN     32
 #define CRC_LENGTH         2
+#define MAX_RF_CHANNEL     125
+#define DUMP_RETRIES       10  // stay on channels long enough to capture packets
 
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
 
 enum {
     XN297DUMP_CHANNEL_CHANGE = 0,
-    XN297DUMP_DUMP,
-    XN297DUMP_SYNC
+    XN297DUMP_GET_PACKET,
+    XN297DUMP_PROCESS_PACKET
 };
 
-static u8 phase, channel;
+static u8 phase, cur_channel, dumps, new_packet;
+static u8 raw_packet[MAX_PACKET_LEN];
 
-/*static u8 checksum()
+static u8 get_packet(void)
 {
-    u8 sum = packet[0];
-    for (int i = 1; i < PACKET_SIZE - 1; i++)
-        sum += packet[i];
-    return sum;
-}
-*/
-
-static void check_rx(void)
-{
-    if (xn297dump.channel != channel) {
+    if (xn297dump.channel > MAX_RF_CHANNEL)
+        xn297dump.channel = 0;
+    if (xn297dump.channel != cur_channel) {
         NRF24L01_WriteReg(NRF24L01_05_RF_CH, xn297dump.channel);
-        channel = xn297dump.channel;
+        cur_channel = xn297dump.channel;
     }
     if (NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR)) {
-        // Receive Data, decrypt payload and check crc
-        // undo encryption for 5 byte adress and reverse packet order
-        int i;
-        u16 packet_crc = 0;
-        u16 crc = 0xb5d2;
-        NRF24L01_ReadPayload(xn297dump.packet, xn297dump.pkt_len);
-        
-        // unscramble address and reverse order
-        for (i = 0; i < ADDRESS_LENGTH; i++) {
-            crc = crc16_update(crc, xn297dump.packet[i], 8);
-            xn297dump.packet[i] ^= xn297_scramble[i];
+        if (!NRF24L01_ReadReg(NRF24L01_09_CD) && xn297dump.scan){
+            NRF24L01_FlushRx();
+            return 0;  // ignore weak signals in scan mode
         }
-        u8 buf[5];
-        memcpy(buf, xn297dump.packet, ADDRESS_LENGTH);
-        for (i = 0; i < ADDRESS_LENGTH; i++) {
-            xn297dump.packet[i] = buf[ADDRESS_LENGTH-1-i];
-        }
-
-        // unscramble payload
-        for (i = ADDRESS_LENGTH; i < xn297dump.pkt_len - CRC_LENGTH; i++) {
-            crc = crc16_update(crc, xn297dump.packet[i], 8);
-            xn297dump.packet[i] = bit_reverse(xn297dump.packet[i] ^ xn297_scramble[i]);
-        }
-        
-        // check crc
-        packet_crc = ((u16)(xn297dump.packet[xn297dump.pkt_len - 2]) << 8)
-                   | ((u16)(xn297dump.packet[xn297dump.pkt_len - 1]) & 0xff);
-        
-        crc ^= xn297_crc_xorout_scrambled[xn297dump.pkt_len-(ADDRESS_LENGTH-2+CRC_LENGTH)];
-        
-        // debug
-        //xn297dump.packet[27] = packet_crc >> 8;
-        //xn297dump.packet[28] = packet_crc & 0xff;
-        //xn297dump.packet[30] = crc >> 8;
-        //xn297dump.packet[31] = crc & 0xff;
-        //
-
-        if (packet_crc == crc)
-            xn297dump.crc_valid = 1;
-        else
-            xn297dump.crc_valid = 0;
-
+        NRF24L01_ReadPayload(raw_packet, xn297dump.pkt_len);
         NRF24L01_WriteReg(NRF24L01_07_STATUS, 255);
         NRF24L01_FlushRx();
+            return 1;
     }
+    return 0;
+}
+
+static void process_packet(void)
+{
+    int i;
+    u16 packet_crc = 0;
+    u16 crc = 0xb5d2;
+
+    // unscramble address and reverse order
+    for (i = 0; i < ADDRESS_LENGTH; i++) {
+        crc = crc16_update(crc, raw_packet[i], 8);
+        xn297dump.packet[ADDRESS_LENGTH - i - 1] = raw_packet[i] ^ xn297_scramble[i];
+    }
+
+    // unscramble payload
+    for (i = ADDRESS_LENGTH; i < xn297dump.pkt_len - CRC_LENGTH; i++) {
+        crc = crc16_update(crc, raw_packet[i], 8);
+        xn297dump.packet[i] = bit_reverse(raw_packet[i] ^ xn297_scramble[i]);
+    }
+
+    // check crc
+    packet_crc = ((u16)(raw_packet[xn297dump.pkt_len - 2]) << 8)
+                | ((u16)(raw_packet[xn297dump.pkt_len - 1]) & 0xff);
+    xn297dump.packet[xn297dump.pkt_len - 2] = raw_packet[xn297dump.pkt_len - 2];
+    xn297dump.packet[xn297dump.pkt_len - 1] = raw_packet[xn297dump.pkt_len - 1];
+    crc ^= xn297_crc_xorout_scrambled[xn297dump.pkt_len-(ADDRESS_LENGTH-2+CRC_LENGTH)];
+
+    if (packet_crc == crc) {
+        xn297dump.crc_valid = 1;
+        if (xn297dump.scan == XN297DUMP_SCAN_ON)
+            xn297dump.scan = XN297DUMP_SCAN_SUCCESS;
+    } else {
+        xn297dump.crc_valid = 0;
+    }
+    
+    // clear invalid packets
+    for (i = xn297dump.pkt_len; i < MAX_PACKET_LEN; i++)
+        xn297dump.packet[i] = 0;
 }
 
 static void xn297dump_init()
@@ -124,7 +124,7 @@ static void xn297dump_init()
     NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 0x00);             // Disable dynamic payload length on all pipes
     NRF24L01_WriteReg(NRF24L01_1D_FEATURE, 0x01);
     NRF24L01_Activate(0x73);
-    NRF24L01_WriteReg(NRF24L01_05_RF_CH, channel);             // Start dumping on channel 0x00
+    NRF24L01_WriteReg(NRF24L01_05_RF_CH, xn297dump.channel);
 }
 
 
@@ -132,17 +132,39 @@ static void xn297dump_init()
 static u16 xn297dump_callback()
 {
     switch (phase) {
-    case XN297DUMP_CHANNEL_CHANGE:
-        xn297dump.channel++;
-        phase = XN297DUMP_DUMP;
-        break;
-    case XN297DUMP_DUMP:
-            check_rx();
-        break;
-    case XN297DUMP_SYNC:
-        break;
+        case XN297DUMP_CHANNEL_CHANGE:
+            if (xn297dump.scan) {
+                xn297dump.channel++;
+                phase = XN297DUMP_GET_PACKET;
+            }
+            /* FALLTHROUGH */
+        case XN297DUMP_GET_PACKET:
+            if (xn297dump.scan == XN297DUMP_SCAN_ON) {
+                dumps++;
+                if (dumps > DUMP_RETRIES) {
+                    dumps = 0;
+                    phase = XN297DUMP_CHANNEL_CHANGE;
+                    return PERIOD_DUMP;
+                }
+            }
+            new_packet = get_packet();
+            /* FALLTHROUGH */
+        case XN297DUMP_PROCESS_PACKET:
+            if (new_packet)
+                process_packet();  // process_packet will set scan = 0 if valid CRC is found to stop scanning
+            if (xn297dump.scan == XN297DUMP_SCAN_ON) {
+                xn297dump.pkt_len--;
+                if (xn297dump.pkt_len > ADDRESS_LENGTH + CRC_LENGTH) {
+                    phase = XN297DUMP_PROCESS_PACKET;
+                } else {
+                    xn297dump.pkt_len = MAX_PACKET_LEN;
+                    phase = XN297DUMP_GET_PACKET;
+                }
+            } else {
+                phase = XN297DUMP_GET_PACKET;
+            }
     }
-    return DUMP_PERIOD;
+    return PERIOD_DUMP;
 }
 
 
@@ -150,7 +172,11 @@ static void initialize()
 {
     CLOCK_StopTimer();
     xn297dump_init();
-    phase = XN297DUMP_DUMP;
+    cur_channel = xn297dump.channel;
+    dumps = 0;
+    new_packet = 0;
+    memset(raw_packet, 0, MAX_PACKET_LEN);
+    phase = XN297DUMP_GET_PACKET;
     CLOCK_StartTimer(INITIAL_WAIT, xn297dump_callback);
 }
 

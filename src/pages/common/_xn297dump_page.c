@@ -56,6 +56,19 @@ static const char *packetdata_cb(guiObject_t *obj, const void *data)
     return tempstring;
 }
 
+static void scan_cb(guiObject_t *obj, void *data)
+{
+    (void)data;
+    if (xn297dump.scan == XN297DUMP_SCAN_OFF) {
+        xn297dump.channel++;
+        xn297dump.crc_valid = 0;
+        xn297dump.scan = XN297DUMP_SCAN_ON;
+    } else {
+        xn297dump.scan = XN297DUMP_SCAN_OFF;
+    }
+    GUI_Redraw(obj);
+}
+
 void PAGE_XN297DumpInit(int page)
 {
     (void)page;
@@ -74,6 +87,12 @@ void PAGE_XN297DumpEvent()
         GUI_Redraw(&gui->packetdata[i]);
     }
     GUI_Redraw(&gui->status);
+    if (xn297dump.scan) {
+        GUI_Redraw(&gui->channel);
+        GUI_Redraw(&gui->pkt_len);
+    }
+    if (xn297dump.scan == XN297DUMP_SCAN_SUCCESS)
+        xn297dump.scan = XN297DUMP_SCAN_OFF;
 }
 
 void PAGE_XN297DumpExit()

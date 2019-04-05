@@ -16,11 +16,18 @@ extern struct Scanner Scanner;
 
 #endif  // SUPPORT_SCANNER
 
+enum {
+    XN297DUMP_SCAN_OFF = 0,
+    XN297DUMP_SCAN_ON,
+    XN297DUMP_SCAN_SUCCESS,
+};
+
 struct Xn297dump {
     u8 packet[32];
     u8 channel;
     u8 pkt_len;
     u8 crc_valid;
+    u8 scan;
 };
 
 extern struct Xn297dump xn297dump;
