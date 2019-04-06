@@ -13,9 +13,27 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef OVERRIDE_PLACEMENT
 #include "common.h"
 #include "pages.h"
 #include "config/model.h"
+
+enum {
+    MODE_X        = 0,
+    MODE_Y        = 13,
+    MODE_WIDTH    = 40,
+    CHANNEL_X     = LCD_WIDTH/2 - 23,
+    CHANNEL_Y     = 13,
+    CHANNEL_WIDTH = 42,
+    LENGTH_X      = LCD_WIDTH - 44,
+    LENGTH_Y      = 13,
+    LENGTH_WIDTH  = 44,
+    PACKET_X      = 0,
+    PACKET_Y      = 9 + 14,
+    PACKET_WIDTH  = LCD_WIDTH,
+    STATUS_Y      = 56,
+};
+#endif  // OVERRIDE_PLACEMENT
 
 static struct xn297dump_obj * const gui = &gui_objs.u.xn297dump;
 
@@ -55,11 +73,11 @@ static const char *pktlen_cb(guiObject_t *obj, int dir, void *data)
 static void _draw_page()
 {
     PAGE_ShowHeader(PAGE_GetName(PAGEID_XN297DUMP));
-    GUI_CreateTextSelectPlate(&gui->mode, 0, HEADER_HEIGHT, 40, LINE_HEIGHT, &TEXTSEL_FONT, NULL, mode_cb, NULL);
-    GUI_CreateTextSelectPlate(&gui->channel, LCD_WIDTH/2 - 23, HEADER_HEIGHT, 42, LINE_HEIGHT, &TEXTSEL_FONT, scan_cb, channel_cb, NULL);
-    GUI_CreateTextSelectPlate(&gui->pkt_len, LCD_WIDTH - 44, HEADER_HEIGHT, 44, LINE_HEIGHT, &TEXTSEL_FONT, NULL, pktlen_cb, NULL);
+    GUI_CreateTextSelectPlate(&gui->mode, MODE_X, MODE_Y, MODE_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT, NULL, mode_cb, NULL);
+    GUI_CreateTextSelectPlate(&gui->channel, CHANNEL_X, CHANNEL_Y, CHANNEL_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT, scan_cb, channel_cb, NULL);
+    GUI_CreateTextSelectPlate(&gui->pkt_len, LENGTH_X, LENGTH_Y, LENGTH_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT, NULL, pktlen_cb, NULL);
     for (int i = 0; i < 4; i++) {
-        GUI_CreateLabelBox(&gui->packetdata[i], 0, HEADER_HEIGHT + 14 + 7 * i, LCD_WIDTH, 7, &TINY_FONT, packetdata_cb, NULL, (void *)(uintptr_t)i);
+        GUI_CreateLabelBox(&gui->packetdata[i], PACKET_X, PACKET_Y + (LINE_HEIGHT/2+1) * i, LCD_WIDTH, LINE_HEIGHT, &TINY_FONT, packetdata_cb, NULL, (void *)(uintptr_t)i);
     }
-    GUI_CreateLabelBox(&gui->status, 0, HEADER_HEIGHT + 43, LCD_WIDTH, 7, &TINY_FONT, status_cb, NULL, NULL);
+    GUI_CreateLabelBox(&gui->status, 0, STATUS_Y, LCD_WIDTH, 7, &TINY_FONT, status_cb, NULL, NULL);
 }

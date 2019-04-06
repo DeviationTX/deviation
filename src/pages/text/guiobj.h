@@ -120,6 +120,14 @@ struct reorder_obj {
     guiScrollable_t scrollable;
 };
 
+struct xn297dump_obj {
+    guiTextSelect_t mode;
+    guiTextSelect_t channel;
+    guiTextSelect_t pkt_len;
+    guiLabel_t packetdata[4];
+    guiLabel_t status;
+};
+
 struct telemcfg_obj {
     guiLabel_t msg;
     guiLabel_t idx[SCROLLABLE_ROWS];
@@ -367,6 +375,7 @@ struct _gui_objs {
         struct modelload_obj modelload;
         struct modelpage_obj modelpage;
         struct reorder_obj reorder;
+        struct xn297dump_obj xn297dump;
         struct telemcfg_obj telemcfg;
         struct telemtest_obj telemtest1;
         struct timer_obj timer;
