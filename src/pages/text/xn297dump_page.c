@@ -29,7 +29,7 @@ enum {
     LENGTH_X      = 2,
     LENGTH_Y      = CHANNEL_Y + ITEM_HEIGHT,
     LENGTH_WIDTH  = CHANNEL_WIDTH,
-    PACKET_X      = 2,
+    PACKET_X      = (LCD_WIDTH == 24) ? 0 : 6,
     PACKET_Y      = LENGTH_Y + ITEM_HEIGHT * 2,
     PACKET_WIDTH  = ITEM_SPACE * 16 + 7,
     PACKET_HEIGHT = LINE_HEIGHT,
