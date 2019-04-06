@@ -78,7 +78,9 @@ PAGEDEF(PAGEID_RANGE,    PAGE_RangeInit,       NULL,                  PAGE_Range
 #if SUPPORT_SCANNER
 PAGEDEF(PAGEID_SCANNER,  PAGE_ScannerInit,     PAGE_ScannerEvent,     PAGE_ScannerExit,   TX_MENU,     _tr_noop("Scanner"))
 #endif
+#if SUPPORT_XN297DUMP
 PAGEDEF(PAGEID_XN297DUMP,  PAGE_XN297DumpInit,     PAGE_XN297DumpEvent,     PAGE_XN297DumpExit,   TX_MENU,     _tr_noop("XN297 Dump"))
+#endif
 //-------------------
 
 // Pages menu

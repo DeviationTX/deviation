@@ -16,14 +16,14 @@
 #include "common.h"
 #include "rftools.h"
 
-#if SUPPORT_SCANNER
-
 #ifndef MODULAR
+
+#if SUPPORT_XN297DUMP
+struct Xn297dump xn297dump;
+#endif
+
+#if SUPPORT_SCANNER
 struct Scanner Scanner;
 #endif
 
-#endif
-
-#ifndef MODULAR
-struct Xn297dump xn297dump;
-#endif
+#endif  // MODULAR

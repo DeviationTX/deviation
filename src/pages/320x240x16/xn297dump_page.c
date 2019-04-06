@@ -17,6 +17,8 @@
 #include "pages.h"
 #include "config/model.h"
 
+#if SUPPORT_XN297DUMP
+
 static struct xn297dump_obj * const gui = &gui_objs.u.xn297dump;
 
 #include "../common/_xn297dump_page.c"
@@ -63,3 +65,5 @@ static void _draw_page()
     }
     GUI_CreateLabelBox(&gui->status, LCD_WIDTH/2 - LCD_WIDTH/3, LCD_HEIGHT - 30, LCD_WIDTH/3*2, 18, &NORMALBOX_FONT, status_cb, NULL, NULL);
 }
+
+#endif  // SUPPORT_XN297DUMP

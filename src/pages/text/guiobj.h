@@ -375,7 +375,9 @@ struct _gui_objs {
         struct modelload_obj modelload;
         struct modelpage_obj modelpage;
         struct reorder_obj reorder;
+#if SUPPORT_XN297DUMP
         struct xn297dump_obj xn297dump;
+#endif
         struct telemcfg_obj telemcfg;
         struct telemtest_obj telemtest1;
         struct timer_obj timer;

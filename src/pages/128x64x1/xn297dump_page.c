@@ -36,6 +36,8 @@ enum {
 };
 #endif  // OVERRIDE_PLACEMENT
 
+#if SUPPORT_XN297DUMP
+
 static struct xn297dump_obj * const gui = &gui_objs.u.xn297dump;
 
 #include "../common/_xn297dump_page.c"
@@ -82,3 +84,5 @@ static void _draw_page()
     }
     GUI_CreateLabelBox(&gui->status, 0, STATUS_Y, LCD_WIDTH, 7, &TINY_FONT, status_cb, NULL, NULL);
 }
+
+#endif  // SUPPORT_XN297DUMP

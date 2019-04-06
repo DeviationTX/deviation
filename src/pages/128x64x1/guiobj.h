@@ -384,7 +384,9 @@ struct _gui_objs {
 #if SUPPORT_SCANNER
         struct scanner_obj scanner;
 #endif
+#if SUPPORT_XN297DUMP
         struct xn297dump_obj xn297dump;
+#endif
         struct telemcfg_obj telemcfg;
         struct telemtest_obj telemtest1;
         struct timer_obj timer;

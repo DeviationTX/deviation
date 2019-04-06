@@ -73,7 +73,9 @@ PAGEDEF(PAGEID_BTNMON,   PAGE_ButtontestInit,  PAGE_ChantestEvent,    PAGE_Chant
 #if SUPPORT_SCANNER
 PAGEDEF(PAGEID_SCANNER,  PAGE_ScannerInit,     PAGE_ScannerEvent,     PAGE_ScannerExit,   TX_MENU,     _tr_noop("Scanner"))
 #endif
-PAGEDEF(PAGEID_XN297DUMP,  PAGE_XN297DumpInit,     PAGE_XN297DumpEvent,     PAGE_XN297DumpExit,   TX_MENU,     _tr_noop("XN297 Dump"))
+#if SUPPORT_XN297DUMP
+PAGEDEF(PAGEID_XN297DUMP,  PAGE_XN297DumpInit, PAGE_XN297DumpEvent,   PAGE_XN297DumpExit, TX_MENU,     _tr_noop("XN297 Dump"))
+#endif
 
 //These pages should not be lisetd for quickpages
 PAGEDEF(PAGEID_SPLASH,   PAGE_SplashInit,      PAGE_SplashEvent,      PAGE_SplashExit,    0,           _tr_noop("Welcome"))
