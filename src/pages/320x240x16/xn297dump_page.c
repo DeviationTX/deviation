@@ -29,7 +29,7 @@ static const char *mode_cb(guiObject_t *obj, int dir, void *data)
     if (xn297dump.mode > XN297DUMP_2MBPS)
         xn297dump.mode = XN297DUMP_OFF;
     _dump_enable(xn297dump.mode);
-    
+
     const void * modelbl[4] = { "Off", "1 Mbps", "250 Kbps", "2 Mbps" };
     return modelbl[xn297dump.mode];
 }
@@ -61,7 +61,7 @@ static void _draw_page()
     GUI_CreateTextSelect(&gui->channel, LCD_WIDTH/2 - 152, 64, TEXTSELECT_128, scan_cb, channel_cb, NULL);
     GUI_CreateTextSelect(&gui->pkt_len,  LCD_WIDTH/2, 64, TEXTSELECT_128, NULL, pktlen_cb, NULL);
     for (int i = 0; i < 4; i++) {
-        GUI_CreateLabelBox(&gui->packetdata[i], LCD_WIDTH/2 - LCD_WIDTH/4, 100 + 20 * i, LCD_WIDTH/2, 7, &LABEL_FONT, packetdata_cb, NULL, (void *)(uintptr_t)i);
+        GUI_CreateLabelBox(&gui->packetdata[i], LCD_WIDTH/2 - LCD_WIDTH/4, 100 + 20 * i, LCD_WIDTH/2, 18, &NORMALBOX_FONT, packetdata_cb, NULL, (void *)(uintptr_t)i);
     }
-    GUI_CreateLabelBox(&gui->status, LCD_WIDTH/2 - LCD_WIDTH/4, LCD_HEIGHT - 30, LCD_WIDTH/2, 7, &LABEL_FONT, status_cb, NULL, NULL);
+    GUI_CreateLabelBox(&gui->status, LCD_WIDTH/2 - LCD_WIDTH/3, LCD_HEIGHT - 30, LCD_WIDTH/3*2, 18, &NORMALBOX_FONT, status_cb, NULL, NULL);
 }

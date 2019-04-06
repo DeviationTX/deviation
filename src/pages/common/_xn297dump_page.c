@@ -20,17 +20,25 @@ static struct xn297dump_page * const xp = &pagemem.u.xn297dump_page;
 
 static void _draw_page();
 
-static void _dump_enable(int enable)
+static void setup_module(int enable)
 {
     if (enable) {
-        PROTOCOL_DeInit();
+        xp->model_protocol = Model.protocol;
         Model.protocol = PROTOCOL_XN297DUMP;
-        PROTOCOL_Init(1);  // Switch to scanner configuration and ignore safety
-        PROTOCOL_SetBindState(0);  // Disable binding message
     } else {
         PROTOCOL_DeInit();
         Model.protocol = xp->model_protocol;
         PROTOCOL_Init(0);
+    }
+}
+
+static void _dump_enable(int enable)
+{
+    if (enable) {
+        PROTOCOL_Init(1);
+        PROTOCOL_SetBindState(0);  // Disable binding message
+    } else {
+        PROTOCOL_DeInit();
     }
 }
 
@@ -64,17 +72,19 @@ static const char *status_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
+    if (!PROTOCOL_HasModule(PROTOCOL_XN297DUMP))
+        return _tr_noop("Module NRF24L01 not available");
     if (xn297dump.scan) {
-        return _tr("Scanning channels and length...");
+        return _tr_noop("Scanning channels and length...");
     }
-    return xn297dump.crc_valid ? _tr("Valid CRC found!") : _tr("CRC invalid");
+    return xn297dump.crc_valid ? _tr_noop("Valid CRC found!") : _tr_noop("CRC invalid");
 }
 
 void PAGE_XN297DumpInit(int page)
 {
     (void)page;
     memset(xp, 0, sizeof(struct xn297dump_page));
-    xp->model_protocol = Model.protocol;  // Save protocol used in current Model file
+    setup_module(1);
     xn297dump.crc_valid = 0;
     xn297dump.pkt_len = 32;  // maximum payload length for nrf24l01
     xn297dump.scan = 0;
@@ -100,6 +110,5 @@ void PAGE_XN297DumpEvent()
 
 void PAGE_XN297DumpExit()
 {
-    if (xn297dump.mode)
-        _dump_enable(0);
+    setup_module(0);
 }
