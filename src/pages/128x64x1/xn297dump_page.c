@@ -29,8 +29,9 @@ enum {
     LENGTH_Y      = 13,
     LENGTH_WIDTH  = 44,
     PACKET_X      = 0,
-    PACKET_Y      = 9 + 14,
+    PACKET_Y      = 26,
     PACKET_WIDTH  = LCD_WIDTH,
+    PACKET_HEIGHT = 7,
     STATUS_Y      = 56,
 };
 #endif  // OVERRIDE_PLACEMENT
@@ -77,7 +78,7 @@ static void _draw_page()
     GUI_CreateTextSelectPlate(&gui->channel, CHANNEL_X, CHANNEL_Y, CHANNEL_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT, scan_cb, channel_cb, NULL);
     GUI_CreateTextSelectPlate(&gui->pkt_len, LENGTH_X, LENGTH_Y, LENGTH_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT, NULL, pktlen_cb, NULL);
     for (int i = 0; i < 4; i++) {
-        GUI_CreateLabelBox(&gui->packetdata[i], PACKET_X, PACKET_Y + (LINE_HEIGHT/2+1) * i, LCD_WIDTH, LINE_HEIGHT, &TINY_FONT, packetdata_cb, NULL, (void *)(uintptr_t)i);
+        GUI_CreateLabelBox(&gui->packetdata[i], PACKET_X, PACKET_Y + (LINE_HEIGHT / 2 + 1) * i, LCD_WIDTH, PACKET_HEIGHT, &TINY_FONT, packetdata_cb, NULL, (void *)(uintptr_t)i);
     }
     GUI_CreateLabelBox(&gui->status, 0, STATUS_Y, LCD_WIDTH, 7, &TINY_FONT, status_cb, NULL, NULL);
 }
