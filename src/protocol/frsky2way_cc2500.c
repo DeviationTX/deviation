@@ -511,13 +511,11 @@ uintptr_t FRSKY2WAY_Cmds(enum ProtoCmds cmd)
             return (CC2500_Reset() ? 1 : -1);
         case PROTOCMD_TELEMETRYTYPE: 
             return TELEM_FRSKY;
-        case PROTOCMD_TELEMETRYRESET:
 #if HAS_EXTENDED_TELEMETRY
-            Model.ground_level = 0;
-            discharge_dAms = 0;
-            Telemetry.value[TELEM_FRSKY_MIN_CELL] = TELEMETRY_GetMaxValue(TELEM_FRSKY_MIN_CELL);
-#endif
+        case PROTOCMD_TELEMETRYRESET:
+            frsky_telem_reset();
             return 0;
+#endif
         case PROTOCMD_CHANNELMAP: return AETRG;
         default: break;
     }

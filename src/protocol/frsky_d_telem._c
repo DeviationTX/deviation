@@ -11,6 +11,11 @@ static void set_telemetry(frsky_telem_t offset, s32 value) {
     TELEMETRY_SetUpdated(offset);
 }
 
+static void frsky_telem_reset() {
+    Model.ground_level = 0;
+    discharge_dAms = 0;
+    Telemetry.value[TELEM_FRSKY_MIN_CELL] = TELEMETRY_GetMaxValue(TELEM_FRSKY_MIN_CELL);
+}
 
 // store "before punctuation" and "after punctuation" values locally
 // keeps Telemetry.gps compatible with devo and dsm

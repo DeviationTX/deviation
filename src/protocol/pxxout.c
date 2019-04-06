@@ -283,7 +283,9 @@ if (spdata) {
         state = PXX_DATA2;
         return mixer_runtime;
     case PXX_DATA2:
+#ifndef EMULATOR
         if (mixer_sync != MIX_DONE && mixer_runtime < 2000) mixer_runtime += 50;
+#endif
         build_data_pkt(0);
         PXX_Enable(packet);
         state = PXX_DATA1;
@@ -349,6 +351,9 @@ uintptr_t PXXOUT_Cmds(enum ProtoCmds cmd)
             return PROTO_TELEM_ON;
         case PROTOCMD_TELEMETRYTYPE:
             return TELEM_FRSKY;
+        case PROTOCMD_TELEMETRYRESET:
+            frsky_telem_reset();
+            return 0;
 #endif
         case PROTOCMD_CHANNELMAP: return UNCHG;
         default: break;
