@@ -64,7 +64,7 @@ u32 CONVERT_COLOR(u32 color) {
     return color;
 
 }
-volatile u32 xxx;
+
 void LCD_DrawPixel(unsigned int color)
 {
     if(xpos == xstart) {
