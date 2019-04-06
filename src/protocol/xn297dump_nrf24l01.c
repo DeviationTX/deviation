@@ -55,6 +55,9 @@ static u8 get_packet(void)
     if (xn297dump.channel != cur_channel) {
         NRF24L01_WriteReg(NRF24L01_05_RF_CH, xn297dump.channel);
         cur_channel = xn297dump.channel;
+        memset(raw_packet, 0, MAX_PACKET_LEN);
+        xn297dump.crc_valid = 0;
+        NRF24L01_FlushRx();
     }
     if (NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR)) {
         if (!NRF24L01_ReadReg(NRF24L01_09_CD) && xn297dump.scan) {

@@ -16,6 +16,9 @@
 #include "protocol/interface.h"
 #include "rftools.h"
 
+#define MAX_RF_CHANNEL 84
+#define MAX_PAYLOAD 32
+
 static struct xn297dump_page * const xp = &pagemem.u.xn297dump_page;
 
 static void _draw_page();
@@ -60,7 +63,6 @@ static void scan_cb(guiObject_t *obj, void *data)
     (void)data;
     if (xn297dump.scan == XN297DUMP_SCAN_OFF) {
         xn297dump.channel++;
-        xn297dump.crc_valid = 0;
         xn297dump.scan = XN297DUMP_SCAN_ON;
     } else {
         xn297dump.scan = XN297DUMP_SCAN_OFF;
@@ -86,7 +88,7 @@ void PAGE_XN297DumpInit(int page)
     memset(xp, 0, sizeof(struct xn297dump_page));
     setup_module(1);
     xn297dump.crc_valid = 0;
-    xn297dump.pkt_len = 32;  // maximum payload length for nrf24l01
+    xn297dump.pkt_len = MAX_PAYLOAD;
     xn297dump.scan = 0;
     PAGE_SetModal(0);
     _draw_page();

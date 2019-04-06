@@ -30,7 +30,7 @@ static const char *mode_cb(guiObject_t *obj, int dir, void *data)
         xn297dump.mode = XN297DUMP_OFF;
     _dump_enable(xn297dump.mode);
 
-    const void * modelbl[4] = { "Off", "1M", "250K", "2M" };
+    const void * modelbl[4] = { "Off", "1 Mbps", "250 K", "2 Mbps" };
     return modelbl[xn297dump.mode];
 }
 
@@ -38,9 +38,8 @@ static const char *channel_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     (void)data;
-    xn297dump.channel = GUI_TextSelectHelper(xn297dump.channel, 0, 84, dir, 1, 10, NULL);
+    xn297dump.channel = GUI_TextSelectHelper(xn297dump.channel, 0, MAX_RF_CHANNEL, dir, 1, 10, NULL);
     snprintf(tempstring, sizeof(tempstring), "Ch %d", xn297dump.channel);
-    memset(xn297dump.packet, 0, sizeof(xn297dump.packet));  // clear old packet data
     return tempstring;
 }
 
@@ -48,9 +47,8 @@ static const char *pktlen_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     (void)data;
-    xn297dump.pkt_len = GUI_TextSelectHelper(xn297dump.pkt_len, 1, 32, dir, 1, 5, NULL);
+    xn297dump.pkt_len = GUI_TextSelectHelper(xn297dump.pkt_len, 1, MAX_PAYLOAD, dir, 1, 5, NULL);
     snprintf(tempstring, sizeof(tempstring), "Len %d", xn297dump.pkt_len);
-    memset(xn297dump.packet, 0, sizeof(xn297dump.packet));  // clear old packet data
     return tempstring;
 }
 
