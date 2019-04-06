@@ -19,6 +19,7 @@
 #include "rftools.h"
 
 #ifdef PROTO_HAS_NRF24L01
+#if SUPPORT_XN297DUMP
 
 #ifdef MODULAR
     struct Xn297dump xn297dump;
@@ -30,7 +31,7 @@
 #define MAX_PACKET_LEN     32
 #define CRC_LENGTH         2
 #define MAX_RF_CHANNEL     84
-#define DUMP_RETRIES       10  // stay on channels long enough to capture packets
+#define DUMP_RETRIES       20  // stay on channels long enough to capture packets
 
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
@@ -219,4 +220,5 @@ uintptr_t XN297Dump_Cmds(enum ProtoCmds cmd)
     }
     return 0;
 }
+#endif  // SUPPORT_XN297DUMP
 #endif  // PROTO_HAS_NRF24L01

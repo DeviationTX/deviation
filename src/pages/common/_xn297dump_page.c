@@ -23,18 +23,6 @@ static struct xn297dump_page * const xp = &pagemem.u.xn297dump_page;
 
 static void _draw_page();
 
-static void setup_module(int enable)
-{
-    if (enable) {
-        xp->model_protocol = Model.protocol;
-        Model.protocol = PROTOCOL_XN297DUMP;
-    } else {
-        PROTOCOL_DeInit();
-        Model.protocol = xp->model_protocol;
-        PROTOCOL_Init(0);
-    }
-}
-
 static void _dump_enable(int enable)
 {
     if (enable) {
@@ -74,8 +62,8 @@ static const char *status_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    if (!PROTOCOL_HasModule(PROTOCOL_XN297DUMP))
-        return _tr_noop("Module NRF24L01 not available");
+    if (Model.protocol != PROTOCOL_XN297DUMP)
+        return _tr_noop("Set protocol to XN297Dump");
     if (xn297dump.scan) {
         return _tr_noop("Scanning channels and length...");
     }
@@ -86,7 +74,6 @@ void PAGE_XN297DumpInit(int page)
 {
     (void)page;
     memset(xp, 0, sizeof(struct xn297dump_page));
-    setup_module(1);
     xn297dump.crc_valid = 0;
     xn297dump.pkt_len = MAX_PAYLOAD;
     xn297dump.scan = 0;
@@ -112,5 +99,5 @@ void PAGE_XN297DumpEvent()
 
 void PAGE_XN297DumpExit()
 {
-    setup_module(0);
+    _dump_enable(0);
 }

@@ -46,6 +46,8 @@ static const char *mode_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     (void)data;
+    if (Model.protocol != PROTOCOL_XN297DUMP)
+        return "---";
     xn297dump.mode = GUI_TextSelectHelper(xn297dump.mode, 0, 3, dir, 1, 1, NULL);
     if (xn297dump.mode > XN297DUMP_2MBPS)
         xn297dump.mode = XN297DUMP_OFF;
