@@ -154,7 +154,7 @@ static void xn297dump_init()
     NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 0x00);             // Disable dynamic payload length on all pipes
     NRF24L01_WriteReg(NRF24L01_1D_FEATURE, 0x01);
     NRF24L01_Activate(0x73);
-    NRF24L01_WriteReg(NRF24L01_05_RF_CH, 0x00);
+    NRF24L01_WriteReg(NRF24L01_05_RF_CH, xn297dump.channel);
 }
 
 static u16 xn297dump_callback()
