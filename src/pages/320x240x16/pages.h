@@ -25,6 +25,7 @@ struct pagemem {
 #if SUPPORT_SCANNER
         struct scanner_page scanner_page;
 #endif
+        struct xn297dump_page xn297dump_page;
 #if HAS_MUSIC_CONFIG
         struct voiceconfig_page voiceconfig_page;
 #endif

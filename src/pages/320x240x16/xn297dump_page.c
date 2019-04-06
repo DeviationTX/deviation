@@ -29,8 +29,8 @@ static const char *mode_cb(guiObject_t *obj, int dir, void *data)
     if (xn297dump.mode > XN297DUMP_2MBPS)
         xn297dump.mode = XN297DUMP_OFF;
     _dump_enable(xn297dump.mode);
-
-    const void * modelbl[4] = { "Off", "1M", "250K", "2M" };
+    
+    const void * modelbl[4] = { "Off", "1 Mbps", "250 Kbps", "2 Mbps" };
     return modelbl[xn297dump.mode];
 }
 
@@ -39,7 +39,7 @@ static const char *channel_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     (void)data;
     xn297dump.channel = GUI_TextSelectHelper(xn297dump.channel, 0, 84, dir, 1, 10, NULL);
-    snprintf(tempstring, sizeof(tempstring), "Ch %d", xn297dump.channel);
+    snprintf(tempstring, sizeof(tempstring), "Channel %d", xn297dump.channel);
     memset(xn297dump.packet, 0, sizeof(xn297dump.packet));  // clear old packet data
     return tempstring;
 }
@@ -49,7 +49,7 @@ static const char *pktlen_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     (void)data;
     xn297dump.pkt_len = GUI_TextSelectHelper(xn297dump.pkt_len, 1, 32, dir, 1, 5, NULL);
-    snprintf(tempstring, sizeof(tempstring), "Len %d", xn297dump.pkt_len);
+    snprintf(tempstring, sizeof(tempstring), "Length %d", xn297dump.pkt_len);
     memset(xn297dump.packet, 0, sizeof(xn297dump.packet));  // clear old packet data
     return tempstring;
 }
@@ -57,11 +57,11 @@ static const char *pktlen_cb(guiObject_t *obj, int dir, void *data)
 static void _draw_page()
 {
     PAGE_ShowHeader(PAGE_GetName(PAGEID_XN297DUMP));
-    GUI_CreateTextSelectPlate(&gui->mode, 0, HEADER_HEIGHT, 40, LINE_HEIGHT, &TEXTSEL_FONT, NULL, mode_cb, NULL);
-    GUI_CreateTextSelectPlate(&gui->channel, LCD_WIDTH/2 - 23, HEADER_HEIGHT, 42, LINE_HEIGHT, &TEXTSEL_FONT, scan_cb, channel_cb, NULL);
-    GUI_CreateTextSelectPlate(&gui->pkt_len, LCD_WIDTH - 44, HEADER_HEIGHT, 44, LINE_HEIGHT, &TEXTSEL_FONT, NULL, pktlen_cb, NULL);
+    GUI_CreateTextSelect(&gui->mode, LCD_WIDTH/2 - 152, 44, TEXTSELECT_96, NULL, mode_cb, NULL);
+    GUI_CreateTextSelect(&gui->channel, LCD_WIDTH/2 - 152, 64, TEXTSELECT_128, scan_cb, channel_cb, NULL);
+    GUI_CreateTextSelect(&gui->pkt_len,  LCD_WIDTH/2, 64, TEXTSELECT_128, NULL, pktlen_cb, NULL);
     for (int i = 0; i < 4; i++) {
-        GUI_CreateLabelBox(&gui->packetdata[i], 0, HEADER_HEIGHT + 14 + 7 * i, LCD_WIDTH, 7, &TINY_FONT, packetdata_cb, NULL, (void *)(uintptr_t)i);
+        GUI_CreateLabelBox(&gui->packetdata[i], LCD_WIDTH/2 - LCD_WIDTH/4, 100 + 20 * i, LCD_WIDTH/2, 7, &LABEL_FONT, packetdata_cb, NULL, (void *)(uintptr_t)i);
     }
-    GUI_CreateLabelBox(&gui->status, 0, HEADER_HEIGHT + 43, LCD_WIDTH, 7, &TINY_FONT, status_cb, NULL, NULL);
+    GUI_CreateLabelBox(&gui->status, LCD_WIDTH/2 - LCD_WIDTH/4, LCD_HEIGHT - 30, LCD_WIDTH/2, 7, &LABEL_FONT, status_cb, NULL, NULL);
 }

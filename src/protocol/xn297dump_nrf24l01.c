@@ -20,7 +20,6 @@
 
 #ifdef PROTO_HAS_NRF24L01
 
-
 #ifdef MODULAR
     struct Xn297dump xn297dump;
 #endif
@@ -46,6 +45,11 @@ static u8 raw_packet[MAX_PACKET_LEN];
 
 static u8 get_packet(void)
 {
+#ifdef EMULATOR
+    for  (int i = 0; i < MAX_PACKET_LEN; i++)
+        raw_packet[i] = rand32() % 0xFF;
+    return 1;
+#else
     if (xn297dump.channel > MAX_RF_CHANNEL)
         xn297dump.channel = 0;
     if (xn297dump.channel != cur_channel) {
@@ -53,7 +57,7 @@ static u8 get_packet(void)
         cur_channel = xn297dump.channel;
     }
     if (NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR)) {
-        if (!NRF24L01_ReadReg(NRF24L01_09_CD) && xn297dump.scan){
+        if (!NRF24L01_ReadReg(NRF24L01_09_CD) && xn297dump.scan) {
             NRF24L01_FlushRx();
             return 0;  // ignore weak signals in scan mode
         }
@@ -63,6 +67,7 @@ static u8 get_packet(void)
             return 1;
     }
     return 0;
+#endif
 }
 
 static void process_packet(void)
@@ -118,7 +123,7 @@ static void xn297dump_init()
     NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, rx_addr, 3);     // set up RX address to xn297 preamble
     NRF24L01_WriteReg(NRF24L01_11_RX_PW_P0, MAX_PACKET_LEN);
 
-    switch(xn297dump.mode) {
+    switch (xn297dump.mode) {
         case XN297DUMP_1MBPS:
             NRF24L01_SetBitrate(NRF24L01_BR_1M); break;
         case XN297DUMP_250KBPS:

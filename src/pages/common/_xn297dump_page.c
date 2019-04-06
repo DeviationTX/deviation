@@ -38,7 +38,7 @@ static void _dump_enable(int enable)
 static const char *packetdata_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    u8 first_packet = (long)data * 8;
+    u8 first_packet = (uintptr_t)data * 8;
     int idx = 0;
     for (unsigned i = 0; i < 8; i++) {
         snprintf(&tempstring[idx], sizeof(tempstring) - idx, "%02X ", xn297dump.packet[i + first_packet]);
@@ -75,8 +75,9 @@ void PAGE_XN297DumpInit(int page)
 {
     (void)page;
     memset(xp, 0, sizeof(struct xn297dump_page));
-    xn297dump.pkt_len = 32;
-    xn297dump.channel = 0;
+    xn297dump.crc_valid = 0;
+    xn297dump.pkt_len = 32;  // maximum payload length for nrf24l01
+    xn297dump.scan = 0;
     PAGE_SetModal(0);
     _draw_page();
 }
