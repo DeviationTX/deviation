@@ -24,7 +24,6 @@ static void _dump_enable(int enable)
 {
     if (enable) {
         PROTOCOL_DeInit();
-        xp->model_protocol = Model.protocol;  // Save protocol used in current Model file
         Model.protocol = PROTOCOL_XN297DUMP;
         PROTOCOL_Init(1);  // Switch to scanner configuration and ignore safety
         PROTOCOL_SetBindState(0);  // Disable binding message
@@ -75,6 +74,7 @@ void PAGE_XN297DumpInit(int page)
 {
     (void)page;
     memset(xp, 0, sizeof(struct xn297dump_page));
+    xp->model_protocol = Model.protocol;  // Save protocol used in current Model file
     xn297dump.crc_valid = 0;
     xn297dump.pkt_len = 32;  // maximum payload length for nrf24l01
     xn297dump.scan = 0;
