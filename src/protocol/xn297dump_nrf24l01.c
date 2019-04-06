@@ -31,7 +31,21 @@
 #define MAX_PACKET_LEN     32
 #define CRC_LENGTH         2
 #define MAX_RF_CHANNEL     84
-#define DUMP_RETRIES       20  // stay on channels long enough to capture packets
+#define DUMP_RETRIES       10  // stay on channels long enough to capture packets
+
+static const char *const xn297dump_opts[] = {
+    _tr_noop("Address"), "5 byte", "4 byte", "3 byte", NULL,
+    _tr_noop("Retries"), "10", "244", NULL,
+    NULL
+};
+
+enum {
+    PROTOOPTS_ADDRESS = 0,
+    PROTOOPTS_RETRIES,
+    LAST_PROTO_OPT,
+};
+
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
@@ -81,13 +95,13 @@ static void process_packet(void)
     u16 crc = 0xb5d2;
 
     // unscramble address and reverse order
-    for (i = 0; i < ADDRESS_LENGTH; i++) {
+    for (i = 0; i < ADDRESS_LENGTH - Model.proto_opts[PROTOOPTS_ADDRESS]; i++) {
         crc = crc16_update(crc, raw_packet[i], 8);
-        xn297dump.packet[ADDRESS_LENGTH - i - 1] = raw_packet[i] ^ xn297_scramble[i];
+        xn297dump.packet[ADDRESS_LENGTH - Model.proto_opts[PROTOOPTS_ADDRESS] - i - 1] = raw_packet[i] ^ xn297_scramble[i];
     }
 
     // unscramble payload
-    for (i = ADDRESS_LENGTH; i < xn297dump.pkt_len - CRC_LENGTH; i++) {
+    for (i = ADDRESS_LENGTH - Model.proto_opts[PROTOOPTS_ADDRESS]; i < xn297dump.pkt_len - CRC_LENGTH; i++) {
         crc = crc16_update(crc, raw_packet[i], 8);
         xn297dump.packet[i] = bit_reverse(raw_packet[i] ^ xn297_scramble[i]);
     }
@@ -97,7 +111,7 @@ static void process_packet(void)
                 | ((u16)(raw_packet[xn297dump.pkt_len - 1]) & 0xff);
     xn297dump.packet[xn297dump.pkt_len - 2] = raw_packet[xn297dump.pkt_len - 2];
     xn297dump.packet[xn297dump.pkt_len - 1] = raw_packet[xn297dump.pkt_len - 1];
-    crc ^= xn297_crc_xorout_scrambled[xn297dump.pkt_len-(ADDRESS_LENGTH-2+CRC_LENGTH)];
+    crc ^= xn297_crc_xorout_scrambled[xn297dump.pkt_len-(ADDRESS_LENGTH - Model.proto_opts[PROTOOPTS_ADDRESS] - 2 + CRC_LENGTH)];
 
     if (packet_crc == crc) {
         xn297dump.crc_valid = 1;
@@ -149,7 +163,7 @@ static u16 xn297dump_callback()
         case XN297DUMP_GET_PACKET:
             if (xn297dump.scan == XN297DUMP_SCAN_ON) {
                 dumps++;
-                if (dumps > DUMP_RETRIES) {
+                if (dumps > (u8)Model.proto_opts[PROTOOPTS_RETRIES] + DUMP_RETRIES) {
                     dumps = 0;
                     xn297dump.channel++;
                     return PERIOD_DUMP;
@@ -162,7 +176,7 @@ static u16 xn297dump_callback()
                 process_packet();  // process_packet will set scan = 0 if valid CRC is found to stop scanning
             if (xn297dump.scan == XN297DUMP_SCAN_ON) {
                 xn297dump.pkt_len--;
-                if (xn297dump.pkt_len > ADDRESS_LENGTH + CRC_LENGTH) {
+                if (xn297dump.pkt_len > ADDRESS_LENGTH - Model.proto_opts[PROTOOPTS_ADDRESS] + CRC_LENGTH) {
                     phase = XN297DUMP_PROCESS_PACKET;
                 } else {
                     xn297dump.pkt_len = MAX_PACKET_LEN;
@@ -210,7 +224,7 @@ uintptr_t XN297Dump_Cmds(enum ProtoCmds cmd)
         return NUM_CHANNELS;
     case PROTOCMD_CURRENT_ID:
     case PROTOCMD_GETOPTIONS:
-        return 0;
+        return (uintptr_t)xn297dump_opts;
     case PROTOCMD_TELEMETRYSTATE:
         return PROTO_TELEM_UNSUPPORTED;
     case PROTOCMD_CHANNELMAP:
