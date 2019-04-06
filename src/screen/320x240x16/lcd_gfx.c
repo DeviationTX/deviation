@@ -31,7 +31,7 @@ void LCD_DrawFastVLine(int16_t x, int16_t y,
     LCD_DrawStop();
 }
 
-void LCD_DrawFastHLine(u16 x, u16 y, u16 w, u16 color) {
+__attribute__((weak))void LCD_DrawFastHLine(u16 x, u16 y, u16 w, u16 color) {
     LCD_DrawStart(x, y, x + w -1, y, DRAW_NWSE);
     while(w--)
         LCD_DrawPixel(color);
@@ -204,7 +204,7 @@ void LCD_DrawRect(u16 x, u16 y, u16 w, u16 h, u16 color)
   LCD_DrawFastVLine(x+w-1, y, h, color);
 }
 
-void LCD_FillRect(u16 x, u16 y, u16 w, u16 h, u16 color)
+__attribute__((weak))void LCD_FillRect(u16 x, u16 y, u16 w, u16 h, u16 color)
 {
     u32 bytes = (u32)w * h;
     LCD_DrawStart(x, y, x + w - 1, y + h -1, DRAW_NWSE); // Bug fix: should be y+h-1 instead of y+h
