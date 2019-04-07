@@ -37,7 +37,7 @@
 static const char *const xn297dump_opts[] = {
     _tr_noop("Address"), "5 byte", "4 byte", "3 byte", NULL,
     _tr_noop("Retries"), "10", "245", NULL,
-    _tr_noop("Get Intvl"), _tr_noop("No"), _tr_noop("Yes"), NULL,
+    _tr_noop("Get Intvl"), "0", "20", NULL,
     NULL
 };
 
@@ -94,11 +94,14 @@ static u8 get_packet(void)
 #endif
 }
 
-static void measure_interval(void)
+static u32 measure_interval(u8 average)
 {
     u32 hits;
-    xn297dump.interval = 0;
-    for (int k = 0; k < INTERVAL_AVERAGE; k++) {
+    u32 result;
+    if (!average)
+        return 0;  // we shouldn't divide by 0...
+    result = 0;
+    for (int k = 0; k < average; k++) {
         time_ms = CLOCK_getms();
         hits = 0;
         for (u32 i = 0; i < 200000; i++) {
@@ -109,9 +112,9 @@ static void measure_interval(void)
                 hits++;
             }
         }
-        xn297dump.interval += 1000 * (CLOCK_getms()-time_ms) / hits;
+        result += 1000 * (CLOCK_getms()-time_ms) / hits;
     }
-    xn297dump.interval /= INTERVAL_AVERAGE;
+    return result /= average;
 }
 
 static void process_packet(void)
@@ -221,11 +224,7 @@ static u16 xn297dump_callback()
             phase = XN297DUMP_MEASURE_INTERVAL;
             return 65355;  // Give status display some more time to update
         case XN297DUMP_MEASURE_INTERVAL:
-            if (Model.proto_opts[PROTOOPTS_INTERVAL]) {
-                measure_interval();
-            } else {
-                xn297dump.interval = 0;
-            }
+            xn297dump.interval = measure_interval(Model.proto_opts[PROTOOPTS_INTERVAL]);
             xn297dump.scan = XN297DUMP_SCAN_FINISHED;  // only run this once;
             phase = XN297DUMP_GET_PACKET;
     }
