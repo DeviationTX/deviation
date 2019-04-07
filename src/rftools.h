@@ -39,7 +39,6 @@ struct Xn297dump {
     u8 scan;
     u8 mode;
     u32 interval;
-    u32 time;
 };
 
 extern struct Xn297dump xn297dump;
