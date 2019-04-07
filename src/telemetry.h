@@ -136,6 +136,10 @@ typedef enum {
     TELEM_FRSKY_ALTITUDE,
     TELEM_FRSKY_VARIO,
     TELEM_FRSKY_DISCHARGE,    // mAh
+    TELEM_FRSKY_ACCX,
+    TELEM_FRSKY_ACCY,
+    TELEM_FRSKY_ACCZ,
+    TELEM_FRSKY_SPEED,
 #endif
     TELEM_FRSKY_LAST
 } frsky_telem_t;

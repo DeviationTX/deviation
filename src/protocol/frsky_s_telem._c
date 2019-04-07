@@ -122,10 +122,10 @@ static void processSportPacket(u8 *packet) {
     // sensor ids from Qlrs
     switch (id) {
         case APID_PITCH:
-            set_telemetry(TELEM_FRSKY_CELL1, data);
+            set_telemetry(TELEM_FRSKY_ACCX, data * 10);
             break;
         case APID_ROLL:
-            set_telemetry(TELEM_FRSKY_CELL2, data);
+            set_telemetry(TELEM_FRSKY_ACCY, data * 10);
             break;
 #if 0
         case APID_RX_RSSI_REG_VAL:
@@ -240,14 +240,22 @@ static void processSportPacket(u8 *packet) {
             TELEMETRY_SetUpdated(TELEM_GPS_TIME);
         }
         break;
+    case ACCX_FIRST_ID & 0xfff0:
+        set_telemetry(TELEM_FRSKY_ACCX, data / 10);
+        break;
+    case ACCY_FIRST_ID & 0xfff0:
+        set_telemetry(TELEM_FRSKY_ACCY, data / 10);
+        break;
+    case ACCZ_FIRST_ID & 0xfff0:
+        set_telemetry(TELEM_FRSKY_ACCZ, data / 10);
+        break;
+    case AIR_SPEED_FIRST_ID & 0xfff0:
+        set_telemetry(TELEM_FRSKY_SPEED, data);
+        break;
     } // switch
 // not sure about these
 //    case A3_FIRST_ID & 0xfff0:
 //    case A4_FIRST_ID & 0xfff0:
-//    case AIR_SPEED_FIRST_ID & 0xfff0:
-//    case ACCX_FIRST_ID & 0xfff0:
-//    case ACCY_FIRST_ID & 0xfff0:
-//    case ACCZ_FIRST_ID & 0xfff0:
 }
 
 
