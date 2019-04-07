@@ -32,16 +32,19 @@
 #define CRC_LENGTH         2
 #define MAX_RF_CHANNEL     84
 #define DUMP_RETRIES       10  // stay on channels long enough to capture packets
+#define INTERVAL_AVERAGE   4
 
 static const char *const xn297dump_opts[] = {
     _tr_noop("Address"), "5 byte", "4 byte", "3 byte", NULL,
-    _tr_noop("Retries"), "10", "244", NULL,
+    _tr_noop("Retries"), "10", "245", NULL,
+    _tr_noop("Get Intvl"), _tr_noop("No"), _tr_noop("Yes"), NULL,
     NULL
 };
 
 enum {
     PROTOOPTS_ADDRESS = 0,
     PROTOOPTS_RETRIES,
+    PROTOOPTS_INTERVAL,
     LAST_PROTO_OPT,
 };
 
@@ -52,12 +55,15 @@ ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 enum {
     XN297DUMP_GET_PACKET = 0,
-    XN297DUMP_PROCESS_PACKET
+    XN297DUMP_PROCESS_PACKET,
+    XN297DUMP_DELAY,
+    XN297DUMP_DELAY2,
+    XN297DUMP_MEASURE_INTERVAL
 };
 
 static u8 phase, cur_channel, dumps, new_packet;
 static u8 raw_packet[MAX_PACKET_LEN];
-
+static u32 time_ms;
 static u8 get_packet(void)
 {
 #ifdef EMULATOR
@@ -86,6 +92,26 @@ static u8 get_packet(void)
     }
     return 0;
 #endif
+}
+
+static void measure_interval(void)
+{
+    u32 hits;
+    xn297dump.interval = 0;
+    for (int k = 0; k < INTERVAL_AVERAGE; k++) {
+        time_ms = CLOCK_getms();
+        hits = 0;
+        for (u32 i = 0; i < 200000; i++) {
+            CLOCK_ResetWatchdog();
+            if (NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR)) {
+                NRF24L01_FlushRx();
+                NRF24L01_WriteReg(NRF24L01_07_STATUS, 255);
+                hits++;
+            }
+        }
+        xn297dump.interval += 1000 * (CLOCK_getms()-time_ms) / hits;
+    }
+    xn297dump.interval /= INTERVAL_AVERAGE;
 }
 
 static void process_packet(void)
@@ -182,13 +208,29 @@ static u16 xn297dump_callback()
                     xn297dump.pkt_len = MAX_PACKET_LEN;
                     phase = XN297DUMP_GET_PACKET;
                 }
+            } else if (xn297dump.scan == XN297DUMP_SCAN_INTERVAL) {
+                phase = XN297DUMP_DELAY;
             } else {
                 phase = XN297DUMP_GET_PACKET;
             }
+            break;
+        case XN297DUMP_DELAY:
+            phase = XN297DUMP_DELAY2;
+            return 65355;  // Give status display some time to update
+        case XN297DUMP_DELAY2:
+            phase = XN297DUMP_MEASURE_INTERVAL;
+            return 65355;  // Give status display some more time to update
+        case XN297DUMP_MEASURE_INTERVAL:
+            if (Model.proto_opts[PROTOOPTS_INTERVAL]) {
+                measure_interval();
+            } else {
+                xn297dump.interval = 0;
+            }
+            xn297dump.scan = XN297DUMP_SCAN_FINISHED;  // only run this once;
+            phase = XN297DUMP_GET_PACKET;
     }
     return PERIOD_DUMP;
 }
-
 
 static void initialize()
 {

@@ -20,6 +20,8 @@ enum {
     XN297DUMP_SCAN_OFF = 0,
     XN297DUMP_SCAN_ON,
     XN297DUMP_SCAN_SUCCESS,
+    XN297DUMP_SCAN_INTERVAL,
+    XN297DUMP_SCAN_FINISHED
 };
 
 enum {
@@ -36,6 +38,8 @@ struct Xn297dump {
     u8 crc_valid;
     u8 scan;
     u8 mode;
+    u32 interval;
+    u32 time;
 };
 
 extern struct Xn297dump xn297dump;

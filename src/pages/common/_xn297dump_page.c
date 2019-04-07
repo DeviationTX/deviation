@@ -52,6 +52,7 @@ static void scan_cb(guiObject_t *obj, void *data)
     if (xn297dump.scan == XN297DUMP_SCAN_OFF) {
         xn297dump.channel++;
         xn297dump.scan = XN297DUMP_SCAN_ON;
+        xn297dump.interval = 0;
     } else {
         xn297dump.scan = XN297DUMP_SCAN_OFF;
     }
@@ -64,8 +65,13 @@ static const char *status_cb(guiObject_t *obj, const void *data)
     (void)data;
     if (Model.protocol != PROTOCOL_XN297DUMP)
         return _tr_noop("Set protocol to XN297Dump");
-    if (xn297dump.scan) {
+    if (xn297dump.scan == XN297DUMP_SCAN_ON)
         return _tr_noop("Scanning channels and length...");
+    if (xn297dump.scan == XN297DUMP_SCAN_INTERVAL)
+        return _tr_noop("Measuring packet intervals...");
+    if (xn297dump.interval) {
+        snprintf(tempstring, sizeof(tempstring), "Packet interval %d usec", xn297dump.interval);
+        return tempstring;
     }
     return xn297dump.crc_valid ? _tr_noop("Valid CRC found!") : _tr_noop("CRC invalid");
 }
@@ -83,18 +89,25 @@ void PAGE_XN297DumpInit(int page)
 
 void PAGE_XN297DumpEvent()
 {
-    if (!xn297dump.mode)
-        return;
-    for (int i = 0; i < 4; i++) {
-        GUI_Redraw(&gui->packetdata[i]);
-    }
-    GUI_Redraw(&gui->status);
-    if (xn297dump.scan) {
+    if (xn297dump.scan == XN297DUMP_SCAN_FINISHED) {
         GUI_Redraw(&gui->channel);
         GUI_Redraw(&gui->pkt_len);
-    }
-    if (xn297dump.scan == XN297DUMP_SCAN_SUCCESS)
         xn297dump.scan = XN297DUMP_SCAN_OFF;
+    } else  if ( xn297dump.scan > XN297DUMP_SCAN_ON ) {
+        GUI_Redraw(&gui->status);  // only update status before measuring interval to avoid ugly display
+        xn297dump.scan = XN297DUMP_SCAN_INTERVAL;
+    } else {
+        if (!xn297dump.mode)
+            return;
+        for (int i = 0; i < 4; i++) {
+            GUI_Redraw(&gui->packetdata[i]);
+        }
+        GUI_Redraw(&gui->status);
+        if (xn297dump.scan) {
+            GUI_Redraw(&gui->channel);
+            GUI_Redraw(&gui->pkt_len);
+        }
+    }
 }
 
 void PAGE_XN297DumpExit()
