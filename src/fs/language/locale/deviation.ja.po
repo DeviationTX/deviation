@@ -183,8 +183,7 @@ msgstr "ELE DR"
 msgid "AIL DR"
 msgstr "AIL DR"
 
-#: inputs.c:57 inputs.c:58 inputs.c:92 inputs.c:93 inputs.c:94
-#: pages/common/standard/_common_standard.c:38
+#: inputs.c:57 inputs.c:58 pages/common/standard/_common_standard.c:38
 #: pages/common/standard/_gyrosense_page.c:57
 msgid "GEAR"
 msgstr "GEAR"
@@ -237,105 +236,104 @@ msgstr "SW G"
 msgid "SW H"
 msgstr "SW H"
 
-#: inputs.c:96
+#: inputs.c:92
 msgid "TRIMLV-"
 msgstr "Trm左V-"
 
-#: inputs.c:97
+#: inputs.c:93
 msgid "TRIMLV+"
 msgstr "Trm左V+"
 
-#: inputs.c:98
+#: inputs.c:94
 msgid "TRIMRV-"
 msgstr "Trm右V-"
 
-#: inputs.c:99
+#: inputs.c:95
 msgid "TRIMRV+"
 msgstr "Trm右V+"
 
-#: inputs.c:100
+#: inputs.c:96
 msgid "TRIMLH-"
 msgstr "Trm左H-"
 
-#: inputs.c:101
+#: inputs.c:97
 msgid "TRIMLH+"
 msgstr "Trm左H+"
 
-#: inputs.c:102
+#: inputs.c:98
 msgid "TRIMRH-"
 msgstr "Trm右H-"
 
-#: inputs.c:103
+#: inputs.c:99
 msgid "TRIMRH+"
 msgstr "Trm右H+"
 
-#: inputs.c:104
+#: inputs.c:100
 msgid "TRIM_L-"
 msgstr "Trm_左-"
 
-#: inputs.c:105
+#: inputs.c:101
 msgid "TRIM_L+"
 msgstr "Trm_左+"
 
-#: inputs.c:106
+#: inputs.c:102
 msgid "TRIM_R-"
 msgstr "Trm_右-"
 
-#: inputs.c:107
+#: inputs.c:103
 msgid "TRIM_R+"
 msgstr "Trm_右+"
 
-#: inputs.c:108
+#: inputs.c:104
 msgid "Left"
 msgstr "左"
 
-#: inputs.c:109
+#: inputs.c:105
 msgid "Right"
 msgstr "右"
 
-#: inputs.c:110 pages/128x64x1/standard/traveladj_page.c:63
+#: inputs.c:106 pages/128x64x1/standard/traveladj_page.c:63
 #: pages/320x240x16/standard/traveladj_page.c:68
 msgid "Down"
 msgstr "下"
 
-#: inputs.c:111 pages/128x64x1/reorder_list.c:38
+#: inputs.c:107 pages/128x64x1/reorder_list.c:38
 #: pages/128x64x1/standard/traveladj_page.c:64
 #: pages/320x240x16/standard/traveladj_page.c:69
 msgid "Up"
 msgstr "上"
 
-#: inputs.c:112
+#: inputs.c:108
 msgid "Enter"
 msgstr "Enter"
 
-#: inputs.c:113
+#: inputs.c:109
 msgid "Exit"
 msgstr "Exit"
 
-#: inputs.c:116
+#: inputs.c:112
 msgid "RIGHT_H"
 msgstr "右_H"
 
-#: inputs.c:117
+#: inputs.c:113
 msgid "LEFT_V"
 msgstr "左_V"
 
-#: inputs.c:118
+#: inputs.c:114
 msgid "RIGHT_V"
 msgstr "右_V"
 
-#: inputs.c:119
+#: inputs.c:115
 msgid "LEFT_H"
 msgstr "左_H"
 
-#: inputs.c:145 inputs.c:258 mixer.c:873 mixer.c:887
-#: pages/128x64x1/datalog_page.c:79 pages/128x64x1/model_page.c:159
-#: pages/320x240x16/datalog_page.c:92 pages/320x240x16/model_page.c:100
-#: pages/320x240x16/trim_page.c:46 pages/common/advanced/_mixer_setup.c:400
-#: pages/common/_main_config.c:177 pages/common/_main_config.c:181
-#: pages/common/_model_config.c:132 pages/common/_model_page.c:223
-#: pages/common/_model_page.c:274 pages/common/_pages.c:152
-#: pages/common/standard/_failsafe_page.c:33
+#: inputs.c:141 mixer.c:873 mixer.c:887 pages/128x64x1/datalog_page.c:79
+#: pages/128x64x1/model_page.c:159 pages/320x240x16/datalog_page.c:92
+#: pages/320x240x16/model_page.c:100 pages/320x240x16/trim_page.c:46
+#: pages/common/advanced/_mixer_setup.c:400 pages/common/_main_config.c:177
+#: pages/common/_main_config.c:181 pages/common/_model_config.c:132
+#: pages/common/_model_page.c:228 pages/common/_model_page.c:279
+#: pages/common/_pages.c:152 pages/common/standard/_failsafe_page.c:33
 #: pages/common/standard/_reverse_page.c:21
 #: pages/common/standard/_swash_page.c:65 pages/common/_trim_page.c:56
 #: pages/common/_trim_page.c:74 pages/common/_voiceconfig_page.c:185
@@ -344,16 +342,16 @@ msgstr "左_H"
 msgid "None"
 msgstr "なし"
 
-#: inputs.c:155 pages/common/standard/_gyrosense_page.c:57
+#: inputs.c:151 pages/common/standard/_gyrosense_page.c:57
 #: pages/common/standard/_gyrosense_page.c:59
 msgid "Ch"
 msgstr "Ch"
 
-#: inputs.c:161 pages/320x240x16/chantest_page.c:219
+#: inputs.c:157 pages/320x240x16/chantest_page.c:219
 msgid "Virt"
 msgstr "仮想"
 
-#: inputs.c:164
+#: inputs.c:160
 msgid "PPM"
 msgstr "PPM"
 
@@ -547,7 +545,7 @@ msgstr "スティック入力"
 msgid "Mixer output"
 msgstr "ミキサー出力"
 
-#: pages/128x64x1/datalog_page.c:56 pages/128x64x1/scanner_page.c:29
+#: pages/128x64x1/datalog_page.c:56 pages/128x64x1/scanner_page.c:28
 #: pages/128x64x1/tx_configure.c:249 pages/128x64x1/usb_page.c:39
 #: pages/320x240x16/usb_page.c:39 pages/320x240x16/usb_page.c:41
 #: pages/common/standard/_curves_page.c:109
@@ -562,7 +560,7 @@ msgstr "ミキサー出力"
 msgid "On"
 msgstr "ON"
 
-#: pages/128x64x1/datalog_page.c:57 pages/128x64x1/scanner_page.c:29
+#: pages/128x64x1/datalog_page.c:57 pages/128x64x1/scanner_page.c:28
 #: pages/128x64x1/tx_configure.c:237 pages/128x64x1/tx_configure.c:247
 #: pages/128x64x1/usb_page.c:39 pages/320x240x16/usb_page.c:39
 #: pages/320x240x16/usb_page.c:41 pages/common/advanced/_mixer_limits.c:189
@@ -805,7 +803,7 @@ msgid "Multi"
 msgstr "マルチ"
 
 #: pages/128x64x1/model_page.c:51 pages/common/_model_loadsave.c:114
-#: pages/common/_model_page.c:181 protocol/hisky_nrf24l01.c:71
+#: pages/common/_model_page.c:186 protocol/hisky_nrf24l01.c:71
 msgid "Default"
 msgstr "初期値"
 
@@ -1014,22 +1012,6 @@ msgstr "下"
 msgid "Copy To"
 msgstr "コピー"
 
-#: pages/128x64x1/scanner_page.c:36 pages/320x240x16/scanner_page.c:42
-msgid "Average"
-msgstr "平均"
-
-#: pages/128x64x1/scanner_page.c:36 pages/320x240x16/scanner_page.c:42
-msgid "Peak"
-msgstr "ピーク"
-
-#: pages/128x64x1/scanner_page.c:43
-msgid "-20dB"
-msgstr "-20dB"
-
-#: pages/128x64x1/scanner_page.c:43
-msgid "0dB"
-msgstr "0dB"
-
 #: pages/128x64x1/set_timer_page.c:44 pages/320x240x16/rtc_config.c:136
 #: pages/320x240x16/set_timer_page.c:98
 msgid "Second"
@@ -1062,7 +1044,7 @@ msgstr "Mode"
 
 #: pages/128x64x1/standard/gyrosense_page.c:58
 #: pages/320x240x16/standard/gyrosense_page.c:64
-#: pages/common/_model_page.c:225
+#: pages/common/_model_page.c:230
 msgid "Channel"
 msgstr "Channel"
 
@@ -1133,7 +1115,7 @@ msgid "TX"
 msgstr "TX"
 
 #: pages/128x64x1/timer_page.c:62 pages/320x240x16/timer_page.c:60
-#: pages/common/_datalog_page.c:63 pages/common/_model_page.c:300
+#: pages/common/_datalog_page.c:63 pages/common/_model_page.c:305
 msgid "Reset"
 msgstr "リセット"
 
@@ -1500,21 +1482,13 @@ msgstr "設定値"
 msgid "resulting value"
 msgstr "リザルト値"
 
-#: pages/320x240x16/scanner_page.c:35
+#: pages/320x240x16/scanner_page.c:37
 msgid "Turn Off"
 msgstr "電源OFF"
 
-#: pages/320x240x16/scanner_page.c:35
+#: pages/320x240x16/scanner_page.c:37
 msgid "Turn On"
 msgstr "電源ON"
-
-#: pages/320x240x16/scanner_page.c:49
-msgid "Att.: -20dB"
-msgstr "Att.: -20dB"
-
-#: pages/320x240x16/scanner_page.c:49
-msgid "Att.: 0dB"
-msgstr "Att.: 0dB"
 
 #: pages/320x240x16/set_timer_page.c:86
 msgid "actual value"
@@ -1824,31 +1798,31 @@ msgstr "Ch %d"
 msgid "PPM%d"
 msgstr "PPM %d"
 
-#: pages/common/_model_page.c:83
+#: pages/common/_model_page.c:88
 msgid "Re-Init"
 msgstr "初期化"
 
-#: pages/common/_model_page.c:83
+#: pages/common/_model_page.c:88
 msgid "Bind"
 msgstr "バインド"
 
-#: pages/common/_model_page.c:227
+#: pages/common/_model_page.c:232
 msgid "Stick"
 msgstr "Stick"
 
-#: pages/common/_model_page.c:229
+#: pages/common/_model_page.c:234
 msgid "Extend"
 msgstr "拡張"
 
-#: pages/common/_model_page.c:294
+#: pages/common/_model_page.c:299
 msgid "Load..."
 msgstr "ロード..."
 
-#: pages/common/_model_page.c:296
+#: pages/common/_model_page.c:301
 msgid "Copy To..."
 msgstr "セーブ..."
 
-#: pages/common/_model_page.c:298
+#: pages/common/_model_page.c:303
 msgid "Template.."
 msgstr "Template.."
 
@@ -2224,7 +2198,7 @@ msgstr "Rx PWM出力"
 msgid "Rx Telem"
 msgstr "Rx Telem"
 
-#: protocol/sbus_uart.c:24
+#: protocol/sbus_uart.c:24 protocol/sumd_uart.c:24
 msgid "Period (ms)"
 msgstr "周期 (ms)"
 

@@ -1,1 +1,1 @@
-#include "../devof7/ia9211_map.c"
+#include "target/drivers/display/spi/ia9211_map.h"

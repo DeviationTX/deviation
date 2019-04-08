@@ -33,18 +33,18 @@ void _scan_extra_switches()
     GPIO_pin_clear(EXTRA_SWITCH_COL_OD);
     u32 port = GPIO_pin_get(BUTTON_MATRIX_ROW_OD);
     GPIO_setup_input(EXTRA_SWITCH_COL_OD, ITYPE_PULLUP);
-    if (SW_ENABLED(SWITCH_3x1) && !SW_ENABLED(SWITCH_3x2)) {
-        global_extra_switches = (((~port) >> 4) & 0x04) | (((~port) >> 5) & 0x08);
-    } else if SW_ENABLED(SWITCH_2x2) {
-        global_extra_switches  = (port>>6)&0x05;
-    } else {
+    if SW_ENABLED(SWITCH_3x2) {
         global_extra_switches  = (~(port>>5))&0xf;
+    } else if (SW_ENABLED(SWITCH_3x1)) {
+        global_extra_switches = (((~port) >> 4) & 0x04) | (((~port) >> 5) & 0x08);
+    } else {
+        global_extra_switches  = (port>>6)&0x05;
     }
 }
 
 uint32_t ADDON_Handle_ExtraSwitches(u32 result) {
     uint32_t button_mask = 0;
-    #define BUTTONDEF(x) button_mask |= (1 << (BUT_ ## x));
+    #define BUTTONDEF(x) button_mask |= (1 << ((BUT_ ## x) - 1));
     #include "capabilities.h"
     #undef BUTTONDEF
     if (!(result & button_mask)) {

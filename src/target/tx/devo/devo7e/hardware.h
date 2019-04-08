@@ -29,20 +29,24 @@
     TWO_WAY(INP_HOLD, (GPIOC, GPIO11), CHAN_INVERT) \
     TWO_WAY(INP_FMOD, (GPIOC, GPIO10), CHAN_INVERT)
 
+#define EXTRA_SWITCHES \
+    EXTRA_3WAY(INP_SWA, 0x04, 0x08, CHAN_NONINV, SWITCH_3x1) \
+    EXTRA_3WAY(INP_SWB, 0x01, 0x02, CHAN_NONINV, SWITCH_3x2) \
+    EXTRA_2WAY(INP_SWA, 0x04, 0x08, CHAN_INVERT, SWITCH_2x1) \
+    EXTRA_2WAY(INP_SWB, 0x01, 0x02, CHAN_INVERT, SWITCH_2x2)
+
 #define ADDON_SWITCH_CFG \
+    ADDON_SWITCH("2x1", SWITCH_2x1, 0) \
     ADDON_SWITCH("2x2", SWITCH_2x2, 0) \
     ADDON_SWITCH("3x1", SWITCH_3x1, 0) \
     ADDON_SWITCH("3x2", SWITCH_3x2, 0)
 
-#define EXTRA_SWITCHES \
-    EXTRA_3WAY(INP_SWA, 0x04, 0x08, CHAN_NONINV, SWITCH_3x2) \
-    EXTRA_3WAY(INP_SWB, 0x01, 0x02, CHAN_NONINV, SWITCH_3x2) \
-    EXTRA_2WAY(INP_SWA, 0x04, 0x08, CHAN_INVERT, SWITCH_2x2) \
-    EXTRA_2WAY(INP_SWB, 0x01, 0x02, CHAN_INVERT, SWITCH_2x2)
-
-#define SWITCH_2x2  ((1 << INP_SWA0) | (1 << INP_SWA1) | (1 << INP_SWB0) | (1 << INP_SWB1))
-#define SWITCH_3x1  ((1 << INP_SWB0) | (1 << INP_SWB1) | (1 << INP_SWB2))
-#define SWITCH_3x2  ((1 << INP_SWA0) | (1 << INP_SWA1) | (1 << INP_SWA2) | SWITCH_3x1)
-#define SWITCH_STOCK (~(SWITCH_2x2 | SWITCH_3x2))
-
+#define SWITCH_3x2  ((1 << INP_SWA0) | (1 << INP_SWA1) | (1 << INP_SWA2) \
+                   | (1 << INP_SWB0) | (1 << INP_SWB1) | (1 << INP_SWB2))
+#define SWITCH_3x1  ((1 << INP_SWA0) | (1 << INP_SWA1) | (1 << INP_SWA2))
+#define SWITCH_2x2  ((1 << INP_SWA0) | (1 << INP_SWA1) \
+                   | (1 << INP_SWB0) | (1 << INP_SWB1))
+#define SWITCH_2x1  ((1 << INP_SWA0) | (1 << INP_SWA1))
+#define SWITCH_STOCK ((1 << INP_HOLD0) | (1 << INP_HOLD1) \
+                    | (1 << INP_FMOD0) | (1 << INP_FMOD1))
 #endif  // _DEVO7E_HARDWARE_H_

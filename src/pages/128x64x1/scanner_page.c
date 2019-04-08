@@ -14,11 +14,10 @@
  */
 
 #include "common.h"
-#include "protocol/interface.h"
 #include "pages.h"
 #include "config/model.h"
 
-#if HAS_SCANNER
+#if SUPPORT_SCANNER
 #include "../common/_scanner_page.c"
 
 static struct scanner_obj * const gui = &gui_objs.u.scanner;
@@ -29,18 +28,33 @@ static const char *enablestr_cb(guiObject_t *obj, const void *data)
     return sp->enable ? _tr("On") : _tr("Off");
 }
 
-static const char *modestr_cb(guiObject_t *obj, const void *data)
+static const char *average_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     (void)data;
-    return sp->scan_mode ? _tr("Average") : _tr("Peak");
+    Scanner.averaging = GUI_TextSelectHelper(Scanner.averaging, 1, 8192, dir, 1, 50, NULL);
+    switch (sp->mode) {
+        case PEAK_MODE:
+            snprintf(tempstring, sizeof(tempstring), "Pk %d", Scanner.averaging); break;
+        case AVERAGE_MODE:
+            snprintf(tempstring, sizeof(tempstring), "Av %d", Scanner.averaging); break;
+        case PEAK_HOLD_AVERAGE_MODE:
+            snprintf(tempstring, sizeof(tempstring), "AP %d", Scanner.averaging); break;
+        case LAST_MODE:
+            break;
+    }
+
+    memset(Scanner.rssi, 0, sizeof(Scanner.rssi));  // clear old rssi values when changing mode
+    memset(Scanner.rssi_peak, 0, sizeof(Scanner.rssi_peak));  // clear old rssi peak values when changing mode
+    return tempstring;
 }
 
-static const char *attstr_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    (void)data;
-    return sp->attenuator ? _tr("-20dB") : _tr("0dB");
+static void mode_cb(guiObject_t *obj, void *data) {
+    (void) obj;
+    (void) data;
+    sp->mode++;
+    if (sp->mode == LAST_MODE)
+        sp->mode = PEAK_MODE;
 }
 
 static void _draw_page(u8 enable)
@@ -48,19 +62,31 @@ static void _draw_page(u8 enable)
     (void)enable;
     PAGE_ShowHeader(PAGE_GetName(PAGEID_SCANNER));
     GUI_CreateButtonPlateText(&gui->enable, 0, HEADER_HEIGHT, 40, LINE_HEIGHT, &BUTTON_FONT, enablestr_cb, press_enable_cb, NULL);
-    GUI_CreateButtonPlateText(&gui->scan_mode, LCD_WIDTH/2 - 23, HEADER_HEIGHT, 46, LINE_HEIGHT, &BUTTON_FONT, modestr_cb, press_mode_cb, NULL);
-    GUI_CreateButtonPlateText(&gui->attenuator, LCD_WIDTH - 40, HEADER_HEIGHT, 40, LINE_HEIGHT, &BUTTON_FONT, attstr_cb, press_attenuator_cb, NULL);
+    GUI_CreateTextSelectPlate(&gui->averaging, LCD_WIDTH/2 - 23, HEADER_HEIGHT, 46, LINE_HEIGHT, &TEXTSEL_FONT, mode_cb, average_cb, NULL);
+    GUI_CreateTextSelectPlate(&gui->attenuator, LCD_WIDTH - 40, HEADER_HEIGHT, 40, LINE_HEIGHT, &TEXTSEL_FONT, NULL, attenuator_cb, NULL);
 }
 
 void _draw_channels()
 {
     const unsigned offset = HEADER_HEIGHT + LINE_HEIGHT;
-    // draw a line
-    int col = (LCD_WIDTH - (MAX_RADIOCHANNEL - MIN_RADIOCHANNEL)) / 2 + sp->channel;
-    int height = sp->channelnoise[sp->channel] * (LCD_HEIGHT - offset) / 0x1F;
+    int col, height;
 
-    LCD_DrawFastVLine(col, offset, LCD_HEIGHT - offset - height, 0);
-    LCD_DrawFastVLine(col, LCD_HEIGHT - height, height, Display.xygraph.grid_color);
+    // draw rssi values
+    for (int i = 0; i < Scanner.chan_max - Scanner.chan_min; i++) {
+        col = (LCD_WIDTH - (Scanner.chan_max - Scanner.chan_min)) / 2 + i;
+        if (sp->mode == PEAK_MODE) {
+            height = Scanner.rssi_peak[i] * (LCD_HEIGHT - offset) / 0x1F;
+        } else {
+            height = Scanner.rssi[i] * (LCD_HEIGHT - offset) / 0x1F;
+        }
+        LCD_DrawFastVLine(col, offset, LCD_HEIGHT - offset - height, 0);
+        LCD_DrawFastVLine(col, LCD_HEIGHT - height, height, 1);
+
+        if (sp->mode == PEAK_HOLD_AVERAGE_MODE) {
+            height = Scanner.rssi_peak[i] * (LCD_HEIGHT - offset) / 0x1F;
+            LCD_DrawPixelXY(col, LCD_HEIGHT - height, 1);
+        }
+    }
 }
 
-#endif //HAS_SCANNER
+#endif  // SUPPORT_SCANNER
