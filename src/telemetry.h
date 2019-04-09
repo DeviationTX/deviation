@@ -329,6 +329,18 @@ enum {
 #define SWR_ID                    0xf105
 #define XJT_VERSION_ID            0xf106
 
+// Custom S.port sensors reported by Qzcek long range system (Qlrs)
+#define APID_PITCH                0x0430
+#define APID_ROLL                 0x0440
+#define APID_MAV_BASE_MODE        0x04A0
+#define APID_MAV_SYS_STATUS       0x04A1
+#define APID_MAV_CUSTOM_MODE      0x04A2
+#define APID_CUST_RSSI            0x04B0
+#define APID_RX_RSSI_REG_VAL      0x04B1
+#define APID_RX_SNR_REG_VAL       0x04B2
+#define APID_RX_PACKET_LOST_VAL   0x04B3
+
+
 /************************************************************************/
 struct TelemetryAlarm {
     u8 src;
