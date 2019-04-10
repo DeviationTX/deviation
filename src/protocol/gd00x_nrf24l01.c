@@ -197,10 +197,12 @@ static void GD00X_send_packet()
 
     // Power on, TX mode, CRC enabled
     XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
-    if (phase == GD00X_DATA)
-    {
-        NRF24L01_WriteReg(NRF24L01_05_RF_CH, hopping_frequency[hopping_frequency_no++]);
-        hopping_frequency_no &= 3;  // 4 RF channels
+    if (phase == GD00X_DATA) {
+        NRF24L01_WriteReg(NRF24L01_05_RF_CH, hopping_frequency[hopping_frequency_no]);
+        if(Model.proto_opts[PROTOOPTS_FORMAT]==FORMAT_V1) {
+            hopping_frequency_no++;
+            hopping_frequency_no &= 3; // 4 RF channels
+        }
     }
 
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
@@ -222,12 +224,13 @@ static void GD00X_init()
     switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
         case FORMAT_V1:
             XN297_SetTXAddr((u8*)"\xcc\xcc\xcc\xcc\xcc", 5);
+            NRF24L01_WriteReg(NRF24L01_05_RF_CH, GD00X_RF_BIND_CHANNEL);
             break;
         case FORMAT_V2:
             XN297_SetTXAddr((u8*)"GDKNx", 5);
+            NRF24L01_WriteReg(NRF24L01_05_RF_CH, GD00X_V2_RF_BIND_CHANNEL);
             break;
     }
-    NRF24L01_WriteReg(NRF24L01_05_RF_CH, GD00X_RF_BIND_CHANNEL);  // Bind channel
     NRF24L01_FlushTx();
     NRF24L01_FlushRx();
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);     // Clear data ready, data sent, and retransmit
