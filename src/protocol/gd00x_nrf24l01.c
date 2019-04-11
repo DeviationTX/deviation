@@ -175,7 +175,7 @@ static void GD00X_send_packet()
                     len--;
                 }
 
-                packet[3]=(packet[0]+packet[1]+packet[2]+packet[4])^0x65;
+                packet[3]=(packet[0]+packet[1]+packet[2]+packet[4])^(rx_tx_addr[0]^rx_tx_addr[1]^rx_tx_addr[2]);
 
                 if ((packet_count%12) == 0 )
                     hopping_frequency_no ^= 1;			// Toggle between the 2 frequencies
@@ -286,14 +286,48 @@ static void GD00X_initialize_txid()
             #endif
             break;
         case FORMAT_V2:
-            //Only 1 ID for now...
-            rx_tx_addr[0]=0x65;
+            //Generate 64 different IDs
             rx_tx_addr[1]=0x00;
             rx_tx_addr[2]=0x00;
+            rx_tx_addr[1+((lfsr&0x10)>>4)]=lfsr&0x8F;
+            rx_tx_addr[0]=0x65;
             rx_tx_addr[3]=0x95;
-            rx_tx_addr[4]=0x47;	 //'G'
-            hopping_frequency[0]=0x05;
-            hopping_frequency[1]=0x25;
+            rx_tx_addr[4]=0x47;	//'G'
+
+            //hopping calculation
+            hopping_frequency[0]=(0x15+(rx_tx_addr[0]^rx_tx_addr[1]^rx_tx_addr[2]^rx_tx_addr[3]))&0x1F;
+            if( hopping_frequency[0] == 0x0F )
+                hopping_frequency[0]=0x0E;
+            else if( (hopping_frequency[0]&0xFE) == 0x10 )
+                hopping_frequency[0]+=2;
+            hopping_frequency[1]=0x20+hopping_frequency[0];
+
+            #ifdef FORCE_GD00X_ORIGINAL_ID
+                //ID 1
+                rx_tx_addr[0]=0x65;
+                rx_tx_addr[1]=0x00;
+                rx_tx_addr[2]=0x00;
+                rx_tx_addr[3]=0x95;
+                rx_tx_addr[4]=0x47;	//'G'
+                hopping_frequency[0]=0x05;
+                hopping_frequency[1]=0x25;
+                //ID 2
+                rx_tx_addr[0]=0xFD;
+                rx_tx_addr[1]=0x09;
+                rx_tx_addr[2]=0x00;
+                rx_tx_addr[3]=0x65;
+                rx_tx_addr[4]=0x47;	//'G'
+                hopping_frequency[0]=0x06;
+                hopping_frequency[1]=0x26;
+                //ID 3
+                rx_tx_addr[0]=0x67;
+                rx_tx_addr[1]=0x0F;
+                rx_tx_addr[2]=0x00;
+                rx_tx_addr[3]=0x69;
+                rx_tx_addr[4]=0x47;	//'G'
+                hopping_frequency[0]=0x16;
+                hopping_frequency[1]=0x36;
+            #endif
             break;
     }
 }
