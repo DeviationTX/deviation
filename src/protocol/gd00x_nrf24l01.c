@@ -27,15 +27,15 @@
 #define GD00X_PACKET_PERIOD   100
 #define dbgprintf printf
 #else
-#define GD00X_BIND_COUNT    857  //3sec
+#define GD00X_BIND_COUNT    857  // 3sec
 #define GD00X_PACKET_PERIOD 3500  // Timeout for callback in uSec
-//printf inside an interrupt handler is really dangerous
-//this shouldn't be enabled even in debug builds without explicitly
-//turning it on
+// printf inside an interrupt handler is really dangerous
+// this shouldn't be enabled even in debug builds without explicitly
+// turning it on
 #define dbgprintf if(0) printf
 #endif
 
-//#define FORCE_GD00X_ORIGINAL_ID
+// #define FORCE_GD00X_ORIGINAL_ID
 
 #define GD00X_INITIAL_WAIT 500
 #define GD00X_RF_BIND_CHANNEL 2
@@ -150,15 +150,17 @@ static void GD00X_send_packet()
                 #define GD00X_V2_DB_MIN 1024-40
                 #define GD00X_V2_DB_MAX 1024+40
                 // Deadband is needed on aileron
-                u16 aileron=scale_channel(CHANNEL1, CHANNEL_MAX_100, CHANNEL_MIN_100);
-                if (aileron > GD00X_V2_DB_MIN && aileron < GD00X_V2_DB_MAX)
+                u16 aileron = scale_channel(CHANNEL1, CHANNEL_MAX_100, CHANNEL_MIN_100);
+                if (aileron > GD00X_V2_DB_MIN && aileron < GD00X_V2_DB_MAX) {
                     packet[1] = 0x20;  // Send the channel centered
+                }
                 else  // Ail:  0x3F..0x20..0x00
+                {
                     if (aileron > GD00X_V2_DB_MAX)
                         packet[1] = 0x1F-((aileron-GD00X_V2_DB_MAX)*(0x20)/(CHANNEL_MAX_100+1-GD00X_V2_DB_MAX));  // 1F..00
                     else
                         packet[1] = 0x3F-((aileron-CHANNEL_MIN_100)*(0x1F)/(GD00X_V2_DB_MIN-CHANNEL_MIN_100));    // 3F..21
-
+                }
                 // Trims must be in a seperate channel for this model
                 packet[2] = 0x3F-(scale_channel(CHANNEL5, 0, 255)>>2);          // Trim: 0x3F..0x20..0x00
 
@@ -200,7 +202,7 @@ static void GD00X_send_packet()
     XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
     if (phase == GD00X_DATA) {
         NRF24L01_WriteReg(NRF24L01_05_RF_CH, hopping_frequency[hopping_frequency_no]);
-        if(Model.proto_opts[PROTOOPTS_FORMAT]==FORMAT_V1) {
+        if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_V1) {
             hopping_frequency_no++;
             hopping_frequency_no &= 3;  // 4 RF channels
         }
@@ -212,7 +214,7 @@ static void GD00X_send_packet()
 
     
     if (tx_power != Model.tx_power) {
-        //Keep transmit power updated
+        // Keep transmit power updated
         tx_power = Model.tx_power;
         NRF24L01_SetPower(tx_power);
     }
@@ -269,63 +271,63 @@ static void GD00X_initialize_txid()
             // tx address
             for (i = 0; i < 2; i++)
                 rx_tx_addr[i] = (lfsr >> (i*8)) & 0xff;
-            
+
             rx_tx_addr[2] = 0x12;
             rx_tx_addr[3] = 0x13;
-            
+
             u8 start = 76+(rx_tx_addr[0]&0x03);
             for (i = 0; i < 4; i++)
-                hopping_frequency[i] = start-(i<<1);
-            
+                hopping_frequency[i] = start-(i << 1);
+
             #ifdef FORCE_GD00X_ORIGINAL_ID
                 rx_tx_addr[0] = 0x1F;
                 rx_tx_addr[1] = 0x39;
                 rx_tx_addr[2] = 0x12;
                 rx_tx_addr[3] = 0x13;
-                for(i = 0; i < 4; i++)
-                    hopping_frequency[i]=79-(i<<1);
+                for (i = 0; i < 4; i++)
+                    hopping_frequency[i] = 79-(i << 1);
             #endif
             break;
         case FORMAT_V2:
-            //Generate 64 different IDs
+            // Generate 64 different IDs
             rx_tx_addr[1] = 0x00;
             rx_tx_addr[2] = 0x00;
             rx_tx_addr[1+((lfsr&0x10)>>4)] = lfsr&0x8F;
             rx_tx_addr[0] = 0x65;
             rx_tx_addr[3] = 0x95;
-            rx_tx_addr[4] = 0x47;  //'G'
+            rx_tx_addr[4] = 0x47;  // 'G'
 
-            //hopping calculation
+            // hopping calculation
             hopping_frequency[0] = (0x15+(rx_tx_addr[0]^rx_tx_addr[1]^rx_tx_addr[2]^rx_tx_addr[3]))&0x1F;
-            if( hopping_frequency[0] == 0x0F )
+            if (hopping_frequency[0] == 0x0F)
                 hopping_frequency[0] = 0x0E;
-            else if( (hopping_frequency[0]&0xFE) == 0x10 )
+            else if ((hopping_frequency[0]&0xFE) == 0x10)
                 hopping_frequency[0] += 2;
             hopping_frequency[1] = 0x20+hopping_frequency[0];
 
             #ifdef FORCE_GD00X_ORIGINAL_ID
-                //ID 1
+                // ID 1
                 rx_tx_addr[0] = 0x65;
                 rx_tx_addr[1] = 0x00;
                 rx_tx_addr[2] = 0x00;
                 rx_tx_addr[3] = 0x95;
-                rx_tx_addr[4] = 0x47;  //'G'
+                rx_tx_addr[4] = 0x47;  // 'G'
                 hopping_frequency[0] = 0x05;
                 hopping_frequency[1] = 0x25;
-                //ID 2
+                // ID 2
                 rx_tx_addr[0] = 0xFD;
                 rx_tx_addr[1] = 0x09;
                 rx_tx_addr[2] = 0x00;
                 rx_tx_addr[3] = 0x65;
-                rx_tx_addr[4] = 0x47;  //'G'
+                rx_tx_addr[4] = 0x47;  // 'G'
                 hopping_frequency[0] = 0x06;
                 hopping_frequency[1] = 0x26;
-                //ID 3
+                // ID 3
                 rx_tx_addr[0] = 0x67;
                 rx_tx_addr[1] = 0x0F;
                 rx_tx_addr[2] = 0x00;
                 rx_tx_addr[3] = 0x69;
-                rx_tx_addr[4] = 0x47;  //'G'
+                rx_tx_addr[4] = 0x47;  // 'G'
                 hopping_frequency[0] = 0x16;
                 hopping_frequency[1] = 0x36;
             #endif
@@ -349,10 +351,10 @@ static void initialize()
 {
     CLOCK_StopTimer();
     tx_power = Model.tx_power;
-    packet_period=Model.proto_opts[PROTOOPTS_FORMAT]==FORMAT_V1?GD00X_PACKET_PERIOD:GD00X_V2_BIND_PACKET_PERIOD;
-    packet_length=Model.proto_opts[PROTOOPTS_FORMAT]==FORMAT_V1?GD00X_PAYLOAD_SIZE:GD00X_V2_PAYLOAD_SIZE;
-    packet_count=0;
-    len=0;
+    packet_period = Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_V1?GD00X_PACKET_PERIOD:GD00X_V2_BIND_PACKET_PERIOD;
+    packet_length = Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_V1?GD00X_PAYLOAD_SIZE:GD00X_V2_PAYLOAD_SIZE;
+    packet_count = 0;
+    len = 0;
     hopping_frequency_no = 0;
     bind_counter=GD00X_BIND_COUNT;
     phase = GD00X_BIND;
