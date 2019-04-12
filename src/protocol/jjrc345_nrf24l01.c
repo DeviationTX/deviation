@@ -40,11 +40,11 @@
 #define JJRC345_INITIAL_WAIT 500
 #define JJRC345_PACKET_LEN  16
 #define JJRC345_RF_BIND_CHANNEL 5
-#define JJRC_NUM_CHANNELS 4
+#define JJRC345_NUM_CHANNELS 4
 
 static u8 packet[JJRC345_PACKET_LEN];
 static u8 tx_power;
-static u8 hopping_frequency[JJRC_NUM_CHANNELS];
+static u8 hopping_frequency[JJRC345_NUM_CHANNELS];
 static u8 txid[2];
 static u8 hopping_frequency_no;
 static u8 phase;
@@ -58,12 +58,14 @@ enum{
 static const char * const jjrc345_opts[] = {
     _tr_noop("Period"), "1000", "20000", "100", NULL,
     _tr_noop("Orig.ID"), "Yes", "No", NULL,
+    _tr_noop("Orig.Ch"), "Yes", "No", NULL,
     NULL
 };
 
 enum {
     PROTOOPTS_PERIOD = 0,
     PROTOOPTS_ORIGINAL_ID,
+    PROTOOPTS_ORIGINAL_CH,
     LAST_PROTO_OPT,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
@@ -108,10 +110,20 @@ static void JJRC345_initialize_txid()
         txid[1] = 0x0d;
     }
 
-    hopping_frequency[0] = 0x3f;
-    hopping_frequency[1] = 0x49;
-    hopping_frequency[2] = 0x47;
-    hopping_frequency[3] = 0x47;
+    if (Model.proto_opts[PROTOOPTS_ORIGINAL_ID] == 0) {
+        // as dumped from origianl transmitter
+        hopping_frequency[0] = 0x3f;
+        hopping_frequency[1] = 0x49;
+        hopping_frequency[2] = 0x47;
+        hopping_frequency[3] = 0x47;
+    }
+    else  // arbitrary channels
+    {
+        hopping_frequency[0] = 0x10;
+        hopping_frequency[1] = 0x20;
+        hopping_frequency[2] = 0x30;
+        hopping_frequency[3] = 0x40;
+    }
 }
 
 #define CHAN_RANGE (CHAN_MAX_VALUE - CHAN_MIN_VALUE)
@@ -144,7 +156,7 @@ static void JJRC45_send_packet(u8 bind)
     else
     {
         NRF24L01_WriteReg(NRF24L01_05_RF_CH, hopping_frequency[hopping_frequency_no++]);
-        if (hopping_frequency_no == JJRC_NUM_CHANNELS)
+        if (hopping_frequency_no == JJRC345_NUM_CHANNELS)
             hopping_frequency_no = 0;
         packet[1]  = hopping_frequency[hopping_frequency_no];  // next packet will be sent on this channel
         packet[4]  = scale_channel(CHANNEL3, 0, 255);      // throttle
