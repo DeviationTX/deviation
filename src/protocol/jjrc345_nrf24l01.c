@@ -110,8 +110,8 @@ static void JJRC345_initialize_txid()
         txid[1] = 0x0d;
     }
 
-    if (Model.proto_opts[PROTOOPTS_ORIGINAL_ID] == 0) {
-        // as dumped from origianl transmitter
+    if (Model.proto_opts[PROTOOPTS_ORIGINAL_CH] == 0) {
+        // as dumped from original transmitter
         hopping_frequency[0] = 0x3f;
         hopping_frequency[1] = 0x49;
         hopping_frequency[2] = 0x47;
