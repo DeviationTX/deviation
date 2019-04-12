@@ -133,11 +133,11 @@ static void JJRC45_send_packet(u8 bind)
         packet[7]  = scale_channel(CHANNEL1, 0xc1, 0x41);  // aileron
         packet[12] = 0x03;  // high rates
     }
-    
+
     packet[8] = 0;      // trim
     packet[9] = 0;      // trim
-    packet[10] = 0x40;  // trim 
-    
+    packet[10] = 0x40;  // trim
+
     packet[11] = 0x3f;  // ?
 
     // checksum
