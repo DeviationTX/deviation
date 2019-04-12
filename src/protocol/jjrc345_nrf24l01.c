@@ -47,13 +47,26 @@ static u8 tx_power;
 static u8 hopping_frequency[JJRC_NUM_CHANNELS];
 static u8 txid[2];
 static u8 hopping_frequency_no;
-static u16 bind_counter;
 static u8 phase;
+static u16 bind_counter;
 
 enum{
     JJRC345_BIND,
     JJRC345_DATA
 };
+
+static const char * const jjrc345_opts[] = {
+    _tr_noop("Period"), "1000", "20000", "100", NULL,
+    _tr_noop("Orig.ID"), "Yes", "No", NULL,
+    NULL
+};
+
+enum {
+    PROTOOPTS_PERIOD = 0,
+    PROTOOPTS_ORIGINAL_ID,
+    LAST_PROTO_OPT,
+};
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 enum{
     CHANNEL1 = 0,
@@ -84,9 +97,16 @@ static void JJRC345_init()
 
 static void JJRC345_initialize_txid()
 {
-    // only fixed id for now
-    txid[0] = 0x1b;
-    txid[1] = 0x12;
+    if (Model.proto_opts[PROTOOPTS_ORIGINAL_ID] == 0) {
+        // only fixed id for now
+        txid[0] = 0x1b;
+        txid[1] = 0x12;
+    }
+    else  // arbitrary ID
+    {
+        txid[0] = 0xf0;
+        txid[1] = 0x0d;
+    }
 
     hopping_frequency[0] = 0x3f;
     hopping_frequency[1] = 0x49;
@@ -174,7 +194,7 @@ static u16 JJRC345_callback()
             JJRC45_send_packet(0);
             break;
     }
-    return JJRC345_PACKET_PERIOD;
+    return Model.proto_opts[PROTOOPTS_PERIOD];
 }
 
 static void JJRC345_initialize()
@@ -203,7 +223,10 @@ uintptr_t JJRC345_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_NUMCHAN: return 6;
         case PROTOCMD_DEFAULT_NUMCHAN: return 6;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id;
-        case PROTOCMD_GETOPTIONS: return 0;
+        case PROTOCMD_GETOPTIONS:
+            if (Model.proto_opts[PROTOOPTS_PERIOD] == 0)
+                Model.proto_opts[PROTOOPTS_PERIOD] = 4000;
+            return (uintptr_t)jjrc345_opts;
         case PROTOCMD_TELEMETRYSTATE: return PROTO_TELEM_UNSUPPORTED;
         case PROTOCMD_CHANNELMAP: return AETRG;
         default: break;
