@@ -215,11 +215,11 @@ static void send_packet(u8 bind)
         packet[5] = rudder >> 1;
         packet[6] = elevator >> 1;
         packet[7] = aileron >> 1;
-        packet[8] = scale_channel(CHANNEL1, 0x39, 0x07)  // dynamic trim
+        packet[8] = (((aileron / 5) >> 1) + 7)   // dynamic trim 0x07 - 0x39
                   | (aileron << 7);
-        packet[9] = scale_channel(CHANNEL2, 0x07, 0x39)  // dynamic trim
+        packet[9] = (((elevator / 5) >> 1) + 7)  // dynamic trim 0x07 - 0x39
                   | (elevator << 7);
-        packet[10]= scale_channel(CHANNEL4, 0x39, 0x07)  // dynamic trim
+        packet[10]= (((rudder / 5) >> 1) + 7)    // dynamic trim 0x07 - 0x39
                   | (rudder << 7);
         packet[11]= 0x40 | (throttle << 7);
         packet[12]= 0x80 | ((packet[12] ^ 0x40) & 0x40)  // bugs 3 H doesn't have 0x80 ?
