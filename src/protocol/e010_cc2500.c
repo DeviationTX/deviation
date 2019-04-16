@@ -81,8 +81,7 @@ enum {
 #define CHANNEL_RTH         CHANNEL10
 
 enum {
-    E010_INIT1 = 0,
-    E010_BIND1,
+    E010_BIND = 0,
     E010_DATA
 };
 
@@ -95,6 +94,9 @@ static u8 rf_chan;
 static u8 txid[3];
 static u8 packet[PACKET_SIZE];
 static u8 rf_channels[RF_NUM_CHANNELS];
+static u8 calibration[RF_NUM_CHANNELS];
+static u8 calibration_fscal2;
+static u8 calibration_fscal3;
 
 // dumped from E010 and H36 stock transmitters
 static const struct {
@@ -306,8 +308,12 @@ static void send_packet(u8 bind)
 
     packet[15] = checksum();
 
+    rf_chan++;
+    CC2500_WriteReg(CC2500_23_FSCAL3, calibration_fscal3);
+    CC2500_WriteReg(CC2500_24_FSCAL2, calibration_fscal2);
+    CC2500_WriteReg(CC2500_25_FSCAL1, calibration[rf_chan / 2]);
     // spacing is 333.25 kHz, must multiply xn297 channel by 3
-    CC2500_WriteReg(CC2500_0A_CHANNR, rf_channels[rf_chan++ / 2] * 3);
+    CC2500_WriteReg(CC2500_0A_CHANNR, rf_channels[rf_chan / 2] * 3);
     rf_chan %= 2 * sizeof(rf_channels);  // channels repeated
 
     // Make sure that the radio is in IDLE state before flushing the FIFO
@@ -328,48 +334,56 @@ static void send_packet(u8 bind)
     }
 }
 
+static void calibrate_rf_chans()
+{
+    for (int c = 0; c < RF_NUM_CHANNELS; c++) {
+        CLOCK_ResetWatchdog();
+        CC2500_Strobe(CC2500_SIDLE);
+        CC2500_WriteReg(CC2500_0A_CHANNR, rf_channels[c] * 3);
+        CC2500_Strobe(CC2500_SCAL);
+        usleep(900);
+        calibration[c] = CC2500_ReadReg(CC2500_25_FSCAL1);
+    }
+    calibration_fscal3 = CC2500_ReadReg(CC2500_23_FSCAL3);  // only needs to be done once
+    calibration_fscal2 = CC2500_ReadReg(CC2500_24_FSCAL2);  // only needs to be done once
+    CC2500_Strobe(CC2500_SIDLE);
+}
+
+
 static void e010_init()
 {
     u8 rx_tx_addr[ADDRESS_LENGTH];
-
     XN297L_init();  // setup cc2500 for xn297L@250kbps emulation
     CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);
     memcpy(rx_tx_addr, "\x6d\x6a\x77\x77\x77", sizeof(rx_tx_addr));
     memcpy(rf_channels, "\x36\x3e\x46\x2e", sizeof(rf_channels));
     XN297L_SetTXAddr(rx_tx_addr, sizeof(rx_tx_addr));
     CC2500_SetPower(tx_power);
-}
-
-static void e010_init2()
-{
-    memcpy(rf_channels, e010_tx_rf_map[Model.fixed_id % (sizeof(e010_tx_rf_map)/sizeof(e010_tx_rf_map[0]))].rfchan, sizeof(rf_channels));
+    calibrate_rf_chans();
 }
 
 static u16 e010_callback()
 {
     switch (phase) {
-    case E010_INIT1:
-        phase = E010_BIND1;
-        break;
+        case E010_BIND:
+            if (counter == 0) {
+                memcpy(rf_channels, e010_tx_rf_map[Model.fixed_id % (sizeof(e010_tx_rf_map)/sizeof(e010_tx_rf_map[0]))].rfchan, sizeof(rf_channels));
+                calibrate_rf_chans();
+                phase = E010_DATA;
+                PROTOCOL_SetBindState(0);
+            } else {
+                send_packet(1);
+                counter -= 1;
+            }
+            break;
 
-    case E010_BIND1:
-        if (counter == 0) {
-            e010_init2();
-            phase = E010_DATA;
-            PROTOCOL_SetBindState(0);
-        } else {
-            send_packet(1);
-            counter -= 1;
-        }
-        break;
-
-    case E010_DATA:
-        if (fine != (s8)Model.proto_opts[PROTOOPTS_FREQFINE]) {
-            fine = (s8)Model.proto_opts[PROTOOPTS_FREQFINE];
-            CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);
-        }
-        send_packet(0);
-        break;
+        case E010_DATA:
+            if (fine != (s8)Model.proto_opts[PROTOOPTS_FREQFINE]) {
+                fine = (s8)Model.proto_opts[PROTOOPTS_FREQFINE];
+                CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);
+            }
+            send_packet(0);
+            break;
     }
     return PACKET_PERIOD;
 }
@@ -388,7 +402,7 @@ static void initialize()
     counter = BIND_COUNT;
     initialize_txid();
     e010_init();
-    phase = E010_INIT1;
+    phase = E010_BIND;
 
     PROTOCOL_SetBindState(BIND_COUNT * PACKET_PERIOD / 1000);
 
