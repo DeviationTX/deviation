@@ -143,7 +143,6 @@ static void JJRC45_send_packet(u8 bind)
 {
     packet[0] = 0x00;
     packet[2] = 0x00;
-    packet[3] = 0x0a;
 
     if (bind) {
         packet[1]  = JJRC345_RF_BIND_CHANNEL;
@@ -163,9 +162,10 @@ static void JJRC45_send_packet(u8 bind)
         packet[5]  = scale_channel(CHANNEL4, 0xc1, 0x41);  // rudder
         packet[6]  = scale_channel(CHANNEL2, 0x41, 0xc1);  // elevator
         packet[7]  = scale_channel(CHANNEL1, 0xc1, 0x41);  // aileron
-        packet[12] = 0x03;  // high rates
+        packet[12] = 0x02;  // high rates
     }
-
+    packet[3] = (packet[4] == 0xff) ? 0x0e : 0x0a;
+    
     packet[8] = 0;      // trim
     packet[9] = 0;      // trim
     packet[10] = 0x40;  // trim
