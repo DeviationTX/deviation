@@ -138,7 +138,7 @@ static void XN297L_init()
     // Address Config = No address check
     // Base Frequency = 2399.999268
     // CRC Autoflush = false
-    // CRC Enable = true
+    // CRC Enable = false
     // Carrier Frequency = 2399.999268
     // Channel Number = 0
     // Channel Spacing = 333.251953
@@ -157,7 +157,7 @@ static void XN297L_init()
     // TX Power = 0
     // Whitening = false
 
-    CC2500_WriteReg(CC2500_08_PKTCTRL0, 0x05);   // Packet Automation Control
+    CC2500_WriteReg(CC2500_08_PKTCTRL0, 0x01);   // Packet Automation Control
     CC2500_WriteReg(CC2500_0B_FSCTRL1,  0x0A);   // Frequency Synthesizer Control
     CC2500_WriteReg(CC2500_0C_FSCTRL0,  0x00);   // Frequency Synthesizer Control
     CC2500_WriteReg(CC2500_0D_FREQ2,    0x5C);   // Frequency Control Word, High Byte
