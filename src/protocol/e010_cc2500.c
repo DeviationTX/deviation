@@ -153,7 +153,7 @@ static void XN297L_init()
     // Packet Length Mode = Variable packet length mode. Packet length configured by the first byte after sync word
     // Preamble Count = 4
     // RX Filter BW = 203.125000
-    // Sync Word Qualifier Mode = 30/32 sync word bits detected
+    // Sync Word Qualifier Mode = No preamble/sync
     // TX Power = 0
     // Whitening = false
 
@@ -165,7 +165,7 @@ static void XN297L_init()
     CC2500_WriteReg(CC2500_0F_FREQ0,    0xC3);   // Frequency Control Word, Low Byte
     CC2500_WriteReg(CC2500_10_MDMCFG4,  0x8D);   // Modem Configuration
     CC2500_WriteReg(CC2500_11_MDMCFG3,  0x3B);   // Modem Configuration
-    CC2500_WriteReg(CC2500_12_MDMCFG2,  0x13);   // Modem Configuration
+    CC2500_WriteReg(CC2500_12_MDMCFG2,  0x11);   // Modem Configuration
     CC2500_WriteReg(CC2500_13_MDMCFG1,  0x23);   // Modem Configuration
     CC2500_WriteReg(CC2500_14_MDMCFG0,  0xA4);   // Modem Configuration
     CC2500_WriteReg(CC2500_15_DEVIATN,  0x62);   // Modem Deviation Setting
