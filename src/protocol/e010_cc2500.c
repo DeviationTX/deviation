@@ -81,9 +81,9 @@ enum {
 #define CHANNEL_RTH         CHANNEL10
 
 enum {
-    MJXq_INIT1 = 0,
-    MJXq_BIND1,
-    MJXq_DATA
+    E010_INIT1 = 0,
+    E010_BIND1,
+    E010_DATA
 };
 
 static u8 tx_power;
@@ -333,7 +333,7 @@ static void send_packet(u8 bind)
     }
 }
 
-static void mjxq_init()
+static void e010_init()
 {
     u8 rx_tx_addr[ADDRESS_LENGTH];
 
@@ -345,7 +345,7 @@ static void mjxq_init()
     CC2500_SetPower(tx_power);
 }
 
-static void mjxq_init2()
+static void e010_init2()
 {
     memcpy(rf_channels, e010_tx_rf_map[Model.fixed_id % (sizeof(e010_tx_rf_map)/sizeof(e010_tx_rf_map[0]))].rfchan, sizeof(rf_channels));
 }
@@ -353,14 +353,14 @@ static void mjxq_init2()
 static u16 e010_callback()
 {
     switch (phase) {
-    case MJXq_INIT1:
-        phase = MJXq_BIND1;
+    case E010_INIT1:
+        phase = E010_BIND1;
         break;
 
-    case MJXq_BIND1:
+    case E010_BIND1:
         if (counter == 0) {
-            mjxq_init2();
-            phase = MJXq_DATA;
+            e010_init2();
+            phase = E010_DATA;
             PROTOCOL_SetBindState(0);
         } else {
             send_packet(1);
@@ -368,7 +368,7 @@ static u16 e010_callback()
         }
         break;
 
-    case MJXq_DATA:
+    case E010_DATA:
         if (fine != (s8)Model.proto_opts[PROTOOPTS_FREQFINE]) {
             fine = (s8)Model.proto_opts[PROTOOPTS_FREQFINE];
             CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);
@@ -392,8 +392,8 @@ static void initialize()
     fine = (s8)Model.proto_opts[PROTOOPTS_FREQFINE];
     counter = BIND_COUNT;
     initialize_txid();
-    mjxq_init();
-    phase = MJXq_INIT1;
+    e010_init();
+    phase = E010_INIT1;
 
     PROTOCOL_SetBindState(BIND_COUNT * PACKET_PERIOD / 1000);
 
