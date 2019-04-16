@@ -165,7 +165,7 @@ static void JJRC45_send_packet(u8 bind)
         packet[12] = 0x02;  // high rates
     }
     packet[3] = (packet[4] == 0xff) ? 0x0e : 0x0a;
-    
+
     packet[8] = 0;      // trim
     packet[9] = 0;      // trim
     packet[10] = 0x40;  // trim
