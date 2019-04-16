@@ -32,7 +32,7 @@
     // printf inside an interrupt handler is really dangerous
     // this shouldn't be enabled even in debug builds without explicitly
     // turning it on
-    #define dbgprintf if(0) printf
+    #define dbgprintf if (0) printf
 #endif
 
 #define INITIAL_WAIT       500
@@ -91,7 +91,7 @@ static s8 fine;
 static u16 counter;
 static u8 phase;
 static u8 tx_power;
-static u8 rf_chan; 
+static u8 rf_chan;
 static u8 txid[3];
 static u8 packet[PACKET_SIZE];
 static u8 rf_channels[RF_NUM_CHANNELS];
@@ -102,12 +102,12 @@ static const struct {
     u8 rfchan[RF_NUM_CHANNELS];
 }
 e010_tx_rf_map[] = {{{0x4F, 0x1C}, {0x3A, 0x35, 0x4A, 0x45}},
-                    {{0x90, 0x1C}, {0x2E, 0x36, 0x3E, 0x46}}, 
+                    {{0x90, 0x1C}, {0x2E, 0x36, 0x3E, 0x46}},
                     {{0x24, 0x36}, {0x32, 0x3E, 0x42, 0x4E}},
                     {{0x7A, 0x40}, {0x2E, 0x3C, 0x3E, 0x4C}},
                     {{0x61, 0x31}, {0x2F, 0x3B, 0x3F, 0x4B}},
                     {{0x5D, 0x37}, {0x33, 0x3B, 0x43, 0x4B}},
-                    {{0xFD, 0x4F}, {0x33, 0x3B, 0x43, 0x4B}}, 
+                    {{0xFD, 0x4F}, {0x33, 0x3B, 0x43, 0x4B}},
                     {{0x86, 0x3C}, {0x34, 0x3E, 0x44, 0x4E}}};
 
 // xn297 emulation
@@ -122,12 +122,12 @@ static const u8 xn297_scramble[] = {
     0xc7, 0x62, 0x97, 0xd5, 0x0b, 0x79, 0xca, 0xcc,
     0x1b, 0x5d, 0x19, 0x10, 0x24, 0xd3, 0xdc, 0x3f,
     0x8e, 0xc5, 0x2f};
-    
+
 static const u16 xn297_crc_xorout[] = {
-    0x0000, 0x3448, 0x9BA7, 0x8BBB, 0x85E1, 0x3E8C, 
+    0x0000, 0x3448, 0x9BA7, 0x8BBB, 0x85E1, 0x3E8C,
     0x451E, 0x18E6, 0x6B24, 0xE7AB, 0x3828, 0x814B,
     0xD461, 0xF494, 0x2503, 0x691D, 0xFE8B, 0x9BA7,
-    0x8B17, 0x2920, 0x8B5F, 0x61B1, 0xD391, 0x7401, 
+    0x8B17, 0x2920, 0x8B5F, 0x61B1, 0xD391, 0x7401,
     0x2138, 0x129F, 0xB3A0, 0x2988};
 
 static void XN297L_init()
@@ -179,7 +179,7 @@ static void XN297L_init()
     CC2500_WriteReg(CC2500_23_FSCAL3, 0xEA);     // Frequency Synthesizer Calibration
     CC2500_WriteReg(CC2500_25_FSCAL1, 0x00);     // Frequency Synthesizer Calibration
     CC2500_WriteReg(CC2500_26_FSCAL0, 0x11);     // Frequency Synthesizer Calibration
-    
+
     CC2500_SetTxRxMode(TX_EN);
 }
 
@@ -209,7 +209,7 @@ static void XN297L_WritePayload(const u8* msg, u8 len)
     u8 buf[32];
     u8 last = 0;
     u8 i;
-    
+
     for (i = 0; i < xn297_addr_len; ++i) {
         buf[last++] = xn297_tx_addr[xn297_addr_len-i-1] ^ xn297_scramble[i];
     }
@@ -229,7 +229,7 @@ static void XN297L_WritePayload(const u8* msg, u8 len)
         buf[last++] = crc >> 8;
         buf[last++] = crc & 0xff;
     }
-    
+
     // stop TX/RX
     CC2500_Strobe(CC2500_SIDLE);
     // flush tx FIFO
@@ -275,9 +275,9 @@ static void send_packet(u8 bind)
     packet[4] = 0x40;         // rudder does not work well with dyntrim
     packet[2] = 0x80 ^ convert_channel(CHANNEL2);   // elevator
     // driven trims cause issues when headless is enabled
-    packet[5] = GET_FLAG(CHANNEL_HEADLESS, 1) ? 0x40 : CHAN2TRIM(packet[2]); // trim elevator
+    packet[5] = GET_FLAG(CHANNEL_HEADLESS, 1) ? 0x40 : CHAN2TRIM(packet[2]);  // trim elevator
     packet[3] = convert_channel(CHANNEL1);          // aileron
-    packet[6] = GET_FLAG(CHANNEL_HEADLESS, 1) ? 0x40 : CHAN2TRIM(packet[3]); // trim aileron
+    packet[6] = GET_FLAG(CHANNEL_HEADLESS, 1) ? 0x40 : CHAN2TRIM(packet[3]);  // trim aileron
     packet[7] = txid[0];
     packet[8] = txid[1];
     packet[9] = txid[2];
@@ -286,7 +286,7 @@ static void send_packet(u8 bind)
     packet[12] = 0;
     packet[13] = 0;
     packet[14] = 0xc0;  // bind value
-    
+
     packet[10] += GET_FLAG(CHANNEL_RTH, 0x02)
                 | GET_FLAG(CHANNEL_HEADLESS, 0x01);
     if (!bind) {
@@ -294,30 +294,30 @@ static void send_packet(u8 bind)
                    | GET_FLAG(CHANNEL_FLIP, 0x01)
                    | GET_FLAG(CHANNEL_PICTURE, 0x08)
                    | GET_FLAG(CHANNEL_VIDEO, 0x10)
-                   | GET_FLAG_INV(CHANNEL_LED, 0x20); // air/ground mode
+                   | GET_FLAG_INV(CHANNEL_LED, 0x20);  // air/ground mode
         if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_PHOENIX) {
             packet[10] |= 0x20  // high rate
                        |  GET_FLAG(CHANNEL_ARM, 0x80);
             packet[14] &= ~0x24;
         }
     }
-        
+
     packet[15] = checksum();
 
     // NRF24L01_WriteReg(NRF24L01_05_RF_CH, rf_channels[rf_chan++ / 2]);
-    
+
     // spacing is 333.25 Mhz, must multiply xn297 channel by 3
     CC2500_WriteReg(CC2500_0A_CHANNR, rf_channels[rf_chan++ / 2] * 3);
     rf_chan %= 2 * sizeof(rf_channels);  // channels repeated
 
     // NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
     // NRF24L01_FlushTx();
-    
+
     // Make sure that the radio is in IDLE state before flushing the FIFO
     CC2500_Strobe(CC2500_SIDLE);
     // Flush TX FIFO
     CC2500_Strobe(CC2500_SFTX);
-          
+
     // Power on, TX mode, 2byte CRC
     // XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
     XN297L_WritePayload(packet, PACKET_SIZE);
@@ -327,7 +327,7 @@ static void send_packet(u8 bind)
     // settings change -  we have plenty of time until next
     // packet.
     if (tx_power != Model.tx_power) {
-        //Keep transmit power updated
+        // Keep transmit power updated
         tx_power = Model.tx_power;
         CC2500_SetPower(tx_power);
     }
@@ -346,7 +346,7 @@ static void mjxq_init()
 }
 
 static void mjxq_init2()
-{    
+{
     memcpy(rf_channels, e010_tx_rf_map[Model.fixed_id % (sizeof(e010_tx_rf_map)/sizeof(e010_tx_rf_map[0]))].rfchan, sizeof(rf_channels));
 }
 
@@ -396,19 +396,19 @@ static void initialize()
     phase = MJXq_INIT1;
 
     PROTOCOL_SetBindState(BIND_COUNT * PACKET_PERIOD / 1000);
-    
+
     CLOCK_StartTimer(INITIAL_WAIT, e010_callback);
 }
 
 uintptr_t E010_Cmds(enum ProtoCmds cmd)
 {
-    switch(cmd) {
+    switch (cmd) {
         case PROTOCMD_INIT:  initialize(0); return 0;
         case PROTOCMD_DEINIT:
         case PROTOCMD_RESET:
             CLOCK_StopTimer();
             return (CC2500_Reset() ? 1 : -1);
-        case PROTOCMD_CHECK_AUTOBIND: return 0; //Never Autobind
+        case PROTOCMD_CHECK_AUTOBIND: return 1;
         case PROTOCMD_BIND:  initialize(1); return 0;
         case PROTOCMD_NUMCHAN: return 8;
         case PROTOCMD_DEFAULT_NUMCHAN: return 8;
