@@ -234,6 +234,8 @@ static void XN297L_WritePayload(const u8* msg, u8 len)
     CC2500_Strobe(CC2500_SIDLE);
     // flush tx FIFO
     CC2500_Strobe(CC2500_SFTX);
+    // packet length
+    CC2500_WriteRegister(CC2500_3F_TXFIFO, last + 4);
     // xn297L preamble
     CC2500_WriteRegisterMulti(CC2500_3F_TXFIFO, (u8*)"\x71\x0f\x55", 3);
     // xn297 packet
