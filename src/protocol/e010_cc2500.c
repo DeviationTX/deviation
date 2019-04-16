@@ -156,29 +156,29 @@ static void XN297L_init()
     // Sync Word Qualifier Mode = 30/32 sync word bits detected
     // TX Power = 0
     // Whitening = false
-    // CC2500_WriteReg(CC2500_0002_IOCFG0,0x06);  // GDO0Output Pin Configuration
+
     CC2500_WriteReg(CC2500_08_PKTCTRL0, 0x05);   // Packet Automation Control
-    CC2500_WriteReg(CC2500_0B_FSCTRL1, 0x0A);    // Frequency Synthesizer Control
-    CC2500_WriteReg(CC2500_0C_FSCTRL0, 0x00);    // Frequency Synthesizer Control
-    CC2500_WriteReg(CC2500_0D_FREQ2, 0x5C);      // Frequency Control Word, High Byte
-    CC2500_WriteReg(CC2500_0E_FREQ1, 0x4E);      // Frequency Control Word, Middle Byte
-    CC2500_WriteReg(CC2500_0F_FREQ0, 0xC3);      // Frequency Control Word, Low Byte
-    CC2500_WriteReg(CC2500_10_MDMCFG4, 0x8D);    // Modem Configuration
-    CC2500_WriteReg(CC2500_11_MDMCFG3, 0x3B);    // Modem Configuration
-    CC2500_WriteReg(CC2500_12_MDMCFG2, 0x13);    // Modem Configuration
-    CC2500_WriteReg(CC2500_13_MDMCFG1, 0x23);    // Modem Configuration
-    CC2500_WriteReg(CC2500_14_MDMCFG0, 0xA4);    // Modem Configuration
-    CC2500_WriteReg(CC2500_15_DEVIATN, 0x62);    // Modem Deviation Setting
-    CC2500_WriteReg(CC2500_18_MCSM0, 0x18);      // Main Radio Control State Machine Configuration
-    CC2500_WriteReg(CC2500_19_FOCCFG, 0x1D);     // Frequency Offset Compensation Configuration
-    CC2500_WriteReg(CC2500_1A_BSCFG, 0x1C);      // Bit Synchronization Configuration
+    CC2500_WriteReg(CC2500_0B_FSCTRL1,  0x0A);   // Frequency Synthesizer Control
+    CC2500_WriteReg(CC2500_0C_FSCTRL0,  0x00);   // Frequency Synthesizer Control
+    CC2500_WriteReg(CC2500_0D_FREQ2,    0x5C);   // Frequency Control Word, High Byte
+    CC2500_WriteReg(CC2500_0E_FREQ1,    0x4E);   // Frequency Control Word, Middle Byte
+    CC2500_WriteReg(CC2500_0F_FREQ0,    0xC3);   // Frequency Control Word, Low Byte
+    CC2500_WriteReg(CC2500_10_MDMCFG4,  0x8D);   // Modem Configuration
+    CC2500_WriteReg(CC2500_11_MDMCFG3,  0x3B);   // Modem Configuration
+    CC2500_WriteReg(CC2500_12_MDMCFG2,  0x13);   // Modem Configuration
+    CC2500_WriteReg(CC2500_13_MDMCFG1,  0x23);   // Modem Configuration
+    CC2500_WriteReg(CC2500_14_MDMCFG0,  0xA4);   // Modem Configuration
+    CC2500_WriteReg(CC2500_15_DEVIATN,  0x62);   // Modem Deviation Setting
+    CC2500_WriteReg(CC2500_18_MCSM0,    0x18);   // Main Radio Control State Machine Configuration
+    CC2500_WriteReg(CC2500_19_FOCCFG,   0x1D);   // Frequency Offset Compensation Configuration
+    CC2500_WriteReg(CC2500_1A_BSCFG,    0x1C);   // Bit Synchronization Configuration
     CC2500_WriteReg(CC2500_1B_AGCCTRL2, 0xC7);   // AGC Control
     CC2500_WriteReg(CC2500_1C_AGCCTRL1, 0x00);   // AGC Control
     CC2500_WriteReg(CC2500_1D_AGCCTRL0, 0xB0);   // AGC Control
-    CC2500_WriteReg(CC2500_21_FREND1, 0xB6);     // Front End RX Configuration
-    CC2500_WriteReg(CC2500_23_FSCAL3, 0xEA);     // Frequency Synthesizer Calibration
-    CC2500_WriteReg(CC2500_25_FSCAL1, 0x00);     // Frequency Synthesizer Calibration
-    CC2500_WriteReg(CC2500_26_FSCAL0, 0x11);     // Frequency Synthesizer Calibration
+    CC2500_WriteReg(CC2500_21_FREND1,   0xB6);   // Front End RX Configuration
+    CC2500_WriteReg(CC2500_23_FSCAL3,   0xEA);   // Frequency Synthesizer Calibration
+    CC2500_WriteReg(CC2500_25_FSCAL1,   0x00);   // Frequency Synthesizer Calibration
+    CC2500_WriteReg(CC2500_26_FSCAL0,   0x11);   // Frequency Synthesizer Calibration
 
     CC2500_SetTxRxMode(TX_EN);
 }
@@ -304,22 +304,15 @@ static void send_packet(u8 bind)
 
     packet[15] = checksum();
 
-    // NRF24L01_WriteReg(NRF24L01_05_RF_CH, rf_channels[rf_chan++ / 2]);
-
-    // spacing is 333.25 Mhz, must multiply xn297 channel by 3
+    // spacing is 333.25 kHz, must multiply xn297 channel by 3
     CC2500_WriteReg(CC2500_0A_CHANNR, rf_channels[rf_chan++ / 2] * 3);
     rf_chan %= 2 * sizeof(rf_channels);  // channels repeated
-
-    // NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
-    // NRF24L01_FlushTx();
 
     // Make sure that the radio is in IDLE state before flushing the FIFO
     CC2500_Strobe(CC2500_SIDLE);
     // Flush TX FIFO
     CC2500_Strobe(CC2500_SFTX);
 
-    // Power on, TX mode, 2byte CRC
-    // XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
     XN297L_WritePayload(packet, PACKET_SIZE);
 
     // Check and adjust transmission power. We do this after
