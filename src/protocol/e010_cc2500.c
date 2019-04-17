@@ -167,7 +167,7 @@ static void XN297L_init()
     CC2500_WriteReg(CC2500_0F_FREQ0,    0xC3);   // Frequency Control Word, Low Byte
     CC2500_WriteReg(CC2500_10_MDMCFG4,  0x8D);   // Modem Configuration
     CC2500_WriteReg(CC2500_11_MDMCFG3,  0x3B);   // Modem Configuration
-    CC2500_WriteReg(CC2500_12_MDMCFG2,  0x11);   // Modem Configuration
+    CC2500_WriteReg(CC2500_12_MDMCFG2,  0x10);   // Modem Configuration
     CC2500_WriteReg(CC2500_13_MDMCFG1,  0x23);   // Modem Configuration
     CC2500_WriteReg(CC2500_14_MDMCFG0,  0xA4);   // Modem Configuration
     CC2500_WriteReg(CC2500_15_DEVIATN,  0x62);   // Modem Deviation Setting
