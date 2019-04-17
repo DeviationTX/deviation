@@ -493,7 +493,7 @@ static void add_device(u8 *buffer) {
 static void add_param(u8 *buffer, u8 num_bytes) {
     // abort if wrong device, or not enough buffer space
     if (buffer[2] != crsf_devices[device_idx].address
-     || ((u8)((sizeof recv_param_buffer) - (recv_param_ptr - recv_param_buffer)) < (num_bytes-4))) {
+     || ((int)((sizeof recv_param_buffer) - (recv_param_ptr - recv_param_buffer)) < (num_bytes-4))) {
         recv_param_ptr = recv_param_buffer;
         next_chunk = 0;
         next_param = 0;
