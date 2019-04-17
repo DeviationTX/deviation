@@ -199,8 +199,10 @@ static u16 JJRC345_callback()
         case JJRC345_BIND:
             JJRC45_send_packet(1);
             bind_counter--;
-            if (bind_counter == 0)
+            if (bind_counter == 0) {
                 phase = JJRC345_DATA;
+                PROTOCOL_SetBindState(0);
+            }
             break;
         case JJRC345_DATA:
             JJRC45_send_packet(0);
