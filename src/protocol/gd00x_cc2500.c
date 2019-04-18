@@ -19,7 +19,7 @@
 #include "config/model.h"
 #include "config/tx.h"  // for Transmitter
 
-#ifdef PROTO_HAS_NRF24L01
+#ifdef PROTO_HAS_CC2500
 
 #ifdef EMULATOR
 #define USE_FIXED_MFGID
@@ -40,17 +40,21 @@
 #define GD00X_INITIAL_WAIT 500
 #define GD00X_RF_BIND_CHANNEL 2
 #define GD00X_PAYLOAD_SIZE 15
+#define GD00X_NUM_CHANNEL 4
 
 #define GD00X_V2_BIND_PACKET_PERIOD 1700
 #define GD00X_V2_RF_BIND_CHANNEL    0x43
 #define GD00X_V2_PAYLOAD_SIZE   6
 
+
 static const char * const gd00x_opts[] = {
   _tr_noop("Format"), "V1", "V2", NULL,
+  _tr_noop("Freq-Fine"),  "-127", "127", NULL,
   NULL
 };
 enum {
     PROTOOPTS_FORMAT = 0,
+    PROTOOPTS_FREQFINE,
     LAST_PROTO_OPT,
 };
 enum {
@@ -63,13 +67,17 @@ static u8 tx_power;
 static u8 packet[GD00X_PAYLOAD_SIZE];
 static u8 hopping_frequency_no;
 static u8 rx_tx_addr[5];
-static u8 hopping_frequency[4];
+static u8 hopping_frequency[GD00X_NUM_CHANNEL];
 static u16 bind_counter;
 static u16 packet_period;
 static u8 packet_count;
 static u8 packet_length;
 static u8 phase;
 static u8 len;
+static s8 fine;
+static u8 calibration[GD00X_NUM_CHANNEL];
+static u8 calibration_fscal2;
+static u8 calibration_fscal3;
 
 enum{
     GD00X_BIND,
@@ -198,50 +206,61 @@ static void GD00X_send_packet()
             break;
     }
 
-    // Power on, TX mode, CRC enabled
-    XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
+    // channel hopping
     if (phase == GD00X_DATA) {
-        NRF24L01_WriteReg(NRF24L01_05_RF_CH, hopping_frequency[hopping_frequency_no]);
+        CC2500_WriteReg(CC2500_23_FSCAL3, calibration_fscal3);
+        CC2500_WriteReg(CC2500_24_FSCAL2, calibration_fscal2);
+        CC2500_WriteReg(CC2500_25_FSCAL1, calibration[hopping_frequency_no]);
+        XN297L_SetChannel(hopping_frequency[hopping_frequency_no]);
         if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_V1) {
             hopping_frequency_no++;
             hopping_frequency_no &= 3;  // 4 RF channels
         }
     }
 
-    NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
-    NRF24L01_FlushTx();
-    XN297_WritePayload(packet, packet_length);
-
+    XN297L_WritePayload(packet, packet_length);
     
     if (tx_power != Model.tx_power) {
         // Keep transmit power updated
         tx_power = Model.tx_power;
-        NRF24L01_SetPower(tx_power);
+        CC2500_SetPower(tx_power);
     }
+}
+
+// calibrate used RF channels for faster hopping
+static void calibrate_rf_chans()
+{
+    for (int c = 0; c < GD00X_NUM_CHANNEL; c++) {
+        CLOCK_ResetWatchdog();
+        CC2500_Strobe(CC2500_SIDLE);
+        XN297L_SetChannel(hopping_frequency[c]);
+        CC2500_Strobe(CC2500_SCAL);
+        usleep(900);
+        calibration[c] = CC2500_ReadReg(CC2500_25_FSCAL1);
+    }
+    calibration_fscal3 = CC2500_ReadReg(CC2500_23_FSCAL3);  // only needs to be done once
+    calibration_fscal2 = CC2500_ReadReg(CC2500_24_FSCAL2);  // only needs to be done once
+    CC2500_Strobe(CC2500_SIDLE);
 }
 
 static void GD00X_init()
 {
-    XN297_SetScrambledMode(XN297_SCRAMBLED);
-    NRF24L01_Initialize();
-    NRF24L01_SetTxRxMode(TX_EN);
+    // setup cc2500 for xn297L@250kbps emulation, scrambled, crc enabled
+    XN297L_Configure(XN297_SCRAMBLED, XN297_CRC);
+    CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);
     switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
         case FORMAT_V1:
-            XN297_SetTXAddr((u8*)"\xcc\xcc\xcc\xcc\xcc", 5);
-            NRF24L01_WriteReg(NRF24L01_05_RF_CH, GD00X_RF_BIND_CHANNEL);
+            XN297L_SetTXAddr((u8*)"\xcc\xcc\xcc\xcc\xcc", 5);
+            XN297L_SetChannel(GD00X_RF_BIND_CHANNEL);
             break;
         case FORMAT_V2:
-            XN297_SetTXAddr((u8*)"GDKNx", 5);
-            NRF24L01_WriteReg(NRF24L01_05_RF_CH, GD00X_V2_RF_BIND_CHANNEL);
+            XN297L_SetTXAddr((u8*)"GDKNx", 5);
+            XN297L_SetChannel(GD00X_V2_RF_BIND_CHANNEL);
             break;
     }
-    NRF24L01_FlushTx();
-    NRF24L01_FlushRx();
-    NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);     // Clear data ready, data sent, and retransmit
-    NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);      // No Auto Acknowldgement on all data pipes
-    NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x01);  // Enable data pipe 0 only
-    NRF24L01_SetBitrate(NRF24L01_BR_250K);           // 250Kbps
-    NRF24L01_SetPower(tx_power);
+    CC2500_SetPower(tx_power);
+    calibrate_rf_chans();
+    CC2500_SetTxRxMode(TX_EN);
 }
 
 static void GD00X_initialize_txid()
@@ -338,6 +357,10 @@ static void GD00X_initialize_txid()
 
 static u16 GD00X_callback()
 {
+    if (fine != (s8)Model.proto_opts[PROTOOPTS_FREQFINE]) {
+        fine = (s8)Model.proto_opts[PROTOOPTS_FREQFINE];
+        CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);
+    }
     if (phase == GD00X_BIND) {
         if (--bind_counter == 0) {
             PROTOCOL_SetBindState(0);
@@ -352,6 +375,7 @@ static void initialize()
 {
     CLOCK_StopTimer();
     tx_power = Model.tx_power;
+    fine = (s8)Model.proto_opts[PROTOOPTS_FREQFINE];
     packet_period = Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_V1?GD00X_PACKET_PERIOD:GD00X_V2_BIND_PACKET_PERIOD;
     packet_length = Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_V1?GD00X_PAYLOAD_SIZE:GD00X_V2_PAYLOAD_SIZE;
     packet_count = 0;
@@ -372,7 +396,7 @@ uintptr_t GD00X_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_DEINIT:
         case PROTOCMD_RESET:
             CLOCK_StopTimer();
-            return (NRF24L01_Reset() ? 1 : -1);
+            return (CC2500_Reset() ? 1 : -1);
         case PROTOCMD_CHECK_AUTOBIND: return 1;
         case PROTOCMD_BIND:  initialize(); return 0;
         case PROTOCMD_NUMCHAN: return 5;

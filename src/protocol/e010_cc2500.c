@@ -93,7 +93,7 @@ static u8 tx_power;
 static u8 rf_chan;
 static u8 txid[3];
 static u8 packet[PACKET_SIZE];
-static u8 rf_channels[RF_NUM_CHANNELS];
+static u8 hopping_frequency[RF_NUM_CHANNELS];
 static u8 calibration[RF_NUM_CHANNELS];
 static u8 calibration_fscal2;
 static u8 calibration_fscal3;
@@ -176,8 +176,8 @@ static void send_packet(u8 bind)
     CC2500_WriteReg(CC2500_23_FSCAL3, calibration_fscal3);
     CC2500_WriteReg(CC2500_24_FSCAL2, calibration_fscal2);
     CC2500_WriteReg(CC2500_25_FSCAL1, calibration[rf_chan / 2]);
-    XN297L_SetChannel(rf_channels[rf_chan / 2]);
-    rf_chan %= 2 * sizeof(rf_channels);  // channels repeated
+    XN297L_SetChannel(hopping_frequency[rf_chan / 2]);
+    rf_chan %= 2 * sizeof(hopping_frequency);  // channels repeated
 
     XN297L_WritePayload(packet, PACKET_SIZE);
 
@@ -198,7 +198,7 @@ static void calibrate_rf_chans()
     for (int c = 0; c < RF_NUM_CHANNELS; c++) {
         CLOCK_ResetWatchdog();
         CC2500_Strobe(CC2500_SIDLE);
-        XN297L_SetChannel(rf_channels[c]);
+        XN297L_SetChannel(hopping_frequency[c]);
         CC2500_Strobe(CC2500_SCAL);
         usleep(900);
         calibration[c] = CC2500_ReadReg(CC2500_25_FSCAL1);
@@ -208,7 +208,6 @@ static void calibrate_rf_chans()
     CC2500_Strobe(CC2500_SIDLE);
 }
 
-
 static void e010_init()
 {
     u8 rx_tx_addr[ADDRESS_LENGTH];
@@ -216,7 +215,7 @@ static void e010_init()
     XN297L_Configure(XN297_SCRAMBLED, XN297_CRC);
     CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);
     memcpy(rx_tx_addr, "\x6d\x6a\x77\x77\x77", sizeof(rx_tx_addr));
-    memcpy(rf_channels, "\x36\x3e\x46\x2e", sizeof(rf_channels));
+    memcpy(hopping_frequency, "\x36\x3e\x46\x2e", sizeof(hopping_frequency));
     XN297L_SetTXAddr(rx_tx_addr, sizeof(rx_tx_addr));
     CC2500_SetPower(tx_power);
     calibrate_rf_chans();
@@ -228,7 +227,7 @@ static u16 e010_callback()
     switch (phase) {
         case E010_BIND:
             if (counter == 0) {
-                memcpy(rf_channels, e010_tx_rf_map[Model.fixed_id % (sizeof(e010_tx_rf_map)/sizeof(e010_tx_rf_map[0]))].rfchan, sizeof(rf_channels));
+                memcpy(hopping_frequency, e010_tx_rf_map[Model.fixed_id % (sizeof(e010_tx_rf_map)/sizeof(e010_tx_rf_map[0]))].rfchan, sizeof(hopping_frequency));
                 calibrate_rf_chans();
                 phase = E010_DATA;
                 PROTOCOL_SetBindState(0);
