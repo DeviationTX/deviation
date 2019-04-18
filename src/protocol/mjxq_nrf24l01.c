@@ -297,6 +297,7 @@ static void send_packet(u8 bind)
 
 static void mjxq_init()
 {
+    XN297_SetScrambledMode(XN297_SCRAMBLED);
     u8 rx_tx_addr[ADDRESS_LENGTH];
 
     NRF24L01_Initialize();

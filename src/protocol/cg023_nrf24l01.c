@@ -219,6 +219,7 @@ static void send_packet(u8 bind)
 
 static void cg023_init()
 {
+    XN297_SetScrambledMode(XN297_SCRAMBLED);
     NRF24L01_Initialize();
 
     NRF24L01_SetTxRxMode(TX_EN);

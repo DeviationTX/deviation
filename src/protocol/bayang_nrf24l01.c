@@ -350,6 +350,7 @@ static int check_rx(void)
 
 static void bay_init()
 {
+    XN297_SetScrambledMode(XN297_SCRAMBLED);
     u8 bind_address[] = { 0, 0, 0, 0, 0 };
     switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
             case FORMAT_REGULAR:

@@ -138,6 +138,7 @@ static u8 checksum()
 
 static void bugs3mini_init()
 {
+    XN297_SetScrambledMode(XN297_SCRAMBLED);
     tx_power = Model.tx_power;
     NRF24L01_Initialize();
     NRF24L01_SetTxRxMode(TX_EN);

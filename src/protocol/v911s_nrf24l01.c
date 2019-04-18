@@ -155,6 +155,7 @@ static void V911S_send_packet(u8 bind)
 
 static void V911S_init()
 {
+    XN297_SetScrambledMode(XN297_SCRAMBLED);
     NRF24L01_Initialize();
     NRF24L01_SetTxRxMode(TX_EN);
     XN297_SetTXAddr((u8 *)"\x4B\x4E\x42\x4E\x44", 5);          // Bind address

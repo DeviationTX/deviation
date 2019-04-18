@@ -137,10 +137,10 @@ int NRF24L01_Reset();
 //void NRF24L01_PulseCE();
 
 // XN297 emulation layer
-enum {
-    XN297_UNSCRAMBLED = 0,
-    XN297_SCRAMBLED
-};
+#define XN297_UNSCRAMBLED 0
+#define XN297_SCRAMBLED 1
+#define XN297_NOCRC 0
+#define XN297_CRC 1
 
 extern const u8 xn297_scramble[];
 extern const u16 xn297_crc_xorout_scrambled[];

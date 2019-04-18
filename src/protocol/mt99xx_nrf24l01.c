@@ -287,6 +287,8 @@ static void mt99xx_init()
     NRF24L01_Initialize();
     if( Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_YZ)
         XN297_SetScrambledMode(XN297_UNSCRAMBLED);
+    else
+        XN297_SetScrambledMode(XN297_SCRAMBLED);
     NRF24L01_SetTxRxMode(TX_EN);
     NRF24L01_FlushTx();
     for(u8 i=0; i<5; i++)

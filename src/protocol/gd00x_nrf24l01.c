@@ -129,6 +129,7 @@ static void GD00X_send_packet()
 
 static void GD00X_init()
 {
+    XN297_SetScrambledMode(XN297_SCRAMBLED);
     NRF24L01_Initialize();
     NRF24L01_SetTxRxMode(TX_EN);
     XN297_SetTXAddr((u8*)"\xcc\xcc\xcc\xcc\xcc", 5);

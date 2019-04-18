@@ -275,7 +275,7 @@ static void calibrate_rf_chans()
 static void e010_init()
 {
     u8 rx_tx_addr[ADDRESS_LENGTH];
-    XN297L_init(1,1);  // setup cc2500 for xn297L@250kbps emulation, scrambled, crc enabled
+    XN297L_init(XN297_SCRAMBLED, XN297_CRC);  // setup cc2500 for xn297L@250kbps emulation, scrambled, crc enabled
     CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);
     memcpy(rx_tx_addr, "\x6d\x6a\x77\x77\x77", sizeof(rx_tx_addr));
     memcpy(rf_channels, "\x36\x3e\x46\x2e", sizeof(rf_channels));
