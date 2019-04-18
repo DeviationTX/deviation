@@ -281,7 +281,7 @@ $(ODIR)/protocol/v911s.mod : $(ODIR)/v911s_nrf24l01.bin
 	@echo Building 'v911s' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
     
-$(ODIR)/protocol/gd00x.mod : $(ODIR)/gd00x_nrf24l01.bin
+$(ODIR)/protocol/gd00x.mod : $(ODIR)/gd00x_cc2500.bin
 	@echo Building 'gd00x' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
     

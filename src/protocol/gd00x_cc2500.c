@@ -32,7 +32,7 @@
 // printf inside an interrupt handler is really dangerous
 // this shouldn't be enabled even in debug builds without explicitly
 // turning it on
-#define dbgprintf if(0) printf
+#define dbgprintf if (0) printf
 #endif
 
 // #define FORCE_GD00X_ORIGINAL_ID
@@ -219,7 +219,7 @@ static void GD00X_send_packet()
     }
 
     XN297L_WritePayload(packet, packet_length);
-    
+
     if (tx_power != Model.tx_power) {
         // Keep transmit power updated
         tx_power = Model.tx_power;
@@ -266,8 +266,8 @@ static void GD00X_init()
 static void GD00X_initialize_txid()
 {
     u32 lfsr = 0xb2c54a2ful;
-    u8 i,j;
-    
+    u8 i, j;
+
 #ifndef USE_FIXED_MFGID
     u8 var[12];
     MCU_SerialNumber(var, 12);
@@ -381,7 +381,7 @@ static void initialize()
     packet_count = 0;
     len = 0;
     hopping_frequency_no = 0;
-    bind_counter=GD00X_BIND_COUNT;
+    bind_counter = GD00X_BIND_COUNT;
     phase = GD00X_BIND;
     PROTOCOL_SetBindState((GD00X_BIND_COUNT * packet_period)/1000);
     GD00X_initialize_txid();
@@ -391,7 +391,7 @@ static void initialize()
 
 uintptr_t GD00X_Cmds(enum ProtoCmds cmd)
 {
-    switch(cmd) {
+    switch (cmd) {
         case PROTOCMD_INIT:  initialize(); return 0;
         case PROTOCMD_DEINIT:
         case PROTOCMD_RESET:
