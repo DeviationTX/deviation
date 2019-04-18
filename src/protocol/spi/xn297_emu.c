@@ -18,7 +18,10 @@
 //static u8 packet[32];
 
 u8 xn297_crc;
-u8 xn297_scramble_enabled; // should be 1 by default ... but can't init static in modular 
+u8 xn297_scramble_enabled;
+u8 xn297_addr_len;
+u8 xn297_tx_addr[5];
+u8 xn297_rx_addr[5];
 
 const u8 xn297_scramble[] = {
     0xe3, 0xb1, 0x4b, 0xea, 0x85, 0xbc, 0xe5, 0x66,

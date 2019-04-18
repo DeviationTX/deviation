@@ -112,65 +112,6 @@ e010_tx_rf_map[] = {{{0x4F, 0x1C}, {0x3A, 0x35, 0x4A, 0x45}},
                     {{0xFD, 0x4F}, {0x33, 0x3B, 0x43, 0x4B}},
                     {{0x86, 0x3C}, {0x34, 0x3E, 0x44, 0x4E}}};
 
-// xn297 emulation
-////////////////////
-static u8 xn297_addr_len;
-static u8 xn297_tx_addr[5];
-//static const u8 xn297_crc = 1;
-
-static const u16 initial    = 0xb5d2;
-
-static void XN297L_SetTXAddr(const u8* addr, u8 len)
-{
-    if (len > 5) len = 5;
-    if (len < 3) len = 3;
-    xn297_addr_len = len;
-    memcpy(xn297_tx_addr, addr, len);
-}
-
-static void XN297L_WritePayload(const u8* msg, u8 len)
-{
-    u8 buf[32];
-    u8 last = 0;
-    u8 i;
-
-    for (i = 0; i < xn297_addr_len; ++i) {
-        buf[last++] = xn297_tx_addr[xn297_addr_len-i-1] ^ xn297_scramble[i];
-    }
-
-    for (i = 0; i < len; ++i) {
-        // bit-reverse bytes in packet
-        u8 b_out = bit_reverse(msg[i]);
-        buf[last++] = b_out ^ xn297_scramble[xn297_addr_len+i];
-    }
-    if (xn297_crc) {
-        u8 offset = xn297_addr_len < 4 ? 1 : 0;
-        u16 crc = initial;
-        for (u8 i = offset; i < last; ++i) {
-            crc = crc16_update(crc, buf[i], 8);
-        }
-        crc ^= xn297_crc_xorout_scrambled[xn297_addr_len - 3 + len];
-        buf[last++] = crc >> 8;
-        buf[last++] = crc & 0xff;
-    }
-
-    // stop TX/RX
-    CC2500_Strobe(CC2500_SIDLE);
-    // flush tx FIFO
-    CC2500_Strobe(CC2500_SFTX);
-    // packet length
-    CC2500_WriteReg(CC2500_3F_TXFIFO, last + 3);
-    // xn297L preamble
-    CC2500_WriteRegisterMulti(CC2500_3F_TXFIFO, (u8*)"\x71\x0f\x55", 3);
-    // xn297 packet
-    CC2500_WriteRegisterMulti(CC2500_3F_TXFIFO, buf, last);
-    // transmit
-    CC2500_Strobe(CC2500_STX);
-}
-
-// end of xn297 emulation
-///////////////////////////
-
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
 
@@ -230,18 +171,13 @@ static void send_packet(u8 bind)
 
     packet[15] = checksum();
 
+    // channel hopping
     rf_chan++;
     CC2500_WriteReg(CC2500_23_FSCAL3, calibration_fscal3);
     CC2500_WriteReg(CC2500_24_FSCAL2, calibration_fscal2);
     CC2500_WriteReg(CC2500_25_FSCAL1, calibration[rf_chan / 2]);
-    // spacing is 333.25 kHz, must multiply xn297 channel by 3
-    CC2500_WriteReg(CC2500_0A_CHANNR, rf_channels[rf_chan / 2] * 3);
+    XN297L_SetChannel(rf_channels[rf_chan / 2]);
     rf_chan %= 2 * sizeof(rf_channels);  // channels repeated
-
-    // Make sure that the radio is in IDLE state before flushing the FIFO
-    CC2500_Strobe(CC2500_SIDLE);
-    // Flush TX FIFO
-    CC2500_Strobe(CC2500_SFTX);
 
     XN297L_WritePayload(packet, PACKET_SIZE);
 
@@ -256,12 +192,13 @@ static void send_packet(u8 bind)
     }
 }
 
+// calibrate used RF channels for faster hopping
 static void calibrate_rf_chans()
 {
     for (int c = 0; c < RF_NUM_CHANNELS; c++) {
         CLOCK_ResetWatchdog();
         CC2500_Strobe(CC2500_SIDLE);
-        CC2500_WriteReg(CC2500_0A_CHANNR, rf_channels[c] * 3);
+        XN297L_SetChannel(rf_channels[c]);
         CC2500_Strobe(CC2500_SCAL);
         usleep(900);
         calibration[c] = CC2500_ReadReg(CC2500_25_FSCAL1);
@@ -282,6 +219,7 @@ static void e010_init()
     XN297L_SetTXAddr(rx_tx_addr, sizeof(rx_tx_addr));
     CC2500_SetPower(tx_power);
     calibrate_rf_chans();
+    CC2500_SetTxRxMode(TX_EN);
 }
 
 static u16 e010_callback()

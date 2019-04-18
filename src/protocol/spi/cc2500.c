@@ -193,10 +193,65 @@ void XN297L_init(u8 scramble_en, u8 crc_en)
     CC2500_WriteReg(CC2500_25_FSCAL1,   0x00);   // Frequency Synthesizer Calibration
     CC2500_WriteReg(CC2500_26_FSCAL0,   0x11);   // Frequency Synthesizer Calibration
 
-    CC2500_SetTxRxMode(TX_EN);
-
     XN297_SetScrambledMode(scramble_en);
     xn297_crc = crc_en;
+}
+
+void XN297L_SetTXAddr(const u8* addr, u8 len)
+{
+    if (len > 5) len = 5;
+    if (len < 3) len = 3;
+    xn297_addr_len = len;
+    memcpy(xn297_tx_addr, addr, len);
+}
+
+void XN297L_WritePayload(const u8* msg, u8 len)
+{
+    u8 buf[32];
+    u8 last = 0;
+    u8 i;
+    static const u16 initial    = 0xb5d2;
+    
+    for (i = 0; i < xn297_addr_len; ++i) {
+        buf[last++] = xn297_tx_addr[xn297_addr_len-i-1] ^ xn297_scramble[i];
+    }
+
+    for (i = 0; i < len; ++i) {
+        // bit-reverse bytes in packet
+        u8 b_out = bit_reverse(msg[i]);
+        buf[last++] = b_out ^ xn297_scramble[xn297_addr_len+i];
+    }
+    if (xn297_crc) {
+        u8 offset = xn297_addr_len < 4 ? 1 : 0;
+        u16 crc = initial;
+        for (u8 i = offset; i < last; ++i) {
+            crc = crc16_update(crc, buf[i], 8);
+        }
+        crc ^= xn297_crc_xorout_scrambled[xn297_addr_len - 3 + len];
+        buf[last++] = crc >> 8;
+        buf[last++] = crc & 0xff;
+    }
+
+    // stop TX/RX
+    CC2500_Strobe(CC2500_SIDLE);
+    // flush tx FIFO
+    CC2500_Strobe(CC2500_SFTX);
+    // packet length
+    CC2500_WriteReg(CC2500_3F_TXFIFO, last + 3);
+    // xn297L preamble
+    CC2500_WriteRegisterMulti(CC2500_3F_TXFIFO, (u8*)"\x71\x0f\x55", 3);
+    // xn297 packet
+    CC2500_WriteRegisterMulti(CC2500_3F_TXFIFO, buf, last);
+    // transmit
+    CC2500_Strobe(CC2500_STX);
+}
+
+void XN297L_SetChannel(u8 ch)
+{
+    // channel spacing is 333.25 MHz, need to multiply XN297 channel by 3
+    if (ch > 85)
+        ch = 85;
+    CC2500_WriteReg(CC2500_0A_CHANNR, ch * 3);
 }
 
 #endif

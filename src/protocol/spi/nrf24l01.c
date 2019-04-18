@@ -272,12 +272,6 @@ int NRF24L01_Reset()
 //
 // XN297 emulation layer
 //////////////////////////
-//static u8  xn297_scramble_enabled;
-static int xn297_addr_len;
-static u8  xn297_tx_addr[5];
-static u8  xn297_rx_addr[5];
-//static u8  xn297_crc = 0;
-
 
 static const uint16_t initial    = 0xb5d2;
 
@@ -294,11 +288,6 @@ void XN297_SetTXAddr(const u8* addr, int len)
     }
     NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, len-2);
     NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, buf, 5);
-    // Receive address is complicated. We need to use scrambled actual address as a receive address
-    // but the TX code now assumes fixed 4-byte transmit address for preamble. We need to adjust it
-    // first. Also, if the scrambled address begings with 1 nRF24 will look for preamble byte 0xAA
-    // instead of 0x55 to ensure enough 0-1 transitions to tune the receiver. Still need to experiment
-    // with receiving signals.
     memcpy(xn297_tx_addr, addr, len);
 }
 

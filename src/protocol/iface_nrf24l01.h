@@ -147,6 +147,9 @@ extern const u16 xn297_crc_xorout_scrambled[];
 extern const u16 xn297_crc_xorout[];
 extern u8 xn297_crc;
 extern u8 xn297_scramble_enabled;
+extern u8 xn297_addr_len;
+extern u8 xn297_tx_addr[5];
+extern u8 xn297_rx_addr[5];
 uint8_t bit_reverse(uint8_t b_in);
 
 void XN297_SetTXAddr(const u8* addr, int len);
