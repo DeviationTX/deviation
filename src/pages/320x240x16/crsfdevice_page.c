@@ -42,6 +42,7 @@ static int row_cb(int absrow, int relrow, int y, void *data) {
     (void)data;
 
     crsf_param_t *param = current_param(absrow);
+    if (!param) return 0;
     void (*lbl_press_cb)(struct guiObject *obj, s8 press_type, const void *data) = NULL;
 
     switch (param->type) {
