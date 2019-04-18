@@ -272,8 +272,7 @@ int NRF24L01_Reset()
 //
 // XN297 emulation layer
 //////////////////////////
-
-static const uint16_t initial    = 0xb5d2;
+static u8 xn297_packet[32];
 
 void XN297_SetTXAddr(const u8* addr, int len)
 {
@@ -319,109 +318,80 @@ void XN297_Configure(u8 flags)
 
 u8 XN297_WritePayload(u8* msg, int len)
 {
-    u8 packet[32];
     u8 res;
-
     int last = 0;
     if (xn297_addr_len < 4) {
         // If address length (which is defined by receive address length)
         // is less than 4 the TX address can't fit the preamble, so the last
         // byte goes here
-        packet[last++] = 0x55;
+        xn297_packet[last++] = 0x55;
     }
-    for (int i = 0; i < xn297_addr_len; ++i) {
-        packet[last] = xn297_tx_addr[xn297_addr_len-i-1];
-        if(xn297_scramble_enabled)
-            packet[last] ^= xn297_scramble[i];
-        last++;
-    }
-
-    for (int i = 0; i < len; ++i) {
-        // bit-reverse bytes in packet
-        u8 b_out = bit_reverse(msg[i]);
-        packet[last] = b_out;
-        if(xn297_scramble_enabled)
-            packet[last] ^= xn297_scramble[xn297_addr_len+i];
-        last++;
-    }
-    if (xn297_crc) {
-        int offset = xn297_addr_len < 4 ? 1 : 0;
-        u16 crc = initial;
-        for (int i = offset; i < last; ++i) {
-            crc = crc16_update(crc, packet[i], 8);
-        }
-        if(xn297_scramble_enabled)
-            crc ^= pgm_read_word(&xn297_crc_xorout_scrambled[xn297_addr_len - 3 + len]);
-        else
-            crc ^= pgm_read_word(&xn297_crc_xorout[xn297_addr_len - 3 + len]);
-        packet[last++] = crc >> 8;
-        packet[last++] = crc & 0xff;
-    }
-    res = NRF24L01_WritePayload(packet, last);
+    last += _xn297_write_payload(msg, len, &xn297_packet[last]);
+    res = NRF24L01_WritePayload(xn297_packet, last);
     return res;
 }
 
 u8 XN297_WriteEnhancedPayload(u8* msg, int len, int noack, u16 crc_xorout)
 {
-    u8 packet[32];
     u8 scramble_index=0;
     u8 res;
     int last = 0;
     static int pid=0;
+    uint16_t initial = 0xb5d2;
 
     // address
     if (xn297_addr_len < 4) {
         // If address length (which is defined by receive address length)
         // is less than 4 the TX address can't fit the preamble, so the last
         // byte goes here
-        packet[last++] = 0x55;
+        xn297_packet[last++] = 0x55;
     }
     for (int i = 0; i < xn297_addr_len; ++i) {
-        packet[last] = xn297_tx_addr[xn297_addr_len-i-1];
-        if(xn297_scramble_enabled)
-            packet[last] ^= xn297_scramble[scramble_index++];
+        xn297_packet[last] = xn297_tx_addr[xn297_addr_len-i-1];
+        if (xn297_scramble_enabled)
+            xn297_packet[last] ^= xn297_scramble[scramble_index++];
         last++;
     }
 
     // pcf
-    packet[last] = (len << 1) | (pid>>1);
+    xn297_packet[last] = (len << 1) | (pid>>1);
     if(xn297_scramble_enabled)
-        packet[last] ^= xn297_scramble[scramble_index++];
+        xn297_packet[last] ^= xn297_scramble[scramble_index++];
     last++;
-    packet[last] = (pid << 7) | (noack << 6);
+    xn297_packet[last] = (pid << 7) | (noack << 6);
 
     // payload
-    packet[last]|= bit_reverse(msg[0]) >> 2; // first 6 bit of payload
+    xn297_packet[last]|= bit_reverse(msg[0]) >> 2;  // first 6 bit of payload
     if(xn297_scramble_enabled)
-        packet[last] ^= xn297_scramble[scramble_index++];
+        xn297_packet[last] ^= xn297_scramble[scramble_index++];
 
     for (int i = 0; i < len-1; ++i) {
         last++;
-        packet[last] = (bit_reverse(msg[i]) << 6) | (bit_reverse(msg[i+1]) >> 2);
+        xn297_packet[last] = (bit_reverse(msg[i]) << 6) | (bit_reverse(msg[i+1]) >> 2);
         if(xn297_scramble_enabled)
-            packet[last] ^= xn297_scramble[scramble_index++];
+            xn297_packet[last] ^= xn297_scramble[scramble_index++];
     }
 
     last++;
-    packet[last] = bit_reverse(msg[len-1]) << 6; // last 2 bit of payload
+    xn297_packet[last] = bit_reverse(msg[len-1]) << 6;  // last 2 bit of payload
     if(xn297_scramble_enabled)
-            packet[last] ^= xn297_scramble[scramble_index++] & 0xc0;
+            xn297_packet[last] ^= xn297_scramble[scramble_index++] & 0xc0;
 
     // crc
     if (xn297_crc) {
         int offset = xn297_addr_len < 4 ? 1 : 0;
         u16 crc = initial;
         for (int i = offset; i < last; ++i) {
-            crc = crc16_update(crc, packet[i], 8);
+            crc = crc16_update(crc, xn297_packet[i], 8);
         }
-        crc = crc16_update(crc, packet[last] & 0xc0, 2);
+        crc = crc16_update(crc, xn297_packet[last] & 0xc0, 2);
         crc ^= crc_xorout;
 
-        packet[last++] |= (crc >> 8) >> 2;
-        packet[last++] = ((crc >> 8) << 6) | ((crc & 0xff) >> 2);
-        packet[last++] = (crc & 0xff) << 6;
+        xn297_packet[last++] |= (crc >> 8) >> 2;
+        xn297_packet[last++] = ((crc >> 8) << 6) | ((crc & 0xff) >> 2);
+        xn297_packet[last++] = (crc & 0xff) << 6;
     }
-    res = NRF24L01_WritePayload(packet, last);
+    res = NRF24L01_WritePayload(xn297_packet, last);
 
     pid++;
     if(pid>3)
@@ -444,8 +414,8 @@ u8 XN297_ReadPayload(u8* msg, int len)
 u8 XN297_ReadEnhancedPayload(u8* msg, int len)
 {
     u8 buffer[32];
-    u8 pcf_size; // pcf payload size
-    NRF24L01_ReadPayload(buffer, len+2); // pcf + payload
+    u8 pcf_size;  // pcf payload size
+    NRF24L01_ReadPayload(buffer, len+2);  // pcf + payload
     pcf_size = buffer[0];
     if(xn297_scramble_enabled)
         pcf_size ^= xn297_scramble[xn297_addr_len];
@@ -471,8 +441,8 @@ static u8 hs6200_tx_addr[5];
 static u8 hs6200_address_length;
 
 static const u8 hs6200_scramble[] = {
-    0x80,0xf5,0x3b,0x0d,0x6d,0x2a,0xf9,0xbc,
-    0x51,0x8e,0x4c,0xfd,0xc1,0x65,0xd0}; // todo: find all 32 bytes ...
+    0x80, 0xf5, 0x3b, 0x0d, 0x6d, 0x2a, 0xf9, 0xbc,
+    0x51, 0x8e, 0x4c, 0xfd, 0xc1, 0x65, 0xd0};  // todo: find all 32 bytes ...
 
 void HS6200_SetTXAddr(const u8* addr, u8 len)
 {

@@ -150,7 +150,8 @@ extern u8 xn297_scramble_enabled;
 extern u8 xn297_addr_len;
 extern u8 xn297_tx_addr[5];
 extern u8 xn297_rx_addr[5];
-uint8_t bit_reverse(uint8_t b_in);
+u8 bit_reverse(u8 b_in);
+u8 _xn297_write_payload(u8* msg, u8 len, u8* out);
 
 void XN297_SetTXAddr(const u8* addr, int len);
 void XN297_SetRXAddr(const u8* addr, int len);

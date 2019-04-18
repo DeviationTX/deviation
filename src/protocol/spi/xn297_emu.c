@@ -15,8 +15,6 @@
 
 #include "common.h"
 
-//static u8 packet[32];
-
 u8 xn297_crc;
 u8 xn297_scramble_enabled;
 u8 xn297_addr_len;
@@ -29,14 +27,14 @@ const u8 xn297_scramble[] = {
     0xc7, 0x62, 0x97, 0xd5, 0x0b, 0x79, 0xca, 0xcc,
     0x1b, 0x5d, 0x19, 0x10, 0x24, 0xd3, 0xdc, 0x3f,
     0x8e, 0xc5, 0x2f};
-    
+
 const u16 xn297_crc_xorout_scrambled[] = {
     0x0000, 0x3448, 0x9BA7, 0x8BBB, 0x85E1, 0x3E8C,
     0x451E, 0x18E6, 0x6B24, 0xE7AB, 0x3828, 0x814B,
     0xD461, 0xF494, 0x2503, 0x691D, 0xFE8B, 0x9BA7,
     0x8B17, 0x2920, 0x8B5F, 0x61B1, 0xD391, 0x7401,
     0x2138, 0x129F, 0xB3A0, 0x2988};
-    
+
 const u16 xn297_crc_xorout[] = {
     0x0000, 0x3d5f, 0xa6f1, 0x3a23, 0xaa16, 0x1caf,
     0x62b2, 0xe0eb, 0x0821, 0xbe07, 0x5f1a, 0xaf15,
@@ -44,11 +42,11 @@ const u16 xn297_crc_xorout[] = {
     0x1852, 0xdf36, 0x129d, 0xb17c, 0xd5f5, 0x70d7,
     0xb798, 0x5133, 0x67db, 0xd94e};
 
-#if defined(__GNUC__) && defined(__ARM_ARCH_ISA_THUMB) && (__ARM_ARCH_ISA_THUMB==2)
+#if defined(__GNUC__) && defined(__ARM_ARCH_ISA_THUMB) && (__ARM_ARCH_ISA_THUMB == 2)
 // rbit instruction works on cortex m3
 static u32 __RBIT_(u32 in)
 {
-    u32 out=0;
+    u32 out = 0;
     __asm volatile ("rbit %0, %1" : "=r" (out) : "r" (in) );
     return(out);
 }
@@ -87,4 +85,41 @@ u16 crc16_update(u16 crc, u8 a, u8 bits)
 void XN297_SetScrambledMode(const u8 mode)
 {
     xn297_scramble_enabled = mode;
+}
+
+u8 _xn297_write_payload(const u8* msg, u8 len, u8* out)
+{
+    u8 last = 0;
+    const uint16_t initial = 0xb5d2;
+
+    for (int i = 0; i < xn297_addr_len; ++i) {
+        out[last] = xn297_tx_addr[xn297_addr_len-i-1];
+        if (xn297_scramble_enabled)
+            out[last] ^= xn297_scramble[i];
+        last++;
+    }
+
+    for (int i = 0; i < len; ++i) {
+        // bit-reverse bytes in packet
+        u8 b_out = bit_reverse(msg[i]);
+        out[last] = b_out;
+        if (xn297_scramble_enabled)
+            out[last] ^= xn297_scramble[xn297_addr_len+i];
+        last++;
+    }
+
+    if (xn297_crc) {
+        int offset = xn297_addr_len < 4 ? 1 : 0;
+        u16 crc = initial;
+        for (int i = offset; i < last; ++i) {
+            crc = crc16_update(crc, out[i], 8);
+        }
+        if (xn297_scramble_enabled)
+            crc ^= xn297_crc_xorout_scrambled[xn297_addr_len - 3 + len];
+        else
+            crc ^= xn297_crc_xorout[xn297_addr_len - 3 + len];
+        out[last++] = crc >> 8;
+        out[last++] = crc & 0xff;
+    }
+    return last;
 }
