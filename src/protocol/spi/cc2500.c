@@ -140,4 +140,63 @@ int CC2500_Reset()
     CC2500_SetTxRxMode(TXRX_OFF);
     return CC2500_ReadReg(CC2500_0E_FREQ1) == 0xC4;
 }
+
+// xn297 emulation
+
+// setup CC2500 for XN297L @ 250 kbps emulation
+void XN297L_init(u8 scramble_en, u8 crc_en)
+{
+    // Address Config = No address check
+    // Base Frequency = 2399.999268
+    // CRC Autoflush = false
+    // CRC Enable = false
+    // Carrier Frequency = 2399.999268
+    // Channel Number = 0
+    // Channel Spacing = 333.251953
+    // Data Format = Normal mode
+    // Data Rate = 249.939
+    // Deviation = 126.953125
+    // Device Address = 0
+    // Manchester Enable = false
+    // Modulated = true
+    // Modulation Format = GFSK
+    // Packet Length = 255
+    // Packet Length Mode = Variable packet length mode. Packet length configured by the first byte after sync word
+    // Preamble Count = 4
+    // RX Filter BW = 203.125000
+    // Sync Word Qualifier Mode = No preamble/sync
+    // TX Power = 0
+    // Whitening = false
+
+    CC2500_Reset();
+    CC2500_Strobe(CC2500_SIDLE);
+    CC2500_WriteReg(CC2500_08_PKTCTRL0, 0x01);   // Packet Automation Control
+    CC2500_WriteReg(CC2500_0B_FSCTRL1,  0x0A);   // Frequency Synthesizer Control
+    CC2500_WriteReg(CC2500_0C_FSCTRL0,  0x00);   // Frequency Synthesizer Control
+    CC2500_WriteReg(CC2500_0D_FREQ2,    0x5C);   // Frequency Control Word, High Byte
+    CC2500_WriteReg(CC2500_0E_FREQ1,    0x4E);   // Frequency Control Word, Middle Byte
+    CC2500_WriteReg(CC2500_0F_FREQ0,    0xC3);   // Frequency Control Word, Low Byte
+    CC2500_WriteReg(CC2500_10_MDMCFG4,  0x8D);   // Modem Configuration
+    CC2500_WriteReg(CC2500_11_MDMCFG3,  0x3B);   // Modem Configuration
+    CC2500_WriteReg(CC2500_12_MDMCFG2,  0x10);   // Modem Configuration
+    CC2500_WriteReg(CC2500_13_MDMCFG1,  0x23);   // Modem Configuration
+    CC2500_WriteReg(CC2500_14_MDMCFG0,  0xA4);   // Modem Configuration
+    CC2500_WriteReg(CC2500_15_DEVIATN,  0x62);   // Modem Deviation Setting
+    CC2500_WriteReg(CC2500_18_MCSM0,    0x18);   // Main Radio Control State Machine Configuration
+    CC2500_WriteReg(CC2500_19_FOCCFG,   0x1D);   // Frequency Offset Compensation Configuration
+    CC2500_WriteReg(CC2500_1A_BSCFG,    0x1C);   // Bit Synchronization Configuration
+    CC2500_WriteReg(CC2500_1B_AGCCTRL2, 0xC7);   // AGC Control
+    CC2500_WriteReg(CC2500_1C_AGCCTRL1, 0x00);   // AGC Control
+    CC2500_WriteReg(CC2500_1D_AGCCTRL0, 0xB0);   // AGC Control
+    CC2500_WriteReg(CC2500_21_FREND1,   0xB6);   // Front End RX Configuration
+    CC2500_WriteReg(CC2500_23_FSCAL3,   0xEA);   // Frequency Synthesizer Calibration
+    CC2500_WriteReg(CC2500_25_FSCAL1,   0x00);   // Frequency Synthesizer Calibration
+    CC2500_WriteReg(CC2500_26_FSCAL0,   0x11);   // Frequency Synthesizer Calibration
+
+    CC2500_SetTxRxMode(TX_EN);
+
+    XN297_SetScrambledMode(scramble_en);
+    xn297_crc = crc_en;
+}
+
 #endif

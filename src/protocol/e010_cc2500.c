@@ -116,84 +116,7 @@ e010_tx_rf_map[] = {{{0x4F, 0x1C}, {0x3A, 0x35, 0x4A, 0x45}},
 ////////////////////
 static u8 xn297_addr_len;
 static u8 xn297_tx_addr[5];
-static const u8 xn297_crc = 1;
-
-static const u8 xn297_scramble[] = {
-    0xe3, 0xb1, 0x4b, 0xea, 0x85, 0xbc, 0xe5, 0x66,
-    0x0d, 0xae, 0x8c, 0x88, 0x12, 0x69, 0xee, 0x1f,
-    0xc7, 0x62, 0x97, 0xd5, 0x0b, 0x79, 0xca, 0xcc,
-    0x1b, 0x5d, 0x19, 0x10, 0x24, 0xd3, 0xdc, 0x3f,
-    0x8e, 0xc5, 0x2f};
-
-static const u16 xn297_crc_xorout[] = {
-    0x0000, 0x3448, 0x9BA7, 0x8BBB, 0x85E1, 0x3E8C,
-    0x451E, 0x18E6, 0x6B24, 0xE7AB, 0x3828, 0x814B,
-    0xD461, 0xF494, 0x2503, 0x691D, 0xFE8B, 0x9BA7,
-    0x8B17, 0x2920, 0x8B5F, 0x61B1, 0xD391, 0x7401,
-    0x2138, 0x129F, 0xB3A0, 0x2988};
-
-static void XN297L_init()
-{
-    CC2500_Reset();
-    CC2500_Strobe(CC2500_SIDLE);
-
-    // Address Config = No address check
-    // Base Frequency = 2399.999268
-    // CRC Autoflush = false
-    // CRC Enable = false
-    // Carrier Frequency = 2399.999268
-    // Channel Number = 0
-    // Channel Spacing = 333.251953
-    // Data Format = Normal mode
-    // Data Rate = 249.939
-    // Deviation = 126.953125
-    // Device Address = 0
-    // Manchester Enable = false
-    // Modulated = true
-    // Modulation Format = GFSK
-    // Packet Length = 255
-    // Packet Length Mode = Variable packet length mode. Packet length configured by the first byte after sync word
-    // Preamble Count = 4
-    // RX Filter BW = 203.125000
-    // Sync Word Qualifier Mode = No preamble/sync
-    // TX Power = 0
-    // Whitening = false
-
-    CC2500_WriteReg(CC2500_08_PKTCTRL0, 0x01);   // Packet Automation Control
-    CC2500_WriteReg(CC2500_0B_FSCTRL1,  0x0A);   // Frequency Synthesizer Control
-    CC2500_WriteReg(CC2500_0C_FSCTRL0,  0x00);   // Frequency Synthesizer Control
-    CC2500_WriteReg(CC2500_0D_FREQ2,    0x5C);   // Frequency Control Word, High Byte
-    CC2500_WriteReg(CC2500_0E_FREQ1,    0x4E);   // Frequency Control Word, Middle Byte
-    CC2500_WriteReg(CC2500_0F_FREQ0,    0xC3);   // Frequency Control Word, Low Byte
-    CC2500_WriteReg(CC2500_10_MDMCFG4,  0x8D);   // Modem Configuration
-    CC2500_WriteReg(CC2500_11_MDMCFG3,  0x3B);   // Modem Configuration
-    CC2500_WriteReg(CC2500_12_MDMCFG2,  0x10);   // Modem Configuration
-    CC2500_WriteReg(CC2500_13_MDMCFG1,  0x23);   // Modem Configuration
-    CC2500_WriteReg(CC2500_14_MDMCFG0,  0xA4);   // Modem Configuration
-    CC2500_WriteReg(CC2500_15_DEVIATN,  0x62);   // Modem Deviation Setting
-    CC2500_WriteReg(CC2500_18_MCSM0,    0x18);   // Main Radio Control State Machine Configuration
-    CC2500_WriteReg(CC2500_19_FOCCFG,   0x1D);   // Frequency Offset Compensation Configuration
-    CC2500_WriteReg(CC2500_1A_BSCFG,    0x1C);   // Bit Synchronization Configuration
-    CC2500_WriteReg(CC2500_1B_AGCCTRL2, 0xC7);   // AGC Control
-    CC2500_WriteReg(CC2500_1C_AGCCTRL1, 0x00);   // AGC Control
-    CC2500_WriteReg(CC2500_1D_AGCCTRL0, 0xB0);   // AGC Control
-    CC2500_WriteReg(CC2500_21_FREND1,   0xB6);   // Front End RX Configuration
-    CC2500_WriteReg(CC2500_23_FSCAL3,   0xEA);   // Frequency Synthesizer Calibration
-    CC2500_WriteReg(CC2500_25_FSCAL1,   0x00);   // Frequency Synthesizer Calibration
-    CC2500_WriteReg(CC2500_26_FSCAL0,   0x11);   // Frequency Synthesizer Calibration
-
-    CC2500_SetTxRxMode(TX_EN);
-}
-
-static u8 bit_reverse(uint8_t b_in)
-{
-    uint8_t b_out = 0;
-    for (u8 i = 0; i < 8; ++i) {
-        b_out = (b_out << 1) | (b_in & 1);
-        b_in >>= 1;
-    }
-    return b_out;
-}
+//static const u8 xn297_crc = 1;
 
 static const u16 initial    = 0xb5d2;
 
@@ -204,7 +127,6 @@ static void XN297L_SetTXAddr(const u8* addr, u8 len)
     xn297_addr_len = len;
     memcpy(xn297_tx_addr, addr, len);
 }
-
 
 static void XN297L_WritePayload(const u8* msg, u8 len)
 {
@@ -227,7 +149,7 @@ static void XN297L_WritePayload(const u8* msg, u8 len)
         for (u8 i = offset; i < last; ++i) {
             crc = crc16_update(crc, buf[i], 8);
         }
-        crc ^= xn297_crc_xorout[xn297_addr_len - 3 + len];
+        crc ^= xn297_crc_xorout_scrambled[xn297_addr_len - 3 + len];
         buf[last++] = crc >> 8;
         buf[last++] = crc & 0xff;
     }
@@ -353,7 +275,7 @@ static void calibrate_rf_chans()
 static void e010_init()
 {
     u8 rx_tx_addr[ADDRESS_LENGTH];
-    XN297L_init();  // setup cc2500 for xn297L@250kbps emulation
+    XN297L_init(1,1);  // setup cc2500 for xn297L@250kbps emulation, scrambled, crc enabled
     CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);
     memcpy(rx_tx_addr, "\x6d\x6a\x77\x77\x77", sizeof(rx_tx_addr));
     memcpy(rf_channels, "\x36\x3e\x46\x2e", sizeof(rf_channels));

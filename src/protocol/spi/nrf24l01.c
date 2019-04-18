@@ -272,75 +272,14 @@ int NRF24L01_Reset()
 //
 // XN297 emulation layer
 //////////////////////////
-static u8  xn297_scramble_enabled;
+//static u8  xn297_scramble_enabled;
 static int xn297_addr_len;
 static u8  xn297_tx_addr[5];
 static u8  xn297_rx_addr[5];
-static u8  xn297_crc = 0;
-
-static const uint8_t xn297_scramble[] = {
-    0xe3, 0xb1, 0x4b, 0xea, 0x85, 0xbc, 0xe5, 0x66,
-    0x0d, 0xae, 0x8c, 0x88, 0x12, 0x69, 0xee, 0x1f,
-    0xc7, 0x62, 0x97, 0xd5, 0x0b, 0x79, 0xca, 0xcc,
-    0x1b, 0x5d, 0x19, 0x10, 0x24, 0xd3, 0xdc, 0x3f,
-    0x8e, 0xc5, 0x2f};
-
-FLASHWORDTABLE xn297_crc_xorout_scrambled[] = {
-    0x0000, 0x3448, 0x9BA7, 0x8BBB, 0x85E1, 0x3E8C,
-    0x451E, 0x18E6, 0x6B24, 0xE7AB, 0x3828, 0x814B,
-    0xD461, 0xF494, 0x2503, 0x691D, 0xFE8B, 0x9BA7,
-    0x8B17, 0x2920, 0x8B5F, 0x61B1, 0xD391, 0x7401,
-    0x2138, 0x129F, 0xB3A0, 0x2988};
-
-FLASHWORDTABLE xn297_crc_xorout[] = {
-    0x0000, 0x3d5f, 0xa6f1, 0x3a23, 0xaa16, 0x1caf,
-    0x62b2, 0xe0eb, 0x0821, 0xbe07, 0x5f1a, 0xaf15,
-    0x4f0a, 0xad24, 0x5e48, 0xed34, 0x068c, 0xf2c9,
-    0x1852, 0xdf36, 0x129d, 0xb17c, 0xd5f5, 0x70d7,
-    0xb798, 0x5133, 0x67db, 0xd94e};
+//static u8  xn297_crc = 0;
 
 
-#if defined(__GNUC__) && defined(__ARM_ARCH_ISA_THUMB) && (__ARM_ARCH_ISA_THUMB==2)
-// rbit instruction works on cortex m3
-uint32_t __RBIT_(uint32_t in)
-{
-    uint32_t out=0;
-    __asm volatile ("rbit %0, %1" : "=r" (out) : "r" (in) );
-    return(out);
-}
-
-static uint8_t bit_reverse(uint8_t a)
-{
-    return __RBIT_( (unsigned int) a)>>24;
-}
-#else
-static uint8_t bit_reverse(uint8_t b_in)
-{
-    uint8_t b_out = 0;
-    for (int i = 0; i < 8; ++i) {
-        b_out = (b_out << 1) | (b_in & 1);
-        b_in >>= 1;
-    }
-    return b_out;
-}
-#endif
-
-static const uint16_t polynomial = 0x1021;
 static const uint16_t initial    = 0xb5d2;
-
-u16 crc16_update(u16 crc, u8 a, u8 bits)
-{
-    crc ^= a << 8;
-    while (bits--) {
-        if (crc & 0x8000) {
-            crc = (crc << 1) ^ polynomial;
-        } else {
-            crc = crc << 1;
-        }
-    }
-    return crc;
-}
-
 
 void XN297_SetTXAddr(const u8* addr, int len)
 {
@@ -387,11 +326,6 @@ void XN297_Configure(u8 flags)
     xn297_crc = !!(flags & BV(NRF24L01_00_EN_CRC));
     flags &= ~(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO));
     NRF24L01_WriteReg(NRF24L01_00_CONFIG, flags & 0xff);
-}
-
-void XN297_SetScrambledMode(const u8 mode)
-{
-    xn297_scramble_enabled = mode;
 }
 
 u8 XN297_WritePayload(u8* msg, int len)
