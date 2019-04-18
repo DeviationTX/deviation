@@ -90,16 +90,17 @@ void XN297_SetScrambledMode(const u8 mode)
 u8 _xn297_write_payload(const u8* msg, u8 len, u8* out)
 {
     u8 last = 0;
+    u8 i;
     const uint16_t initial = 0xb5d2;
 
-    for (int i = 0; i < xn297_addr_len; ++i) {
+    for (i = 0; i < xn297_addr_len; ++i) {
         out[last] = xn297_tx_addr[xn297_addr_len-i-1];
         if (xn297_scramble_enabled)
             out[last] ^= xn297_scramble[i];
         last++;
     }
 
-    for (int i = 0; i < len; ++i) {
+    for (i = 0; i < len; ++i) {
         // bit-reverse bytes in packet
         u8 b_out = bit_reverse(msg[i]);
         out[last] = b_out;
@@ -109,9 +110,8 @@ u8 _xn297_write_payload(const u8* msg, u8 len, u8* out)
     }
 
     if (xn297_crc) {
-        int offset = xn297_addr_len < 4 ? 1 : 0;
         u16 crc = initial;
-        for (int i = offset; i < last; ++i) {
+        for (i = 0; i < last; ++i) {
             crc = crc16_update(crc, out[i], 8);
         }
         if (xn297_scramble_enabled)
