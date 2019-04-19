@@ -277,7 +277,7 @@ $(ODIR)/protocol/ncc1701.mod : $(ODIR)/ncc1701_nrf24l01.bin
 	@echo Building 'ncc1701' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
     
-$(ODIR)/protocol/v911s.mod : $(ODIR)/v911s_nrf24l01.bin
+$(ODIR)/protocol/v911s.mod : $(ODIR)/v911s_cc2500.bin
 	@echo Building 'v911s' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
     
