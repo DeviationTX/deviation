@@ -19,7 +19,7 @@
 #include "config/model.h"
 #include "config/tx.h" // for Transmitter
 
-#ifdef PROTO_HAS_NRF24L01
+#ifdef PROTO_HAS_CC2500
 
 #ifdef EMULATOR
 #define USE_FIXED_MFGID
@@ -44,6 +44,16 @@
 #define V911S_RF_BIND_CHANNEL       35
 #define V911S_NUM_RF_CHANNELS       8
 
+static const char * const v911s_opts[] = {
+  _tr_noop("Freq-Fine"),  "-127", "127", NULL,
+  NULL
+};
+enum {
+    PROTOOPTS_FREQFINE = 0,
+    LAST_PROTO_OPT,
+};
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
+
 static u8 tx_power;
 static u8 packet[V911S_PACKET_SIZE];
 static u8 rf_ch_num;
@@ -53,6 +63,9 @@ static u8 hopping_frequency[V911S_NUM_RF_CHANNELS];
 static u16 bind_counter;
 static u16 packet_period;
 static u8 phase;
+static u8 calibration[V911S_NUM_RF_CHANNELS];
+static u8 calibration_fscal2;
+static u8 calibration_fscal3;
 
 enum{
     V911S_BIND,
@@ -132,41 +145,54 @@ static void V911S_send_packet(u8 bind)
         packet[11]|= ch<<3;
         packet[12] = ch>>5;
     }
-    
-    // Power on, TX mode, 2byte CRC
-    XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
+
     if (!bind)
     {
-        NRF24L01_WriteReg(NRF24L01_05_RF_CH, hopping_frequency[channel]);
+        // channel hopping
+        CC2500_WriteReg(CC2500_23_FSCAL3, calibration_fscal3);
+        CC2500_WriteReg(CC2500_24_FSCAL2, calibration_fscal2);
+        CC2500_WriteReg(CC2500_25_FSCAL1, calibration[channel]);
+        XN297L_SetChannel(hopping_frequency[channel]);
         hopping_frequency_no++;
         hopping_frequency_no&=7;    // 8 RF channels
     }
-    // clear packet status bits and TX FIFO
-    NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
-    NRF24L01_FlushTx();
-    XN297_WritePayload(packet, V911S_PACKET_SIZE);
+
+    XN297L_WritePayload(packet, V911S_PACKET_SIZE);
 
     if (tx_power != Model.tx_power) {
         //Keep transmit power updated
         tx_power = Model.tx_power;
-        NRF24L01_SetPower(tx_power);
+        CC2500_SetPower(tx_power);
     }
+}
+
+// calibrate used RF channels for faster hopping
+static void calibrate_rf_chans()
+{
+    for (int c = 0; c < V911S_NUM_RF_CHANNELS; c++) {
+        CLOCK_ResetWatchdog();
+        CC2500_Strobe(CC2500_SIDLE);
+        XN297L_SetChannel(hopping_frequency[c]);
+        CC2500_Strobe(CC2500_SCAL);
+        usleep(900);
+        calibration[c] = CC2500_ReadReg(CC2500_25_FSCAL1);
+    }
+    calibration_fscal3 = CC2500_ReadReg(CC2500_23_FSCAL3);  // only needs to be done once
+    calibration_fscal2 = CC2500_ReadReg(CC2500_24_FSCAL2);  // only needs to be done once
+    CC2500_Strobe(CC2500_SIDLE);
 }
 
 static void V911S_init()
 {
-    XN297_SetScrambledMode(XN297_SCRAMBLED);
-    NRF24L01_Initialize();
-    NRF24L01_SetTxRxMode(TX_EN);
-    XN297_SetTXAddr((u8 *)"\x4B\x4E\x42\x4E\x44", 5);          // Bind address
-    NRF24L01_WriteReg(NRF24L01_05_RF_CH, V911S_RF_BIND_CHANNEL);    // Bind channel
-    NRF24L01_FlushTx();
-    NRF24L01_FlushRx();
-    NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);    // Clear data ready, data sent, and retransmit
-    NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);     // No Auto Acknowldgement on all data pipes
-    NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x01); // Enable data pipe 0 only
-    NRF24L01_SetBitrate(NRF24L01_BR_250K);          // 250Kbps
-    NRF24L01_SetPower(tx_power);
+    // setup cc2500 for xn297L@250kbps emulation, scrambled, crc enabled
+    XN297L_Configure(XN297_SCRAMBLED, XN297_CRC);
+    // Bind address
+    XN297L_SetTXAddr((u8 *)"\x4B\x4E\x42\x4E\x44", 5);
+    // Bind channel
+    XN297L_SetChannel(V911S_RF_BIND_CHANNEL);
+    CC2500_SetPower(tx_power);
+    calibrate_rf_chans();
+    CC2500_SetTxRxMode(TX_EN);
 }
 
 static void V911S_initialize_txid()
@@ -215,7 +241,7 @@ static u16 V911S_callback()
             if (bind_counter == 0)
             {
                 PROTOCOL_SetBindState(0);
-                XN297_SetTXAddr(rx_tx_addr, 5);
+                XN297L_SetTXAddr(rx_tx_addr, 5);
                 packet_period=V911S_PACKET_PERIOD;
                 phase = V911S_DATA;
             }
@@ -263,7 +289,7 @@ static void initialize(u8 bind)
     }
     else
     {
-        XN297_SetTXAddr(rx_tx_addr, 5);
+        XN297L_SetTXAddr(rx_tx_addr, 5);
         packet_period= V911S_PACKET_PERIOD;
         phase = V911S_DATA;
     }
@@ -279,12 +305,13 @@ uintptr_t V911S_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_DEINIT:
         case PROTOCMD_RESET:
             CLOCK_StopTimer();
-            return (NRF24L01_Reset() ? 1 : -1);
+            return (CC2500_Reset() ? 1 : -1);
         case PROTOCMD_CHECK_AUTOBIND: return 0;
         case PROTOCMD_BIND:  initialize(1); return 0;
         case PROTOCMD_NUMCHAN: return 5;
         case PROTOCMD_DEFAULT_NUMCHAN: return 5;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id;
+        case PROTOCMD_GETOPTIONS: return (uintptr_t)v911s_opts;
         case PROTOCMD_TELEMETRYSTATE: return PROTO_TELEM_UNSUPPORTED;
         case PROTOCMD_CHANNELMAP: return AETRG;
         default: break;
