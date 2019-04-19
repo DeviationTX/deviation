@@ -251,7 +251,7 @@ static void GD00X_init()
     // setup cc2500 for xn297L@250kbps emulation, scrambled, crc enabled
     XN297L_Configure(XN297_SCRAMBLED, XN297_CRC);
     CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);
-    CC2500_WriteReg(CC2500_0F_FREQ0, 0xc3 + coarse);
+    CC2500_WriteReg(CC2500_0E_FREQ1, 0x4e + coarse);
     switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
         case FORMAT_V1:
             XN297L_SetTXAddr((u8*)"\xcc\xcc\xcc\xcc\xcc", 5);
@@ -367,7 +367,7 @@ static u16 GD00X_callback()
     }
     if (coarse != (s8)Model.proto_opts[PROTOOPTS_FREQCOARSE]) {
         coarse = (s8)Model.proto_opts[PROTOOPTS_FREQCOARSE];
-        CC2500_WriteReg(CC2500_0F_FREQ0, 0xc3 + coarse);
+        CC2500_WriteReg(CC2500_0E_FREQ1, 0x4e + coarse);
     }
     if (phase == GD00X_BIND) {
         if (--bind_counter == 0) {
