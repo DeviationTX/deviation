@@ -147,10 +147,10 @@ int CC2500_Reset()
 void XN297L_Configure(u8 scramble_en, u8 crc_en)
 {
     // Address Config = No address check
-    // Base Frequency = 2399.999268
+    // Base Frequency = 2400
     // CRC Autoflush = false
     // CRC Enable = false
-    // Carrier Frequency = 2399.999268
+    // Carrier Frequency = 2400
     // Channel Number = 0
     // Channel Spacing = 333.251953
     // Data Format = Normal mode
@@ -175,7 +175,7 @@ void XN297L_Configure(u8 scramble_en, u8 crc_en)
     CC2500_WriteReg(CC2500_0C_FSCTRL0,  0x00);   // Frequency Synthesizer Control
     CC2500_WriteReg(CC2500_0D_FREQ2,    0x5C);   // Frequency Control Word, High Byte
     CC2500_WriteReg(CC2500_0E_FREQ1,    0x4E);   // Frequency Control Word, Middle Byte
-    CC2500_WriteReg(CC2500_0F_FREQ0,    0xC3);   // Frequency Control Word, Low Byte
+    CC2500_WriteReg(CC2500_0F_FREQ0,    0xC5);   // Frequency Control Word, Low Byte
     CC2500_WriteReg(CC2500_10_MDMCFG4,  0x8D);   // Modem Configuration
     CC2500_WriteReg(CC2500_11_MDMCFG3,  0x3B);   // Modem Configuration
     CC2500_WriteReg(CC2500_12_MDMCFG2,  0x10);   // Modem Configuration
