@@ -35,7 +35,7 @@
 #define dbgprintf if (0) printf
 #endif
 
-// #define FORCE_GD00X_ORIGINAL_ID
+#define FORCE_GD00X_ORIGINAL_ID
 
 #define GD00X_INITIAL_WAIT 500
 #define GD00X_RF_BIND_CHANNEL 2
@@ -50,11 +50,13 @@
 static const char * const gd00x_opts[] = {
   _tr_noop("Format"), "V1", "V2", NULL,
   _tr_noop("Freq-Fine"),  "-127", "127", NULL,
+  _tr_noop("Freq-Coarse"), "-127", "127", NULL,
   NULL
 };
 enum {
     PROTOOPTS_FORMAT = 0,
     PROTOOPTS_FREQFINE,
+    PROTOOPTS_FREQCOARSE,
     LAST_PROTO_OPT,
 };
 enum {
@@ -75,6 +77,7 @@ static u8 packet_length;
 static u8 phase;
 static u8 len;
 static s8 fine;
+static s8 coarse;
 static u8 calibration[GD00X_NUM_CHANNEL];
 static u8 calibration_fscal2;
 static u8 calibration_fscal3;
@@ -248,6 +251,7 @@ static void GD00X_init()
     // setup cc2500 for xn297L@250kbps emulation, scrambled, crc enabled
     XN297L_Configure(XN297_SCRAMBLED, XN297_CRC);
     CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);
+    CC2500_WriteReg(CC2500_0F_FREQ0, 0xc3 + coarse);
     switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
         case FORMAT_V1:
             XN297L_SetTXAddr((u8*)"\xcc\xcc\xcc\xcc\xcc", 5);
@@ -361,6 +365,10 @@ static u16 GD00X_callback()
         fine = (s8)Model.proto_opts[PROTOOPTS_FREQFINE];
         CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);
     }
+    if (coarse != (s8)Model.proto_opts[PROTOOPTS_FREQCOARSE]) {
+        coarse = (s8)Model.proto_opts[PROTOOPTS_FREQCOARSE];
+        CC2500_WriteReg(CC2500_0F_FREQ0, 0xc3 + coarse);
+    }
     if (phase == GD00X_BIND) {
         if (--bind_counter == 0) {
             PROTOCOL_SetBindState(0);
@@ -376,6 +384,7 @@ static void initialize()
     CLOCK_StopTimer();
     tx_power = Model.tx_power;
     fine = (s8)Model.proto_opts[PROTOOPTS_FREQFINE];
+    coarse = (s8)Model.proto_opts[PROTOOPTS_FREQCOARSE];
     packet_period = Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_V1?GD00X_PACKET_PERIOD:GD00X_V2_BIND_PACKET_PERIOD;
     packet_length = Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_V1?GD00X_PAYLOAD_SIZE:GD00X_V2_PAYLOAD_SIZE;
     packet_count = 0;
