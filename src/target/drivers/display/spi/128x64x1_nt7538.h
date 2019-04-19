@@ -50,5 +50,5 @@ inline static void _lcd_init()
     i = 0x8000;
     while (i) i--;
     if (HAS_LCD_FLIPPED)
-        LCD_Cmd(0x26);  //Select Internal Resistor Rate (Rb/Ra)
+        LCD_Cmd(0x26);  // Select Internal Resistor Rate (Rb/Ra)
 }
