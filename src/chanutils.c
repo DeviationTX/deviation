@@ -24,7 +24,7 @@ void CHAN_Init()
 
 s32 CHAN_ReadRawInput(int channel)
 {
-    if (channel < INP_HAS_CALIBRATION) {
+    if (channel <= INP_HAS_CALIBRATION) {
         return ADC_ReadRawInput(channel);
     }
     return SWITCH_ReadRawInput(channel);
