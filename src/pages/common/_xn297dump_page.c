@@ -49,14 +49,11 @@ static const char *packetdata_cb(guiObject_t *obj, const void *data)
 static void scan_cb(guiObject_t *obj, void *data)
 {
     (void)data;
-    if (xn297dump.scan == XN297DUMP_SCAN_OFF) {
+    (void)obj;
+    if (xn297dump.mode > XN297DUMP_MANUAL)
+        xn297dump.scan ^= 1;
+    if (xn297dump.mode == XN297DUMP_SCAN)
         xn297dump.channel++;
-        xn297dump.scan = XN297DUMP_SCAN_ON;
-        xn297dump.interval = 0;
-    } else {
-        xn297dump.scan = XN297DUMP_SCAN_OFF;
-    }
-    GUI_Redraw(obj);
 }
 
 static const char *status_cb(guiObject_t *obj, const void *data)
@@ -65,10 +62,12 @@ static const char *status_cb(guiObject_t *obj, const void *data)
     (void)data;
     if (Model.protocol != PROTOCOL_XN297DUMP)
         return _tr_noop("Set protocol to XN297Dump");
-    if (xn297dump.scan == XN297DUMP_SCAN_ON)
-        return _tr_noop("Scanning channels and length...");
-    if (xn297dump.scan == XN297DUMP_SCAN_INTERVAL)
-        return _tr_noop("Measuring packet intervals...");
+    if (xn297dump.scan) {
+        if (xn297dump.mode == XN297DUMP_SCAN)
+            return _tr_noop("Scanning channels and length...");
+        else if (xn297dump.mode == XN297DUMP_INTERVAL)
+            return _tr_noop("Measuring packet intervals...");
+    }
     if (xn297dump.interval) {
         snprintf(tempstring, sizeof(tempstring), "Packet interval %d usec", xn297dump.interval);
         return tempstring;
@@ -82,32 +81,32 @@ void PAGE_XN297DumpInit(int page)
     memset(xp, 0, sizeof(struct xn297dump_page));
     xn297dump.crc_valid = 0;
     xn297dump.pkt_len = MAX_PAYLOAD;
-    xn297dump.scan = 0;
+    xn297dump.mode = 0;
     PAGE_SetModal(0);
     _draw_page();
 }
 
 void PAGE_XN297DumpEvent()
 {
-    if (xn297dump.scan == XN297DUMP_SCAN_FINISHED) {
-        GUI_Redraw(&gui->channel);
-        GUI_Redraw(&gui->pkt_len);
-        xn297dump.scan = XN297DUMP_SCAN_OFF;
-    } else  if ( xn297dump.scan > XN297DUMP_SCAN_ON ) {
-        GUI_Redraw(&gui->status);  // only update status before measuring interval to avoid ugly display
-        xn297dump.scan = XN297DUMP_SCAN_INTERVAL;
-    } else {
-        if (!xn297dump.mode)
+    switch (xn297dump.mode) {
+        case XN297DUMP_OFF:
             return;
-        for (int i = 0; i < 4; i++) {
-            GUI_Redraw(&gui->packetdata[i]);
-        }
-        GUI_Redraw(&gui->status);
-        if (xn297dump.scan) {
+        case XN297DUMP_MANUAL:
+            break;
+        case XN297DUMP_SCAN:
             GUI_Redraw(&gui->channel);
             GUI_Redraw(&gui->pkt_len);
-        }
+            break;
+        case XN297DUMP_INTERVAL:
+            if (xn297dump.scan) {
+                GUI_Redraw(&gui->status);  // only update status before measuring interval to avoid ugly display
+                return;
+            }
     }
+    for (int i = 0; i < 4; i++) {
+        GUI_Redraw(&gui->packetdata[i]);
+    }
+    GUI_Redraw(&gui->status);
 }
 
 void PAGE_XN297DumpExit()

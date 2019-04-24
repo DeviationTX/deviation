@@ -35,14 +35,18 @@
 #define INTERVAL_AVERAGE   4
 
 static const char *const xn297dump_opts[] = {
+    _tr_noop("Bitrate"), "1 Mbps", "2 Mbps", "250 Kbps", NULL,
     _tr_noop("Address"), "5 byte", "4 byte", "3 byte", NULL,
+    _tr_noop("Scrambled"), _tr_noop("No"), _tr_noop("Yes"), NULL,
     _tr_noop("Retries"), "10", "245", NULL,
-    _tr_noop("Get Intvl"), "0", "20", NULL,
+    _tr_noop("Intvl Scan"), "5", "20", NULL,
     NULL
 };
 
 enum {
-    PROTOOPTS_ADDRESS = 0,
+    PROTOOPTS_BITRATE = 0,
+    PROTOOPTS_ADDRESS,
+    PROTOOPTS_SCRAMBLE,
     PROTOOPTS_RETRIES,
     PROTOOPTS_INTERVAL,
     LAST_PROTO_OPT,
@@ -54,16 +58,17 @@ ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 #define BV(bit) (1 << bit)
 
 enum {
-    XN297DUMP_GET_PACKET = 0,
-    XN297DUMP_PROCESS_PACKET,
-    XN297DUMP_DELAY,
-    XN297DUMP_DELAY2,
-    XN297DUMP_MEASURE_INTERVAL
+    STATE_GET_PACKET = 0,
+    STATE_PROCESS_PACKET,
+    STATE_DELAY,
+    STATE_DELAY2,
+    STATE_INTERVAL,
 };
 
 static u8 phase, cur_channel, dumps, new_packet;
 static u8 raw_packet[MAX_PACKET_LEN];
 static u32 time_ms;
+
 static u8 get_packet(void)
 {
 #ifdef EMULATOR
@@ -81,7 +86,7 @@ static u8 get_packet(void)
         NRF24L01_FlushRx();
     }
     if (NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR)) {
-        if (!NRF24L01_ReadReg(NRF24L01_09_CD) && xn297dump.scan) {
+        if (!NRF24L01_ReadReg(NRF24L01_09_CD) && xn297dump.mode == XN297DUMP_SCAN) {
             NRF24L01_FlushRx();
             return 0;  // ignore weak signals in scan mode
         }
@@ -117,7 +122,7 @@ static u32 measure_interval(u8 average)
     return result /= average;
 }
 
-static void process_packet(void)
+static u8 process_packet(void)
 {
     int i;
     u16 packet_crc = 0;
@@ -126,13 +131,19 @@ static void process_packet(void)
     // unscramble address and reverse order
     for (i = 0; i < ADDRESS_LENGTH - Model.proto_opts[PROTOOPTS_ADDRESS]; i++) {
         crc = crc16_update(crc, raw_packet[i], 8);
-        xn297dump.packet[ADDRESS_LENGTH - Model.proto_opts[PROTOOPTS_ADDRESS] - i - 1] = raw_packet[i] ^ xn297_scramble[i];
+        if (Model.proto_opts[PROTOOPTS_SCRAMBLE] == XN297_UNSCRAMBLED)
+            xn297dump.packet[ADDRESS_LENGTH - Model.proto_opts[PROTOOPTS_ADDRESS] - i - 1] = raw_packet[i];
+        else
+            xn297dump.packet[ADDRESS_LENGTH - Model.proto_opts[PROTOOPTS_ADDRESS] - i - 1] = raw_packet[i] ^ xn297_scramble[i];
     }
 
     // unscramble payload
     for (i = ADDRESS_LENGTH - Model.proto_opts[PROTOOPTS_ADDRESS]; i < xn297dump.pkt_len - CRC_LENGTH; i++) {
         crc = crc16_update(crc, raw_packet[i], 8);
-        xn297dump.packet[i] = bit_reverse(raw_packet[i] ^ xn297_scramble[i]);
+        if (Model.proto_opts[PROTOOPTS_SCRAMBLE] == XN297_UNSCRAMBLED)
+            xn297dump.packet[i] = bit_reverse(raw_packet[i]);
+        else
+            xn297dump.packet[i] = bit_reverse(raw_packet[i] ^ xn297_scramble[i]);
     }
 
     // check crc
@@ -140,19 +151,22 @@ static void process_packet(void)
                 | ((u16)(raw_packet[xn297dump.pkt_len - 1]) & 0xff);
     xn297dump.packet[xn297dump.pkt_len - 2] = raw_packet[xn297dump.pkt_len - 2];
     xn297dump.packet[xn297dump.pkt_len - 1] = raw_packet[xn297dump.pkt_len - 1];
-    crc ^= xn297_crc_xorout_scrambled[xn297dump.pkt_len-(ADDRESS_LENGTH - Model.proto_opts[PROTOOPTS_ADDRESS] - 2 + CRC_LENGTH)];
-
-    if (packet_crc == crc) {
-        xn297dump.crc_valid = 1;
-        if (xn297dump.scan == XN297DUMP_SCAN_ON)
-            xn297dump.scan = XN297DUMP_SCAN_SUCCESS;
-    } else {
-        xn297dump.crc_valid = 0;
-    }
+    if (Model.proto_opts[PROTOOPTS_SCRAMBLE] == XN297_UNSCRAMBLED)
+        crc ^= xn297_crc_xorout[xn297dump.pkt_len-(ADDRESS_LENGTH - Model.proto_opts[PROTOOPTS_ADDRESS] - 2 + CRC_LENGTH)];
+    else
+        crc ^= xn297_crc_xorout_scrambled[xn297dump.pkt_len-(ADDRESS_LENGTH - Model.proto_opts[PROTOOPTS_ADDRESS] - 2 + CRC_LENGTH)];
 
     // clear invalid packets
     for (i = xn297dump.pkt_len; i < MAX_PACKET_LEN; i++)
         xn297dump.packet[i] = 0;
+
+    if (packet_crc == crc) {
+        if (xn297dump.scan)
+            xn297dump.scan = 0;  // Stop scanning on valid CRC
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 static void xn297dump_init()
@@ -169,16 +183,7 @@ static void xn297dump_init()
     NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x01);          // 3 byte RX/TX address
     NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, rx_addr, 3);     // set up RX address to xn297 preamble
     NRF24L01_WriteReg(NRF24L01_11_RX_PW_P0, MAX_PACKET_LEN);
-
-    switch (xn297dump.mode) {
-        case XN297DUMP_1MBPS:
-            NRF24L01_SetBitrate(NRF24L01_BR_1M); break;
-        case XN297DUMP_250KBPS:
-            NRF24L01_SetBitrate(NRF24L01_BR_250K); break;
-        case XN297DUMP_2MBPS:
-            NRF24L01_SetBitrate(NRF24L01_BR_2M);
-    }
-
+    NRF24L01_SetBitrate(Model.proto_opts[PROTOOPTS_BITRATE]);
     NRF24L01_Activate(0x73);                                // Activate feature register
     NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 0x00);             // Disable dynamic payload length on all pipes
     NRF24L01_WriteReg(NRF24L01_1D_FEATURE, 0x01);
@@ -189,8 +194,8 @@ static void xn297dump_init()
 static u16 xn297dump_callback()
 {
     switch (phase) {
-        case XN297DUMP_GET_PACKET:
-            if (xn297dump.scan == XN297DUMP_SCAN_ON) {
+        case STATE_GET_PACKET:
+            if (xn297dump.mode == XN297DUMP_SCAN && xn297dump.scan) {
                 dumps++;
                 if (dumps > (u8)Model.proto_opts[PROTOOPTS_RETRIES] + DUMP_RETRIES) {
                     dumps = 0;
@@ -200,33 +205,43 @@ static u16 xn297dump_callback()
             }
             new_packet = get_packet();
             /* FALLTHROUGH */
-        case XN297DUMP_PROCESS_PACKET:
+        case STATE_PROCESS_PACKET:
             if (new_packet)
-                process_packet();  // process_packet will set scan = 0 if valid CRC is found to stop scanning
-            if (xn297dump.scan == XN297DUMP_SCAN_ON) {
-                xn297dump.pkt_len--;
-                if (xn297dump.pkt_len > ADDRESS_LENGTH - Model.proto_opts[PROTOOPTS_ADDRESS] + CRC_LENGTH) {
-                    phase = XN297DUMP_PROCESS_PACKET;
-                } else {
-                    xn297dump.pkt_len = MAX_PACKET_LEN;
-                    phase = XN297DUMP_GET_PACKET;
-                }
-            } else if (xn297dump.scan == XN297DUMP_SCAN_INTERVAL) {
-                phase = XN297DUMP_DELAY;
-            } else {
-                phase = XN297DUMP_GET_PACKET;
+                xn297dump.crc_valid = process_packet();  // process_packet will set scan = 0 if valid CRC is found to stop scanning
+            switch (xn297dump.mode) {
+                case XN297DUMP_SCAN:
+                    if (xn297dump.scan) {
+                        xn297dump.pkt_len--;
+                        if (xn297dump.pkt_len > ADDRESS_LENGTH - Model.proto_opts[PROTOOPTS_ADDRESS] + CRC_LENGTH) {
+                            phase = STATE_PROCESS_PACKET;
+                        } else {
+                            xn297dump.pkt_len = MAX_PACKET_LEN;
+                            phase = STATE_GET_PACKET;
+                        }
+                    } else {
+                        phase = STATE_GET_PACKET;
+                    }
+                    break;
+                case XN297DUMP_INTERVAL:
+                    if (xn297dump.scan)
+                        phase = STATE_DELAY;
+                    else
+                        phase = STATE_GET_PACKET;
+                    break;
+                default:
+                    phase = STATE_GET_PACKET;
             }
             break;
-        case XN297DUMP_DELAY:
-            phase = XN297DUMP_DELAY2;
+        case STATE_DELAY:
+            phase = STATE_DELAY2;
             return 65355;  // Give status display some time to update
-        case XN297DUMP_DELAY2:
-            phase = XN297DUMP_MEASURE_INTERVAL;
+        case STATE_DELAY2:
+            phase = STATE_INTERVAL;
             return 65355;  // Give status display some more time to update
-        case XN297DUMP_MEASURE_INTERVAL:
+        case STATE_INTERVAL:
+            xn297dump.scan = 0;  // only run this once;
             xn297dump.interval = measure_interval(Model.proto_opts[PROTOOPTS_INTERVAL]);
-            xn297dump.scan = XN297DUMP_SCAN_FINISHED;  // only run this once;
-            phase = XN297DUMP_GET_PACKET;
+            phase = STATE_GET_PACKET;
     }
     return PERIOD_DUMP;
 }
@@ -240,7 +255,7 @@ static void initialize()
     dumps = 0;
     new_packet = 0;
     memset(raw_packet, 0, MAX_PACKET_LEN);
-    phase = XN297DUMP_GET_PACKET;
+    phase = STATE_GET_PACKET;
     CLOCK_StartTimer(INITIAL_WAIT, xn297dump_callback);
 }
 
