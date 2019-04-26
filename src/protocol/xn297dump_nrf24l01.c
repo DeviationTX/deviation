@@ -161,7 +161,7 @@ static u8 process_packet(void)
         xn297dump.packet[i] = 0;
 
     if (packet_crc == crc) {
-        if (xn297dump.scan)
+        if (xn297dump.scan && xn297dump.mode == XN297DUMP_SCAN)
             xn297dump.scan = 0;  // Stop scanning on valid CRC
         return 1;
     } else {

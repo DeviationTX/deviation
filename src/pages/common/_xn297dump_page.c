@@ -16,9 +16,6 @@
 #include "protocol/interface.h"
 #include "rftools.h"
 
-#define MAX_RF_CHANNEL 84
-#define MAX_PAYLOAD 32
-
 static struct xn297dump_page * const xp = &pagemem.u.xn297dump_page;
 
 static void _draw_page();
@@ -30,6 +27,16 @@ static void _dump_enable(int enable)
         PROTOCOL_SetBindState(0);  // Disable binding message
     } else {
         PROTOCOL_DeInit();
+    }
+}
+
+static void _write_dump()
+{
+    for (unsigned int i = 0 ; i < xn297dump.pkt_len ; ++i) {
+        if (xp->last_packet[i] != xn297dump.packet[i]) {
+            memcpy(xp->last_packet, xn297dump.packet, xn297dump.pkt_len);
+            RFTOOLS_DumpXN297Packet(&xp->last_packet);
+        }
     }
 }
 
@@ -50,8 +57,9 @@ static void scan_cb(guiObject_t *obj, void *data)
 {
     (void)data;
     (void)obj;
-    if (xn297dump.mode > XN297DUMP_MANUAL)
-        xn297dump.scan ^= 1;
+    xn297dump.scan ^= 1;
+    if (xn297dump.mode == XN297DUMP_MANUAL)
+        RFTOOLS_InitDumpLog(xn297dump.scan);
     if (xn297dump.mode == XN297DUMP_SCAN)
         xn297dump.channel++;
 }
@@ -67,6 +75,8 @@ static const char *status_cb(guiObject_t *obj, const void *data)
             return _tr_noop("Scanning channels and length...");
         else if (xn297dump.mode == XN297DUMP_INTERVAL)
             return _tr_noop("Measuring packet intervals...");
+        else if (xn297dump.mode == XN297DUMP_MANUAL)
+            return _tr_noop("Recording packets...");
     }
     if (xn297dump.interval) {
         snprintf(tempstring, sizeof(tempstring), "Packet interval %d usec", xn297dump.interval);
@@ -82,6 +92,7 @@ void PAGE_XN297DumpInit(int page)
     xn297dump.crc_valid = 0;
     xn297dump.pkt_len = MAX_PAYLOAD;
     xn297dump.mode = 0;
+    xn297dump.scan = 0;
     PAGE_SetModal(0);
     _draw_page();
 }
@@ -92,6 +103,9 @@ void PAGE_XN297DumpEvent()
         case XN297DUMP_OFF:
             return;
         case XN297DUMP_MANUAL:
+            if (xn297dump.scan) {
+                _write_dump();
+            }
             break;
         case XN297DUMP_SCAN:
             GUI_Redraw(&gui->channel);

@@ -1,6 +1,8 @@
 #ifndef _RFTOOLS_H_
 #define _RFTOOLS_H_
 
+#define MAX_PAYLOAD 32
+
 #if SUPPORT_SCANNER
 
 struct Scanner {
@@ -33,6 +35,8 @@ struct Xn297dump {
     u32 interval;
 };
 
+extern void RFTOOLS_DumpXN297Packet();
+extern void RFTOOLS_InitDumpLog();
 extern struct Xn297dump xn297dump;
 
 #endif

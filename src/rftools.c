@@ -15,11 +15,32 @@
 
 #include "common.h"
 #include "rftools.h"
+#include "target.h"
 
 #ifndef MODULAR
 
 #if SUPPORT_XN297DUMP
+static FILE *fh;
+
 struct Xn297dump xn297dump;
+
+void RFTOOLS_DumpXN297Packet(u8 *packet) {
+    fprintf(fh, "%d ", CLOCK_getms() & 0xFFFF);
+    for (unsigned int i = 0 ; i < xn297dump.pkt_len ; ++i) {
+        fprintf(fh, "%02X", *packet);
+        packet++;
+    }
+    fprintf(fh, "\n");
+}
+
+void RFTOOLS_InitDumpLog(int enable) {
+    if (enable) {
+        fh = fopen("datalog.bin", "w");
+    } else {
+        fclose(fh);
+    }
+}
+
 #endif
 
 #if SUPPORT_SCANNER
