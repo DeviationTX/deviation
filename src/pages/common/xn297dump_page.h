@@ -5,8 +5,6 @@
 #define MAX_PAYLOAD 32
 
 struct xn297dump_page {
-    enum Protocols model_protocol;
-    u8 init_datalog;
     u8 last_packet[MAX_PAYLOAD];
 };
 #endif
