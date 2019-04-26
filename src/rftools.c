@@ -36,6 +36,7 @@ void RFTOOLS_DumpXN297Packet(u8 *packet) {
 void RFTOOLS_InitDumpLog(int enable) {
     if (enable) {
         fh = fopen("datalog.bin", "w");
+        fempty(fh);
     } else {
         fclose(fh);
     }
