@@ -138,7 +138,11 @@ struct telemcfg_obj {
 struct telemtest_obj {
     guiLabel_t msg;
     guiLabel_t header[7];
+#if HAS_EXTENDED_TELEMETRY
     guiLabel_t box[36];
+#else
+    guiLabel_t box[10];
+#endif
     guiScrollable_t scrollable;
 };
 
