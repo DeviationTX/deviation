@@ -32,6 +32,7 @@
 #define KEY_INP_FMOD      gui.fmod
 #define KEY_INP_HOLD      gui.hold
 #define KEY_INP_TRN       gui.trn
+#define KEY_INP_DR        gui.dr
 
 s32 ADC_ReadRawInput(int channel)
 {
