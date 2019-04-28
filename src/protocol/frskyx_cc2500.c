@@ -693,13 +693,11 @@ uintptr_t FRSKYX_Cmds(enum ProtoCmds cmd)
             return PROTO_TELEM_ON;
         case PROTOCMD_TELEMETRYTYPE:
             return TELEM_FRSKY;
-        case PROTOCMD_TELEMETRYRESET:
 #if HAS_EXTENDED_TELEMETRY
-            Model.ground_level = 0;
-            discharge_dAms = 0;
-            Telemetry.value[TELEM_FRSKY_MIN_CELL] = TELEMETRY_GetMaxValue(TELEM_FRSKY_MIN_CELL);
-#endif
+        case PROTOCMD_TELEMETRYRESET:
+            frsky_telem_reset();
             return 0;
+#endif
         case PROTOCMD_RESET:
         case PROTOCMD_DEINIT:
 #if HAS_EXTENDED_TELEMETRY

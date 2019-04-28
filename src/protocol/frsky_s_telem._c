@@ -71,6 +71,7 @@ static u8 sport_crc(u8 *data) {
     return 0x00ff - crc;
 }
 
+
 static void processSportPacket(u8 *packet) {
 //    u8  instance = (packet[0] & 0x1F) + 1;    // all instances of same sensor write to same telemetry value
     u8  prim = packet[1];
@@ -107,6 +108,40 @@ static void processSportPacket(u8 *packet) {
     }
 
     s32 data = SPORT_DATA_S32(packet);
+
+    // sensor ids from Qlrs
+    switch (id) {
+        case APID_PITCH:
+            set_telemetry(TELEM_FRSKY_ACCX, data * 10);
+            break;
+        case APID_ROLL:
+            set_telemetry(TELEM_FRSKY_ACCY, data * 10);
+            break;
+#if 0
+        case APID_RX_RSSI_REG_VAL:
+            set_telemetry(TELEM_FRSKY_CELL1, data);
+            break;
+        case APID_RX_SNR_REG_VAL:
+            set_telemetry(TELEM_FRSKY_CELL2, data);
+            break;
+        case APID_RX_PACKET_LOST_VAL:
+            set_telemetry(TELEM_FRSKY_CELL3, data);
+            break;
+        case APID_MAV_BASE_MODE:
+            set_telemetry(TELEM_FRSKY_CELL4, data);
+            break;
+        case APID_MAV_SYS_STATUS:
+            set_telemetry(TELEM_FRSKY_CELL5, data);
+            break;
+        case APID_MAV_CUSTOM_MODE:
+            set_telemetry(TELEM_FRSKY_CELL6, data);
+            break;
+        case APID_CUST_RSSI:
+            set_telemetry(TELEM_FRSKY_ALL_CELL, data);
+            break;
+#endif
+    }
+
     switch (id & 0xfff0) {
     case ALT_FIRST_ID & 0xfff0:
         if (Model.ground_level == 0) Model.ground_level = data;
@@ -195,14 +230,22 @@ static void processSportPacket(u8 *packet) {
             TELEMETRY_SetUpdated(TELEM_GPS_TIME);
         }
         break;
+    case ACCX_FIRST_ID & 0xfff0:
+        set_telemetry(TELEM_FRSKY_ACCX, data / 10);
+        break;
+    case ACCY_FIRST_ID & 0xfff0:
+        set_telemetry(TELEM_FRSKY_ACCY, data / 10);
+        break;
+    case ACCZ_FIRST_ID & 0xfff0:
+        set_telemetry(TELEM_FRSKY_ACCZ, data / 10);
+        break;
+    case AIR_SPEED_FIRST_ID & 0xfff0:
+        set_telemetry(TELEM_FRSKY_SPEED, data);
+        break;
     } // switch
 // not sure about these
 //    case A3_FIRST_ID & 0xfff0:
 //    case A4_FIRST_ID & 0xfff0:
-//    case AIR_SPEED_FIRST_ID & 0xfff0:
-//    case ACCX_FIRST_ID & 0xfff0:
-//    case ACCY_FIRST_ID & 0xfff0:
-//    case ACCZ_FIRST_ID & 0xfff0:
 }
 
 

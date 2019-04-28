@@ -231,7 +231,7 @@ static enum {
 #ifndef EMULATOR
   PXX_BIND_DONE = 600,
 #else
-  PXX_BIND_DONE = 50,
+  PXX_BIND_DONE = 5,
 #endif
   PXX_DATA1,
   PXX_DATA2,
@@ -239,6 +239,20 @@ static enum {
 
 static u16 mixer_runtime;
 
+#if HAS_EXTENDED_TELEMETRY
+// Support S.Port telemetry on RX pin
+// couple defines to avoid errors from include file
+static void serial_echo(u8 *packet) {(void)packet;}
+#define PROTO_OPTS_AD2GAIN 0
+#include "frsky_d_telem._c"
+#include "frsky_s_telem._c"
+#endif  // HAS_EXTENDED_TELEMETRY
+
+#ifndef EMULATOR
+#define STD_DELAY   9000
+#else
+#define STD_DELAY   300
+#endif
 static u16 pxxout_cb()
 {
     switch (state) {
@@ -246,7 +260,7 @@ static u16 pxxout_cb()
         build_data_pkt(1);
         PXX_Enable(packet);
         state++;
-        return 9000;
+        return STD_DELAY;
     case PXX_BIND_DONE:
         PROTOCOL_SetBindState(0);
         state++;
@@ -256,22 +270,15 @@ static u16 pxxout_cb()
         state = PXX_DATA2;
         return mixer_runtime;
     case PXX_DATA2:
+#ifndef EMULATOR
         if (mixer_sync != MIX_DONE && mixer_runtime < 2000) mixer_runtime += 50;
+#endif
         build_data_pkt(0);
         PXX_Enable(packet);
         state = PXX_DATA1;
-        return 9000 - mixer_runtime;
+        return STD_DELAY - mixer_runtime;
     }
 }
-
-#if HAS_EXTENDED_TELEMETRY
-// Support S.Port telemetry on RX pin
-// couple defines to avoid errors from include file
-static void serial_echo(u8 *packet) {(void)packet;}
-#define PROTO_OPTS_AD2GAIN 0
-#include "frsky_d_telem._c"
-#include "frsky_s_telem._c"
-#endif // HAS_EXTENDED_TELEMETRY
 
 static void initialize(u8 bind)
 {
@@ -328,6 +335,9 @@ uintptr_t PXXOUT_Cmds(enum ProtoCmds cmd)
             return PROTO_TELEM_ON;
         case PROTOCMD_TELEMETRYTYPE:
             return TELEM_FRSKY;
+        case PROTOCMD_TELEMETRYRESET:
+            frsky_telem_reset();
+            return 0;
 #endif
         case PROTOCMD_CHANNELMAP: return UNCHG;
         default: break;
