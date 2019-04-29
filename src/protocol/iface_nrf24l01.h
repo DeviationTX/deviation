@@ -137,10 +137,21 @@ int NRF24L01_Reset();
 //void NRF24L01_PulseCE();
 
 // XN297 emulation layer
-enum {
-    XN297_UNSCRAMBLED = 0,
-    XN297_SCRAMBLED
-};
+#define XN297_UNSCRAMBLED 0
+#define XN297_SCRAMBLED 1
+#define XN297_NOCRC 0
+#define XN297_CRC 1
+
+extern const u8 xn297_scramble[];
+extern const u16 xn297_crc_xorout_scrambled[];
+extern const u16 xn297_crc_xorout[];
+extern u8 xn297_crc;
+extern u8 xn297_scramble_enabled;
+extern u8 xn297_addr_len;
+extern u8 xn297_tx_addr[5];
+extern u8 xn297_rx_addr[5];
+u8 bit_reverse(u8 b_in);
+u8 _xn297_write_payload(u8* msg, u8 len, u8* out);
 
 void XN297_SetTXAddr(const u8* addr, int len);
 void XN297_SetRXAddr(const u8* addr, int len);

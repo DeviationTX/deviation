@@ -61,6 +61,7 @@ PROTO_MODULES += $(ODIR)/protocol/loli.mod
 PROTO_MODULES += $(ODIR)/protocol/e016h.mod
 PROTO_MODULES += $(ODIR)/protocol/sumd.mod
 PROTO_MODULES += $(ODIR)/protocol/scancyrf.mod
+PROTO_MODULES += $(ODIR)/protocol/e010.mod
 
 ALL += $(PROTO_MODULES)
 else #BUILD_TARGET
@@ -276,11 +277,11 @@ $(ODIR)/protocol/ncc1701.mod : $(ODIR)/ncc1701_nrf24l01.bin
 	@echo Building 'ncc1701' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
     
-$(ODIR)/protocol/v911s.mod : $(ODIR)/v911s_nrf24l01.bin
+$(ODIR)/protocol/v911s.mod : $(ODIR)/v911s_cc2500.bin
 	@echo Building 'v911s' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
     
-$(ODIR)/protocol/gd00x.mod : $(ODIR)/gd00x_nrf24l01.bin
+$(ODIR)/protocol/gd00x.mod : $(ODIR)/gd00x_cc2500.bin
 	@echo Building 'gd00x' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
     
@@ -307,4 +308,9 @@ $(ODIR)/protocol/sumd.mod : $(ODIR)/sumd_uart.bin
 $(ODIR)/protocol/scancyrf.mod : $(ODIR)/scanner_cyrf6936.bin
 	@echo Building 'scancyrf' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
+
+$(ODIR)/protocol/e010.mod : $(ODIR)/e010_cc2500.bin
+	@echo Building 'e010' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
+
 endif #BUILD_TARGET

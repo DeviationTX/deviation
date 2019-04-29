@@ -55,7 +55,7 @@
 #define ADDRESS_LENGTH     5
 
 static const char * const mjxq_opts[] = {
-  _tr_noop("Format"), "WLH08", "X600", "X800", "H26D", "H26WH", "E010", "Phoenix", NULL,
+  _tr_noop("Format"), "WLH08", "X600", "X800", "H26D", "H26WH", NULL,
   NULL
 };
 enum {
@@ -68,8 +68,6 @@ enum {
     FORMAT_X800,
     FORMAT_H26D,
     FORMAT_H26WH,
-    FORMAT_E010,
-    FORMAT_PHOENIX,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
@@ -90,7 +88,7 @@ enum {
     CHANNEL12,    // Camera tilt
 };
 #define CHANNEL_LED         CHANNEL5
-#define CHANNEL_ARM         CHANNEL5  // H26WH - TDR Phoenix mini
+#define CHANNEL_ARM         CHANNEL5  // H26WH
 #define CHANNEL_FLIP        CHANNEL6
 #define CHANNEL_PICTURE     CHANNEL7
 #define CHANNEL_VIDEO       CHANNEL8
@@ -122,20 +120,6 @@ static const struct {
 } mjx_tx_rf_map[] = {{{0xF8, 0x4F, 0x1C}, {0x0A, 0x46, 0x3A, 0x42}},
                      {{0xC8, 0x6E, 0x02}, {0x0A, 0x3C, 0x36, 0x3F}},
                      {{0x48, 0x6A, 0x40}, {0x0A, 0x43, 0x36, 0x3F}}};
-
-// captured from E010 and H36 stock transmitters
-static const struct {
-    u8 txid[2];
-    u8 rfchan[RF_NUM_CHANNELS];
-}
-e010_tx_rf_map[] = {{{0x4F, 0x1C}, {0x3A, 0x35, 0x4A, 0x45}},
-                    {{0x90, 0x1C}, {0x2E, 0x36, 0x3E, 0x46}}, 
-                    {{0x24, 0x36}, {0x32, 0x3E, 0x42, 0x4E}},
-                    {{0x7A, 0x40}, {0x2E, 0x3C, 0x3E, 0x4C}},
-                    {{0x61, 0x31}, {0x2F, 0x3B, 0x3F, 0x4B}},
-                    {{0x5D, 0x37}, {0x33, 0x3B, 0x43, 0x4B}},
-                    {{0xFD, 0x4F}, {0x33, 0x3B, 0x43, 0x4B}}, 
-                    {{0x86, 0x3C}, {0x34, 0x3E, 0x44, 0x4E}}};                     
 
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
@@ -212,8 +196,6 @@ static void send_packet(u8 bind)
         packet[10] = pan_tilt_value();
         /* FALLTHROUGH */
     case FORMAT_WLH08:
-    case FORMAT_E010:
-    case FORMAT_PHOENIX:
         packet[10] += GET_FLAG(CHANNEL_RTH, 0x02)
                     | GET_FLAG(CHANNEL_HEADLESS, 0x01);
         if (!bind) {
@@ -222,11 +204,6 @@ static void send_packet(u8 bind)
                        | GET_FLAG(CHANNEL_PICTURE, 0x08)
                        | GET_FLAG(CHANNEL_VIDEO, 0x10)
                        | GET_FLAG_INV(CHANNEL_LED, 0x20); // air/ground mode
-            if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_PHOENIX) {
-                packet[10] |= 0x20  // high rate
-                           |  GET_FLAG(CHANNEL_ARM, 0x80);
-                packet[14] &= ~0x24;
-            }
             if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H26WH) {
                 packet[10] |= 0x40;  // high rate
                 packet[14] &= ~0x24; // unset air/ground & arm flags
@@ -297,6 +274,7 @@ static void send_packet(u8 bind)
 
 static void mjxq_init()
 {
+    XN297_SetScrambledMode(XN297_SCRAMBLED);
     u8 rx_tx_addr[ADDRESS_LENGTH];
 
     NRF24L01_Initialize();
@@ -309,8 +287,6 @@ static void mjxq_init()
             break;
         case FORMAT_H26D:
         case FORMAT_H26WH:
-        case FORMAT_E010:
-        case FORMAT_PHOENIX:
             memcpy(rf_channels, "\x36\x3e\x46\x2e", sizeof(rf_channels));
             break;
         default:
@@ -342,11 +318,7 @@ static void mjxq_init()
     NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x01);
     NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0x00); // no retransmits
     NRF24L01_WriteReg(NRF24L01_11_RX_PW_P0, PACKET_SIZE);
-    if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_E010
-     || Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_PHOENIX)
-        NRF24L01_SetBitrate(NRF24L01_BR_250K);             // 250kbps
-    else
-        NRF24L01_SetBitrate(NRF24L01_BR_1M);             // 1Mbps
+    NRF24L01_SetBitrate(NRF24L01_BR_1M);             // 1Mbps
     NRF24L01_SetPower(Model.tx_power);
     NRF24L01_Activate(0x73);                          // Activate feature register
     NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 0x00);       // Disable dynamic payload length on all pipes
@@ -359,10 +331,6 @@ static void mjxq_init2()
     switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
         case FORMAT_H26WH:
             memcpy(rf_channels, "\x47\x42\x37\x32", sizeof(rf_channels));
-            break;
-        case FORMAT_E010:
-        case FORMAT_PHOENIX:
-            memcpy(rf_channels, e010_tx_rf_map[Model.fixed_id % (sizeof(e010_tx_rf_map)/sizeof(e010_tx_rf_map[0]))].rfchan, sizeof(rf_channels));
             break;
         case FORMAT_H26D:
             memcpy(rf_channels, "\x32\x3e\x42\x4e", sizeof(rf_channels));
@@ -427,11 +395,6 @@ static void initialize_txid()
     switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
         case FORMAT_H26WH:
             memcpy(txid, "\xa4\x03\x00", sizeof(txid));
-            break;
-        case FORMAT_E010:
-        case FORMAT_PHOENIX:
-            memcpy(txid, e010_tx_rf_map[Model.fixed_id % (sizeof(e010_tx_rf_map)/sizeof(e010_tx_rf_map[0]))].txid, 2);
-            txid[2] = 0x00;
             break;
         case FORMAT_WLH08:
             // txid must be multiple of 8

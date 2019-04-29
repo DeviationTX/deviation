@@ -175,6 +175,7 @@ static void DM002_send_packet(u8 bind)
 
 static void DM002_init()
 {
+    XN297_SetScrambledMode(XN297_SCRAMBLED);
     NRF24L01_Initialize();
     NRF24L01_SetTxRxMode(TX_EN);
     XN297_SetTXAddr((uint8_t *)"\x26\xA8\x67\x35\xCC", DM002_ADDRESS_SIZE);

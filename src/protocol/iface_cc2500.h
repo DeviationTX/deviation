@@ -135,4 +135,13 @@ void CC2500_WriteData(u8 *packet, u8 length);
 void CC2500_ReadData(u8 *dpbuffer, int len);
 void CC2500_SetTxRxMode(enum TXRX_State);
 void CC2500_SetPower(int power);
+
+//----------------------------------------------------------------------------------
+// XN297L emulation, used for XN297@250kbps, TX only for now
+//----------------------------------------------------------------------------------
+void XN297L_Configure(u8 scramble_en, u8 crc_en);
+void XN297L_SetTXAddr(const u8* addr, u8 len);
+void XN297L_WritePayload(u8* msg, u8 len);
+void XN297L_SetChannel(u8 ch);
+
 #endif

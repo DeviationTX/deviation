@@ -101,6 +101,7 @@ static u16 scale_channel(s32 chanval, s32 inMin, s32 inMax, u16 destMin, u16 des
 
 static void init_e016h()
 {
+    XN297_SetScrambledMode(XN297_SCRAMBLED);
     NRF24L01_Initialize();
     NRF24L01_FlushTx();
     NRF24L01_FlushRx();
