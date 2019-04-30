@@ -24,6 +24,7 @@
 #include "rtc_config.h"
 #include "voiceconfig_page.h"
 #include "scanner_page.h"
+#include "xn297dump_page.h"
 
 #define PAGE_NAME_MAX 10
 
@@ -121,6 +122,11 @@ void PAGE_ChantestModal(void(*return_page)(int page), int page);
 void PAGE_ScannerInit(int page);
 void PAGE_ScannerEvent();
 void PAGE_ScannerExit();
+
+/* XN297 Dump */
+void PAGE_XN297DumpInit(int page);
+void PAGE_XN297DumpEvent();
+void PAGE_XN297DumpExit();
 
 /* USB */
 void PAGE_USBInit(int page);

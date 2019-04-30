@@ -14,38 +14,26 @@
  */
 
 #include "common.h"
-#include "rftools.h"
-#include "target.h"
+#include "pages.h"
+#include "config/model.h"
 
-#ifndef MODULAR
+#define OVERRIDE_PLACEMENT
 
-#if SUPPORT_XN297DUMP
-static FILE *fh;
+enum {
+    MODE_X        = 2,
+    MODE_Y        = HEADER_HEIGHT,
+    MODE_WIDTH    = 10 * ITEM_SPACE,
+    CHANNEL_X     = 2,
+    CHANNEL_Y     = ITEM_HEIGHT * 2,
+    CHANNEL_WIDTH = 8 * ITEM_SPACE,
+    LENGTH_X      = 2,
+    LENGTH_Y      = CHANNEL_Y + ITEM_HEIGHT,
+    LENGTH_WIDTH  = CHANNEL_WIDTH,
+    PACKET_X      = (LCD_WIDTH == 24) ? 0 : 6,
+    PACKET_Y      = LENGTH_Y + ITEM_HEIGHT * 2,
+    PACKET_WIDTH  = ITEM_SPACE * 16 + 7,
+    PACKET_HEIGHT = LINE_HEIGHT,
+    STATUS_Y      = LCD_HEIGHT-2,
+};
 
-struct Xn297dump xn297dump;
-
-void RFTOOLS_DumpXN297Packet(u8 *packet) {
-    fprintf(fh, "%d ", CLOCK_getms() & 0xFFFF);
-    for (unsigned int i = 0 ; i < xn297dump.pkt_len ; ++i) {
-        fprintf(fh, "%02X", *packet);
-        packet++;
-    }
-    fprintf(fh, "\n");
-}
-
-void RFTOOLS_InitDumpLog(int enable) {
-    if (enable) {
-        fh = fopen("datalog.bin", "w");
-        fempty(fh);
-    } else {
-        fclose(fh);
-    }
-}
-
-#endif
-
-#if SUPPORT_SCANNER
-struct Scanner Scanner;
-#endif
-
-#endif  // MODULAR
+#include "../128x64x1/xn297dump_page.c"

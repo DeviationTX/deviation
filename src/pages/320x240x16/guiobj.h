@@ -206,6 +206,14 @@ struct scanner_obj {
     guiBarGraph_t bar[80];
 };
 
+struct xn297dump_obj {
+    guiTextSelect_t mode;
+    guiTextSelect_t channel;
+    guiTextSelect_t pkt_len;
+    guiLabel_t packetdata[4];
+    guiLabel_t status;
+};
+
 struct telemcfg_obj {
     guiLabel_t msg;
     guiLabel_t name[TELEM_NUM_ALARMS];
@@ -612,6 +620,9 @@ struct _gui_objs {
         struct reorder_obj reorder;
 #if SUPPORT_SCANNER
         struct scanner_obj scanner;
+#endif
+#if SUPPORT_XN297DUMP
+        struct xn297dump_obj xn297dump;
 #endif
         struct telemcfg_obj telemcfg;
         struct telemtest_obj telemtest1;
