@@ -32,12 +32,11 @@
 #define CRC_LENGTH         2
 #define MAX_RF_CHANNEL     84
 #define DUMP_RETRIES       10  // stay on channels long enough to capture packets
-#define INTERVAL_AVERAGE   4
 
 static const char *const xn297dump_opts[] = {
     _tr_noop("Bitrate"), "1 Mbps", "2 Mbps", "250 Kbps", NULL,
     _tr_noop("Address"), "5 byte", "4 byte", "3 byte", NULL,
-    _tr_noop("Scrambled"), _tr_noop("No"), _tr_noop("Yes"), NULL,
+    _tr_noop("Scrambled"), _tr_noop("Yes"), _tr_noop("No"), NULL,
     _tr_noop("Retries"), "10", "245", NULL,
     _tr_noop("Intvl Scan"), "5", "20", NULL,
     NULL
@@ -46,7 +45,7 @@ static const char *const xn297dump_opts[] = {
 enum {
     PROTOOPTS_BITRATE = 0,
     PROTOOPTS_ADDRESS,
-    PROTOOPTS_SCRAMBLE,
+    PROTOOPTS_UNSCRAMBLED,
     PROTOOPTS_RETRIES,
     PROTOOPTS_INTERVAL,
     LAST_PROTO_OPT,
@@ -131,7 +130,7 @@ static u8 process_packet(void)
     // unscramble address and reverse order
     for (i = 0; i < ADDRESS_LENGTH - Model.proto_opts[PROTOOPTS_ADDRESS]; i++) {
         crc = crc16_update(crc, raw_packet[i], 8);
-        if (Model.proto_opts[PROTOOPTS_SCRAMBLE] == XN297_UNSCRAMBLED)
+        if (Model.proto_opts[PROTOOPTS_UNSCRAMBLED])
             xn297dump.packet[ADDRESS_LENGTH - Model.proto_opts[PROTOOPTS_ADDRESS] - i - 1] = raw_packet[i];
         else
             xn297dump.packet[ADDRESS_LENGTH - Model.proto_opts[PROTOOPTS_ADDRESS] - i - 1] = raw_packet[i] ^ xn297_scramble[i];
@@ -140,7 +139,7 @@ static u8 process_packet(void)
     // unscramble payload
     for (i = ADDRESS_LENGTH - Model.proto_opts[PROTOOPTS_ADDRESS]; i < xn297dump.pkt_len - CRC_LENGTH; i++) {
         crc = crc16_update(crc, raw_packet[i], 8);
-        if (Model.proto_opts[PROTOOPTS_SCRAMBLE] == XN297_UNSCRAMBLED)
+        if (Model.proto_opts[PROTOOPTS_UNSCRAMBLED])
             xn297dump.packet[i] = bit_reverse(raw_packet[i]);
         else
             xn297dump.packet[i] = bit_reverse(raw_packet[i] ^ xn297_scramble[i]);
@@ -151,7 +150,7 @@ static u8 process_packet(void)
                 | ((u16)(raw_packet[xn297dump.pkt_len - 1]) & 0xff);
     xn297dump.packet[xn297dump.pkt_len - 2] = raw_packet[xn297dump.pkt_len - 2];
     xn297dump.packet[xn297dump.pkt_len - 1] = raw_packet[xn297dump.pkt_len - 1];
-    if (Model.proto_opts[PROTOOPTS_SCRAMBLE] == XN297_UNSCRAMBLED)
+    if (Model.proto_opts[PROTOOPTS_UNSCRAMBLED])
         crc ^= xn297_crc_xorout[xn297dump.pkt_len-(ADDRESS_LENGTH - Model.proto_opts[PROTOOPTS_ADDRESS] - 2 + CRC_LENGTH)];
     else
         crc ^= xn297_crc_xorout_scrambled[xn297dump.pkt_len-(ADDRESS_LENGTH - Model.proto_opts[PROTOOPTS_ADDRESS] - 2 + CRC_LENGTH)];
