@@ -338,7 +338,7 @@ msgstr "左_H"
 #: pages/common/standard/_swash_page.c:65 pages/common/_trim_page.c:56
 #: pages/common/_trim_page.c:74 pages/common/_voiceconfig_page.c:185
 #: protocol/protocol.c:89 telemetry/telem_crsf.c:80 telemetry/telem_devo.c:76
-#: telemetry/telem_dsm.c:261 telemetry/telem_frsky.c:58
+#: telemetry/telem_dsm.c:261 telemetry/telem_frsky.c:62
 msgid "None"
 msgstr "なし"
 
@@ -464,6 +464,7 @@ msgstr "サブトリム"
 
 #: pages/128x64x1/advanced/mixer_limits.c:99
 #: pages/320x240x16/advanced/mixer_limits.c:68 telemetry.c:246
+#: telemetry/telem_frsky.c:94
 msgid "Speed"
 msgstr "速度"
 
@@ -963,7 +964,7 @@ msgstr "送信機設定"
 msgid "Channel monitor"
 msgstr "チャンネル モニタ"
 
-#: pages/128x64x1/pagelist.h:75 pages/128x64x1/telemtest_page.c:412
+#: pages/128x64x1/pagelist.h:75 pages/128x64x1/telemtest_page.c:418
 #: pages/320x240x16/pagelist.h:69
 msgid "Telemetry monitor"
 msgstr "テレメトリー モニタ"
@@ -976,11 +977,15 @@ msgstr "通信レンジ テスト"
 msgid "Scanner"
 msgstr "スキャン設定"
 
-#: pages/128x64x1/pagelist.h:86
+#: pages/128x64x1/pagelist.h:82 pages/320x240x16/pagelist.h:77
+msgid "XN297 Dump"
+msgstr ""
+
+#: pages/128x64x1/pagelist.h:89
 msgid "External OSD"
 msgstr "外部OSD"
 
-#: pages/128x64x1/pagelist.h:91 pages/320x240x16/pagelist.h:78
+#: pages/128x64x1/pagelist.h:94 pages/320x240x16/pagelist.h:81
 msgid "Welcome"
 msgstr "ようこそ"
 
@@ -1086,31 +1091,31 @@ msgstr "D/R&Exp -RUD"
 msgid "Hold position"
 msgstr "Hold Position"
 
-#: pages/128x64x1/telemtest_page.c:339 telemetry/telem_devo.c:85
-#: telemetry/telem_dsm.c:193 telemetry/telem_frsky.c:81
+#: pages/128x64x1/telemtest_page.c:345 telemetry/telem_devo.c:85
+#: telemetry/telem_dsm.c:193 telemetry/telem_frsky.c:85
 msgid "Temp"
 msgstr "温度"
 
-#: pages/128x64x1/telemtest_page.c:340 telemetry/telem_crsf.c:92
+#: pages/128x64x1/telemtest_page.c:346 telemetry/telem_crsf.c:92
 #: telemetry/telem_devo.c:79 telemetry/telem_dsm.c:192
-#: telemetry/telem_frsky.c:64 telemetry/telem_frsky.c:70
+#: telemetry/telem_frsky.c:68 telemetry/telem_frsky.c:74
 msgid "Volt"
 msgstr "電圧"
 
-#: pages/128x64x1/telemtest_page.c:341 telemetry/telem_devo.c:81
-#: telemetry/telem_dsm.c:194 telemetry/telem_frsky.c:79
+#: pages/128x64x1/telemtest_page.c:347 telemetry/telem_devo.c:81
+#: telemetry/telem_dsm.c:194 telemetry/telem_frsky.c:83
 msgid "RPM"
 msgstr "RPM"
 
-#: pages/128x64x1/telemtest_page.c:342
+#: pages/128x64x1/telemtest_page.c:348
 msgid "GPS"
 msgstr "GPS"
 
-#: pages/128x64x1/telemtest_page.c:351
+#: pages/128x64x1/telemtest_page.c:357
 msgid "RX"
 msgstr "RX"
 
-#: pages/128x64x1/telemtest_page.c:352
+#: pages/128x64x1/telemtest_page.c:358
 msgid "TX"
 msgstr "TX"
 
@@ -1418,7 +1423,7 @@ msgstr "入力 モニタ"
 msgid "Button monitor"
 msgstr "ボタン モニタ"
 
-#: pages/320x240x16/pagelist.h:84
+#: pages/320x240x16/pagelist.h:87
 msgid "Select Language"
 msgstr "言語選択"
 
@@ -1626,7 +1631,7 @@ msgstr "ネガ"
 #: protocol/esky150_nrf24l01.c:137 protocol/kn_nrf24l01.c:167
 #: protocol/kn_nrf24l01.c:168 protocol/v202_nrf24l01.c:113
 #: protocol/v202_nrf24l01.c:114 protocol/v202_nrf24l01.c:116
-#: protocol/yd717_nrf24l01.c:93
+#: protocol/xn297dump_nrf24l01.c:39 protocol/yd717_nrf24l01.c:93
 msgid "Yes"
 msgstr "Yes"
 
@@ -1634,7 +1639,7 @@ msgstr "Yes"
 #: protocol/esky150_nrf24l01.c:137 protocol/kn_nrf24l01.c:167
 #: protocol/kn_nrf24l01.c:168 protocol/v202_nrf24l01.c:113
 #: protocol/v202_nrf24l01.c:114 protocol/v202_nrf24l01.c:116
-#: protocol/yd717_nrf24l01.c:93
+#: protocol/xn297dump_nrf24l01.c:39 protocol/yd717_nrf24l01.c:93
 msgid "No"
 msgstr "No"
 
@@ -1997,6 +2002,30 @@ msgstr "タイマー%d"
 msgid "Telem %d"
 msgstr "Telem %d"
 
+#: pages/common/_xn297dump_page.c:72
+msgid "Set protocol to XN297Dump"
+msgstr ""
+
+#: pages/common/_xn297dump_page.c:75
+msgid "Scanning channels and length..."
+msgstr ""
+
+#: pages/common/_xn297dump_page.c:77
+msgid "Measuring packet intervals..."
+msgstr ""
+
+#: pages/common/_xn297dump_page.c:79
+msgid "Recording packets..."
+msgstr ""
+
+#: pages/common/_xn297dump_page.c:85
+msgid "Valid CRC found!"
+msgstr ""
+
+#: pages/common/_xn297dump_page.c:85
+msgid "CRC invalid"
+msgstr ""
+
 #: pages/text/splash_page.c:37
 msgid "Deviation"
 msgstr "Deviation"
@@ -2226,6 +2255,26 @@ msgstr "6+1"
 msgid "COL Limit"
 msgstr "COL Limit"
 
+#: protocol/xn297dump_nrf24l01.c:37
+msgid "Bitrate"
+msgstr ""
+
+#: protocol/xn297dump_nrf24l01.c:38
+msgid "Address"
+msgstr ""
+
+#: protocol/xn297dump_nrf24l01.c:39
+msgid "Scrambled"
+msgstr ""
+
+#: protocol/xn297dump_nrf24l01.c:40
+msgid "Retries"
+msgstr ""
+
+#: protocol/xn297dump_nrf24l01.c:41
+msgid "Intvl Scan"
+msgstr ""
+
 #: protocol/yd717_nrf24l01.c:93
 msgid "USE A.ACK"
 msgstr "A.ACK使用"
@@ -2310,15 +2359,15 @@ msgstr "Curr"
 msgid "Cap"
 msgstr "Cap"
 
-#: telemetry/telem_crsf.c:95
+#: telemetry/telem_crsf.c:95 telemetry/telem_frsky.c:91
 msgid "Pitch"
 msgstr "ピッチ"
 
-#: telemetry/telem_crsf.c:96
+#: telemetry/telem_crsf.c:96 telemetry/telem_frsky.c:92
 msgid "Roll"
 msgstr "ロール"
 
-#: telemetry/telem_crsf.c:97
+#: telemetry/telem_crsf.c:97 telemetry/telem_frsky.c:93
 msgid "Yaw"
 msgstr "ヨー"
 
@@ -2346,16 +2395,16 @@ msgstr "TX 品質"
 msgid "Capacity"
 msgstr "Capacity"
 
-#: telemetry/telem_devo.c:55 telemetry/telem_frsky.c:101
-#: telemetry/telem_frsky.c:108
+#: telemetry/telem_devo.c:55 telemetry/telem_frsky.c:109
+#: telemetry/telem_frsky.c:116
 msgid "TelemV"
 msgstr "TelemV"
 
-#: telemetry/telem_devo.c:61 telemetry/telem_frsky.c:112
+#: telemetry/telem_devo.c:61 telemetry/telem_frsky.c:120
 msgid "TelemT"
 msgstr "Telem時間"
 
-#: telemetry/telem_devo.c:65 telemetry/telem_frsky.c:115
+#: telemetry/telem_devo.c:65 telemetry/telem_frsky.c:123
 msgid "TelemRPM"
 msgstr "TelemRPM"
 
@@ -2372,8 +2421,8 @@ msgstr "損失"
 msgid "Holds"
 msgstr "Holds"
 
-#: telemetry/telem_dsm.c:201 telemetry/telem_frsky.c:70
-#: telemetry/telem_frsky.c:83
+#: telemetry/telem_dsm.c:201 telemetry/telem_frsky.c:74
+#: telemetry/telem_frsky.c:87
 msgid "Amps"
 msgstr "アンプ"
 
@@ -2389,7 +2438,7 @@ msgstr "高度"
 msgid "Alt.max"
 msgstr "高度Max"
 
-#: telemetry/telem_dsm.c:213 telemetry/telem_frsky.c:66
+#: telemetry/telem_dsm.c:213 telemetry/telem_frsky.c:70
 msgid "RSSI"
 msgstr "RSSI"
 
@@ -2401,43 +2450,43 @@ msgstr "Rx電圧"
 msgid "Bat"
 msgstr "Bat"
 
-#: telemetry/telem_frsky.c:67
+#: telemetry/telem_frsky.c:71
 msgid "LRSSI"
 msgstr "LRSSI"
 
-#: telemetry/telem_frsky.c:68
+#: telemetry/telem_frsky.c:72
 msgid "LQI"
 msgstr "LQI"
 
-#: telemetry/telem_frsky.c:71
+#: telemetry/telem_frsky.c:75
 msgid "MinCell"
 msgstr "セル容量"
 
-#: telemetry/telem_frsky.c:72
+#: telemetry/telem_frsky.c:76
 msgid "AllCell"
 msgstr "セル合計"
 
-#: telemetry/telem_frsky.c:82
+#: telemetry/telem_frsky.c:86
 msgid "Fuel"
 msgstr "燃料"
 
-#: telemetry/telem_frsky.c:84
+#: telemetry/telem_frsky.c:88
 msgid "Alt"
 msgstr "高度"
 
-#: telemetry/telem_frsky.c:85
+#: telemetry/telem_frsky.c:89
 msgid "VSI"
 msgstr "VSI"
 
-#: telemetry/telem_frsky.c:86
+#: telemetry/telem_frsky.c:90
 msgid "DIS"
 msgstr "DIS"
 
-#: telemetry/telem_frsky.c:104
+#: telemetry/telem_frsky.c:112
 msgid "TelemRSSI"
 msgstr "TelemRSSI"
 
-#: telemetry/telem_frsky.c:108
+#: telemetry/telem_frsky.c:116
 msgid "Amp"
 msgstr "アンプ"
 

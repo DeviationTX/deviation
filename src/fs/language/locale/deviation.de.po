@@ -341,7 +341,7 @@ msgstr "LINKS_H"
 #: pages/common/standard/_swash_page.c:65 pages/common/_trim_page.c:56
 #: pages/common/_trim_page.c:74 pages/common/_voiceconfig_page.c:185
 #: protocol/protocol.c:89 telemetry/telem_crsf.c:80 telemetry/telem_devo.c:76
-#: telemetry/telem_dsm.c:261 telemetry/telem_frsky.c:58
+#: telemetry/telem_dsm.c:261 telemetry/telem_frsky.c:62
 msgid "None"
 msgstr "keine"
 
@@ -473,6 +473,7 @@ msgstr "Servomitte"
 
 #: pages/128x64x1/advanced/mixer_limits.c:99
 #: pages/320x240x16/advanced/mixer_limits.c:68 telemetry.c:246
+#: telemetry/telem_frsky.c:94
 msgid "Speed"
 msgstr ""
 "Geschwind.\n"
@@ -1001,7 +1002,7 @@ msgstr "Sender-Einstellungen"
 msgid "Channel monitor"
 msgstr "Kanal-Anzeige"
 
-#: pages/128x64x1/pagelist.h:75 pages/128x64x1/telemtest_page.c:412
+#: pages/128x64x1/pagelist.h:75 pages/128x64x1/telemtest_page.c:418
 #: pages/320x240x16/pagelist.h:69
 msgid "Telemetry monitor"
 msgstr "Telemetrie-Anzeige"
@@ -1014,11 +1015,15 @@ msgstr ""
 msgid "Scanner"
 msgstr "Scanner"
 
-#: pages/128x64x1/pagelist.h:86
+#: pages/128x64x1/pagelist.h:82 pages/320x240x16/pagelist.h:77
+msgid "XN297 Dump"
+msgstr ""
+
+#: pages/128x64x1/pagelist.h:89
 msgid "External OSD"
 msgstr "Externes OSD"
 
-#: pages/128x64x1/pagelist.h:91 pages/320x240x16/pagelist.h:78
+#: pages/128x64x1/pagelist.h:94 pages/320x240x16/pagelist.h:81
 msgid "Welcome"
 msgstr "Willkommen"
 
@@ -1124,31 +1129,31 @@ msgstr "D/R&Exp -SR"
 msgid "Hold position"
 msgstr "Halteposition"
 
-#: pages/128x64x1/telemtest_page.c:339 telemetry/telem_devo.c:85
-#: telemetry/telem_dsm.c:193 telemetry/telem_frsky.c:81
+#: pages/128x64x1/telemtest_page.c:345 telemetry/telem_devo.c:85
+#: telemetry/telem_dsm.c:193 telemetry/telem_frsky.c:85
 msgid "Temp"
 msgstr "Temp"
 
-#: pages/128x64x1/telemtest_page.c:340 telemetry/telem_crsf.c:92
+#: pages/128x64x1/telemtest_page.c:346 telemetry/telem_crsf.c:92
 #: telemetry/telem_devo.c:79 telemetry/telem_dsm.c:192
-#: telemetry/telem_frsky.c:64 telemetry/telem_frsky.c:70
+#: telemetry/telem_frsky.c:68 telemetry/telem_frsky.c:74
 msgid "Volt"
 msgstr "Volt"
 
-#: pages/128x64x1/telemtest_page.c:341 telemetry/telem_devo.c:81
-#: telemetry/telem_dsm.c:194 telemetry/telem_frsky.c:79
+#: pages/128x64x1/telemtest_page.c:347 telemetry/telem_devo.c:81
+#: telemetry/telem_dsm.c:194 telemetry/telem_frsky.c:83
 msgid "RPM"
 msgstr "UPM"
 
-#: pages/128x64x1/telemtest_page.c:342
+#: pages/128x64x1/telemtest_page.c:348
 msgid "GPS"
 msgstr "GPS"
 
-#: pages/128x64x1/telemtest_page.c:351
+#: pages/128x64x1/telemtest_page.c:357
 msgid "RX"
 msgstr "RX"
 
-#: pages/128x64x1/telemtest_page.c:352
+#: pages/128x64x1/telemtest_page.c:358
 msgid "TX"
 msgstr "TX"
 
@@ -1469,7 +1474,7 @@ msgstr "Eingaben-Anzeige"
 msgid "Button monitor"
 msgstr "Tasten-Anzeige"
 
-#: pages/320x240x16/pagelist.h:84
+#: pages/320x240x16/pagelist.h:87
 msgid "Select Language"
 msgstr "Sprache wählen"
 
@@ -1675,7 +1680,7 @@ msgstr "-"
 #: protocol/esky150_nrf24l01.c:137 protocol/kn_nrf24l01.c:167
 #: protocol/kn_nrf24l01.c:168 protocol/v202_nrf24l01.c:113
 #: protocol/v202_nrf24l01.c:114 protocol/v202_nrf24l01.c:116
-#: protocol/yd717_nrf24l01.c:93
+#: protocol/xn297dump_nrf24l01.c:39 protocol/yd717_nrf24l01.c:93
 msgid "Yes"
 msgstr "Ja"
 
@@ -1683,7 +1688,7 @@ msgstr "Ja"
 #: protocol/esky150_nrf24l01.c:137 protocol/kn_nrf24l01.c:167
 #: protocol/kn_nrf24l01.c:168 protocol/v202_nrf24l01.c:113
 #: protocol/v202_nrf24l01.c:114 protocol/v202_nrf24l01.c:116
-#: protocol/yd717_nrf24l01.c:93
+#: protocol/xn297dump_nrf24l01.c:39 protocol/yd717_nrf24l01.c:93
 msgid "No"
 msgstr "Nein"
 
@@ -2066,6 +2071,30 @@ msgstr ""
 msgid "Telem %d"
 msgstr ""
 
+#: pages/common/_xn297dump_page.c:72
+msgid "Set protocol to XN297Dump"
+msgstr ""
+
+#: pages/common/_xn297dump_page.c:75
+msgid "Scanning channels and length..."
+msgstr ""
+
+#: pages/common/_xn297dump_page.c:77
+msgid "Measuring packet intervals..."
+msgstr ""
+
+#: pages/common/_xn297dump_page.c:79
+msgid "Recording packets..."
+msgstr ""
+
+#: pages/common/_xn297dump_page.c:85
+msgid "Valid CRC found!"
+msgstr ""
+
+#: pages/common/_xn297dump_page.c:85
+msgid "CRC invalid"
+msgstr ""
+
 #: pages/text/splash_page.c:37
 msgid "Deviation"
 msgstr "Deviation"
@@ -2295,6 +2324,26 @@ msgstr "6+1"
 msgid "COL Limit"
 msgstr "COL Limit"
 
+#: protocol/xn297dump_nrf24l01.c:37
+msgid "Bitrate"
+msgstr ""
+
+#: protocol/xn297dump_nrf24l01.c:38
+msgid "Address"
+msgstr ""
+
+#: protocol/xn297dump_nrf24l01.c:39
+msgid "Scrambled"
+msgstr ""
+
+#: protocol/xn297dump_nrf24l01.c:40
+msgid "Retries"
+msgstr ""
+
+#: protocol/xn297dump_nrf24l01.c:41
+msgid "Intvl Scan"
+msgstr ""
+
 #: protocol/yd717_nrf24l01.c:93
 msgid "USE A.ACK"
 msgstr ""
@@ -2377,15 +2426,15 @@ msgstr ""
 msgid "Cap"
 msgstr ""
 
-#: telemetry/telem_crsf.c:95
+#: telemetry/telem_crsf.c:95 telemetry/telem_frsky.c:91
 msgid "Pitch"
 msgstr ""
 
-#: telemetry/telem_crsf.c:96
+#: telemetry/telem_crsf.c:96 telemetry/telem_frsky.c:92
 msgid "Roll"
 msgstr ""
 
-#: telemetry/telem_crsf.c:97
+#: telemetry/telem_crsf.c:97 telemetry/telem_frsky.c:93
 msgid "Yaw"
 msgstr ""
 
@@ -2413,16 +2462,16 @@ msgstr ""
 msgid "Capacity"
 msgstr ""
 
-#: telemetry/telem_devo.c:55 telemetry/telem_frsky.c:101
-#: telemetry/telem_frsky.c:108
+#: telemetry/telem_devo.c:55 telemetry/telem_frsky.c:109
+#: telemetry/telem_frsky.c:116
 msgid "TelemV"
 msgstr "TelemV"
 
-#: telemetry/telem_devo.c:61 telemetry/telem_frsky.c:112
+#: telemetry/telem_devo.c:61 telemetry/telem_frsky.c:120
 msgid "TelemT"
 msgstr "TelemT"
 
-#: telemetry/telem_devo.c:65 telemetry/telem_frsky.c:115
+#: telemetry/telem_devo.c:65 telemetry/telem_frsky.c:123
 msgid "TelemRPM"
 msgstr "TelemUPM"
 
@@ -2439,8 +2488,8 @@ msgstr ""
 msgid "Holds"
 msgstr ""
 
-#: telemetry/telem_dsm.c:201 telemetry/telem_frsky.c:70
-#: telemetry/telem_frsky.c:83
+#: telemetry/telem_dsm.c:201 telemetry/telem_frsky.c:74
+#: telemetry/telem_frsky.c:87
 msgid "Amps"
 msgstr ""
 
@@ -2456,7 +2505,7 @@ msgstr ""
 msgid "Alt.max"
 msgstr ""
 
-#: telemetry/telem_dsm.c:213 telemetry/telem_frsky.c:66
+#: telemetry/telem_dsm.c:213 telemetry/telem_frsky.c:70
 msgid "RSSI"
 msgstr "RSSI"
 
@@ -2468,43 +2517,43 @@ msgstr ""
 msgid "Bat"
 msgstr ""
 
-#: telemetry/telem_frsky.c:67
+#: telemetry/telem_frsky.c:71
 msgid "LRSSI"
 msgstr "LRSSI"
 
-#: telemetry/telem_frsky.c:68
+#: telemetry/telem_frsky.c:72
 msgid "LQI"
 msgstr "LQI"
 
-#: telemetry/telem_frsky.c:71
+#: telemetry/telem_frsky.c:75
 msgid "MinCell"
 msgstr ""
 
-#: telemetry/telem_frsky.c:72
+#: telemetry/telem_frsky.c:76
 msgid "AllCell"
 msgstr ""
 
-#: telemetry/telem_frsky.c:82
+#: telemetry/telem_frsky.c:86
 msgid "Fuel"
 msgstr ""
 
-#: telemetry/telem_frsky.c:84
+#: telemetry/telem_frsky.c:88
 msgid "Alt"
 msgstr ""
 
-#: telemetry/telem_frsky.c:85
+#: telemetry/telem_frsky.c:89
 msgid "VSI"
 msgstr ""
 
-#: telemetry/telem_frsky.c:86
+#: telemetry/telem_frsky.c:90
 msgid "DIS"
 msgstr ""
 
-#: telemetry/telem_frsky.c:104
+#: telemetry/telem_frsky.c:112
 msgid "TelemRSSI"
 msgstr "TelemRSSI"
 
-#: telemetry/telem_frsky.c:108
+#: telemetry/telem_frsky.c:116
 msgid "Amp"
 msgstr ""
 
