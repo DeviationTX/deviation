@@ -19,12 +19,13 @@
     - iRangeX IR8M
     - Jumper T8SG, V2, V2 Plus
     - RadioLink AT9
-  * Introduce a new format of localiztion file to save Flash space and speed up UI rendering.
+  * Introduce a new format of localization file to save Flash space and speed up UI rendering.
   * Scanner to check the RF enviroment around.
   * Enhance telemetry support by adding some new fields.
   * Support Japanese language in manual and Tx
   * F12e-XMS supports CN/JA/RU language
   * Improved Tx Power interface
+  * Add tool to scan for and dump XN297 packets
 
 ## Minor Features / Bug Fixes
   * Reduce RAM requirement by optimizing stack and heap usage
@@ -34,6 +35,7 @@
   * Fix USBHID under OSX
   * Tx power setting shows power values of radio in use
   * Support Walkera QR-X350 telemetry format
+  * Enable LTO build for Devo7e to reduce ROM size
 
 ## New protocols
     * PXX protocol
@@ -46,3 +48,5 @@
     * Flydream V3 protocol
     * Corona protocol
     * LOLI protocol
+    * TDR Phoenix Mini protocol
+    * E016H protocol
