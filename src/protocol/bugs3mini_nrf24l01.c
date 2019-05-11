@@ -91,7 +91,7 @@ enum {
     CHANNEL7,
     CHANNEL8,
     CHANNEL9,
-    CHANNEL10
+    CHANNEL10,
 };
 
 #define CHANNEL_ARM         CHANNEL5
@@ -99,7 +99,7 @@ enum {
 #define CHANNEL_FLIP        CHANNEL7
 #define CHANNEL_PICTURE     CHANNEL8
 #define CHANNEL_VIDEO       CHANNEL9
-#define CHANNEL_ANGLE       CHANNEL10
+#define CHANNEL_ANGLE       CHANNEL10  // alt hold on Bugs 3H
 
 // flags packet[12]
 #define FLAG_FLIP    0x08    // automatic flip
@@ -112,17 +112,24 @@ enum {
 #define FLAG_ARM     0x40    // arm (toggle to turn on motors)
 #define FLAG_DISARM  0x20    // disarm (toggle to turn off motors)
 #define FLAG_ANGLE   0x02    // angle/acro mode (set is angle mode)
+#define FLAG_ALTHOLD 0x04    // angle/altitude hold mode (set is altitude mode)
 
 static const char *const bugs3mini_opts[] = {
+    _tr_noop("Format"), "Bugs3 Mini", "Bugs 3H",
     _tr_noop("RX Id"), "-32768", "32767", "1", NULL,
     NULL
 };
 
 enum {
-    PROTOOPTS_RXID = 0,
-    LAST_PROTO_OPT
+    FORMAT_MINI = 0,
+    FORMAT_3H,
 };
 
+enum {
+    PROTOOPTS_FORMAT = 0,
+    PROTOOPTS_RXID,
+    LAST_PROTO_OPT
+};
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 // Bit vector from bit position
@@ -228,9 +235,12 @@ static void send_packet(u8 bind)
                   | GET_FLAG(CHANNEL_VIDEO, FLAG_VIDEO)
                   | GET_FLAG(CHANNEL_FLIP, FLAG_FLIP);
         packet[13] = arm_flags
-                   | GET_FLAG(CHANNEL_LED, FLAG_LED)
-                   | GET_FLAG(CHANNEL_ANGLE, FLAG_ANGLE);
-        
+                   | GET_FLAG(CHANNEL_LED, FLAG_LED);
+        if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_MINI)
+            packet[13] |= GET_FLAG(CHANNEL_ANGLE, FLAG_ANGLE);
+        else  // 3H
+            packet[13] |= GET_FLAG(CHANNEL_ANGLE, FLAG_ALTHOLD);
+
         packet[14] = 0;
         packet[15] = 0; // 0x53 on bugs 3 H ?
     }
