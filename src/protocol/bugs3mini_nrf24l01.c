@@ -236,7 +236,7 @@ static void send_packet(u8 bind)
                   | GET_FLAG(CHANNEL_FLIP, FLAG_FLIP);
         packet[13] = arm_flags
                    | GET_FLAG(CHANNEL_LED, FLAG_LED);
-        if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_MINI)
+        if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_MINI)
             packet[13] |= GET_FLAG(CHANNEL_ANGLE, FLAG_ANGLE);
         else  // 3H
             packet[13] |= GET_FLAG(CHANNEL_ANGLE, FLAG_ALTHOLD);
