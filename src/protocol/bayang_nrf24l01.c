@@ -258,7 +258,7 @@ static void send_packet(u8 bind)
                 packet[13] = 0x2e;
                 break;
             case FORMAT_DHD_D4:
-                packet[12] = 0x37; 	// 0x17 during bind
+                packet[12] = 0x37;  // 0x17 during bind
                 packet[13] = 0xED;
                 break;
             case FORMAT_H8S3D:
