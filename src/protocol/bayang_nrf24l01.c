@@ -88,7 +88,7 @@ enum {
 
 static const char *const bay_opts[] = {
     _tr_noop("Telemetry"), _tr_noop("Off"), _tr_noop("On"), NULL,
-    _tr_noop("Format"), _tr_noop("regular"), "X16-AH", "IRDRONE", "DHD D4", NULL,
+    _tr_noop("Format"), _tr_noop("regular"), "X16-AH", "IRDRONE", "DHD D4", "H8S 3D", NULL,
     _tr_noop("Analog Aux"), _tr_noop("Off"), _tr_noop("On"), NULL,
     NULL
 };
@@ -106,6 +106,7 @@ enum {
     FORMAT_X16_AH,
     FORMAT_IRDRONE,
     FORMAT_DHD_D4,
+    FORMAT_H8S3D,
 };
 
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
@@ -182,6 +183,7 @@ static void send_packet(u8 bind)
         memcpy(&packet[6], rf_channels, 4);
         switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
                 case FORMAT_REGULAR:
+                case FORMAT_H8S3D:
                     packet[10] = txid[0];
                     packet[11] = txid[1];
                     break;
@@ -203,6 +205,7 @@ static void send_packet(u8 bind)
         switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
                 case FORMAT_REGULAR:
                 case FORMAT_DHD_D4:
+                case FORMAT_H8S3D:
                     packet[0] = 0xa5;
                     break;
                 case FORMAT_X16_AH:
@@ -257,6 +260,10 @@ static void send_packet(u8 bind)
             case FORMAT_DHD_D4:
                 packet[12] = 0x37; 	// 0x17 during bind
                 packet[13] = 0xED;
+                break;
+            case FORMAT_H8S3D:
+                packet[12] = txid[2];
+                packet[13] = 0x34;
                 break;
     }
 
