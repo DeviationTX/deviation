@@ -278,19 +278,19 @@ static void make_address()
         0x2d9e, 0x95a4, 0x9c5c, 0xb4a6, 0xa9ce, 0x562b, 0x3e73, 0xb895, 0x6a82, 0x9437, 0x3d5a,
         0x4bb2, 0x6949, 0xc224, 0x6b3d, 0x23c6, 0x9ea3, 0xa498, 0x5c9e, 0xa652, 0xce76, 0x2b4b, 0x733a };
     
-    if (rxid_high==0x00 || rxid_high==0xFF)
+    if (rxid_high == 0x00 || rxid_high == 0xFF)
         rx_tx_addr[0]=0x52;
     else
         rx_tx_addr[0]=rxid_high;
     
     rx_tx_addr[1]=tx_hash;
     
-    if (rxid_low==0x00 || rxid_low==0xFF)
+    if (rxid_low == 0x00 || rxid_low == 0xFF)
         rx_tx_addr[2]=0x66;
     else
         rx_tx_addr[2]=rxid_low;
     
-    for (u8 end_idx=0; end_idx<23; end_idx++)
+    for (u8 end_idx=0; end_idx < 23; end_idx++)
     {
         //calculate sequence start
         if (end_idx <= 7)
@@ -298,21 +298,21 @@ static void make_address()
         else
             start=(end_idx-7)*16+7;
         //calculate sequence length
-        if (end_idx>6)
+        if (end_idx > 6)
         {
-            if (end_idx>15)
-                length = (23-end_idx)<<1;
+            if (end_idx > 15)
+                length = (23-end_idx) << 1;
             else
                 length = 16;
         }
         else
-            length = (end_idx+1)<<1;
+            length = (end_idx+1) << 1;
         //scan for a possible solution using the current end
-        for (u8 i=0;i<length;i++)
+        for (u8 i=0; i < length; i++)
         {
             index=(i>>1)*7+(((i+1)>>1)<<3);
             index=start+index-rxid_high;
-            if (index==rxid_low)
+            if (index == rxid_low)
             {
                 rx_tx_addr[3]=end[end_idx]>>8;
                 rx_tx_addr[4]=end[end_idx];
@@ -325,13 +325,13 @@ static void make_address()
 
 static void update_telemetry() {
     u8 checksum = 0x6d;
-    for (u8 i=1; i<12; i++) {
+    for (u8 i=1; i < 12; i++) {
         checksum += packet[i];
     }
     if (packet[0] == checksum) {
         Telemetry.value[TELEM_FRSKY_RSSI] = packet[3];
         TELEMETRY_SetUpdated(TELEM_FRSKY_RSSI);
-        if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_MINI) {
+        if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_MINI) {
             if (packet[11] & 0x80)
                 Telemetry.value[TELEM_FRSKY_VOLT1] = 840;  // Ok
             else if (packet[11] & 0x40)
@@ -356,9 +356,9 @@ static u16 bugs3mini_callback()
 {
     switch (phase) {
         case BIND1:
-            if ( NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR)) { // RX fifo data ready
+            if (NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR)) {  // RX fifo data ready
                 XN297_ReadPayload(packet, RX_PAYLOAD_SIZE);
-                Model.proto_opts[PROTOOPTS_RXID] = (u16)packet[1]<<8 | packet[2]; // store rxid into protocol options
+                Model.proto_opts[PROTOOPTS_RXID] = (u16)packet[1] << 8 | packet[2];  // store rxid into protocol options
                 NRF24L01_SetTxRxMode(TXRX_OFF);
                 NRF24L01_SetTxRxMode(TX_EN);
                 make_address();
@@ -383,7 +383,7 @@ static u16 bugs3mini_callback()
             phase = BIND1;
             return PACKET_INTERVAL - WRITE_WAIT;
         case DATA1:
-            if ( NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR)) { // RX fifo data ready
+            if (NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR)) {  // RX fifo data ready
                 // read only 12 bytes to not overwrite channel change flag
                 XN297_ReadPayload(packet, 12);
                 update_telemetry();
