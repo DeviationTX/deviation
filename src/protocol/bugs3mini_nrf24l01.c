@@ -331,12 +331,22 @@ static void update_telemetry() {
     if(packet[0] == checksum) {
         Telemetry.value[TELEM_FRSKY_RSSI] = packet[3];
         TELEMETRY_SetUpdated(TELEM_FRSKY_RSSI);
-        if(packet[11] & 0x80)
-            Telemetry.value[TELEM_FRSKY_VOLT1] = 840; // Ok
-        else if(packet[11] & 0x40)
-            Telemetry.value[TELEM_FRSKY_VOLT1] = 710; // Warning
-        else
-            Telemetry.value[TELEM_FRSKY_VOLT1] = 640; // Critical
+        if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_MINI) {
+            if(packet[11] & 0x80)
+                Telemetry.value[TELEM_FRSKY_VOLT1] = 840;  // Ok
+            else if(packet[11] & 0x40)
+                Telemetry.value[TELEM_FRSKY_VOLT1] = 710;  // Warning
+            else
+                Telemetry.value[TELEM_FRSKY_VOLT1] = 640;  // Critical
+        }
+        else {  // 3H
+            if (packet[11] & 0x40)
+                Telemetry.value[TELEM_FRSKY_VOLT1] = 710; // Warning
+            else if (packet[11] & 0x80)
+                Telemetry.value[TELEM_FRSKY_VOLT1] = 640; // Critical
+            else
+                Telemetry.value[TELEM_FRSKY_VOLT1] = 840; // Ok
+        }
         TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT1);
     }
 }
