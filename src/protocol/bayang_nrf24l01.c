@@ -503,7 +503,7 @@ static void initialize_txid()
         rand32_r(&lfsr, 0);
     // Could be using txid[0..2] but using rx_tx_addr everywhere instead...
     if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_DHD_D4)
-        rf_channels[0] = (rx_tx_addr[2] & 0x07) | 0x01;
+        rf_channels[0] = (txid[2] & 0x07) | 0x01;
     else
         rf_channels[0] = 0;
     rf_channels[1] = (lfsr & 0x1f) + 0x10;
