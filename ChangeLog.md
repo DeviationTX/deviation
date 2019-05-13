@@ -46,3 +46,5 @@
     * Flydream V3 protocol
     * Corona protocol
     * LOLI protocol
+    * Bugs3Mini protocol: Bugs 3H format
+    * Bayang protocol: DHD D4 and H8S 3D formats
