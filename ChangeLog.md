@@ -38,15 +38,17 @@
   * Enable LTO build for Devo7e to reduce ROM size
 
 ## New protocols
-    * PXX protocol
-    * GD00X protocol
-    * Air Hogs "Star Trek" NCC-1701 protocol
-    * WFLY protocol
-    * Hitec protocol
-    * protocol for MJX Bugs 3, 6, 8
-    * SBUS, CRSF
-    * Flydream V3 protocol
-    * Corona protocol
-    * LOLI protocol
-    * TDR Phoenix Mini protocol
-    * E016H protocol
+  * PXX protocol
+  * GD00X protocol
+  * Air Hogs "Star Trek" NCC-1701 protocol
+  * WFLY protocol
+  * Hitec protocol
+  * protocol for MJX Bugs 3, 6, 8
+  * SBUS, CRSF
+  * Flydream V3 protocol
+  * Corona protocol
+  * LOLI protocol
+  * Bugs3Mini protocol: Bugs 3H format
+  * Bayang protocol: DHD D4 and H8S 3D formats
+  * TDR Phoenix Mini protocol
+  * E016H protocol
