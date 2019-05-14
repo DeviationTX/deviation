@@ -102,7 +102,7 @@ enum {
 
 static const char *const bay_opts[] = {
     _tr_noop("Telemetry"), _tr_noop("Off"), _tr_noop("On"), NULL,
-    _tr_noop("Format"), _tr_noop("regular"), "X16-AH", "IRDRONE", NULL,
+    _tr_noop("Format"), _tr_noop("regular"), "X16-AH", "IRDRONE", "DHD D4", "H8S 3D", NULL,
     _tr_noop("Analog Aux"), _tr_noop("Off"), _tr_noop("On"), NULL,
     NULL
 };
@@ -119,6 +119,8 @@ enum {
     FORMAT_REGULAR,
     FORMAT_X16_AH,
     FORMAT_IRDRONE,
+    FORMAT_DHD_D4,
+    FORMAT_H8S3D,
 };
 
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
@@ -195,6 +197,7 @@ static void send_packet(u8 bind)
         memcpy(&packet[6], rf_channels, 4);
         switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
                 case FORMAT_REGULAR:
+                case FORMAT_H8S3D:
                     packet[10] = txid[0];
                     packet[11] = txid[1];
                     break;
@@ -206,11 +209,17 @@ static void send_packet(u8 bind)
                     packet[10] = 0x30;
                     packet[11] = 0x01;
                     break;
+                case FORMAT_DHD_D4:
+                    packet[10] = 0xC8;
+                    packet[11] = 0x99;
+                    break;
         }
 
     } else {
         switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
                 case FORMAT_REGULAR:
+                case FORMAT_DHD_D4:
+                case FORMAT_H8S3D:
                     packet[0] = 0xa5;
                     break;
                 case FORMAT_X16_AH:
@@ -261,6 +270,14 @@ static void send_packet(u8 bind)
             case FORMAT_IRDRONE:
                 packet[12] = 0xe0;
                 packet[13] = 0x2e;
+                break;
+            case FORMAT_DHD_D4:
+                packet[12] = 0x37;  // 0x17 during bind
+                packet[13] = 0xED;
+                break;
+            case FORMAT_H8S3D:
+                packet[12] = txid[2];
+                packet[13] = 0x34;
                 break;
     }
 
@@ -498,7 +515,11 @@ static void initialize_txid()
     rx_tx_addr[4] = (lfsr >> 24) & 0xff;
     for (u8 i = 0; i < sizeof(lfsr); ++i)
         rand32_r(&lfsr, 0);
-    rf_channels[0] = 0;
+    // Could be using txid[0..2] but using rx_tx_addr everywhere instead...
+    if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_DHD_D4)
+        rf_channels[0] = (txid[2] & 0x07) | 0x01;
+    else
+        rf_channels[0] = 0;
     rf_channels[1] = (lfsr & 0x1f) + 0x10;
     rf_channels[2] = rf_channels[1] + 0x20;
     rf_channels[3] = rf_channels[2] + 0x20;
