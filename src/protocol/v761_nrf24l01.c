@@ -35,13 +35,13 @@
 #define dbgprintf if (0) printf
 #endif
 
-#define V761_PACKET_PERIOD		7060  // Timeout for callback in uSec
-#define V761_INITIAL_WAIT		500
-#define V761_PACKET_SIZE	8
+#define V761_PACKET_PERIOD  7060  // Timeout for callback in uSec
+#define V761_INITIAL_WAIT   500
+#define V761_PACKET_SIZE    8
 
 // Fx chan management
-#define V761_BIND_FREQ			0x28
-#define V761_RF_NUM_CHANNELS	3
+#define V761_BIND_FREQ  0x28
+#define V761_RF_NUM_CHANNELS    3
 
 static u8 packet[V761_PACKET_SIZE];
 static u8 hopping_frequency[V761_RF_NUM_CHANNELS];
@@ -118,7 +118,7 @@ static void V761_send_packet()
     }
     else
     {
-        packet[0] = scale_channel(Channels[CHANNEL3], CHAN_MIN_VALUE, CHAN_MAX_VALUE, 0, 0xff);  // throttle       
+        packet[0] = scale_channel(Channels[CHANNEL3], CHAN_MIN_VALUE, CHAN_MAX_VALUE, 0, 0xff);  // throttle
         packet[1] = scale_channel(Channels[CHANNEL4], CHAN_MIN_VALUE, CHAN_MAX_VALUE, 0xff, 0) >> 1;  // rudder
         packet[2] = scale_channel(Channels[CHANNEL2], CHAN_MIN_VALUE, CHAN_MAX_VALUE, 0xff, 0) >> 1;  // elevator
         packet[3] = 0x3f;  // no functional implementation in this model, possibly optional aileron channel for 4ch version?
@@ -129,11 +129,11 @@ static void V761_send_packet()
         if (GET_FLAG(CHANNEL5, 1))    // Expert mode, gyro off
             flags = 0x0c;
         else
-            flags = 0x0a;     // Midd Mode ( Gyro on, no rate limits)        
+            flags = 0x0a;     // Midd Mode ( Gyro on, no rate limits)
         packet[5] |= flags;
-        packet[6] = 0x80;  // unknown 
+        packet[6] = 0x80;  // unknown
 
-        //packet counter
+        // packet counter
         if (packet_count >= 12)
             packet_count = 0;
         NRF24L01_WriteReg(NRF24L01_05_RF_CH, hopping_frequency[hopping_frequency_no++]);
@@ -160,31 +160,31 @@ static void V761_init()
     NRF24L01_SetTxRxMode(TX_EN);
     NRF24L01_FlushTx();
     NRF24L01_FlushRx();
-    NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);			// No Auto Acknowldgement on all data pipes
-    NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x01);		// Enable data pipe 0 only
-    NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x02);		// set address length (4 bytes)
-    NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0x00);	// no retransmits
-    NRF24L01_SetBitrate(NRF24L01_BR_1M);				// 1Mbps
+    NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);            // No Auto Acknowldgement on all data pipes
+    NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x01);        // Enable data pipe 0 only
+    NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x02);        // set address length (4 bytes)
+    NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0x00);    // no retransmits
+    NRF24L01_SetBitrate(NRF24L01_BR_1M);                // 1Mbps
     NRF24L01_SetPower(power);
-    NRF24L01_Activate(0x73);							// Activate feature register
-    NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 0x00);			// Disable dynamic payload length on all pipes
+    NRF24L01_Activate(0x73);                            // Activate feature register
+    NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 0x00);            // Disable dynamic payload length on all pipes
     NRF24L01_WriteReg(NRF24L01_1D_FEATURE, 0x01);
     NRF24L01_Activate(0x73);
 }
 
 static void V761_initialize_txid()
 {
-    // TODO: try arbitrary rx_tx_addr & frequencies (except hopping_frequency[0])
+    // TODO(): try arbitrary rx_tx_addr & frequencies (except hopping_frequency[0])
     // testing for random Rx_tx_address
     memcpy(rx_tx_addr, (u8 *)"\x47\x93\x45\xD5", 4);  // random 4 bytes x47\x93\x45\xD5
-    //Actual rx_tx_addr from SPI grab)
-    //memcpy(rx_tx_addr,(u8 *)"\x6f\x2c\xb1\x93",4);
+    // Actual rx_tx_addr from SPI grab)
+    // memcpy(rx_tx_addr,(u8 *)"\x6f\x2c\xb1\x93",4);
     memcpy(hopping_frequency, (u8 *)"\x14\x32\x46", 3);  // random 2 bytes for hopping_frequency[1] = 0x32 hopping_frequency[2] = 0x46;
-    //Actual hopping_frequency from SPI grab)
-    //memcpy(hopping_frequency,(u8 *)"\x14\x1e\x4b",3);
-    //hopping_frequency[0] = 0x14; // not sure if this one is const or calculated ... // combined into one memcopy
-    //hopping_frequency[1] = 0x1e; //combined into one memcopy
-    //hopping_frequency[2] = 0x4b; //combined into one memcopy
+    // Actual hopping_frequency from SPI grab)
+    // memcpy(hopping_frequency,(u8 *)"\x14\x1e\x4b",3);
+    // hopping_frequency[0] = 0x14; // not sure if this one is const or calculated ... // combined into one memcopy
+    // hopping_frequency[1] = 0x1e; //combined into one memcopy
+    // hopping_frequency[2] = 0x4b; //combined into one memcopy
 }
 
 static u16 V761_callback()
