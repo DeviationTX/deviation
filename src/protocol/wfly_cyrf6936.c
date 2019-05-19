@@ -36,6 +36,18 @@ static u32 bind_counter;
 static u32 packet_count;
 static u8 phase;
 static u8 tx_power;
+static s16 fine;
+
+static const char * const wfly_opts[] = {
+  _tr_noop("Freq-Fine"),  "-300", "300", "655361", NULL,  // large step 10, small step 1
+  NULL
+};
+
+enum {
+    PROTO_OPTS_FREQFINE = 0,
+    LAST_PROTO_OPT,
+};
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 enum {
     WFLY_BIND_TX=0,
@@ -70,6 +82,14 @@ const u8 WFLY_init_vals[][2] = {
     {CYRF_16_CRC_SEED_MSB, 0x00},           // CRC seed for bind
 };
 
+static void WFLY_tune_cyrf()
+{
+    // default value is 0x555 = 0x400 + 0x155
+    u16 tune = 0x555 + fine;
+    CYRF_WriteRegister(CYRF_1B_TX_OFFSET_LSB, tune & 0xFF);
+    CYRF_WriteRegister(CYRF_1C_TX_OFFSET_MSB, tune >> 8);
+}
+
 static void WFLY_cyrf_bind_config()
 {
     for(u8 i = 0; i < sizeof(WFLY_init_vals) / 2; i++)  
@@ -77,6 +97,8 @@ static void WFLY_cyrf_bind_config()
 
     CYRF_ConfigSOPCode(WFLY_sop_bind);
     CYRF_ConfigRFChannel(WFLY_BIND_CHANNEL);
+    WFLY_tune_cyrf();
+
     CYRF_SetTxRxMode(TX_EN);
 }
 
@@ -93,7 +115,8 @@ static void WFLY_cyrf_data_config()
     
     tx_power = Model.tx_power;
     CYRF_SetPower(tx_power); 
-    
+    WFLY_tune_cyrf();
+
     CYRF_SetTxRxMode(TX_EN);
 }
 
@@ -157,6 +180,11 @@ static u16 WFLY_send_data_packet()
     if(tx_power != Model.tx_power) {
         tx_power = Model.tx_power;
         CYRF_SetPower(tx_power);
+    }
+
+    if (fine != Model.proto_opts[PROTO_OPTS_FREQFINE]) {
+        fine = Model.proto_opts[PROTO_OPTS_FREQFINE];
+        WFLY_tune_cyrf();
     }
     
     CYRF_ConfigRFChannel(hopping_frequency[(packet_count)%4]);
@@ -303,7 +331,8 @@ static void initWFLY(u8 bind)
     hopping_frequency[3]=rf_ch_num;         // RF channel used to send the current hopping table
     
     CYRF_Reset();
-    
+    fine = (s16)Model.proto_opts[PROTO_OPTS_FREQFINE];
+
     if(bind)
     {
         bind_counter=WFLY_BIND_COUNT;
@@ -338,7 +367,7 @@ uintptr_t WFLY_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_NUMCHAN: return 9;
         case PROTOCMD_DEFAULT_NUMCHAN: return 9;
         case PROTOCMD_CURRENT_ID:  return Model.fixed_id;
-        case PROTOCMD_GETOPTIONS: return 0;
+        case PROTOCMD_GETOPTIONS: return (uintptr_t)wfly_opts;
         case PROTOCMD_TELEMETRYSTATE: return  PROTO_TELEM_UNSUPPORTED;
         case PROTOCMD_CHANNELMAP: return AETRG;
         default: break;
