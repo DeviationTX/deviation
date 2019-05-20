@@ -332,20 +332,22 @@ static void set_telemetry(frsky_telem_t offset, s32 value) {
 
 static void update_telemetry()
 {
+    // 0    1234   5678   9           10         11       12
     // AA | TXID | RXID | sensor id | sensor # | value 16 bit big endian | sensor id ......
+    // AC | TXID | RXID | sensor id | sensor # | length | value 32 bit big endian | sensor id ......
     // max 7 sensors per packet
     
     u8 voltage_index = 0;
     u8 index = 9;   // first sensor ID in telemetry packet
     u16 data16 = packet[index+3] << 8 | packet[index+2];
 #if HAS_EXTENDED_TELEMETRY
-    s32 data32 = packet[index+5] << 24 | packet[index+4] << 16 | packet[index+3] << 8 | packet[index+2];
+    s32 data32 = packet[index+6] << 24 | packet[index+5] << 16 | packet[index+4] << 8 | packet[index+3];
     u8 cell_index = 0;
     u16 cell_total = 0;
     u8 temp_index;
 #endif
 
-    for(u8 sensor=0; sensor<7; sensor++) {
+    while (index <= 36) {
         switch(packet[index]) {
         case SENSOR_VOLTAGE:
             voltage_index++;
@@ -376,7 +378,7 @@ static void update_telemetry()
         case SENSOR_CELL_VOLTAGE:
             if (cell_index < 6) {
                 set_telemetry(TELEM_FRSKY_CELL1 + cell_index, data16);
-                cell_total += packet[index+3] << 8 | packet[index+2];
+                cell_total += data16;
             }
             cell_index++;
             break;
@@ -418,7 +420,10 @@ static void update_telemetry()
             // unknown sensor ID or end of list
             break;
         }
-        index += ((packet[index] & 0xf0) == 0x80 ? 6 : 4);
+        if (packet[0] == 0xaa)
+            index += ((packet[index] & 0xf0) == 0x80 ? 6 : 4);
+        else
+            index += packet[index + 2] + 3;
     }
 #if HAS_EXTENDED_TELEMETRY
     if(cell_index > 0) {
@@ -628,13 +633,12 @@ static u16 afhds2a_cb()
                 A7105_Strobe(A7105_RST_RDPTR);
                 u8 check;
                 A7105_ReadData(&check,1);
-                if(check == 0xaa) {
+                if (check == 0xaa || check == 0xac) {
                     A7105_Strobe(A7105_RST_RDPTR);
                     A7105_ReadData(packet, RXPACKET_SIZE);
-                    if(packet[9] == 0xfc) { // rx is asking for settings
+                    if (packet[9] == 0xfc) {  // rx is asking for settings
                         packet_type=PACKET_SETTINGS;
-                    }
-                    else {
+                    } else {
                         update_telemetry();
                     }
                 }
