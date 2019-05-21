@@ -323,6 +323,11 @@ enum{
     SENSOR_RX_RSSI        = 0xfc,    // RSSI
     SENSOR_RX_ERR_RATE    = 0xfe,    // Error rate
     SENSOR_UNKNOWN        = 0xff,
+
+// AC type telemetry with multiple values in one packet
+    SENSOR_GPS_FULL       = 0xfd,
+    SENSOR_VOLT_FULL      = 0xf0,
+    SENSOR_ACC_FULL       = 0xef,
 };
 
 static void set_telemetry(frsky_telem_t offset, s32 value) {
@@ -347,7 +352,8 @@ static void update_telemetry()
     u8 temp_index;
 #endif
 
-    while (index <= 36) {
+    while (index <= 32 && packet[index] != 0xff) {
+//TODO    printf("type %x, sensor id 0x%02x   ", packet[0], packet[index]);
         switch(packet[index]) {
         case SENSOR_VOLTAGE:
             voltage_index++;
@@ -374,6 +380,10 @@ static void update_telemetry()
             } else if (temp_index == 1) {
                 set_telemetry(TELEM_FRSKY_TEMP2, (data16 - 400)/10);
             }
+            break;
+        case SENSOR_PRES:
+            set_telemetry(TELEM_FRSKY_TEMP1, ((data32 >> 19) -400)/10);
+            // Use getALT() to convert pressure and temp to altitude. set_telemetry(TELEM_FRSKY_ALTITUDE, data32 & 0x7ffff);
             break;
         case SENSOR_CELL_VOLTAGE:
             if (cell_index < 6) {
@@ -409,17 +419,40 @@ static void update_telemetry()
             Telemetry.gps.altitude = data32;
             TELEMETRY_SetUpdated(TELEM_GPS_ALT);
             break;
+        case SENSOR_GPS_FULL: {
+            u8 tmp = index + 5;     // skip GPS status
+            data32 = packet[tmp+3] << 24 | packet[tmp+2] << 16 | packet[tmp+1] << 8 | packet[tmp];
+            Telemetry.gps.latitude = data32;
+            TELEMETRY_SetUpdated(TELEM_GPS_LAT);
+            tmp += 4;
+            data32 = packet[tmp+3] << 24 | packet[tmp+2] << 16 | packet[tmp+1] << 8 | packet[tmp];
+            Telemetry.gps.longitude = data32;
+            TELEMETRY_SetUpdated(TELEM_GPS_LONG);
+            tmp += 4;
+            data32 = packet[tmp+3] << 24 | packet[tmp+2] << 16 | packet[tmp+1] << 8 | packet[tmp];
+            Telemetry.gps.altitude = data32;
+            TELEMETRY_SetUpdated(TELEM_GPS_ALT);
+        }
+            break;
 #endif
-        case SENSOR_RX_ERR_RATE:
-            set_telemetry(TELEM_FRSKY_LQI, 100 - packet[index+2]);
+        case SENSOR_RX_SNR:
+//            set_telemetry(TELEM_FRSKY_LQI, 100 - packet[index+2]);
+            break;
+        case SENSOR_RX_NOISE:
+//            set_telemetry(TELEM_FRSKY_LQI, 100 - packet[index+2]);
             break;
         case SENSOR_RX_RSSI:
             set_telemetry(TELEM_FRSKY_RSSI, packet[index+2]);
             break;
+        case SENSOR_RX_ERR_RATE:
+            set_telemetry(TELEM_FRSKY_LQI, 100 - packet[index+2]);
+            break;
         default:
             // unknown sensor ID or end of list
+//TODO            printf("unknown");
             break;
         }
+//TODO        printf("\n");
         if (packet[0] == 0xaa)
             index += ((packet[index] & 0xf0) == 0x80 ? 6 : 4);
         else
