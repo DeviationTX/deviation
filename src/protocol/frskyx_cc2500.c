@@ -373,14 +373,14 @@ static void frsky_check_telemetry(u8 *pkt, u8 len) {
 #if HAS_EXTENDED_TELEMETRY
                 if (pkt[6] <= 6) {
                     for (u8 i=0; i < pkt[6]; i++)
-                        frsky_parse_sport_stream(pkt[7+i]);
+                        frsky_parse_sport_stream(pkt[7+i], SPORT_NOCRC);
                 }
                 // process any saved data from out-of-sequence packet if
                 // it's the next expected packet
                 if (telem_save_seq == seq_rx_expected) {
                     seq_rx_expected = (seq_rx_expected + 1) % 4;
                     for (u8 i=0; i < telem_save_data[0]; i++)
-                        frsky_parse_sport_stream(telem_save_data[1+i]);
+                        frsky_parse_sport_stream(telem_save_data[1+i], SPORT_NOCRC);
                 }
                 telem_save_seq = -1;
 #endif

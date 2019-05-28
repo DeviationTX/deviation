@@ -246,6 +246,10 @@ static void serial_echo(u8 *packet) {(void)packet;}
 #define PROTO_OPTS_AD2GAIN 0
 #include "frsky_d_telem._c"
 #include "frsky_s_telem._c"
+
+static void frsky_parse_sport_stream_crc(u8 data) {
+    frsky_parse_sport_stream(data, SPORT_CRC);
+}
 #endif  // HAS_EXTENDED_TELEMETRY
 
 #ifndef EMULATOR
@@ -294,7 +298,7 @@ static void initialize(u8 bind)
 #endif
 #if HAS_EXTENDED_TELEMETRY
     SSER_Initialize(); // soft serial receiver
-    SSER_StartReceive(frsky_parse_sport_stream);
+    SSER_StartReceive(frsky_parse_sport_stream_crc);
 #endif
 
     PWM_Initialize();
