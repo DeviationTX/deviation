@@ -50,6 +50,18 @@ static  u32 bind_counter;
 static  u32 packet_count;
 static  u8 phase;
 static  u8 tx_power;
+static  s16 fine;
+
+static const char * const wfly_opts[] = {
+  _tr_noop("Freq-Fine"),  "-300", "300", "655361", NULL,  // large step 10, small step 1
+  NULL
+};
+
+enum {
+    PROTO_OPTS_FREQFINE = 0,
+    LAST_PROTO_OPT,
+};
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 enum {
     WFLY_BIND_TX=0,
@@ -84,30 +96,41 @@ const u8 WFLY_init_vals[][2] = {
     {CYRF_16_CRC_SEED_MSB, 0x00},           // CRC seed for bind
 };
 
+static void WFLY_tune_cyrf()
+{
+    // default value is 0x555 = 0x400 + 0x155
+    u16 tune = 0x555 + fine;
+    CYRF_WriteRegister(CYRF_1B_TX_OFFSET_LSB, tune & 0xFF);
+    CYRF_WriteRegister(CYRF_1C_TX_OFFSET_MSB, tune >> 8);
+}
+
 static void WFLY_cyrf_bind_config()
 {
-    for(u8 i = 0; i < sizeof(WFLY_init_vals) / 2; i++)  
+    for(u8 i = 0; i < sizeof(WFLY_init_vals) / 2; i++)
         CYRF_WriteRegister(WFLY_init_vals[i][0], WFLY_init_vals[i][1]);
 
     CYRF_ConfigSOPCode(WFLY_sop_bind);
     CYRF_ConfigRFChannel(WFLY_BIND_CHANNEL);
+    WFLY_tune_cyrf();
+
     CYRF_SetTxRxMode(TX_EN);
 }
 
 static void WFLY_cyrf_data_config()
 {
-    for(u8 i = 0; i < (sizeof(WFLY_init_vals) / 2)-3; i++)  
+    for(u8 i = 0; i < (sizeof(WFLY_init_vals) / 2)-3; i++)
         CYRF_WriteRegister(WFLY_init_vals[i][0], WFLY_init_vals[i][1]);
 
     //CYRF_WriteRegister(CYRF_1E_RX_OVERRIDE, 0x08);    // Do not accept CRC with 0 seed but not needed since the RX is not sending any data...
     CYRF_WriteRegister(CYRF_15_CRC_SEED_LSB, rx_tx_addr[2]);
     CYRF_WriteRegister(CYRF_16_CRC_SEED_MSB, rx_tx_addr[3]);
-    
+
     CYRF_ConfigSOPCode(WFLY_sop_data);
-    
+
     tx_power = Model.tx_power;
-    CYRF_SetPower(tx_power); 
-    
+    CYRF_SetPower(tx_power);
+    WFLY_tune_cyrf();
+
     CYRF_SetTxRxMode(TX_EN);
 }
 
@@ -166,15 +189,20 @@ static u16 WFLY_send_data_packet()
     for(u8 i = 0; i < len; i++)
         sum += packet[i];
     packet[len] = sum;
-    
+
     //Keep transmit power in sync
     if(tx_power != Model.tx_power) {
         tx_power = Model.tx_power;
         CYRF_SetPower(tx_power);
     }
-    
+
+    if (fine != Model.proto_opts[PROTO_OPTS_FREQFINE]) {
+        fine = Model.proto_opts[PROTO_OPTS_FREQFINE];
+        WFLY_tune_cyrf();
+    }
+
     CYRF_ConfigRFChannel(hopping_frequency[(packet_count)%4]);
-    
+
     CYRF_WriteDataPacketLen(packet, len+1);
 
     switch(packet_count%4)
@@ -247,7 +275,7 @@ static u16 WFLY_callback()
                         }
                         memcpy((void *)packet,(void *)pkt,0x10);    // Send back to the RX what we've just received with no modifications
                     }
-                    phase=WFLY_BIND_TX;                         
+                    phase=WFLY_BIND_TX;
                     return 200;
                 }
             }
@@ -274,7 +302,7 @@ static u16 WFLY_callback()
 }
 
 static void initWFLY(u8 bind)
-{ 
+{
     CLOCK_StopTimer();
     u32 lfsr = 0xb2c54a2ful;
 
@@ -293,17 +321,17 @@ static void initWFLY(u8 bind)
     // Pump zero bytes for LFSR to diverge more
     for (u8 i = 0; i < sizeof(lfsr); ++i)
         rand32_r(&lfsr, 0);
-    
+
     for(u8 i=1; i<4; i++) {
         rx_tx_addr[i] = (lfsr >> i*8) & 0xff;
     }
-    
+
     //Random start channel
     u8 ch=0x0A+rand32()%0x0E;
     if(ch%3==0)
         ch++;                               // remove these channels as they seem to not be working...
     rf_ch_num=0x0C+(rx_tx_addr[1]%4)*3;     // use the start channels which do not seem to work to send the hopping table instead
-    
+
     #ifdef WFLY_FORCE_ID                    // data taken from TX dump
         rx_tx_addr[2]=0xBF;                 // ID
         rx_tx_addr[3]=0x13;                 // ID
@@ -315,9 +343,10 @@ static void initWFLY(u8 bind)
     hopping_frequency[1]=ch+0x1E;
     hopping_frequency[2]=ch+0x2D;
     hopping_frequency[3]=rf_ch_num;         // RF channel used to send the current hopping table
-    
+
     CYRF_Reset();
-    
+    fine = (s16)Model.proto_opts[PROTO_OPTS_FREQFINE];
+
     if(bind)
     {
         bind_counter=WFLY_BIND_COUNT;
@@ -352,7 +381,7 @@ const void *WFLY_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_NUMCHAN: return (void *)9L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)9L;
         case PROTOCMD_CURRENT_ID:  return (void *)((unsigned long)Model.fixed_id);
-        case PROTOCMD_GETOPTIONS: return (void*)0L;
+        case PROTOCMD_GETOPTIONS: return wfly_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *) PROTO_TELEM_UNSUPPORTED;
         default: break;
     }
