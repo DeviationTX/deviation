@@ -114,11 +114,6 @@ static u16 crc(u8 *data, u8 len) {
   return crc;
 }
 
-static u8 power_to_r9m() {
-    if (Model.tx_power >= TXPOWER_10mW) return Model.tx_power - TXPOWER_10mW;
-    return TXPOWER_100uW;
-}
-
 //#define STICK_SCALE    819  // full scale at +-125
 #define STICK_SCALE    751  // +/-100 gives 2000/1000 us pwm
 static u16 scaleForPXX(u8 chan, u8 failsafe)
@@ -215,7 +210,7 @@ static void build_data_pkt(u8 bind)
     // b2: set receiver PWM output to channels 9-16
     // b3-4: RF power setting
     // b5: set to disable R9M S.Port output
-    packet[15] = (power_to_r9m() << 3)
+    packet[15] = (Model.tx_power << 3)
                | (Model.proto_opts[PROTO_OPTS_RXTELEM] << 1)
                | (Model.proto_opts[PROTO_OPTS_RXPWM] << 2);
 
