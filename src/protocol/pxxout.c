@@ -57,6 +57,7 @@ static u8 packet[PXX_PKT_BYTES];
 static u16 failsafe_count;
 static u8 chan_offset;
 static u8 FS_flag;
+static u8 range_check;
  
 enum XJTRFProtocols {
   RF_PROTO_OFF = -1,
@@ -187,7 +188,7 @@ static void build_data_pkt(u8 bind)
     if (bind) {
         // if b0, then b1..b2 = country code (us 0, japan 1, eu 2 ?)
         packet[1] |= PXX_SEND_BIND | (Model.proto_opts[PROTO_OPTS_COUNTRY] << 1);
-    } else if (Model.tx_power == TXPOWER_100uW) {   // RANGE_test() sets power to 100uW
+    } else if (range_check) {
         packet[1] |= PXX_SEND_RANGECHECK;
     } else {
         packet[1] |= FS_flag;
@@ -297,6 +298,7 @@ static void initialize(u8 bind)
     failsafe_count = 0;
     chan_offset = 0;
     FS_flag = 0;
+    range_check = 0;
     packet[0] = (u8) Model.fixed_id & 0x3f;  // limit to valid range - 6 bits
     mixer_runtime = 50;
 
@@ -335,6 +337,8 @@ uintptr_t PXXOUT_Cmds(enum ProtoCmds cmd)
             return 0;
 #endif
         case PROTOCMD_CHANNELMAP: return UNCHG;
+        case PROTOCMD_RANGETESTON: range_check = 1; return 1;
+        case PROTOCMD_RANGETESTOFF: range_check = 0; return 1;
         default: break;
     }
     return 0;

@@ -177,6 +177,7 @@ int PROTOCOL_SticksMoved(int init);
 void PROTOCOL_InitModules();
 void PROTOCOL_ResetTelemetry();
 enum Radio PROTOCOL_GetRadio(u16 idx);
+int PROTOCOL_RangeTest(int on);
 
 
 /* Input */
