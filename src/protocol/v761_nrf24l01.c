@@ -174,17 +174,11 @@ static void V761_init()
 
 static void V761_initialize_txid()
 {
-    // TODO(): try arbitrary rx_tx_addr & frequencies (except hopping_frequency[0])
-    // testing for random Rx_tx_address
-    memcpy(rx_tx_addr, (u8 *)"\x47\x93\x45\xD5", 4);  // random 4 bytes x47\x93\x45\xD5
-    // Actual rx_tx_addr from SPI grab)
-    // memcpy(rx_tx_addr,(u8 *)"\x6f\x2c\xb1\x93",4);
-    memcpy(hopping_frequency, (u8 *)"\x14\x32\x46", 3);  // random 2 bytes for hopping_frequency[1] = 0x32 hopping_frequency[2] = 0x46;
-    // Actual hopping_frequency from SPI grab)
-    // memcpy(hopping_frequency,(u8 *)"\x14\x1e\x4b",3);
-    // hopping_frequency[0] = 0x14; // not sure if this one is const or calculated ... // combined into one memcopy
-    // hopping_frequency[1] = 0x1e; //combined into one memcopy
-    // hopping_frequency[2] = 0x4b; //combined into one memcopy
+    // TODO: try arbitrary rx_tx_addr & frequencies (except hopping_frequency[0])
+    //Actual rx_tx_addr from SPI grab)
+    memcpy(rx_tx_addr, (uint8_t *)"\x6f\x2c\xb1\x93", 4);
+    //Actual hopping_frequency from SPI grab)
+    memcpy(hopping_frequency, (uint8_t *)"\x14\x1e\x4b", 3);
 }
 
 static u16 V761_callback()
