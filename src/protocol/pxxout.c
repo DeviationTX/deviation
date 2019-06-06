@@ -57,6 +57,7 @@ static u8 packet[PXX_PKT_BYTES];
 static u16 failsafe_count;
 static u8 chan_offset;
 static u8 FS_flag;
+static u8 range_check;
  
 enum XJTRFProtocols {
   RF_PROTO_OFF = -1,
@@ -112,11 +113,6 @@ static u16 crc(u8 *data, u8 len) {
   for(int i=0; i < len; i++)
       crc = (crc<<8) ^ CRCTable[((u8)(crc>>8) ^ *data++) & 0xFF];
   return crc;
-}
-
-static u8 power_to_r9m() {
-    if (Model.tx_power >= TXPOWER_10mW) return Model.tx_power - TXPOWER_10mW;
-    return TXPOWER_100uW;
 }
 
 //#define STICK_SCALE    819  // full scale at +-125
@@ -192,7 +188,7 @@ static void build_data_pkt(u8 bind)
     if (bind) {
         // if b0, then b1..b2 = country code (us 0, japan 1, eu 2 ?)
         packet[1] |= PXX_SEND_BIND | (Model.proto_opts[PROTO_OPTS_COUNTRY] << 1);
-    } else if (Model.tx_power == TXPOWER_100uW) {   // RANGE_test() sets power to 100uW
+    } else if (range_check) {
         packet[1] |= PXX_SEND_RANGECHECK;
     } else {
         packet[1] |= FS_flag;
@@ -215,7 +211,7 @@ static void build_data_pkt(u8 bind)
     // b2: set receiver PWM output to channels 9-16
     // b3-4: RF power setting
     // b5: set to disable R9M S.Port output
-    packet[15] = (power_to_r9m() << 3)
+    packet[15] = (Model.tx_power << 3)
                | (Model.proto_opts[PROTO_OPTS_RXTELEM] << 1)
                | (Model.proto_opts[PROTO_OPTS_RXPWM] << 2);
 
@@ -302,6 +298,7 @@ static void initialize(u8 bind)
     failsafe_count = 0;
     chan_offset = 0;
     FS_flag = 0;
+    range_check = 0;
     packet[0] = (u8) Model.fixed_id & 0x3f;  // limit to valid range - 6 bits
     mixer_runtime = 50;
 
@@ -340,6 +337,8 @@ uintptr_t PXXOUT_Cmds(enum ProtoCmds cmd)
             return 0;
 #endif
         case PROTOCMD_CHANNELMAP: return UNCHG;
+        case PROTOCMD_RANGETESTON: range_check = 1; return 1;
+        case PROTOCMD_RANGETESTOFF: range_check = 0; return 1;
         default: break;
     }
     return 0;

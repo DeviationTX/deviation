@@ -386,6 +386,17 @@ void PROTOCOL_ResetTelemetry()
         PROTO_Cmds(PROTOCMD_TELEMETRYRESET);
 }
 
+int PROTOCOL_RangeTest(int on)
+{
+    if (Model.protocol != PROTOCOL_NONE && PROTOCOL_LOADED) {
+        if (on)
+            return PROTO_Cmds(PROTOCMD_RANGETESTON);
+        else
+            return PROTO_Cmds(PROTOCMD_RANGETESTOFF);
+    }
+    return 0;
+}
+
 void PROTOCOL_CheckDialogs()
 {
     if (proto_state & PROTO_MODULEDLG) {
