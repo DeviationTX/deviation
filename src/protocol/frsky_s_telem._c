@@ -71,13 +71,16 @@ static u8 sport_crc(u8 *data) {
     return 0x00ff - crc;
 }
 
+static u8 check_sport_crc(u8 *data) {
+    return sport_crc(data) == data[8];
+}
 
 static void processSportPacket(u8 *packet) {
 //    u8  instance = (packet[0] & 0x1F) + 1;    // all instances of same sensor write to same telemetry value
     u8  prim = packet[1];
     u16 id = *((u16 *)(packet+2));
 
-        serial_echo(packet);   // echo to trainer port
+    serial_echo(packet);   // echo to trainer port
 
     if (prim != DATA_FRAME)
         return;
@@ -257,9 +260,14 @@ typedef enum {
 } SportStates;
 static SportStates dataState = STATE_DATA_IDLE;   // file scope so can be reset on loss of rx packet sync
 
-static void frsky_parse_sport_stream(u8 data) {
+typedef enum {
+    SPORT_CRC = 0,
+    SPORT_NOCRC = 1
+} sport_crc_t;
+
+static void frsky_parse_sport_stream(u8 data, sport_crc_t crc_configure) {
     static u8 sportRxBufferCount;
-    static u8 sportRxBuffer[FRSKY_SPORT_PACKET_SIZE];   // Receive buffer. 8 bytes (full packet)
+    static u8 sportRxBuffer[FRSKY_SPORT_PACKET_SIZE];   // Receive buffer. 8 bytes no crc, 9 bytes with crc
 
     switch (dataState) {
     case STATE_DATA_START:
@@ -267,7 +275,7 @@ static void frsky_parse_sport_stream(u8 data) {
             dataState = STATE_DATA_IN_FRAME ;
             sportRxBufferCount = 0;
         } else {
-            if (sportRxBufferCount < FRSKY_SPORT_PACKET_SIZE)
+            if (sportRxBufferCount < FRSKY_SPORT_PACKET_SIZE - crc_configure)
                 sportRxBuffer[sportRxBufferCount++] = data;
             dataState = STATE_DATA_IN_FRAME;
         }
@@ -281,13 +289,13 @@ static void frsky_parse_sport_stream(u8 data) {
             dataState = STATE_DATA_IN_FRAME ;
             sportRxBufferCount = 0;
         }
-        else if (sportRxBufferCount < FRSKY_SPORT_PACKET_SIZE) {
+        else if (sportRxBufferCount < FRSKY_SPORT_PACKET_SIZE - crc_configure) {
             sportRxBuffer[sportRxBufferCount++] = data;
         }
         break;
 
     case STATE_DATA_XOR:
-        if (sportRxBufferCount < FRSKY_SPORT_PACKET_SIZE) {
+        if (sportRxBufferCount < FRSKY_SPORT_PACKET_SIZE - crc_configure) {
           sportRxBuffer[sportRxBufferCount++] = data ^ STUFF_MASK;
         }
         dataState = STATE_DATA_IN_FRAME;
@@ -301,9 +309,9 @@ static void frsky_parse_sport_stream(u8 data) {
         break;
     } // switch
 
-    if (sportRxBufferCount >= FRSKY_SPORT_PACKET_SIZE) {
+    if (sportRxBufferCount >= FRSKY_SPORT_PACKET_SIZE - crc_configure) {
         dataState = STATE_DATA_IDLE;
-        if (data == sport_crc(sportRxBuffer))
+        if (crc_configure == SPORT_NOCRC || check_sport_crc(sportRxBuffer))
             processSportPacket(sportRxBuffer);
     }
 }
