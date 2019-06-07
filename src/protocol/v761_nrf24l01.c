@@ -174,12 +174,11 @@ static void V761_init()
 
 static void V761_initialize_txid()
 {
-    // TODO: try arbitrary rx_tx_addr & frequencies (except hopping_frequency[0])
     if (Model.fixed_id & 1)
     {
         // dump from SPI grab)
         memcpy(rx_tx_addr, (uint8_t *)"\x6f\x2c\xb1\x93", 4);
-        //Actual hopping_frequency from SPI grab)
+        // Actual hopping_frequency from SPI grab)
         memcpy(hopping_frequency, (uint8_t *)"\x14\x1e\x4b", 3);
     }
     else
