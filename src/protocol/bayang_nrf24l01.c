@@ -366,7 +366,7 @@ static int check_rx(void)
             const u8 pid_term = packet[8] >> 6;
             chanval.bytes.msb = packet[8] & 0x3F;
             chanval.bytes.lsb = packet[9];
-            int telem_idx;
+            int telem_idx = 0;
             switch (pid_term) {
                 case 0:  // P
                     telem_idx = TELEM_DSM_FLOG_FADESA;
