@@ -368,13 +368,13 @@ static int check_rx(void)
             chanval.bytes.lsb = packet[9];
             int telem_idx;
             switch (pid_term) {
-                case 0: // P
+                case 0:  // P
                     telem_idx = TELEM_DSM_FLOG_FADESA;
                     break;
-                case 1: // I
+                case 1:  // I
                     telem_idx = TELEM_DSM_FLOG_FADESB;
                     break;
-                case 2: // D
+                case 2:  // D
                     telem_idx = TELEM_DSM_FLOG_FADESR;
                     break;
             }
