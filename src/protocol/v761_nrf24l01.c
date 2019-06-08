@@ -121,7 +121,7 @@ static void V761_send_packet()
         packet[0] = scale_channel(Channels[CHANNEL3], CHAN_MIN_VALUE, CHAN_MAX_VALUE, 0, 0xff);  // throttle
         packet[1] = scale_channel(Channels[CHANNEL4], CHAN_MIN_VALUE, CHAN_MAX_VALUE, 0xff, 0) >> 1;  // rudder
         packet[2] = scale_channel(Channels[CHANNEL2], CHAN_MIN_VALUE, CHAN_MAX_VALUE, 0xff, 0) >> 1;  // elevator
-        packet[3] = 0x3f;  // no functional implementation in this model, possibly optional aileron channel for 4ch version?
+        packet[1] = scale_channel(Channels[CHANNEL1], CHAN_MIN_VALUE, CHAN_MAX_VALUE, 0xff, 0) >> 1; // Aileron
         packet[5] = (packet_count++ / 3) << 6;
         packet[4] = (packet[5] == 0x40) ? 0x1a : 0x20;
 
