@@ -174,18 +174,24 @@ static void V761_init()
 
 static void V761_initialize_txid()
 {
-    if (Model.fixed_id & 1)
-    {
-        // dump from SPI grab)
-        memcpy(rx_tx_addr, (uint8_t *)"\x6f\x2c\xb1\x93", 4);
-        // Actual hopping_frequency from SPI grab)
-        memcpy(hopping_frequency, (uint8_t *)"\x14\x1e\x4b", 3);
-    }
-    else
-    {
-        // Dump from air on Protonus TX
-        memcpy(rx_tx_addr, (uint8_t *)"\xE8\xE4\x45\x09", 4);
-        memcpy(hopping_frequency, (uint8_t *)"\x0D\x21\x44", 3);
+    // use address / frequencies dumped from stock transmitters
+    switch (Model.fixed_id % 3) {
+        case 0:
+            // dump from SPI grab)
+            memcpy(rx_tx_addr, (uint8_t *)"\x6f\x2c\xb1\x93", 4);
+            // Actual hopping_frequency from SPI grab)
+            memcpy(hopping_frequency, (uint8_t *)"\x14\x1e\x4b", 3);
+            break;
+        case 1:
+            // Dump from air on Protonus TX
+            memcpy(rx_tx_addr, (uint8_t *)"\xE8\xE4\x45\x09", 4);
+            memcpy(hopping_frequency, (uint8_t *)"\x0D\x21\x44", 3);
+            break;
+        case 2:
+            // Dump from air on mshagg2 TX
+            memcpy(rx_tx_addr, (uint8_t *)"\xAE\xD1\x45\x09", 4);
+            memcpy(hopping_frequency, (uint8_t *)"\x13\x1D\x4A", 3);
+            break;
     }
 }
 
