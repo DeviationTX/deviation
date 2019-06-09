@@ -19,6 +19,9 @@
 // TELEM_DSM_FLOG_HOLDS - rx reception strenght ( packets per second )
 // TELEM_DSM_FLOG_FRAMELOSS - tx telemetry reception strenght ( packets per second )
 // TELEM_DSM_FLOG_FADESL - battery low flag ( LVC )
+// TELEM_DSM_FLOG_FADESA - Kp ( multiplied by 1000 )
+// TELEM_DSM_FLOG_FADESB - Ki ( multiplied by 1000 )
+// TELEM_DSM_FLOG_FADESR - Kd ( multiplied by 1000 )
 
 #include "common.h"
 #include "interface.h"
@@ -356,6 +359,27 @@ static int check_rx(void)
             // battery low flag
             Telemetry.value[TELEM_DSM_FLOG_FADESL] = (flags & 1) ? 100 : 0;
             TELEMETRY_SetUpdated(TELEM_DSM_FLOG_FADESL);
+
+            // Multiplexed P, I, D values in packet[8] and packet[9].
+            // The two most significant bits specify which term is sent.
+            // Remaining 14 bits represent the value: 0 .. 16383
+            const u8 pid_term = packet[8] >> 6;
+            chanval.bytes.msb = packet[8] & 0x3F;
+            chanval.bytes.lsb = packet[9];
+            int telem_idx = 0;
+            switch (pid_term) {
+                case 0:  // P
+                    telem_idx = TELEM_DSM_FLOG_FADESA;
+                    break;
+                case 1:  // I
+                    telem_idx = TELEM_DSM_FLOG_FADESB;
+                    break;
+                case 2:  // D
+                    telem_idx = TELEM_DSM_FLOG_FADESR;
+                    break;
+            }
+            Telemetry.value[telem_idx] = chanval.value;
+            TELEMETRY_SetUpdated(telem_idx);
 
             telemetry_count++;
             return 1;
