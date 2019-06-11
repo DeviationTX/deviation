@@ -118,6 +118,7 @@ static u8 rx_tx_addr[ADDRESS_LENGTH];
 
 typedef union {
     struct {
+#ifdef EMULATOR
         u8 h:1;
         u8 g:1;
         u8 f:1;
@@ -126,6 +127,16 @@ typedef union {
         u8 c:1;
         u8 b:1;
         u8 a:1;
+#else
+        u8 a:1;
+        u8 b:1;
+        u8 c:1;
+        u8 d:1;
+        u8 e:1;
+        u8 f:1;
+        u8 g:1;
+        u8 h:1;
+#endif
     } bits;
     u8 byte:8;
 } byte_bits_t;
@@ -225,7 +236,7 @@ static void process_rx(void)
 }
 
 static void propel_init()
-{   
+{
     const u8 address[] = {0x73, 0xd3, 0x31, 0x30, 0x11};
     memcpy(rx_tx_addr, address, ADDRESS_LENGTH);
 
