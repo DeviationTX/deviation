@@ -118,7 +118,6 @@ static u8 rx_tx_addr[ADDRESS_LENGTH];
 
 typedef union {
     struct {
-#ifdef EMULATOR
         u8 h:1;
         u8 g:1;
         u8 f:1;
@@ -127,16 +126,6 @@ typedef union {
         u8 c:1;
         u8 b:1;
         u8 a:1;
-#else
-        u8 a:1;
-        u8 b:1;
-        u8 c:1;
-        u8 d:1;
-        u8 e:1;
-        u8 f:1;
-        u8 g:1;
-        u8 h:1;
-#endif
     } bits;
     u8 byte:8;
 } byte_bits_t;
@@ -263,6 +252,7 @@ static void propel_init()
 }
 
 
+#define CLEAR_MASK  (BV(NRF24L01_07_RX_DR) | BV(NRF24L01_07_TX_DS) | BV(NRF24L01_07_MAX_RT))
 static u16 propel_callback()
 {
     static u8 rf_channels[] = {0x39, 0x2A, 0x18, 0x23};
@@ -272,30 +262,29 @@ static u16 propel_callback()
     case PROPEL_INIT1:
         NRF24L01_FlushTx();
         build_packet(1);
+        NRF24L01_WriteReg(NRF24L01_07_STATUS, CLEAR_MASK);
         NRF24L01_WritePayload(packet, PACKET_SIZE);
         state = PROPEL_INIT2;
         break;
 
     case PROPEL_INIT2:
-        if (!(NRF24L01_07_RX_DR & NRF24L01_ReadReg(NRF24L01_07_STATUS))) {
+        if (!(BV(NRF24L01_07_RX_DR) & NRF24L01_ReadReg(NRF24L01_07_STATUS))) {
             state = PROPEL_INIT1;
             break;
         }
         PROTOCOL_SetBindState(0);
         NRF24L01_ReadPayload(packet, PACKET_SIZE);
-        NRF24L01_WriteReg(NRF24L01_07_STATUS,
-                          NRF24L01_07_RX_DR || NRF24L01_07_TX_DS || NRF24L01_07_MAX_RT);
+        NRF24L01_WriteReg(NRF24L01_07_STATUS, CLEAR_MASK);
         /*  FALLTHROUGH  */
 
     case PROPEL_DATA1:
-        if (NRF24L01_07_RX_DR & NRF24L01_ReadReg(NRF24L01_07_STATUS)) {
+        if (BV(NRF24L01_07_RX_DR) & NRF24L01_ReadReg(NRF24L01_07_STATUS)) {
             NRF24L01_ReadPayload(packet, PACKET_SIZE);
             process_rx();
         }
         NRF24L01_WriteReg(NRF24L01_05_RF_CH, rf_channels[rf_chan++]);
         rf_chan %= sizeof rf_channels / sizeof rf_channels[0];
-        NRF24L01_WriteReg(NRF24L01_07_STATUS,
-            NRF24L01_07_RX_DR || NRF24L01_07_TX_DS || NRF24L01_07_MAX_RT);
+        NRF24L01_WriteReg(NRF24L01_07_STATUS, CLEAR_MASK);
         NRF24L01_FlushTx();
         build_packet(0);
         NRF24L01_WritePayload(packet, PACKET_SIZE);
