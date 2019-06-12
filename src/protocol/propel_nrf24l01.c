@@ -24,10 +24,12 @@
 #ifdef EMULATOR
 #define USE_FIXED_MFGID
 #define PACKET_PERIOD    450
+#define BIND_PERIOD      450
 #define dbgprintf printf
 #else
 // Timeout for callback in uSec
 #define PACKET_PERIOD    10000
+#define BIND_PERIOD      1000
 
 // printf inside an interrupt handler is really dangerous
 // this shouldn't be enabled even in debug builds without explicitly
@@ -60,8 +62,8 @@ enum {
 #define CHANNEL_CALIBRATE   CHANNEL9
 
 enum {
-    PROPEL_INIT1 = 0,
-    PROPEL_INIT2,
+    PROPEL_BIND1 = 0,
+    PROPEL_BIND2,
     PROPEL_DATA1,
 };
 
@@ -181,39 +183,54 @@ static u16 scale_channel(u8 ch, u16 destMin, u16 destMax)
 
 #define DYNTRIM(chval) ((u8)((chval >> 2) & 0xfc))
 #define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
-static void build_packet(u8 bind)
+static void bind_packet(u8 type)
 {
     memset(packet, 0, PACKET_SIZE);
 
-    if (bind) {
-        packet[0] = 0xd0;
-        memcpy(&packet[1], rx_tx_addr, 4);  // only 4 bytes sent of 5-byte address
-        packet[9] = 0x03;
-        packet[11] = 0x05;
-    } else {
-        packet[0] = 0xc0;
-        packet[1] = scale_channel(CHANNEL3, 0x2f, 0xcf);    // throttle
-        packet[2] = scale_channel(CHANNEL4, 0x2f, 0xcf);    // rudder
-        packet[3] = scale_channel(CHANNEL2, 0x2f, 0xcf);    // elevator
-        packet[4] = scale_channel(CHANNEL1, 0x2f, 0xcf);    // aileron
-        packet[5] = 0x40;
-        packet[6] = 0x40;
-        packet[7] = 0x40;
-        packet[8] = 0x40;
-        packet[9] = 0x02    //  always fast speed
-                  | GET_FLAG(CHANNEL_CALIBRATE, 0x04)
-                  | GET_FLAG(CHANNEL_ROLLCCW  , 0x80)
-                  | GET_FLAG(CHANNEL_ROLLCW   , 0x40)
-                  | GET_FLAG(CHANNEL_ALTHOLD  , 0x20);
-        packet[10] = GET_FLAG(CHANNEL_LEDS, 0x80);
-        packet[11] = 1;
-    }
+    packet[0] = 0xd0;
+    memcpy(&packet[1], rx_tx_addr, 4);  // only 4 bytes sent of 5-byte address
+    packet[9] = 0x03;
+    packet[11] = type ? 0x05 : 0x01;
+
     u16 check = checksum();
     packet[12] = check >> 8;
     packet[13] = check & 0xff;
 
 #ifdef EMULATOR
-    dbgprintf("bind %d, data %02x", bind, packet[0]);
+    dbgprintf("type %d, data %02x", type, packet[0]);
+    for (int i = 1; i < PACKET_SIZE; i++)
+        dbgprintf(" %02x", packet[i]);
+    dbgprintf("\n");
+#endif
+}
+
+static void data_packet()
+{
+    memset(packet, 0, PACKET_SIZE);
+
+    packet[0] = 0xc0;
+    packet[1] = scale_channel(CHANNEL3, 0x2f, 0xcf);    // throttle
+    packet[2] = scale_channel(CHANNEL4, 0x2f, 0xcf);    // rudder
+    packet[3] = scale_channel(CHANNEL2, 0x2f, 0xcf);    // elevator
+    packet[4] = scale_channel(CHANNEL1, 0x2f, 0xcf);    // aileron
+    packet[5] = 0x40;
+    packet[6] = 0x40;
+    packet[7] = 0x40;
+    packet[8] = 0x40;
+    packet[9] = 0x02    //  always fast speed
+              | GET_FLAG(CHANNEL_CALIBRATE, 0x04)
+              | GET_FLAG(CHANNEL_ROLLCCW  , 0x80)
+              | GET_FLAG(CHANNEL_ROLLCW   , 0x40)
+              | GET_FLAG(CHANNEL_ALTHOLD  , 0x20);
+    packet[10] = GET_FLAG(CHANNEL_LEDS, 0x80);
+    packet[11] = 1;
+
+    u16 check = checksum();
+    packet[12] = check >> 8;
+    packet[13] = check & 0xff;
+
+#ifdef EMULATOR
+    dbgprintf("data %02x", packet[0]);
     for (int i = 1; i < PACKET_SIZE; i++)
         dbgprintf(" %02x", packet[i]);
     dbgprintf("\n");
@@ -257,25 +274,35 @@ static u16 propel_callback()
 {
     static u8 rf_channels[] = {0x39, 0x2A, 0x18, 0x23};
     static u8 rf_chan;
+    u8 status;
 
     switch (state) {
-    case PROPEL_INIT1:
+    case PROPEL_BIND1:
         NRF24L01_FlushTx();
-        build_packet(1);
         NRF24L01_WriteReg(NRF24L01_07_STATUS, CLEAR_MASK);
+        bind_packet(1);
         NRF24L01_WritePayload(packet, PACKET_SIZE);
-        state = PROPEL_INIT2;
+        state = PROPEL_BIND2;
+        return BIND_PERIOD;
         break;
 
-    case PROPEL_INIT2:
-        if (!(BV(NRF24L01_07_RX_DR) & NRF24L01_ReadReg(NRF24L01_07_STATUS))) {
-            state = PROPEL_INIT1;
-            break;
+    case PROPEL_BIND2:
+        status = NRF24L01_ReadReg(NRF24L01_07_STATUS);
+        if (BV(NRF24L01_07_MAX_RT) & status) {
+            state = PROPEL_BIND1;
+            return BIND_PERIOD;
         }
+        if (!(BV(NRF24L01_07_RX_DR) & status))
+            return BIND_PERIOD;
+
         PROTOCOL_SetBindState(0);
         NRF24L01_ReadPayload(packet, PACKET_SIZE);
         NRF24L01_WriteReg(NRF24L01_07_STATUS, CLEAR_MASK);
-        /*  FALLTHROUGH  */
+        NRF24L01_FlushTx();
+        bind_packet(0);
+        NRF24L01_WritePayload(packet, PACKET_SIZE);
+        state = PROPEL_DATA1;
+        break;
 
     case PROPEL_DATA1:
         if (BV(NRF24L01_07_RX_DR) & NRF24L01_ReadReg(NRF24L01_07_STATUS)) {
@@ -286,7 +313,7 @@ static u16 propel_callback()
         rf_chan %= sizeof rf_channels / sizeof rf_channels[0];
         NRF24L01_WriteReg(NRF24L01_07_STATUS, CLEAR_MASK);
         NRF24L01_FlushTx();
-        build_packet(0);
+        data_packet();
         NRF24L01_WritePayload(packet, PACKET_SIZE);
 
         break;
@@ -325,7 +352,7 @@ static void initialize()
 
     initialize_txid();
     propel_init();
-    state = PROPEL_INIT1;
+    state = PROPEL_BIND1;
 
     PROTOCOL_SetBindState(0xFFFFFFFF);
     CLOCK_StartTimer(500, propel_callback);
