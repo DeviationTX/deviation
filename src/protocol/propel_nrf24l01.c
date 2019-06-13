@@ -18,6 +18,7 @@
 #include "mixer.h"
 #include "config/model.h"
 #include "config/tx.h"          // for Transmitter
+#include "telemetry.h"
 
 #ifdef PROTO_HAS_NRF24L01
 
@@ -77,9 +78,6 @@ static u8 packet[PACKET_SIZE];
 static u8 tx_power;
 static u8 rx_tx_addr[ADDRESS_LENGTH];
 
-// Bit vector from bit position
-#define BV(bit) (1 << bit)
-
 // equations for checksum check byte from truth table
 // (1)  z =  a && !b
 //       ||  a && !c && !d
@@ -138,7 +136,7 @@ static u16 checksum()
     for (int i = 1; i < PACKET_SIZE - 2; i++)
         sum += packet[i];
 
-    byte_bits_t in = { .byte = sum };
+    byte_bits_t in  = { .byte = sum };
     byte_bits_t out = { .byte = sum ^ 0x0a};
     out.bits.d = !(in.bits.d ^ in.bits.h);
     out.bits.c = (!in.bits.c && !in.bits.d &&  in.bits.g)
@@ -195,6 +193,8 @@ static void bind_packet(u8 type)
     u16 check = checksum();
     packet[12] = check >> 8;
     packet[13] = check & 0xff;
+Telemetry.value[TELEM_FRSKY_CELL1] = packet[13];
+TELEMETRY_SetUpdated(TELEM_FRSKY_CELL1);
 
 #ifdef EMULATOR
     dbgprintf("type %d, data %02x", type, packet[0]);
@@ -228,6 +228,8 @@ static void data_packet()
     u16 check = checksum();
     packet[12] = check >> 8;
     packet[13] = check & 0xff;
+Telemetry.value[TELEM_FRSKY_CELL1] = packet[13];
+TELEMETRY_SetUpdated(TELEM_FRSKY_CELL1);
 
 #ifdef EMULATOR
     dbgprintf("data %02x", packet[0]);
@@ -249,6 +251,7 @@ static void propel_init()
     NRF24L01_Initialize();
     NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x3f);       // AA on all pipes
     NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x3f);   // Enable all pipes
+    NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x03);    // Enable all pipes
     NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0x36);  // retransmit 1ms, 6 times
     NRF24L01_WriteReg(NRF24L01_05_RF_CH, 0x23);       // bind channel
     NRF24L01_SetBitrate(NRF24L01_BR_1M);              // 1Mbps
@@ -258,17 +261,15 @@ static void propel_init()
     NRF24L01_WriteReg(NRF24L01_1D_FEATURE, 0x07);     // Enable all features
     // Beken 2425 register bank 1 initialized here in stock tx capture
     // Hopefully won't matter for nRF compatibility
-    NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x8f);  // not supposed to write bit7?
-    NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0,
-            rx_tx_addr, sizeof rx_tx_addr);
-    NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR,
-            rx_tx_addr, sizeof rx_tx_addr);
+    NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x0f);
+    NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, rx_tx_addr, ADDRESS_LENGTH);
+    NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, rx_tx_addr, ADDRESS_LENGTH);
     NRF24L01_FlushTx();
-    NRF24L01_FlushRx();
     NRF24L01_SetTxRxMode(TX_EN);
 }
 
 
+#define BV(bit) (1 << bit)
 #define CLEAR_MASK  (BV(NRF24L01_07_RX_DR) | BV(NRF24L01_07_TX_DS) | BV(NRF24L01_07_MAX_RT))
 static u16 propel_callback()
 {
@@ -278,8 +279,8 @@ static u16 propel_callback()
 
     switch (state) {
     case PROPEL_BIND1:
-        NRF24L01_FlushTx();
         NRF24L01_WriteReg(NRF24L01_07_STATUS, CLEAR_MASK);
+        NRF24L01_FlushTx();
         bind_packet(1);
         NRF24L01_WritePayload(packet, PACKET_SIZE);
         state = PROPEL_BIND2;
@@ -288,12 +289,18 @@ static u16 propel_callback()
 
     case PROPEL_BIND2:
         status = NRF24L01_ReadReg(NRF24L01_07_STATUS);
+Telemetry.value[TELEM_FRSKY_CELL2] = status;
+TELEMETRY_SetUpdated(TELEM_FRSKY_CELL2);
         if (BV(NRF24L01_07_MAX_RT) & status) {
             state = PROPEL_BIND1;
             return BIND_PERIOD;
         }
+Telemetry.value[TELEM_FRSKY_CELL3] = status;
+TELEMETRY_SetUpdated(TELEM_FRSKY_CELL3);
         if (!(BV(NRF24L01_07_RX_DR) & status))
             return BIND_PERIOD;
+Telemetry.value[TELEM_FRSKY_CELL4] = status;
+TELEMETRY_SetUpdated(TELEM_FRSKY_CELL4);
 
         PROTOCOL_SetBindState(0);
         NRF24L01_ReadPayload(packet, PACKET_SIZE);
@@ -381,6 +388,10 @@ uintptr_t Propel_Cmds(enum ProtoCmds cmd)
         return Model.fixed_id;
     case PROTOCMD_CHANNELMAP:
         return AETRG;
+    case PROTOCMD_TELEMETRYSTATE:
+        return PROTO_TELEM_ON;
+    case PROTOCMD_TELEMETRYTYPE:
+        return TELEM_FRSKY;
     default:
         break;
     }
