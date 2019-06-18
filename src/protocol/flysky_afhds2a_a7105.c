@@ -171,13 +171,13 @@ static int afhds2a_init()
     A7105_WriteReg(0x25, 0x0A);
 
     A7105_SetTxRxMode(TX_EN);
-    
+
     A7105_SetPower(Model.tx_power);
     tx_power = Model.tx_power;
-    
+
     freq_offset = Model.proto_opts[PROTOOPTS_FREQTUNE];
     A7105_AdjustLOBaseFreq(freq_offset);
-    
+
     A7105_Strobe(A7105_STANDBY);
     A7105_SetTxRxMode(TX_EN);
     return 1;
@@ -335,13 +335,95 @@ static void set_telemetry(frsky_telem_t offset, s32 value) {
     TELEMETRY_SetUpdated(offset);
 }
 
+#if HAS_EXTENDED_TELEMETRY
+// from https://github.com/qba667/FlySkyI6/blob/2e10f354e72779246357adb778ba785f19cb397f/source/source/alt.c#L47
+#define precision 15
+#define FIXED(val) (val << precision)
+#define DECIMAL(val) (val >> precision)
+#define TMP_OFFSET 19
+#define ALT_MASK 0x7FFFF;
+#define R_DIV_G_MUL_10_Q15 UINT64_C(9591506)
+#define INV_LOG2_E_Q1DOT31 UINT64_C(0x58b90bfc)  // Inverse log base 2 of e
+
+
+static uint16_t ibusTempToK(int16_t tempertureIbus) {
+    return (uint16_t)(tempertureIbus - 400) + 2731;
+}
+
+static int32_t log2fix(uint32_t x) {
+    int32_t b = 1U << (precision - 1);
+    int32_t y = 0;
+    while (x < 1U << precision) {
+            x <<= 1;
+            y -= 1U << precision;
+    }
+
+    while (x >= 2U << precision) {
+            x >>= 1;
+            y += 1U << precision;
+    }
+
+    uint64_t z = x;
+    for (size_t i = 0; i < precision; i++) {
+//        z = __mul64(z, z) >> precision;
+        z = (z * z) >> precision;
+        if (z >= 2U << precision) {
+            z >>= 1;
+            y += b;
+        }
+        b >>= 1;
+    }
+    return y;
+}
+
+static int getAlt(uint32_t pressurePa, uint16_t temperatureIbus) {
+    static uint16_t initPressure = 0;
+    static uint16_t initTemperature = 0;
+
+    if (pressurePa == 0) return 0;
+    uint16_t temperatureK = ibusTempToK(temperatureIbus);
+    if (initPressure <= 0) {
+            initTemperature = ibusTempToK(temperatureIbus);
+    }
+    int temperature = (initTemperature + temperatureK) >> 1;
+    int tempNegative = temperature < 0;
+    if (tempNegative)  temperature = temperature * -1;
+    uint64_t helper = R_DIV_G_MUL_10_Q15;
+//    helper = __mul64(helper, (uint64_t)temperature);
+    helper = helper * (uint64_t)temperature;
+    helper = helper >> precision;
+
+    uint32_t po_to_p = (uint32_t)(initPressure << (precision-1));
+//    po_to_p = div_(po_to_p, pressurePa);
+    po_to_p = po_to_p / pressurePa;
+    // shift missing bit
+    po_to_p = po_to_p << 1;
+    if (po_to_p == 0) return 0;
+//    uint64_t t =  __mul64(log2fix(po_to_p), INV_LOG2_E_Q1DOT31);
+    uint64_t t =  log2fix(po_to_p) * (uint64_t) INV_LOG2_E_Q1DOT31;
+    int32_t ln = t >> 31;
+    int neg = ln < 0;
+    if (neg) ln = ln * -1;
+//    helper = __mul64(helper, (uint64_t)ln);
+    helper = helper * (uint64_t)ln;
+    helper = helper >> precision;
+    int result = (int)helper;
+
+    if (neg ^ tempNegative) result = result * - 1;
+    initPressure = pressurePa;
+    initTemperature = temperature;
+    return result;
+}
+// end pressure sensor code
+#endif
+
 static void update_telemetry()
 {
     // 0    1234   5678   9           10         11       12
     // AA | TXID | RXID | sensor id | sensor # | value 16 bit big endian | sensor id ......
     // AC | TXID | RXID | sensor id | sensor # | length | value 32 bit big endian | sensor id ......
     // max 7 sensors per packet
-    
+
     u8 voltage_index = 0;
     u8 index = 9;   // first sensor ID in telemetry packet
     u16 data16 = packet[index+3] << 8 | packet[index+2];
@@ -353,7 +435,6 @@ static void update_telemetry()
 #endif
 
     while (index <= 32 && packet[index] != 0xff) {
-//TODO    printf("type %x, sensor id 0x%02x   ", packet[0], packet[index]);
         switch(packet[index]) {
         case SENSOR_VOLTAGE:
             voltage_index++;
@@ -382,8 +463,8 @@ static void update_telemetry()
             }
             break;
         case SENSOR_PRES:
-            set_telemetry(TELEM_FRSKY_TEMP1, ((data32 >> 19) -400)/10);
-            // Use getALT() to convert pressure and temp to altitude. set_telemetry(TELEM_FRSKY_ALTITUDE, data32 & 0x7ffff);
+            set_telemetry(TELEM_FRSKY_TEMP1, ((data32 >> 19) - 400)/10);
+            set_telemetry(TELEM_FRSKY_ALTITUDE, getAlt(data32 & 0x7ffff, data32 >> 19));
             break;
         case SENSOR_CELL_VOLTAGE:
             if (cell_index < 6) {
@@ -449,10 +530,8 @@ static void update_telemetry()
             break;
         default:
             // unknown sensor ID or end of list
-//TODO            printf("unknown");
             break;
         }
-//TODO        printf("\n");
         if (packet[0] == 0xaa)
             index += ((packet[index] & 0xf0) == 0x80 ? 6 : 4);
         else
@@ -463,7 +542,7 @@ static void update_telemetry()
         Telemetry.value[TELEM_FRSKY_ALL_CELL] = cell_total;
         TELEMETRY_SetUpdated(TELEM_FRSKY_ALL_CELL);
     }
-#endif 
+#endif
 }
 
 static void build_bind_packet()
@@ -541,7 +620,7 @@ static void calc_fh_channels(uint32_t seed)
 static void initialize_tx_id()
 {
     u32 lfsr = 0x7649eca9ul;
-    
+
 #ifndef USE_FIXED_MFGID
     u8 var[12];
     MCU_SerialNumber(var, 12);
@@ -557,7 +636,7 @@ static void initialize_tx_id()
        for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
            rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
     }
-    
+
     // Pump zero bytes for LFSR to diverge more
     for (int i = 0; i < TXID_SIZE; ++i) rand32_r(&lfsr, 0);
 
@@ -565,7 +644,7 @@ static void initialize_tx_id()
         txid[i] = lfsr & 0xff;
         rand32_r(&lfsr, i);
     }
-    
+
     // Use LFSR to seed frequency hopping sequence after another
     // divergence round
     for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
@@ -584,7 +663,7 @@ static u16 afhds2a_cb()
     switch(state) {
         case BIND1:
         case BIND2:
-        case BIND3:    
+        case BIND3:
             A7105_Strobe(A7105_STANDBY);
             A7105_SetTxRxMode(TX_EN);
             build_bind_packet();
@@ -601,11 +680,11 @@ static u16 afhds2a_cb()
                     if(packet[9] == 0x01)
                         state = BIND4;
                 }
-            } 
+            }
             packet_count++;
             state |= WAIT_WRITE;
             return 1700;
-        
+
         case BIND1|WAIT_WRITE:
         case BIND2|WAIT_WRITE:
         case BIND3|WAIT_WRITE:
@@ -616,7 +695,7 @@ static u16 afhds2a_cb()
             if(state > BIND3)
                 state = BIND1;
             return 2150;
-        
+
         case BIND4:
             A7105_Strobe(A7105_STANDBY);
             A7105_SetTxRxMode(TX_EN);
@@ -624,22 +703,22 @@ static u16 afhds2a_cb()
             A7105_WriteData(packet, 38, packet_count%2 ? 0x0d : 0x8c);
             packet_count++;
             bind_reply++;
-            if(bind_reply>=4) { 
+            if (bind_reply >= 4) {
                 packet_count=0;
                 channel=1;
                 state = DATA1;
                 PROTOCOL_SetBindState(0);
-            }                        
+            }
             state |= WAIT_WRITE;
             return 1700;
-            
+
         case BIND4|WAIT_WRITE:
             A7105_SetTxRxMode(RX_EN);
             A7105_Strobe(A7105_RX);
             state &= ~WAIT_WRITE;
             return 2150;
-        
-        case DATA1:    
+
+        case DATA1:
             A7105_Strobe(A7105_STANDBY);
             A7105_SetTxRxMode(TX_EN);
             build_packet(packet_type);
@@ -679,7 +758,7 @@ static u16 afhds2a_cb()
             packet_count++;
             state |= WAIT_WRITE;
             return 1700;
-            
+
         case DATA1|WAIT_WRITE:
             state &= ~WAIT_WRITE;
             A7105_SetTxRxMode(RX_EN);
