@@ -377,8 +377,8 @@ static int32_t log2fix(uint32_t x) {
 }
 
 static int getAlt(uint32_t pressurePa, uint16_t temperatureIbus) {
-    static uint16_t initPressure = 0;
-    static uint16_t initTemperature = 0;
+    static uint32_t initPressure = 100000;
+    static uint32_t initTemperature = 617;
 
     if (pressurePa == 0) return 0;
     uint16_t temperatureK = ibusTempToK(temperatureIbus);
@@ -410,8 +410,6 @@ static int getAlt(uint32_t pressurePa, uint16_t temperatureIbus) {
     int result = (int)helper;
 
     if (neg ^ tempNegative) result = result * - 1;
-    initPressure = pressurePa;
-    initTemperature = temperature;
     return result;
 }
 // end pressure sensor code
@@ -736,6 +734,7 @@ static u16 afhds2a_cb()
                 A7105_SetPower(Model.tx_power);
                 tx_power = Model.tx_power;
             }
+#ifndef EMULATOR
             // got some data from RX ?
             // we've no way to know if RX fifo has been filled
             // as we can't poll GIO1 or GIO2 to check WTR
@@ -755,15 +754,27 @@ static u16 afhds2a_cb()
                     }
                 }
             }
+#else
+#include "../../protocol_dev/telem_flysky/telem_data.txt"
+            static u16 row;
+
+            memcpy(packet, telem_data[row], sizeof telem_data[0]);
+            row += 1;
+            if ( row >= sizeof telem_data / sizeof telem_data[0]) row = 0;
+            update_telemetry();
+#endif
             packet_count++;
             state |= WAIT_WRITE;
+#ifndef EMULATOR
             return 1700;
-
+#else
+            return 17;
+#endif
         case DATA1|WAIT_WRITE:
             state &= ~WAIT_WRITE;
             A7105_SetTxRxMode(RX_EN);
             A7105_Strobe(A7105_RX);
-            return 2150;
+            return 21;
     }
     return 3850; // never reached, please the compiler
 }
@@ -793,7 +804,11 @@ static void initialize(u8 bind)
         rxid[3] = (Model.proto_opts[PROTOOPTS_RXID2]) & 0xff;
     }
     channel = 0;
+#ifndef EMULATOR
     CLOCK_StartTimer(50000, afhds2a_cb);
+#else
+    CLOCK_StartTimer(500, afhds2a_cb);
+#endif
 }
 
 uintptr_t AFHDS2A_Cmds(enum ProtoCmds cmd)
