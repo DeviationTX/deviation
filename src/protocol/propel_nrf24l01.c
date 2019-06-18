@@ -29,8 +29,8 @@
 #define dbgprintf printf
 #else
 // Timeout for callback in uSec
-#define PACKET_PERIOD    10000
-#define BIND_PERIOD      1000
+#define PACKET_PERIOD    14000
+#define BIND_PERIOD      1500
 
 // printf inside an interrupt handler is really dangerous
 // this shouldn't be enabled even in debug builds without explicitly
@@ -185,10 +185,10 @@ static void bind_packet(u8 type)
 {
     memset(packet, 0, PACKET_SIZE);
 
-    packet[0] = 0xd0;
+    packet[0] = 0xD0;
     memcpy(&packet[1], rx_tx_addr, 4);  // only 4 bytes sent of 5-byte address
     packet[9] = 0x03;
-    packet[11] = type ? 0x05 : 0x01;
+    packet[11] = 0x05;
 
     u16 check = checksum();
     packet[12] = check >> 8;
@@ -208,7 +208,7 @@ static void data_packet()
 {
     memset(packet, 0, PACKET_SIZE);
 
-    packet[0] = 0xc0;
+    packet[0] = 0xC0;
     packet[1] = scale_channel(CHANNEL3, 0x2f, 0xcf);    // throttle
     packet[2] = scale_channel(CHANNEL4, 0x2f, 0xcf);    // rudder
     packet[3] = scale_channel(CHANNEL2, 0x2f, 0xcf);    // elevator
@@ -223,7 +223,7 @@ static void data_packet()
               | GET_FLAG(CHANNEL_ROLLCW   , 0x40)
               | GET_FLAG(CHANNEL_ALTHOLD  , 0x20);
     packet[10] = GET_FLAG(CHANNEL_LEDS, 0x80);
-    packet[11] = 1;
+    packet[11] = 5;
 
     u16 check = checksum();
     packet[12] = check >> 8;
@@ -251,21 +251,20 @@ static void propel_init()
     NRF24L01_Initialize();
     NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x3f);       // AA on all pipes
     NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x3f);   // Enable all pipes
-    NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x03);    // Enable all pipes
+    NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x03);    // 5-byte address
     NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0x36);  // retransmit 1ms, 6 times
     NRF24L01_WriteReg(NRF24L01_05_RF_CH, 0x23);       // bind channel
     NRF24L01_SetBitrate(NRF24L01_BR_1M);              // 1Mbps
     NRF24L01_SetPower(Model.tx_power);
+    NRF24L01_SetTxRxMode(TX_EN);
     NRF24L01_Activate(0x73);                          // Activate feature register
     NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 0x3f);       // Enable dynamic payload length
     NRF24L01_WriteReg(NRF24L01_1D_FEATURE, 0x07);     // Enable all features
     // Beken 2425 register bank 1 initialized here in stock tx capture
     // Hopefully won't matter for nRF compatibility
-    NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x0f);
     NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, rx_tx_addr, ADDRESS_LENGTH);
     NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, rx_tx_addr, ADDRESS_LENGTH);
     NRF24L01_FlushTx();
-    NRF24L01_SetTxRxMode(TX_EN);
 }
 
 
