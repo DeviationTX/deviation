@@ -17,7 +17,6 @@
 #include "interface.h"
 #include "mixer.h"
 #include "config/model.h"
-#include "config/tx.h"          // for Transmitter
 #include "telemetry.h"
 
 #ifdef PROTO_HAS_NRF24L01
@@ -26,11 +25,13 @@
 #define USE_FIXED_MFGID
 #define PACKET_PERIOD    450
 #define BIND_PERIOD      450
+#define BIND_COUNT       36
 #define dbgprintf printf
 #else
 // Timeout for callback in uSec
 #define PACKET_PERIOD    14000
 #define BIND_PERIOD      1500
+#define BIND_COUNT       360
 
 // printf inside an interrupt handler is really dangerous
 // this shouldn't be enabled even in debug builds without explicitly
@@ -62,21 +63,19 @@ enum {
 #define CHANNEL_ALTHOLD     CHANNEL8
 #define CHANNEL_CALIBRATE   CHANNEL9
 
-enum {
-    PROPEL_BIND1 = 0,
-    PROPEL_BIND2,
-    PROPEL_DATA1,
-};
-
-
 #define PACKET_SIZE        14
 #define RF_NUM_CHANNELS    4
 #define ADDRESS_LENGTH     5
 
-static u8 state;
+static enum {
+    PROPEL_BIND1 = 0,
+    PROPEL_BIND2,
+    PROPEL_DATA1,
+} state;
 static u8 packet[PACKET_SIZE];
 static u8 tx_power;
 static u8 rx_tx_addr[ADDRESS_LENGTH];
+static u16 bind_count;
 
 // equations for checksum check byte from truth table
 // (1)  z =  a && !b
@@ -181,7 +180,7 @@ static u16 scale_channel(u8 ch, u16 destMin, u16 destMax)
 
 #define DYNTRIM(chval) ((u8)((chval >> 2) & 0xfc))
 #define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
-static void bind_packet(u8 type)
+static void bind_packet()
 {
     memset(packet, 0, PACKET_SIZE);
 
@@ -193,11 +192,11 @@ static void bind_packet(u8 type)
     u16 check = checksum();
     packet[12] = check >> 8;
     packet[13] = check & 0xff;
-Telemetry.value[TELEM_FRSKY_CELL1] = packet[13];
-TELEMETRY_SetUpdated(TELEM_FRSKY_CELL1);
+Telemetry.value[TELEM_FRSKY_RSSI] = packet[13];
+TELEMETRY_SetUpdated(TELEM_FRSKY_RSSI);
 
 #ifdef EMULATOR
-    dbgprintf("type %d, data %02x", type, packet[0]);
+    dbgprintf("data %02x", packet[0]);
     for (int i = 1; i < PACKET_SIZE; i++)
         dbgprintf(" %02x", packet[i]);
     dbgprintf("\n");
@@ -228,8 +227,8 @@ static void data_packet()
     u16 check = checksum();
     packet[12] = check >> 8;
     packet[13] = check & 0xff;
-Telemetry.value[TELEM_FRSKY_CELL1] = packet[13];
-TELEMETRY_SetUpdated(TELEM_FRSKY_CELL1);
+Telemetry.value[TELEM_FRSKY_RSSI] = packet[13];
+TELEMETRY_SetUpdated(TELEM_FRSKY_RSSI);
 
 #ifdef EMULATOR
     dbgprintf("data %02x", packet[0]);
@@ -249,14 +248,14 @@ static void propel_init()
     memcpy(rx_tx_addr, address, ADDRESS_LENGTH);
 
     NRF24L01_Initialize();
-    NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x3f);       // AA on all pipes
+//    NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x3f);       // AA on all pipes TODO
+    NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);       // AA disabled
     NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x3f);   // Enable all pipes
     NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x03);    // 5-byte address
     NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0x36);  // retransmit 1ms, 6 times
     NRF24L01_WriteReg(NRF24L01_05_RF_CH, 0x23);       // bind channel
     NRF24L01_SetBitrate(NRF24L01_BR_1M);              // 1Mbps
     NRF24L01_SetPower(Model.tx_power);
-    NRF24L01_SetTxRxMode(TX_EN);
     NRF24L01_Activate(0x73);                          // Activate feature register
     NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 0x3f);       // Enable dynamic payload length
     NRF24L01_WriteReg(NRF24L01_1D_FEATURE, 0x07);     // Enable all features
@@ -265,6 +264,7 @@ static void propel_init()
     NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, rx_tx_addr, ADDRESS_LENGTH);
     NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, rx_tx_addr, ADDRESS_LENGTH);
     NRF24L01_FlushTx();
+    NRF24L01_SetTxRxMode(TX_EN);
 }
 
 
@@ -280,32 +280,32 @@ static u16 propel_callback()
     case PROPEL_BIND1:
         NRF24L01_WriteReg(NRF24L01_07_STATUS, CLEAR_MASK);
         NRF24L01_FlushTx();
-        bind_packet(1);
+        bind_packet();
         NRF24L01_WritePayload(packet, PACKET_SIZE);
-        state = PROPEL_BIND2;
-        return BIND_PERIOD;
+        if (bind_count-- == 0) {
+            PROTOCOL_SetBindState(0);
+            state = PROPEL_DATA1;
+        }
         break;
-
+// bind2 state only used with Auto Acknowledge
     case PROPEL_BIND2:
         status = NRF24L01_ReadReg(NRF24L01_07_STATUS);
-Telemetry.value[TELEM_FRSKY_CELL2] = status;
-TELEMETRY_SetUpdated(TELEM_FRSKY_CELL2);
+Telemetry.value[TELEM_FRSKY_VOLT1] = status;
+TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT1);
         if (BV(NRF24L01_07_MAX_RT) & status) {
             state = PROPEL_BIND1;
             return BIND_PERIOD;
         }
-Telemetry.value[TELEM_FRSKY_CELL3] = status;
-TELEMETRY_SetUpdated(TELEM_FRSKY_CELL3);
+Telemetry.value[TELEM_FRSKY_VOLT2] = status;
+TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT2);
         if (!(BV(NRF24L01_07_RX_DR) & status))
             return BIND_PERIOD;
-Telemetry.value[TELEM_FRSKY_CELL4] = status;
-TELEMETRY_SetUpdated(TELEM_FRSKY_CELL4);
 
         PROTOCOL_SetBindState(0);
         NRF24L01_ReadPayload(packet, PACKET_SIZE);
         NRF24L01_WriteReg(NRF24L01_07_STATUS, CLEAR_MASK);
         NRF24L01_FlushTx();
-        bind_packet(0);
+        bind_packet();
         NRF24L01_WritePayload(packet, PACKET_SIZE);
         state = PROPEL_DATA1;
         break;
@@ -359,8 +359,9 @@ static void initialize()
     initialize_txid();
     propel_init();
     state = PROPEL_BIND1;
+    bind_count = BIND_COUNT;
 
-    PROTOCOL_SetBindState(0xFFFFFFFF);
+    PROTOCOL_SetBindState(BIND_COUNT * PACKET_PERIOD / 1000);
     CLOCK_StartTimer(500, propel_callback);
 }
 
