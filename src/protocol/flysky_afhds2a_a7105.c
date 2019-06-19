@@ -378,7 +378,7 @@ static int32_t log2fix(uint32_t x) {
 
 static int getAlt(uint32_t pressurePa, uint16_t temperatureIbus) {
     static uint32_t initPressure = 100000;
-    static uint32_t initTemperature = 617;
+    static uint32_t initTemperature = 400;
 
     if (pressurePa == 0) return 0;
     uint16_t temperatureK = ibusTempToK(temperatureIbus);
@@ -462,7 +462,9 @@ static void update_telemetry()
             break;
         case SENSOR_PRES:
             set_telemetry(TELEM_FRSKY_TEMP1, ((data32 >> 19) - 400)/10);
-            set_telemetry(TELEM_FRSKY_ALTITUDE, getAlt(data32 & 0x7ffff, data32 >> 19));
+            int altitude = getAlt(data32 & 0x7ffff, data32 >> 19);
+            if (Model.ground_level == 0) Model.ground_level = altitude;
+            set_telemetry(TELEM_FRSKY_ALTITUDE, altitude - Model.ground_level);
             break;
         case SENSOR_CELL_VOLTAGE:
             if (cell_index < 6) {
@@ -832,6 +834,11 @@ uintptr_t AFHDS2A_Cmds(enum ProtoCmds cmd)
             return PROTO_TELEM_ON;
         case PROTOCMD_TELEMETRYTYPE:
             return TELEM_FRSKY;
+#if HAS_EXTENDED_TELEMETRY
+        case PROTOCMD_TELEMETRYRESET:
+            Model.ground_level = 0;
+            return 0;
+#endif
         case PROTOCMD_CHANNELMAP: return AETRG;
         default: break;
     }
