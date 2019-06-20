@@ -13,6 +13,7 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <math.h>
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
@@ -336,6 +337,7 @@ static void set_telemetry(frsky_telem_t offset, s32 value) {
 }
 
 #if HAS_EXTENDED_TELEMETRY
+#if 0
 // from https://github.com/qba667/FlySkyI6/blob/2e10f354e72779246357adb778ba785f19cb397f/source/source/alt.c#L47
 #define precision 15
 #define FIXED(val) (val << precision)
@@ -413,6 +415,14 @@ static int getAlt(uint32_t pressurePa, uint16_t temperatureIbus) {
     return result;
 }
 // end pressure sensor code
+#endif
+
+static int getAlt(uint32_t pressurePa, uint16_t temperatureIbus) {
+    (void) temperatureIbus;
+    // altitude = 44330 * (1 - (P/P0)**-5.25579))
+    return (int)(44330.0 * (1 - powf(pressurePa / 100000.0, -5.25579)));
+}
+
 #endif
 
 static void update_telemetry()
