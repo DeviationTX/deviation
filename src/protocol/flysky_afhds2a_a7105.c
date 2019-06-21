@@ -337,90 +337,13 @@ static void set_telemetry(frsky_telem_t offset, s32 value) {
 }
 
 #if HAS_EXTENDED_TELEMETRY
-#if 0
-// from https://github.com/qba667/FlySkyI6/blob/2e10f354e72779246357adb778ba785f19cb397f/source/source/alt.c#L47
-#define precision 15
-#define FIXED(val) (val << precision)
-#define DECIMAL(val) (val >> precision)
-#define TMP_OFFSET 19
-#define ALT_MASK 0x7FFFF;
-#define R_DIV_G_MUL_10_Q15 UINT64_C(9591506)
-#define INV_LOG2_E_Q1DOT31 UINT64_C(0x58b90bfc)  // Inverse log base 2 of e
-
-
-static uint16_t ibusTempToK(int16_t tempertureIbus) {
-    return (uint16_t)(tempertureIbus - 400) + 2731;
-}
-
-static int32_t log2fix(uint32_t x) {
-    int32_t b = 1U << (precision - 1);
-    int32_t y = 0;
-    while (x < 1U << precision) {
-            x <<= 1;
-            y -= 1U << precision;
-    }
-
-    while (x >= 2U << precision) {
-            x >>= 1;
-            y += 1U << precision;
-    }
-
-    uint64_t z = x;
-    for (size_t i = 0; i < precision; i++) {
-//        z = __mul64(z, z) >> precision;
-        z = (z * z) >> precision;
-        if (z >= 2U << precision) {
-            z >>= 1;
-            y += b;
-        }
-        b >>= 1;
-    }
-    return y;
-}
-
-static int getAlt(uint32_t pressurePa, uint16_t temperatureIbus) {
-    static uint32_t initPressure = 100000;
-    static uint32_t initTemperature = 400;
-
-    if (pressurePa == 0) return 0;
-    uint16_t temperatureK = ibusTempToK(temperatureIbus);
-    if (initPressure <= 0) {
-            initTemperature = ibusTempToK(temperatureIbus);
-    }
-    int temperature = (initTemperature + temperatureK) >> 1;
-    int tempNegative = temperature < 0;
-    if (tempNegative)  temperature = temperature * -1;
-    uint64_t helper = R_DIV_G_MUL_10_Q15;
-//    helper = __mul64(helper, (uint64_t)temperature);
-    helper = helper * (uint64_t)temperature;
-    helper = helper >> precision;
-
-    uint32_t po_to_p = (uint32_t)(initPressure << (precision-1));
-//    po_to_p = div_(po_to_p, pressurePa);
-    po_to_p = po_to_p / pressurePa;
-    // shift missing bit
-    po_to_p = po_to_p << 1;
-    if (po_to_p == 0) return 0;
-//    uint64_t t =  __mul64(log2fix(po_to_p), INV_LOG2_E_Q1DOT31);
-    uint64_t t =  log2fix(po_to_p) * (uint64_t) INV_LOG2_E_Q1DOT31;
-    int32_t ln = t >> 31;
-    int neg = ln < 0;
-    if (neg) ln = ln * -1;
-//    helper = __mul64(helper, (uint64_t)ln);
-    helper = helper * (uint64_t)ln;
-    helper = helper >> precision;
-    int result = (int)helper;
-
-    if (neg ^ tempNegative) result = result * - 1;
-    return result;
-}
-// end pressure sensor code
-#endif
 
 static int getAlt(uint32_t pressurePa, uint16_t temperatureIbus) {
     (void) temperatureIbus;
-    // altitude = 44330 * (1 - (P/P0)**-5.25579))
-    return (int)(44330.0 * (1 - powf(pressurePa / 100000.0, -5.25579)));
+    // simplified pressure to altitude calculation, since very linear
+    // at below 2000m and display is relative (AGL)
+    // y = -0.079x + 1513.
+    return (int)(-0.08 * pressurePa + 1513);
 }
 
 #endif
