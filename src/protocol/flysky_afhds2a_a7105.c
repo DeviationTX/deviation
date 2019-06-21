@@ -13,7 +13,6 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <math.h>
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
@@ -709,7 +708,11 @@ static u16 afhds2a_cb()
             state &= ~WAIT_WRITE;
             A7105_SetTxRxMode(RX_EN);
             A7105_Strobe(A7105_RX);
+#ifndef EMULATOR
+            return 2150;
+#else
             return 21;
+#endif
     }
     return 3850; // never reached, please the compiler
 }
