@@ -335,18 +335,6 @@ static void set_telemetry(frsky_telem_t offset, s32 value) {
     TELEMETRY_SetUpdated(offset);
 }
 
-#if HAS_EXTENDED_TELEMETRY
-
-static int getAlt(uint32_t pressurePa, uint16_t temperatureIbus) {
-    (void) temperatureIbus;
-    // simplified pressure to altitude calculation, since very linear
-    // at below 2000m and display is relative (AGL)
-    // y = -0.079x + 1513.
-    return (int)(-0.08 * pressurePa + 1513);
-}
-
-#endif
-
 static void update_telemetry()
 {
     // 0    1234   5678   9           10         11       12
@@ -394,7 +382,11 @@ static void update_telemetry()
             break;
         case SENSOR_PRES:
             set_telemetry(TELEM_FRSKY_TEMP1, ((data32 >> 19) - 400)/10);
-            int altitude = getAlt(data32 & 0x7ffff, data32 >> 19);
+            // simplified pressure to altitude calculation, since very linear
+            // below 2000m and display is relative (AGL)
+            // linear approximation of barometric formula in ISA at low altitude
+            // y = -0.079x + 1513, scaled to centimeters
+            int altitude = (int)(-8 * (data32 & 0x7ffff) + 151300);
             if (Model.ground_level == 0) Model.ground_level = altitude;
             set_telemetry(TELEM_FRSKY_ALTITUDE, altitude - Model.ground_level);
             break;
@@ -668,7 +660,6 @@ static u16 afhds2a_cb()
                 A7105_SetPower(Model.tx_power);
                 tx_power = Model.tx_power;
             }
-#ifndef EMULATOR
             // got some data from RX ?
             // we've no way to know if RX fifo has been filled
             // as we can't poll GIO1 or GIO2 to check WTR
@@ -688,31 +679,14 @@ static u16 afhds2a_cb()
                     }
                 }
             }
-#else
-#include "../../protocol_dev/telem_flysky/telem_data.txt"
-            static u16 row;
-
-            memcpy(packet, telem_data[row], sizeof telem_data[0]);
-            row += 1;
-            if ( row >= sizeof telem_data / sizeof telem_data[0]) row = 0;
-            update_telemetry();
-#endif
             packet_count++;
             state |= WAIT_WRITE;
-#ifndef EMULATOR
             return 1700;
-#else
-            return 17;
-#endif
         case DATA1|WAIT_WRITE:
             state &= ~WAIT_WRITE;
             A7105_SetTxRxMode(RX_EN);
             A7105_Strobe(A7105_RX);
-#ifndef EMULATOR
             return 2150;
-#else
-            return 21;
-#endif
     }
     return 3850; // never reached, please the compiler
 }
@@ -742,11 +716,7 @@ static void initialize(u8 bind)
         rxid[3] = (Model.proto_opts[PROTOOPTS_RXID2]) & 0xff;
     }
     channel = 0;
-#ifndef EMULATOR
     CLOCK_StartTimer(50000, afhds2a_cb);
-#else
-    CLOCK_StartTimer(500, afhds2a_cb);
-#endif
 }
 
 uintptr_t AFHDS2A_Cmds(enum ProtoCmds cmd)
