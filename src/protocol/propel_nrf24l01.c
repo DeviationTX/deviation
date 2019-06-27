@@ -29,7 +29,7 @@
 #define dbgprintf printf
 #else
 // Timeout for callback in uSec
-#define PACKET_PERIOD    14000
+#define PACKET_PERIOD    14500
 #define BIND_PERIOD      1500
 #define BIND_COUNT       360
 
@@ -62,6 +62,20 @@ enum {
 #define CHANNEL_ROLLCW      CHANNEL7
 #define CHANNEL_ALTHOLD     CHANNEL8
 #define CHANNEL_CALIBRATE   CHANNEL9
+
+static const char * const propel_opts[] = {
+  _tr_noop("USE A.ACK"),  _tr_noop("Yes"), _tr_noop("No"), NULL,
+  NULL
+};
+
+enum {
+    PROTOOPTS_SKIPAACK = 0,
+    LAST_PROTO_OPT,
+};
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
+
+#define AUTO_ACK_ENABLE   0
+#define AUTO_ACK_DISABLE  1
 
 #define PACKET_SIZE        14
 #define RF_NUM_CHANNELS    4
@@ -245,24 +259,30 @@ static void process_rx(void)
 static void propel_init()
 {
     const u8 address[] = {0x73, 0xd3, 0x31, 0x30, 0x11};
+    const u8 wtf_addr[] = {0x99, 0x77, 0x55, 0x33, 0x11};
     memcpy(rx_tx_addr, address, ADDRESS_LENGTH);
 
     NRF24L01_Initialize();
-//    NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x3f);       // AA on all pipes TODO
-    NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);       // AA disabled
+    NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x7f);
+    if (Model.proto_opts[PROTOOPTS_SKIPAACK] == AUTO_ACK_DISABLE) {
+        NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);       // AA disabled
+    } else {
+        NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x3f);       // AA on all pipes
+    }
     NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x3f);   // Enable all pipes
     NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x03);    // 5-byte address
     NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0x36);  // retransmit 1ms, 6 times
     NRF24L01_WriteReg(NRF24L01_05_RF_CH, 0x23);       // bind channel
     NRF24L01_SetBitrate(NRF24L01_BR_1M);              // 1Mbps
     NRF24L01_SetPower(Model.tx_power);
+    NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x07);      // ?? match protocol capture
+    NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, wtf_addr, ADDRESS_LENGTH);    // ?? match protocol capture
+    NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, wtf_addr, ADDRESS_LENGTH);    // ?? match protocol capture
     NRF24L01_Activate(0x73);                          // Activate feature register
     NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 0x3f);       // Enable dynamic payload length
     NRF24L01_WriteReg(NRF24L01_1D_FEATURE, 0x07);     // Enable all features
     // Beken 2425 register bank 1 initialized here in stock tx capture
     // Hopefully won't matter for nRF compatibility
-    NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, rx_tx_addr, ADDRESS_LENGTH);
-    NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, rx_tx_addr, ADDRESS_LENGTH);
     NRF24L01_FlushTx();
     NRF24L01_SetTxRxMode(TX_EN);
 }
@@ -278,13 +298,20 @@ static u16 propel_callback()
 
     switch (state) {
     case PROPEL_BIND1:
+        NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, rx_tx_addr, ADDRESS_LENGTH);
+        NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, rx_tx_addr, ADDRESS_LENGTH);
         NRF24L01_WriteReg(NRF24L01_07_STATUS, CLEAR_MASK);
         NRF24L01_FlushTx();
         bind_packet();
         NRF24L01_WritePayload(packet, PACKET_SIZE);
-        if (bind_count-- == 0) {
-            PROTOCOL_SetBindState(0);
-            state = PROPEL_DATA1;
+        if (Model.proto_opts[PROTOOPTS_SKIPAACK] == AUTO_ACK_DISABLE) {
+            if (bind_count-- == 0) {
+                PROTOCOL_SetBindState(0);
+                state = PROPEL_DATA1;
+            }
+        } else {
+            state = PROPEL_BIND2;
+            return BIND_PERIOD;
         }
         break;
 // bind2 state only used with Auto Acknowledge
@@ -327,6 +354,7 @@ TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT2);
     return PACKET_PERIOD;
 }
 
+#if 0
 static void initialize_txid()
 {
     u32 lfsr = 0xb2c54a2ful;
@@ -350,18 +378,23 @@ static void initialize_txid()
     for (u8 i = 0; i < sizeof(lfsr); ++i)
         rand32_r(&lfsr, 0);
 }
+#endif
 
 static void initialize()
 {
     CLOCK_StopTimer();
     tx_power = Model.tx_power;
 
-    initialize_txid();
+//    initialize_txid();
     propel_init();
     state = PROPEL_BIND1;
     bind_count = BIND_COUNT;
 
-    PROTOCOL_SetBindState(BIND_COUNT * PACKET_PERIOD / 1000);
+    if (Model.proto_opts[PROTOOPTS_SKIPAACK] == AUTO_ACK_DISABLE)
+        PROTOCOL_SetBindState(BIND_COUNT * PACKET_PERIOD / 1000);
+    else
+        PROTOCOL_SetBindState(-1);
+
     CLOCK_StartTimer(500, propel_callback);
 }
 
@@ -392,6 +425,8 @@ uintptr_t Propel_Cmds(enum ProtoCmds cmd)
         return PROTO_TELEM_ON;
     case PROTOCMD_TELEMETRYTYPE:
         return TELEM_FRSKY;
+    case PROTOCMD_GETOPTIONS:
+        return (uintptr_t)propel_opts;
     default:
         break;
     }
