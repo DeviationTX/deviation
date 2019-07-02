@@ -25,13 +25,11 @@
 #define USE_FIXED_MFGID
 #define PACKET_PERIOD    450
 #define BIND_PERIOD      450
-#define BIND_COUNT       36
 #define dbgprintf printf
 #else
 // Timeout for callback in uSec
-#define PACKET_PERIOD    14500
+#define PACKET_PERIOD    10000
 #define BIND_PERIOD      1500
-#define BIND_COUNT       360
 
 // printf inside an interrupt handler is really dangerous
 // this shouldn't be enabled even in debug builds without explicitly
@@ -63,20 +61,6 @@ enum {
 #define CHANNEL_ALTHOLD     CHANNEL8
 #define CHANNEL_CALIBRATE   CHANNEL9
 
-static const char * const propel_opts[] = {
-  _tr_noop("USE A.ACK"),  _tr_noop("Yes"), _tr_noop("No"), NULL,
-  NULL
-};
-
-enum {
-    PROTOOPTS_SKIPAACK = 0,
-    LAST_PROTO_OPT,
-};
-ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
-
-#define AUTO_ACK_ENABLE   0
-#define AUTO_ACK_DISABLE  1
-
 #define PACKET_SIZE        14
 #define RF_NUM_CHANNELS    4
 #define ADDRESS_LENGTH     5
@@ -84,12 +68,12 @@ ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 static enum {
     PROPEL_BIND1 = 0,
     PROPEL_BIND2,
+    PROPEL_BIND3,
     PROPEL_DATA1,
 } state;
 static u8 packet[PACKET_SIZE];
 static u8 tx_power;
-static u8 rx_tx_addr[ADDRESS_LENGTH];
-static u16 bind_count;
+static u8 data_addr[ADDRESS_LENGTH];
 
 // equations for checksum check byte from truth table
 // (1)  z =  a && !b
@@ -194,12 +178,13 @@ static u16 scale_channel(u8 ch, u16 destMin, u16 destMax)
 
 #define DYNTRIM(chval) ((u8)((chval >> 2) & 0xfc))
 #define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
-static void bind_packet()
+static void bind_packet(u8 *rxid)
 {
     memset(packet, 0, PACKET_SIZE);
 
     packet[0] = 0xD0;
-    memcpy(&packet[1], rx_tx_addr, 4);  // only 4 bytes sent of 5-byte address
+    memcpy(&packet[1], data_addr, 4);  // only 4 bytes sent of 5-byte address
+    if (rxid) memcpy(&packet[5], rxid, 4);
     packet[9] = 0x03;
     packet[11] = 0x05;
 
@@ -210,7 +195,7 @@ Telemetry.value[TELEM_FRSKY_RSSI] = packet[13];
 TELEMETRY_SetUpdated(TELEM_FRSKY_RSSI);
 
 #ifdef EMULATOR
-    dbgprintf("data %02x", packet[0]);
+    dbgprintf("state %d, data %02x", state, packet[0]);
     for (int i = 1; i < PACKET_SIZE; i++)
         dbgprintf(" %02x", packet[i]);
     dbgprintf("\n");
@@ -245,7 +230,7 @@ Telemetry.value[TELEM_FRSKY_RSSI] = packet[13];
 TELEMETRY_SetUpdated(TELEM_FRSKY_RSSI);
 
 #ifdef EMULATOR
-    dbgprintf("data %02x", packet[0]);
+     dbgprintf("state %d, data %02x", state, packet[0]);
     for (int i = 1; i < PACKET_SIZE; i++)
         dbgprintf(" %02x", packet[i]);
     dbgprintf("\n");
@@ -258,17 +243,13 @@ static void process_rx(void)
 
 static void propel_init()
 {
-    const u8 address[] = {0x73, 0xd3, 0x31, 0x30, 0x11};
-    const u8 wtf_addr[] = {0x99, 0x77, 0x55, 0x33, 0x11};
-    memcpy(rx_tx_addr, address, ADDRESS_LENGTH);
+    const u8 _data_addr[] = {0x73, 0xd3, 0x31, 0x30, 0x11};
+    const u8 bind_addr[] = {0x99, 0x77, 0x55, 0x33, 0x11};
+    memcpy(data_addr, _data_addr, ADDRESS_LENGTH);
 
     NRF24L01_Initialize();
     NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x7f);
-    if (Model.proto_opts[PROTOOPTS_SKIPAACK] == AUTO_ACK_DISABLE) {
-        NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);       // AA disabled
-    } else {
-        NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x3f);       // AA on all pipes
-    }
+    NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x3f);       // AA on all pipes
     NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x3f);   // Enable all pipes
     NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x03);    // 5-byte address
     NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0x36);  // retransmit 1ms, 6 times
@@ -276,8 +257,8 @@ static void propel_init()
     NRF24L01_SetBitrate(NRF24L01_BR_1M);              // 1Mbps
     NRF24L01_SetPower(Model.tx_power);
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x07);      // ?? match protocol capture
-    NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, wtf_addr, ADDRESS_LENGTH);    // ?? match protocol capture
-    NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, wtf_addr, ADDRESS_LENGTH);    // ?? match protocol capture
+    NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, bind_addr, ADDRESS_LENGTH);    // ?? match protocol capture
+    NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, bind_addr, ADDRESS_LENGTH);    // ?? match protocol capture
     NRF24L01_Activate(0x73);                          // Activate feature register
     NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 0x3f);       // Enable dynamic payload length
     NRF24L01_WriteReg(NRF24L01_1D_FEATURE, 0x07);     // Enable all features
@@ -292,29 +273,21 @@ static void propel_init()
 #define CLEAR_MASK  (BV(NRF24L01_07_RX_DR) | BV(NRF24L01_07_TX_DS) | BV(NRF24L01_07_MAX_RT))
 static u16 propel_callback()
 {
-    static u8 rf_channels[] = {0x39, 0x2A, 0x18, 0x23};
+    u8 rf_channels[] = {0x39, 0x2A, 0x18, 0x23};
     static u8 rf_chan;
+    static u8 rxid[4];
     u8 status;
 
     switch (state) {
     case PROPEL_BIND1:
-        NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, rx_tx_addr, ADDRESS_LENGTH);
-        NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, rx_tx_addr, ADDRESS_LENGTH);
         NRF24L01_WriteReg(NRF24L01_07_STATUS, CLEAR_MASK);
         NRF24L01_FlushTx();
-        bind_packet();
+        bind_packet(0);
         NRF24L01_WritePayload(packet, PACKET_SIZE);
-        if (Model.proto_opts[PROTOOPTS_SKIPAACK] == AUTO_ACK_DISABLE) {
-            if (bind_count-- == 0) {
-                PROTOCOL_SetBindState(0);
-                state = PROPEL_DATA1;
-            }
-        } else {
-            state = PROPEL_BIND2;
-            return BIND_PERIOD;
-        }
+        state = PROPEL_BIND2;
+        return BIND_PERIOD;
         break;
-// bind2 state only used with Auto Acknowledge
+
     case PROPEL_BIND2:
         status = NRF24L01_ReadReg(NRF24L01_07_STATUS);
 Telemetry.value[TELEM_FRSKY_VOLT1] = status;
@@ -328,13 +301,35 @@ TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT2);
         if (!(BV(NRF24L01_07_RX_DR) & status))
             return BIND_PERIOD;
 
-        PROTOCOL_SetBindState(0);
         NRF24L01_ReadPayload(packet, PACKET_SIZE);
+        if (packet[0] != 0xdd)
+            return BIND_PERIOD;
+
+        // got rxid, put in bind packet
+        memcpy(rxid, &packet[1], 4);
         NRF24L01_WriteReg(NRF24L01_07_STATUS, CLEAR_MASK);
         NRF24L01_FlushTx();
-        bind_packet();
+        bind_packet(rxid);
         NRF24L01_WritePayload(packet, PACKET_SIZE);
-        state = PROPEL_DATA1;
+        state = PROPEL_BIND3;
+        break;
+
+    case PROPEL_BIND3:
+        if (BV(NRF24L01_07_RX_DR) & NRF24L01_ReadReg(NRF24L01_07_STATUS)) {
+            NRF24L01_ReadPayload(packet, PACKET_SIZE);
+            if (packet[0] == 0xa3) {
+                state = PROPEL_DATA1;
+                break;
+            }
+        }
+
+        NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, data_addr, ADDRESS_LENGTH);
+        NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, data_addr, ADDRESS_LENGTH);
+        NRF24L01_WriteReg(NRF24L01_07_STATUS, CLEAR_MASK);
+        NRF24L01_FlushTx();
+        bind_packet(rxid);
+        NRF24L01_WritePayload(packet, PACKET_SIZE);
+        state = PROPEL_BIND3;
         break;
 
     case PROPEL_DATA1:
@@ -388,13 +383,8 @@ static void initialize()
 //    initialize_txid();
     propel_init();
     state = PROPEL_BIND1;
-    bind_count = BIND_COUNT;
 
-    if (Model.proto_opts[PROTOOPTS_SKIPAACK] == AUTO_ACK_DISABLE)
-        PROTOCOL_SetBindState(BIND_COUNT * PACKET_PERIOD / 1000);
-    else
-        PROTOCOL_SetBindState(-1);
-
+    PROTOCOL_SetBindState(-1);
     CLOCK_StartTimer(500, propel_callback);
 }
 
@@ -425,8 +415,6 @@ uintptr_t Propel_Cmds(enum ProtoCmds cmd)
         return PROTO_TELEM_ON;
     case PROTOCMD_TELEMETRYTYPE:
         return TELEM_FRSKY;
-    case PROTOCMD_GETOPTIONS:
-        return (uintptr_t)propel_opts;
     default:
         break;
     }
