@@ -13,6 +13,13 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
+#ifdef MODULAR
+  //Allows the linker to properly relocate
+  #define Propel_Cmds PROTO_Cmds
+  #pragma long_calls
+#endif
+
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
