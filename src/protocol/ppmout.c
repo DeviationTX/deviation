@@ -13,20 +13,12 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef MODULAR
-  //Allows the linker to properly relocate
-  #define PPMOUT_Cmds PROTO_Cmds
-  #pragma long_calls
-#endif
 
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
 #include "config/model.h"
 
-#ifdef MODULAR
-  #pragma long_calls_off
-#endif
 
 #define PPMOUT_MAX_CHANNELS NUM_OUT_CHANNELS
 static volatile u16 pulses[PPMOUT_MAX_CHANNELS+1];  // +1 for "inter-packet" pulse at end

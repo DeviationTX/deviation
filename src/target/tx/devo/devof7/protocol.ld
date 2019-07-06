@@ -1,3 +1,5 @@
+EXTERN(protocol_type)
+
 MEMORY
 {
 	ram (rwx) : ORIGIN = 0x20004000, LENGTH = 4K
@@ -6,7 +8,7 @@ SECTIONS
 {
         .text : {
             KEEP(*(.rodata.protocol_type))
-            KEEP(*(.text.PROTO_Cmds))
+            KEEP(*(.text.*_Cmds))
             *(.text*)
             . = ALIGN(4);
             *(.rodata*)     /* Read-only data */
