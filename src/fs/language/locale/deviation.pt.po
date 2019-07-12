@@ -976,7 +976,7 @@ msgstr "Scanner"
 
 #: pages/128x64x1/pagelist.h:82 pages/320x240x16/pagelist.h:77
 msgid "XN297 Dump"
-msgstr ""
+msgstr "XN297 Dump"
 
 #: pages/128x64x1/pagelist.h:89
 msgid "External OSD"
@@ -1992,27 +1992,27 @@ msgstr "Telem 1%d"
 
 #: pages/common/_xn297dump_page.c:72
 msgid "Set protocol to XN297Dump"
-msgstr ""
+msgstr "Seta protocolo como XN297Dump"
 
 #: pages/common/_xn297dump_page.c:75
 msgid "Scanning channels and length..."
-msgstr ""
+msgstr "Escaneando canais e comprimento..."
 
 #: pages/common/_xn297dump_page.c:77
 msgid "Measuring packet intervals..."
-msgstr ""
+msgstr "Medindo o intervalo dos pacotes"
 
 #: pages/common/_xn297dump_page.c:79
 msgid "Recording packets..."
-msgstr ""
+msgstr "Gravando os pacotes..."
 
 #: pages/common/_xn297dump_page.c:85
 msgid "Valid CRC found!"
-msgstr ""
+msgstr "CRC válido"
 
 #: pages/common/_xn297dump_page.c:85
 msgid "CRC invalid"
-msgstr ""
+msgstr "CRC inválido"
 
 #: pages/text/splash_page.c:37
 msgid "Deviation"
@@ -2245,23 +2245,23 @@ msgstr "COL limite\t"
 
 #: protocol/xn297dump_nrf24l01.c:37
 msgid "Bitrate"
-msgstr ""
+msgstr "Bitrate"
 
 #: protocol/xn297dump_nrf24l01.c:38
 msgid "Address"
-msgstr ""
+msgstr "Endereço"
 
 #: protocol/xn297dump_nrf24l01.c:39
 msgid "Scrambled"
-msgstr ""
+msgstr "Alterados"
 
 #: protocol/xn297dump_nrf24l01.c:40
 msgid "Retries"
-msgstr ""
+msgstr "Retentativas"
 
 #: protocol/xn297dump_nrf24l01.c:41
 msgid "Intvl Scan"
-msgstr ""
+msgstr "Intervalo escaner"
 
 #: protocol/yd717_nrf24l01.c:93
 msgid "USE A.ACK"
