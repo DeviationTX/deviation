@@ -81,6 +81,8 @@ static enum {
 static u8 packet[PACKET_SIZE];
 static u8 tx_power;
 static u8 data_addr[ADDRESS_LENGTH];
+static u8 bind_addr[ADDRESS_LENGTH];
+static u32 bind_time;
 
 // equations for checksum check byte from truth table
 // (1)  z =  a && !b
@@ -251,8 +253,9 @@ static void process_rx(void)
 static void propel_init()
 {
     const u8 _data_addr[] = {0x73, 0xd3, 0x31, 0x30, 0x11};
-    const u8 bind_addr[] = {0x99, 0x77, 0x55, 0x33, 0x11};
+    const u8 _bind_addr[] = {0x99, 0x77, 0x55, 0x33, 0x11};
     memcpy(data_addr, _data_addr, ADDRESS_LENGTH);
+    memcpy(bind_addr, _bind_addr, ADDRESS_LENGTH);
 
     NRF24L01_Initialize();
     NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x7f);
@@ -264,8 +267,8 @@ static void propel_init()
     NRF24L01_SetBitrate(NRF24L01_BR_1M);              // 1Mbps
     NRF24L01_SetPower(Model.tx_power);
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x07);      // ?? match protocol capture
-    NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, bind_addr, ADDRESS_LENGTH);    // ?? match protocol capture
-    NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, bind_addr, ADDRESS_LENGTH);    // ?? match protocol capture
+    NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, data_addr, ADDRESS_LENGTH); // first check if aircraft active
+    NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, data_addr, ADDRESS_LENGTH);
     NRF24L01_Activate(0x73);                          // Activate feature register
     NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 0x3f);       // Enable dynamic payload length
     NRF24L01_WriteReg(NRF24L01_1D_FEATURE, 0x07);     // Enable all features
@@ -284,6 +287,7 @@ static u16 propel_callback()
     static u8 rf_chan;
     static u8 rxid[4];
     u8 status;
+    static u8 addr_bind;
 
     switch (state) {
     case PROPEL_BIND1:
@@ -301,6 +305,11 @@ Telemetry.value[TELEM_FRSKY_VOLT1] = status;
 TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT1);
         if (BV(NRF24L01_07_MAX_RT) & status) {
             state = PROPEL_BIND1;
+            if (CLOCK_getms() - bind_time > 500) {
+                NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, bind_addr, ADDRESS_LENGTH);
+                NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, bind_addr, ADDRESS_LENGTH);
+                addr_bind = 1;
+            }
             return BIND_PERIOD;
         }
 Telemetry.value[TELEM_FRSKY_VOLT2] = status;
@@ -308,12 +317,15 @@ TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT2);
         if (!(BV(NRF24L01_07_RX_DR) & status))
             return BIND_PERIOD;
 
-        NRF24L01_ReadPayload(packet, PACKET_SIZE);
-        if (packet[0] != 0xdd)
-            return BIND_PERIOD;
+        if (!addr_bind) {           // restart after tx power-off
+            state = PROPEL_DATA1;
+            break;
+        }
 
         // got rxid, put in bind packet
+        NRF24L01_ReadPayload(packet, PACKET_SIZE);
         memcpy(rxid, &packet[1], 4);
+
         NRF24L01_WriteReg(NRF24L01_07_STATUS, CLEAR_MASK);
         NRF24L01_FlushTx();
         bind_packet(rxid);
@@ -390,6 +402,7 @@ static void initialize()
 //    initialize_txid();
     propel_init();
     state = PROPEL_BIND1;
+    bind_time = CLOCK_getms();
 
     PROTOCOL_SetBindState(-1);
     CLOCK_StartTimer(500, propel_callback);
