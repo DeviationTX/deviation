@@ -386,7 +386,7 @@ static void update_telemetry()
             // below 2000m and display is relative (AGL)
             // linear approximation of barometric formula in ISA at low altitude
             // y = -0.079x + 1513, scaled to centimeters
-            int altitude = (int)(-8 * (data32 & 0x7ffff) + 151300);
+            int altitude = (int)(-0.08 * (uint32_t)(data32 & 0x7ffff) + 1513) * 100;
             if (Model.ground_level == 0) Model.ground_level = altitude;
             set_telemetry(TELEM_FRSKY_ALTITUDE, altitude - Model.ground_level);
             break;
