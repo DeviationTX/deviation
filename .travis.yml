@@ -20,7 +20,6 @@ sudo: false
 
 addons:
   apt:
-    update: false
     packages:
       - build-essential
       - git
