@@ -50,6 +50,7 @@ struct elem {
     u8 blob[3];
     u8 src;
     u8 extra[3];
+    u8 padding_1[1];
 };
 
 #define ELEM_X(elem)    (*((u32 *)(&(elem))) & 0x1FF)
