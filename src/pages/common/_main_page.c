@@ -240,6 +240,7 @@ void PAGE_MainEvent()
                 }
                 if (idx != -1) {
 #ifdef HAS_CHAR_ICONS
+                    GUI_SetHidden((guiObject_t *)&gui->elem[i], 1);
                     gui->elem[i].box.cb_data = (void *)(long)idx;
 #else
                     struct ImageMap img;
