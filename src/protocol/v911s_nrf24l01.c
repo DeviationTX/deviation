@@ -133,7 +133,7 @@ static void V911S_send_packet(u8 bind)
         packet[ 0]=(rf_ch_num<<3)|channel;
         packet[ 1]=V911S_FLAG_EXPERT; // short press on left button
         packet[ 2]=GET_FLAG(CHANNEL_CALIB,V911S_FLAG_CALIB); // long  press on right button
-        memset(packet+3,0x00,14);
+        memset(packet + 3, 0x00, V911S_PACKET_SIZE - 3);
         //packet[3..6]=trims TAER signed
         u16 ch=scale_channel(CHANNEL3 ,0,0x7FF);// throttle
         packet[ 7] = ch;
