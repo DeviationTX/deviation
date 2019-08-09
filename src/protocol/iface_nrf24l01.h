@@ -152,6 +152,7 @@ u8 XN297_WritePayload(u8* msg, int len);
 u8 XN297_WriteEnhancedPayload(u8* msg, int len, int noack, u16 crc_xorout);
 u8 XN297_ReadPayload(u8* msg, int len);
 u8 XN297_ReadEnhancedPayload(u8* msg, int len);
+u16 crc16_update(u16 crc, u8 a, u8 bits);
 
 // HS6200 emulation layer
 void HS6200_SetTXAddr(const u8* addr, u8 len);

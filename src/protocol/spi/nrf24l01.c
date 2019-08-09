@@ -360,7 +360,7 @@ static uint8_t bit_reverse(uint8_t b_in)
 static const uint16_t polynomial = 0x1021;
 static const uint16_t initial    = 0xb5d2;
 
-static uint16_t crc16_update(uint16_t crc, unsigned char a, unsigned char bits)
+u16 crc16_update(u16 crc, u8 a, u8 bits)
 {
     crc ^= a << 8;
     while (bits--) {
