@@ -73,7 +73,7 @@ int PWR_CheckPowerSwitch()
     } else {
         debounce = 0;
     }
-        if(debounce && (CLOCK_getms() - debounce) >= 1000) { // 1 sec
+    if(debounce && (CLOCK_getms() - debounce) >= 1000) { // 1 sec
 #endif
         return 1;
     }
