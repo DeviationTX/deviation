@@ -340,12 +340,6 @@ static void yd717_init()
 
     NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, rx_tx_addr, 5);
     NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, rx_tx_addr, 5);
-
-    // Check for Beken BK2421/BK2423 chip
-    BK2421_init();
-
-    // Implicit delay in callback
-    // delay(50);
 }
 
 
