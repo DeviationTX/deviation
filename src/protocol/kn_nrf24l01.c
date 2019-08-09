@@ -351,10 +351,6 @@ static void kn_init(u8 tx_addr[], u8 hopping_ch[])
     // Enable: Dynamic Payload Length to enable PCF
     NRF24L01_WriteReg(NRF24L01_1D_FEATURE, BV(NRF2401_1D_EN_DPL));
 
-    
-    // Check for Beken BK2421/BK2423 chip
-    BK2421_init();
-
     tx_power_ = Model.tx_power;
     NRF24L01_SetPower(Model.tx_power);
     
