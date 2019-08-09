@@ -51,7 +51,7 @@
 #define NUM_WAIT_LOOPS (100 / 5) //each loop is ~5us.  Do not wait more than 100us
 
 static const char * const devo_opts[] = {
-  _tr_noop("Telemetry"),  _tr_noop("On"), _tr_noop("Off"), NULL,
+  _tr_noop("Telemetry"), _tr_noop("Std"), _tr_noop("X350"), _tr_noop("Off"), NULL,
   NULL
 };
 
@@ -62,8 +62,9 @@ enum {
 
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
-#define TELEM_ON 0
-#define TELEM_OFF 1
+#define TELEM_STD  0
+#define TELEM_X350 1
+#define TELEM_OFF  2
 
 enum PktState {
     DEVO_BIND,
@@ -294,17 +295,31 @@ static void parse_telemetry_packet()
     */
     if (packet[0] == 0x32) {
         update = gpslongpkt;
-        Telemetry.gps.longitude = text_to_int(&packet[1], 3) * 3600000
-                                + text_to_int(&packet[4], 2) * 60000
-                                + text_to_int(&packet[7], 4) * 6;
+        if (Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_STD) {
+            // data is degrees decimal minutes
+            Telemetry.gps.longitude = text_to_int(&packet[1], 3) * 3600000
+                                    + text_to_int(&packet[4], 2) * 60000
+                                    + text_to_int(&packet[7], 4) * 6;
+        } else {
+            // data is decimal degrees
+            Telemetry.gps.longitude = text_to_int(&packet[1], 3) * 3600000
+                                    + text_to_int(&packet[4], 2) * 36000
+                                    + text_to_int(&packet[7], 4) * 36 / 10;
+        }
         if (packet[11] == 'W')
             Telemetry.gps.longitude *= -1;
     }
     if (packet[0] == 0x33) {
         update = gpslatpkt;
-        Telemetry.gps.latitude = text_to_int(&packet[1], 2) * 3600000
-                               + text_to_int(&packet[3], 2) * 60000
-                               + text_to_int(&packet[6], 4) * 6;
+        if (Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_STD) {
+            Telemetry.gps.latitude = text_to_int(&packet[1], 2) * 3600000
+                                   + text_to_int(&packet[3], 2) * 60000
+                                   + text_to_int(&packet[6], 4) * 6;
+        } else {
+            Telemetry.gps.latitude = text_to_int(&packet[1], 2) * 3600000
+                                   + text_to_int(&packet[3], 2) * 36000
+                                   + text_to_int(&packet[6], 4) * 36 / 10;
+        }
         if (packet[10] == 'S')
             Telemetry.gps.latitude *= -1;
     }
@@ -587,7 +602,7 @@ static void initialize()
         bind_counter = 0;
         cyrf_set_bound_sop_code();
     }
-    if (Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON) {
+    if (Model.proto_opts[PROTOOPTS_TELEMETRY] != TELEM_OFF) {
         CLOCK_StartTimer(2400, devo_telemetry_cb);
     } else {
         CLOCK_StartTimer(2400, devo_cb);
@@ -613,7 +628,7 @@ const void *DEVO_Cmds(enum ProtoCmds cmd)
             PROTOCOL_Init(0);  // only 1 prot_ops item, it is to enable/disable telemetry
             break;
         case PROTOCMD_TELEMETRYSTATE:
-            return (void *)(long)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
+            return (void *)(long)(Model.proto_opts[PROTOOPTS_TELEMETRY] != TELEM_OFF ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
         case PROTOCMD_TELEMETRYTYPE: 
             return (void *)(long) TELEM_DEVO;
         default: break;
