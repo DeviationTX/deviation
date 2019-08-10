@@ -142,6 +142,11 @@ enum {
     XN297_SCRAMBLED
 };
 
+extern const u8 xn297_scramble[];
+extern const u16 xn297_crc_xorout_scrambled[];
+extern const u16 xn297_crc_xorout[];
+uint8_t bit_reverse(uint8_t b_in);
+
 void XN297_SetTXAddr(const u8* addr, int len);
 void XN297_SetRXAddr(const u8* addr, int len);
 void XN297_Configure(u8 flags);
