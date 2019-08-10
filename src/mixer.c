@@ -246,41 +246,36 @@ s32 MIXER_CreateCyclicOutput(volatile s32 *raw, unsigned cycnum)
     if (Model.swash_invert & SWASH_INV_AILERON_MASK)    aileron    = -aileron;
     if (Model.swash_invert & SWASH_INV_COLLECTIVE_MASK) collective = -collective;
 
-    switch(Model.swash_type) {
-    case SWASH_TYPE_NONE:
-    case SWASH_TYPE_LAST:
+    if ( (Model.swash_type == SWASH_TYPE_NONE) || (Model.swash_type == SWASH_TYPE_LAST) ) {
         cyc[0] = aileron;
         cyc[1] = elevator;
         cyc[2] = collective;
+    }
+    //Normalize for swash setups
+    aileron  = Model.swashmix[0] * aileron / normalize;
+    elevator = Model.swashmix[1] * elevator / normalize;
+    collective = Model.swashmix[2] * collective / normalize;
+
+    switch(Model.swash_type) {
+    case SWASH_TYPE_NONE:
+    case SWASH_TYPE_LAST:
         break;
     case SWASH_TYPE_120:
-        aileron  = Model.swashmix[0] * aileron / normalize;
-        elevator = Model.swashmix[1] * elevator / normalize;
-        collective = Model.swashmix[2] * collective / normalize;
         cyc[0] = collective - elevator;
         cyc[1] = collective + elevator/2 + aileron;
         cyc[2] = collective + elevator/2 - aileron;
         break;
     case SWASH_TYPE_120X:
-        aileron  = Model.swashmix[0] * aileron / normalize;
-        elevator = Model.swashmix[1] * elevator / normalize;
-        collective = Model.swashmix[2] * collective / normalize;
         cyc[0] = collective - aileron;
         cyc[1] = collective + aileron/2 + elevator;
         cyc[2] = collective + aileron/2 - elevator;
         break;
     case SWASH_TYPE_140:
-        aileron  = Model.swashmix[0] * aileron / normalize;
-        elevator = Model.swashmix[1] * elevator / normalize;
-        collective = Model.swashmix[2] * collective / normalize;
         cyc[0] = collective - elevator;
         cyc[1] = collective + elevator + aileron;
         cyc[2] = collective + elevator - aileron;
         break;
     case SWASH_TYPE_90:
-        aileron  = Model.swashmix[0] * aileron / normalize;
-        elevator = Model.swashmix[1] * elevator / normalize;
-        collective = Model.swashmix[2] * collective / normalize;
         cyc[0] = collective - elevator;
         cyc[1] = collective + aileron;
         cyc[2] = collective - aileron;
@@ -312,23 +307,24 @@ void MIXER_ApplyMixer(struct Mixer *mixer, volatile s32 *raw, s32 *orig_value)
     value = value * mixer->scalar / 100 + PCT_TO_RANGE(mixer->offset);
 
     //4th: multiplex result
+    s32 scaled_value = raw[mixer->dest + NUM_INPUTS + 1];
     switch(MIXER_MUX(mixer)) {
     case MUX_REPLACE:
         break;
     case MUX_MULTIPLY:
-        value = raw[mixer->dest + NUM_INPUTS + 1] * value / CHAN_MAX_VALUE;
+        value = scaled_value * value / CHAN_MAX_VALUE;
         break;
     case MUX_ADD:
-        value = raw[mixer->dest + NUM_INPUTS + 1] + value;
+        value = scaled_value + value;
         break;
     case MUX_MAX:
-        value = raw[mixer->dest + NUM_INPUTS + 1] > value
-                  ? raw[mixer->dest + NUM_INPUTS + 1]
+        value = scaled_value > value
+                  ? scaled_value
                   : value;
         break;
     case MUX_MIN:
-        value = raw[mixer->dest + NUM_INPUTS + 1] < value
-                  ? raw[mixer->dest + NUM_INPUTS + 1]
+        value = scaled_value < value
+                  ? scaled_value
                   : value;
         break;
     case MUX_DELAY:
@@ -336,14 +332,14 @@ void MIXER_ApplyMixer(struct Mixer *mixer, volatile s32 *raw, s32 *orig_value)
             //value initially represents 20ths of seconds to cover 60-degrees
             //convert value to represent #msecs to cover 60-degrees (zero->full)
             if (value == 0 || orig_value == NULL) {
-                value = raw[mixer->dest + NUM_INPUTS + 1];
+                value = scaled_value;
                 break;
             }
             value = abs(RANGE_TO_PCT(value)) * 50;
             //rate represents the maximum travel per iteration (once per MEDIUM_PRIORITY_MSEC)
             s32 rate = CHAN_MAX_VALUE * MEDIUM_PRIORITY_MSEC / value;
 
-            value = raw[mixer->dest + NUM_INPUTS + 1];
+            value = scaled_value;
             if (value - *orig_value > rate)
                 value = *orig_value + rate;
             else if(value - *orig_value < -rate)
@@ -353,36 +349,34 @@ void MIXER_ApplyMixer(struct Mixer *mixer, volatile s32 *raw, s32 *orig_value)
 #if HAS_EXTENDED_AUDIO
     case MUX_BEEP:
         if (orig_value) {
-            s32 new_value = raw[mixer->dest + NUM_INPUTS + 1];
-            if (abs(value - new_value) > 100)
+            if (abs(value - scaled_value) > 100)
                 mixer->beep_lock = 0;
             if (mixer->beep_lock == 0) {
-                if ((value > *orig_value && value < new_value) ||
-                    (value < *orig_value && value > new_value) ||
-                    (abs(value - new_value) <= 10)) {
+                if ((value > *orig_value && value < scaled_value) ||
+                    (value < *orig_value && value > scaled_value) ||
+                    (abs(value - scaled_value) <= 10)) {
                     mixer->beep_lock = 1;
                     MUSIC_Play(MUSIC_MAXLEN);
                 }
             }
         }
-        value = raw[mixer->dest + NUM_INPUTS + 1];	// Use input value
+        value = scaled_value;	// Use input value
         break;
     case MUX_VOICE:
         if (orig_value) {
-            s32 new_value = raw[mixer->dest + NUM_INPUTS + 1];
-            if (abs(value - new_value) > 100)
+            if (abs(value - scaled_value) > 100)
                 mixer->voice_lock = 0;
             if (mixer->voice_lock == 0) {
-                if ((value > *orig_value && value < new_value) ||
-                    (value < *orig_value && value > new_value) ||
-                    (abs(value - new_value) <= 10)) {
+                if ((value > *orig_value && value < scaled_value) ||
+                    (value < *orig_value && value > scaled_value) ||
+                    (abs(value - scaled_value) <= 10)) {
                     mixer->voice_lock = 1;
                     if (Model.voice.mixer[mixer->dest].music)
                         MUSIC_Play(Model.voice.mixer[mixer->dest].music);
                 }
             }
         }
-        value = raw[mixer->dest + NUM_INPUTS + 1];	// Use input value
+        value = scaled_value;	// Use input value
         break;
 #endif
     case MUX_LAST: break;
