@@ -23,6 +23,7 @@
 #include "config/display.h"
 #include "rtc_config.h"
 #include "voiceconfig_page.h"
+#include "scanner_page.h"
 
 #define PAGE_NAME_MAX 10
 

@@ -120,6 +120,12 @@ struct reorder_obj {
     guiScrollable_t scrollable;
 };
 
+struct scanner_obj {
+    guiButton_t enable;
+    guiButton_t scan_mode;
+    guiButton_t attenuator;
+};
+
 struct telemcfg_obj {
     guiLabel_t msg;
     guiLabel_t idx[7];
@@ -367,6 +373,9 @@ struct gui_objs {
         struct modelload_obj modelload;
         struct modelpage_obj modelpage;
         struct reorder_obj reorder;
+#if HAS_SCANNER
+        struct scanner_obj scanner;
+#endif
         struct telemcfg_obj telemcfg;
         struct telemtest_obj telemtest1;
         struct timer_obj timer;
