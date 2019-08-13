@@ -18,21 +18,15 @@
 #include "pages.h"
 #include "config/model.h"
 
-
 #if HAS_SCANNER
 #include "../common/_scanner_page.c"
-static struct scanner_obj * const gui = &gui_objs.u.scanner;
-static s32 show_bar_cb(void *data)
-{
-    long ch = (long)data;
-    return sp->channelnoise[ch];
-}
 
+static struct scanner_obj * const gui = &gui_objs.u.scanner;
 static const char *enablestr_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    return sp->enable ? _tr("Turn Off") : _tr("Turn On");
+    return sp->enable ? _tr("On") : _tr("Off");
 }
 
 static const char *modestr_cb(guiObject_t *obj, const void *data)
@@ -46,30 +40,27 @@ static const char *attstr_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    return sp->attenuator ? _tr("Att.: -20dB") : _tr("Att.: 0dB");
+    return sp->attenuator ? _tr("-20dB") : _tr("0dB");
 }
 
 void _draw_page(u8 enable)
 {
-    enum {
-        SCANBARWIDTH   = (LCD_WIDTH / (MAX_RADIOCHANNEL - MIN_RADIOCHANNEL + 1)),
-        SCANBARXOFFSET = ((LCD_WIDTH - SCANBARWIDTH * (MAX_RADIOCHANNEL - MIN_RADIOCHANNEL + 1))/2),
-        SCANBARHEIGHT  = (LCD_HEIGHT - 78),
-    };
-    u8 i;
     (void)enable;
     PAGE_ShowHeader(PAGE_GetName(PAGEID_SCANNER));
-    GUI_CreateButton(&gui->enable, LCD_WIDTH/2 - 152, 40, BUTTON_96, enablestr_cb, press_enable_cb, NULL);
-    GUI_CreateButton(&gui->scan_mode, LCD_WIDTH/2 - 48, 40, BUTTON_96, modestr_cb, press_mode_cb, NULL);
-    GUI_CreateButton(&gui->attenuator, LCD_WIDTH/2 + 56, 40, BUTTON_96, attstr_cb, press_attenuator_cb, NULL);
-    for(i = 0; i < (MAX_RADIOCHANNEL - MIN_RADIOCHANNEL + 1); i++) {
-        GUI_CreateBarGraph(&gui->bar[i], SCANBARXOFFSET + i * SCANBARWIDTH, 70, SCANBARWIDTH, SCANBARHEIGHT, 2, 31, BAR_VERTICAL, show_bar_cb, (void *)((long)i));
-    }
+    GUI_CreateButtonPlateText(&gui->enable, 0, HEADER_HEIGHT, 40, LINE_HEIGHT, &BUTTON_FONT, enablestr_cb, press_enable_cb, NULL);
+    GUI_CreateButtonPlateText(&gui->scan_mode, LCD_WIDTH/2 - 23, HEADER_HEIGHT, 46, LINE_HEIGHT, &BUTTON_FONT, modestr_cb, press_mode_cb, NULL);
+    GUI_CreateButtonPlateText(&gui->attenuator, LCD_WIDTH - 40, HEADER_HEIGHT, 40, LINE_HEIGHT, &BUTTON_FONT, attstr_cb, press_attenuator_cb, NULL);
 }
 
 void _draw_channels()
 {
-    GUI_Redraw(&gui->bar[sp->channel]);
+    const unsigned offset = HEADER_HEIGHT + LINE_HEIGHT;
+    // draw a line
+    int col = (LCD_WIDTH - (MAX_RADIOCHANNEL - MIN_RADIOCHANNEL)) / 2 + sp->channel;
+    int height = sp->channelnoise[sp->channel] * (LCD_HEIGHT - offset) / 0x1F;
+
+    LCD_DrawFastVLine(col, offset, LCD_HEIGHT - offset - height, 0);
+    LCD_DrawFastVLine(col, LCD_HEIGHT - height, height, Display.xygraph.grid_color);
 }
 
 #endif //HAS_SCANNER

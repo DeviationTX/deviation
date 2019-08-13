@@ -14,7 +14,9 @@ struct pagemem {
         struct timer_page timer_page;
         struct chantest_page chantest_page;
         struct range_page range_page;
-        //struct scanner_page scanner_page;
+#if HAS_SCANNER
+        struct scanner_page scanner_page;
+#endif
 #if HAS_MUSIC_CONFIG
         struct voiceconfig_page voiceconfig_page;
 #endif
