@@ -12,14 +12,14 @@ env:
       - MAKETARGET=zip_win_emu_devo8
 #      - COMPILER=latest TARGET=devo8
 
-# use new docker environment
-sudo: false
+matrix:
+  fast_finish: true
 
-#sudo: required
-#dist: trusty
+dist: trusty
 
 addons:
   apt:
+    update: false
     packages:
       - build-essential
       - git
@@ -30,8 +30,11 @@ addons:
 #      - gcc-arm-none-eabi
 
 #Do NOT set these.  They set 'CC' which breaks the build
-#language: c
+language: minimal
 #compiler: gcc
+
+git:
+  depth: 5
 
 before_install:
    - if [ ! -d "$HOME/gcc-arm-none-eabi-4_8-2013q4/bin" ]; then
