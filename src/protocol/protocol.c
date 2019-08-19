@@ -132,7 +132,7 @@ void PROTOCOL_Load(int no_dlg)
     //printf("Loading %s: %08lx\n", file, fh);
     if(! fh) {
         if(! no_dlg) {
-            sprintf(tempstring, "Misisng protocol:\n%s", file);
+            sprintf(tempstring, "Missing protocol:\n%s", file);
             PAGE_ShowWarning(NULL, tempstring);
         }
         LCD_SetFont(old_font);
