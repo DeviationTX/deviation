@@ -30,7 +30,6 @@
 #include "mixer.h"
 #include "config/model.h"
 #include "config/tx.h" // for Transmitter
-#include "music.h"
 #include "telemetry.h"
 
 #ifdef PROTO_HAS_NRF24L01
@@ -246,7 +245,6 @@ static s32 rf_ch_idx = 0;
         } else {
             //Tell foreground interface binding is done
             PROTOCOL_SetBindState(0);
-            MUSIC_Play(MUSIC_DONE_BINDING);
             tx_state_ = STATE_PRE_SEND;
            //Do once, no break needed
         }

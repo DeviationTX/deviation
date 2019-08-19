@@ -21,7 +21,6 @@
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
-#include "music.h"
 #include "config/model.h"
 #include "telemetry.h"
 #include <string.h>
@@ -680,7 +679,6 @@ static void initialize(u8 bind) {
     A7105_Reset();
     CLOCK_ResetWatchdog();
     while(!bugs3_init(bind)) {
-        MUSIC_Play(MUSIC_ALARM1);
         A7105_Reset();
         CLOCK_ResetWatchdog();
     }
