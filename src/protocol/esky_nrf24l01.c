@@ -23,7 +23,6 @@
 #include "mixer.h"
 #include "config/model.h"
 #include "config/tx.h" // for Transmitter
-#include "music.h"
 #include "telemetry.h"
 
 #ifdef MODULAR
@@ -291,7 +290,6 @@ static u16 esky_callback()
     switch (phase) {
     case ESKY_INIT2:
         esky_init2();
-        // MUSIC_Play(MUSIC_TELEMALARM1);	// Shouldn't play telemetry alarm doing bind init
         phase = ESKY_BIND;
         return 150;
         break;
@@ -310,7 +308,6 @@ static u16 esky_callback()
             phase = ESKY_DATA;
             set_data_address();
             PROTOCOL_SetBindState(0);
-            MUSIC_Play(MUSIC_DONE_BINDING);
         }
         break;
     case ESKY_DATA:

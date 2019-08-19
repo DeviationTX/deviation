@@ -24,7 +24,6 @@
 #include "mixer.h"
 #include "config/model.h"
 #include "config/tx.h" // for Transmitter
-#include "music.h"
 
 #ifdef MODULAR
   //Some versions of gcc applythis to definitions, others to calls
@@ -346,7 +345,6 @@ static u16 cx10_callback()
 {
     switch (phase) {
     case CX10_INIT1:
-        // MUSIC_Play(MUSIC_TELEMALARM1);	// Shouldn't play telemetry alarm doing bind init
         phase = bind_phase;
         break;
 
@@ -354,7 +352,6 @@ static u16 cx10_callback()
         if (bind_counter == 0) {
             phase = CX10_DATA;
             PROTOCOL_SetBindState(0);
-            MUSIC_Play(MUSIC_DONE_BINDING);
         } else {
             send_packet(1);
             bind_counter -= 1;
