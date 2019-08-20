@@ -5,4 +5,6 @@ FONTS        = filesystem/$(FILESYSTEM)/media/12normal.fon \
                filesystem/$(FILESYSTEM)/media/04b03.fon
 LANGUAGE   := devo10
 
+OPTIMIZE_DFU := 1
+
 include $(SDIR)/target/common/devo/Makefile.inc
