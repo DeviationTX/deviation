@@ -9,7 +9,7 @@ use Getopt::Long;
 my %map;
 my $free = 0;
 my $mapfile;
-GetOptions("mapfile=s" => \$mapfile, "size=i" => \$free);
+GetOptions("mapfile=s" => \$mapfile, "size=o" => \$free);
 read_map($mapfile);
 repack_obj();
 
