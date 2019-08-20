@@ -17,4 +17,3 @@ Docker can be found here: http://www.deviationtx.com/wiki/development/docker
 
 While not recommended, other methods of building Deviation are documented
 here: http://www.deviationtx.com/wiki/development
-
