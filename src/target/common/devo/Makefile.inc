@@ -53,7 +53,6 @@ ifeq (,$(wildcard $(LINKFILEOPT)))
 LINKFILEOPT = $(LINKFILE)
 endif
 LFLAGS2OPT  = -Wl,-T$(LINKFILEOPT)
-CRC_OFFSET=$(shell grep _crc_offset $(LINKFILEOPT) | awk -F'[= ;]' '{print $$4}')
 endif
 
 #-lnosys
@@ -66,7 +65,7 @@ $(TARGET).bin: $(TARGET).elf
 ifdef OPTIMIZE_DFU
 	$(CP) $(TARGET).elf objs/$(TARGET)/$(TARGET).elf
 	@echo " + Optimizing placement and re-linking"
-	$(SDIR)/../utils/repack_ld.pl -mapfile $(TARGET).map -size $(CRC_OFFSET) > objs/optimize.ld
+	$(SDIR)/../utils/repack_ld.pl -mapfile $(TARGET).map -linkfile $(LINKFILE) -size 0 > objs/optimize.ld
 	$(CC) -o $< $(OBJS) $(LIBOPENCM3) $(LFLAGS) $(LFLAGS2OPT) $(CFLAGS)
 endif
 ifdef MODULAR # the following builds a symbol file with thumb addresses (address+1 for functions, address+0 for variables)
