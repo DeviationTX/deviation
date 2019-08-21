@@ -71,14 +71,14 @@ OPTIMIZE_DFU := 0
 endif
 
 ifeq "$(OPTIMIZE_DFU)" "1"
-LINKFILE = $(SDIR)/target/$(TARGET)/$(TARGET).ld
+LINKFILE = $(SDIR)/target/tx/devo/$(TARGET)/$(TARGET).ld
 LFLAGS2  = -Wl,-T$(LINKFILE)
-LINKFILEOPT = $(SDIR)/target/$(TARGET)/$(TARGET)_opt.ld
+LINKFILEOPT = $(SDIR)/target/tx/devo/$(TARGET)/$(TARGET)_opt.ld
 LFLAGS2OPT  = -Wl,-T$(LINKFILEOPT)
 else
-LINKFILE = $(SDIR)/target/$(TARGET)/$(TARGET)_opt.ld
+LINKFILE = $(SDIR)/target/tx/devo/$(TARGET)/$(TARGET)_opt.ld
 ifeq (,$(wildcard $(LINKFILE)))
-LINKFILE = $(SDIR)/target/$(TARGET)/$(TARGET).ld
+LINKFILE = $(SDIR)/target/tx/devo/$(TARGET)/$(TARGET).ld
 endif
 LFLAGS2  = -Wl,-T$(LINKFILE)
 endif
