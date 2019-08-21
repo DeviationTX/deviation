@@ -41,6 +41,9 @@ LINKFILEOPT = $(SDIR)/target/$(TARGET)/$(TARGET)_opt.ld
 LFLAGS2OPT  = -Wl,-T$(LINKFILEOPT)
 else
 LINKFILE = $(SDIR)/target/$(TARGET)/$(TARGET)_opt.ld
+ifeq (,$(wildcard $(LINKFILE)))
+LINKFILE = $(SDIR)/target/$(TARGET)/$(TARGET).ld
+endif
 LFLAGS2  = -Wl,-T$(LINKFILE)
 endif
 
