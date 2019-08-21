@@ -30,15 +30,18 @@ MODULE_FLAGS = -fno-builtin
 #LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -nostdlib
 LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -lc -lnosys -L$(SDIR)
 
+ifndef OPTIMIZE_DFU
+OPTIMIZE_DFU := 0
+endif
+
+ifeq "$(OPTIMIZE_DFU)" "1"
 LINKFILE = $(SDIR)/target/$(TARGET)/$(TARGET).ld
 LFLAGS2  = -Wl,-T$(LINKFILE)
-
-ifdef OPTIMIZE_DFU
 LINKFILEOPT = $(SDIR)/target/$(TARGET)/$(TARGET)_opt.ld
-ifeq (,$(wildcard $(LINKFILEOPT)))
-LINKFILEOPT = $(LINKFILE)
-endif
 LFLAGS2OPT  = -Wl,-T$(LINKFILEOPT)
+else
+LINKFILE = $(SDIR)/target/$(TARGET)/$(TARGET)_opt.ld
+LFLAGS2  = -Wl,-T$(LINKFILE)
 endif
 
 #-lnosys
@@ -48,7 +51,7 @@ ALL = $(LIBOPENCM3) $(TARGET).dfu
 else #BUILD_TARGET
 
 $(TARGET).bin: $(TARGET).elf
-ifdef OPTIMIZE_DFU
+ifeq "$(OPTIMIZE_DFU)" "1"
 	$(CP) $(TARGET).elf objs/$(TARGET)/$(TARGET).elf
 	@echo " + Optimizing placement and re-linking"
 	$(SDIR)/../utils/repack_ld.pl -mapfile $(TARGET).map -linkfile $(LINKFILE) -size 0 > objs/optimize.ld
