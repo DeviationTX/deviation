@@ -34,13 +34,14 @@
 
 #ifdef PROTO_HAS_A7105
 
+#define MAX(A, B) (A > B ? A : B)
 #define TXPACKET_SIZE 38
-#define RXPACKET_SIZE 37
+#define RXPACKET_SIZE (9 + 7 * 6)
 #define NUMFREQ       16
 #define TXID_SIZE     4
 #define RXID_SIZE     4
 
-static u8 packet[TXPACKET_SIZE];
+static u8 packet[MAX(TXPACKET_SIZE, RXPACKET_SIZE)];
 static u8 txid[TXID_SIZE];
 static u8 rxid[RXID_SIZE];
 static u8 hopping_frequency[NUMFREQ];
@@ -51,6 +52,7 @@ static u8 state;
 static u8 channel;
 static u8 tx_power;
 static s16 freq_offset;
+static s32 ground_level;
 
 static const u8 AFHDS2A_regs[] = {
     -1  , 0x42 | (1<<5), 0x00, 0x25, 0x00,   -1,   -1, 0x00, 0x00, 0x00, 0x00, 0x01, 0x3c, 0x05, 0x00, 0x50, // 00 - 0f
@@ -104,13 +106,13 @@ ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 static int afhds2a_init()
 {
-    int i;
+    u8 i;
     u8 if_calibration1;
     u8 vco_calibration0;
     u8 vco_calibration1;
 
     A7105_WriteID(0x5475c52a);
-    for (i = 0; i < 0x33; i++)
+    for (i = 0; i < sizeof(AFHDS2A_regs); i++)
         if((s8)AFHDS2A_regs[i] != -1)
             A7105_WriteReg(i, AFHDS2A_regs[i]);
 
@@ -182,13 +184,13 @@ static int afhds2a_init()
     A7105_WriteReg(0x25, 0x0A);
 
     A7105_SetTxRxMode(TX_EN);
-    
+
     A7105_SetPower(Model.tx_power);
     tx_power = Model.tx_power;
-    
+
     freq_offset = Model.proto_opts[PROTOOPTS_FREQTUNE];
     A7105_AdjustLOBaseFreq(freq_offset);
-    
+
     A7105_Strobe(A7105_STANDBY);
     A7105_SetTxRxMode(TX_EN);
     return 1;
@@ -285,95 +287,199 @@ static void build_packet(u8 type)
 
 // telemetry sensors ID
 enum{
-    SENSOR_VOLTAGE      = 0x00,
-    SENSOR_TEMPERATURE  = 0x01,
-    SENSOR_RPM          = 0x02,
-    SENSOR_CELL_VOLTAGE = 0x03,
-    SENSOR_RX_ERR_RATE  = 0xfe,
-    SENSOR_RX_RSSI      = 0xfc,
-    SENSOR_RX_NOISE     = 0xfb,
-    SENSOR_RX_SNR       = 0xfa,
+    SENSOR_VOLTAGE        = 0x00,    // Internal Voltage
+    SENSOR_TEMPERATURE    = 0x01,    // Temperature
+    SENSOR_MOT            = 0x02,    // RPM
+    SENSOR_EXTV           = 0x03,    // External Voltage
+    SENSOR_CELL_VOLTAGE   = 0x04,    // Avg Cell voltage
+    SENSOR_BAT_CURR       = 0x05,    // battery current A * 100
+    SENSOR_FUEL           = 0x06,    // remaining battery percentage / mah drawn otherwise or fuel level no unit!
+    SENSOR_RPM            = 0x07,    // throttle value / battery capacity
+    SENSOR_CMP_HEAD       = 0x08,    // Heading  0..360 deg, 0=north 2bytes
+    SENSOR_CLIMB_RATE     = 0x09,    // 2 bytes m/s *100
+    SENSOR_COG            = 0x0a,    // 2 bytes  Course over ground(NOT heading, but direction of movement) in degrees * 100, 0.0..359.99 degrees. unknown max uint
+    SENSOR_GPS_STATUS     = 0x0b,    // 2 bytes
+    SENSOR_ACC_X          = 0x0c,    // 2 bytes m/s *100 signed
+    SENSOR_ACC_Y          = 0x0d,    // 2 bytes m/s *100 signed
+    SENSOR_ACC_Z          = 0x0e,    // 2 bytes m/s *100 signed
+    SENSOR_ROLL           = 0x0f,    // 2 bytes deg *100 signed
+    SENSOR_PITCH          = 0x10,    // 2 bytes deg *100 signed
+    SENSOR_YAW            = 0x11,    // 2 bytes deg *100 signed
+    SENSOR_VERTICAL_SPEED = 0x12,    // 2 bytes m/s *100
+    SENSOR_GROUND_SPEED   = 0x13,    // 2 bytes m/s *100 different unit than build-in sensor
+    SENSOR_GPS_DIST       = 0x14,    // 2 bytes dist from home m unsigned
+    SENSOR_ARMED          = 0x15,    // 2 bytes
+    SENSOR_FLIGHT_MODE    = 0x16,    // 2 bytes simple index listed below
+
+    SENSOR_PRES           = 0x41,    // Pressure
+    SENSOR_ODO1           = 0x7c,    // Odometer1
+    SENSOR_ODO2           = 0x7d,    // Odometer2
+    SENSOR_SPE            = 0x7e,    // Speed            //2byte km/h
+    SENSOR_TX_V           = 0x7f,    // TX Voltage
+
+    // 4 byte sensors
+    SENSOR_GPS_LAT        = 0x80,    // 4bytes signed WGS84 in degrees * 1E7
+    SENSOR_GPS_LON        = 0x81,    // 4bytes signed WGS84 in degrees * 1E7
+    SENSOR_GPS_ALT        = 0x82,    // 4bytes signed!!! GPS alt m*100
+    SENSOR_ALT            = 0x83,    // 4bytes signed!!! Alt m*100
+    SENSOR_S84            = 0x84,
+    SENSOR_S85            = 0x85,
+    SENSOR_S86            = 0x86,
+    SENSOR_S87            = 0x87,
+    SENSOR_S88            = 0x88,
+    SENSOR_S89            = 0x89,
+    SENSOR_S8a            = 0x8a,
+
+// commented out in MAVLink    SENSOR_ALT_FLYSKY     = 0xf9,    // Altitude         //2 bytes signed in m
+    SENSOR_RX_SNR         = 0xfa,    // SNR
+    SENSOR_RX_NOISE       = 0xfb,    // Noise
+    SENSOR_RX_RSSI        = 0xfc,    // RSSI
+    SENSOR_RX_ERR_RATE    = 0xfe,    // Error rate
+    SENSOR_UNKNOWN        = 0xff,
+
+// AC type telemetry with multiple values in one packet
+    SENSOR_GPS_FULL       = 0xfd,
+    SENSOR_VOLT_FULL      = 0xf0,
+    SENSOR_ACC_FULL       = 0xef,
 };
+
+static void set_telemetry(frsky_telem_t offset, s32 value) {
+    Telemetry.value[offset] = value;
+    TELEMETRY_SetUpdated(offset);
+}
 
 static void update_telemetry()
 {
+    // 0    1234   5678   9           10         11       12
     // AA | TXID | RXID | sensor id | sensor # | value 16 bit big endian | sensor id ......
+    // AC | TXID | RXID | sensor id | sensor # | length | value 32 bit big endian | sensor id ......
     // max 7 sensors per packet
-    
+
     u8 voltage_index = 0;
+    u8 index = 9;   // first sensor ID in telemetry packet
+    u16 data16 = packet[index+3] << 8 | packet[index+2];
 #if HAS_EXTENDED_TELEMETRY
+    s32 data32 = packet[index+6] << 24 | packet[index+5] << 16 | packet[index+4] << 8 | packet[index+3];
     u8 cell_index = 0;
     u16 cell_total = 0;
     u8 temp_index;
 #endif
 
-    for(u8 sensor=0; sensor<7; sensor++) {
-        u8 index = 9+(4*sensor);
+    while (index <= 32 && packet[index] != 0xff) {
         switch(packet[index]) {
-            case SENSOR_VOLTAGE:
-                voltage_index++;
-                if(packet[index+1] == 0) // Rx voltage
-                {
-                    Telemetry.value[TELEM_FRSKY_VOLT1] = packet[index+3]<<8 | packet[index+2];
-                    TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT1);
-                }
-                else if(voltage_index == 2) // external voltage sensor #1
-                {
-                    Telemetry.value[TELEM_FRSKY_VOLT2] = packet[index+3]<<8 | packet[index+2];
-                    TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT2);
-                }
-#if HAS_EXTENDED_TELEMETRY
-                else if(voltage_index == 3) // external voltage sensor #2
-                {
-                    Telemetry.value[TELEM_FRSKY_VOLT3] = packet[index+3]<<8 | packet[index+2];
-                    TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT3);
-                }
-#endif
-                break;
-#if HAS_EXTENDED_TELEMETRY
-            case SENSOR_TEMPERATURE:
-                temp_index = packet[index+1];
-                if(temp_index == 0) {
-                    Telemetry.value[TELEM_FRSKY_TEMP1] = ((packet[index+3]<<8 | packet[index+2]) - 400)/10;
-                    TELEMETRY_SetUpdated(TELEM_FRSKY_TEMP1);
-                }
-                else if(temp_index == 1) {
-                    Telemetry.value[TELEM_FRSKY_TEMP2] = ((packet[index+3]<<8 | packet[index+2]) - 400)/10;
-                    TELEMETRY_SetUpdated(TELEM_FRSKY_TEMP2);
-                }
-                break;
-            case SENSOR_CELL_VOLTAGE:
-                if(cell_index < 6) {
-                    Telemetry.value[TELEM_FRSKY_CELL1 + cell_index] = packet[index+3]<<8 | packet[index+2];
-                    TELEMETRY_SetUpdated(TELEM_FRSKY_CELL1 + cell_index);
-                    cell_total += packet[index+3]<<8 | packet[index+2];
-                }
-                cell_index++;
-                break;
-            case SENSOR_RPM:
-                Telemetry.value[TELEM_FRSKY_RPM] = packet[index+3]<<8 | packet[index+2];
-                TELEMETRY_SetUpdated(TELEM_FRSKY_RPM);
-                break;
-#endif
-            case SENSOR_RX_ERR_RATE:
-                Telemetry.value[TELEM_FRSKY_LQI] = 100 - packet[index+2];
-                TELEMETRY_SetUpdated(TELEM_FRSKY_LQI);
-                break;
-            case SENSOR_RX_RSSI:
-                Telemetry.value[TELEM_FRSKY_RSSI] = packet[index+2];
-                TELEMETRY_SetUpdated(TELEM_FRSKY_RSSI);
-                break;
-            default:
-                // unknown sensor ID or end of list
-                break;
+        case SENSOR_VOLTAGE:
+            voltage_index++;
+            if (packet[index+1] == 0)  // Rx voltage
+            {
+                set_telemetry(TELEM_FRSKY_VOLT1, data16);
             }
+            else if (voltage_index == 2)  // external voltage sensor #1
+            {
+                set_telemetry(TELEM_FRSKY_VOLT2, data16);
+            }
+#if HAS_EXTENDED_TELEMETRY
+            else if (voltage_index == 3)  // external voltage sensor #2
+            {
+                set_telemetry(TELEM_FRSKY_VOLT3, data16);
+            }
+#endif
+            break;
+#if HAS_EXTENDED_TELEMETRY
+        case SENSOR_TEMPERATURE:
+            temp_index = packet[index+1];
+            if (temp_index == 0) {
+                set_telemetry(TELEM_FRSKY_TEMP1, (data16 - 400)/10);
+            } else if (temp_index == 1) {
+                set_telemetry(TELEM_FRSKY_TEMP2, (data16 - 400)/10);
+            }
+            break;
+        case SENSOR_PRES:
+            set_telemetry(TELEM_FRSKY_TEMP1, ((data32 >> 19) - 400)/10);
+            // simplified pressure to altitude calculation, since very linear
+            // below 2000m and display is relative (AGL)
+            // linear approximation of barometric formula in ISA at low altitude
+            // y = -0.079x + 1513, scaled to centimeters
+            int altitude = (int)(-0.08 * (uint32_t)(data32 & 0x7ffff) + 1513) * 100;
+            if (ground_level == 0) ground_level = altitude;
+            set_telemetry(TELEM_FRSKY_ALTITUDE, altitude - ground_level);
+            break;
+        case SENSOR_CELL_VOLTAGE:
+            if (cell_index < 6) {
+                set_telemetry(TELEM_FRSKY_CELL1 + cell_index, data16);
+                cell_total += data16;
+            }
+            cell_index++;
+            break;
+        case SENSOR_CLIMB_RATE:
+            set_telemetry(TELEM_FRSKY_VARIO, data16);
+            break;
+        case SENSOR_ALT:
+            set_telemetry(TELEM_FRSKY_ALTITUDE, data32);
+            break;
+        case SENSOR_FUEL:
+            set_telemetry(TELEM_FRSKY_FUEL, data16);
+            break;
+        case SENSOR_BAT_CURR:
+            set_telemetry(TELEM_FRSKY_CURRENT, data16 * 10);
+            break;
+        case SENSOR_MOT:
+            set_telemetry(TELEM_FRSKY_RPM, data16);
+            break;
+        case SENSOR_GPS_LON:
+            Telemetry.gps.longitude = data32;
+            TELEMETRY_SetUpdated(TELEM_GPS_LONG);
+            break;
+        case SENSOR_GPS_LAT:
+            Telemetry.gps.latitude = data32;
+            TELEMETRY_SetUpdated(TELEM_GPS_LAT);
+            break;
+        case SENSOR_GPS_ALT:
+            Telemetry.gps.altitude = data32;
+            TELEMETRY_SetUpdated(TELEM_GPS_ALT);
+            break;
+        case SENSOR_GPS_FULL: {
+            u8 tmp = index + 5;     // skip GPS status
+            data32 = packet[tmp+3] << 24 | packet[tmp+2] << 16 | packet[tmp+1] << 8 | packet[tmp];
+            Telemetry.gps.latitude = data32;
+            TELEMETRY_SetUpdated(TELEM_GPS_LAT);
+            tmp += 4;
+            data32 = packet[tmp+3] << 24 | packet[tmp+2] << 16 | packet[tmp+1] << 8 | packet[tmp];
+            Telemetry.gps.longitude = data32;
+            TELEMETRY_SetUpdated(TELEM_GPS_LONG);
+            tmp += 4;
+            data32 = packet[tmp+3] << 24 | packet[tmp+2] << 16 | packet[tmp+1] << 8 | packet[tmp];
+            Telemetry.gps.altitude = data32;
+            TELEMETRY_SetUpdated(TELEM_GPS_ALT);
+        }
+            break;
+#endif
+        case SENSOR_RX_SNR:
+//            set_telemetry(TELEM_FRSKY_LQI, 100 - packet[index+2]);
+            break;
+        case SENSOR_RX_NOISE:
+//            set_telemetry(TELEM_FRSKY_LQI, 100 - packet[index+2]);
+            break;
+        case SENSOR_RX_RSSI:
+            set_telemetry(TELEM_FRSKY_RSSI, packet[index+2]);
+            break;
+        case SENSOR_RX_ERR_RATE:
+            set_telemetry(TELEM_FRSKY_LQI, 100 - packet[index+2]);
+            break;
+        default:
+            // unknown sensor ID or end of list
+            break;
+        }
+        if (packet[0] == 0xaa)
+            index += ((packet[index] & 0xf0) == 0x80 ? 6 : 4);
+        else
+            index += packet[index + 2] + 3;
     }
 #if HAS_EXTENDED_TELEMETRY
     if(cell_index > 0) {
         Telemetry.value[TELEM_FRSKY_ALL_CELL] = cell_total;
         TELEMETRY_SetUpdated(TELEM_FRSKY_ALL_CELL);
     }
-#endif 
+#endif
 }
 
 static void build_bind_packet()
@@ -451,7 +557,7 @@ static void calc_fh_channels(uint32_t seed)
 static void initialize_tx_id()
 {
     u32 lfsr = 0x7649eca9ul;
-    
+
 #ifndef USE_FIXED_MFGID
     u8 var[12];
     MCU_SerialNumber(var, 12);
@@ -467,7 +573,7 @@ static void initialize_tx_id()
        for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
            rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
     }
-    
+
     // Pump zero bytes for LFSR to diverge more
     for (int i = 0; i < TXID_SIZE; ++i) rand32_r(&lfsr, 0);
 
@@ -475,7 +581,7 @@ static void initialize_tx_id()
         txid[i] = lfsr & 0xff;
         rand32_r(&lfsr, i);
     }
-    
+
     // Use LFSR to seed frequency hopping sequence after another
     // divergence round
     for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
@@ -494,7 +600,7 @@ static u16 afhds2a_cb()
     switch(state) {
         case BIND1:
         case BIND2:
-        case BIND3:    
+        case BIND3:
             A7105_Strobe(A7105_STANDBY);
             A7105_SetTxRxMode(TX_EN);
             build_bind_packet();
@@ -511,11 +617,11 @@ static u16 afhds2a_cb()
                     if(packet[9] == 0x01)
                         state = BIND4;
                 }
-            } 
+            }
             packet_count++;
             state |= WAIT_WRITE;
             return 1700;
-        
+
         case BIND1|WAIT_WRITE:
         case BIND2|WAIT_WRITE:
         case BIND3|WAIT_WRITE:
@@ -526,7 +632,7 @@ static u16 afhds2a_cb()
             if(state > BIND3)
                 state = BIND1;
             return 2150;
-        
+
         case BIND4:
             A7105_Strobe(A7105_STANDBY);
             A7105_SetTxRxMode(TX_EN);
@@ -534,22 +640,22 @@ static u16 afhds2a_cb()
             A7105_WriteData(packet, 38, packet_count%2 ? 0x0d : 0x8c);
             packet_count++;
             bind_reply++;
-            if(bind_reply>=4) { 
+            if (bind_reply >= 4) {
                 packet_count=0;
                 channel=1;
                 state = DATA1;
                 PROTOCOL_SetBindState(0);
-            }                        
+            }
             state |= WAIT_WRITE;
             return 1700;
-            
+
         case BIND4|WAIT_WRITE:
             A7105_SetTxRxMode(RX_EN);
             A7105_Strobe(A7105_RX);
             state &= ~WAIT_WRITE;
             return 2150;
-        
-        case DATA1:    
+
+        case DATA1:
             A7105_Strobe(A7105_STANDBY);
             A7105_SetTxRxMode(TX_EN);
             build_packet(packet_type);
@@ -576,13 +682,12 @@ static u16 afhds2a_cb()
                 A7105_Strobe(A7105_RST_RDPTR);
                 u8 check;
                 A7105_ReadData(&check,1);
-                if(check == 0xaa) {
+                if (check == 0xaa || check == 0xac) {
                     A7105_Strobe(A7105_RST_RDPTR);
                     A7105_ReadData(packet, RXPACKET_SIZE);
-                    if(packet[9] == 0xfc) { // rx is asking for settings
+                    if (packet[9] == 0xfc) {  // rx is asking for settings
                         packet_type=PACKET_SETTINGS;
-                    }
-                    else {
+                    } else {
                         update_telemetry();
                     }
                 }
@@ -590,7 +695,6 @@ static u16 afhds2a_cb()
             packet_count++;
             state |= WAIT_WRITE;
             return 1700;
-            
         case DATA1|WAIT_WRITE:
             state &= ~WAIT_WRITE;
             A7105_SetTxRxMode(RX_EN);
