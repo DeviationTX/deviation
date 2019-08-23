@@ -165,8 +165,10 @@ unsigned page_change_cb(u32 buttons, unsigned flags, void *data)
     if (PAGE_GetID() == PAGEID_TELEMMON) {
         if(CHAN_ButtonIsPressed(buttons, BUT_ENTER) || CHAN_ButtonIsPressed(buttons, BUT_EXIT))
             TELEMETRY_MuteAlarm();
-        if(flags & BUTTON_LONGPRESS && CHAN_ButtonIsPressed(buttons, BUT_UP))
+        if(flags & BUTTON_LONGPRESS && CHAN_ButtonIsPressed(buttons, BUT_UP)) {
+            BUTTON_InterruptLongPress(); // disable fast repeating TELEMETRY_ResetValues()
             TELEMETRY_ResetValues();
+        }
     }
     if (flags & BUTTON_LONGPRESS) {
         if (flags & BUTTON_REPEAT)
