@@ -525,7 +525,7 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
         TELEMETRY_MuteAlarm();
     }
     if (flags & BUTTON_LONGPRESS && CHAN_ButtonIsPressed(button, BUT_UP)) {
-        BUTTON_InterruptLongPress(); // disable fast repeating TELEMETRY_ResetValues()
+        BUTTON_InterruptLongPress();  // disable fast repeating TELEMETRY_ResetValues()
         TELEMETRY_ResetValues();
     }
     return default_button_action_cb(button, flags, data);
