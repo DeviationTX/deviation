@@ -52,7 +52,9 @@ static u8 state;
 static u8 channel;
 static u8 tx_power;
 static s16 freq_offset;
+#if HAS_EXTENDED_TELEMETRY
 static s32 ground_level;
+#endif
 
 static const u8 AFHDS2A_regs[] = {
     -1  , 0x42 | (1<<5), 0x00, 0x25, 0x00,   -1,   -1, 0x00, 0x00, 0x00, 0x00, 0x01, 0x3c, 0x05, 0x00, 0x50, // 00 - 0f
