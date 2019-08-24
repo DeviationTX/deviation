@@ -507,6 +507,8 @@ void TELEMETRY_ResetValues(void)
     // Reset cumulative values, altitude ground level, etc.
     // Exact values are protocol depenedent
     PROTOCOL_ResetTelemetry();
+    SOUND_SetFrequency(3951, Transmitter.volume * 10);
+    SOUND_StartWithoutVibrating(100, NULL);
 }
 
 void TELEMETRY_MuteAlarm()
