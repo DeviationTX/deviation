@@ -52,9 +52,6 @@ static u8 state;
 static u8 channel;
 static u8 tx_power;
 static s16 freq_offset;
-#if HAS_EXTENDED_TELEMETRY
-static s32 ground_level;
-#endif
 
 static const u8 AFHDS2A_regs[] = {
     -1  , 0x42 | (1<<5), 0x00, 0x25, 0x00,   -1,   -1, 0x00, 0x00, 0x00, 0x00, 0x01, 0x3c, 0x05, 0x00, 0x50, // 00 - 0f
@@ -402,8 +399,8 @@ static void update_telemetry()
             // linear approximation of barometric formula in ISA at low altitude
             // y = -0.079x + 1513, scaled to centimeters
             int altitude = (int)(-0.08 * (uint32_t)(data32 & 0x7ffff) + 1513) * 100;
-            if (ground_level == 0) ground_level = altitude;
-            set_telemetry(TELEM_FRSKY_ALTITUDE, altitude - ground_level);
+            if (Model.ground_level == 0) Model.ground_level = altitude;
+            set_telemetry(TELEM_FRSKY_ALTITUDE, altitude - Model.ground_level);
             break;
         case SENSOR_CELL_VOLTAGE:
             if (cell_index < 6) {
@@ -755,6 +752,11 @@ const void *AFHDS2A_Cmds(enum ProtoCmds cmd)
             return (void *)(long) PROTO_TELEM_ON;
         case PROTOCMD_TELEMETRYTYPE:
             return (void *)(long) TELEM_FRSKY;
+#if HAS_EXTENDED_TELEMETRY
+        case PROTOCMD_TELEMETRYRESET:
+            Model.ground_level = 0;
+            return 0;
+#endif
         default: break;
     }
     return 0;

@@ -463,6 +463,10 @@ static void _navigate_pages(s8 direction)
 static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
+    if (flags & BUTTON_LONGPRESS && CHAN_ButtonIsPressed(button, BUT_UP)) {
+        BUTTON_InterruptLongPress();  // disable fast repeating TELEMETRY_ResetValues()
+        TELEMETRY_ResetValues();
+    }
     if (flags & BUTTON_PRESS) {
         if (CHAN_ButtonIsPressed(button, BUT_ENTER) || CHAN_ButtonIsPressed(button, BUT_EXIT))
             TELEMETRY_MuteAlarm();
