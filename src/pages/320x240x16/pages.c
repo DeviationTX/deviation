@@ -86,7 +86,8 @@ void PAGE_Init()
     exit_cmd = NULL;
     BUTTON_RegisterCallback(&button_action,
         CHAN_ButtonMask(BUT_ENTER) | CHAN_ButtonMask(BUT_EXIT)
-        | CHAN_ButtonMask(BUT_RIGHT) | CHAN_ButtonMask(BUT_LEFT),
+        | CHAN_ButtonMask(BUT_RIGHT) | CHAN_ButtonMask(BUT_LEFT)
+        | CHAN_ButtonMask(BUT_UP),
         BUTTON_PRESS | BUTTON_LONGPRESS, page_change_cb, NULL);
     PAGE_ChangeByID(PAGEID_SPLASH);
     //PAGE_ChangeByID(PAGEID_MAIN);
@@ -226,8 +227,12 @@ unsigned page_change_cb(u32 buttons, unsigned flags, void *data)
     (void)data;
     (void)flags;
     if (PAGE_GetID() == PAGEID_TELEMMON) {
-        if(CHAN_ButtonIsPressed(buttons, BUT_ENTER) || CHAN_ButtonIsPressed(buttons, BUT_EXIT))
+        if (CHAN_ButtonIsPressed(buttons, BUT_ENTER) || CHAN_ButtonIsPressed(buttons, BUT_EXIT))
             TELEMETRY_MuteAlarm();
+        if (flags & BUTTON_LONGPRESS && CHAN_ButtonIsPressed(buttons, BUT_UP)) {
+            BUTTON_InterruptLongPress();  // disable fast repeating TELEMETRY_ResetValues()
+            TELEMETRY_ResetValues();
+        }
     }
     if (ActionCB != NULL)
         return ActionCB(buttons, flags, data);

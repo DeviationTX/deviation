@@ -64,6 +64,9 @@ struct Model {
 #if HAS_DATALOG
     struct datalog datalog;
 #endif
+#if HAS_EXTENDED_TELEMETRY
+    s32 ground_level;
+#endif
 };
 extern struct Model Model;
 extern const char * const RADIO_TX_POWER_VAL[TXPOWER_LAST];
