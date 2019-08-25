@@ -90,6 +90,7 @@ void print_buttons(u32 buttons)
     buttonstring[32] = 0;
     printf("Buttons: %s\n",buttonstring);
 }
+
 static u8 interrupt_longpress = 0;
 void BUTTON_Handler()
 {
@@ -125,11 +126,11 @@ void BUTTON_Handler()
     if(buttons_released) {
         //printf("release: %08d\n", buttons_released);
         interrupt_longpress = 0;
-        longpress_release = 0;
         if(!longpress_release) {
             exec_callbacks(buttons_released, BUTTON_RELEASE);
         } else {
             exec_callbacks(buttons_released, BUTTON_RELEASE | BUTTON_HAD_LONGPRESS);
+            longpress_release = 0;
         }
     }
 
