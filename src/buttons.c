@@ -137,7 +137,7 @@ void BUTTON_Handler()
     if(buttons && (buttons == last_buttons) && !interrupt_longpress) {
         if(ms > long_press_at) {
             //printf("long_press: %08d\n", buttons_released);
-            exec_callbacks(last_buttons_pressed, BUTTON_LONGPRESS);
+            exec_callbacks(last_buttons_pressed, BUTTON_LONGPRESS | (longpress_release ? BUTTON_REPEAT : 0));
             longpress_release=1;
             long_press_at += 100;
         }
