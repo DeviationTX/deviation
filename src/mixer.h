@@ -25,8 +25,12 @@
 
 #define MIXER_MUX(x)        (((x)->flags) & 0x0F)
 #define MIXER_APPLY_TRIM(x) (((x)->flags) & 0x10)
+#define MIXER_BEEP_LOCK(x)  (((x)->flags) & 0x20)
+#define MIXER_VOICE_LOCK(x)  (((x)->flags) & 0x40)
 #define MIXER_SET_APPLY_TRIM(x,y) ((x)->flags = ((x)->flags & ~0x10) | ((y) ? 0x10 : 0))
 #define MIXER_SET_MUX(x,y)        ((x)->flags = ((x)->flags & ~0x0F) | (y))
+#define MIXER_SET_BEEP_LOCK(x,y)  ((x)->flags = ((x)->flags & ~0x20) | ((y) ? 0x20 : 0))
+#define MIXER_SET_VOICE_LOCK(x,y) ((x)->flags = ((x)->flags & ~0x40) | ((y) ? 0x40 : 0))
 
 enum {
     TRIM_ONOFF     = 191,
@@ -135,10 +139,6 @@ struct Mixer {
     s8 scalar;
     s8 offset;
     u8 flags;
-    u8 beep_lock;
-    u8 voice_lock;
-    //apply_trim;
-    //enum MuxType mux;
 };
 
 enum LimitFlags {
