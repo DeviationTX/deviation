@@ -350,12 +350,12 @@ void MIXER_ApplyMixer(struct Mixer *mixer, volatile s32 *raw, s32 *orig_value)
     case MUX_BEEP:
         if (orig_value) {
             if (abs(value - scaled_value) > 100)
-                mixer->beep_lock = 0;
-            if (mixer->beep_lock == 0) {
+                MIXER_SET_BEEP_LOCK(mixer, 0);
+            if (! MIXER_BEEP_LOCK(mixer)) {
                 if ((value > *orig_value && value < scaled_value) ||
                     (value < *orig_value && value > scaled_value) ||
                     (abs(value - scaled_value) <= 10)) {
-                    mixer->beep_lock = 1;
+                    MIXER_SET_BEEP_LOCK(mixer, 1);
                     MUSIC_Play(MUSIC_MAXLEN);
                 }
             }
@@ -365,12 +365,12 @@ void MIXER_ApplyMixer(struct Mixer *mixer, volatile s32 *raw, s32 *orig_value)
     case MUX_VOICE:
         if (orig_value) {
             if (abs(value - scaled_value) > 100)
-                mixer->voice_lock = 0;
-            if (mixer->voice_lock == 0) {
+                MIXER_SET_VOICE_LOCK(mixer, 0);
+            if (! MIXER_VOICE_LOCK(mixer)) {
                 if ((value > *orig_value && value < scaled_value) ||
                     (value < *orig_value && value > scaled_value) ||
                     (abs(value - scaled_value) <= 10)) {
-                    mixer->voice_lock = 1;
+                    MIXER_SET_VOICE_LOCK(mixer, 1);
                     if (Model.voice.mixer[mixer->dest].music)
                         MUSIC_Play(Model.voice.mixer[mixer->dest].music);
                 }
