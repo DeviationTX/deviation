@@ -19,7 +19,7 @@ static void _draw_page(u8 enable);
 static void _draw_channels(void);
 static u16 scan_cb();
 
-#ifdef ENABLE_MODULAR
+#ifdef MODULAR
 #error "Not supported in MODULAR build"
 #endif
 
