@@ -8,7 +8,13 @@
 #define SPIFLASH_SECTOR_OFFSET 54
 #define SPIFLASH_SECTORS 1024
 
-#define HAS_STANDARD_GUI    1
+#if defined BUILDTYPE_DEV && ! defined EMULATOR
+//No room for debug and standard gui
+ #define HAS_STANDARD_GUI   0
+#else
+ #define HAS_STANDARD_GUI   1
+#endif
+
 #define HAS_ADVANCED_GUI    1
 #define HAS_PERMANENT_TIMER 1
 #define HAS_TELEMETRY       1
