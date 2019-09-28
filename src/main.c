@@ -327,8 +327,9 @@ void TOUCH_Handler() {
 void VIDEO_Update()
 {
     static u8 video_enable = 0;
-    static u8 video_standard_in_use = 0xFE; //unknown
-    //FIXME This is just like DATALOG_IsEnabled
+    static u32 check_standard_ms = 0;
+
+    // Check if Video is turn on
     int enabled = MIXER_SourceAsBoolean(Model.videosrc);
 
     if (enabled != video_enable) {
@@ -338,18 +339,28 @@ void VIDEO_Update()
             VIDEO_SetChannel(Model.videoch);
             VIDEO_Contrast(Model.video_contrast);
             VIDEO_Brightness(Model.video_brightness);
+            check_standard_ms = CLOCK_getms() + 1000;
         }
+        else
+            check_standard_ms = 0;
     }
-    if(video_enable) {
-        u8 video_standard_current = VIDEO_GetStandard();
-        if((video_standard_current > 0) &&
-           (video_standard_current < 8) &&
-           (video_standard_current != video_standard_in_use)) {
-            video_standard_in_use = video_standard_current;
-            VIDEO_SetStandard(video_standard_current);
-        }
-	AUTODIMMER_Check();
+
+    if(video_enable &&
+        check_standard_ms > 0
+        && check_standard_ms < CLOCK_getms()) {
+            u8 video_standard_current = VIDEO_GetStandard();
+            if((video_standard_current > 0) &&
+               (video_standard_current < 8)) {
+                VIDEO_SetStandard(video_standard_current);
+                check_standard_ms = 0;
+            }
+            else {
+                check_standard_ms = CLOCK_getms() + 1000;
+            }
     }
+
+    if(video_enable)
+        AUTODIMMER_Check();
 }
 #endif //HAS_VIDEO
 
