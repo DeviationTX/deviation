@@ -46,7 +46,6 @@ u8 A7105_ReadReg(u8 address)
     u8 data;
     CS_LO();
     PROTOSPI_xfer(0x40 | address);
-    /* Wait for tx completion before spi shutdown */
     data = PROTOSPI_read3wire();
     CS_HI();
     return data;
