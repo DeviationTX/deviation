@@ -47,6 +47,8 @@ int SPI_ConfigSwitch(unsigned csn_high, unsigned csn_low)
     //Switch back to SPI
     gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
                   GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO13);
+    //Save baudrate prescaler
+    u32 reg32 = (SPI_CR1(SPI2) & 0x0038) >> 3; /* bits [5:3] */
     spi_set_baudrate_prescaler(SPI2, SPI_CR1_BR_FPCLK_DIV_128);
     spi_enable(SPI2);
     //Finally ready to send a command
@@ -57,7 +59,7 @@ int SPI_ConfigSwitch(unsigned csn_high, unsigned csn_low)
         asm volatile ("nop");
     //Reset transfer speed
     spi_disable(SPI2);
-    spi_set_baudrate_prescaler(SPI2, SPI_CR1_BR_FPCLK_DIV_16);
+    spi_set_baudrate_prescaler(SPI2, reg32);
     spi_enable(SPI2);
     return byte1 == 0xa5 ? byte2 : 0;
 }
@@ -142,7 +144,7 @@ void SPI_ProtoInit()
     }
     /* Includes enable? */
     spi_init_master(SPI2, 
-                    SPI_CR1_BAUDRATE_FPCLK_DIV_16,
+                    SPI_CR1_BAUDRATE_FPCLK_DIV_8,  // Set SPI2 speed 36MHz/8 = 4.5MHz
                     SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE,
                     SPI_CR1_CPHA_CLK_TRANSITION_1, 
                     SPI_CR1_DFF_8BIT,
