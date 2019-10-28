@@ -32,10 +32,12 @@
     #define SPIx        SPI1
     #define SPIxEN      RCC_APB2ENR_SPI1EN
     #define APB_SPIxEN  RCC_APB2ENR
+    #define SPI_CR1_BAUDRATE_FPCLK_DIV_x  SPI_CR1_BAUDRATE_FPCLK_DIV_16  // Set SPIx speed 72MHz/16 = 4.5MHz
 #elif _SPI_PROTO_PORT == 2
     #define SPIx        SPI2
     #define SPIxEN      RCC_APB1ENR_SPI2EN
     #define APB_SPIxEN  RCC_APB1ENR
+    #define SPI_CR1_BAUDRATE_FPCLK_DIV_x  SPI_CR1_BAUDRATE_FPCLK_DIV_8   // Set SPIx speed 36MHz/8 = 4.5MHz
 #endif
 
 #ifndef HAS_4IN1_FLASH
@@ -61,6 +63,8 @@ int SPI_ConfigSwitch(unsigned csn_high, unsigned csn_low)
     //Switch back to SPI
     gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
                   GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO13);
+    //Save baudrate prescaler
+    u32 reg32 = (SPI_CR1(SPI2) & 0x0038) >> 3; /* bits [5:3] */
     spi_set_baudrate_prescaler(SPIx, SPI_CR1_BR_FPCLK_DIV_128);
     spi_enable(SPIx);
     //Finally ready to send a command
@@ -71,7 +75,7 @@ int SPI_ConfigSwitch(unsigned csn_high, unsigned csn_low)
         asm volatile ("nop");
     //Reset transfer speed
     spi_disable(SPIx);
-    spi_set_baudrate_prescaler(SPIx, SPI_CR1_BR_FPCLK_DIV_16);
+    spi_set_baudrate_prescaler(SPIx, reg32);
     spi_enable(SPIx);
     return byte1 == 0xa5 ? byte2 : 0;
 }
@@ -133,7 +137,7 @@ void SPI_ProtoInit()
 
     /* Includes enable? */
     spi_init_master(SPIx, 
-                    SPI_CR1_BAUDRATE_FPCLK_DIV_16,
+                    SPI_CR1_BAUDRATE_FPCLK_DIV_x,
                     SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE,
                     SPI_CR1_CPHA_CLK_TRANSITION_1, 
                     SPI_CR1_DFF_8BIT,
