@@ -23,10 +23,12 @@
     #define SPIx        SPI1
     #define SPIxEN      RCC_APB2ENR_SPI1EN
     #define APB_SPIxEN  RCC_APB2ENR
+    #define SPI_CR1_BR_FPCLK_DIV_x  SPI_CR1_BR_FPCLK_DIV_16  // Set SPI1 speed 72MHz/16 = 4.5MHz
 #elif _SPI_PROTO_PORT == 2
     #define SPIx        SPI2
     #define SPIxEN      RCC_APB1ENR_SPI2EN
     #define APB_SPIxEN  RCC_APB1ENR
+    #define SPI_CR1_BR_FPCLK_DIV_x  SPI_CR1_BR_FPCLK_DIV_8   // Set SPI2 speed 36MHz/8 = 4.5MHz
 #endif
 
 
@@ -153,7 +155,7 @@ static void UseModule(int module)
     if (module == MODULE_FLASH) {
         spi_set_baudrate_prescaler(SPIx, SPI_CR1_BR_FPCLK_DIV_4);
     } else if (last_module_used == MODULE_FLASH) {
-        spi_set_baudrate_prescaler(SPIx, SPI_CR1_BR_FPCLK_DIV_16);
+        spi_set_baudrate_prescaler(SPIx, SPI_CR1_BR_FPCLK_DIV_x);
     }
     spi_enable(SPIx);
 
