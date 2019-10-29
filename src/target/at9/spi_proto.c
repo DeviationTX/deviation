@@ -33,10 +33,12 @@ void SPI_ProtoInit()
         #define SPIx        SPI1
         #define SPIxEN      RCC_APB2ENR_SPI1EN
         #define APB_SPIxEN  RCC_APB2ENR
+        #define SPI_CR1_BAUDRATE_FPCLK_DIV_x  SPI_CR1_BAUDRATE_FPCLK_DIV_16  // Set SPIx speed 72MHz/16 = 4.5MHz
     #elif _SPI_PROTO_PORT == 2
         #define SPIx        SPI2
         #define SPIxEN      RCC_APB1ENR_SPI2EN
         #define APB_SPIxEN  RCC_APB1ENR
+        #define SPI_CR1_BAUDRATE_FPCLK_DIV_x  SPI_CR1_BAUDRATE_FPCLK_DIV_8   // Set SPIx speed 36MHz/8 = 4.5MHz
     #endif
     /* Enable SPIx */
     rcc_peripheral_enable_clock(&APB_SPIxEN,  SPIxEN);
@@ -57,7 +59,7 @@ void SPI_ProtoInit()
 
     /* Includes enable? */
     spi_init_master(SPIx, 
-                    SPI_CR1_BAUDRATE_FPCLK_DIV_16,
+                    SPI_CR1_BAUDRATE_FPCLK_DIV_x,
                     SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE,
                     SPI_CR1_CPHA_CLK_TRANSITION_1, 
                     SPI_CR1_DFF_8BIT,
