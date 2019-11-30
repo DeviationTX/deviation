@@ -59,9 +59,6 @@ MODULE_CFLAGS := -fno-builtin
 #LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -nostdlib
 LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -lc -lnosys -L$(SDIR) -L$(SDIR)/protocol -Lobjs/$(TARGET) -Wl,-warn-common
 
-LINKFILE = $(SDIR)/target/tx/devo/$(TARGET)/$(TARGET).ld
-LFLAGS2  = -Wl,-T$(LINKFILE)
-
 ifdef ENABLE_LTO
 EXTRA_CFLAGS  := $(EXTRA_CFLAGS) -flto -ffat-lto-objects -DENABLE_LTO
 MODULE_CFLAGS := $(MODULE_CFLAGS) -ffunction-sections
@@ -69,12 +66,21 @@ else
 CFLAGS += -ffunction-sections
 endif
 
-ifdef OPTIMIZE_DFU
-LINKFILEOPT = $(SDIR)/target/tx/devo/$(TARGET)/$(TARGET)_opt.ld
-ifeq (,$(wildcard $(LINKFILEOPT)))
-LINKFILEOPT = $(LINKFILE)
+ifndef OPTIMIZE_DFU
+OPTIMIZE_DFU := 0
 endif
+
+ifeq "$(OPTIMIZE_DFU)" "1"
+LINKFILE = $(SDIR)/target/tx/devo/$(TARGET)/$(TARGET).ld
+LFLAGS2  = -Wl,-T$(LINKFILE)
+LINKFILEOPT = $(SDIR)/target/tx/devo/$(TARGET)/$(TARGET)_opt.ld
 LFLAGS2OPT  = -Wl,-T$(LINKFILEOPT)
+else
+LINKFILE = $(SDIR)/target/tx/devo/$(TARGET)/$(TARGET)_opt.ld
+ifeq (,$(wildcard $(LINKFILE)))
+LINKFILE = $(SDIR)/target/tx/devo/$(TARGET)/$(TARGET).ld
+endif
+LFLAGS2  = -Wl,-T$(LINKFILE)
 endif
 
 # Enable warning as error
@@ -103,7 +109,7 @@ else
 endif
 
 $(TARGET).bin: $(TARGET).elf
-ifdef OPTIMIZE_DFU
+ifeq "$(OPTIMIZE_DFU)" "1"
 	$(CP) $(TARGET).elf objs/$(TARGET)/$(TARGET).elf
 	@echo " + Optimizing placement and re-linking"
 	$(SDIR)/../utils/repack_ld.pl -mapfile $(TARGET).map -linkfile $(LINKFILE) > objs/$(TARGET)/optimize.ld

@@ -1,6 +1,6 @@
 MEMORY
 {
-        /* Devo7e has 128K, and bootloader takes up 12K */
+        /* DevoF7 has 128K, and bootloader takes up 12K */
 	rom (rx) : ORIGIN = 0x08003000, LENGTH = 116K
 	ram (rwx) : ORIGIN = 0x20000000, LENGTH = 16K
 }
