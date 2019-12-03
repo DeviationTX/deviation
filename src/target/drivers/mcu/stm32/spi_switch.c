@@ -138,7 +138,7 @@ static void UseModule(int module)
     if (module == MODULE_FLASH) {
         spi_set_baudrate_prescaler(PROTO_SPI.spi, SPI_CR1_BR_FPCLK_DIV_4);
     } else if (last_module_used == MODULE_FLASH) {
-        spi_set_baudrate_prescaler(PROTO_SPI.spi, SPI_CR1_BR_FPCLK_DIV_16);
+        spi_set_baudrate_prescaler(PROTO_SPI.spi, PROTO_SPI_CFG.rate);
     }
     spi_enable(PROTO_SPI.spi);
 
