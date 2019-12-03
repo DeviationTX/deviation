@@ -8,7 +8,7 @@
 
 #include "common.h"
 
-static u8 PROTOSPI_read3wire(){
+u8 PROTOSPI_read3wire(){
     u8 data;
     while (!(SPI_SR(PROTO_SPI.spi) & SPI_SR_TXE))
         ;
