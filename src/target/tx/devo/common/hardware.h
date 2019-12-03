@@ -106,7 +106,7 @@
             .sck = {GPIOB, GPIO13},                \
             .miso = {GPIOB, GPIO14},               \
             .mosi = {GPIOB, GPIO15},               \
-            .rate = SPI_CR1_BR_FPCLK_DIV_16,       \
+            .rate = SPI_CR1_BR_FPCLK_DIV_8,       \
             DEFAULT_SPI_SETTINGS,                  \
            })
     #endif
