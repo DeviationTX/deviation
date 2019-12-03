@@ -15,7 +15,7 @@ static u8 PROTOSPI_read3wire(){
     while ((SPI_SR(PROTO_SPI.spi) & SPI_SR_BSY))
         ;
     spi_disable(PROTO_SPI.spi);
-    cm_disable_interrupts();  //Fix Hubsan dropouts
+    cm_disable_interrupts();  // Fix Hubsan dropouts
     spi_set_bidirectional_receive_only_mode(PROTO_SPI.spi);
     /* Force read from SPI_DR to ensure RXNE is clear (probably not needed) */
     volatile u8 x = SPI_DR(PROTO_SPI.spi);
@@ -27,7 +27,7 @@ static u8 PROTOSPI_read3wire(){
     spi_disable(PROTO_SPI.spi);  // This ends the read window
     data = spi_read(PROTO_SPI.spi);
     spi_set_unidirectional_mode(PROTO_SPI.spi);
-    cm_enable_interrupts();  //Fix Hubsan dropouts
+    cm_enable_interrupts();  // Fix Hubsan dropouts
     spi_enable(PROTO_SPI.spi);
     return data;
 }
