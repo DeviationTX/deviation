@@ -13,20 +13,12 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef MODULAR
-    //Allows the linker to properly relocate
-    #define J6PRO_Cmds PROTO_Cmds
-    #pragma long_calls
-#endif
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
 #include "config/model.h"
 #include "telemetry.h"
 
-#ifdef MODULAR
-    #pragma long_calls_off
-#endif
 
 #ifdef PROTO_HAS_CYRF6936
 #define NUM_WAIT_LOOPS (100 / 5) //each loop is ~5us.  Do not wait more than 100us
