@@ -12,11 +12,6 @@
     You should have received a copy of the GNU General Public License
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifdef MODULAR
-  //Allows the linker to properly relocate
-  #define DEVO_Cmds PROTO_Cmds
-  #pragma long_calls
-#endif
 
 #include "common.h"
 #include "config/tx.h"

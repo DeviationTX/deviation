@@ -13,11 +13,6 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef MODULAR
-    // Allows the linker to properly relocate
-    #define SCANNER_CYRF_Cmds PROTO_Cmds
-    #pragma long_calls
-#endif
 
 #include "common.h"
 #include "interface.h"
