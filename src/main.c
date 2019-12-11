@@ -158,10 +158,6 @@ void Init() {
     Initialize_ButtonMatrix();
     STORAGE_Init();  // This must come before LCD_Init() for 7e
 
-#ifdef MEDIA_DRIVE
-    MEDIA_Init();
-#endif
-
     LCD_Init();
     CHAN_Init();
 

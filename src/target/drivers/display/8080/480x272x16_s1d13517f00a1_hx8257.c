@@ -35,8 +35,6 @@
 static u8 invert;
 static u16 xpos, ypos, xstart, xend;
 
-extern void PARFlash_Init();
-
 void WRITE_PX(unsigned int c) {
     LCD_DATA = (c >> 16) & 0xff;
     LCD_DATA = c & 0xFFFF;
@@ -212,6 +210,11 @@ void LCD_Init()
         FSMC_BCR_MWID | FSMC_BCR_WREN | FSMC_BCR_MBKEN,
         FSMC_BTR_DATASTx(2) | FSMC_BTR_ADDHLDx(0) | FSMC_BTR_ADDSETx(1) | FSMC_BTR_ACCMODx(FSMC_BTx_ACCMOD_B),
         FSMC_BTR_DATASTx(2) | FSMC_BTR_ADDHLDx(0) | FSMC_BTR_ADDSETx(1) | FSMC_BTR_ACCMODx(FSMC_BTx_ACCMOD_B));
+
+#ifdef MEDIA_DRIVE
+    // it depends from _fsmc_init(), so can't be moved from here
+    MEDIA_Init();
+#endif
 
     //SPILCD_Init();
 
