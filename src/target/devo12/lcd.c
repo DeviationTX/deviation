@@ -333,6 +333,37 @@ void LCD_Init()
     lcd_cmd(LCD_6E_GPOUT1, 0x08);
 }
 
+void LCD_FillRect(u16 x, u16 y, u16 w, u16 h, u16 color)
+{
+    LCD_DrawStart(x, y, x + w - 1, y + h - 1, DRAW_NWSE);  // Bug fix: should be y+h-1 instead of y+h
+    unsigned pre_count = xstart & 0x07;
+    unsigned post_count = (8 - ((xend + 1) & 0x07)) & 0x07;
+    u32 rgb24 = CONVERT_COLOR(color);
+    for (u32 row = 0; row < h; row++) {
+        for (u32 i = 0; i < pre_count; i++)
+            WRITE_PX(TRANSPARENT);
+        for (u32 i = 0; i < w; i++)
+            WRITE_PX(rgb24);
+        for (u32 i = 0; i < post_count; i++)
+            WRITE_PX(TRANSPARENT);
+    }
+    LCD_DrawStop();
+}
+
+void LCD_DrawFastHLine(u16 x, u16 y, u16 w, u16 color) {
+    LCD_DrawStart(x, y, x + w - 1, y, DRAW_NWSE);
+    unsigned pre_count = xstart & 0x07;
+    unsigned post_count = (8 - ((xend + 1) & 0x07)) & 0x07;
+    u32 rgb24 = CONVERT_COLOR(color);
+    for (u32 i = 0; i < pre_count; i++)
+        WRITE_PX(TRANSPARENT);
+    while (w--)
+        WRITE_PX(rgb24);
+    for (u32 i = 0; i < post_count; i++)
+        WRITE_PX(TRANSPARENT);
+    LCD_DrawStop();
+}
+
 void LCD_Sleep()
 {
 }

@@ -25,23 +25,25 @@ All text above must be included in any redistribution
 
 void LCD_DrawFastVLine(int16_t x, int16_t y, 
                  int16_t h, uint16_t color) {
-    LCD_DrawStart(x, y, x, y + h -1, DRAW_NWSE); // bug fix: should be y+ h-1
+    LCD_DrawStart(x, y, x, y + h - 1, DRAW_NWSE); // bug fix: should be y+h-1
     while(h--)
         LCD_DrawPixel(color);
     LCD_DrawStop();
 }
 
+#if (!defined(_DEVO12_TARGET_H_) && !defined(_DEVO12_XMS_TARGET_H_)) || defined(EMULATOR)
 void LCD_DrawFastHLine(u16 x, u16 y, u16 w, u16 color) {
-    LCD_DrawStart(x, y, x + w -1, y, DRAW_NWSE);
+    LCD_DrawStart(x, y, x + w - 1, y, DRAW_NWSE);
     while(w--)
         LCD_DrawPixel(color);
     LCD_DrawStop();
 }
+#endif
 
 void LCD_DrawDashedHLine(int16_t x, int16_t y, 
              int16_t w, int16_t space, uint16_t color)
 {
-    LCD_DrawStart(x, y, x + w -1, y, DRAW_NWSE);
+    LCD_DrawStart(x, y, x + w - 1, y, DRAW_NWSE);
     int16_t x1;
     for (x1 = 0; x1 < w; x1++)
         if ((x1 / space) & 0x01)
@@ -51,7 +53,7 @@ void LCD_DrawDashedHLine(int16_t x, int16_t y,
 
 void LCD_DrawDashedVLine(int16_t x, int16_t y, 
              int16_t h, int16_t space, uint16_t color) {
-    LCD_DrawStart(x, y, x, y + h -1, DRAW_NWSE);
+    LCD_DrawStart(x, y, x, y + h - 1, DRAW_NWSE);
     int16_t y1;
     for (y1 = 0; y1 < h; y1++)
         if ((y1 / space) & 0x01)
@@ -204,14 +206,16 @@ void LCD_DrawRect(u16 x, u16 y, u16 w, u16 h, u16 color)
   LCD_DrawFastVLine(x+w-1, y, h, color);
 }
 
+#if (!defined(_DEVO12_TARGET_H_) && !defined(_DEVO12_XMS_TARGET_H_)) || defined(EMULATOR)
 void LCD_FillRect(u16 x, u16 y, u16 w, u16 h, u16 color)
 {
     u32 bytes = (u32)w * h;
-    LCD_DrawStart(x, y, x + w - 1, y + h -1, DRAW_NWSE); // Bug fix: should be y+h-1 instead of y+h
+    LCD_DrawStart(x, y, x + w - 1, y + h - 1, DRAW_NWSE); // Bug fix: should be y+h-1 instead of y+h
     while(bytes--)
         LCD_DrawPixel(color);
     LCD_DrawStop();
 }
+#endif
 
 // draw a rounded rectangle!
 void LCD_DrawRoundRect(u16 x, u16 y, u16 w, u16 h, u16 r, u16 color)
