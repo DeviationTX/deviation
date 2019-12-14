@@ -210,7 +210,7 @@ void LCD_DrawRect(u16 x, u16 y, u16 w, u16 h, u16 color)
 void LCD_FillRect(u16 x, u16 y, u16 w, u16 h, u16 color)
 {
     u32 bytes = (u32)w * h;
-    LCD_DrawStart(x, y, x + w - 1, y + h - 1, DRAW_NWSE); // Bug fix: should be y+h-1 instead of y+h
+    LCD_DrawStart(x, y, x + w - 1, y + h - 1, DRAW_NWSE);  // Bug fix: should be y+h-1 instead of y+h
     while(bytes--)
         LCD_DrawPixel(color);
     LCD_DrawStop();
