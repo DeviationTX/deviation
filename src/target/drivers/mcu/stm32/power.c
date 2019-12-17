@@ -75,8 +75,11 @@ int PWR_CheckPowerSwitch()
         } else {
             debounce = 0;
         }
-
-        if (debounce && (CLOCK_getms() - debounce) >= 100) {  // 0.25 sec
+#if defined(HAS_BUTTON_POWER_ON) && HAS_BUTTON_POWER_ON
+        if (debounce && (CLOCK_getms() - debounce) >= 1000) {  // 1.0 sec
+#else
+        if (debounce && (CLOCK_getms() - debounce) >= 100) {   // 0.1 sec
+#endif
             return 1;
         }
     }
