@@ -31,6 +31,8 @@ void __attribute__((__used__)) _USART_DMA_ISR(void)
     usart_disable_tx_dma(UART_CFG.uart);
     DMA_disable_stream(USART_DMA);
 
+    if (USART_CR3(UART_CFG.uart) & USART_CR3_HDSEL)   // re-enable receiver if half-duplex
+      usart_set_mode(UART_CFG.uart, USART_MODE_TX_RX);
     busy = 0;
 }
 

@@ -331,6 +331,15 @@ const char **PROTOCOL_GetOptions()
     return data;
 }
 
+int PROTOCOL_OptionsPage()
+{
+    int id = 0;
+
+    if (Model.protocol != PROTOCOL_NONE && PROTOCOL_LOADED)
+        id = (int)PROTO_Cmds(PROTOCMD_OPTIONSPAGE);
+    return id;
+}
+
 void PROTOCOL_SetOptions()
 {
     if(Model.protocol != PROTOCOL_NONE && PROTOCOL_LOADED)

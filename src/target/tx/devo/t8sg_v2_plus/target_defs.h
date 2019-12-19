@@ -32,6 +32,8 @@
 #define HAS_BUTTON_POWER_ON 1
 #define HAS_OLED_DISPLAY    1
 
+#define SUPPORT_CRSF_CONFIG 1
+
 #ifdef BUILDTYPE_DEV
   #define DEBUG_WINDOW_SIZE 200
 #else
