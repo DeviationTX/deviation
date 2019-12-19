@@ -23,7 +23,7 @@
 #define HAS_SWITCHES_NOSTOCK 1
 #define HAS_EXTRA_BUTTONS   0
 #define HAS_EXTRA_POTS      OPTIONAL
-#define HAS_MULTIMOD_SUPPORT 1
+#define HAS_MULTIMOD_SUPPORT 0
 #define HAS_VIDEO           0
 #define HAS_4IN1_FLASH      0
 #define HAS_EXTENDED_AUDIO  1
