@@ -20,15 +20,15 @@
 #define HAS_RTC             1
 #define HAS_VIBRATINGMOTOR  0
 #define HAS_DATALOG         1
-#define SUPPORT_SCANNER         1
+#define SUPPORT_SCANNER     1
 #define HAS_EXTRA_SWITCHES  0
 #define HAS_EXTRA_BUTTONS   0
 #define HAS_MULTIMOD_SUPPORT 1
 #define ENABLE_320x240_GUI  1 //Enable support for 320x240 gui items as well as 480x360 ones
 #define HAS_VIDEO           0
-#define HAS_4IN1_FLASH      1
+#define HAS_4IN1_FLASH      0
 #define HAS_EXTENDED_AUDIO  1
-#define HAS_AUDIO_UART     0
+#define HAS_AUDIO_UART      0
 #define HAS_MUSIC_CONFIG    1
 
 #define SUPPORT_CRSF_CONFIG 1
