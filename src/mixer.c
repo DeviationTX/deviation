@@ -319,6 +319,9 @@ void MIXER_ApplyMixer(struct Mixer *mixer, volatile s32 *raw, s32 *orig_value)
 
     //4th: multiplex result
     s32 scaled_value = raw[mixer->dest + NUM_INPUTS + 1];
+#if HAS_EXTENDED_AUDIO
+    u16 diff_value = abs(value-scaled_value);
+#endif
     switch(MIXER_MUX(mixer)) {
     case MUX_REPLACE:
         break;
@@ -360,12 +363,12 @@ void MIXER_ApplyMixer(struct Mixer *mixer, volatile s32 *raw, s32 *orig_value)
 #if HAS_EXTENDED_AUDIO
     case MUX_BEEP:
         if (orig_value) {
-            if (abs(value - scaled_value) > 100)
+            if (diff_value  > 100)
                 MIXER_SET_BEEP_LOCK(mixer, 0);
             if (! MIXER_BEEP_LOCK(mixer)) {
                 if ((value > *orig_value && value < scaled_value) ||
                     (value < *orig_value && value > scaled_value) ||
-                    (abs(value - scaled_value) <= 10)) {
+                    (diff_value <= 10)) {
                     MIXER_SET_BEEP_LOCK(mixer, 1);
                     MUSIC_Play(MUSIC_MAXLEN);
                 }
@@ -375,12 +378,12 @@ void MIXER_ApplyMixer(struct Mixer *mixer, volatile s32 *raw, s32 *orig_value)
         break;
     case MUX_VOICE:
         if (orig_value) {
-            if (abs(value - scaled_value) > 100)
+            if (diff_value > 100)
                 MIXER_SET_VOICE_LOCK(mixer, 0);
             if (! MIXER_VOICE_LOCK(mixer)) {
                 if ((value > *orig_value && value < scaled_value) ||
                     (value < *orig_value && value > scaled_value) ||
-                    (abs(value - scaled_value) <= 10)) {
+                    (diff_value <= 10)) {
                     MIXER_SET_VOICE_LOCK(mixer, 1);
                     if (Model.voice.mixer[mixer->dest].music)
                         MUSIC_Play(Model.voice.mixer[mixer->dest].music);
@@ -721,25 +724,6 @@ void MIXER_InitMixer(struct Mixer *mixer, unsigned ch)
         mixer->curve.points[i] = 0;
 }
 
-#if HAS_EXTENDED_AUDIO
-static void _trim_music_play(int trim_idx, int is_neg, int on_state)
-{
-    int button_idx;
-
-    if (is_neg)
-        button_idx = Model.trims[trim_idx].neg - 1;
-    else
-        button_idx = Model.trims[trim_idx].pos - 1;
-    if (on_state) {
-        if (Model.voice.buttons[button_idx].on)
-            MUSIC_Play(Model.voice.buttons[button_idx].on);
-    } else {
-        if (Model.voice.buttons[button_idx].off)
-            MUSIC_Play(Model.voice.buttons[button_idx].off);
-    }
-}
-#endif
-
 static void _trim_as_switch(unsigned flags, int i, int is_neg)
 {
     s8 *value = MIXER_GetTrim(i);
@@ -747,40 +731,22 @@ static void _trim_as_switch(unsigned flags, int i, int is_neg)
         //Momentarty
         if (flags & BUTTON_PRESS) {
             *value = 100;
-#if HAS_EXTENDED_AUDIO
-            _trim_music_play(i, is_neg, 1);
-#endif
         } else if (flags & BUTTON_RELEASE) {
             *value = -100;
-#if HAS_EXTENDED_AUDIO
-            _trim_music_play(i, is_neg, 0);
-#endif
         }
     } else if (Model.trims[i].step == TRIM_3POS) {
         if (flags & BUTTON_PRESS) {
             *value = is_neg ? -100 : 100;
-#if HAS_EXTENDED_AUDIO
-            _trim_music_play(i, is_neg, 1);
-#endif
         } else if (flags & BUTTON_RELEASE) {
             *value = 0;
-#if HAS_EXTENDED_AUDIO
-            _trim_music_play(i, is_neg, 0);
-#endif
         }
     } else if (flags & BUTTON_PRESS) {
         if (Model.trims[i].step == TRIM_ONOFF) {
             //On/Off
             *value = is_neg ? -100 : 100;
-#if HAS_EXTENDED_AUDIO
-            _trim_music_play(i, is_neg, 1);
-#endif
         } else {
             //Toggle
             *value = *value == -100 ? 100 : -100;
-#if HAS_EXTENDED_AUDIO
-            _trim_music_play(i, is_neg, *value == -100 ? 0 : 1);
-#endif
         }
     }
 }

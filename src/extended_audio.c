@@ -17,6 +17,7 @@
 #include "music.h"
 #include "config/tx.h"
 #include "config/model.h"
+#include "config/voice.h"
 #include "extended_audio.h"
 #include "stdlib.h"
 
@@ -25,9 +26,8 @@
 #endif // EMULATOR
 
 #if HAS_EXTENDED_AUDIO
-u16 voice_map_entries;
-struct VoiceMap voice_map[MAX_VOICEMAP_ENTRIES];
-u16 audio_queue[AUDIO_QUEUE_LENGTH];
+struct QueueEntry current_voice_mapping;
+struct QueueEntry audio_queue[AUDIO_QUEUE_LENGTH];
 u8 next_audio;
 u8 num_audio;
 u32 audio_queue_time;
@@ -75,8 +75,7 @@ void AUDIO_Init() {
 
 #ifndef EMULATOR
 // Send a block of len bytes to the Audio device.
-void
-AUDIO_Send(u8 *data, int len) {
+static void AUDIO_Send(u8 *data, int len) {
   void AUDIO_send_char(char c);
   for (u16 iter = 0; iter < len; iter += 1) {
     AUDIO_send_char(data[iter]);
@@ -84,19 +83,18 @@ AUDIO_Send(u8 *data, int len) {
 }
 
 // Send a string  to the Audio device.
-void
-AUDIO_Print(char *string) {
+static void AUDIO_Print(char *string) {
   AUDIO_Send((u8 *)string, strlen(string));
 }
 #endif // EMULATOR
 
-void u16ToArray(u16 value, u8 *array){
+static void u16ToArray(u16 value, u8 *array) {
     *array = (u8)(value>>8);
     *(array+1) = (u8)value;
 }
 
 // generate Checksum for DFPlyer commands
-u16 AUDIO_CalculateChecksum(u8 *buffer) {
+static u16 AUDIO_CalculateChecksum(u8 *buffer) {
     u16 sum = 0;
     for (int i=1; i < 7; i += 1)
         sum += buffer[i];
@@ -104,22 +102,21 @@ u16 AUDIO_CalculateChecksum(u8 *buffer) {
 }
 
 // Generate a string to play.
-int AUDIO_Play(u16 music) {
-
+static int AUDIO_Play(u16 id) {
     // If we are just playing beeps....
-    if (music == MUSIC_KEY_PRESSING || music == MUSIC_MAXLEN) {
+    if (id == MUSIC_KEY_PRESSING || id == MUSIC_MAXLEN) {
         printf("Voice: beep only\n");
         return 0;
     }
-    printf("Voice: Playing mp3 #%d\n", voice_map[music].id);
+    printf("Voice: Playing mp3 #%d\n", id);
 
 #ifdef EMULATOR     // On emulators call mpg123 to play mp3s
     char cmd[70];
     u16 vol_val = Transmitter.audio_vol * 32786/10;
 #ifdef _WIN32
-    sprintf(cmd, "start /B ..\\..\\mpg123 -f %d -q ..\\..\\mp3\\%04d*.mp3 > nul 2>&1", vol_val, voice_map[music].id);
+    snprintf(cmd, sizeof(cmd), "start /B ..\\..\\mpg123 -f %d -q ..\\..\\mp3\\%04d*.mp3 > nul 2>&1", vol_val, id);
 #else
-    sprintf(cmd, "mpg123 -f %d -q ../../mp3/%04d*.mp3 > /dev/null 2>&1 &", vol_val, voice_map[music].id);
+    snprintf(cmd, sizeof(cmd), "mpg123 -f %d -q ../../mp3/%04d*.mp3 > /dev/null 2>&1 &", vol_val, id);
 #endif // _WIN32
     system(cmd);
     return 1;
@@ -132,14 +129,14 @@ int AUDIO_Play(u16 music) {
     case AUDIO_NONE: return 0;	// Play beeps...
     case AUDIO_AUDIOFX: {
       char buffer[5];
-      snprintf(buffer, sizeof(buffer), "#%d\n", voice_map[music].id);
+      snprintf(buffer, sizeof(buffer), "#%d\n", id);
       AUDIO_Print(buffer);
       break;
     }
     case AUDIO_DF_PLAYER:
         // Fill in track number and checksum
         player_buffer[3] = 0x12;
-        u16ToArray(voice_map[music].id, player_buffer+5);
+        u16ToArray(id, player_buffer+5);
         u16ToArray(AUDIO_CalculateChecksum(player_buffer), player_buffer+7);
         AUDIO_Send(player_buffer, sizeof(player_buffer));
         break;
@@ -188,32 +185,35 @@ void AUDIO_SetVolume() {
     }
 #endif
 }
+static void AUDIO_ResetQueue() {
+    num_audio = 0;
+    next_audio = 0;
+    printf("Voice: Resetting queue.\n");
+}
 
 void AUDIO_CheckQueue() {
     u32 t = CLOCK_getms();
     if (next_audio < num_audio) {
         if (t > audio_queue_time) {
-            AUDIO_Play(audio_queue[next_audio]);
-            audio_queue_time = CLOCK_getms() + voice_map[audio_queue[next_audio]].duration;
+            AUDIO_Play(audio_queue[next_audio].id);
+            audio_queue_time = CLOCK_getms() + audio_queue[next_audio].duration;
             next_audio++;
         }
     } else if (num_audio && t > audio_queue_time) {
-        printf("Voice: Queue finished, resetting.\n");
-        num_audio = 0;
-        next_audio = 0;
+        printf("Voice: Queue finished.\n");
+        AUDIO_ResetQueue();
         AUDIO_SetVolume();
     }
 }
 
-int AUDIO_VoiceAvailable() {
+static int AUDIO_VoiceAvailable() {
 #if defined BUILDTYPE_DEV
 #if HAS_AUDIO_UART
     if (!Transmitter.audio_uart)
 #endif
     {
         printf("Voice: Dev mode enabled, cannot set volume\n");
-        num_audio = 0;  // Reset queue when audio not available
-        next_audio = 0;
+        AUDIO_ResetQueue();
         return 0;
     }
 #endif  // BUILDTYPE_DEV
@@ -224,15 +224,13 @@ int AUDIO_VoiceAvailable() {
     if ( PPMin_Mode() || Model.protocol == PROTOCOL_PPM ) { // don't send play command when using PPM port
 #endif
         printf("Voice: PPM port in use\n");
-        num_audio = 0;  // Reset queue when audio not available
-        next_audio = 0;
+        AUDIO_ResetQueue();
         return 0;
     }
 #endif // _DEVO12_TARGET_H_
 
     if ( (Transmitter.audio_player == AUDIO_NONE) || (Transmitter.audio_player == AUDIO_DISABLED) || !Transmitter.audio_vol ) {
-        num_audio = 0; // Reset queue when audio not available
-        next_audio = 0;
+        AUDIO_ResetQueue();
         return 0;
     }
 
@@ -240,16 +238,19 @@ int AUDIO_VoiceAvailable() {
 }
 
 int AUDIO_AddQueue(u16 music) {
-    if (num_audio == AUDIO_QUEUE_LENGTH) {
-        printf("Voice: Queue full, cannot add new mp3 #%d\n",music);
+    if (!AUDIO_VoiceAvailable() || num_audio == AUDIO_QUEUE_LENGTH) {
+        printf("Voice: queue full or voice not available, cannot add new mp3 #%d\n", music);
         return 0;
     }
-    if (!voice_map[music].duration) {
+    CONFIG_VoiceParse(music);
+    if (!current_voice_mapping.duration) {
         printf("Voice: mp3 length is zero\n");
         return 0;
     }
-
-    audio_queue[num_audio++] = music;
+    audio_queue[num_audio].duration = current_voice_mapping.duration;
+    audio_queue[num_audio].id = music;
+    printf("Voice: added ID %d with duration %d to queue position %d.\n", music, current_voice_mapping.duration, num_audio);
+    num_audio++;
     return 1;
 }
 

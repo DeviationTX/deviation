@@ -29,14 +29,10 @@ static struct voiceconfig_obj * const gui = &gui_objs.u.voiceconfig;
 
 static u16 current_selected = 0;
 
-
-
 static u8 voiceconfig_getsrctype (u8 idx)
 {
     if (idx < NUM_SWITCHES)
         return VOICE_SRC_SWITCH;
-/*    if (idx < NUM_INPUTS - INP_HAS_CALIBRATION + NUM_TX_BUTTONS)
-        return VOICE_SRC_BUTTON;*/
 #if NUM_AUX_KNOBS
     if (idx < NUM_SWITCHES + NUM_AUX_KNOBS * 2)
         return VOICE_SRC_AUX;
@@ -46,6 +42,24 @@ static u8 voiceconfig_getsrctype (u8 idx)
     if (idx < NUM_SWITCHES + NUM_AUX_KNOBS * 2 + NUM_TIMERS + TELEM_NUM_ALARMS)
         return VOICE_SRC_TELEMETRY;
     return VOICE_SRC_MIXER;
+}
+
+static struct CustomVoice *voiceconfig_setsrcptr(u8 idx) {
+    switch (voiceconfig_getsrctype(idx)) {
+        case VOICE_SRC_SWITCH:
+            return &Model.voice.switches[idx - VOICE_SRC_SWITCH];
+#if NUM_AUX_KNOBS
+        case VOICE_SRC_AUX:
+            return &Model.voice.aux[idx - VOICE_SRC_AUX];
+#endif
+        case VOICE_SRC_TIMER:
+            return &Model.voice.timer[idx - VOICE_SRC_TIMER];
+        case VOICE_SRC_TELEMETRY:
+            return &Model.voice.telemetry[idx - VOICE_SRC_TELEMETRY];
+        case VOICE_SRC_MIXER:
+            return &Model.voice.mixer[idx - VOICE_SRC_MIXER];
+    }
+    return NULL;
 }
 
 const char *voiceconfig_str_cb(guiObject_t *obj, const void *data)
@@ -90,61 +104,24 @@ static void voice_test_cb(guiObject_t *obj, void *data)
 {
     (void) obj;
     u8 idx = (long)data;
-    switch(voiceconfig_getsrctype(idx)) {
-        case VOICE_SRC_SWITCH:
-            if (Model.voice.switches[idx - VOICE_SRC_SWITCH].music)
-                MUSIC_Play(Model.voice.switches[idx - VOICE_SRC_SWITCH].music);
-            break;
-#if NUM_AUX_KNOBS
-        case VOICE_SRC_AUX:
-            if (Model.voice.aux[idx - VOICE_SRC_AUX].music)
-                MUSIC_Play(Model.voice.aux[idx - VOICE_SRC_AUX].music);
-            break;
-#endif
-        case VOICE_SRC_TIMER:
-            if (Model.voice.timer[idx - VOICE_SRC_TIMER].music)
-                MUSIC_Play(Model.voice.timer[idx - VOICE_SRC_TIMER].music);
-            break;
-        case VOICE_SRC_TELEMETRY:
-            if (Model.voice.telemetry[idx - VOICE_SRC_TELEMETRY].music)
-                MUSIC_Play(Model.voice.telemetry[idx - VOICE_SRC_TELEMETRY].music);
-            break;
-        case VOICE_SRC_MIXER:
-            if (Model.voice.mixer[idx - VOICE_SRC_MIXER].music)
-                MUSIC_Play(Model.voice.mixer[idx - VOICE_SRC_MIXER].music);
-            break;
-    }
+    struct CustomVoice *vpt;
+    vpt = voiceconfig_setsrcptr(idx);
+    if (vpt == NULL)
+        return;
+    MUSIC_Play(vpt->music);
 }
 
 static const char *voicelbl_cb(guiObject_t *obj, const void *data)
 {
     (void) obj;
     int idx = (long)data;
-    switch (voiceconfig_getsrctype(idx)) {
-        case VOICE_SRC_SWITCH:
-            if (Model.voice.switches[idx - VOICE_SRC_SWITCH].music)
-                return CONFIG_VoiceParse(voice_map[Model.voice.switches[idx - VOICE_SRC_SWITCH].music].id);
-            break;
-#if NUM_AUX_KNOBS
-        case VOICE_SRC_AUX:
-            if(Model.voice.aux[idx - VOICE_SRC_AUX].music)
-                return CONFIG_VoiceParse(voice_map[Model.voice.aux[idx - VOICE_SRC_AUX].music].id);
-            break;
-#endif
-        case VOICE_SRC_TIMER:
-            if (Model.voice.timer[idx - VOICE_SRC_TIMER].music)
-                return CONFIG_VoiceParse(voice_map[Model.voice.timer[idx - VOICE_SRC_TIMER].music].id);
-            break;
-        case VOICE_SRC_TELEMETRY:
-            if (Model.voice.telemetry[idx - VOICE_SRC_TELEMETRY].music)
-                return CONFIG_VoiceParse(voice_map[Model.voice.telemetry[idx - VOICE_SRC_TELEMETRY].music].id);
-            break;
-        case VOICE_SRC_MIXER:
-            if (Model.voice.mixer[idx - VOICE_SRC_MIXER].music)
-                return CONFIG_VoiceParse(voice_map[Model.voice.mixer[idx - VOICE_SRC_MIXER].music].id);
-            break;
+    struct CustomVoice *vpt;
+    vpt = voiceconfig_setsrcptr(idx);
+    if (!vpt->music) {
+        tempstring[0] = '\0';
+        return tempstring;
     }
-    return strcpy(tempstring, "");
+    return CONFIG_VoiceParse(vpt->music);
 }
 
 static const char *voiceid_cb(guiObject_t *obj, int dir, void *data)
@@ -153,39 +130,29 @@ static const char *voiceid_cb(guiObject_t *obj, int dir, void *data)
     int idx = (long)data;
     int cur_row = idx - GUI_ScrollableCurrentRow(&gui->scrollable);
     struct CustomVoice *vpt;
-    vpt = NULL;
+    vpt = voiceconfig_setsrcptr(idx);
 
-    switch (voiceconfig_getsrctype(idx)) {
-        case VOICE_SRC_SWITCH:
-            vpt = &Model.voice.switches[idx - VOICE_SRC_SWITCH];
-            break;
-#if NUM_AUX_KNOBS
-        case VOICE_SRC_AUX:
-            vpt = &Model.voice.aux[idx - VOICE_SRC_AUX];
-            break;
-#endif
-        case VOICE_SRC_TIMER:
-            vpt = &Model.voice.timer[idx - VOICE_SRC_TIMER];
-            break;
-        case VOICE_SRC_TELEMETRY:
-            vpt = &Model.voice.telemetry[idx - VOICE_SRC_TELEMETRY];
-            break;
-        case VOICE_SRC_MIXER:
-            vpt = &Model.voice.mixer[idx - VOICE_SRC_MIXER];
-            break;
-    }
-    if (dir == -1 && vpt->music == CUSTOM_ALARM_ID) // set to none below 1
+    if (dir == -1 && vpt->music == CUSTOM_ALARM_ID)  // set to none below 1
         vpt->music = 0;
-    if (dir == 1 && vpt->music == 0) // set to CUSTOM_ALARM_ID when currently none
+    if (dir == 1 && vpt->music == 0)  // set to CUSTOM_ALARM_ID when currently none
         vpt->music = CUSTOM_ALARM_ID - 1;
     GUI_TextSelectEnablePress((guiTextSelect_t *)obj, vpt->music);
 
     if (vpt->music == 0) {
         GUI_Redraw(&gui->voicelbl[cur_row]);
+        if (voiceconfig_getsrctype(idx) == VOICE_SRC_TIMER) {  // Setting duration to global alarm value for timers
+            CONFIG_VoiceParse(idx - VOICE_SRC_TIMER + MUSIC_ALARM1);
+            Model.timer[idx - VOICE_SRC_TIMER].duration = current_voice_mapping.duration;
+        }
         return strcpy(tempstring, _tr("None"));
     }
-    vpt->music = GUI_TextSelectHelper(vpt->music - CUSTOM_ALARM_ID + 1, //Relabling so voice in menu starts with 1
-        1, voice_map_entries - CUSTOM_ALARM_ID, dir, 1, 10, NULL) + CUSTOM_ALARM_ID - 1;
+    vpt->music = GUI_TextSelectHelper(vpt->music - CUSTOM_ALARM_ID + 1,  // Relabling so voice in menu starts with 1
+        1, Transmitter.voice_ini_entries, dir, 1, 10, NULL) + CUSTOM_ALARM_ID - 1;
+
+    if (voiceconfig_getsrctype(idx) == VOICE_SRC_TIMER) {  // Setting duration for custom timer alarms
+        CONFIG_VoiceParse(vpt->music);
+        Model.timer[idx - VOICE_SRC_TIMER].duration = current_voice_mapping.duration;
+    }
     snprintf(tempstring, 5, "%d", vpt->music - CUSTOM_ALARM_ID + 1);
     GUI_Redraw(&gui->voicelbl[cur_row]);
     return tempstring;

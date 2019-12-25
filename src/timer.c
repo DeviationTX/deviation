@@ -141,6 +141,7 @@ void TIMER_Update()
     unsigned i;
     unsigned chan_val = 0;
     u32 t = CLOCK_getms();
+
     if (PROTOCOL_WaitingForSafe())
         return;
     if( Transmitter.power_alarm > 0 )
@@ -173,6 +174,11 @@ void TIMER_Update()
             }
         }
         if (timer_state[i]) {
+#if HAS_EXTENDED_AUDIO
+            unsigned timer_music = MUSIC_ALARM1 + i;
+            if (Model.voice.timer[i].music)
+                timer_music = Model.voice.timer[i].music;
+#endif
             s32 delta = t - last_time[i];
             s32 warn_time;
             if (Model.timer[i].type == TIMER_STOPWATCH_PROP || Model.timer[i].type == TIMER_COUNTDOWN_PROP) {
@@ -195,10 +201,10 @@ void TIMER_Update()
                     if (timer_val[i] >= 600000)
                         warn_time += 300000; // 5-minute alerts above 10 minutes
                 }
-                warn_time -= voice_map[MUSIC_ALARM1 + i].duration;
+                warn_time -= Model.timer[i].duration;
                 if (timer_val[i] > warn_time && (timer_val[i] - delta) <= warn_time)
-                    MUSIC_PlayValue(MUSIC_GetTimerAlarm(MUSIC_ALARM1 + i),
-                    (timer_val[i]+voice_map[MUSIC_GetTimerAlarm(MUSIC_ALARM1 + i)].duration)/1000, VOICE_UNIT_TIME, 0);
+                    MUSIC_PlayValue(timer_music,
+                    (timer_val[i]+Model.timer[i].duration)/1000, VOICE_UNIT_TIME, 0);
 #endif
             } else {
                 // start to beep  for each prealert_interval at the last prealert_time(seconds)
@@ -209,12 +215,11 @@ void TIMER_Update()
                     warn_time = ((timer_val[i] / Transmitter.countdown_timer_settings.prealert_interval)
                             * Transmitter.countdown_timer_settings.prealert_interval);
 #if HAS_EXTENDED_AUDIO
-                    warn_time += voice_map[MUSIC_TIMER_WARNING].duration + 1000;
+                    warn_time += 2000;  // Play voice prealerts earlier to optimize timing
 #endif
                     if (timer_val[i] > warn_time && (timer_val[i] - delta) <= warn_time) {
 #if HAS_EXTENDED_AUDIO
-                        MUSIC_PlayValue(MUSIC_TIMER_WARNING,
-                            (timer_val[i]-voice_map[MUSIC_TIMER_WARNING].duration-1000)/1000,VOICE_UNIT_TIME,0);
+                        MUSIC_PlayValue(MUSIC_TIMER_WARNING, (timer_val[i]-2000)/1000, VOICE_UNIT_TIME, 0);
 #else
                         MUSIC_Play(MUSIC_TIMER_WARNING);
 #endif
@@ -225,12 +230,12 @@ void TIMER_Update()
                     warn_time = ((timer_val[i] - Transmitter.countdown_timer_settings.timeup_interval) / Transmitter.countdown_timer_settings.timeup_interval)
                             * Transmitter.countdown_timer_settings.timeup_interval;
 #if HAS_EXTENDED_AUDIO
-                    warn_time += voice_map[MUSIC_ALARM1 + i].duration;
+                    warn_time += Model.timer[i].duration;
 #endif
                     if (timer_val[i] > warn_time && (timer_val[i] - delta) <= warn_time) {
 #if HAS_EXTENDED_AUDIO
-                        MUSIC_PlayValue(MUSIC_GetTimerAlarm(MUSIC_ALARM1 + i),
-                            (timer_val[i]-voice_map[MUSIC_GetTimerAlarm(MUSIC_ALARM1 + i)].duration)/-1000+1,VOICE_UNIT_TIME,0);
+                        MUSIC_PlayValue(timer_music,
+                            (timer_val[i]-Model.timer[i].duration)/-1000+1, VOICE_UNIT_TIME, 0);
 #else
                         MUSIC_Play(MUSIC_ALARM1 + i + 2);
 #endif
@@ -238,7 +243,7 @@ void TIMER_Update()
                 }
                 if (timer_val[i] >= 0 && timer_val[i] < delta) {
 #if HAS_EXTENDED_AUDIO
-                    MUSIC_Play(MUSIC_GetTimerAlarm(MUSIC_ALARM1 + i));
+                    MUSIC_Play(timer_music);
 #else
                     MUSIC_Play(MUSIC_ALARM1+i);
 #endif

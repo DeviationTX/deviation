@@ -24,8 +24,9 @@ struct Timer {
     u8 resetsrc;
     u16 timer;
     u32 val;
+    u16 duration;  // only needed for voice, but we're padding anyways
     enum TimerType type;
-    u8 padding_1[3];  //Needed to ensure structure is word aligned
+    u8 padding_1[1];  // Needed to ensure structure is word aligned
 };
 
 struct CountDownTimerSettings {

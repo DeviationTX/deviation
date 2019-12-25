@@ -380,121 +380,118 @@ void TELEMETRY_Alarm()
 #if HAS_EXTENDED_AUDIO
         u16 telem_music = MUSIC_GetTelemetryAlarm(MUSIC_TELEMALARM1 + telem_idx);
         s32 telem_value = TELEMETRY_GetValue(alarm->src);
-        if (TELEMETRY_Type() == TELEM_DEVO) {
-            switch (alarm->src) {
-                case TELEM_DEVO_VOLT1:
-                case TELEM_DEVO_VOLT2:
-                case TELEM_DEVO_VOLT3: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_VOLT,1); break;
-                case TELEM_DEVO_RPM1:
-                case TELEM_DEVO_RPM2: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_RPM,0); break;
-                default: MUSIC_PlayValue(telem_music, telem_value-20,VOICE_UNIT_TEMP,0); break;
-            }
-        }
-        if (TELEMETRY_Type() == TELEM_DSM) {
-            switch (alarm->src) {
+        unsigned telem_unit = VOICE_UNIT_NONE;
+        unsigned telem_prec = 0;
+        switch (TELEMETRY_Type()) {
+            case TELEM_DEVO:
+                switch (alarm->src) {
+                    case TELEM_DEVO_VOLT1:
+                    case TELEM_DEVO_VOLT2:
+                    case TELEM_DEVO_VOLT3: telem_unit = VOICE_UNIT_VOLT; telem_prec = 1; break;
+                    case TELEM_DEVO_RPM1:
+                    case TELEM_DEVO_RPM2: telem_unit = VOICE_UNIT_RPM; break;
+                    default: telem_value -= 20; telem_unit = VOICE_UNIT_TEMP; break;
+                }
+                break;
+            case TELEM_DSM:
+                switch (alarm->src) {
 #if HAS_EXTENDED_TELEMETRY
-                case TELEM_DSM_JETCAT_RPM:
-                case TELEM_DSM_ESC_RPM:
+                    case TELEM_DSM_JETCAT_RPM:
+                    case TELEM_DSM_ESC_RPM:
 #endif
-                case TELEM_DSM_FLOG_RPM1: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_RPM,0); break;
+                    case TELEM_DSM_FLOG_RPM1: telem_unit = VOICE_UNIT_RPM; break;
 #if HAS_EXTENDED_TELEMETRY
-                case TELEM_DSM_PBOX_VOLT1:
-                case TELEM_DSM_PBOX_VOLT2:
-                case TELEM_DSM_JETCAT_PACKVOLT:
-                case TELEM_DSM_JETCAT_PUMPVOLT:
-                case TELEM_DSM_RXPCAP_VOLT:
-                case TELEM_DSM_ESC_VOLT1:
-                case TELEM_DSM_ESC_VOLT2:
+                    case TELEM_DSM_PBOX_VOLT1:
+                    case TELEM_DSM_PBOX_VOLT2:
+                    case TELEM_DSM_JETCAT_PACKVOLT:
+                    case TELEM_DSM_JETCAT_PUMPVOLT:
+                    case TELEM_DSM_RXPCAP_VOLT:
+                    case TELEM_DSM_ESC_VOLT1:
+                    case TELEM_DSM_ESC_VOLT2:
 #endif
-                case TELEM_DSM_FLOG_VOLT1:
-                case TELEM_DSM_FLOG_VOLT2: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_VOLT,2); break;
+                    case TELEM_DSM_FLOG_VOLT1:
+                    case TELEM_DSM_FLOG_VOLT2: telem_unit = VOICE_UNIT_VOLT; telem_prec = 2; break;
 #if HAS_EXTENDED_TELEMETRY
-                case TELEM_DSM_JETCAT_TEMPEGT: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_TEMP,0); break;
-                case TELEM_DSM_ESC_TEMP1:
-                case TELEM_DSM_ESC_TEMP2:
+                    case TELEM_DSM_JETCAT_TEMPEGT: telem_unit = VOICE_UNIT_TEMP; break;
+                    case TELEM_DSM_ESC_TEMP1:
+                    case TELEM_DSM_ESC_TEMP2:
 #endif
-                case TELEM_DSM_FLOG_TEMP1: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_TEMP,1); break;
+                    case TELEM_DSM_FLOG_TEMP1: telem_unit = VOICE_UNIT_TEMP; telem_prec = 1; break;
 #if HAS_EXTENDED_TELEMETRY
-                case TELEM_DSM_RXPCAP_AMPS:
-                case TELEM_DSM_ESC_AMPS1: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_AMPS,2); break;
-                case TELEM_DSM_FPCAP_AMPS:
-                case TELEM_DSM_ESC_AMPS2:
+                    case TELEM_DSM_RXPCAP_AMPS:
+                    case TELEM_DSM_ESC_AMPS1: telem_unit = VOICE_UNIT_AMPS;  telem_prec = 2; break;
+                    case TELEM_DSM_FPCAP_AMPS:
+                    case TELEM_DSM_ESC_AMPS2:
 #endif
-                case TELEM_DSM_AMPS1: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_AMPS,1); break;
-                case TELEM_DSM_ALTITUDE:
-                case TELEM_DSM_ALTITUDE_MAX:
-                case TELEM_DSM_VARIO_CLIMBRATE1:
-                case TELEM_DSM_VARIO_CLIMBRATE2:
-                case TELEM_DSM_VARIO_CLIMBRATE3:
-                case TELEM_DSM_VARIO_CLIMBRATE4:
-                case TELEM_DSM_VARIO_CLIMBRATE5:
-                case TELEM_DSM_VARIO_CLIMBRATE6:
-                case TELEM_DSM_VARIO_ALTITUDE: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_ALTITUDE,1); break;
+                    case TELEM_DSM_AMPS1: telem_unit = VOICE_UNIT_AMPS; telem_prec = 1; break;
+                    case TELEM_DSM_ALTITUDE:
+                    case TELEM_DSM_ALTITUDE_MAX:
+                    case TELEM_DSM_VARIO_CLIMBRATE1:
+                    case TELEM_DSM_VARIO_CLIMBRATE2:
+                    case TELEM_DSM_VARIO_CLIMBRATE3:
+                    case TELEM_DSM_VARIO_CLIMBRATE4:
+                    case TELEM_DSM_VARIO_CLIMBRATE5:
+                    case TELEM_DSM_VARIO_CLIMBRATE6:
+                    case TELEM_DSM_VARIO_ALTITUDE: telem_unit = VOICE_UNIT_ALTITUDE; telem_prec = 1; break;
 
-                case TELEM_DSM_GFORCE_X:
-                case TELEM_DSM_GFORCE_Y:
-                case TELEM_DSM_GFORCE_Z:
-                case TELEM_DSM_GFORCE_XMAX:
-                case TELEM_DSM_GFORCE_YMAX:
-                case TELEM_DSM_GFORCE_ZMAX:
-                case TELEM_DSM_GFORCE_ZMIN: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_GFORCE,2); break;
+                    case TELEM_DSM_GFORCE_X:
+                    case TELEM_DSM_GFORCE_Y:
+                    case TELEM_DSM_GFORCE_Z:
+                    case TELEM_DSM_GFORCE_XMAX:
+                    case TELEM_DSM_GFORCE_YMAX:
+                    case TELEM_DSM_GFORCE_ZMAX:
+                    case TELEM_DSM_GFORCE_ZMIN: telem_unit = VOICE_UNIT_GFORCE; telem_prec = 2; break;
 #if HAS_EXTENDED_TELEMETRY
-                case TELEM_DSM_FLOG_RSSI_DBM: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_DB,0); break;
+                    case TELEM_DSM_FLOG_RSSI_DBM: telem_unit = VOICE_UNIT_DB; break;
 #endif
-                default: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_NONE,0);
-          }
-        }
-
-        if (TELEMETRY_Type() == TELEM_FRSKY) {
-            switch (alarm->src) {
+                }
+                break;
+            case TELEM_FRSKY:
+                switch (alarm->src) {
 #if HAS_EXTENDED_TELEMETRY
-                case TELEM_FRSKY_VOLT3:
-                case TELEM_FRSKY_VOLTA:
-                case TELEM_FRSKY_MIN_CELL:
-                case TELEM_FRSKY_ALL_CELL:
-                case TELEM_FRSKY_CELL1:
-                case TELEM_FRSKY_CELL2:
-                case TELEM_FRSKY_CELL3:
-                case TELEM_FRSKY_CELL4:
-                case TELEM_FRSKY_CELL5:
-                case TELEM_FRSKY_CELL6:
+                    case TELEM_FRSKY_VOLT3:
+                    case TELEM_FRSKY_VOLTA:
+                    case TELEM_FRSKY_MIN_CELL:
+                    case TELEM_FRSKY_ALL_CELL:
+                    case TELEM_FRSKY_CELL1:
+                    case TELEM_FRSKY_CELL2:
+                    case TELEM_FRSKY_CELL3:
+                    case TELEM_FRSKY_CELL4:
+                    case TELEM_FRSKY_CELL5:
+                    case TELEM_FRSKY_CELL6:
 #endif
-                case TELEM_FRSKY_VOLT1:
-                case TELEM_FRSKY_VOLT2: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_VOLT,2); break;
+                    case TELEM_FRSKY_VOLT1:
+                    case TELEM_FRSKY_VOLT2: telem_unit = VOICE_UNIT_VOLT; telem_prec = 2; break;
 #if HAS_EXTENDED_TELEMETRY
-                case TELEM_FRSKY_TEMP1:
-                case TELEM_FRSKY_TEMP2: MUSIC_PlayValue(telem_music, telem_value-20,VOICE_UNIT_TEMP,0); break;
-                case TELEM_FRSKY_RPM: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_RPM,0); break;
-                case TELEM_FRSKY_CURRENT: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_AMPS,2); break;
-                case TELEM_FRSKY_ALTITUDE: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_ALTITUDE,2); break;
+                    case TELEM_FRSKY_TEMP1:
+                    case TELEM_FRSKY_TEMP2: telem_value -= 20; telem_unit = VOICE_UNIT_TEMP; break;
+                    case TELEM_FRSKY_RPM: telem_unit = VOICE_UNIT_RPM; break;
+                    case TELEM_FRSKY_CURRENT: telem_unit = VOICE_UNIT_AMPS; telem_prec = 2; break;
+                    case TELEM_FRSKY_ALTITUDE: telem_unit = VOICE_UNIT_ALTITUDE; telem_prec = 2; break;
 #endif
-                case TELEM_FRSKY_LRSSI:
-                case TELEM_FRSKY_RSSI: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_DB,0); break;
-                default: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_NONE,0);
-            }
-        }
-
+                    case TELEM_FRSKY_LRSSI:
+                    case TELEM_FRSKY_RSSI: telem_unit = VOICE_UNIT_DB; break;
+                }
+                break;
 #if HAS_EXTENDED_TELEMETRY
-        if (TELEMETRY_Type() == TELEM_CRSF) {
-            switch (alarm->src) {
-                case TELEM_CRSF_BATT_VOLTAGE:
-                    MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_VOLT,2); break;
-                case TELEM_CRSF_BATT_CURRENT: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_AMPS,2); break;
-                case TELEM_CRSF_GPS_ALTITUDE: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_ALTITUDE,2); break;
-                case TELEM_CRSF_TX_SNR:
-                case TELEM_CRSF_TX_RSSI:
-                case TELEM_CRSF_RX_SNR:
-                case TELEM_CRSF_RX_RSSI1:
-                case TELEM_CRSF_RX_RSSI2: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_DB,0); break;
-                default: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_NONE,0);
-            }
-        }
+            case TELEM_CRSF:
+                switch (alarm->src) {
+                    case TELEM_CRSF_BATT_VOLTAGE: telem_unit = VOICE_UNIT_VOLT; telem_prec = 2; break;
+                    case TELEM_CRSF_BATT_CURRENT: telem_unit = VOICE_UNIT_AMPS; telem_prec = 2; break;
+                    case TELEM_CRSF_GPS_ALTITUDE: telem_unit = VOICE_UNIT_ALTITUDE; telem_prec = 2; break;
+                    case TELEM_CRSF_TX_SNR:
+                    case TELEM_CRSF_TX_RSSI:
+                    case TELEM_CRSF_RX_SNR:
+                    case TELEM_CRSF_RX_RSSI1:
+                    case TELEM_CRSF_RX_RSSI2: telem_unit = VOICE_UNIT_DB; break;
+                }
+                break;
 #endif //HAS_EXTENDED_TELEMETRY
-
+        }
+        MUSIC_PlayValue(telem_music, telem_value, telem_unit, telem_prec);
 #else
         MUSIC_Play(MUSIC_TELEMALARM1 + telem_idx);
 #endif //HAS_EXTENDED_AUDIO
-
     }
 }
 

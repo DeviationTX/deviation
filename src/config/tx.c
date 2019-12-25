@@ -338,6 +338,7 @@ void CONFIG_LoadTx()
 #if HAS_EXTENDED_AUDIO
     Transmitter.audio_player = AUDIO_NONE;
     Transmitter.audio_vol = 10;
+    Transmitter.voice_ini_entries = VOICE_INI_EMPTY;
 #endif
 #if HAS_AUDIO_UART
     Transmitter.audio_uart = 0;
@@ -349,7 +350,7 @@ void CONFIG_LoadTx()
     CONFIG_LoadHardware();
     CONFIG_IniParse("tx.ini", ini_handler, (void *)&Transmitter);
     crc32 = Crc(&Transmitter, sizeof(Transmitter));
-#if HAS_EXTENDED_AUDIO
+#if HAS_MUSIC_CONFIG
     CONFIG_VoiceParse(MAX_VOICEMAP_ENTRIES);
 #endif
     return;

@@ -29,7 +29,7 @@ enum Music {
 };
 
 #if HAS_EXTENDED_AUDIO
-#define MAX_VOICEMAP_ENTRIES 400 // arbitraty chosen
+#define MAX_VOICEMAP_ENTRIES 999  // arbitraty chosen
 #ifdef _DEVO12_TARGET_H_ // Check for Devo12 screen
 #define MAX_VOICE_LABEL 35 // limit label length due to limited screen width
 #else
@@ -85,10 +85,9 @@ enum {
     VOICE_UNIT_TOTAL
 };
 
-struct ButtonVoice {
-    u16 on;             // Music to be played when button is On
-    u16 off;
-    u16 music;            // Music to be played when button is Off
+enum {
+    VOICE_INI_EMPTY = -1,
+    VOICE_INI_GLOBAL_ONLY = 0,
 };
 
 struct CustomVoice {
@@ -100,23 +99,17 @@ struct Voice {
     struct CustomVoice telemetry[TELEM_NUM_ALARMS]; //Telemetry Alarm array to point to music file number
     struct CustomVoice timer[NUM_TIMERS]; //Timer Alarm array to point to music file number
     struct CustomVoice mixer[NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS];
-    struct ButtonVoice buttons[NUM_TX_BUTTONS];	//Button array to point to music file number
 #if NUM_AUX_KNOBS
     struct CustomVoice aux[NUM_AUX_KNOBS * 2]; //two per knob for up and down
 #endif
 };
 
-extern u16 voice_map_entries;
-
-struct VoiceMap {
+struct QueueEntry {
     u16 id;
     u16 duration;
 };
 
-extern struct VoiceMap voice_map[MAX_VOICEMAP_ENTRIES];
-
 u16 MUSIC_GetTelemetryAlarm(enum Music music);
-u16 MUSIC_GetTimerAlarm(enum Music music);
 void MUSIC_PlayValue(u16 music, s32 value, u8 unit, u8 prec);
 
 #endif //HAS_EXTENDED_AUDIO
