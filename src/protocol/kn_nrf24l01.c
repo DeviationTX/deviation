@@ -96,7 +96,8 @@ enum {
     CHANNEL8,
     CHANNEL9,
     CHANNEL10,
-    CHANNEL11
+    CHANNEL11,
+    CHANNEL12
 };
  
 enum {
@@ -194,7 +195,7 @@ uintptr_t KN_Cmds(enum ProtoCmds cmd)
             kn_start_tx(STARTBIND_YES);
             return 0;
         case PROTOCMD_NUMCHAN:
-            return 11;  // T, R, E, A, DR, TH, Flight mode, 6G, trim T, R, E and V977 side DR
+            return 12;  // T, R, E, A, DR, TH, Flight mode, 6G, trim T, R, E, A and V977 side DR
         case PROTOCMD_DEFAULT_NUMCHAN:
             return 11;
         case PROTOCMD_CURRENT_ID: 
@@ -562,7 +563,7 @@ static void kn_update_packet_control_data(u8 packet[], s32 packet_count, s32 rf_
     } else {
        packet[9]  = Channels[CHANNEL10] /101 + 100; // 0x64; // A
        packet[10] = Channels[CHANNEL11] /101 + 100; // 0x64; // E
-       packet[11] = 0x64; // R
+       packet[11] = Channels[CHANNEL12] /101 + 100; // 0x64; // R
     }
     packet[12] = *((u8*)&flags);
     
