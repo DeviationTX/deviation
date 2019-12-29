@@ -236,7 +236,7 @@ static void kn_start_tx(BOOL bind_yes)
     kn_init(tx_addr_, hopping_channels_);
     if(bind_yes)
     {
-        PROTOCOL_SetBindState(bind_count * BINDING_PACKET_PERIOD / 1000);  //msec
+        PROTOCOL_SetBindState(bind_count * BINDING_PACKET_PERIOD / 1000);  // msec
         tx_state_ = STATE_PRE_BIND;
     } else {
         tx_state_ = STATE_PRE_SEND;
@@ -296,7 +296,7 @@ static s32 rf_ch_idx = 0;
         }
         packet_sent++;
         return sending_packet_period;
-    }  //switch
+    }  // switch
  
     //Bad things happened, rest
     packet_sent = 0;
@@ -636,4 +636,4 @@ static u16 kn_convert_channel(u8 num)
     return (u16) ((ch * 511 / CHAN_MAX_VALUE) + 512);
 }
  
-#endif  //PROTO_HAS_NRF24L01
+#endif  // PROTO_HAS_NRF24L01
