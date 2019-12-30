@@ -17,7 +17,7 @@
 #define HAS_RTC             0
 #define HAS_VIBRATINGMOTOR  1
 #define HAS_DATALOG         1
-#define SUPPORT_SCANNER         1
+#define SUPPORT_SCANNER     1
 #define HAS_LAYOUT_EDITOR   1
 #define HAS_EXTRA_SWITCHES  OPTIONAL
 #define HAS_SWITCHES_NOSTOCK 1
@@ -27,9 +27,12 @@
 #define HAS_VIDEO           0
 #define HAS_4IN1_FLASH      0
 #define HAS_EXTENDED_AUDIO  1
-#define HAS_AUDIO_UART     1
+#define HAS_AUDIO_UART      1
 #define HAS_MUSIC_CONFIG    1
+#define HAS_BUTTON_POWER_ON 1
 #define HAS_OLED_DISPLAY    1
+
+#define SUPPORT_CRSF_CONFIG 1
 
 #ifdef BUILDTYPE_DEV
   #define DEBUG_WINDOW_SIZE 200

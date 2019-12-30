@@ -17,7 +17,7 @@
 #include "interface.h"
 #include "mixer.h"
 #include "config/model.h"
-#include "config/tx.h" // for Transmitter
+#include "config/tx.h"  // for Transmitter
 #include "telemetry.h"
 
 #ifdef PROTO_HAS_NRF24L01
@@ -96,7 +96,8 @@ enum {
     CHANNEL8,
     CHANNEL9,
     CHANNEL10,
-    CHANNEL11
+    CHANNEL11,
+    CHANNEL12
 };
  
 enum {
@@ -194,7 +195,7 @@ uintptr_t KN_Cmds(enum ProtoCmds cmd)
             kn_start_tx(STARTBIND_YES);
             return 0;
         case PROTOCMD_NUMCHAN:
-            return 11;  // T, R, E, A, DR, TH, Flight mode, 6G, trim T, R, E and V977 side DR
+            return 12;  // T, R, E, A, DR, TH, Flight mode, 6G, trim T, R, E, A and V977 side DR
         case PROTOCMD_DEFAULT_NUMCHAN:
             return 11;
         case PROTOCMD_CURRENT_ID: 
@@ -235,7 +236,7 @@ static void kn_start_tx(BOOL bind_yes)
     kn_init(tx_addr_, hopping_channels_);
     if(bind_yes)
     {
-        PROTOCOL_SetBindState(bind_count * BINDING_PACKET_PERIOD / 1000); //msec
+        PROTOCOL_SetBindState(bind_count * BINDING_PACKET_PERIOD / 1000);  // msec
         tx_state_ = STATE_PRE_BIND;
     } else {
         tx_state_ = STATE_PRE_SEND;
@@ -295,7 +296,7 @@ static s32 rf_ch_idx = 0;
         }
         packet_sent++;
         return sending_packet_period;
-    } //switch
+    }  // switch
  
     //Bad things happened, rest
     packet_sent = 0;
@@ -334,7 +335,7 @@ static void kn_init(u8 tx_addr[], u8 hopping_ch[])
 
 
     NRF24L01_Activate(0x73);
-    NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 1); // Dynamic payload for data pipe 0
+    NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 1);  // Dynamic payload for data pipe 0
     // Enable: Dynamic Payload Length to enable PCF
     NRF24L01_WriteReg(NRF24L01_1D_FEATURE, BV(NRF2401_1D_EN_DPL));
 
@@ -364,7 +365,7 @@ static void kn_calculate_freqency_hopping_channels(u32 seed, u8 hopping_channels
             u32 rnd = seed;
             while (idx < RF_CH_COUNT) {
               s32 i;
-              rnd = rnd * 0x0019660D + 0x3C6EF35F; // Randomization
+              rnd = rnd * 0x0019660D + 0x3C6EF35F;  // Randomization
               // Drop least-significant byte for better randomization. Start from 1
               u8 next_ch = (rnd >> 8) % MAX_RF_CHANNEL + 1;
               // Check that it's not duplicate nor adjacent
@@ -554,15 +555,15 @@ static void kn_update_packet_control_data(u8 packet[], s32 packet_count, s32 rf_
     packet[6]  = (rudder >> 8) & 0xFF;
     packet[7]  = rudder & 0xFF;
     // Trims, middle is 0x64 (100) range 0-200
-    packet[8]  = Channels[CHANNEL9] /101 + 100; // 0x64; // T
+    packet[8]  = Channels[CHANNEL9] /101 + 100;  // 0x64; // T
     if (Model.proto_opts[PROTOOPTS_DYNTRIM] == 1) {
-       packet[9]  = Channels[CHANNEL2] / 101 + 100; // A;
-       packet[10] = Channels[CHANNEL3] / 101 + 100; // E;
-       packet[11] = Channels[CHANNEL4] / 101 + 100; // R;
+       packet[9]  = Channels[CHANNEL2] / 101 + 100;  // A;
+       packet[10] = Channels[CHANNEL3] / 101 + 100;  // E;
+       packet[11] = Channels[CHANNEL4] / 101 + 100;  // R;
     } else {
-       packet[9]  = Channels[CHANNEL10] /101 + 100; // 0x64; // A
-       packet[10] = Channels[CHANNEL11] /101 + 100; // 0x64; // E
-       packet[11] = 0x64; // R
+       packet[9]  = Channels[CHANNEL10] /101 + 100;  // 0x64; // A
+       packet[10] = Channels[CHANNEL11] /101 + 100;  // 0x64; // E
+       packet[11] = Channels[CHANNEL12] /101 + 100;  // 0x64; // R
     }
     packet[12] = *((u8*)&flags);
     
@@ -635,4 +636,4 @@ static u16 kn_convert_channel(u8 num)
     return (u16) ((ch * 511 / CHAN_MAX_VALUE) + 512);
 }
  
-#endif //PROTO_HAS_NRF24L01
+#endif  // PROTO_HAS_NRF24L01

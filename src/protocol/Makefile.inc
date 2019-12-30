@@ -67,6 +67,7 @@ ifeq "$(SUPPORT_XN297DUMP)" "1"
 PROTO_MODULES += $(ODIR)/protocol/xn297dmp.mod
 endif
 PROTO_MODULES += $(ODIR)/protocol/e010.mod
+PROTO_MODULES += $(ODIR)/protocol/v761.mod
 
 ALL += $(PROTO_MODULES)
 else #BUILD_TARGET
@@ -324,5 +325,9 @@ endif
 
 $(ODIR)/protocol/e010.mod : $(ODIR)/e010_cc2500.bin
 	@echo Building 'e010' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
+
+$(ODIR)/protocol/v761.mod : $(ODIR)/v761_nrf24l01.bin
+	@echo Building 'v761' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 endif #BUILD_TARGET

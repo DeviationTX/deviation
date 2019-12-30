@@ -129,6 +129,8 @@ volatile u8 busy;
 u8 UART_Send(u8 *data, u16 len) {
     if (busy) return 1;
     busy = 1;
+    if (USART_CR3(UART_CFG.uart) & USART_CR3_HDSEL)   // disable receiver if half-duplex
+        usart_set_mode(UART_CFG.uart, USART_MODE_TX);
 
     DMA_stream_reset(USART_DMA);
 

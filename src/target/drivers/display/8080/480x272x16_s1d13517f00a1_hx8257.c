@@ -35,8 +35,6 @@
 static u8 invert;
 static u16 xpos, ypos, xstart, xend;
 
-extern void PARFlash_Init();
-
 void WRITE_PX(unsigned int c) {
     LCD_DATA = (c >> 16) & 0xff;
     LCD_DATA = c & 0xFFFF;
@@ -213,6 +211,11 @@ void LCD_Init()
         FSMC_BTR_DATASTx(2) | FSMC_BTR_ADDHLDx(0) | FSMC_BTR_ADDSETx(1) | FSMC_BTR_ACCMODx(FSMC_BTx_ACCMOD_B),
         FSMC_BTR_DATASTx(2) | FSMC_BTR_ADDHLDx(0) | FSMC_BTR_ADDSETx(1) | FSMC_BTR_ACCMODx(FSMC_BTx_ACCMOD_B));
 
+#ifdef MEDIA_DRIVE
+    // it depends from _fsmc_init(), so can't be moved from here
+    MEDIA_Init();
+#endif
+
     //SPILCD_Init();
 
     lcd_cmd(LCD_2A_DISPMODE, 0x00);
@@ -280,6 +283,37 @@ void LCD_Init()
     lcd_cmd(LCD_50_DISPCON, 0x80);
     lcd_clear(0x001F);
     lcd_cmd(LCD_6E_GPOUT1, 0x08);
+}
+
+void LCD_FillRect(u16 x, u16 y, u16 w, u16 h, u16 color)
+{
+    LCD_DrawStart(x, y, x + w - 1, y + h - 1, DRAW_NWSE);  // Bug fix: should be y+h-1 instead of y+h
+    unsigned pre_count = xstart & 0x07;
+    unsigned post_count = (8 - ((xend+1) & 0x07)) & 0x07;
+    u32 rgb24 = CONVERT_COLOR(color);
+    for (u32 row = 0; row < h; row++) {
+        for (u32 i = 0; i < pre_count; i++)
+            WRITE_PX(TRANSPARENT);
+        for (u32 i = 0; i < w; i++)
+            WRITE_PX(rgb24);
+        for (u32 i = 0; i < post_count; i++)
+            WRITE_PX(TRANSPARENT);
+    }
+    LCD_DrawStop();
+}
+
+void LCD_DrawFastHLine(u16 x, u16 y, u16 w, u16 color) {
+    LCD_DrawStart(x, y, x + w - 1, y, DRAW_NWSE);
+    unsigned pre_count = xstart & 0x07;
+    unsigned post_count = (8 - ((xend+1) & 0x07)) & 0x07;
+    u32 rgb24 = CONVERT_COLOR(color);
+    for (u32 i = 0; i < pre_count; i++)
+        WRITE_PX(TRANSPARENT);
+    while (w--)
+        WRITE_PX(rgb24);
+    for (u32 i = 0; i < post_count; i++)
+        WRITE_PX(TRANSPARENT);
+    LCD_DrawStop();
 }
 
 void LCD_Sleep()

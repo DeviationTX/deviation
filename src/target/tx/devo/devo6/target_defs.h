@@ -16,15 +16,16 @@
 #define HAS_RTC             0
 #define HAS_VIBRATINGMOTOR  OPTIONAL
 #define HAS_DATALOG         1
-#define SUPPORT_SCANNER         1
+#define SUPPORT_SCANNER     1
 #define HAS_MULTIMOD_SUPPORT 1
 #define HAS_EXTRA_SWITCHES  1
 #define HAS_EXTRA_BUTTONS   1
 #define HAS_VIDEO           0
-#define HAS_4IN1_FLASH      1
+#define HAS_4IN1_FLASH      0
 #define HAS_EXTENDED_AUDIO  1
-#define HAS_AUDIO_UART     0
+#define HAS_AUDIO_UART      0
 #define HAS_MUSIC_CONFIG    1
+
 #ifdef BUILDTYPE_DEV
    #define DEBUG_WINDOW_SIZE 200
 #else
