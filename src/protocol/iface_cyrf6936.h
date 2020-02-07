@@ -62,6 +62,7 @@ int CYRF_Reset();
 void CYRF_GetMfgData(u8 data[]);
 
 void CYRF_SetTxRxMode(enum TXRX_State);
+void CYRF_TuneFreq(s16 offset);
 void CYRF_ConfigRFChannel(u8 ch);
 void CYRF_SetPower(u8 power);
 void CYRF_ConfigCRCSeed(u16 crc);
