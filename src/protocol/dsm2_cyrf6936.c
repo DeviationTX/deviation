@@ -34,11 +34,12 @@
 #define NUM_WAIT_LOOPS (100 / 5) //each loop is ~5us.  Do not wait more than 100us
 
 static const char * const dsm_opts[] = {
-    _tr_noop("Telemetry"),  _tr_noop("Off"), _tr_noop("On"), NULL, 
-    _tr_noop("OrangeRx"),  _tr_noop("No"), _tr_noop("Yes"), NULL, 
+    _tr_noop("Telemetry"),  _tr_noop("Off"), _tr_noop("On"), NULL,
+    _tr_noop("OrangeRx"),  _tr_noop("No"), _tr_noop("Yes"), NULL,
 #ifndef MODULAR
-    _tr_noop("HighSpeed"),  _tr_noop("Off"), _tr_noop("On"), NULL, 
-    _tr_noop("F.Log filter"),  _tr_noop("Off"), _tr_noop("On"), NULL, 
+    _tr_noop("Freq-Fine"),  "-1000", "1000", "655361", NULL,  // large step 10, small step 1
+    _tr_noop("HighSpeed"),  _tr_noop("Off"), _tr_noop("On"), NULL,
+    _tr_noop("F.Log filter"),  _tr_noop("Off"), _tr_noop("On"), NULL,
 #endif
     NULL
 };
@@ -47,6 +48,7 @@ enum {
     PROTOOPTS_TELEMETRY = 0,
     PROTOOPTS_ORANGERX,
 #ifndef MODULAR
+    PROTOOPTS_FREQTUNE,
     PROTOOPTS_HIGHSPEED,
     PROTOOPTS_FLOGFILTER,
 #endif
@@ -188,6 +190,9 @@ static u8 binding;
 static u8 num_channels;
 static u16 crc;
 static u8 model;
+#ifndef MODULAR
+static s16 freq_offset;
+#endif
 
 static void build_bind_packet()
 {
@@ -663,6 +668,14 @@ static u16 dsm2_cb()
 #define WRITE_DELAY   1550  // Time after write to verify write complete
 #define READ_DELAY     600  // Time before write to check read state, and switch channels.
                             // Telemetry read+processing =~200us and switch channels =~300us
+
+#ifndef MODULAR
+    // keep frequency tuning updated
+    if(freq_offset != Model.proto_opts[PROTOOPTS_FREQTUNE]) {
+        freq_offset = Model.proto_opts[PROTOOPTS_FREQTUNE];
+        CYRF_TuneFreq(freq_offset);
+    }
+#endif
     if(state >= DSM2_BIND && state < DSM2_CHANSEL) {
         //Binding
         state += 1;
@@ -720,6 +733,9 @@ static u16 dsm2_cb()
                 CYRF_Reset();
                 cyrf_startup_config();
                 cyrf_transfer_config();
+#ifndef MODULAR
+                CYRF_TuneFreq(freq_offset);
+#endif
                 CYRF_SetTxRxMode(TX_EN);
                 //printf(" Rst CYRF\n");
             }
