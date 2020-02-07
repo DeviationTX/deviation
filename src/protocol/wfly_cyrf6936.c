@@ -176,7 +176,7 @@ static u16 WFLY_send_data_packet()
     }
 
     // keep frequency tuning updated
-    if(freq_offset != Model.proto_opts[PROTOOPTS_FREQTUNE]) {
+    if (freq_offset != Model.proto_opts[PROTOOPTS_FREQTUNE]) {
         freq_offset = Model.proto_opts[PROTOOPTS_FREQTUNE];
         CYRF_TuneFreq(freq_offset);
     }

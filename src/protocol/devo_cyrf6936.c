@@ -487,7 +487,7 @@ static u16 devo_telemetry_cb()
         }
         if(pkt_num == 0) {
             // keep frequency tuning updated
-            if(freq_offset != Model.proto_opts[PROTOOPTS_FREQTUNE]) {
+            if (freq_offset != Model.proto_opts[PROTOOPTS_FREQTUNE]) {
                 freq_offset = Model.proto_opts[PROTOOPTS_FREQTUNE];
                 CYRF_TuneFreq(freq_offset);
             }
@@ -546,7 +546,7 @@ static u16 devo_cb()
     }   
     if(pkt_num == 0) {
         // keep frequency tuning updated
-        if(freq_offset != Model.proto_opts[PROTOOPTS_FREQTUNE]) {
+        if (freq_offset != Model.proto_opts[PROTOOPTS_FREQTUNE]) {
             freq_offset = Model.proto_opts[PROTOOPTS_FREQTUNE];
             CYRF_TuneFreq(freq_offset);
         }

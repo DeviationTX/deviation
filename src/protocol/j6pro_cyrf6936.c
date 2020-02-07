@@ -255,7 +255,7 @@ static u16 j6pro_cb()
             /* FALLTHROUGH */
         case J6PRO_CHAN_1:
             // keep frequency tuning updated
-            if(freq_offset != Model.proto_opts[PROTOOPTS_FREQTUNE]) {
+            if (freq_offset != Model.proto_opts[PROTOOPTS_FREQTUNE]) {
                 freq_offset = Model.proto_opts[PROTOOPTS_FREQTUNE];
                 CYRF_TuneFreq(freq_offset);
             }
