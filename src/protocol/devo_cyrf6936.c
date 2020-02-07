@@ -51,12 +51,14 @@
 #define NUM_WAIT_LOOPS (100 / 5) //each loop is ~5us.  Do not wait more than 100us
 
 static const char * const devo_opts[] = {
-  _tr_noop("Telemetry"),  _tr_noop("On"), _tr_noop("X350"), _tr_noop("Off"), NULL,
-  NULL
+    _tr_noop("Telemetry"),  _tr_noop("On"), _tr_noop("X350"), _tr_noop("Off"), NULL,
+    _tr_noop("Freq-Fine"),  "-1000", "1000", "655361", NULL,  // large step 10, small step 1
+    NULL
 };
 
 enum {
     PROTOOPTS_TELEMETRY = 0,
+    PROTOOPTS_FREQTUNE,
     LAST_PROTO_OPT,
 };
 
@@ -110,6 +112,7 @@ static u8 num_channels;
 static u8 ch_idx;
 static u8 use_fixed_id;
 static u8 failsafe_pkt;
+static s16 freq_offset;
 
 static void scramble_pkt()
 {
@@ -480,6 +483,7 @@ static u16 devo_telemetry_cb()
             CYRF_Reset();
             cyrf_init();
             cyrf_set_bound_sop_code();
+            CYRF_TuneFreq(freq_offset);
             CYRF_ConfigRFChannel(*radio_ch_ptr);
             //printf("Rst CYRF\n");
             delay = 1500;
@@ -498,7 +502,12 @@ static u16 devo_telemetry_cb()
             }
         }
         if(pkt_num == 0) {
-            //Keep tx power updated
+            // keep frequency tuning updated
+            if(freq_offset != Model.proto_opts[PROTOOPTS_FREQTUNE]) {
+                freq_offset = Model.proto_opts[PROTOOPTS_FREQTUNE];
+                CYRF_TuneFreq(freq_offset);
+            }
+            // keep tx power updated
             CYRF_SetPower(Model.tx_power);
             radio_ch_ptr = radio_ch_ptr == &radio_ch[2] ? radio_ch : radio_ch_ptr + 1;
             CYRF_ConfigRFChannel(*radio_ch_ptr);
@@ -553,7 +562,12 @@ static u16 devo_cb()
         cyrf_set_bound_sop_code();
     }   
     if(pkt_num == 0) {
-        //Keep tx power updated
+        // keep frequency tuning updated
+        if(freq_offset != Model.proto_opts[PROTOOPTS_FREQTUNE]) {
+            freq_offset = Model.proto_opts[PROTOOPTS_FREQTUNE];
+            CYRF_TuneFreq(freq_offset);
+        }
+        // keep tx power updated
         CYRF_SetPower(Model.tx_power);
         radio_ch_ptr = radio_ch_ptr == &radio_ch[2] ? radio_ch : radio_ch_ptr + 1;
         CYRF_ConfigRFChannel(*radio_ch_ptr);

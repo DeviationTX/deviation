@@ -36,6 +36,18 @@
 //For Debug
 //#define NO_SCRAMBLE
 
+static const char * const j6pro_opts[] = {
+    _tr_noop("Freq-Fine"),  "-1000", "1000", "655361", NULL,  // large step 10, small step 1
+    NULL
+};
+
+enum {
+    PROTOOPTS_FREQTUNE = 0,
+    LAST_PROTO_OPT,
+};
+
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
+
 enum PktState {
     J6PRO_BIND,
     J6PRO_BIND_01,
@@ -83,6 +95,7 @@ static enum PktState state;
 static u8 packet[16];
 static u8 radio_ch[4];
 static u8 num_channels;
+static  s16 freq_offset;
 #ifdef USE_FIXED_MFGID
     //static const u8 cyrfmfg_id[6] = {0x00,0x00,0x00,0x00,0x00,0x00};
     static const u8 cyrfmfg_id[6] = {0x49, 0xec, 0xa9, 0xc4, 0xc1, 0xff};
@@ -157,6 +170,7 @@ static void cyrf_bindinit()
     CYRF_SetPower(0x07); //Use max power (+4 dBm) for binding in case there is no telem module
     CYRF_ConfigSOPCode(bind_sop_code);
     CYRF_ConfigCRCSeed(0x0000);
+    CYRF_TuneFreq(freq_offset);
     build_bind_packet();
 }
 static void cyrf_datainit()
@@ -249,6 +263,11 @@ static u16 j6pro_cb()
             cyrf_datainit();
             state = J6PRO_CHAN_1;
         case J6PRO_CHAN_1:
+            // keep frequency tuning updated
+            if(freq_offset != Model.proto_opts[PROTOOPTS_FREQTUNE]) {
+                freq_offset = Model.proto_opts[PROTOOPTS_FREQTUNE];
+                CYRF_TuneFreq(freq_offset);
+            }
             //Keep transmit power updated
             CYRF_SetPower(Model.tx_power);
             build_data_packet();
@@ -276,6 +295,7 @@ static void initialize(u8 bind)
     CLOCK_StopTimer();
     CYRF_Reset();
     cyrf_init();
+    freq_offset = Model.proto_opts[PROTOOPTS_FREQTUNE];
     num_channels = 8;
     if (bind) {
         state = J6PRO_BIND;
@@ -299,6 +319,7 @@ const void *J6PRO_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_NUMCHAN: return (void *)12L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)6L;
         case PROTOCMD_CURRENT_ID: return 0;
+        case PROTOCMD_GETOPTIONS: return j6pro_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
         default: break;
     }
