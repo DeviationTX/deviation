@@ -390,9 +390,6 @@ static void update_telemetry()
             if (Model.ground_level == 0) Model.ground_level = altitude;
             set_telemetry(TELEM_FRSKY_ALTITUDE, altitude - Model.ground_level);
             break;
-        case SENSOR_EXTV:
-            set_telemetry(TELEM_FRSKY_ALL_CELL, data16);
-            break;
         case SENSOR_CELL_VOLTAGE:
             if (cell_index < 6) {
                 set_telemetry(TELEM_FRSKY_CELL1 + cell_index, data16);
@@ -466,7 +463,8 @@ static void update_telemetry()
     }
 #if HAS_EXTENDED_TELEMETRY
     if(cell_index > 0) {
-        set_telemetry(TELEM_FRSKY_ALL_CELL, cell_total);
+        Telemetry.value[TELEM_FRSKY_ALL_CELL] = cell_total;
+        TELEMETRY_SetUpdated(TELEM_FRSKY_ALL_CELL);
     }
 #endif
 }
