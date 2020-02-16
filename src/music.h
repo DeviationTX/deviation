@@ -37,6 +37,8 @@ enum Music {
 #endif
 #define VOICE_UNIT_OFFSET 130
 #define CUSTOM_ALARM_ID 200 // start of custom MP3 IDs
+#define USE_NEW_CUSTOM_ALARM_MODE 1 // if this is 0, all the custom alarms are enqueued and never skipped
+#define CUSTOM_ALARM_IGNORE_MS 200 // ignore custom alarms if the switch was faster than this value (requires USE_NEW_CUSTOM_ALARM_MODE)
 #define VOICE_DEC_SEP 110  // MP3 ID of DECSEP = 110 + MUSIC_TOTAL
 #define NUM_STICKS 4
 #define NUM_AUX_KNOBS	(INP_HAS_CALIBRATION - NUM_STICKS)	// Exclude sticks
