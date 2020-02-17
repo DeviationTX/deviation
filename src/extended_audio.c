@@ -258,7 +258,7 @@ int AUDIO_AddQueue(u16 music) {
     if (voice_map[music].id >= CUSTOM_ALARM_ID)
     {
         u32 id = voice_map[audio_queue[next_audio-1]].id;
-        if (id == 0 || id >= CUSTOM_ALARM_ID)  // Only skip welcome message or custom alarms
+        if (id == MUSIC_STARTUP || id >= CUSTOM_ALARM_ID)  // Only skip welcome message or custom alarms
             audio_queue_time = t + CUSTOM_ALARM_IGNORE_MS;  // Do not consume the audio right away (prevent triggering transitional sounds)
 
         for (u8 i = next_audio; i < num_audio; i++)
