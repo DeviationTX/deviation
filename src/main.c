@@ -47,10 +47,12 @@ int main() {
 #ifndef ENABLE_MODULAR
     //Banner();
 #endif
-#if defined(HAS_BUTTON_POWER_ON) && HAS_BUTTON_POWER_ON && !defined(_T12_TARGET_H_)
+#if defined(HAS_BUTTON_POWER_ON) && HAS_BUTTON_POWER_ON
     u32 power_on_delay = 0;
     while (1) {
-        if (!GPIO_pin_get(PWR_SWITCH_PIN)) {
+        u32 value = GPIO_pin_get(PWR_SWITCH_PIN);
+	if ((HAS_PWR_SWITCH_INVERTED && value)
+	    || (!HAS_PWR_SWITCH_INVERTED && !value)) {
             PWR_Shutdown();
         } else {
             power_on_delay++;
