@@ -13,6 +13,7 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <libopencm3/stm32/gpio.h>
 #include "common.h"
 #include "protocol/interface.h"
 #include "mixer.h"
@@ -47,7 +48,21 @@ int main() {
 #ifndef ENABLE_MODULAR
     //Banner();
 #endif
+
+#if defined(HAS_BUTTON_POWER_ON) && HAS_BUTTON_POWER_ON
+    u32 power_on_delay = 0;
+    while (1) {
+        if(!gpio_get(_PWRSW_PORT, _PWRSW_PIN))
+            PWR_Shutdown();
+        else {
+            power_on_delay++;
+            if (power_on_delay > 500000)  // about 1 sec
+                break;
+        }        
+    }
+#else
     if(PWR_CheckPowerSwitch()) PWR_Shutdown();
+#endif
 
     LCD_Clear(0x0000);
 #ifdef TEST_ADC
