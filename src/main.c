@@ -51,8 +51,8 @@ int main() {
     u32 power_on_delay = 0;
     while (1) {
         u32 value = GPIO_pin_get(PWR_SWITCH_PIN);
-	if ((HAS_PWR_SWITCH_INVERTED && value)
-	    || (!HAS_PWR_SWITCH_INVERTED && !value)) {
+        if ((HAS_PWR_SWITCH_INVERTED && value)
+            || (!HAS_PWR_SWITCH_INVERTED && !value)) {
             PWR_Shutdown();
         } else {
             power_on_delay++;
