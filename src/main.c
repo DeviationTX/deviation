@@ -53,8 +53,7 @@ int main() {
     while (1) {
         if (!gpio_get(_PWRSW_PORT, _PWRSW_PIN)) {
             PWR_Shutdown();
-        }
-        else {
+        } else {
             power_on_delay++;
             if (power_on_delay > 500000)  // about 1 sec
                 break;
