@@ -29,7 +29,7 @@ enum {
     ARROW_W      = 10,
     //
     LBL1_X       = 0,
-    LBL1_WIDTH   = 8,
+    LBL1_WIDTH   = 7,
     LBL2_X       = 43,
     LBL3_X       = 86,
     LBL4_X       = 0,
