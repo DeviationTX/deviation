@@ -181,19 +181,19 @@ const struct telem_layout dsm_layout_basic[] = {
     {TYPE_HEADER | 1, LBL3_X, LBL1_WIDTH,  H_LABEL},
     {TYPE_VALUE  | 1, DSM3_X, DSM1_WIDTH, TELEM_DSM_FLOG_HOLDS},
 
-#if HAS_EXTENDED_TELEMETRY
+    /*  #if HAS_EXTENDED_TELEMETRY // it doesn't nicely fit to page
     {TYPE_HEADER | 2, LBL1_X, LBL1_WIDTH, TEMP_LABEL},
     {TYPE_VALUE  | 2, DSM1_X, DSM1_WIDTH, TELEM_DSM_FLOG_TEMP1},
     {TYPE_HEADER | 2, LBL2_X, LBL1_WIDTH, RXV_LABEL},
     {TYPE_VALUE  | 2, DSM2_X, DSM1_WIDTH, TELEM_DSM_FLOG_VOLT1},
     {TYPE_HEADER | 2, LBL3_X, LBL1_WIDTH, MISC_LABEL},
     {TYPE_VALUE  | 2, DSM3_X, DSM1_WIDTH, TELEM_DSM_FLOG_RSSI_DBM},
-#else
+    #else  */
     {TYPE_HEADER | 2, LBL4_X, LBL4_WIDTH, TEMP_LABEL},
     {TYPE_VALUE  | 2, DSM4_X, DSM1_WIDTH, TELEM_DSM_FLOG_TEMP1},
     {TYPE_HEADER | 2, LBL5_X, LBL4_WIDTH, RXV_LABEL},
     {TYPE_VALUE  | 2, DSM5_X, DSM1_WIDTH, TELEM_DSM_FLOG_VOLT1},
-#endif
+    //  #endif
 
     {TYPE_HEADER | 3, LBL4_X, LBL4_WIDTH, BATT_LABEL},
     {TYPE_VALUE  | 3, DSM4_X, DSM1_WIDTH, TELEM_DSM_FLOG_VOLT2},
@@ -357,7 +357,7 @@ static const char *header_cb(guiObject_t *obj, const void *data)
         case CELLS_LABEL:return "Signl";
 #endif
         case MISC_LABEL: return "Misc";
-        case ARROW_LABEL: return current_page== telemetry_gps ? "<-" : "->";
+        case ARROW_LABEL: return current_page == telemetry_gps ? "<-" : "->";
     }
     return "";
 }
