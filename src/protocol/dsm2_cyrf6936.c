@@ -618,7 +618,7 @@ NO_INLINE static void parse_telemetry_packet()
             Telemetry.value[TELEM_DSM_FLOG_VOLT2] =  pktTelem[2];
             Telemetry.value[TELEM_DSM_FLOG_TEMP1] = (pktTelem[3] == 0x7fff) ? 0 : (pktTelem[3] - 32) * 5 / 9; //Convert to C
 #if HAS_EXTENDED_TELEMETRY
-            Telemetry.value[TELEM_DSM_FLOG_RSSI_DBM] = (pktTelem[4] == 0xffff) ? 0 : (s8)packet[8];  //Average signal for A antenna in dBm
+            Telemetry.value[TELEM_DSM_FLOG_RSSI_DBM] = (pktTelem[4] == 0xffff) ? 0 : (s8)packet[8];  // Average signal for A antenna in dBm
 #endif
             break;
         case 0x16: //GPS sensor (always second GPS packet)
