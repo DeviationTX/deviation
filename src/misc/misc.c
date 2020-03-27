@@ -137,6 +137,7 @@ static void update_lfsr(uint32_t *lfsr, uint8_t b)
         b >>= 1;
     }
 }
+
 u32 rand32_r(u32 *seed, u8 update)
 {
     if(! seed)
@@ -144,6 +145,7 @@ u32 rand32_r(u32 *seed, u8 update)
     update_lfsr(seed, update);
     return *seed;
 }
+
 u32 rand32()
 {
     return rand32_r(0, 0);
@@ -176,6 +178,7 @@ void wait_press_release(u32 press)
 void wait_press() {
     wait_press_release(CHAN_ButtonMask(BUT_ENTER));
 }
+
 void wait_release()
 {
     wait_press_release(0);
@@ -183,7 +186,7 @@ void wait_release()
 
 void USB_Connect()
 {
-#if defined(HAS_USB_DRIVE_ERASE) && HAS_USB_DRIVE_ERASE
+#if !defined(EMULATOR) && defined(HAS_USB_DRIVE_ERASE) && HAS_USB_DRIVE_ERASE
     u16 up = 0;
     u16 down = 0;
     u32 counter = 0;
@@ -193,7 +196,7 @@ void USB_Connect()
     while(1) {
         if(PWR_CheckPowerSwitch())
             PWR_Shutdown();
-#if defined(HAS_USB_DRIVE_ERASE) && HAS_USB_DRIVE_ERASE
+#if !defined(EMULATOR) && defined(HAS_USB_DRIVE_ERASE) && HAS_USB_DRIVE_ERASE
         // Erase flash drive in case any filesystem damages
         u32 buttons = ScanButtons();
         if (CHAN_ButtonIsPressed(buttons, BUT_UP) && !up && !down) {
@@ -215,4 +218,3 @@ void USB_Connect()
 #endif
     }
 }
-
