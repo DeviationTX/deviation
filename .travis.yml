@@ -3,11 +3,11 @@ matrix:
 #Do not define 'global' env vars here.  They cannot be used with API builds
     fast_finish: true
     include:
-      - stage: nightly
+      - stage: Nightly
         env: MAKETARGET="zips winzips"
-      - stage: release
+      - stage: Release
         env: MAKETARGET="zips winzips"
-      - stage: build
+      - stage: Build
         env: MAKETARGET=lint
       - env: MAKETARGET=zip_devo8
       - env: MAKETARGET=zip_devo10
@@ -23,11 +23,11 @@ matrix:
       - env: MAKETARGET=test
 
 stages:
-    - name: release
+    - name: Release
       if: type = api AND branch =~ /^v[0-9]+\.[0-9]+\.[0-9]+$/
-    - name: nightly
+    - name: Nightly
       if: type IN (api, cron) and branch = "master"
-    - name: build
+    - name: Build
       if: type NOT IN (api, cron)
       # if: type NOT IN (api, cron) AND NOT commit_message =~ /^Updating translations from Transifex \(Languages:/
       # We still need to rebuild even if the last commit was from transifex to calculate rom size and verify string lengths
