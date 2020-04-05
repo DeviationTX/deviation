@@ -29,6 +29,7 @@ static const char * const frskyx_opts[] = {
   _tr_noop("Format"),  "FCC", "EU", NULL,
   _tr_noop("RSSIChan"),  "None", "LastChan", NULL,
   _tr_noop("S.PORT Out"), _tr_noop("Disabled"), _tr_noop("Enabled"), NULL,
+  _tr_noop("Bind Mode"), _tr_noop("1-8, On"), _tr_noop("1-8, Off"), _tr_noop("9-16, On"), _tr_noop("9-16, Off"), NULL,
   _tr_noop("Version"), _tr_noop("V1"), _tr_noop("V2"), NULL,
   NULL
 };
@@ -39,6 +40,7 @@ enum {
     PROTO_OPTS_FORMAT,
     PROTO_OPTS_RSSICHAN,
     PROTO_OPTS_SPORTOUT,
+    PROTO_OPTS_BINDMODE,
     PROTO_OPTS_VERSION,
     LAST_PROTO_OPT,
 };
@@ -139,9 +141,8 @@ static const u16 CRCTable[] = {
 
 static void init_hop_FRSkyX2(void)
 {
-    // Increment
-    u8 inc = (fixed_id % 46) + 1;
-    if ( inc == 12 || inc ==35 ) inc++;                     // Exception list from dumps
+    u8 inc = (fixed_id % 46) + 1;                               // Increment
+    if ( inc == 12 || inc == 35 ) inc++;                        // Exception list from dumps
     // Start offset
     u8 offset = fixed_id % 5;
 
@@ -150,21 +151,21 @@ static void init_hop_FRSkyX2(void)
     {
         channel = 5 * ((u16)(inc * i) % 47) + offset;
         // Exception list from dumps
-        if (Model.proto_opts[PROTO_OPTS_FORMAT])            // LBT or FCC
+        if (Model.proto_opts[PROTO_OPTS_FORMAT])                // LBT or FCC
         {
-             // LBT
+            // LBT
             if (channel <= 1 || channel == 43 || channel == 44 || channel == 87 || channel == 88 || channel == 129 || channel == 130 || channel == 173 || channel == 174)
                 channel += 2;
             else if (channel == 216 || channel == 217 || channel == 218)
                 channel += 3;
         }
-        else  // FCC
+        else
+            // FCC
             if (channel == 3 || channel == 4 || channel == 46 || channel == 47 || channel == 90 || channel == 91  || channel == 133 || channel == 134 || channel == 176 || channel == 177 || channel == 220 || channel == 221)
                 channel += 2;
-        // Store
-        hop_data_v2[i] = channel;
+        hop_data_v2[i] = channel;                               // Store
     }
-    hop_data_v2[47] = 0;                                    // Bind freq
+    hop_data_v2[47] = 0;                                        // Bind freq
 }
 
 static u16 crc(u8 *data, u8 len) {
@@ -216,9 +217,9 @@ static void frskyX_build_bind_packet()
         packet[12] = RXNUM;
 
         memset(&packet[13], 0, packet_size-14);
-        if (binding_idx&0x01)
+        if (binding_idx & 0x01)
             memcpy(&packet[13], (void *)"\x55\xAA\x5A\xA5", 4);   // Telem off
-        if (binding_idx&0x02)
+        if (binding_idx & 0x02)
             memcpy(&packet[17], (void *)"\x55\xAA\x5A\xA5", 4);   // CH9-16
     } else {
         // packet 1D 03 01 0E 1C 02 00 00 32 0B 00 00 A8 26 28 01 A1 00 00 00 3E F6 87 C7 00 00 00 00 C9 C9
@@ -226,9 +227,9 @@ static void frskyX_build_bind_packet()
         packet[6] = RXNUM;
         // Bind flags
         packet[7] = 0;
-        if (binding_idx&0x01)
+        if (binding_idx & 0x01)
             packet[7] |= 0x40;              // Telem off
-        if (binding_idx&0x02)
+        if (binding_idx & 0x02)
             packet[7] |= 0x80;              // CH9-16
         // Unknown bytes
         memcpy(&packet[8], "\x32\x0B\x00\x00\xA8\x26\x28\x01\xA1\x00\x00\x00\x3E\xF6\x87\xC7", 16);
@@ -724,7 +725,7 @@ static void initialize(int bind)
     ctr = 0;
     seq_rx_expected = 0;
     seq_tx_send = 8;
-    binding_idx = 0;
+    binding_idx = Model.proto_opts[PROTO_OPTS_BINDMODE];
 #if HAS_EXTENDED_TELEMETRY
     telem_save_seq = -1;
     setup_serial_port();
