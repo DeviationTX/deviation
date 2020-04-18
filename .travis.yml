@@ -135,14 +135,14 @@ install:
        export MPG123_DIR=$HOME/mpg123-w32
      fi
    - |
-     if [[ $TRAVIS_BUILD_STAGE_NAME == "Nightly" || $TRAVIS_BUILD_STAGE_NAME == "Release" ]]; then
+     if [[ $TRAVIS_BUILD_STAGE_NAME == "nightly" || $TRAVIS_BUILD_STAGE_NAME == "release" ]]; then
          pip3 install --user urllib3==1.23 transifex-client
          openssl aes-256-cbc -K $encrypted_54cd4d6ff016_key -iv $encrypted_54cd4d6ff016_iv -in install_nightlies.tar.enc -out install_nightlies.tar -d
          tar -xf install_nightlies.tar;
          rm -f install_nightlies.tar
      fi
    - |
-     if [[ $TRAVIS_BUILD_STAGE_NAME == "Nightly" ]]; then
+     if [[ $TRAVIS_BUILD_STAGE_NAME == "nightly" ]]; then
          echo "[https://www.transifex.com]" > .transifexrc;
          echo "hostname = https://www.transifex.com" >> .transifexrc;
          echo "password = $TX_PASSWD" >> .transifexrc;
@@ -159,7 +159,7 @@ before_script:
 
 script: 
   - |
-    if [[ $TRAVIS_BUILD_STAGE_NAME == "Nightly" ]]; then
+    if [[ $TRAVIS_BUILD_STAGE_NAME == "nightly" ]]; then
         # 'make language' changes order randomly.  Needs to be consistent before enabling this
         pushd src; make language; popd;
         if [[ `git diff src/fs/language/| grep -E -v '^(diff|index|---|\+\+\+|@@|-#|\+#| |$)'` == "" ]]; then
@@ -198,11 +198,11 @@ script:
 
 after_success:
   - |
-    if [[ $TRAVIS_BUILD_STAGE_NAME == "Build" ]]; then
+    if [[ $TRAVIS_BUILD_STAGE_NAME == "build" ]]; then
         travis_terminate 0
     fi
   - |
-    if [[ $TRAVIS_BUILD_STAGE_NAME == "Release" ]]; then
+    if [[ $TRAVIS_BUILD_STAGE_NAME == "release" ]]; then
         export RELEASE_VERSION=$(echo $TRAVIS_BRANCH | egrep -o '[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+');
         if [[ "$RELEASE_VERSION" != "" && "$TRAVIS_BRANCH" == "v$RELEASE_VERSION" ]]; then
             echo "Releasing $RELEASE_VERSION";

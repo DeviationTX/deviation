@@ -27,16 +27,17 @@
 #define HAS_RTC             0
 #define HAS_VIBRATINGMOTOR  1
 #define HAS_DATALOG         1
-#define SUPPORT_SCANNER         0
+#define SUPPORT_SCANNER     0
 #define HAS_LAYOUT_EDITOR   0
 #define HAS_EXTRA_SWITCHES  OPTIONAL
 #define HAS_EXTRA_BUTTONS   0
+#define HAS_BUTTON_MATRIX_PULLUP 1
 #define HAS_MULTIMOD_SUPPORT 1
 #define HAS_MAPPED_GFX      0
 #define HAS_CHAR_ICONS      1
 #define HAS_VIDEO           8
 #define HAS_EXTENDED_AUDIO  0
-#define HAS_AUDIO_UART     0
+#define HAS_AUDIO_UART      0
 #define HAS_MUSIC_CONFIG    0
 
 #define SUPPORT_MULTI_LANGUAGE 0

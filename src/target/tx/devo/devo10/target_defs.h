@@ -19,6 +19,7 @@
 #define SUPPORT_SCANNER     1
 #define HAS_EXTRA_SWITCHES  0
 #define HAS_EXTRA_BUTTONS   0
+#define HAS_BUTTON_MATRIX_PULLUP 0
 #define HAS_MULTIMOD_SUPPORT 1
 #define HAS_VIDEO           0
 #define HAS_4IN1_FLASH      0

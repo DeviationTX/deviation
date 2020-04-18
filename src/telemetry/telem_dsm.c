@@ -309,7 +309,7 @@ s32 _dsm_get_max_value(u8 telem)
         case TELEM_DSM_RXPCAP_AMPS:     return 1800;
         case TELEM_DSM_FPCAP_AMPS:      return 1400;
         case TELEM_DSM_FPCAP_TEMP:      return 1500;
-        case TELEM_DSM_FLOG_RSSI_DBM:   return 255;
+        case TELEM_DSM_FLOG_RSSI_DBM:   return 127;
 #endif
         case TELEM_DSM_AIRSPEED:        return 999;
         case TELEM_DSM_ALTITUDE:
@@ -350,6 +350,7 @@ s32 _dsm_get_min_value(u8 telem)
         case TELEM_DSM_RXPCAP_AMPS:     return -1800;
         case TELEM_DSM_FPCAP_CAPACITY:
         case TELEM_DSM_RXPCAP_CAPACITY: return -32766;
+        case TELEM_DSM_FLOG_RSSI_DBM:   return -127;
 #endif
         default: return 0;
     }
