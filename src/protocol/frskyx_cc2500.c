@@ -50,7 +50,7 @@ ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 #define FAILSAFE_NOPULSE 1
 #define FAILSAFE_RX      2
 
-#define MAX_PACKET_SIZE 33
+#define MAX_PACKET_SIZE  33
 
 // Statics are not initialized on 7e so in initialize() if necessary
 static u8 chanskip;
@@ -66,7 +66,7 @@ static u8 binding_idx;
 
 
 // u8 ptr[4] = {0x01,0x12,0x23,0x30};
-//u8 ptr[4] = {0x00,0x11,0x22,0x33};
+// u8 ptr[4] = {0x00,0x11,0x22,0x33};
 static enum {
   FRSKY_BIND,
 #ifndef EMULATOR
@@ -82,11 +82,11 @@ static enum {
 } state, datam_state;
 
 #define TELEM_PKT_SIZE            17
-#define HOPP_DATA_SIZE            48
+#define HOP_DATA_SIZE             48
 
 static u16 fixed_id;
 static u8 packet[MAX_PACKET_SIZE];
-static u8 hop_data_v2[HOPP_DATA_SIZE];
+static u8 hop_data_v2[HOP_DATA_SIZE];
 
 static const u8 hop_data[] = {
   0x02, 0xD4, 0xBB, 0xA2, 0x89,
@@ -102,40 +102,38 @@ static const u8 hop_data[] = {
 };
 
 
-static const uint16_t CRC_Short[] = {
-  0x0000, 0x1189, 0x2312, 0x329B, 0x4624, 0x57AD, 0x6536, 0x74BF,
-  0x8C48, 0x9DC1, 0xAF5A, 0xBED3, 0xCA6C, 0xDBE5, 0xE97E, 0xF8F7
+static const u16 CRC_Short[] = {
+  0x0000,0x1189,0x2312,0x329b,0x4624,0x57ad,0x6536,0x74bf,
+  0x8c48,0x9dc1,0xaf5a,0xbed3,0xca6c,0xdbe5,0xe97e,0xf8f7,
 };
 
 
 
 static void init_hop_FRSkyX2(void)
 {
-    u8 inc = (fixed_id % 46) + 1;                               // Increment
+    u8 inc = (fixed_id % (HOP_DATA_SIZE - 2)) + 1;              // Increment
     if ( inc == 12 || inc == 35 ) inc++;                        // Exception list from dumps
-    // Start offset
-    u8 offset = fixed_id % 5;
+    u8 offset = fixed_id % 5;                                   // Start offset
 
     u8 channel;
-    for (u8 i = 0; i < 47; i++)
+    for (u8 i = 0; i < (HOP_DATA_SIZE - 1); i++)
     {
-        channel = 5 * ((u16)(inc * i) % 47) + offset;
+        channel = 5 * ((u16)(inc * i) % (HOP_DATA_SIZE - 1)) + offset;
         // Exception list from dumps
-        if (Model.proto_opts[PROTO_OPTS_FORMAT])                // LBT or FCC
-        {
+        if (Model.proto_opts[PROTO_OPTS_FORMAT]) {              // LBT or FCC
             // LBT
             if (channel <= 1 || channel == 43 || channel == 44 || channel == 87 || channel == 88 || channel == 129 || channel == 130 || channel == 173 || channel == 174)
                 channel += 2;
             else if (channel == 216 || channel == 217 || channel == 218)
                 channel += 3;
-        }
-        else
+        } else {
             // FCC
             if (channel == 3 || channel == 4 || channel == 46 || channel == 47 || channel == 90 || channel == 91  || channel == 133 || channel == 134 || channel == 176 || channel == 177 || channel == 220 || channel == 221)
                 channel += 2;
+        }
         hop_data_v2[i] = channel;                               // Store
     }
-    hop_data_v2[47] = 0;                                        // Bind freq
+    hop_data_v2[HOP_DATA_SIZE - 1] = 0;                                        // Bind freq
 }
 
 static u16 crcTable(u8 val)
@@ -155,7 +153,7 @@ static u16 crc(u8 *data, u8 len) {
 
 static void initialize_data(u8 adr)
 {
-  CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);                 // Frequency offset hack
+  CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);                     // Frequency offset hack
   CC2500_WriteReg(CC2500_18_MCSM0,    0x8);
   CC2500_WriteReg(CC2500_09_ADDR, adr ? 0x03 : (fixed_id & 0xff));
   CC2500_WriteReg(CC2500_07_PKTCTRL1,0x05);
@@ -194,7 +192,7 @@ static void frskyX_build_bind_packet()
         packet[11] = 0x02;
         packet[12] = RXNUM;
 
-        memset(&packet[13], 0, packet_size-14);
+        memset(&packet[13], 0, packet_size - 14);
         if (binding_idx & 0x01)
             memcpy(&packet[13], (void *)"\x55\xAA\x5A\xA5", 4);   // Telem off
         if (binding_idx & 0x02)
@@ -214,12 +212,12 @@ static void frskyX_build_bind_packet()
         packet[20]^= 0x0E ^ fixed_id;       // Update the ID
         packet[21]^= 0x1C ^ fixed_id >> 8;  // Update the ID
         // Xor
-        for (u8 i = 3; i < packet_size-1; i++)
+        for (u8 i = 3; i < packet_size - 1; i++)
             packet[i] ^= 0xA7;
     }
 
-    u16 lcrc = crc(&packet[3], packet_size-4);
-    packet[packet_size-1] = lcrc >> 8;
+    u16 lcrc = crc(&packet[3], packet_size - 4);
+    packet[packet_size - 1] = lcrc >> 8;
     packet[packet_size] = lcrc;
 
 }
@@ -340,10 +338,10 @@ static void frskyX_data_frame() {
 
     chan_offset ^= 0x08;
 
-    memset(&packet[22], 0, packet_size-23);
+    memset(&packet[22], 0, packet_size - 23);
 
-    u16 lcrc = crc(&packet[3], packet_size-4);
-    packet[packet_size-1] = lcrc >> 8;
+    u16 lcrc = crc(&packet[3], packet_size - 4);
+    packet[packet_size - 1] = lcrc >> 8;
     packet[packet_size] = lcrc;
 }
 
@@ -369,13 +367,13 @@ static void setup_serial_port() {
 }
 
 static void serial_echo(u8 *packet) {
-  static u8 outbuf[FRSKY_SPORT_PACKET_SIZE+1] = {0x7e};
+  static u8 outbuf[FRSKY_SPORT_PACKET_SIZE + 1] = {0x7e};
 
   if (PPMin_Mode() || !Model.proto_opts[PROTO_OPTS_SPORTOUT]) return;
 
-  memcpy(outbuf+1, packet, FRSKY_SPORT_PACKET_SIZE-1);
-  outbuf[FRSKY_SPORT_PACKET_SIZE] = sport_crc(outbuf+2);
-  UART_Send(outbuf, FRSKY_SPORT_PACKET_SIZE+1);
+  memcpy(outbuf+1, packet, FRSKY_SPORT_PACKET_SIZE - 1);
+  outbuf[FRSKY_SPORT_PACKET_SIZE] = sport_crc(outbuf + 2);
+  UART_Send(outbuf, FRSKY_SPORT_PACKET_SIZE + 1);
 }
 
 #endif // HAS_EXTENDED_TELEMETRY
@@ -386,7 +384,7 @@ static void frsky_check_telemetry(u8 *pkt, u8 len) {
         && pkt[0] == TELEM_PKT_SIZE - 3
         && pkt[1] == (fixed_id & 0xff)
         && pkt[2] == (fixed_id >> 8)
-        && crc(&pkt[3], TELEM_PKT_SIZE-7) == (pkt[TELEM_PKT_SIZE-4] << 8 | pkt[TELEM_PKT_SIZE-3])
+        && crc(&pkt[3], TELEM_PKT_SIZE - 7) == (pkt[TELEM_PKT_SIZE - 4] << 8 | pkt[TELEM_PKT_SIZE - 3])
        ) {
         if (pkt[4] & 0x80) {   // distinguish RSSI from VOLT1
             Telemetry.value[TELEM_FRSKY_RSSI] = pkt[4] & 0x7f;
@@ -396,10 +394,10 @@ static void frsky_check_telemetry(u8 *pkt, u8 len) {
             TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT1);
         }
 
-        Telemetry.value[TELEM_FRSKY_LQI] = pkt[len-1] & 0x7f;
+        Telemetry.value[TELEM_FRSKY_LQI] = pkt[len - 1] & 0x7f;
         TELEMETRY_SetUpdated(TELEM_FRSKY_LQI);
 
-        Telemetry.value[TELEM_FRSKY_LRSSI] = (s8)pkt[len-2] / 2 - 70;  // Value in dBm
+        Telemetry.value[TELEM_FRSKY_LRSSI] = (s8)pkt[len - 2] / 2 - 70;  // Value in dBm
         TELEMETRY_SetUpdated(TELEM_FRSKY_LRSSI);
 
         if (((pkt[5] & 0x0f) == 0x08) || ((pkt[5] >> 4) == 0x08)) {   // restart
@@ -414,14 +412,14 @@ static void frsky_check_telemetry(u8 *pkt, u8 len) {
 #if HAS_EXTENDED_TELEMETRY
                 if (pkt[6] <= 6) {
                     for (u8 i = 0; i < pkt[6]; i++)
-                        frsky_parse_sport_stream(pkt[7+i], SPORT_NOCRC);
+                        frsky_parse_sport_stream(pkt[7 + i], SPORT_NOCRC);
                 }
                 // process any saved data from out-of-sequence packet if
                 // it's the next expected packet
                 if (telem_save_seq == seq_rx_expected) {
                     seq_rx_expected = (seq_rx_expected + 1) % 4;
                     for (u8 i = 0; i < telem_save_data[0]; i++)
-                        frsky_parse_sport_stream(telem_save_data[1+i], SPORT_NOCRC);
+                        frsky_parse_sport_stream(telem_save_data[1 + i], SPORT_NOCRC);
                 }
                 telem_save_seq = -1;
 #endif
@@ -432,7 +430,7 @@ static void frsky_check_telemetry(u8 *pkt, u8 len) {
                 // if this is the packet after the expected one, save the sport data
                 if ((pkt[5] & 0x03) == ((seq_rx_expected+1) % 4) && pkt[6] <= 6) {
                     telem_save_seq = (seq_rx_expected+1) % 4;
-                    memcpy(telem_save_data, &pkt[6], pkt[6]+1);
+                    memcpy(telem_save_data, &pkt[6], pkt[6] + 1);
                 }
             }
 #endif
@@ -481,7 +479,7 @@ static u16 frskyx_cb() {
       CC2500_Strobe(CC2500_SFRX);
       frskyX_build_bind_packet();
       CC2500_Strobe(CC2500_SIDLE);
-      CC2500_WriteData(packet, packet[0]+1);
+      CC2500_WriteData(packet, packet[0] + 1);
       state++;
 #ifndef EMULATOR
       return 9000;
@@ -507,7 +505,7 @@ static u16 frskyx_cb() {
       if (mixer_sync != MIX_DONE && mixer_runtime < 2000) mixer_runtime += 50;
       frskyX_data_frame();
       CC2500_Strobe(CC2500_SIDLE);
-      CC2500_WriteData(packet, packet[0]+1);
+      CC2500_WriteData(packet, packet[0] + 1);
       channr = (channr + chanskip) % 47;
       state++;
 #ifndef EMULATOR
@@ -630,13 +628,11 @@ static void frskyX_init() {
   for (u32 i = 0; i < ((sizeof init_data_shared) / (sizeof init_data_shared[0])); i++)
       CC2500_WriteReg(init_data_shared[i][0], init_data_shared[i][1]);
 
-  if (Model.proto_opts[PROTO_OPTS_VERSION])
-  {
-      CC2500_WriteReg(CC2500_08_PKTCTRL0, 0x05);      // Enable CRC
-      if (!Model.proto_opts[PROTO_OPTS_FORMAT])
-      {  // FCC
-          CC2500_WriteReg(CC2500_17_MCSM1, 0x0E);     // Go/Stay in RX mode
-          CC2500_WriteReg(CC2500_11_MDMCFG3, 0x84);   // bitrate 70K->77K
+  if (Model.proto_opts[PROTO_OPTS_VERSION]) {
+      CC2500_WriteReg(CC2500_08_PKTCTRL0, 0x05);                // Enable CRC
+      if (!Model.proto_opts[PROTO_OPTS_FORMAT]) {               // FCC
+          CC2500_WriteReg(CC2500_17_MCSM1, 0x0E);               // Go/Stay in RX mode
+          CC2500_WriteReg(CC2500_11_MDMCFG3, 0x84);             // bitrate 70K->77K
       }
   }
 
@@ -644,7 +640,7 @@ static void frskyX_init() {
   CC2500_Strobe(CC2500_SIDLE);
 
   // calibrate hop channels
-  for (u8 c = 0; c < 47; c++) {
+  for (u8 c = 0; c < (HOP_DATA_SIZE - 1); c++) {
       CC2500_Strobe(CC2500_SIDLE);
       if (!Model.proto_opts[PROTO_OPTS_VERSION]) {
           CC2500_WriteReg(CC2500_0A_CHANNR, hop_data[c]);
@@ -662,9 +658,9 @@ static void frskyX_init() {
   CC2500_WriteReg(CC2500_0A_CHANNR, 0x00);
   CC2500_Strobe(CC2500_SCAL);
   usleep(900);
-  calData[47][0] = CC2500_ReadReg(CC2500_23_FSCAL3);
-  calData[47][1] = CC2500_ReadReg(CC2500_24_FSCAL2);
-  calData[47][2] = CC2500_ReadReg(CC2500_25_FSCAL1);
+  calData[HOP_DATA_SIZE - 1][0] = CC2500_ReadReg(CC2500_23_FSCAL3);
+  calData[HOP_DATA_SIZE - 1][1] = CC2500_ReadReg(CC2500_24_FSCAL2);
+  calData[HOP_DATA_SIZE - 1][2] = CC2500_ReadReg(CC2500_25_FSCAL1);
 }
 
 
@@ -693,7 +689,7 @@ static void initialize(int bind)
     fine = Model.proto_opts[PROTO_OPTS_FREQFINE];
     packet_size = 0x1D;
     if (!Model.proto_opts[PROTO_OPTS_VERSION] && Model.proto_opts[PROTO_OPTS_FORMAT])
-        packet_size = 0x20;               // FrSkyX V1 LBT
+       packet_size = 0x20;               // FrSkyX V1 LBT
     fixed_id = (u16) get_tx_id();
     failsafe_count = 0;
     chan_offset = 0;
@@ -711,7 +707,7 @@ static void initialize(int bind)
 
     u32 seed = get_tx_id();
     while (!chanskip)
-        chanskip = (rand32_r(&seed, 0) & 0xfefefefe) % 47;
+        chanskip = (rand32_r(&seed, 0) & 0xfefefefe) % (HOP_DATA_SIZE - 1);
     while((chanskip - ctr) % 4)
         ctr = (ctr+1) % 4;
     counter_rst = (chanskip - ctr) >> 2;
