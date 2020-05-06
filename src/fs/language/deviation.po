@@ -545,10 +545,10 @@ msgstr ""
 #: pages/common/standard/_throhold_page.c:40 pages/common/_tx_configure.c:376
 #: protocol/bayang_nrf24l01.c:93 protocol/bayang_nrf24l01.c:95
 #: protocol/cg023_nrf24l01.c:44 protocol/dsm2_cyrf6936.c:37
-#: protocol/dsm2_cyrf6936.c:40 protocol/dsm2_cyrf6936.c:41
+#: protocol/dsm2_cyrf6936.c:41 protocol/dsm2_cyrf6936.c:42
 #: protocol/frsky2way_cc2500.c:25 protocol/fy326_nrf24l01.c:45
 #: protocol/hubsan_a7105.c:114 protocol/inav_nrf24l01.c:170
-#: protocol/kn_nrf24l01.c:160 protocol/symax_nrf24l01.c:94
+#: protocol/kn_nrf24l01.c:161 protocol/symax_nrf24l01.c:94
 #: protocol/yd717_nrf24l01.c:95 telemetry/telem_dsm.c:147
 msgid "On"
 msgstr ""
@@ -568,11 +568,11 @@ msgstr ""
 #: pages/common/_tx_configure.c:412 protocol/bayang_nrf24l01.c:93
 #: protocol/bayang_nrf24l01.c:95 protocol/cflie_nrf24l01.c:185
 #: protocol/cg023_nrf24l01.c:44 protocol/devo_cyrf6936.c:40
-#: protocol/dsm2_cyrf6936.c:37 protocol/dsm2_cyrf6936.c:40
-#: protocol/dsm2_cyrf6936.c:41 protocol/flysky_a7105.c:36
+#: protocol/dsm2_cyrf6936.c:37 protocol/dsm2_cyrf6936.c:41
+#: protocol/dsm2_cyrf6936.c:42 protocol/flysky_a7105.c:36
 #: protocol/frsky2way_cc2500.c:25 protocol/fy326_nrf24l01.c:45
 #: protocol/hubsan_a7105.c:114 protocol/inav_nrf24l01.c:170
-#: protocol/kn_nrf24l01.c:160 protocol/symax_nrf24l01.c:94
+#: protocol/kn_nrf24l01.c:161 protocol/symax_nrf24l01.c:94
 #: protocol/yd717_nrf24l01.c:95
 msgid "Off"
 msgstr ""
@@ -1590,16 +1590,16 @@ msgid "Neg"
 msgstr ""
 
 #: pages/common/advanced/_mixer_curves.c:157 protocol/dsm2_cyrf6936.c:38
-#: protocol/esky150_nrf24l01.c:137 protocol/kn_nrf24l01.c:157
-#: protocol/kn_nrf24l01.c:158 protocol/v202_nrf24l01.c:113
+#: protocol/esky150_nrf24l01.c:137 protocol/kn_nrf24l01.c:158
+#: protocol/kn_nrf24l01.c:159 protocol/v202_nrf24l01.c:113
 #: protocol/v202_nrf24l01.c:114 protocol/v202_nrf24l01.c:116
 #: protocol/xn297dump_nrf24l01.c:39 protocol/yd717_nrf24l01.c:93
 msgid "Yes"
 msgstr ""
 
 #: pages/common/advanced/_mixer_curves.c:157 protocol/dsm2_cyrf6936.c:38
-#: protocol/esky150_nrf24l01.c:137 protocol/kn_nrf24l01.c:157
-#: protocol/kn_nrf24l01.c:158 protocol/v202_nrf24l01.c:113
+#: protocol/esky150_nrf24l01.c:137 protocol/kn_nrf24l01.c:158
+#: protocol/kn_nrf24l01.c:159 protocol/v202_nrf24l01.c:113
 #: protocol/v202_nrf24l01.c:114 protocol/v202_nrf24l01.c:116
 #: protocol/xn297dump_nrf24l01.c:39 protocol/yd717_nrf24l01.c:93
 msgid "No"
@@ -1983,7 +1983,7 @@ msgstr ""
 #: protocol/frskyx_cc2500.c:29 protocol/fy326_nrf24l01.c:44
 #: protocol/h8_3d_nrf24l01.c:51 protocol/hisky_nrf24l01.c:61
 #: protocol/hitec_cc2500.c:50 protocol/hontai_nrf24l01.c:50
-#: protocol/hubsan_a7105.c:112 protocol/kn_nrf24l01.c:159
+#: protocol/hubsan_a7105.c:112 protocol/kn_nrf24l01.c:160
 #: protocol/mjxq_nrf24l01.c:48 protocol/mt99xx_nrf24l01.c:115
 #: protocol/q303_nrf24l01.c:60 protocol/slt_nrf24l01.c:69
 #: protocol/v202_nrf24l01.c:112 protocol/yd717_nrf24l01.c:92
@@ -1998,7 +1998,7 @@ msgstr ""
 msgid "Analog Aux"
 msgstr ""
 
-#: protocol/bugs3_a7105.c:237 protocol/flysky_afhds2a_a7105.c:69
+#: protocol/bugs3_a7105.c:237 protocol/flysky_afhds2a_a7105.c:68
 #: protocol/hubsan_a7105.c:115 protocol/joysway_a7105.c:45
 msgid "Freq Tune"
 msgstr ""
@@ -2027,10 +2027,12 @@ msgstr ""
 msgid "CPPM"
 msgstr ""
 
-#: protocol/corona_cc2500.c:26 protocol/e010_cc2500.c:42
+#: protocol/corona_cc2500.c:26 protocol/devo_cyrf6936.c:41
+#: protocol/dsm2_cyrf6936.c:40 protocol/e010_cc2500.c:42
 #: protocol/frsky1way_cc2500.c:25 protocol/frsky2way_cc2500.c:26
 #: protocol/frskyx_cc2500.c:28 protocol/hitec_cc2500.c:51
-#: protocol/sfhss_cc2500.c:27 protocol/wfly_cyrf6936.c:42
+#: protocol/j6pro_cyrf6936.c:30 protocol/sfhss_cc2500.c:27
+#: protocol/wfly_cyrf6936.c:42
 msgid "Freq-Fine"
 msgstr ""
 
@@ -2054,28 +2056,28 @@ msgstr ""
 msgid "OrangeRx"
 msgstr ""
 
-#: protocol/dsm2_cyrf6936.c:40
+#: protocol/dsm2_cyrf6936.c:41
 msgid "HighSpeed"
 msgstr ""
 
-#: protocol/dsm2_cyrf6936.c:41
+#: protocol/dsm2_cyrf6936.c:42
 msgid "F.Log filter"
 msgstr ""
 
-#: protocol/esky150_nrf24l01.c:137 protocol/kn_nrf24l01.c:157
+#: protocol/esky150_nrf24l01.c:137 protocol/kn_nrf24l01.c:158
 #: protocol/v202_nrf24l01.c:113
 msgid "Re-bind"
 msgstr ""
 
-#: protocol/flysky_afhds2a_a7105.c:66
+#: protocol/flysky_afhds2a_a7105.c:65
 msgid "Outputs"
 msgstr ""
 
-#: protocol/flysky_afhds2a_a7105.c:67
+#: protocol/flysky_afhds2a_a7105.c:66
 msgid "Servo Hz"
 msgstr ""
 
-#: protocol/flysky_afhds2a_a7105.c:68
+#: protocol/flysky_afhds2a_a7105.c:67
 msgid "LQI output"
 msgstr ""
 
@@ -2104,6 +2106,38 @@ msgstr ""
 msgid "Disabled"
 msgstr ""
 
+#: protocol/frskyx_cc2500.c:32
+msgid "Bind Mode"
+msgstr ""
+
+#: protocol/frskyx_cc2500.c:32
+msgid "1-8, On"
+msgstr ""
+
+#: protocol/frskyx_cc2500.c:32
+msgid "1-8, Off"
+msgstr ""
+
+#: protocol/frskyx_cc2500.c:32
+msgid "9-16, On"
+msgstr ""
+
+#: protocol/frskyx_cc2500.c:32
+msgid "9-16, Off"
+msgstr ""
+
+#: protocol/frskyx_cc2500.c:33
+msgid "Version"
+msgstr ""
+
+#: protocol/frskyx_cc2500.c:33
+msgid "V1"
+msgstr ""
+
+#: protocol/frskyx_cc2500.c:33
+msgid "V2"
+msgstr ""
+
 #: protocol/fy326_nrf24l01.c:45
 msgid "Expert"
 msgstr ""
@@ -2112,11 +2146,11 @@ msgstr ""
 msgid "vTX MHz"
 msgstr ""
 
-#: protocol/kn_nrf24l01.c:158
+#: protocol/kn_nrf24l01.c:159
 msgid "1Mbps"
 msgstr ""
 
-#: protocol/kn_nrf24l01.c:160
+#: protocol/kn_nrf24l01.c:161
 msgid "DynTrim"
 msgstr ""
 
