@@ -45,7 +45,7 @@ static u16 table_size;
 static unsigned fix_crlf(char *str);
 
 #define MAX_LINE 300
-#define MAX_STRINGS 489
+#define MAX_STRINGS 512
 
 #if !SUPPORT_DYNAMIC_LOCSTR
     static char strings[8192];
