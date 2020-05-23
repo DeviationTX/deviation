@@ -62,6 +62,11 @@ PAGEDEF(PAGEID_MAINCFG,  PAGE_MainLayoutInit,  PAGE_MainLayoutEvent,  PAGE_MainL
 #if HAS_MUSIC_CONFIG
 PAGEDEF(PAGEID_VOICECFG, PAGE_VoiceconfigInit, NULL,                  NULL,               MODEL_MENU,  _tr_noop("Voice config"))
 #endif
+#if SUPPORT_CRSF_CONFIG
+PAGEDEF(PAGEID_CRSFCFG,  PAGE_CrsfconfigInit,  PAGE_CRSFConfigEvent,  NULL,               0,           _tr_noop("CRSF config"))
+PAGEDEF(PAGEID_CRSFDEVICE, PAGE_CrsfdeviceInit, PAGE_CRSFDeviceEvent, NULL,               0,           _tr_noop("CRSF device config"))
+#endif
+
 // Transmitter menu
 //-----------------
 PAGEDEF(PAGEID_TXCFG,    PAGE_TxConfigureInit, NULL,                  NULL,               TX_MENU,     _tr_noop("Transmitter config"))
@@ -70,8 +75,11 @@ PAGEDEF(PAGEID_TELEMMON, PAGE_TelemtestInit,   PAGE_TelemtestEvent,   NULL,     
 PAGEDEF(PAGEID_RANGE,    PAGE_RangeInit,       NULL,	              PAGE_RangeExit,     TX_MENU,     _tr_noop("Range Test"))
 PAGEDEF(PAGEID_INPUTMON, PAGE_InputtestInit,   PAGE_ChantestEvent,    PAGE_ChantestExit,  TX_MENU,     _tr_noop("Input monitor"))
 PAGEDEF(PAGEID_BTNMON,   PAGE_ButtontestInit,  PAGE_ChantestEvent,    PAGE_ChantestExit,  TX_MENU,     _tr_noop("Button monitor"))
-#if HAS_SCANNER
+#if SUPPORT_SCANNER
 PAGEDEF(PAGEID_SCANNER,  PAGE_ScannerInit,     PAGE_ScannerEvent,     PAGE_ScannerExit,   TX_MENU,     _tr_noop("Scanner"))
+#endif
+#if SUPPORT_XN297DUMP
+PAGEDEF(PAGEID_XN297DUMP,  PAGE_XN297DumpInit, PAGE_XN297DumpEvent,   PAGE_XN297DumpExit, TX_MENU,     _tr_noop("XN297 Dump"))
 #endif
 
 //These pages should not be lisetd for quickpages

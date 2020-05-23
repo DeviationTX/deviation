@@ -13,11 +13,6 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef MODULAR
-    // Allows the linker to properly relocate
-    #define LOLI_Cmds PROTO_Cmds
-    #pragma long_calls
-#endif
 
 #include "common.h"
 #include "interface.h"
@@ -25,11 +20,6 @@
 #include "config/model.h"
 #include "config/tx.h"  // for Transmitter
 
-#ifdef MODULAR
-    // Some versions of gcc apply this to definitions, others to calls
-    // So just use long_calls everywhere
-    // #pragma long_calls_off
-#endif
 
 #ifdef PROTO_HAS_NRF24L01
 

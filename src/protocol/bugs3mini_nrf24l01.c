@@ -91,7 +91,7 @@ enum {
     CHANNEL7,
     CHANNEL8,
     CHANNEL9,
-    CHANNEL10
+    CHANNEL10,
 };
 
 #define CHANNEL_ARM         CHANNEL5
@@ -99,7 +99,7 @@ enum {
 #define CHANNEL_FLIP        CHANNEL7
 #define CHANNEL_PICTURE     CHANNEL8
 #define CHANNEL_VIDEO       CHANNEL9
-#define CHANNEL_ANGLE       CHANNEL10
+#define CHANNEL_ANGLE       CHANNEL10  // alt hold on Bugs 3H
 
 // flags packet[12]
 #define FLAG_FLIP    0x08    // automatic flip
@@ -112,17 +112,24 @@ enum {
 #define FLAG_ARM     0x40    // arm (toggle to turn on motors)
 #define FLAG_DISARM  0x20    // disarm (toggle to turn off motors)
 #define FLAG_ANGLE   0x02    // angle/acro mode (set is angle mode)
+#define FLAG_ALTHOLD 0x04    // angle/altitude hold mode (set is altitude mode)
 
 static const char *const bugs3mini_opts[] = {
+    _tr_noop("Format"), "Bugs3 Mini", "Bugs 3H",
     _tr_noop("RX Id"), "-32768", "32767", "1", NULL,
     NULL
 };
 
 enum {
-    PROTOOPTS_RXID = 0,
-    LAST_PROTO_OPT
+    FORMAT_MINI = 0,
+    FORMAT_3H,
 };
 
+enum {
+    PROTOOPTS_FORMAT = 0,
+    PROTOOPTS_RXID,
+    LAST_PROTO_OPT
+};
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 // Bit vector from bit position
@@ -131,7 +138,7 @@ ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 static u8 checksum()
 {
     u8 checksum = 0x6d;
-    for(u8 i=1; i < TX_PAYLOAD_SIZE; i++)
+    for (u8 i=1; i < TX_PAYLOAD_SIZE; i++)
         checksum ^= packet[i];
     return checksum;
 }
@@ -196,7 +203,7 @@ static void send_packet(u8 bind)
     packet[1] = txid[0];
     packet[2] = txid[1];
     packet[3] = txid[2];
-    if(bind) {
+    if (bind) {
         packet[4] = 0x00;
         packet[5] = 0x7d;
         packet[6] = 0x7d;
@@ -215,28 +222,33 @@ static void send_packet(u8 bind)
         packet[5] = rudder >> 1;
         packet[6] = elevator >> 1;
         packet[7] = aileron >> 1;
-        packet[8] = 0x20 | (aileron << 7);
-        packet[9] = 0x20 | (elevator << 7);
-        packet[10]= 0x20 | (rudder << 7);
+        packet[8] = (((aileron / 5) >> 1) + 7)   // dynamic trim 0x07 - 0x39
+                  | (aileron << 7);
+        packet[9] = (((elevator / 5) >> 1) + 7)  // dynamic trim 0x07 - 0x39
+                  | (elevator << 7);
+        packet[10]= (((rudder / 5) >> 1) + 7)    // dynamic trim 0x07 - 0x39
+                  | (rudder << 7);
         packet[11]= 0x40 | (throttle << 7);
-        packet[12]= 0x80 | (packet[12] ^ 0x40) // bugs 3 H doesn't have 0x80 ?
+        packet[12]= 0x80 | ((packet[12] ^ 0x40) & 0x40)  // bugs 3 H doesn't have 0x80 ?
                   | FLAG_MODE
                   | GET_FLAG(CHANNEL_PICTURE, FLAG_PICTURE)
-                  | GET_FLAG(CHANNEL_VIDEO, FLAG_VIDEO);
-        if(armed)
-            packet[12] |= GET_FLAG(CHANNEL_FLIP, FLAG_FLIP);
+                  | GET_FLAG(CHANNEL_VIDEO, FLAG_VIDEO)
+                  | GET_FLAG(CHANNEL_FLIP, FLAG_FLIP);
         packet[13] = arm_flags
-                   | GET_FLAG(CHANNEL_LED, FLAG_LED)
-                   | GET_FLAG(CHANNEL_ANGLE, FLAG_ANGLE);
-        
+                   | GET_FLAG(CHANNEL_LED, FLAG_LED);
+        if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_MINI)
+            packet[13] |= GET_FLAG(CHANNEL_ANGLE, FLAG_ANGLE);
+        else  // 3H
+            packet[13] |= GET_FLAG(CHANNEL_ANGLE, FLAG_ALTHOLD);
+
         packet[14] = 0;
         packet[15] = 0; // 0x53 on bugs 3 H ?
     }
     packet[0] = checksum();
     
-    if(!(packet[12]&0x40)) {
+    if (!(packet[12]&0x40)) {
         current_chan++;
-        if(current_chan >= NUM_RF_CHANNELS)
+        if (current_chan >= NUM_RF_CHANNELS)
             current_chan = 0;
         NRF24L01_WriteReg(NRF24L01_05_RF_CH, bind ? bind_chans[current_chan] : rf_chans[current_chan]);
     }
@@ -266,41 +278,41 @@ static void make_address()
         0x2d9e, 0x95a4, 0x9c5c, 0xb4a6, 0xa9ce, 0x562b, 0x3e73, 0xb895, 0x6a82, 0x9437, 0x3d5a,
         0x4bb2, 0x6949, 0xc224, 0x6b3d, 0x23c6, 0x9ea3, 0xa498, 0x5c9e, 0xa652, 0xce76, 0x2b4b, 0x733a };
     
-    if(rxid_high==0x00 || rxid_high==0xFF)
+    if (rxid_high == 0x00 || rxid_high == 0xFF)
         rx_tx_addr[0]=0x52;
     else
         rx_tx_addr[0]=rxid_high;
     
     rx_tx_addr[1]=tx_hash;
     
-    if(rxid_low==0x00 || rxid_low==0xFF)
+    if (rxid_low == 0x00 || rxid_low == 0xFF)
         rx_tx_addr[2]=0x66;
     else
         rx_tx_addr[2]=rxid_low;
     
-    for(u8 end_idx=0;end_idx<23;end_idx++)
+    for (u8 end_idx=0; end_idx < 23; end_idx++)
     {
         //calculate sequence start
-        if(end_idx<=7)
+        if (end_idx <= 7)
             start=end_idx;
         else
             start=(end_idx-7)*16+7;
         //calculate sequence length
-        if(end_idx>6)
+        if (end_idx > 6)
         {
-            if(end_idx>15)
-                length=(23-end_idx)<<1;
+            if (end_idx > 15)
+                length = (23-end_idx) << 1;
             else
-                length=16;
+                length = 16;
         }
         else
-            length=(end_idx+1)<<1;
+            length = (end_idx+1) << 1;
         //scan for a possible solution using the current end
-        for(u8 i=0;i<length;i++)
+        for (u8 i=0; i < length; i++)
         {
             index=(i>>1)*7+(((i+1)>>1)<<3);
             index=start+index-rxid_high;
-            if(index==rxid_low)
+            if (index == rxid_low)
             {
                 rx_tx_addr[3]=end[end_idx]>>8;
                 rx_tx_addr[4]=end[end_idx];
@@ -313,29 +325,40 @@ static void make_address()
 
 static void update_telemetry() {
     u8 checksum = 0x6d;
-    for(u8 i=1; i<12; i++) {
+    for (u8 i=1; i < 12; i++) {
         checksum += packet[i];
     }
-    if(packet[0] == checksum) {
+    if (packet[0] == checksum) {
         Telemetry.value[TELEM_FRSKY_RSSI] = packet[3];
         TELEMETRY_SetUpdated(TELEM_FRSKY_RSSI);
-        if(packet[11] & 0x80)
-            Telemetry.value[TELEM_FRSKY_VOLT1] = 840; // Ok
-        else if(packet[11] & 0x40)
-            Telemetry.value[TELEM_FRSKY_VOLT1] = 710; // Warning
+        if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_MINI) {
+            if (packet[11] & 0x80)
+                Telemetry.value[TELEM_FRSKY_VOLT1] = 840;  // Ok
+            else if (packet[11] & 0x40)
+                Telemetry.value[TELEM_FRSKY_VOLT1] = 710;  // Warning
+            else
+                Telemetry.value[TELEM_FRSKY_VOLT1] = 640;  // Critical
+        }
         else
-            Telemetry.value[TELEM_FRSKY_VOLT1] = 640; // Critical
+        {  // 3H
+            if (packet[11] & 0x40)
+                Telemetry.value[TELEM_FRSKY_VOLT1] = 710;  // Warning
+            else if (packet[11] & 0x80)
+                Telemetry.value[TELEM_FRSKY_VOLT1] = 640;  // Critical
+            else
+                Telemetry.value[TELEM_FRSKY_VOLT1] = 840;  // Ok
+        }
         TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT1);
     }
 }
 
 static u16 bugs3mini_callback()
 {
-    switch(phase) {
+    switch (phase) {
         case BIND1:
-            if( NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR)) { // RX fifo data ready
+            if (NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR)) {  // RX fifo data ready
                 XN297_ReadPayload(packet, RX_PAYLOAD_SIZE);
-                Model.proto_opts[PROTOOPTS_RXID] = (u16)packet[1]<<8 | packet[2]; // store rxid into protocol options
+                Model.proto_opts[PROTOOPTS_RXID] = (u16)packet[1] << 8 | packet[2];  // store rxid into protocol options
                 NRF24L01_SetTxRxMode(TXRX_OFF);
                 NRF24L01_SetTxRxMode(TX_EN);
                 make_address();
@@ -360,7 +383,7 @@ static u16 bugs3mini_callback()
             phase = BIND1;
             return PACKET_INTERVAL - WRITE_WAIT;
         case DATA1:
-            if( NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR)) { // RX fifo data ready
+            if (NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR)) {  // RX fifo data ready
                 // read only 12 bytes to not overwrite channel change flag
                 XN297_ReadPayload(packet, 12);
                 update_telemetry();
@@ -404,13 +427,14 @@ static void initialize(u8 bind)
     initialize_txid();
     memset(packet, (u8)0, sizeof(packet));
     bugs3mini_init();
-    if(bind) {
+    if (bind) {
         phase = BIND1;
         XN297_SetTXAddr((const u8*)"mjxRC", 5);
         XN297_SetRXAddr((const u8*)"mjxRC", 5);
         PROTOCOL_SetBindState(0xFFFFFFFF);
     }
-    else {
+    else
+    {
         make_address();
         XN297_SetTXAddr(rx_tx_addr, 5);
         XN297_SetRXAddr(rx_tx_addr, 5);
@@ -424,7 +448,7 @@ static void initialize(u8 bind)
 
 uintptr_t BUGS3MINI_Cmds(enum ProtoCmds cmd)
 {
-    switch(cmd) {
+    switch (cmd) {
         case PROTOCMD_INIT:  initialize(0); return 0;
         case PROTOCMD_DEINIT:
         case PROTOCMD_RESET:

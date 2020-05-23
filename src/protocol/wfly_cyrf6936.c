@@ -36,6 +36,19 @@ static u32 bind_counter;
 static u32 packet_count;
 static u8 phase;
 static u8 tx_power;
+static s16 freq_offset;
+
+static const char * const wfly_opts[] = {
+    _tr_noop("Freq-Fine"),  "-1000", "1000", "655361", NULL,  // large step 10, small step 1
+    NULL
+};
+
+enum {
+    PROTOOPTS_FREQTUNE = 0,
+    LAST_PROTO_OPT,
+};
+
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 enum {
     WFLY_BIND_TX=0,
@@ -77,6 +90,8 @@ static void WFLY_cyrf_bind_config()
 
     CYRF_ConfigSOPCode(WFLY_sop_bind);
     CYRF_ConfigRFChannel(WFLY_BIND_CHANNEL);
+    CYRF_TuneFreq(freq_offset);
+
     CYRF_SetTxRxMode(TX_EN);
 }
 
@@ -93,7 +108,8 @@ static void WFLY_cyrf_data_config()
     
     tx_power = Model.tx_power;
     CYRF_SetPower(tx_power); 
-    
+    CYRF_TuneFreq(freq_offset);
+
     CYRF_SetTxRxMode(TX_EN);
 }
 
@@ -157,6 +173,12 @@ static u16 WFLY_send_data_packet()
     if(tx_power != Model.tx_power) {
         tx_power = Model.tx_power;
         CYRF_SetPower(tx_power);
+    }
+
+    // keep frequency tuning updated
+    if (freq_offset != Model.proto_opts[PROTOOPTS_FREQTUNE]) {
+        freq_offset = Model.proto_opts[PROTOOPTS_FREQTUNE];
+        CYRF_TuneFreq(freq_offset);
     }
     
     CYRF_ConfigRFChannel(hopping_frequency[(packet_count)%4]);
@@ -303,7 +325,8 @@ static void initWFLY(u8 bind)
     hopping_frequency[3]=rf_ch_num;         // RF channel used to send the current hopping table
     
     CYRF_Reset();
-    
+    freq_offset = Model.proto_opts[PROTOOPTS_FREQTUNE];
+
     if(bind)
     {
         bind_counter=WFLY_BIND_COUNT;
@@ -338,7 +361,7 @@ uintptr_t WFLY_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_NUMCHAN: return 9;
         case PROTOCMD_DEFAULT_NUMCHAN: return 9;
         case PROTOCMD_CURRENT_ID:  return Model.fixed_id;
-        case PROTOCMD_GETOPTIONS: return 0;
+        case PROTOCMD_GETOPTIONS: return (uintptr_t)wfly_opts;
         case PROTOCMD_TELEMETRYSTATE: return  PROTO_TELEM_UNSUPPORTED;
         case PROTOCMD_CHANNELMAP: return AETRG;
         default: break;

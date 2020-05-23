@@ -13,11 +13,6 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef MODULAR
-  //Allows the linker to properly relocate
-  #define JOYSWAY_Cmds PROTO_Cmds
-  #pragma long_calls
-#endif
 
 #include "common.h"
 #include "interface.h"
@@ -26,9 +21,6 @@
 #include "config/tx.h"
 #include "telemetry.h"
 
-#ifdef MODULAR
-  #pragma long_calls_off
-#endif
 
 #ifdef PROTO_HAS_A7105
 

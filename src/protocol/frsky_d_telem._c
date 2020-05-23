@@ -4,13 +4,13 @@
 
 static u32 discharge_time;
 static u32 discharge_dAms;   // deciAmp-milliseconds
+static u8 last_cell;
 
 
 static void set_telemetry(frsky_telem_t offset, s32 value) {
     Telemetry.value[offset] = value;
     TELEMETRY_SetUpdated(offset);
 }
-
 
 // store "before punctuation" and "after punctuation" values locally
 // keeps Telemetry.gps compatible with devo and dsm
@@ -47,12 +47,18 @@ static void update_cell(u8 cell, s32 value) {
 static void update_min_cell(u8 num_cells) {
     Telemetry.value[TELEM_FRSKY_MIN_CELL] = Telemetry.value[TELEM_FRSKY_CELL1];
     for (int i=1; i < MIN(num_cells, 6); i++) {
-        if (Telemetry.value[TELEM_FRSKY_CELL1 + i] < Telemetry.value[TELEM_FRSKY_MIN_CELL])
+        if (Telemetry.value[TELEM_FRSKY_CELL1 + i] < Telemetry.value[TELEM_FRSKY_MIN_CELL]) {
             Telemetry.value[TELEM_FRSKY_MIN_CELL] = Telemetry.value[TELEM_FRSKY_CELL1 + i];
+            TELEMETRY_SetUpdated(TELEM_FRSKY_MIN_CELL);
+        }
     }
-    TELEMETRY_SetUpdated(TELEM_FRSKY_MIN_CELL);
 }
 
+static void frsky_telem_reset() {
+    Model.ground_level = 0;
+    discharge_dAms = 0;
+    update_min_cell(last_cell+1);
+}
 
 static void processHubPacket(u8 id, u16 value) {
     static u8 varioHighPrecision = 0;
@@ -83,7 +89,6 @@ static void processHubPacket(u8 id, u16 value) {
         set_telemetry(TELEM_FRSKY_TEMP2, (s16)value);
         break;
     case 0x06: { //Battery voltages - CELL# and VOLT
-        static u8 last_cell;
         u8 cell = (value >> 4) & 0x0f;
         value = (((value & 0x0F) << 8) + (value >> 8)) / 5;
 

@@ -25,6 +25,7 @@ utils/genspeech/*.zip
 #src/beta-*
 /local/
 coverage/
+src/.vs/
 
 src/filesystem/
 

@@ -331,6 +331,15 @@ const char **PROTOCOL_GetOptions()
     return data;
 }
 
+int PROTOCOL_OptionsPage()
+{
+    int id = 0;
+
+    if (Model.protocol != PROTOCOL_NONE && PROTOCOL_LOADED)
+        id = (int)PROTO_Cmds(PROTOCMD_OPTIONSPAGE);
+    return id;
+}
+
 void PROTOCOL_SetOptions()
 {
     if(Model.protocol != PROTOCOL_NONE && PROTOCOL_LOADED)
@@ -384,6 +393,17 @@ void PROTOCOL_ResetTelemetry()
 {
     if(Model.protocol != PROTOCOL_NONE && PROTOCOL_LOADED)
         PROTO_Cmds(PROTOCMD_TELEMETRYRESET);
+}
+
+int PROTOCOL_RangeTest(int on)
+{
+    if (Model.protocol != PROTOCOL_NONE && PROTOCOL_LOADED) {
+        if (on)
+            return PROTO_Cmds(PROTOCMD_RANGETESTON);
+        else
+            return PROTO_Cmds(PROTOCMD_RANGETESTOFF);
+    }
+    return 0;
 }
 
 void PROTOCOL_CheckDialogs()

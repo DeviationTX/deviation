@@ -21,19 +21,21 @@
 #define HAS_RTC             0
 #define HAS_VIBRATINGMOTOR  1
 #define HAS_DATALOG         0
-#define HAS_SCANNER         0
+#define SUPPORT_SCANNER     0
 #define HAS_LAYOUT_EDITOR   0
 #define HAS_EXTRA_SWITCHES  OPTIONAL
 #define HAS_EXTRA_BUTTONS   0
+#define HAS_BUTTON_MATRIX_PULLUP 1
 #define HAS_MULTIMOD_SUPPORT 1
 #define HAS_VIDEO           0
 #define HAS_4IN1_FLASH      0
 #define HAS_EXTENDED_AUDIO  0
-#define HAS_AUDIO_UART     0
+#define HAS_AUDIO_UART      0
 #define HAS_MUSIC_CONFIG    0
 
 #define SUPPORT_DYNAMIC_LOCSTR 1
 #define SUPPORT_MULTI_LANGUAGE 1
+#define SUPPORT_XN297DUMP 0
 
 #define DEBUG_WINDOW_SIZE 0
 #define MIN_BRIGHTNESS 0

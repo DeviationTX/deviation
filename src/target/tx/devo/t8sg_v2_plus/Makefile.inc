@@ -1,7 +1,13 @@
 SCREENSIZE  := 128x64x1
-DISPLAY_DRIVER := spi/128x64x1_oled_ssd1306.c
+DISPLAY_DRIVER := spi/128x64x1.c
 FILESYSTEMS := common base_fonts 128x64x1
-DFU_ARGS    := -c 7 -b 0x08003000
+ifdef NEW_BOOTLOADER
+    DFU_ARGS    := -c 0 -b 0x08003000
+    DFU_STRING   = "$(HGVERSION) Unified Firmware"
+else
+    DFU_ARGS    := -c 7 -b 0x08003000
+endif
+
 FONTS        = filesystem/$(FILESYSTEM)/media/12normal.fon \
                filesystem/$(FILESYSTEM)/media/04b03.fon
 LANGUAGE    := devo10

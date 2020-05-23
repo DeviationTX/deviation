@@ -29,6 +29,8 @@ static const char * const frskyx_opts[] = {
   _tr_noop("Format"),  "FCC", "EU", NULL,
   _tr_noop("RSSIChan"),  "None", "LastChan", NULL,
   _tr_noop("S.PORT Out"), _tr_noop("Disabled"), _tr_noop("Enabled"), NULL,
+  _tr_noop("Bind Mode"), _tr_noop("1-8, On"), _tr_noop("1-8, Off"), _tr_noop("9-16, On"), _tr_noop("9-16, Off"), NULL,
+  _tr_noop("Version"), _tr_noop("V1"), _tr_noop("V2"), NULL,
   NULL
 };
 enum {
@@ -38,6 +40,8 @@ enum {
     PROTO_OPTS_FORMAT,
     PROTO_OPTS_RSSICHAN,
     PROTO_OPTS_SPORTOUT,
+    PROTO_OPTS_BINDMODE,
+    PROTO_OPTS_VERSION,
     LAST_PROTO_OPT,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
@@ -46,7 +50,7 @@ ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 #define FAILSAFE_NOPULSE 1
 #define FAILSAFE_RX      2
 
-#define MAX_PACKET_SIZE 33
+#define MAX_PACKET_SIZE  33
 
 // Statics are not initialized on 7e so in initialize() if necessary
 static u8 chanskip;
@@ -58,10 +62,11 @@ static s8 fine;
 static u8 seq_rx_expected;
 static u8 seq_tx_send;
 static u8 packet_size;
+static u8 binding_idx;
 
 
 // u8 ptr[4] = {0x01,0x12,0x23,0x30};
-//u8 ptr[4] = {0x00,0x11,0x22,0x33};
+// u8 ptr[4] = {0x00,0x11,0x22,0x33};
 static enum {
   FRSKY_BIND,
 #ifndef EMULATOR
@@ -77,9 +82,11 @@ static enum {
 } state, datam_state;
 
 #define TELEM_PKT_SIZE            17
+#define HOP_DATA_SIZE             48
 
 static u16 fixed_id;
 static u8 packet[MAX_PACKET_SIZE];
+static u8 hop_data_v2[HOP_DATA_SIZE];
 
 static const u8 hop_data[] = {
   0x02, 0xD4, 0xBB, 0xA2, 0x89,
@@ -95,53 +102,58 @@ static const u8 hop_data[] = {
 };
 
 
-static const u16 CRCTable[] = {
+static const u16 CRC_Short[] = {
   0x0000,0x1189,0x2312,0x329b,0x4624,0x57ad,0x6536,0x74bf,
   0x8c48,0x9dc1,0xaf5a,0xbed3,0xca6c,0xdbe5,0xe97e,0xf8f7,
-  0x1081,0x0108,0x3393,0x221a,0x56a5,0x472c,0x75b7,0x643e,
-  0x9cc9,0x8d40,0xbfdb,0xae52,0xdaed,0xcb64,0xf9ff,0xe876,
-  0x2102,0x308b,0x0210,0x1399,0x6726,0x76af,0x4434,0x55bd,
-  0xad4a,0xbcc3,0x8e58,0x9fd1,0xeb6e,0xfae7,0xc87c,0xd9f5,
-  0x3183,0x200a,0x1291,0x0318,0x77a7,0x662e,0x54b5,0x453c,
-  0xbdcb,0xac42,0x9ed9,0x8f50,0xfbef,0xea66,0xd8fd,0xc974,
-  0x4204,0x538d,0x6116,0x709f,0x0420,0x15a9,0x2732,0x36bb,
-  0xce4c,0xdfc5,0xed5e,0xfcd7,0x8868,0x99e1,0xab7a,0xbaf3,
-  0x5285,0x430c,0x7197,0x601e,0x14a1,0x0528,0x37b3,0x263a,
-  0xdecd,0xcf44,0xfddf,0xec56,0x98e9,0x8960,0xbbfb,0xaa72,
-  0x6306,0x728f,0x4014,0x519d,0x2522,0x34ab,0x0630,0x17b9,
-  0xef4e,0xfec7,0xcc5c,0xddd5,0xa96a,0xb8e3,0x8a78,0x9bf1,
-  0x7387,0x620e,0x5095,0x411c,0x35a3,0x242a,0x16b1,0x0738,
-  0xffcf,0xee46,0xdcdd,0xcd54,0xb9eb,0xa862,0x9af9,0x8b70,
-  0x8408,0x9581,0xa71a,0xb693,0xc22c,0xd3a5,0xe13e,0xf0b7,
-  0x0840,0x19c9,0x2b52,0x3adb,0x4e64,0x5fed,0x6d76,0x7cff,
-  0x9489,0x8500,0xb79b,0xa612,0xd2ad,0xc324,0xf1bf,0xe036,
-  0x18c1,0x0948,0x3bd3,0x2a5a,0x5ee5,0x4f6c,0x7df7,0x6c7e,
-  0xa50a,0xb483,0x8618,0x9791,0xe32e,0xf2a7,0xc03c,0xd1b5,
-  0x2942,0x38cb,0x0a50,0x1bd9,0x6f66,0x7eef,0x4c74,0x5dfd,
-  0xb58b,0xa402,0x9699,0x8710,0xf3af,0xe226,0xd0bd,0xc134,
-  0x39c3,0x284a,0x1ad1,0x0b58,0x7fe7,0x6e6e,0x5cf5,0x4d7c,
-  0xc60c,0xd785,0xe51e,0xf497,0x8028,0x91a1,0xa33a,0xb2b3,
-  0x4a44,0x5bcd,0x6956,0x78df,0x0c60,0x1de9,0x2f72,0x3efb,
-  0xd68d,0xc704,0xf59f,0xe416,0x90a9,0x8120,0xb3bb,0xa232,
-  0x5ac5,0x4b4c,0x79d7,0x685e,0x1ce1,0x0d68,0x3ff3,0x2e7a,
-  0xe70e,0xf687,0xc41c,0xd595,0xa12a,0xb0a3,0x8238,0x93b1,
-  0x6b46,0x7acf,0x4854,0x59dd,0x2d62,0x3ceb,0x0e70,0x1ff9,
-  0xf78f,0xe606,0xd49d,0xc514,0xb1ab,0xa022,0x92b9,0x8330,
-  0x7bc7,0x6a4e,0x58d5,0x495c,0x3de3,0x2c6a,0x1ef1,0x0f78
 };
 
 
 
+static void init_hop_FRSkyX2(void)
+{
+    u8 inc = (fixed_id % (HOP_DATA_SIZE - 2)) + 1;              // Increment
+    if ( inc == 12 || inc == 35 ) inc++;                        // Exception list from dumps
+    u8 offset = fixed_id % 5;                                   // Start offset
+
+    u8 channel;
+    for (u8 i = 0; i < (HOP_DATA_SIZE - 1); i++)
+    {
+        channel = 5 * ((u16)(inc * i) % (HOP_DATA_SIZE - 1)) + offset;
+        // Exception list from dumps
+        if (Model.proto_opts[PROTO_OPTS_FORMAT]) {              // LBT or FCC
+            // LBT
+            if (channel <= 1 || channel == 43 || channel == 44 || channel == 87 || channel == 88 || channel == 129 || channel == 130 || channel == 173 || channel == 174)
+                channel += 2;
+            else if (channel == 216 || channel == 217 || channel == 218)
+                channel += 3;
+        } else {
+            // FCC
+            if (channel == 3 || channel == 4 || channel == 46 || channel == 47 || channel == 90 || channel == 91  || channel == 133 || channel == 134 || channel == 176 || channel == 177 || channel == 220 || channel == 221)
+                channel += 2;
+        }
+        hop_data_v2[i] = channel;                               // Store
+    }
+    hop_data_v2[HOP_DATA_SIZE - 1] = 0;                                        // Bind freq
+}
+
+static u16 crcTable(u8 val)
+{
+  u16 word;
+  word = pgm_read_word(&CRC_Short[val & 0x0F]);
+  val /= 16;
+  return word ^ (0x1081 * val);
+}
+
 static u16 crc(u8 *data, u8 len) {
   u16 crc = 0;
-  for(int i=0; i < len; i++)
-      crc = (crc<<8) ^ CRCTable[((u8)(crc>>8) ^ *data++) & 0xFF];
+  for (int i = 0; i < len; i++)
+      crc = (crc << 8) ^ crcTable((u8)(crc >> 8) ^ *data++);
   return crc;
 }
 
 static void initialize_data(u8 adr)
 {
-  CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);  // Frequency offset hack
+  CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);                     // Frequency offset hack
   CC2500_WriteReg(CC2500_18_MCSM0,    0x8);
   CC2500_WriteReg(CC2500_09_ADDR, adr ? 0x03 : (fixed_id & 0xff));
   CC2500_WriteReg(CC2500_07_PKTCTRL1,0x05);
@@ -153,33 +165,60 @@ static void set_start(u8 ch) {
   CC2500_WriteReg(CC2500_23_FSCAL3, calData[ch][0]);
   CC2500_WriteReg(CC2500_24_FSCAL2, calData[ch][1]);
   CC2500_WriteReg(CC2500_25_FSCAL1, calData[ch][2]);
-  CC2500_WriteReg(CC2500_0A_CHANNR, ch == 47 ? 0 : hop_data[ch]);
+  if (!Model.proto_opts[PROTO_OPTS_VERSION])
+      CC2500_WriteReg(CC2500_0A_CHANNR, ch == 47 ? 0 : hop_data[ch]);
+  else
+      CC2500_WriteReg(CC2500_0A_CHANNR, hop_data_v2[ch]);
 }
 
 #define RXNUM 16
 static void frskyX_build_bind_packet()
 {
-    packet[0] = Model.proto_opts[PROTO_OPTS_FORMAT] ? 0x20 : 0x1D;
+    packet[0] = packet_size;
     packet[1] = 0x03;
     packet[2] = 0x01;
 
     packet[3] = fixed_id;
     packet[4] = fixed_id >> 8;
-    int idx = ((state - FRSKY_BIND) % 10) * 5;
-    packet[5] = idx;
-    packet[6] = hop_data[idx++];
-    packet[7] = hop_data[idx++];
-    packet[8] = hop_data[idx++];
-    packet[9] = hop_data[idx++];
-    packet[10] = hop_data[idx++];
-    packet[11] = 0x02;
-    packet[12] = RXNUM;
 
-    memset(&packet[13], 0, packet_size-15);
+    if (!Model.proto_opts[PROTO_OPTS_VERSION]) {
+        int idx = ((state - FRSKY_BIND) % 10) * 5;
+        packet[5] = idx;
+        packet[6] = hop_data[idx++];
+        packet[7] = hop_data[idx++];
+        packet[8] = hop_data[idx++];
+        packet[9] = hop_data[idx++];
+        packet[10] = hop_data[idx++];
+        packet[11] = 0x02;
+        packet[12] = RXNUM;
 
-    u16 lcrc = crc(&packet[3], packet_size-5);
-    packet[packet_size-2] = lcrc >> 8;
-    packet[packet_size-1] = lcrc;
+        memset(&packet[13], 0, packet_size - 14);
+        if (binding_idx & 0x01)
+            memcpy(&packet[13], (void *)"\x55\xAA\x5A\xA5", 4);   // Telem off
+        if (binding_idx & 0x02)
+            memcpy(&packet[17], (void *)"\x55\xAA\x5A\xA5", 4);   // CH9-16
+    } else {
+        // packet 1D 03 01 0E 1C 02 00 00 32 0B 00 00 A8 26 28 01 A1 00 00 00 3E F6 87 C7 00 00 00 00 C9 C9
+        packet[5] = 0x02;                   // Unknown but constant ID?
+        packet[6] = RXNUM;
+        // Bind flags
+        packet[7] = 0;
+        if (binding_idx & 0x01)
+            packet[7] |= 0x40;              // Telem off
+        if (binding_idx & 0x02)
+            packet[7] |= 0x80;              // CH9-16
+        // Unknown bytes
+        memcpy(&packet[8], "\x32\x0B\x00\x00\xA8\x26\x28\x01\xA1\x00\x00\x00\x3E\xF6\x87\xC7", 16);
+        packet[20]^= 0x0E ^ fixed_id;       // Update the ID
+        packet[21]^= 0x1C ^ fixed_id >> 8;  // Update the ID
+        // Xor
+        for (u8 i = 3; i < packet_size - 1; i++)
+            packet[i] ^= 0xA7;
+    }
+
+    u16 lcrc = crc(&packet[3], packet_size - 4);
+    packet[packet_size - 1] = lcrc >> 8;
+    packet[packet_size] = lcrc;
 
 }
 
@@ -256,7 +295,7 @@ static void frskyX_data_frame() {
     failsafe_count += 1;
 
 
-    packet[0] = Model.proto_opts[PROTO_OPTS_FORMAT] ? 0x20 : 0x1D;
+    packet[0] = packet_size;
     packet[1] = fixed_id;
     packet[2] = fixed_id >> 8;
 
@@ -273,7 +312,7 @@ static void frskyX_data_frame() {
 
     startChan = chan_offset;
 
-    for(u8 i = 0; i < 12 ; i += 3) {    // 12 bytes of channel data
+    for (u8 i = 0; i < 12 ; i += 3) {    // 12 bytes of channel data
         if (FS_flag & 0x10 && (((failsafe_chan & 0x7) | chan_offset) == startChan)) {
             packet[7] = FS_flag;
             chan_0 = scaleForPXX(failsafe_chan, 1);
@@ -299,11 +338,11 @@ static void frskyX_data_frame() {
 
     chan_offset ^= 0x08;
 
-    memset(&packet[22], 0, packet_size-24);
+    memset(&packet[22], 0, packet_size - 23);
 
-    u16 lcrc = crc(&packet[3], packet_size-5);
-    packet[packet_size-2] = lcrc >> 8;
-    packet[packet_size-1] = lcrc;
+    u16 lcrc = crc(&packet[3], packet_size - 4);
+    packet[packet_size - 1] = lcrc >> 8;
+    packet[packet_size] = lcrc;
 }
 
 
@@ -313,7 +352,7 @@ static void frskyX_data_frame() {
 #include "frsky_s_telem._c"
 
 static s8 telem_save_seq;
-static u8 telem_save_data[FRSKY_SPORT_PACKET_SIZE+1];
+static u8 telem_save_data[FRSKY_SPORT_PACKET_SIZE];
 
 static void setup_serial_port() {
     if ( Model.proto_opts[PROTO_OPTS_SPORTOUT] ) {
@@ -327,24 +366,14 @@ static void setup_serial_port() {
     }
 }
 
-static u8 sport_crc(u8 *data) {
-    u16 crc = 0;
-    for (int i=1; i < FRSKY_SPORT_PACKET_SIZE-1; ++i) {
-        crc += data[i];
-        crc += crc >> 8;
-        crc &= 0x00ff;
-    }
-    return 0x00ff - crc;
-}
-
 static void serial_echo(u8 *packet) {
-  static u8 outbuf[FRSKY_SPORT_PACKET_SIZE+2] = {0x7e};
+  static u8 outbuf[FRSKY_SPORT_PACKET_SIZE + 1] = {0x7e};
 
   if (PPMin_Mode() || !Model.proto_opts[PROTO_OPTS_SPORTOUT]) return;
 
-  memcpy(outbuf+1, packet, FRSKY_SPORT_PACKET_SIZE);
-  outbuf[FRSKY_SPORT_PACKET_SIZE+1] = sport_crc(outbuf+2);
-  UART_Send(outbuf, FRSKY_SPORT_PACKET_SIZE+2);
+  memcpy(outbuf+1, packet, FRSKY_SPORT_PACKET_SIZE - 1);
+  outbuf[FRSKY_SPORT_PACKET_SIZE] = sport_crc(outbuf + 2);
+  UART_Send(outbuf, FRSKY_SPORT_PACKET_SIZE + 1);
 }
 
 #endif // HAS_EXTENDED_TELEMETRY
@@ -355,7 +384,7 @@ static void frsky_check_telemetry(u8 *pkt, u8 len) {
         && pkt[0] == TELEM_PKT_SIZE - 3
         && pkt[1] == (fixed_id & 0xff)
         && pkt[2] == (fixed_id >> 8)
-        && crc(&pkt[3], TELEM_PKT_SIZE-7) == (pkt[TELEM_PKT_SIZE-4] << 8 | pkt[TELEM_PKT_SIZE-3])
+        && crc(&pkt[3], TELEM_PKT_SIZE - 7) == (pkt[TELEM_PKT_SIZE - 4] << 8 | pkt[TELEM_PKT_SIZE - 3])
        ) {
         if (pkt[4] & 0x80) {   // distinguish RSSI from VOLT1
             Telemetry.value[TELEM_FRSKY_RSSI] = pkt[4] & 0x7f;
@@ -365,10 +394,10 @@ static void frsky_check_telemetry(u8 *pkt, u8 len) {
             TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT1);
         }
 
-        Telemetry.value[TELEM_FRSKY_LQI] = pkt[len-1] & 0x7f;
+        Telemetry.value[TELEM_FRSKY_LQI] = pkt[len - 1] & 0x7f;
         TELEMETRY_SetUpdated(TELEM_FRSKY_LQI);
 
-        Telemetry.value[TELEM_FRSKY_LRSSI] = (s8)pkt[len-2] / 2 - 70;  // Value in dBm
+        Telemetry.value[TELEM_FRSKY_LRSSI] = (s8)pkt[len - 2] / 2 - 70;  // Value in dBm
         TELEMETRY_SetUpdated(TELEM_FRSKY_LRSSI);
 
         if (((pkt[5] & 0x0f) == 0x08) || ((pkt[5] >> 4) == 0x08)) {   // restart
@@ -382,15 +411,15 @@ static void frsky_check_telemetry(u8 *pkt, u8 len) {
                 seq_rx_expected = (seq_rx_expected + 1) % 4;
 #if HAS_EXTENDED_TELEMETRY
                 if (pkt[6] <= 6) {
-                    for (u8 i=0; i < pkt[6]; i++)
-                        frsky_parse_sport_stream(pkt[7+i]);
+                    for (u8 i = 0; i < pkt[6]; i++)
+                        frsky_parse_sport_stream(pkt[7 + i], SPORT_NOCRC);
                 }
                 // process any saved data from out-of-sequence packet if
                 // it's the next expected packet
                 if (telem_save_seq == seq_rx_expected) {
                     seq_rx_expected = (seq_rx_expected + 1) % 4;
-                    for (u8 i=0; i < telem_save_data[0]; i++)
-                        frsky_parse_sport_stream(telem_save_data[1+i]);
+                    for (u8 i = 0; i < telem_save_data[0]; i++)
+                        frsky_parse_sport_stream(telem_save_data[1 + i], SPORT_NOCRC);
                 }
                 telem_save_seq = -1;
 #endif
@@ -401,7 +430,7 @@ static void frsky_check_telemetry(u8 *pkt, u8 len) {
                 // if this is the packet after the expected one, save the sport data
                 if ((pkt[5] & 0x03) == ((seq_rx_expected+1) % 4) && pkt[6] <= 6) {
                     telem_save_seq = (seq_rx_expected+1) % 4;
-                    memcpy(telem_save_data, &pkt[6], pkt[6]+1);
+                    memcpy(telem_save_data, &pkt[6], pkt[6] + 1);
                 }
             }
 #endif
@@ -450,7 +479,7 @@ static u16 frskyx_cb() {
       CC2500_Strobe(CC2500_SFRX);
       frskyX_build_bind_packet();
       CC2500_Strobe(CC2500_SIDLE);
-      CC2500_WriteData(packet, packet[0]+1);
+      CC2500_WriteData(packet, packet[0] + 1);
       state++;
 #ifndef EMULATOR
       return 9000;
@@ -476,7 +505,7 @@ static u16 frskyx_cb() {
       if (mixer_sync != MIX_DONE && mixer_runtime < 2000) mixer_runtime += 50;
       frskyX_data_frame();
       CC2500_Strobe(CC2500_SIDLE);
-      CC2500_WriteData(packet, packet[0]+1);
+      CC2500_WriteData(packet, packet[0] + 1);
       channr = (channr + chanskip) % 47;
       state++;
 #ifndef EMULATOR
@@ -594,18 +623,31 @@ static void frskyX_init() {
 
   u8 format = Model.proto_opts[PROTO_OPTS_FORMAT] + 1;
 
-  for (u32 i=0; i < ((sizeof init_data) / (sizeof init_data[0])); i++)
+  for (u32 i = 0; i < ((sizeof init_data) / (sizeof init_data[0])); i++)
       CC2500_WriteReg(init_data[i][0], init_data[i][format]);
-  for (u32 i=0; i < ((sizeof init_data_shared) / (sizeof init_data_shared[0])); i++)
+  for (u32 i = 0; i < ((sizeof init_data_shared) / (sizeof init_data_shared[0])); i++)
       CC2500_WriteReg(init_data_shared[i][0], init_data_shared[i][1]);
+
+  if (Model.proto_opts[PROTO_OPTS_VERSION]) {
+      CC2500_WriteReg(CC2500_08_PKTCTRL0, 0x05);                // Enable CRC
+      if (!Model.proto_opts[PROTO_OPTS_FORMAT]) {               // FCC
+          CC2500_WriteReg(CC2500_17_MCSM1, 0x0E);               // Go/Stay in RX mode
+          CC2500_WriteReg(CC2500_11_MDMCFG3, 0x84);             // bitrate 70K->77K
+      }
+  }
 
   CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);
   CC2500_Strobe(CC2500_SIDLE);
 
-  //calibrate hop channels
-  for (u8 c = 0; c < 47; c++) {
+  // calibrate hop channels
+  for (u8 c = 0; c < (HOP_DATA_SIZE - 1); c++) {
       CC2500_Strobe(CC2500_SIDLE);
-      CC2500_WriteReg(CC2500_0A_CHANNR, hop_data[c]);
+      if (!Model.proto_opts[PROTO_OPTS_VERSION]) {
+          CC2500_WriteReg(CC2500_0A_CHANNR, hop_data[c]);
+      } else {
+          init_hop_FRSkyX2();
+          CC2500_WriteReg(CC2500_0A_CHANNR, hop_data_v2[c]);
+      }
       CC2500_Strobe(CC2500_SCAL);
       usleep(900);
       calData[c][0] = CC2500_ReadReg(CC2500_23_FSCAL3);
@@ -616,9 +658,9 @@ static void frskyX_init() {
   CC2500_WriteReg(CC2500_0A_CHANNR, 0x00);
   CC2500_Strobe(CC2500_SCAL);
   usleep(900);
-  calData[47][0] = CC2500_ReadReg(CC2500_23_FSCAL3);
-  calData[47][1] = CC2500_ReadReg(CC2500_24_FSCAL2);
-  calData[47][2] = CC2500_ReadReg(CC2500_25_FSCAL1);
+  calData[HOP_DATA_SIZE - 1][0] = CC2500_ReadReg(CC2500_23_FSCAL3);
+  calData[HOP_DATA_SIZE - 1][1] = CC2500_ReadReg(CC2500_24_FSCAL2);
+  calData[HOP_DATA_SIZE - 1][2] = CC2500_ReadReg(CC2500_25_FSCAL1);
 }
 
 
@@ -645,7 +687,9 @@ static void initialize(int bind)
 
     // initialize statics since 7e modules don't initialize
     fine = Model.proto_opts[PROTO_OPTS_FREQFINE];
-    packet_size = Model.proto_opts[PROTO_OPTS_FORMAT] ? 33 : 30;
+    packet_size = 0x1D;
+    if (!Model.proto_opts[PROTO_OPTS_VERSION] && Model.proto_opts[PROTO_OPTS_FORMAT])
+       packet_size = 0x20;               // FrSkyX V1 LBT
     fixed_id = (u16) get_tx_id();
     failsafe_count = 0;
     chan_offset = 0;
@@ -655,6 +699,7 @@ static void initialize(int bind)
     ctr = 0;
     seq_rx_expected = 0;
     seq_tx_send = 8;
+    binding_idx = Model.proto_opts[PROTO_OPTS_BINDMODE];
 #if HAS_EXTENDED_TELEMETRY
     telem_save_seq = -1;
     setup_serial_port();
@@ -662,7 +707,7 @@ static void initialize(int bind)
 
     u32 seed = get_tx_id();
     while (!chanskip)
-        chanskip = (rand32_r(&seed, 0) & 0xfefefefe) % 47;
+        chanskip = (rand32_r(&seed, 0) & 0xfefefefe) % (HOP_DATA_SIZE - 1);
     while((chanskip - ctr) % 4)
         ctr = (ctr+1) % 4;
     counter_rst = (chanskip - ctr) >> 2;
@@ -690,7 +735,7 @@ uintptr_t FRSKYX_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT: initialize(0); return 0;
-        case PROTOCMD_CHECK_AUTOBIND: return 0; //Never Autobind
+        case PROTOCMD_CHECK_AUTOBIND: return 0;  // Never Autobind
         case PROTOCMD_BIND:  initialize(1); return 0;
         case PROTOCMD_NUMCHAN: return 16;
         case PROTOCMD_DEFAULT_NUMCHAN: return 8;
@@ -703,18 +748,16 @@ uintptr_t FRSKYX_Cmds(enum ProtoCmds cmd)
             return PROTO_TELEM_ON;
         case PROTOCMD_TELEMETRYTYPE:
             return TELEM_FRSKY;
-        case PROTOCMD_TELEMETRYRESET:
 #if HAS_EXTENDED_TELEMETRY
-            Model.ground_level = 0;
-            discharge_dAms = 0;
-            Telemetry.value[TELEM_FRSKY_MIN_CELL] = TELEMETRY_GetMaxValue(TELEM_FRSKY_MIN_CELL);
-#endif
+        case PROTOCMD_TELEMETRYRESET:
+            frsky_telem_reset();
             return 0;
+#endif
         case PROTOCMD_RESET:
         case PROTOCMD_DEINIT:
 #if HAS_EXTENDED_TELEMETRY
             if (Model.proto_opts[PROTO_OPTS_SPORTOUT]) {
-                UART_SetDataRate(0); // restore default rate, voice will be reset on next model's load anyways
+                UART_SetDataRate(0);  // restore default rate, voice will be reset on next model's load anyways
             }
 #endif
             CLOCK_StopTimer();

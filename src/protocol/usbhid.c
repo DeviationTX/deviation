@@ -61,7 +61,7 @@ static u16 usbhid_cb()
 {
     build_data_pkt();
         
-    HID_Write(packet, USBHID_DIGITAL_CHANNELS + 1);
+    HID_Write(packet, sizeof(packet));
 
     return 50000;
 }

@@ -13,11 +13,6 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef MODULAR
-    // Allows the linker to properly relocate
-    #define E016H_Cmds PROTO_Cmds
-    #pragma long_calls
-#endif
 
 #include "common.h"
 #include "interface.h"
@@ -72,6 +67,7 @@ enum {
 };
 
 // flags going to packet[1]
+#define FLAG_CALIBRATE 0x80
 #define FLAG_STOP   0x20
 #define FLAG_FLIP   0x04
 
@@ -119,6 +115,7 @@ static void send_packet(u8 bind)
 {
     u16 val;
     u8 can_flip = 0;
+    u8 calibrate = 1;
     if (bind) {
         memcpy(packet, &rx_tx_addr[1], 4);
         memcpy(&packet[4], hopping_frequency, 4);
@@ -131,22 +128,31 @@ static void send_packet(u8 bind)
         can_flip |= (val < 0x100) || (val > 0x300);
         packet[1] = val >> 8;
         packet[2] = val & 0xff;
+        if (val < 0x300)
+            calibrate = 0;
         // elevator
         val = scale_channel(Channels[CHANNEL2], CHAN_MIN_VALUE, CHAN_MAX_VALUE, 0x3ff, 0);
         can_flip |= (val < 0x100) || (val > 0x300);
         packet[3] = val >> 8;
         packet[4] = val & 0xff;
+        if (val < 0x300)
+            calibrate = 0;
         // throttle
         val = scale_channel(Channels[CHANNEL3], CHAN_MIN_VALUE, CHAN_MAX_VALUE, 0, 0x3ff);
         packet[5] = val >> 8;
         packet[6] = val & 0xff;
+        if (val > 0x100)
+            calibrate = 0;
         // rudder
         val = scale_channel(Channels[CHANNEL4], CHAN_MIN_VALUE, CHAN_MAX_VALUE, 0x3ff, 0);
         packet[7] = val >> 8;
         packet[8] = val & 0xff;
+        if (val > 0x100)
+            calibrate = 0;
         // flags
         packet[1] |= GET_FLAG(CHANNEL8, FLAG_STOP)
-                  |  (can_flip ? GET_FLAG(CHANNEL5, FLAG_FLIP) : 0);
+                  |  (can_flip ? GET_FLAG(CHANNEL5, FLAG_FLIP) : 0)
+                  |  (calibrate ? FLAG_CALIBRATE : 0);
         packet[3] |= GET_FLAG(CHANNEL6, FLAG_HEADLESS)
                   |  GET_FLAG(CHANNEL7, FLAG_RTH);
         packet[7] |= FLAG_HIGHRATE;

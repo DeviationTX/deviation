@@ -66,6 +66,10 @@ PAGEDEF(PAGEID_MAINCFG,  PAGE_MainLayoutInit,  NULL,                  NULL,     
 #if HAS_MUSIC_CONFIG
 PAGEDEF(PAGEID_VOICECFG, PAGE_VoiceconfigInit, NULL,                  NULL,               MODEL_MENU,  _tr_noop("Voice config"))
 #endif
+#if SUPPORT_CRSF_CONFIG
+PAGEDEF(PAGEID_CRSFCFG,  PAGE_CrsfconfigInit,  PAGE_CRSFConfigEvent,  NULL,               0,           _tr_noop("CRSF config"))
+PAGEDEF(PAGEID_CRSFDEVICE, PAGE_CrsfdeviceInit, PAGE_CRSFDeviceEvent, NULL,               0,           _tr_noop("CRSF device config"))
+#endif
 
 // Transmitter menu
 //-----------------
@@ -75,8 +79,11 @@ PAGEDEF(PAGEID_CHANMON,  PAGE_ChantestInit,    PAGE_ChantestEvent,    PAGE_Chant
 PAGEDEF(PAGEID_TELEMMON, PAGE_TelemtestInit,   PAGE_TelemtestEvent,   NULL,                TX_MENU,    _tr_noop("Telemetry monitor"))
 #endif
 PAGEDEF(PAGEID_RANGE,    PAGE_RangeInit,       NULL,                  PAGE_RangeExit,      TX_MENU,    _tr_noop("Range Test"))
-#if HAS_SCANNER
+#if SUPPORT_SCANNER
 PAGEDEF(PAGEID_SCANNER,  PAGE_ScannerInit,     PAGE_ScannerEvent,     PAGE_ScannerExit,   TX_MENU,     _tr_noop("Scanner"))
+#endif
+#if SUPPORT_XN297DUMP
+PAGEDEF(PAGEID_XN297DUMP,  PAGE_XN297DumpInit,     PAGE_XN297DumpEvent,     PAGE_XN297DumpExit,   TX_MENU,     _tr_noop("XN297 Dump"))
 #endif
 //-------------------
 

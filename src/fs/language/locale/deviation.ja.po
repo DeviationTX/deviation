@@ -183,8 +183,7 @@ msgstr "ELE DR"
 msgid "AIL DR"
 msgstr "AIL DR"
 
-#: inputs.c:57 inputs.c:58 inputs.c:92 inputs.c:93 inputs.c:94
-#: pages/common/standard/_common_standard.c:38
+#: inputs.c:57 inputs.c:58 pages/common/standard/_common_standard.c:38
 #: pages/common/standard/_gyrosense_page.c:57
 msgid "GEAR"
 msgstr "GEAR"
@@ -237,123 +236,122 @@ msgstr "SW G"
 msgid "SW H"
 msgstr "SW H"
 
-#: inputs.c:96
+#: inputs.c:92
 msgid "TRIMLV-"
 msgstr "Trm左V-"
 
-#: inputs.c:97
+#: inputs.c:93
 msgid "TRIMLV+"
 msgstr "Trm左V+"
 
-#: inputs.c:98
+#: inputs.c:94
 msgid "TRIMRV-"
 msgstr "Trm右V-"
 
-#: inputs.c:99
+#: inputs.c:95
 msgid "TRIMRV+"
 msgstr "Trm右V+"
 
-#: inputs.c:100
+#: inputs.c:96
 msgid "TRIMLH-"
 msgstr "Trm左H-"
 
-#: inputs.c:101
+#: inputs.c:97
 msgid "TRIMLH+"
 msgstr "Trm左H+"
 
-#: inputs.c:102
+#: inputs.c:98
 msgid "TRIMRH-"
 msgstr "Trm右H-"
 
-#: inputs.c:103
+#: inputs.c:99
 msgid "TRIMRH+"
 msgstr "Trm右H+"
 
-#: inputs.c:104
+#: inputs.c:100
 msgid "TRIM_L-"
 msgstr "Trm_左-"
 
-#: inputs.c:105
+#: inputs.c:101
 msgid "TRIM_L+"
 msgstr "Trm_左+"
 
-#: inputs.c:106
+#: inputs.c:102
 msgid "TRIM_R-"
 msgstr "Trm_右-"
 
-#: inputs.c:107
+#: inputs.c:103
 msgid "TRIM_R+"
 msgstr "Trm_右+"
 
-#: inputs.c:108
+#: inputs.c:104
 msgid "Left"
 msgstr "左"
 
-#: inputs.c:109
+#: inputs.c:105
 msgid "Right"
 msgstr "右"
 
-#: inputs.c:110 pages/128x64x1/standard/traveladj_page.c:63
+#: inputs.c:106 pages/128x64x1/standard/traveladj_page.c:63
 #: pages/320x240x16/standard/traveladj_page.c:68
 msgid "Down"
 msgstr "下"
 
-#: inputs.c:111 pages/128x64x1/reorder_list.c:38
+#: inputs.c:107 pages/128x64x1/reorder_list.c:38
 #: pages/128x64x1/standard/traveladj_page.c:64
 #: pages/320x240x16/standard/traveladj_page.c:69
 msgid "Up"
 msgstr "上"
 
-#: inputs.c:112
+#: inputs.c:108
 msgid "Enter"
 msgstr "Enter"
 
-#: inputs.c:113
+#: inputs.c:109
 msgid "Exit"
 msgstr "Exit"
 
-#: inputs.c:116
+#: inputs.c:112
 msgid "RIGHT_H"
 msgstr "右_H"
 
-#: inputs.c:117
+#: inputs.c:113
 msgid "LEFT_V"
 msgstr "左_V"
 
-#: inputs.c:118
+#: inputs.c:114
 msgid "RIGHT_V"
 msgstr "右_V"
 
-#: inputs.c:119
+#: inputs.c:115
 msgid "LEFT_H"
 msgstr "左_H"
 
-#: inputs.c:145 inputs.c:258 mixer.c:873 mixer.c:887
-#: pages/128x64x1/datalog_page.c:79 pages/128x64x1/model_page.c:159
-#: pages/320x240x16/datalog_page.c:92 pages/320x240x16/model_page.c:100
-#: pages/320x240x16/trim_page.c:46 pages/common/advanced/_mixer_setup.c:400
-#: pages/common/_main_config.c:177 pages/common/_main_config.c:181
-#: pages/common/_model_config.c:132 pages/common/_model_page.c:223
-#: pages/common/_model_page.c:274 pages/common/_pages.c:152
-#: pages/common/standard/_failsafe_page.c:33
+#: inputs.c:141 mixer.c:873 mixer.c:887 pages/128x64x1/datalog_page.c:79
+#: pages/128x64x1/model_page.c:159 pages/320x240x16/datalog_page.c:92
+#: pages/320x240x16/model_page.c:100 pages/320x240x16/trim_page.c:46
+#: pages/common/advanced/_mixer_setup.c:400 pages/common/_main_config.c:177
+#: pages/common/_main_config.c:181 pages/common/_model_config.c:132
+#: pages/common/_model_page.c:228 pages/common/_model_page.c:280
+#: pages/common/_pages.c:152 pages/common/standard/_failsafe_page.c:33
 #: pages/common/standard/_reverse_page.c:21
 #: pages/common/standard/_swash_page.c:65 pages/common/_trim_page.c:56
 #: pages/common/_trim_page.c:74 pages/common/_voiceconfig_page.c:185
 #: protocol/protocol.c:89 telemetry/telem_crsf.c:80 telemetry/telem_devo.c:76
-#: telemetry/telem_dsm.c:261 telemetry/telem_frsky.c:58
+#: telemetry/telem_dsm.c:261 telemetry/telem_frsky.c:62
 msgid "None"
 msgstr "なし"
 
-#: inputs.c:155 pages/common/standard/_gyrosense_page.c:57
+#: inputs.c:151 pages/common/standard/_gyrosense_page.c:57
 #: pages/common/standard/_gyrosense_page.c:59
 msgid "Ch"
 msgstr "Ch"
 
-#: inputs.c:161 pages/320x240x16/chantest_page.c:219
+#: inputs.c:157 pages/320x240x16/chantest_page.c:219
 msgid "Virt"
 msgstr "仮想"
 
-#: inputs.c:164
+#: inputs.c:160
 msgid "PPM"
 msgstr "PPM"
 
@@ -439,7 +437,7 @@ msgid "Fail-safe"
 msgstr "Fail-Safe"
 
 #: pages/128x64x1/advanced/mixer_limits.c:71
-#: pages/320x240x16/advanced/mixer_limits.c:41 pages/320x240x16/dialogs.c:49
+#: pages/320x240x16/advanced/mixer_limits.c:41 pages/320x240x16/dialogs.c:50
 msgid "Safety"
 msgstr "セーフティSW"
 
@@ -466,6 +464,7 @@ msgstr "サブトリム"
 
 #: pages/128x64x1/advanced/mixer_limits.c:99
 #: pages/320x240x16/advanced/mixer_limits.c:68 telemetry.c:246
+#: telemetry/telem_frsky.c:94
 msgid "Speed"
 msgstr "速度"
 
@@ -547,22 +546,26 @@ msgstr "スティック入力"
 msgid "Mixer output"
 msgstr "ミキサー出力"
 
-#: pages/128x64x1/datalog_page.c:56 pages/128x64x1/scanner_page.c:29
+#: pages/128x64x1/crsfdevice_page.c:104 pages/320x240x16/crsfdevice_page.c:96
+msgid "LOADING"
+msgstr ""
+
+#: pages/128x64x1/datalog_page.c:56 pages/128x64x1/scanner_page.c:28
 #: pages/128x64x1/tx_configure.c:249 pages/128x64x1/usb_page.c:39
 #: pages/320x240x16/usb_page.c:39 pages/320x240x16/usb_page.c:41
 #: pages/common/standard/_curves_page.c:109
 #: pages/common/standard/_throhold_page.c:40 pages/common/_tx_configure.c:376
-#: protocol/bayang_nrf24l01.c:90 protocol/bayang_nrf24l01.c:92
+#: protocol/bayang_nrf24l01.c:93 protocol/bayang_nrf24l01.c:95
 #: protocol/cg023_nrf24l01.c:44 protocol/dsm2_cyrf6936.c:37
 #: protocol/dsm2_cyrf6936.c:40 protocol/dsm2_cyrf6936.c:41
 #: protocol/frsky2way_cc2500.c:25 protocol/fy326_nrf24l01.c:45
-#: protocol/hubsan_a7105.c:124 protocol/inav_nrf24l01.c:180
-#: protocol/kn_nrf24l01.c:170 protocol/symax_nrf24l01.c:94
+#: protocol/hubsan_a7105.c:114 protocol/inav_nrf24l01.c:170
+#: protocol/kn_nrf24l01.c:160 protocol/symax_nrf24l01.c:94
 #: protocol/yd717_nrf24l01.c:95 telemetry/telem_dsm.c:147
 msgid "On"
 msgstr "ON"
 
-#: pages/128x64x1/datalog_page.c:57 pages/128x64x1/scanner_page.c:29
+#: pages/128x64x1/datalog_page.c:57 pages/128x64x1/scanner_page.c:28
 #: pages/128x64x1/tx_configure.c:237 pages/128x64x1/tx_configure.c:247
 #: pages/128x64x1/usb_page.c:39 pages/320x240x16/usb_page.c:39
 #: pages/320x240x16/usb_page.c:41 pages/common/advanced/_mixer_limits.c:189
@@ -574,14 +577,14 @@ msgstr "ON"
 #: pages/common/_tx_configure.c:250 pages/common/_tx_configure.c:265
 #: pages/common/_tx_configure.c:278 pages/common/_tx_configure.c:305
 #: pages/common/_tx_configure.c:374 pages/common/_tx_configure.c:390
-#: pages/common/_tx_configure.c:412 protocol/bayang_nrf24l01.c:90
-#: protocol/bayang_nrf24l01.c:92 protocol/cflie_nrf24l01.c:185
+#: pages/common/_tx_configure.c:412 protocol/bayang_nrf24l01.c:93
+#: protocol/bayang_nrf24l01.c:95 protocol/cflie_nrf24l01.c:185
 #: protocol/cg023_nrf24l01.c:44 protocol/devo_cyrf6936.c:40
 #: protocol/dsm2_cyrf6936.c:37 protocol/dsm2_cyrf6936.c:40
 #: protocol/dsm2_cyrf6936.c:41 protocol/flysky_a7105.c:36
 #: protocol/frsky2way_cc2500.c:25 protocol/fy326_nrf24l01.c:45
-#: protocol/hubsan_a7105.c:124 protocol/inav_nrf24l01.c:180
-#: protocol/kn_nrf24l01.c:170 protocol/symax_nrf24l01.c:94
+#: protocol/hubsan_a7105.c:114 protocol/inav_nrf24l01.c:170
+#: protocol/kn_nrf24l01.c:160 protocol/symax_nrf24l01.c:94
 #: protocol/yd717_nrf24l01.c:95
 msgid "Off"
 msgstr "OFF"
@@ -607,7 +610,7 @@ msgstr "ログ項目"
 msgid "%d bytes left"
 msgstr "%d Bytes 残り"
 
-#: pages/128x64x1/dialogs.c:82
+#: pages/128x64x1/dialogs.c:83
 #, c-format
 msgid ""
 "Binding %s...\n"
@@ -616,7 +619,7 @@ msgstr ""
 "バインド中 %s...\n"
 "停止はENTを押すこと"
 
-#: pages/128x64x1/dialogs.c:85
+#: pages/128x64x1/dialogs.c:86
 #, c-format
 msgid ""
 "\n"
@@ -625,7 +628,7 @@ msgstr ""
 "\n"
 "%d 秒後"
 
-#: pages/128x64x1/dialogs.c:133
+#: pages/128x64x1/dialogs.c:134
 msgid ""
 "Battery too low,\n"
 "can't save!"
@@ -634,7 +637,7 @@ msgstr ""
 "低すぎます.\n"
 "保存できません!"
 
-#: pages/128x64x1/dialogs.c:140
+#: pages/128x64x1/dialogs.c:141
 msgid ""
 "Model needs reset\n"
 "for standard mixer"
@@ -643,7 +646,7 @@ msgstr ""
 "モデルをリセットする\n"
 "必要があります."
 
-#: pages/128x64x1/dialogs.c:154
+#: pages/128x64x1/dialogs.c:155
 msgid ""
 "Bad/missing\n"
 "protocol modules!"
@@ -651,7 +654,7 @@ msgstr ""
 "プロトコルモジュールの\n"
 "不良 / 不具合です!"
 
-#: pages/128x64x1/dialogs.c:179 pages/320x240x16/dialogs.c:151
+#: pages/128x64x1/dialogs.c:180 pages/320x240x16/dialogs.c:152
 msgid "Missing Modules:\n"
 msgstr "モジュールの不具合:\n"
 
@@ -735,12 +738,12 @@ msgid "Multirotor"
 msgstr "マルチ"
 
 #: pages/128x64x1/model_config.c:139 pages/320x240x16/model_config.c:103
-#: protocol/ppmout.c:37
+#: protocol/ppmout.c:29
 msgid "Center PW"
 msgstr "Center PW"
 
 #: pages/128x64x1/model_config.c:143 pages/320x240x16/model_config.c:106
-#: protocol/ppmout.c:38
+#: protocol/ppmout.c:30
 msgid "Delta PW"
 msgstr "Delta PW"
 
@@ -805,7 +808,7 @@ msgid "Multi"
 msgstr "マルチ"
 
 #: pages/128x64x1/model_page.c:51 pages/common/_model_loadsave.c:114
-#: pages/common/_model_page.c:181 protocol/hisky_nrf24l01.c:71
+#: pages/common/_model_page.c:186 protocol/hisky_nrf24l01.c:61
 msgid "Default"
 msgstr "初期値"
 
@@ -957,32 +960,44 @@ msgstr "メインページ設定"
 msgid "Voice config"
 msgstr "音声設定"
 
-#: pages/128x64x1/pagelist.h:72 pages/320x240x16/pagelist.h:67
+#: pages/128x64x1/pagelist.h:70 pages/320x240x16/pagelist.h:66
+msgid "CRSF config"
+msgstr ""
+
+#: pages/128x64x1/pagelist.h:71 pages/320x240x16/pagelist.h:67
+msgid "CRSF device config"
+msgstr ""
+
+#: pages/128x64x1/pagelist.h:76 pages/320x240x16/pagelist.h:72
 msgid "Transmitter config"
 msgstr "送信機設定"
 
-#: pages/128x64x1/pagelist.h:73 pages/320x240x16/pagelist.h:68
+#: pages/128x64x1/pagelist.h:77 pages/320x240x16/pagelist.h:73
 msgid "Channel monitor"
 msgstr "チャンネル モニタ"
 
-#: pages/128x64x1/pagelist.h:75 pages/128x64x1/telemtest_page.c:412
-#: pages/320x240x16/pagelist.h:69
+#: pages/128x64x1/pagelist.h:79 pages/128x64x1/telemtest_page.c:418
+#: pages/320x240x16/pagelist.h:74
 msgid "Telemetry monitor"
 msgstr "テレメトリー モニタ"
 
-#: pages/128x64x1/pagelist.h:77 pages/320x240x16/pagelist.h:70
+#: pages/128x64x1/pagelist.h:81 pages/320x240x16/pagelist.h:75
 msgid "Range Test"
 msgstr "通信レンジ テスト"
 
-#: pages/128x64x1/pagelist.h:79 pages/320x240x16/pagelist.h:74
+#: pages/128x64x1/pagelist.h:83 pages/320x240x16/pagelist.h:79
 msgid "Scanner"
 msgstr "スキャン設定"
 
-#: pages/128x64x1/pagelist.h:86
+#: pages/128x64x1/pagelist.h:86 pages/320x240x16/pagelist.h:82
+msgid "XN297 Dump"
+msgstr "XN297 Dump"
+
+#: pages/128x64x1/pagelist.h:93
 msgid "External OSD"
 msgstr "外部OSD"
 
-#: pages/128x64x1/pagelist.h:91 pages/320x240x16/pagelist.h:78
+#: pages/128x64x1/pagelist.h:98 pages/320x240x16/pagelist.h:86
 msgid "Welcome"
 msgstr "ようこそ"
 
@@ -1013,22 +1028,6 @@ msgstr "下"
 #: pages/128x64x1/reorder_list.c:40 pages/320x240x16/reorder_list.c:30
 msgid "Copy To"
 msgstr "コピー"
-
-#: pages/128x64x1/scanner_page.c:36 pages/320x240x16/scanner_page.c:42
-msgid "Average"
-msgstr "平均"
-
-#: pages/128x64x1/scanner_page.c:36 pages/320x240x16/scanner_page.c:42
-msgid "Peak"
-msgstr "ピーク"
-
-#: pages/128x64x1/scanner_page.c:43
-msgid "-20dB"
-msgstr "-20dB"
-
-#: pages/128x64x1/scanner_page.c:43
-msgid "0dB"
-msgstr "0dB"
 
 #: pages/128x64x1/set_timer_page.c:44 pages/320x240x16/rtc_config.c:136
 #: pages/320x240x16/set_timer_page.c:98
@@ -1062,7 +1061,7 @@ msgstr "Mode"
 
 #: pages/128x64x1/standard/gyrosense_page.c:58
 #: pages/320x240x16/standard/gyrosense_page.c:64
-#: pages/common/_model_page.c:225
+#: pages/common/_model_page.c:230
 msgid "Channel"
 msgstr "Channel"
 
@@ -1104,36 +1103,36 @@ msgstr "D/R&Exp -RUD"
 msgid "Hold position"
 msgstr "Hold Position"
 
-#: pages/128x64x1/telemtest_page.c:339 telemetry/telem_devo.c:85
-#: telemetry/telem_dsm.c:193 telemetry/telem_frsky.c:81
+#: pages/128x64x1/telemtest_page.c:345 telemetry/telem_devo.c:85
+#: telemetry/telem_dsm.c:193 telemetry/telem_frsky.c:85
 msgid "Temp"
 msgstr "温度"
 
-#: pages/128x64x1/telemtest_page.c:340 telemetry/telem_crsf.c:92
+#: pages/128x64x1/telemtest_page.c:346 telemetry/telem_crsf.c:92
 #: telemetry/telem_devo.c:79 telemetry/telem_dsm.c:192
-#: telemetry/telem_frsky.c:64 telemetry/telem_frsky.c:70
+#: telemetry/telem_frsky.c:68 telemetry/telem_frsky.c:74
 msgid "Volt"
 msgstr "電圧"
 
-#: pages/128x64x1/telemtest_page.c:341 telemetry/telem_devo.c:81
-#: telemetry/telem_dsm.c:194 telemetry/telem_frsky.c:79
+#: pages/128x64x1/telemtest_page.c:347 telemetry/telem_devo.c:81
+#: telemetry/telem_dsm.c:194 telemetry/telem_frsky.c:83
 msgid "RPM"
 msgstr "RPM"
 
-#: pages/128x64x1/telemtest_page.c:342
+#: pages/128x64x1/telemtest_page.c:348
 msgid "GPS"
 msgstr "GPS"
 
-#: pages/128x64x1/telemtest_page.c:351
+#: pages/128x64x1/telemtest_page.c:357
 msgid "RX"
 msgstr "RX"
 
-#: pages/128x64x1/telemtest_page.c:352
+#: pages/128x64x1/telemtest_page.c:358
 msgid "TX"
 msgstr "TX"
 
 #: pages/128x64x1/timer_page.c:62 pages/320x240x16/timer_page.c:60
-#: pages/common/_datalog_page.c:63 pages/common/_model_page.c:300
+#: pages/common/_datalog_page.c:63 pages/common/_model_page.c:310
 msgid "Reset"
 msgstr "リセット"
 
@@ -1308,7 +1307,7 @@ msgstr "リンク"
 msgid "Sample Rate"
 msgstr "サンプルレート"
 
-#: pages/320x240x16/dialogs.c:63
+#: pages/320x240x16/dialogs.c:64
 msgid ""
 "Binding is in progress...\n"
 "Make sure model is on!\n"
@@ -1322,7 +1321,7 @@ msgstr ""
 "OKを押してもキャンセルされません.\n"
 "送信機は全操作可能となります."
 
-#: pages/320x240x16/dialogs.c:66
+#: pages/320x240x16/dialogs.c:67
 #, c-format
 msgid ""
 "\n"
@@ -1333,15 +1332,15 @@ msgstr ""
 "\n"
 "バインドは約 %d 秒で完了..."
 
-#: pages/320x240x16/dialogs.c:93
+#: pages/320x240x16/dialogs.c:94
 msgid "Binding"
 msgstr "バインド中"
 
-#: pages/320x240x16/dialogs.c:110
+#: pages/320x240x16/dialogs.c:111
 msgid "Low Battery"
 msgstr "バッテリー低下"
 
-#: pages/320x240x16/dialogs.c:111
+#: pages/320x240x16/dialogs.c:112
 msgid ""
 "Critical battery level detected.\n"
 "Settings have been saved.\n"
@@ -1356,7 +1355,7 @@ msgstr ""
 "\n"
 "すぐバッテリー交換を!"
 
-#: pages/320x240x16/dialogs.c:122
+#: pages/320x240x16/dialogs.c:123
 msgid ""
 "Model needs to be reset\n"
 "in order to switch to the standard mixer"
@@ -1365,17 +1364,17 @@ msgstr ""
 "機体モデルをリセットする\n"
 "必要があります."
 
-#: pages/320x240x16/dialogs.c:129
+#: pages/320x240x16/dialogs.c:130
 msgid "Standard Mixer"
 msgstr "標準ミキサー"
 
-#: pages/320x240x16/dialogs.c:143
+#: pages/320x240x16/dialogs.c:144
 msgid "Reset Permanent Timer?"
 msgstr ""
 "Permanentタイマーを\n"
 "リセットしますか?"
 
-#: pages/320x240x16/dialogs.c:157
+#: pages/320x240x16/dialogs.c:158
 msgid "Module Error"
 msgstr "モジュールエラー"
 
@@ -1428,15 +1427,15 @@ msgstr "内蔵時計"
 msgid "Touch Test"
 msgstr "Touchテスト"
 
-#: pages/320x240x16/pagelist.h:71
+#: pages/320x240x16/pagelist.h:76
 msgid "Input monitor"
 msgstr "入力 モニタ"
 
-#: pages/320x240x16/pagelist.h:72
+#: pages/320x240x16/pagelist.h:77
 msgid "Button monitor"
 msgstr "ボタン モニタ"
 
-#: pages/320x240x16/pagelist.h:84
+#: pages/320x240x16/pagelist.h:92
 msgid "Select Language"
 msgstr "言語選択"
 
@@ -1500,21 +1499,13 @@ msgstr "設定値"
 msgid "resulting value"
 msgstr "リザルト値"
 
-#: pages/320x240x16/scanner_page.c:35
+#: pages/320x240x16/scanner_page.c:37
 msgid "Turn Off"
 msgstr "電源OFF"
 
-#: pages/320x240x16/scanner_page.c:35
+#: pages/320x240x16/scanner_page.c:37
 msgid "Turn On"
 msgstr "電源ON"
-
-#: pages/320x240x16/scanner_page.c:49
-msgid "Att.: -20dB"
-msgstr "Att.: -20dB"
-
-#: pages/320x240x16/scanner_page.c:49
-msgid "Att.: 0dB"
-msgstr "Att.: 0dB"
 
 #: pages/320x240x16/set_timer_page.c:86
 msgid "actual value"
@@ -1649,18 +1640,18 @@ msgid "Neg"
 msgstr "ネガ"
 
 #: pages/common/advanced/_mixer_curves.c:157 protocol/dsm2_cyrf6936.c:38
-#: protocol/esky150_nrf24l01.c:137 protocol/kn_nrf24l01.c:167
-#: protocol/kn_nrf24l01.c:168 protocol/v202_nrf24l01.c:113
+#: protocol/esky150_nrf24l01.c:137 protocol/kn_nrf24l01.c:157
+#: protocol/kn_nrf24l01.c:158 protocol/v202_nrf24l01.c:113
 #: protocol/v202_nrf24l01.c:114 protocol/v202_nrf24l01.c:116
-#: protocol/yd717_nrf24l01.c:93
+#: protocol/xn297dump_nrf24l01.c:39 protocol/yd717_nrf24l01.c:93
 msgid "Yes"
 msgstr "Yes"
 
 #: pages/common/advanced/_mixer_curves.c:157 protocol/dsm2_cyrf6936.c:38
-#: protocol/esky150_nrf24l01.c:137 protocol/kn_nrf24l01.c:167
-#: protocol/kn_nrf24l01.c:168 protocol/v202_nrf24l01.c:113
+#: protocol/esky150_nrf24l01.c:137 protocol/kn_nrf24l01.c:157
+#: protocol/kn_nrf24l01.c:158 protocol/v202_nrf24l01.c:113
 #: protocol/v202_nrf24l01.c:114 protocol/v202_nrf24l01.c:116
-#: protocol/yd717_nrf24l01.c:93
+#: protocol/xn297dump_nrf24l01.c:39 protocol/yd717_nrf24l01.c:93
 msgid "No"
 msgstr "No"
 
@@ -1677,7 +1668,7 @@ msgstr "リバース"
 
 #: pages/common/advanced/_mixer_limits.c:208 pages/common/_model_config.c:36
 #: pages/common/standard/_common_standard.c:67
-#: pages/common/standard/_reverse_page.c:28 protocol/ppmout.c:41
+#: pages/common/standard/_reverse_page.c:28 protocol/ppmout.c:33
 #: protocol/wk2x01.c:71
 msgid "Normal"
 msgstr "ノーマル"
@@ -1810,7 +1801,7 @@ msgstr "ロード"
 msgid "Menu"
 msgstr "メニュー"
 
-#: pages/common/_model_config.c:37 protocol/ppmout.c:41 protocol/wk2x01.c:71
+#: pages/common/_model_config.c:37 protocol/ppmout.c:33 protocol/wk2x01.c:71
 msgid "Inverted"
 msgstr "反転"
 
@@ -1824,39 +1815,39 @@ msgstr "Ch %d"
 msgid "PPM%d"
 msgstr "PPM %d"
 
-#: pages/common/_model_page.c:83
+#: pages/common/_model_page.c:88
 msgid "Re-Init"
 msgstr "初期化"
 
-#: pages/common/_model_page.c:83
+#: pages/common/_model_page.c:88
 msgid "Bind"
 msgstr "バインド"
 
-#: pages/common/_model_page.c:227
+#: pages/common/_model_page.c:232
 msgid "Stick"
 msgstr "Stick"
 
-#: pages/common/_model_page.c:229
+#: pages/common/_model_page.c:234
 msgid "Extend"
 msgstr "拡張"
 
-#: pages/common/_model_page.c:294
+#: pages/common/_model_page.c:304
 msgid "Load..."
 msgstr "ロード..."
 
-#: pages/common/_model_page.c:296
+#: pages/common/_model_page.c:306
 msgid "Copy To..."
 msgstr "セーブ..."
 
-#: pages/common/_model_page.c:298
+#: pages/common/_model_page.c:308
 msgid "Template.."
 msgstr "Template.."
 
 #: pages/common/_pages.c:110 pages/common/_pages.c:117
-#: protocol/bayang_nrf24l01.c:90 protocol/cflie_nrf24l01.c:185
+#: protocol/bayang_nrf24l01.c:93 protocol/cflie_nrf24l01.c:185
 #: protocol/devo_cyrf6936.c:40 protocol/dsm2_cyrf6936.c:37
-#: protocol/frsky2way_cc2500.c:25 protocol/hubsan_a7105.c:124
-#: protocol/inav_nrf24l01.c:180 protocol/yd717_nrf24l01.c:95
+#: protocol/frsky2way_cc2500.c:25 protocol/hubsan_a7105.c:114
+#: protocol/inav_nrf24l01.c:170 protocol/yd717_nrf24l01.c:95
 msgid "Telemetry"
 msgstr "テレメトリー"
 
@@ -2023,36 +2014,61 @@ msgstr "タイマー%d"
 msgid "Telem %d"
 msgstr "Telem %d"
 
+#: pages/common/_xn297dump_page.c:72
+msgid "Set protocol to XN297Dump"
+msgstr "プロトコルをXN297Dumpに設定"
+
+#: pages/common/_xn297dump_page.c:75
+msgid "Scanning channels and length..."
+msgstr "CHと波長をスキャン..."
+
+#: pages/common/_xn297dump_page.c:77
+msgid "Measuring packet intervals..."
+msgstr "パケット間隔を測定..."
+
+#: pages/common/_xn297dump_page.c:79
+msgid "Recording packets..."
+msgstr "パケットを記録..."
+
+#: pages/common/_xn297dump_page.c:85
+msgid "Valid CRC found!"
+msgstr "有効なCRCを確認!"
+
+#: pages/common/_xn297dump_page.c:85
+msgid "CRC invalid"
+msgstr "CRC無効"
+
 #: pages/text/splash_page.c:37
 msgid "Deviation"
 msgstr "Deviation"
 
-#: protocol/bayang_nrf24l01.c:91 protocol/corona_cc2500.c:25
-#: protocol/cx10_nrf24l01.c:53 protocol/fq777_nrf24l01.c:68
+#: protocol/bayang_nrf24l01.c:94 protocol/bugs3mini_nrf24l01.c:118
+#: protocol/corona_cc2500.c:25 protocol/cx10_nrf24l01.c:53
+#: protocol/e010_cc2500.c:41 protocol/fq777_nrf24l01.c:68
 #: protocol/frskyx_cc2500.c:29 protocol/fy326_nrf24l01.c:44
-#: protocol/h8_3d_nrf24l01.c:61 protocol/hisky_nrf24l01.c:71
-#: protocol/hitec_cc2500.c:60 protocol/hontai_nrf24l01.c:60
-#: protocol/hubsan_a7105.c:122 protocol/kn_nrf24l01.c:169
-#: protocol/mjxq_nrf24l01.c:58 protocol/mt99xx_nrf24l01.c:125
+#: protocol/h8_3d_nrf24l01.c:51 protocol/hisky_nrf24l01.c:61
+#: protocol/hitec_cc2500.c:50 protocol/hontai_nrf24l01.c:50
+#: protocol/hubsan_a7105.c:112 protocol/kn_nrf24l01.c:159
+#: protocol/mjxq_nrf24l01.c:48 protocol/mt99xx_nrf24l01.c:115
 #: protocol/q303_nrf24l01.c:60 protocol/slt_nrf24l01.c:69
 #: protocol/v202_nrf24l01.c:112 protocol/yd717_nrf24l01.c:92
 msgid "Format"
 msgstr "Format"
 
-#: protocol/bayang_nrf24l01.c:91
+#: protocol/bayang_nrf24l01.c:94
 msgid "regular"
 msgstr "通常"
 
-#: protocol/bayang_nrf24l01.c:92
+#: protocol/bayang_nrf24l01.c:95
 msgid "Analog Aux"
 msgstr "アナログAUX"
 
-#: protocol/bugs3_a7105.c:237 protocol/flysky_afhds2a_a7105.c:68
-#: protocol/hubsan_a7105.c:125 protocol/joysway_a7105.c:53
+#: protocol/bugs3_a7105.c:237 protocol/flysky_afhds2a_a7105.c:69
+#: protocol/hubsan_a7105.c:115 protocol/joysway_a7105.c:45
 msgid "Freq Tune"
 msgstr "周波数調整"
 
-#: protocol/bugs3mini_nrf24l01.c:117
+#: protocol/bugs3mini_nrf24l01.c:119
 msgid "RX Id"
 msgstr "RX Id"
 
@@ -2076,9 +2092,10 @@ msgstr "RPYT"
 msgid "CPPM"
 msgstr "CPPM"
 
-#: protocol/corona_cc2500.c:26 protocol/frsky1way_cc2500.c:25
-#: protocol/frsky2way_cc2500.c:26 protocol/frskyx_cc2500.c:28
-#: protocol/hitec_cc2500.c:61 protocol/sfhss_cc2500.c:27
+#: protocol/corona_cc2500.c:26 protocol/e010_cc2500.c:42
+#: protocol/frsky1way_cc2500.c:25 protocol/frsky2way_cc2500.c:26
+#: protocol/frskyx_cc2500.c:28 protocol/hitec_cc2500.c:51
+#: protocol/sfhss_cc2500.c:27 protocol/wfly_cyrf6936.c:42
 msgid "Freq-Fine"
 msgstr "周波数微調"
 
@@ -2110,20 +2127,20 @@ msgstr "HighSpeed"
 msgid "F.Log filter"
 msgstr "F.Log filter"
 
-#: protocol/esky150_nrf24l01.c:137 protocol/kn_nrf24l01.c:167
+#: protocol/esky150_nrf24l01.c:137 protocol/kn_nrf24l01.c:157
 #: protocol/v202_nrf24l01.c:113
 msgid "Re-bind"
 msgstr "バインド"
 
-#: protocol/flysky_afhds2a_a7105.c:65
+#: protocol/flysky_afhds2a_a7105.c:66
 msgid "Outputs"
 msgstr "出力"
 
-#: protocol/flysky_afhds2a_a7105.c:66
+#: protocol/flysky_afhds2a_a7105.c:67
 msgid "Servo Hz"
 msgstr "サーボ Hz"
 
-#: protocol/flysky_afhds2a_a7105.c:67
+#: protocol/flysky_afhds2a_a7105.c:68
 msgid "LQI output"
 msgstr "LQI出力"
 
@@ -2156,59 +2173,59 @@ msgstr "無効"
 msgid "Expert"
 msgstr "Expert"
 
-#: protocol/hubsan_a7105.c:123
+#: protocol/hubsan_a7105.c:113
 msgid "vTX MHz"
 msgstr "VTX MHz"
 
-#: protocol/kn_nrf24l01.c:168
+#: protocol/kn_nrf24l01.c:158
 msgid "1Mbps"
 msgstr "1Mbps"
 
-#: protocol/kn_nrf24l01.c:170
+#: protocol/kn_nrf24l01.c:160
 msgid "DynTrim"
 msgstr "DynTrim"
 
-#: protocol/loli_nrf24l01.c:63
+#: protocol/loli_nrf24l01.c:53
 msgid "Chan 1"
 msgstr "Ch 1"
 
-#: protocol/loli_nrf24l01.c:64
+#: protocol/loli_nrf24l01.c:54
 msgid "Chan 2"
 msgstr "Ch 2"
 
-#: protocol/loli_nrf24l01.c:65
+#: protocol/loli_nrf24l01.c:55
 msgid "Chan 3"
 msgstr "Ch 3"
 
-#: protocol/loli_nrf24l01.c:66
+#: protocol/loli_nrf24l01.c:56
 msgid "Chan 4"
 msgstr "Ch 4"
 
-#: protocol/loli_nrf24l01.c:67
+#: protocol/loli_nrf24l01.c:57
 msgid "Chan 5"
 msgstr "Ch 5"
 
-#: protocol/loli_nrf24l01.c:68
+#: protocol/loli_nrf24l01.c:58
 msgid "Chan 6"
 msgstr "Ch 6"
 
-#: protocol/loli_nrf24l01.c:69
+#: protocol/loli_nrf24l01.c:59
 msgid "Chan 7"
 msgstr "Ch 7"
 
-#: protocol/loli_nrf24l01.c:70
+#: protocol/loli_nrf24l01.c:60
 msgid "Chan 8"
 msgstr "Ch 8"
 
-#: protocol/ppmout.c:39
+#: protocol/ppmout.c:31
 msgid "Notch PW"
 msgstr "Notch PW"
 
-#: protocol/ppmout.c:40
+#: protocol/ppmout.c:32
 msgid "Frame Size"
 msgstr "Frame Size"
 
-#: protocol/ppmout.c:41
+#: protocol/ppmout.c:33
 msgid "Polarity"
 msgstr "極性"
 
@@ -2224,7 +2241,7 @@ msgstr "Rx PWM出力"
 msgid "Rx Telem"
 msgstr "Rx Telem"
 
-#: protocol/sbus_uart.c:24
+#: protocol/sbus_uart.c:24 protocol/sumd_uart.c:24
 msgid "Period (ms)"
 msgstr "周期 (ms)"
 
@@ -2251,6 +2268,26 @@ msgstr "6+1"
 #: protocol/wk2x01.c:72
 msgid "COL Limit"
 msgstr "COL Limit"
+
+#: protocol/xn297dump_nrf24l01.c:37
+msgid "Bitrate"
+msgstr "ビットレート"
+
+#: protocol/xn297dump_nrf24l01.c:38
+msgid "Address"
+msgstr "アドレス"
+
+#: protocol/xn297dump_nrf24l01.c:39
+msgid "Scrambled"
+msgstr "スクランブル"
+
+#: protocol/xn297dump_nrf24l01.c:40
+msgid "Retries"
+msgstr "リトライ"
+
+#: protocol/xn297dump_nrf24l01.c:41
+msgid "Intvl Scan"
+msgstr "スキャン間隔"
 
 #: protocol/yd717_nrf24l01.c:93
 msgid "USE A.ACK"
@@ -2336,15 +2373,15 @@ msgstr "Curr"
 msgid "Cap"
 msgstr "Cap"
 
-#: telemetry/telem_crsf.c:95
+#: telemetry/telem_crsf.c:95 telemetry/telem_frsky.c:91
 msgid "Pitch"
 msgstr "ピッチ"
 
-#: telemetry/telem_crsf.c:96
+#: telemetry/telem_crsf.c:96 telemetry/telem_frsky.c:92
 msgid "Roll"
 msgstr "ロール"
 
-#: telemetry/telem_crsf.c:97
+#: telemetry/telem_crsf.c:97 telemetry/telem_frsky.c:93
 msgid "Yaw"
 msgstr "ヨー"
 
@@ -2372,16 +2409,16 @@ msgstr "TX 品質"
 msgid "Capacity"
 msgstr "Capacity"
 
-#: telemetry/telem_devo.c:55 telemetry/telem_frsky.c:101
-#: telemetry/telem_frsky.c:108
+#: telemetry/telem_devo.c:55 telemetry/telem_frsky.c:109
+#: telemetry/telem_frsky.c:116
 msgid "TelemV"
 msgstr "TelemV"
 
-#: telemetry/telem_devo.c:61 telemetry/telem_frsky.c:112
+#: telemetry/telem_devo.c:61 telemetry/telem_frsky.c:120
 msgid "TelemT"
 msgstr "Telem時間"
 
-#: telemetry/telem_devo.c:65 telemetry/telem_frsky.c:115
+#: telemetry/telem_devo.c:65 telemetry/telem_frsky.c:123
 msgid "TelemRPM"
 msgstr "TelemRPM"
 
@@ -2398,8 +2435,8 @@ msgstr "損失"
 msgid "Holds"
 msgstr "Holds"
 
-#: telemetry/telem_dsm.c:201 telemetry/telem_frsky.c:70
-#: telemetry/telem_frsky.c:83
+#: telemetry/telem_dsm.c:201 telemetry/telem_frsky.c:74
+#: telemetry/telem_frsky.c:87
 msgid "Amps"
 msgstr "アンプ"
 
@@ -2415,7 +2452,7 @@ msgstr "高度"
 msgid "Alt.max"
 msgstr "高度Max"
 
-#: telemetry/telem_dsm.c:213 telemetry/telem_frsky.c:66
+#: telemetry/telem_dsm.c:213 telemetry/telem_frsky.c:70
 msgid "RSSI"
 msgstr "RSSI"
 
@@ -2427,43 +2464,43 @@ msgstr "Rx電圧"
 msgid "Bat"
 msgstr "Bat"
 
-#: telemetry/telem_frsky.c:67
+#: telemetry/telem_frsky.c:71
 msgid "LRSSI"
 msgstr "LRSSI"
 
-#: telemetry/telem_frsky.c:68
+#: telemetry/telem_frsky.c:72
 msgid "LQI"
 msgstr "LQI"
 
-#: telemetry/telem_frsky.c:71
+#: telemetry/telem_frsky.c:75
 msgid "MinCell"
 msgstr "セル容量"
 
-#: telemetry/telem_frsky.c:72
+#: telemetry/telem_frsky.c:76
 msgid "AllCell"
 msgstr "セル合計"
 
-#: telemetry/telem_frsky.c:82
+#: telemetry/telem_frsky.c:86
 msgid "Fuel"
 msgstr "燃料"
 
-#: telemetry/telem_frsky.c:84
+#: telemetry/telem_frsky.c:88
 msgid "Alt"
 msgstr "高度"
 
-#: telemetry/telem_frsky.c:85
+#: telemetry/telem_frsky.c:89
 msgid "VSI"
 msgstr "VSI"
 
-#: telemetry/telem_frsky.c:86
+#: telemetry/telem_frsky.c:90
 msgid "DIS"
 msgstr "DIS"
 
-#: telemetry/telem_frsky.c:104
+#: telemetry/telem_frsky.c:112
 msgid "TelemRSSI"
 msgstr "TelemRSSI"
 
-#: telemetry/telem_frsky.c:108
+#: telemetry/telem_frsky.c:116
 msgid "Amp"
 msgstr "アンプ"
 

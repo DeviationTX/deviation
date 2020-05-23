@@ -16,15 +16,18 @@
 #define HAS_VIBRATINGMOTOR  1
 #define HAS_DATALOG         1
 #define HAS_LAYOUT_EDITOR   1
-#define HAS_SCANNER         1
+#define SUPPORT_SCANNER     1
 #define HAS_EXTRA_SWITCHES  0
 #define HAS_EXTRA_BUTTONS   0
+#define HAS_BUTTON_MATRIX_PULLUP 0
 #define HAS_MULTIMOD_SUPPORT 1
 #define HAS_VIDEO           0
-#define HAS_4IN1_FLASH      1
+#define HAS_4IN1_FLASH      0
 #define HAS_EXTENDED_AUDIO  1 
-#define HAS_AUDIO_UART     0
+#define HAS_AUDIO_UART      0
 #define HAS_MUSIC_CONFIG    1
+
+#define SUPPORT_CRSF_CONFIG 1
 
 #ifdef BUILDTYPE_DEV
    #define DEBUG_WINDOW_SIZE 200
@@ -32,6 +35,7 @@
    #define DEBUG_WINDOW_SIZE 0
 #endif
 
+#define HAS_LCD_SWAPPED_PAGES 1
 
 #define MIN_BRIGHTNESS 0
 #define DEFAULT_BATTERY_ALARM 8000

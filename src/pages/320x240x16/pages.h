@@ -22,11 +22,18 @@ struct pagemem {
         struct range_page range_page;
         struct gyrosense_page gyrosense_page;
         struct switchassign_page switchassign_page;
-#if HAS_SCANNER
+#if SUPPORT_SCANNER
         struct scanner_page scanner_page;
+#endif
+#if SUPPORT_XN297DUMP
+        struct xn297dump_page xn297dump_page;
 #endif
 #if HAS_MUSIC_CONFIG
         struct voiceconfig_page voiceconfig_page;
+#endif
+#if SUPPORT_CRSF_CONFIG
+        struct crsfconfig_page crsfconfig_page;
+        struct crsfdevice_page crsfdevice_page;
 #endif
         struct usb_page usb_page;
         struct tx_configure_page tx_configure_page;
@@ -59,4 +66,6 @@ void PAGE_ModelMenuInit(int page);
 //Touch
 void PAGE_TouchInit(int page);
 void PAGE_TouchEvent();
+void PAGE_CRSFdialog(int type, void *param);
+void PAGE_CRSFdialogClose();
 #endif

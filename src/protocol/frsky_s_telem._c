@@ -48,7 +48,7 @@
 #define START_STOP              0x7e
 #define BYTESTUFF               0x7d
 #define STUFF_MASK              0x20
-#define FRSKY_SPORT_PACKET_SIZE    8
+#define FRSKY_SPORT_PACKET_SIZE    9
 
 static void serial_echo(u8 *packet);
 
@@ -61,12 +61,26 @@ static void serial_echo(u8 *packet);
 #define HUB_DATA_U16(packet)    (*((uint16_t *)(packet+4)))
 
 
+static u8 sport_crc(u8 *data) {
+    u16 crc = 0;
+    for (int i=1; i < FRSKY_SPORT_PACKET_SIZE-1; ++i) {
+        crc += data[i];
+        crc += crc >> 8;
+        crc &= 0x00ff;
+    }
+    return 0x00ff - crc;
+}
+
+static u8 check_sport_crc(u8 *data) {
+    return sport_crc(data) == data[8];
+}
+
 static void processSportPacket(u8 *packet) {
 //    u8  instance = (packet[0] & 0x1F) + 1;    // all instances of same sensor write to same telemetry value
     u8  prim = packet[1];
     u16 id = *((u16 *)(packet+2));
 
-        serial_echo(packet);   // echo to trainer port
+    serial_echo(packet);   // echo to trainer port
 
     if (prim != DATA_FRAME)
         return;
@@ -97,6 +111,40 @@ static void processSportPacket(u8 *packet) {
     }
 
     s32 data = SPORT_DATA_S32(packet);
+
+    // sensor ids from Qlrs
+    switch (id) {
+        case APID_PITCH:
+            set_telemetry(TELEM_FRSKY_ACCX, data * 10);
+            break;
+        case APID_ROLL:
+            set_telemetry(TELEM_FRSKY_ACCY, data * 10);
+            break;
+#if 0
+        case APID_RX_RSSI_REG_VAL:
+            set_telemetry(TELEM_FRSKY_CELL1, data);
+            break;
+        case APID_RX_SNR_REG_VAL:
+            set_telemetry(TELEM_FRSKY_CELL2, data);
+            break;
+        case APID_RX_PACKET_LOST_VAL:
+            set_telemetry(TELEM_FRSKY_CELL3, data);
+            break;
+        case APID_MAV_BASE_MODE:
+            set_telemetry(TELEM_FRSKY_CELL4, data);
+            break;
+        case APID_MAV_SYS_STATUS:
+            set_telemetry(TELEM_FRSKY_CELL5, data);
+            break;
+        case APID_MAV_CUSTOM_MODE:
+            set_telemetry(TELEM_FRSKY_CELL6, data);
+            break;
+        case APID_CUST_RSSI:
+            set_telemetry(TELEM_FRSKY_ALL_CELL, data);
+            break;
+#endif
+    }
+
     switch (id & 0xfff0) {
     case ALT_FIRST_ID & 0xfff0:
         if (Model.ground_level == 0) Model.ground_level = data;
@@ -185,14 +233,22 @@ static void processSportPacket(u8 *packet) {
             TELEMETRY_SetUpdated(TELEM_GPS_TIME);
         }
         break;
+    case ACCX_FIRST_ID & 0xfff0:
+        set_telemetry(TELEM_FRSKY_ACCX, data / 10);
+        break;
+    case ACCY_FIRST_ID & 0xfff0:
+        set_telemetry(TELEM_FRSKY_ACCY, data / 10);
+        break;
+    case ACCZ_FIRST_ID & 0xfff0:
+        set_telemetry(TELEM_FRSKY_ACCZ, data / 10);
+        break;
+    case AIR_SPEED_FIRST_ID & 0xfff0:
+        set_telemetry(TELEM_FRSKY_SPEED, data);
+        break;
     } // switch
 // not sure about these
 //    case A3_FIRST_ID & 0xfff0:
 //    case A4_FIRST_ID & 0xfff0:
-//    case AIR_SPEED_FIRST_ID & 0xfff0:
-//    case ACCX_FIRST_ID & 0xfff0:
-//    case ACCY_FIRST_ID & 0xfff0:
-//    case ACCZ_FIRST_ID & 0xfff0:
 }
 
 
@@ -204,9 +260,14 @@ typedef enum {
 } SportStates;
 static SportStates dataState = STATE_DATA_IDLE;   // file scope so can be reset on loss of rx packet sync
 
-static void frsky_parse_sport_stream(u8 data) {
+typedef enum {
+    SPORT_CRC = 0,
+    SPORT_NOCRC = 1
+} sport_crc_t;
+
+static void frsky_parse_sport_stream(u8 data, sport_crc_t crc_configure) {
     static u8 sportRxBufferCount;
-    static u8 sportRxBuffer[FRSKY_SPORT_PACKET_SIZE];   // Receive buffer. 8 bytes (full packet)
+    static u8 sportRxBuffer[FRSKY_SPORT_PACKET_SIZE];   // Receive buffer. 8 bytes no crc, 9 bytes with crc
 
     switch (dataState) {
     case STATE_DATA_START:
@@ -214,7 +275,7 @@ static void frsky_parse_sport_stream(u8 data) {
             dataState = STATE_DATA_IN_FRAME ;
             sportRxBufferCount = 0;
         } else {
-            if (sportRxBufferCount < FRSKY_SPORT_PACKET_SIZE)
+            if (sportRxBufferCount < FRSKY_SPORT_PACKET_SIZE - crc_configure)
                 sportRxBuffer[sportRxBufferCount++] = data;
             dataState = STATE_DATA_IN_FRAME;
         }
@@ -228,13 +289,13 @@ static void frsky_parse_sport_stream(u8 data) {
             dataState = STATE_DATA_IN_FRAME ;
             sportRxBufferCount = 0;
         }
-        else if (sportRxBufferCount < FRSKY_SPORT_PACKET_SIZE) {
+        else if (sportRxBufferCount < FRSKY_SPORT_PACKET_SIZE - crc_configure) {
             sportRxBuffer[sportRxBufferCount++] = data;
         }
         break;
 
     case STATE_DATA_XOR:
-        if (sportRxBufferCount < FRSKY_SPORT_PACKET_SIZE) {
+        if (sportRxBufferCount < FRSKY_SPORT_PACKET_SIZE - crc_configure) {
           sportRxBuffer[sportRxBufferCount++] = data ^ STUFF_MASK;
         }
         dataState = STATE_DATA_IN_FRAME;
@@ -248,9 +309,10 @@ static void frsky_parse_sport_stream(u8 data) {
         break;
     } // switch
 
-    if (sportRxBufferCount >= FRSKY_SPORT_PACKET_SIZE) {
-        processSportPacket(sportRxBuffer);
+    if (sportRxBufferCount >= FRSKY_SPORT_PACKET_SIZE - crc_configure) {
         dataState = STATE_DATA_IDLE;
+        if (crc_configure == SPORT_NOCRC || check_sport_crc(sportRxBuffer))
+            processSportPacket(sportRxBuffer);
     }
 }
 

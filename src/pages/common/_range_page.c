@@ -20,10 +20,14 @@ static void _draw_page(int);
 void RANGE_test(int start) {
   if (start != mp->testing) {
       if (start) {
-          mp->old_power = Model.tx_power;
-          Model.tx_power = TXPOWER_100uW;
+          // if protocol doesn't support range test, set power to minimum
+          if (!PROTOCOL_RangeTest(1)) {
+              mp->old_power = Model.tx_power;
+              Model.tx_power = TXPOWER_100uW;
+          }
       } else {
-          Model.tx_power = mp->old_power;
+          if (!PROTOCOL_RangeTest(0))
+              Model.tx_power = mp->old_power;
       }
       mp->testing = start;
       _draw_page(1);
@@ -35,8 +39,7 @@ void PAGE_RangeInit(int page) {
     PAGE_SetModal(0);
     memset(mp, 0, sizeof(&mp));
     mp->old_power = Model.tx_power;
-    _draw_page(PROTOCOL_HasPowerAmp(Model.protocol) 
-               && Model.tx_power != TXPOWER_100uW);
+    _draw_page(PROTOCOL_HasPowerAmp(Model.protocol));
 }
 
 void PAGE_RangeExit() {

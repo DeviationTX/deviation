@@ -167,11 +167,16 @@ void PPMin_Stop();
 
 /* Sticks */
 void CHAN_Init();
+void ADC_Init();
+void SWITCH_Init();
 s32  CHAN_ReadInput(int channel);
 s32  CHAN_ReadRawInput(int channel);
 extern void CHAN_SetSwitchCfg(const char *str);
 extern void CHAN_SetButtonCfg(const char *str);
 #define CHAN_ButtonIsPressed(buttons, btn) (buttons & (CHAN_ButtonMask(btn)))
+s32 ADC_ReadRawInput(int channel);
+s32 SWITCH_ReadRawInput(int channel);
+s32 ADC_NormalizeChannel(int channel);
 
 /* SPI Flash */
 void SPIFlash_Init();

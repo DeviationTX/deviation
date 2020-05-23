@@ -48,13 +48,19 @@ extern "C" {
 #include "fltk.h"
 #include "mixer.h"
 #include "config/tx.h"
+#include "buttonmap.h"
 }
 
 #ifdef LCD_EMU_LOWLEVEL
 #define LCD_Init EMULCD_Init
 #endif
 
-static const u16 keymap[BUT_LAST] = BUTTON_MAP;
+#define BUTTONDEF(x) BTNMAP_ ## x
+static const u16 keymap[] = {
+    #include "capabilities.h"
+    0
+    };
+#undef BUTTONDEF
 
 static struct {
     s32 xscale;

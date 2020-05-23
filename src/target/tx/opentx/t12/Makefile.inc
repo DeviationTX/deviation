@@ -14,7 +14,7 @@ LINKFILE = $(SDIR)/target/tx/$(FAMILY)/$(TARGET)/$(TARGET).ld
 LIBOPENCM3 = libopencm3/lib/libopencm3_stm32f2.a
 
 SRC_C = $(wildcard target/tx/$(FAMILY)/$(TARGET)/*.c) \
-        target/drivers/display/spi/128x64x1_nt7538.c \
+        target/drivers/display/spi/128x64x1.c \
         $(wildcard target/drivers/mcu/stm32/*.c) \
         $(wildcard target/drivers/serial/soft_serial/*.c) \
         $(wildcard target/drivers/serial/usb_cdc/*.c) \
@@ -28,7 +28,8 @@ SRC_C = $(wildcard target/tx/$(FAMILY)/$(TARGET)/*.c) \
         target/drivers/rtc/rtc_driver.c \
         target/drivers/input/analog/analog.c \
         target/drivers/indicators/led.c \
-        target/drivers/input/button_switch/button_switch.c
+        target/drivers/input/button_switch/button_switch.c \
+        target/drivers/input/switch/switch.c
 
 CFLAGS   = -D"assert_param(x)=" -DSTM32F20X_HD -DSTM32F2 -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -fdata-sections -ffunction-sections -Ilibopencm3/include -fno-builtin-printf -Os -I$(SDIR)/target/drivers/filesystems
 MODULE_FLAGS = -fno-builtin

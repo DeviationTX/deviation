@@ -137,6 +137,7 @@ static void update_lfsr(uint32_t *lfsr, uint8_t b)
         b >>= 1;
     }
 }
+
 u32 rand32_r(u32 *seed, u8 update)
 {
     if(! seed)
@@ -144,6 +145,7 @@ u32 rand32_r(u32 *seed, u8 update)
     update_lfsr(seed, update);
     return *seed;
 }
+
 u32 rand32()
 {
     return rand32_r(0, 0);
@@ -176,6 +178,7 @@ void wait_press_release(u32 press)
 void wait_press() {
     wait_press_release(CHAN_ButtonMask(BUT_ENTER));
 }
+
 void wait_release()
 {
     wait_press_release(0);
@@ -183,15 +186,35 @@ void wait_release()
 
 void USB_Connect()
 {
+#if !defined(EMULATOR) && defined(HAS_USB_DRIVE_ERASE) && HAS_USB_DRIVE_ERASE
+    u16 up = 0;
+    u16 down = 0;
+    u32 counter = 0;
+#endif
     MSC_Enable();
     //Disable USB Exit
     while(1) {
         if(PWR_CheckPowerSwitch())
             PWR_Shutdown();
+#if !defined(EMULATOR) && defined(HAS_USB_DRIVE_ERASE) && HAS_USB_DRIVE_ERASE
+        // Erase flash drive in case any filesystem damages
+        u32 buttons = ScanButtons();
+        if (CHAN_ButtonIsPressed(buttons, BUT_UP) && !up && !down) {
+            up = 1;
+            counter = CLOCK_getms();
+        } else if (CHAN_ButtonIsPressed(buttons, BUT_DOWN) && up && !down) {
+            down = 1;
+            counter = CLOCK_getms();
+            SPIFlash_BulkErase();
+        }
+        if (counter) {
+            SOUND_SetFrequency(3951, 100);
+            SOUND_StartWithoutVibrating(200, NULL);
+        }
+        if (counter && (CLOCK_getms() - counter) >= 200) {
+            SOUND_Stop();
+            counter = 0;
+        }
+#endif
     }
-    wait_release();
-    wait_press();
-    wait_release();
-    MSC_Disable();
 }
-

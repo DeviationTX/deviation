@@ -57,6 +57,7 @@ static u8 packet[PXX_PKT_BYTES];
 static u16 failsafe_count;
 static u8 chan_offset;
 static u8 FS_flag;
+static u8 range_check;
  
 enum XJTRFProtocols {
   RF_PROTO_OFF = -1,
@@ -112,11 +113,6 @@ static u16 crc(u8 *data, u8 len) {
   for(int i=0; i < len; i++)
       crc = (crc<<8) ^ CRCTable[((u8)(crc>>8) ^ *data++) & 0xFF];
   return crc;
-}
-
-static u8 power_to_r9m() {
-    if (Model.tx_power >= TXPOWER_10mW) return Model.tx_power - TXPOWER_10mW;
-    return TXPOWER_100uW;
 }
 
 //#define STICK_SCALE    819  // full scale at +-125
@@ -192,7 +188,7 @@ static void build_data_pkt(u8 bind)
     if (bind) {
         // if b0, then b1..b2 = country code (us 0, japan 1, eu 2 ?)
         packet[1] |= PXX_SEND_BIND | (Model.proto_opts[PROTO_OPTS_COUNTRY] << 1);
-    } else if (Model.tx_power == TXPOWER_100uW) {   // RANGE_test() sets power to 100uW
+    } else if (range_check) {
         packet[1] |= PXX_SEND_RANGECHECK;
     } else {
         packet[1] |= FS_flag;
@@ -215,7 +211,7 @@ static void build_data_pkt(u8 bind)
     // b2: set receiver PWM output to channels 9-16
     // b3-4: RF power setting
     // b5: set to disable R9M S.Port output
-    packet[15] = (power_to_r9m() << 3)
+    packet[15] = (Model.tx_power << 3)
                | (Model.proto_opts[PROTO_OPTS_RXTELEM] << 1)
                | (Model.proto_opts[PROTO_OPTS_RXPWM] << 2);
 
@@ -231,7 +227,7 @@ static enum {
 #ifndef EMULATOR
   PXX_BIND_DONE = 600,
 #else
-  PXX_BIND_DONE = 50,
+  PXX_BIND_DONE = 5,
 #endif
   PXX_DATA1,
   PXX_DATA2,
@@ -239,6 +235,24 @@ static enum {
 
 static u16 mixer_runtime;
 
+#if HAS_EXTENDED_TELEMETRY
+// Support S.Port telemetry on RX pin
+// couple defines to avoid errors from include file
+static void serial_echo(u8 *packet) {(void)packet;}
+#define PROTO_OPTS_AD2GAIN 0
+#include "frsky_d_telem._c"
+#include "frsky_s_telem._c"
+
+static void frsky_parse_sport_stream_crc(u8 data) {
+    frsky_parse_sport_stream(data, SPORT_CRC);
+}
+#endif  // HAS_EXTENDED_TELEMETRY
+
+#ifndef EMULATOR
+#define STD_DELAY   9000
+#else
+#define STD_DELAY   300
+#endif
 static u16 pxxout_cb()
 {
     switch (state) {
@@ -246,7 +260,7 @@ static u16 pxxout_cb()
         build_data_pkt(1);
         PXX_Enable(packet);
         state++;
-        return 9000;
+        return STD_DELAY;
     case PXX_BIND_DONE:
         PROTOCOL_SetBindState(0);
         state++;
@@ -256,22 +270,15 @@ static u16 pxxout_cb()
         state = PXX_DATA2;
         return mixer_runtime;
     case PXX_DATA2:
+#ifndef EMULATOR
         if (mixer_sync != MIX_DONE && mixer_runtime < 2000) mixer_runtime += 50;
+#endif
         build_data_pkt(0);
         PXX_Enable(packet);
         state = PXX_DATA1;
-        return 9000 - mixer_runtime;
+        return STD_DELAY - mixer_runtime;
     }
 }
-
-#if HAS_EXTENDED_TELEMETRY
-// Support S.Port telemetry on RX pin
-// couple defines to avoid errors from include file
-static void serial_echo(u8 *packet) {(void)packet;}
-#define PROTO_OPTS_AD2GAIN 0
-#include "frsky_d_telem._c"
-#include "frsky_s_telem._c"
-#endif // HAS_EXTENDED_TELEMETRY
 
 static void initialize(u8 bind)
 {
@@ -287,7 +294,7 @@ static void initialize(u8 bind)
 #endif
 #if HAS_EXTENDED_TELEMETRY
     SSER_Initialize(); // soft serial receiver
-    SSER_StartReceive(frsky_parse_sport_stream);
+    SSER_StartReceive(frsky_parse_sport_stream_crc);
 #endif
 
     PWM_Initialize();
@@ -295,6 +302,7 @@ static void initialize(u8 bind)
     failsafe_count = 0;
     chan_offset = 0;
     FS_flag = 0;
+    range_check = 0;
     packet[0] = (u8) Model.fixed_id & 0x3f;  // limit to valid range - 6 bits
     mixer_runtime = 50;
 
@@ -328,8 +336,13 @@ uintptr_t PXXOUT_Cmds(enum ProtoCmds cmd)
             return PROTO_TELEM_ON;
         case PROTOCMD_TELEMETRYTYPE:
             return TELEM_FRSKY;
+        case PROTOCMD_TELEMETRYRESET:
+            frsky_telem_reset();
+            return 0;
 #endif
         case PROTOCMD_CHANNELMAP: return UNCHG;
+        case PROTOCMD_RANGETESTON: range_check = 1; return 1;
+        case PROTOCMD_RANGETESTOFF: range_check = 0; return 1;
         default: break;
     }
     return 0;

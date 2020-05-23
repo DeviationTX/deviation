@@ -14,11 +14,6 @@
  */
 
 
-#ifdef MODULAR
-  //Allows the linker to properly relocate
-  #define Hitec_Cmds PROTO_Cmds
-  #pragma long_calls
-#endif
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
@@ -26,11 +21,6 @@
 #include "config/tx.h"
 #include "telemetry.h"
 
-#ifdef MODULAR
-  //Some versions of gcc applythis to definitions, others to calls
-  //So just use long_calls everywhere
-  //#pragma long_calls_off
-#endif
 
 #ifdef PROTO_HAS_CC2500
 

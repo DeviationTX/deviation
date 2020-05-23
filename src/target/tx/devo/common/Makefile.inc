@@ -1,6 +1,7 @@
 HAS_4IN1_FLASH ?= 0
 HAS_FLASH_DETECT ?= 0
 USE_JTAG ?= 0
+DFU_STRING ?= "$(HGVERSION) Firmware"
 
 ifndef BUILD_TARGET
 
@@ -21,6 +22,9 @@ SRC_C    = $(wildcard $(SDIR)/target/tx/devo/$(TARGET)/*.c) \
            $(wildcard $(SDIR)/target/drivers/filesystems/petit_fat/*.c) \
            $(wildcard $(SDIR)/target/drivers/filesystems/devofs/*.c) \
            $(wildcard $(SDIR)/target/drivers/input/button_matrix/*.c) \
+           $(wildcard $(SDIR)/target/drivers/input/analog/*.c) \
+           $(wildcard $(SDIR)/target/drivers/input/switch/*.c) \
+           $(wildcard $(SDIR)/target/drivers/input/addon_switch/*.c) \
            $(wildcard $(SDIR)/target/drivers/serial/uart/*.c) \
            $(wildcard $(SDIR)/target/drivers/serial/soft_serial/*.c) \
            $(wildcard $(SDIR)/target/drivers/sound/piezo/*.c) \
@@ -28,8 +32,7 @@ SRC_C    = $(wildcard $(SDIR)/target/tx/devo/$(TARGET)/*.c) \
            $(wildcard $(SDIR)/target/drivers/usb/*.c) \
            $(SDIR)/target/drivers/backlight/backlight.c \
            $(SDIR)/target/drivers/rtc/rtc_driver.c \
-           $(SDIR)/target/drivers/haptic/haptic.c \
-           $(SDIR)/target/drivers/input/analog/analog.c
+           $(SDIR)/target/drivers/haptic/haptic.c
 
 ifdef MODULAR
 PROTO_EXTRA_C = $(wildcard $(SDIR)/target/tx/devo/common/protocol/*.c) \
@@ -56,9 +59,6 @@ MODULE_CFLAGS := -fno-builtin
 #LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -nostdlib
 LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -lc -lnosys -L$(SDIR) -L$(SDIR)/protocol -Lobjs/$(TARGET) -Wl,-warn-common
 
-LINKFILE = $(SDIR)/target/tx/devo/$(TARGET)/$(TARGET).ld
-LFLAGS2  = -Wl,-T$(LINKFILE)
-
 ifdef ENABLE_LTO
 EXTRA_CFLAGS  := $(EXTRA_CFLAGS) -flto -ffat-lto-objects -DENABLE_LTO
 MODULE_CFLAGS := $(MODULE_CFLAGS) -ffunction-sections
@@ -66,12 +66,21 @@ else
 CFLAGS += -ffunction-sections
 endif
 
-ifdef OPTIMIZE_DFU
-LINKFILEOPT = $(SDIR)/target/tx/devo/$(TARGET)/$(TARGET)_opt.ld
-ifeq (,$(wildcard $(LINKFILEOPT)))
-LINKFILEOPT = $(LINKFILE)
+ifndef OPTIMIZE_DFU
+OPTIMIZE_DFU := 0
 endif
+
+ifeq "$(OPTIMIZE_DFU)" "1"
+LINKFILE = $(SDIR)/target/tx/devo/$(TARGET)/$(TARGET).ld
+LFLAGS2  = -Wl,-T$(LINKFILE)
+LINKFILEOPT = $(SDIR)/target/tx/devo/$(TARGET)/$(TARGET)_opt.ld
 LFLAGS2OPT  = -Wl,-T$(LINKFILEOPT)
+else
+LINKFILE = $(SDIR)/target/tx/devo/$(TARGET)/$(TARGET)_opt.ld
+ifeq (,$(wildcard $(LINKFILE)))
+LINKFILE = $(SDIR)/target/tx/devo/$(TARGET)/$(TARGET).ld
+endif
+LFLAGS2  = -Wl,-T$(LINKFILE)
 endif
 
 # Enable warning as error
@@ -100,7 +109,7 @@ else
 endif
 
 $(TARGET).bin: $(TARGET).elf
-ifdef OPTIMIZE_DFU
+ifeq "$(OPTIMIZE_DFU)" "1"
 	$(CP) $(TARGET).elf objs/$(TARGET)/$(TARGET).elf
 	@echo " + Optimizing placement and re-linking"
 	$(SDIR)/../utils/repack_ld.pl -mapfile $(TARGET).map -linkfile $(LINKFILE) > objs/$(TARGET)/optimize.ld
@@ -117,7 +126,7 @@ $(LIBOPENCM3):
 	+$(FLOCKS) $(MAKE) -C $(SDIR)/libopencm3 TARGETS=stm32/f1 lib
 
 $(TARGET).dfu: $(TARGET).bin
-	$(SDIR)/../utils/dfu.py --name "$(HGVERSION) Firmware" $(DFU_ARGS):$< $@
+	$(SDIR)/../utils/dfu.py --name $(DFU_STRING) $(DFU_ARGS):$< $@
 	$(SDIR)/../utils/get_mem_usage.pl $(TARGET).map
 
 ###################################

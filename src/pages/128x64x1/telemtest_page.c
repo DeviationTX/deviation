@@ -29,7 +29,7 @@ enum {
     ARROW_W      = 10,
     //
     LBL1_X       = 0,
-    LBL1_WIDTH   = 8,
+    LBL1_WIDTH   = 7,
     LBL2_X       = 43,
     LBL3_X       = 86,
     LBL4_X       = 0,
@@ -181,19 +181,19 @@ const struct telem_layout dsm_layout_basic[] = {
     {TYPE_HEADER | 1, LBL3_X, LBL1_WIDTH,  H_LABEL},
     {TYPE_VALUE  | 1, DSM3_X, DSM1_WIDTH, TELEM_DSM_FLOG_HOLDS},
 
-#if HAS_EXTENDED_TELEMETRY
+    /*  #if HAS_EXTENDED_TELEMETRY  // it doesn't nicely fit to page
     {TYPE_HEADER | 2, LBL1_X, LBL1_WIDTH, TEMP_LABEL},
     {TYPE_VALUE  | 2, DSM1_X, DSM1_WIDTH, TELEM_DSM_FLOG_TEMP1},
     {TYPE_HEADER | 2, LBL2_X, LBL1_WIDTH, RXV_LABEL},
     {TYPE_VALUE  | 2, DSM2_X, DSM1_WIDTH, TELEM_DSM_FLOG_VOLT1},
     {TYPE_HEADER | 2, LBL3_X, LBL1_WIDTH, MISC_LABEL},
     {TYPE_VALUE  | 2, DSM3_X, DSM1_WIDTH, TELEM_DSM_FLOG_RSSI_DBM},
-#else
+    #else  */
     {TYPE_HEADER | 2, LBL4_X, LBL4_WIDTH, TEMP_LABEL},
     {TYPE_VALUE  | 2, DSM4_X, DSM1_WIDTH, TELEM_DSM_FLOG_TEMP1},
     {TYPE_HEADER | 2, LBL5_X, LBL4_WIDTH, RXV_LABEL},
     {TYPE_VALUE  | 2, DSM5_X, DSM1_WIDTH, TELEM_DSM_FLOG_VOLT1},
-#endif
+    //  #endif
 
     {TYPE_HEADER | 3, LBL4_X, LBL4_WIDTH, BATT_LABEL},
     {TYPE_VALUE  | 3, DSM4_X, DSM1_WIDTH, TELEM_DSM_FLOG_VOLT2},
@@ -260,6 +260,12 @@ const struct telem_layout frsky_layout_basic[] = {
     {TYPE_INDEX | 7, LBL1_X, LBL1_WIDTH, 8},
     {TYPE_VALUE | 7, FRSKY1_X, FRSKY1_WIDTH, TELEM_FRSKY_LQI},
     {TYPE_VALUE | 7, FRSKY2_X, FRSKY1_WIDTH, TELEM_FRSKY_LRSSI},
+    {TYPE_VALUE | 7, FRSKY3_X, FRSKY1_WIDTH, TELEM_FRSKY_SPEED},
+
+    {TYPE_INDEX | 8, LBL1_X, LBL1_WIDTH, 9},
+    {TYPE_VALUE | 8, FRSKY1_X, FRSKY1_WIDTH, TELEM_FRSKY_ACCX},
+    {TYPE_VALUE | 8, FRSKY2_X, FRSKY1_WIDTH, TELEM_FRSKY_ACCY},
+    {TYPE_VALUE | 8, FRSKY3_X, FRSKY1_WIDTH, TELEM_FRSKY_ACCZ},
 #endif
 
     {0, 0, 0, 0},
@@ -318,7 +324,7 @@ const struct telem_layout2 dsm_page[] = {
 };
 const struct telem_layout2 frsky_page[] = {
 #if HAS_EXTENDED_TELEMETRY
-    {frsky_header_basic, frsky_layout_basic, 8, 1},
+    {frsky_header_basic, frsky_layout_basic, 9, 1},
 #else
     {frsky_header_basic, frsky_layout_basic, 2, 1},
 #endif
@@ -357,7 +363,7 @@ static const char *header_cb(guiObject_t *obj, const void *data)
         case CELLS_LABEL:return "Signl";
 #endif
         case MISC_LABEL: return "Misc";
-        case ARROW_LABEL: return current_page== telemetry_gps ? "<-" : "->";
+        case ARROW_LABEL: return current_page == telemetry_gps ? "<-" : "->";
     }
     return "";
 }
@@ -519,6 +525,7 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
         TELEMETRY_MuteAlarm();
     }
     if (flags & BUTTON_LONGPRESS && CHAN_ButtonIsPressed(button, BUT_UP)) {
+        BUTTON_InterruptLongPress();  // disable fast repeating TELEMETRY_ResetValues()
         TELEMETRY_ResetValues();
     }
     return default_button_action_cb(button, flags, data);
