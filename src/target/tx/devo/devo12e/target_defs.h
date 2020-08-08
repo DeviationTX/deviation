@@ -35,6 +35,7 @@
    #define DEBUG_WINDOW_SIZE 0
 #endif
 
+#define HAS_LCD_SWAPPED_PAGES 1
 
 #define MIN_BRIGHTNESS 0
 #define DEFAULT_BATTERY_ALARM 8000

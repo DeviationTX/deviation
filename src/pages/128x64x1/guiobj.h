@@ -149,7 +149,7 @@ struct telemtest_obj {
 #if HAS_EXTENDED_TELEMETRY
     guiLabel_t box[36];
 #else
-    guiLabel_t box[10];
+    guiLabel_t box[20];
 #endif
     guiScrollable_t scrollable;
 };
