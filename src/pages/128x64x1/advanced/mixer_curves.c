@@ -95,9 +95,10 @@ void PAGE_EditCurvesInit(int page)
 static unsigned action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
+    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS) || (flags & BUTTON_RELEASE)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_Pop();
+            if (flags & BUTTON_RELEASE) 
+                PAGE_Pop();
         } else if (CHAN_ButtonIsPressed(button, BUT_ENTER) && (flags & BUTTON_LONGPRESS)) {
             // long press enter = save without exiting
             if (edit->pointnum < 0)
