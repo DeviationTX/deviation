@@ -90,7 +90,7 @@ void PAGE_EditCurvesInit(int page)
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
                               0, 0, //CHAN_MAX_VALUE / 4, CHAN_MAX_VALUE / 4,
                               show_curve_cb, NULL, touch_cb, &edit->curve);
-    GUI_SetSelected((guiObject_t *)&gui->point);
+    GUI_SetSelected((guiObject_t *)&gui->value);
 }
 
 static unsigned action_cb(u32 button, unsigned flags, void *data)
