@@ -1985,8 +1985,9 @@ msgstr ""
 #: protocol/hitec_cc2500.c:50 protocol/hontai_nrf24l01.c:50
 #: protocol/hubsan_a7105.c:112 protocol/kn_nrf24l01.c:160
 #: protocol/mjxq_nrf24l01.c:48 protocol/mt99xx_nrf24l01.c:115
-#: protocol/q303_nrf24l01.c:60 protocol/slt_nrf24l01.c:69
-#: protocol/v202_nrf24l01.c:112 protocol/yd717_nrf24l01.c:92
+#: protocol/q303_nrf24l01.c:60 protocol/redpine_cc2500.c:29
+#: protocol/slt_nrf24l01.c:69 protocol/v202_nrf24l01.c:112
+#: protocol/yd717_nrf24l01.c:92
 msgid "Format"
 msgstr ""
 
@@ -2208,6 +2209,30 @@ msgstr ""
 
 #: protocol/pxxout.c:39
 msgid "Rx Telem"
+msgstr ""
+
+#: protocol/redpine_cc2500.c:30
+msgid "Fast .1ms"
+msgstr ""
+
+#: protocol/redpine_cc2500.c:31
+msgid "Slow 1ms"
+msgstr ""
+
+#: protocol/redpine_cc2500.c:32
+msgid "VTX Band"
+msgstr ""
+
+#: protocol/redpine_cc2500.c:33
+msgid "VTX Channel"
+msgstr ""
+
+#: protocol/redpine_cc2500.c:34
+msgid "VTX Power"
+msgstr ""
+
+#: protocol/redpine_cc2500.c:35
+msgid "VTX Send"
 msgstr ""
 
 #: protocol/sbus_uart.c:24 protocol/sumd_uart.c:24
