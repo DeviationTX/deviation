@@ -270,7 +270,7 @@ struct crsfdevice_obj {
 
 /****Advanced ****/
 struct advcurve_obj {
-    //guiTextSelect_t name;
+    // guiTextSelect_t name;
     guiLabel_t title;
     guiButton_t save;
     guiRect_t rect;
