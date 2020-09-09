@@ -18,6 +18,17 @@
 #include "mixer.h"
 #include "config/model.h"
 
+static const char * const usbhid_opts[] = {
+  _tr_noop("Period (ms)"),  "1", "64", NULL,
+  NULL
+};
+enum {
+    PROTO_OPTS_PERIOD,
+    LAST_PROTO_OPT,
+};
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
+#define USBHID_FRAME_PERIOD_STD 8 // 8ms default period for 125Hz
+
 //To change USBHID_MAX_CHANNELS you must change the Report_Descriptor in hid_usb_desc.c as well
 #define USBHID_ANALOG_CHANNELS 8
 #define USBHID_DIGITAL_CHANNELS 4
@@ -57,13 +68,23 @@ static void build_data_pkt()
     packet[USBHID_ANALOG_CHANNELS] = digital;
 }
 
+// ms suffix to indicate that this is in milliseconds not microseconds like other protocols
+static u16 usbhid_period_ms;
 static u16 usbhid_cb()
 {
+    if (usbhid_period_ms != Model.proto_opts[PROTO_OPTS_PERIOD]) {
+        usbhid_period_ms = Model.proto_opts[PROTO_OPTS_PERIOD];
+        // HID should be restarted when period changes
+        // this lets us update the endpoint descriptor's bInterval field
+        HID_Disable();
+        HID_SetInterval(usbhid_period_ms);
+        HID_Enable();
+    }
     build_data_pkt();
         
     HID_Write(packet, sizeof(packet));
 
-    return 50000;
+    return usbhid_period_ms * 1000;
 }
 
 static void deinit()
@@ -76,6 +97,8 @@ static void initialize()
 {
     CLOCK_StopTimer();
     num_channels = Model.num_channels;
+    usbhid_period_ms = Model.proto_opts[PROTO_OPTS_PERIOD] ? Model.proto_opts[PROTO_OPTS_PERIOD] : USBHID_FRAME_PERIOD_STD;
+    HID_SetInterval(usbhid_period_ms);
     HID_Enable();
     CLOCK_StartTimer(1000, usbhid_cb);
 }
@@ -91,6 +114,10 @@ uintptr_t USBHID_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_DEFAULT_NUMCHAN: return 6;
         case PROTOCMD_CHANNELMAP: return UNCHG;
         case PROTOCMD_TELEMETRYSTATE: return PROTO_TELEM_UNSUPPORTED;
+        case PROTOCMD_GETOPTIONS:
+            if (!Model.proto_opts[PROTO_OPTS_PERIOD])
+                Model.proto_opts[PROTO_OPTS_PERIOD] = USBHID_FRAME_PERIOD_STD;
+            return (uintptr_t)usbhid_opts;
         default: break;
     }
     return 0;

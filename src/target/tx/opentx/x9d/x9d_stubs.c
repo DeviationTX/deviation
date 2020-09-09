@@ -20,6 +20,9 @@
 #include "common.h"
 void MSC_Enable() {}
 void MSC_Disable() {}
+void HID_SetInterval(u8 interval) {
+    (void)interval;
+}
 void HID_Enable() {}
 void HID_Disable() {}
 void HID_Write(s8 *pkt, u8 size) {

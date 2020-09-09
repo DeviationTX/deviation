@@ -72,13 +72,14 @@ static const struct {
     }
 };
 
-static const struct usb_endpoint_descriptor hid_endpoint = {
+// this is no longer const so that bInterval can be modified at runtime
+static struct usb_endpoint_descriptor hid_endpoint = {
     .bLength = USB_DT_ENDPOINT_SIZE,
     .bDescriptorType = USB_DT_ENDPOINT,
     .bEndpointAddress = 0x81,
     .bmAttributes = USB_ENDPOINT_ATTR_INTERRUPT,
     .wMaxPacketSize = 9,
-    .bInterval = 0x20,
+    .bInterval = 8,
 };
 
 static const struct usb_interface_descriptor hid_iface = {
@@ -169,6 +170,11 @@ void HID_Write(s8 *packet, u8 size)
         usb_preXferComplete = 0;
         usbd_ep_write_packet(usbd_dev, 0x81, packet, size);
     }
+}
+
+void HID_SetInterval(u8 interval)
+{
+    hid_endpoint.bInterval = interval;
 }
 
 void HID_Enable() {
