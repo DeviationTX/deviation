@@ -293,6 +293,7 @@ void USB_Disable();
 void USB_HandleISR();
 void USB_Connect();
 
+void HID_SetInterval(u8 interval);
 void HID_Enable();
 void HID_Disable();
 
