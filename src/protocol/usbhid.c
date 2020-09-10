@@ -27,7 +27,7 @@ enum {
     LAST_PROTO_OPT,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
-#define USBHID_FRAME_PERIOD_STD 8 // 8ms default period for 125Hz
+#define USBHID_FRAME_PERIOD_STD 8  // 8ms default period for 125Hz
 
 //To change USBHID_MAX_CHANNELS you must change the Report_Descriptor in hid_usb_desc.c as well
 #define USBHID_ANALOG_CHANNELS 8
