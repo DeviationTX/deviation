@@ -73,7 +73,7 @@ static const struct {
 };
 
 // this is no longer const so that bInterval can be modified at runtime
-static struct usb_endpoint_descriptor hid_endpoint = {
+struct usb_endpoint_descriptor hid_endpoint = {
     .bLength = USB_DT_ENDPOINT_SIZE,
     .bDescriptorType = USB_DT_ENDPOINT,
     .bEndpointAddress = 0x81,

@@ -296,6 +296,7 @@ void USB_Connect();
 void HID_SetInterval(u8 interval);
 void HID_Enable();
 void HID_Disable();
+void HID_Write(s8 *packet, u8 size);
 
 void MSC_Enable();
 void MSC_Disable();

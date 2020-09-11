@@ -40,7 +40,6 @@ ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 //if sizeof(packet) changes, must change wMaxPacketSize to match in Joystick_ConfigDescriptor
 static s8 packet[USBHID_ANALOG_CHANNELS + 1];
 static u8 num_channels;
-extern void HID_Write(s8 *packet, u8 size);
 
 static void build_data_pkt()
 {
