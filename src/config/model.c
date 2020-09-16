@@ -1089,11 +1089,10 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
                     break;
                 }
             }
-        }
-        else {
+        } else {
             idx = val;
         }
-        if(idx > MAX_VOICEMAP_ENTRIES-1 || voice_map[idx].duration == 0 || idx < CUSTOM_ALARM_ID) {
+        if (idx > MAX_VOICEMAP_ENTRIES-1 || voice_map[idx].duration == 0 || idx < CUSTOM_ALARM_ID) {
             printf("%s: Music %s not found in voice.ini or below ID %d\n", section, value, CUSTOM_ALARM_ID);
             return 0;
         }
@@ -1450,15 +1449,15 @@ u8 CONFIG_WriteModel(u8 model_num) {
     fprintf(fh, "[%s]\n", SECTION_VOICE);
     for (idx = 0; idx < NUM_SWITCHES; idx++) {
         if (m->voice.switches[idx].music)
-            fprintf(fh, "%s=%s%d\n", INPUT_SourceName(file,idx + INP_HAS_CALIBRATION + 1), VOICE_MP3ID_PREFIX, voice_map[m->voice.switches[idx].music].id);
+            fprintf(fh, "%s=%s%d\n", INPUT_SourceName(file, idx + INP_HAS_CALIBRATION + 1), VOICE_MP3ID_PREFIX, voice_map[m->voice.switches[idx].music].id);
     }
 #if NUM_AUX_KNOBS
     for (idx = 0; idx < NUM_AUX_KNOBS * 2; idx++) {
         if (m->voice.aux[idx].music) {
             if (idx % 2)
-                fprintf(fh, "%s_UP=%s%d\n", INPUT_SourceName(tempstring,(idx-1) / 2 + NUM_STICKS + 1), VOICE_MP3ID_PREFIX, voice_map[m->voice.aux[idx].music].id);
+                fprintf(fh, "%s_UP=%s%d\n", INPUT_SourceName(tempstring, (idx-1) / 2 + NUM_STICKS + 1), VOICE_MP3ID_PREFIX, voice_map[m->voice.aux[idx].music].id);
             else
-                fprintf(fh, "%s_DOWN=%s%d\n", INPUT_SourceName(tempstring,idx / 2 + NUM_STICKS + 1), VOICE_MP3ID_PREFIX, voice_map[m->voice.aux[idx].music].id);
+                fprintf(fh, "%s_DOWN=%s%d\n", INPUT_SourceName(tempstring, idx / 2 + NUM_STICKS + 1), VOICE_MP3ID_PREFIX, voice_map[m->voice.aux[idx].music].id);
         }
     }
 #endif
