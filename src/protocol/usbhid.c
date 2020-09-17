@@ -97,7 +97,6 @@ static u16 usbhid_cb()
         HID_SetInterval(usbhid_period_ms);
         HID_Enable();
     }
-    
     switch (state) {
         case ST_DATA1:
             CLOCK_RunMixer();    // clears mixer_sync, which is then set when mixer update complete
