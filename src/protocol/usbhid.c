@@ -19,7 +19,7 @@
 #include "config/model.h"
 
 static const char * const usbhid_opts[] = {
-  _tr_noop("Period (ms)"),  "1", "64", NULL,
+  _tr_noop("Period (Hz)"),  "125", "250", "500", "1000", NULL,
   NULL
 };
 enum {
@@ -27,7 +27,18 @@ enum {
     LAST_PROTO_OPT,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
-#define USBHID_FRAME_PERIOD_STD 8  // 8ms default period for 125Hz
+
+# define USBHID_PERIOD_MAX_INDEX 3
+static u16 period_index_to_ms(s16 idx)
+{
+    switch (idx) {
+        case 3: return 1;
+        case 2: return 2;
+        case 1: return 4;
+        default: return 8;
+    }
+    return 8;
+}
 
 //To change USBHID_MAX_CHANNELS you must change the Report_Descriptor in hid_usb_desc.c as well
 #define USBHID_ANALOG_CHANNELS 8
@@ -67,23 +78,40 @@ static void build_data_pkt()
     packet[USBHID_ANALOG_CHANNELS] = digital;
 }
 
-// ms suffix to indicate that this is in milliseconds not microseconds like other protocols
+static enum {
+    ST_DATA1,
+    ST_DATA2,
+} state;
+
+static u16 mixer_runtime;
+// ms suffix on usbhid_period_ms to indicate that it's in milliseconds not microseconds like other protocols
 static u16 usbhid_period_ms;
 static u16 usbhid_cb()
 {
-    if (usbhid_period_ms != Model.proto_opts[PROTO_OPTS_PERIOD]) {
-        usbhid_period_ms = Model.proto_opts[PROTO_OPTS_PERIOD];
+    u16 protoopts_period = period_index_to_ms(Model.proto_opts[PROTO_OPTS_PERIOD]);
+    if (usbhid_period_ms != protoopts_period) {
+        usbhid_period_ms = protoopts_period;
         // HID should be restarted when period changes
         // this lets us update the endpoint descriptor's bInterval field
         HID_Disable();
         HID_SetInterval(usbhid_period_ms);
         HID_Enable();
     }
-    build_data_pkt();
-        
-    HID_Write(packet, sizeof(packet));
+    
+    switch (state) {
+        case ST_DATA1:
+            CLOCK_RunMixer();    // clears mixer_sync, which is then set when mixer update complete
+            state = ST_DATA2;
+            return mixer_runtime;
 
-    return usbhid_period_ms * 1000;
+        case ST_DATA2:
+            if (mixer_sync != MIX_DONE && mixer_runtime < 2000) mixer_runtime += 50;
+            build_data_pkt();
+            HID_Write(packet, sizeof(packet));
+            state = ST_DATA1;
+            return usbhid_period_ms * 1000 - mixer_runtime;
+        }
+    return usbhid_period_ms * 1000;   // avoid compiler warning
 }
 
 static void deinit()
@@ -95,8 +123,10 @@ static void deinit()
 static void initialize()
 {
     CLOCK_StopTimer();
+    state = ST_DATA1;
+    mixer_runtime = 50;
     num_channels = Model.num_channels;
-    usbhid_period_ms = Model.proto_opts[PROTO_OPTS_PERIOD] ? Model.proto_opts[PROTO_OPTS_PERIOD] : USBHID_FRAME_PERIOD_STD;
+    usbhid_period_ms = period_index_to_ms(Model.proto_opts[PROTO_OPTS_PERIOD]);
     HID_SetInterval(usbhid_period_ms);
     HID_Enable();
     CLOCK_StartTimer(1000, usbhid_cb);
@@ -114,8 +144,8 @@ uintptr_t USBHID_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_CHANNELMAP: return UNCHG;
         case PROTOCMD_TELEMETRYSTATE: return PROTO_TELEM_UNSUPPORTED;
         case PROTOCMD_GETOPTIONS:
-            if (!Model.proto_opts[PROTO_OPTS_PERIOD])
-                Model.proto_opts[PROTO_OPTS_PERIOD] = USBHID_FRAME_PERIOD_STD;
+            if (Model.proto_opts[PROTO_OPTS_PERIOD] > USBHID_PERIOD_MAX_INDEX)
+                Model.proto_opts[PROTO_OPTS_PERIOD] = USBHID_PERIOD_MAX_INDEX;
             return (uintptr_t)usbhid_opts;
         default: break;
     }
