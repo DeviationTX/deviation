@@ -91,7 +91,7 @@ static u16 usbhid_cb()
     // wait until endpoint is ready for writing before preparing data
     // if the host is polling slower than our clock, this will just delay us a bit
     // it does increase the chance of mixers not completing in time for 1ms period though...
-    if (!HID_TransferComplete()) return 100;
+    if (!HID_prevXferComplete) return 100;
 
     u16 protoopts_period = period_index_to_ms(Model.proto_opts[PROTO_OPTS_PERIOD]);
     if (usbhid_period_ms != protoopts_period) {
