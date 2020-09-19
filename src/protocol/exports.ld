@@ -23,6 +23,7 @@ EXTERN(USB_Enable)
 EXTERN(USB_Disable)
 EXTERN(HID_SetInterval)
 EXTERN(HID_Write)
+EXTERN(HID_TransferComplete)
 
 EXTERN(usbd_dev)
 EXTERN(USB_Product_Name)

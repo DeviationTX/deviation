@@ -88,6 +88,11 @@ static u16 mixer_runtime;
 static u16 usbhid_period_ms;
 static u16 usbhid_cb()
 {
+    // wait until endpoint is ready for writing before preparing data
+    // if the host is polling slower than our clock, this will just delay us a bit
+    // it does increase the chance of mixers not completing in time for 1ms period though...
+    if (!HID_TransferComplete()) return 100;
+
     u16 protoopts_period = period_index_to_ms(Model.proto_opts[PROTO_OPTS_PERIOD]);
     if (usbhid_period_ms != protoopts_period) {
         usbhid_period_ms = protoopts_period;
@@ -108,9 +113,12 @@ static u16 usbhid_cb()
             build_data_pkt();
             HID_Write(packet, sizeof(packet));
             state = ST_DATA1;
-            return usbhid_period_ms * 1000 - mixer_runtime;
-        }
-    return usbhid_period_ms * 1000;   // avoid compiler warning
+            // return with - 200 in case host is polling slightly faster than our clock
+            // this doesn't guarantee perfect timing, but it should be sufficient to
+            // catch most variations and get us back to waiting for the host
+            return usbhid_period_ms * 1000 - mixer_runtime - 200;
+    }
+    return usbhid_period_ms * 1000 - 200;   // avoid compiler warning
 }
 
 static void deinit()

@@ -29,6 +29,7 @@ void HID_Write(s8 *pkt, u8 size) {
     (void)pkt;
     (void)size;
 }
+u8 HID_TransferComplete() { return 0;}
 void SOUND_Init() {}
 void SOUND_SetFrequency(unsigned frequency, unsigned volume) {
     (void)frequency;

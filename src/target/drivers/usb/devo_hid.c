@@ -172,6 +172,11 @@ void HID_Write(s8 *packet, u8 size)
     }
 }
 
+u8 HID_TransferComplete()
+{
+    return usb_preXferComplete;
+}
+
 void HID_SetInterval(u8 interval)
 {
     hid_endpoint.bInterval = interval;
