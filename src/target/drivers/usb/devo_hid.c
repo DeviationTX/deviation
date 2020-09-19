@@ -10,8 +10,6 @@ static const char * const usb_strings[] = {
     DeviationVersion
 };
 
-volatile u8 HID_prevXferComplete;
-
 static const uint8_t hid_report_descriptor[] = {
     0x05, 0x01,                    // USAGE_PAGE (Generic Desktop)
     0x15, 0x81,                    // LOGICAL_MINIMUM (0)
@@ -132,12 +130,21 @@ static enum usbd_request_return_codes hid_control_request(usbd_device *dev, stru
     return USBD_REQ_HANDLED;
 }
 
+static u16 (*protocol_callback)(void);
+static volatile u8 waiting_for_cb;
+
 static void hid_callback(usbd_device *usbd_dev, uint8_t ep)
 {
     (void)usbd_dev;
     (void)ep;
 
-    HID_prevXferComplete = 1;
+    if (protocol_callback && !waiting_for_cb) {
+        waiting_for_cb = 1;
+        // call protocol_callback to let it know to prepare new data,
+        // but use a clock to not delay responding to the USB interrupt
+        // (USB interrupt seems to be higher priority, so this shouldn't need a time delay)
+        CLOCK_StartTimer(0, protocol_callback);
+    }
 }
 
 static void hid_set_config(usbd_device *dev, uint16_t wValue)
@@ -152,8 +159,6 @@ static void hid_set_config(usbd_device *dev, uint16_t wValue)
                 USB_REQ_TYPE_STANDARD | USB_REQ_TYPE_INTERFACE,
                 USB_REQ_TYPE_TYPE | USB_REQ_TYPE_RECIPIENT,
                 hid_control_request);
-
-    HID_prevXferComplete = 1;
 }
 
 static void HID_Init()
@@ -166,10 +171,8 @@ static void HID_Init()
 
 void HID_Write(s8 *packet, u8 size)
 {
-    if (HID_prevXferComplete) {
-        HID_prevXferComplete = 0;
-        usbd_ep_write_packet(usbd_dev, 0x81, packet, size);
-    }
+    usbd_ep_write_packet(usbd_dev, 0x81, packet, size);
+    waiting_for_cb = 0;
 }
 
 void HID_SetInterval(u8 interval)
@@ -177,10 +180,15 @@ void HID_SetInterval(u8 interval)
     hid_endpoint.bInterval = interval;
 }
 
+void HID_SetCallback(u16 (*callback)(void))
+{
+    protocol_callback = callback;
+}
+
 void HID_Enable() {
-    HID_prevXferComplete = 0;
     USB_Enable(1);
     HID_Init();
+    waiting_for_cb = 0;
 }
 
 void HID_Disable() {

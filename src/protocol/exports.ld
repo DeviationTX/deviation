@@ -22,7 +22,6 @@ EXTERN(TELEMETRY_SetUpdated)
 EXTERN(USB_Enable)
 EXTERN(USB_Disable)
 EXTERN(HID_SetInterval)
-EXTERN(HID_prevXferComplete)
 
 EXTERN(usbd_dev)
 EXTERN(USB_Product_Name)

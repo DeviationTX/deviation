@@ -84,15 +84,9 @@ static enum {
 } state;
 
 static u16 mixer_runtime;
-// ms suffix on usbhid_period_ms to indicate that it's in milliseconds not microseconds like other protocols
 static u16 usbhid_period_ms;
 static u16 usbhid_cb()
 {
-    // wait until endpoint is ready for writing before preparing data
-    // if the host is polling slower than our clock, this will just delay us a bit
-    // it does increase the chance of mixers not completing in time for 1ms period though...
-    if (!HID_prevXferComplete) return 100;
-
     u16 protoopts_period = period_index_to_ms(Model.proto_opts[PROTO_OPTS_PERIOD]);
     if (usbhid_period_ms != protoopts_period) {
         usbhid_period_ms = protoopts_period;
@@ -101,29 +95,29 @@ static u16 usbhid_cb()
         HID_Disable();
         HID_SetInterval(usbhid_period_ms);
         HID_Enable();
+        return 0;
     }
     switch (state) {
         case ST_DATA1:
-            CLOCK_RunMixer();    // clears mixer_sync, which is then set when mixer update complete
+            CLOCK_RunMixer();  // clears mixer_sync, which is then set when mixer update complete
             state = ST_DATA2;
             return mixer_runtime;
 
         case ST_DATA2:
-            if (mixer_sync != MIX_DONE && mixer_runtime < 2000) mixer_runtime += 50;
+            if (mixer_sync != MIX_DONE && mixer_runtime < 2000) {
+                mixer_runtime += 50;
+                return 50;  // wait for mixer instead of forcing a write
+            }
             build_data_pkt();
             HID_Write(packet, sizeof(packet));
             state = ST_DATA1;
-            // return with - 200 in case host is polling slightly faster than our clock
-            // this doesn't guarantee perfect timing, but it should be sufficient to
-            // catch most variations and get us back to waiting for the host
-            return usbhid_period_ms * 1000 - mixer_runtime - 200;
+            return 0;  // stop the clock and let USB interrupts trigger us instead
     }
-    return usbhid_period_ms * 1000 - 200;   // avoid compiler warning
+    return 0;  // avoid compiler warning
 }
 
 static void deinit()
 {
-    CLOCK_StopTimer();
     HID_Disable();
 }
 
@@ -135,8 +129,8 @@ static void initialize()
     num_channels = Model.num_channels;
     usbhid_period_ms = period_index_to_ms(Model.proto_opts[PROTO_OPTS_PERIOD]);
     HID_SetInterval(usbhid_period_ms);
+    HID_SetCallback(usbhid_cb);
     HID_Enable();
-    CLOCK_StartTimer(1000, usbhid_cb);
 }
 
 uintptr_t USBHID_Cmds(enum ProtoCmds cmd)

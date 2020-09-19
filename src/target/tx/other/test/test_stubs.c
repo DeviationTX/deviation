@@ -114,7 +114,9 @@ void HID_Write(s8 *pkt, u8 size) {
     (void)pkt;
     (void)size;
 }
-volatile u8 HID_prevXferComplete;
+void HID_SetCallback(u16 (*callback)(void)) {
+    (void)callback;
+}
 void Initialize_ButtonMatrix() {}
 void PWR_Init(void) {}
 unsigned  PWR_ReadVoltage() { return (DEFAULT_BATTERY_ALARM + 1000); }
