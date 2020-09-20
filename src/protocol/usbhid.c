@@ -119,6 +119,7 @@ static u16 usbhid_cb()
 static void deinit()
 {
     HID_Disable();
+    CLOCK_StopTimer();  // ensure clock is stopped and won't try to call USB functions after unloading
 }
 
 static void initialize()
