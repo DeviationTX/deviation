@@ -293,8 +293,11 @@ void USB_Disable();
 void USB_HandleISR();
 void USB_Connect();
 
+void HID_SetInterval(u8 interval);
 void HID_Enable();
 void HID_Disable();
+void HID_Write(s8 *packet, u8 size);
+extern volatile u8 HID_prevXferComplete;
 
 void MSC_Enable();
 void MSC_Disable();
