@@ -2239,6 +2239,10 @@ msgstr ""
 msgid "Period (ms)"
 msgstr ""
 
+#: protocol/usbhid.c:22
+msgid "Period (Hz)"
+msgstr ""
+
 #: protocol/v202_nrf24l01.c:114
 msgid "250kbps"
 msgstr ""
