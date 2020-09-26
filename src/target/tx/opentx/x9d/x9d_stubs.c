@@ -29,9 +29,7 @@ void HID_Write(s8 *pkt, u8 size) {
     (void)pkt;
     (void)size;
 }
-void HID_SetCallback(u16 (*callback)(void)) {
-    (void)callback;
-}
+volatile u8 HID_prevXferComplete;
 void SOUND_Init() {}
 void SOUND_SetFrequency(unsigned frequency, unsigned volume) {
     (void)frequency;
