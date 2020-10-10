@@ -74,7 +74,7 @@ static u16 mixer_runtime;
 
 static u8 hop_data[NUM_HOPS];
 
-unsigned format = 0;  // todo: use enum
+unsigned format;  // todo: use enum
 
 static void initialize_data()
 {
@@ -393,6 +393,7 @@ static void initialize(int bind)
     fixed_id = (u16) get_tx_id();
     channr = 0;
     ctr = 0;
+    format = 0;
 
     // Used from kn_nrf24l01.c : kn_calculate_freqency_hopping_channels
     u32 idx = 0;
