@@ -135,4 +135,24 @@ void CC2500_WriteData(u8 *packet, u8 length);
 void CC2500_ReadData(u8 *dpbuffer, int len);
 void CC2500_SetTxRxMode(enum TXRX_State);
 void CC2500_SetPower(int power);
+
+void XN297L_Configure(u8 scramble_en, u8 crc_en, u8 cc2500_packet_len);
+void XN297L_SetTXAddr(const u8* addr, u8 len);
+void XN297L_SetRXAddr(const u8* addr, u8 len);
+void XN297L_WritePayload(u8* msg, u8 len);
+void XN297L_SetChannel(u8 ch);
+void XN297L_SetScrambledMode(const u8 mode);
+void XN297L_WriteEnhancedPayload(u8* msg, u8 len, u8 noack);
+u8 _xn297l_write_enhancedpayload(const u8* msg, u8 len, u8* out, u8 noack);
+u8 _xn297l_write_payload(const u8* msg, u8 len, u8* out);
+u8 XN297L_ReadPayload(u8* msg, u8 len);
+u8 XN297L_ReadEnhancedPayload(u8* msg, u8 len);
+#define XN297L_UNSCRAMBLED 0
+#define XN297L_SCRAMBLED 1
+#define XN297L_NOCRC 0
+#define XN297L_CRC 1
+
+u16 crc16_update(u16 crc, u8 a, u8 bits);
+u8 bit_reverse(u8 b_in);
+
 #endif

@@ -60,6 +60,7 @@ PROTO_MODULES += $(ODIR)/protocol/pxx.mod
 PROTO_MODULES += $(ODIR)/protocol/loli.mod
 PROTO_MODULES += $(ODIR)/protocol/e016h.mod
 PROTO_MODULES += $(ODIR)/protocol/sumd.mod
+PROTO_MODULES += $(ODIR)/protocol/omp.mod
 ifeq "$(SUPPORT_SCANNER)" "1"
 PROTO_MODULES += $(ODIR)/protocol/scancyrf.mod
 endif
@@ -326,6 +327,10 @@ endif
 
 $(ODIR)/protocol/e010.mod : $(ODIR)/e010_cc2500.bin
 	@echo Building 'e010' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
+
+$(ODIR)/protocol/omp.mod : $(ODIR)/omp_cc2500.bin
+	@echo Building 'omp' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
 $(ODIR)/protocol/v761.mod : $(ODIR)/v761_nrf24l01.bin
