@@ -175,7 +175,7 @@ static void omp_update_telemetry()
 // packet_in = 01 00 98 2C 03 19 19 F0 49 02 00 00 00 00 00 00
 // all bytes are fixed and unknown except 2 and 3 which represent the battery voltage: packet_in[3]*256+packet_in[2]=lipo voltage*100 in V
     const u8 *update = NULL;
-    static const u8 omp_telem[] = { TELEM_DEVO_VOLT1, TELEM_DEVO_RPM1, TELEM_DEVO_RPM2, 0 };  // use TELEM_DEVO_RPM1 LRSSI, TELEM_DEVO_RPM2 for LQI
+    static const u8 omp_telem[] = { TELEM_DEVO_VOLT1, TELEM_DEVO_RPM1, TELEM_DEVO_RPM2, 0 };  // use TELEM_DEVO_RPM1 for LRSSI, TELEM_DEVO_RPM2 for LQI
 
     u16 V = 0;
     u8 telem_len = CC2500_ReadReg(CC2500_3B_RXBYTES | CC2500_READ_BURST) & 0x7F;

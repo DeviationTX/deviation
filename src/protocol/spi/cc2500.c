@@ -163,7 +163,7 @@ void XN297L_Configure(u8 scramble_en, u8 crc_en, u8 cc2500_packet_len)
     // Packet Length = fix len
     // Packet Length Mode = Variable packet length mode. Packet length configured by the first byte after sync word
     // Preamble Count = 1
-    // RX Filter BW = 406kHz
+    // RX Filter BW = 464kHz
     // !!! channel filter bandwidth should be selected so that the signal bandwidth occupies at most 80% of the channel filter bandwidth.
     // The channel centre tolerance due to crystal accuracy should also be subtracted from the signal bandwidth.
     // Sync Word Qualifier Mode = preamble (0x71 0x0F)
@@ -183,7 +183,7 @@ void XN297L_Configure(u8 scramble_en, u8 crc_en, u8 cc2500_packet_len)
     CC2500_WriteReg(CC2500_0D_FREQ2,    0x5C);   // Frequency Control Word, High Byte
     CC2500_WriteReg(CC2500_0E_FREQ1,    0x4E);   // Frequency Control Word, Middle Byte
     CC2500_WriteReg(CC2500_0F_FREQ0,    0xC5);   // Frequency Control Word, Low Byte
-    CC2500_WriteReg(CC2500_10_MDMCFG4,  0x4D);   // Modem Configuration  Set to 406kHz BW filter
+    CC2500_WriteReg(CC2500_10_MDMCFG4,  0x3D);   // Modem Configuration  Set to 406kHz BW filter
     CC2500_WriteReg(CC2500_11_MDMCFG3,  0x3B);   // Modem Configuration
     CC2500_WriteReg(CC2500_12_MDMCFG2,  0x12);   // Modem Configuration  16/16 Sync Word detect
     CC2500_WriteReg(CC2500_13_MDMCFG1,  0x03);   // Modem Configuration
