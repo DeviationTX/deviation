@@ -273,28 +273,11 @@ static u8  xn297_tx_addr[5];
 static u8  xn297_rx_addr[5];
 static u8  xn297_crc = 0;
 
-const uint8_t xn297_scramble[] = {
-    0xe3, 0xb1, 0x4b, 0xea, 0x85, 0xbc, 0xe5, 0x66,
-    0x0d, 0xae, 0x8c, 0x88, 0x12, 0x69, 0xee, 0x1f,
-    0xc7, 0x62, 0x97, 0xd5, 0x0b, 0x79, 0xca, 0xcc,
-    0x1b, 0x5d, 0x19, 0x10, 0x24, 0xd3, 0xdc, 0x3f,
-    0x8e, 0xc5, 0x2f};
+extern const u8 xn297_scramble[];
+extern const u16 xn297_crc_xorout_scrambled[];
+extern const u16 xn297_crc_xorout[];
 
-const u16 xn297_crc_xorout_scrambled[] = {
-    0x0000, 0x3448, 0x9BA7, 0x8BBB, 0x85E1, 0x3E8C,
-    0x451E, 0x18E6, 0x6B24, 0xE7AB, 0x3828, 0x814B,
-    0xD461, 0xF494, 0x2503, 0x691D, 0xFE8B, 0x9BA7,
-    0x8B17, 0x2920, 0x8B5F, 0x61B1, 0xD391, 0x7401,
-    0x2138, 0x129F, 0xB3A0, 0x2988};
-
-const u16 xn297_crc_xorout[] = {
-    0x0000, 0x3d5f, 0xa6f1, 0x3a23, 0xaa16, 0x1caf,
-    0x62b2, 0xe0eb, 0x0821, 0xbe07, 0x5f1a, 0xaf15,
-    0x4f0a, 0xad24, 0x5e48, 0xed34, 0x068c, 0xf2c9,
-    0x1852, 0xdf36, 0x129d, 0xb17c, 0xd5f5, 0x70d7,
-    0xb798, 0x5133, 0x67db, 0xd94e};
-
-
+/*
 #if defined(__GNUC__) && defined(__ARM_ARCH_ISA_THUMB) && (__ARM_ARCH_ISA_THUMB==2)
 // rbit instruction works on cortex m3
 uint32_t __RBIT_(uint32_t in)
@@ -335,9 +318,11 @@ u16 crc16_update(u16 crc, u8 a, u8 bits)
     }
     return crc;
 }
+*/
 
+static const uint16_t initial    = 0xb5d2;
 
-void XN297_SetTXAddr(const u8* addr, int len)
+void XN297_SetTXAddr(const u8* addr, u8 len)
 {
     if (len > 5) len = 5;
     if (len < 3) len = 3;
@@ -359,7 +344,7 @@ void XN297_SetTXAddr(const u8* addr, int len)
 }
 
 
-void XN297_SetRXAddr(const u8* addr, int len)
+void XN297_SetRXAddr(const u8* addr, u8 len)
 {
     if (len > 5) len = 5;
     if (len < 3) len = 3;
@@ -433,7 +418,7 @@ u8 XN297_WritePayload(u8* msg, int len)
     return res;
 }
 
-u8 XN297_WriteEnhancedPayload(u8* msg, int len, int noack, u16 crc_xorout)
+u8 XN297_WriteEnhancedPayload(u8* msg, u8 len, u8 noack, u16 crc_xorout)
 {
     u8 packet[32];
     u8 scramble_index=0;
@@ -501,35 +486,95 @@ u8 XN297_WriteEnhancedPayload(u8* msg, int len, int noack, u16 crc_xorout)
     return res;
 }
 
-u8 XN297_ReadPayload(u8* msg, int len)
-{
-    // TODO: if xn297_crc==1, check CRC before filling *msg
-    u8 res = NRF24L01_ReadPayload(msg, len);
-    for(u8 i=0; i<len; i++) {
-      msg[i] = bit_reverse(msg[i]);
-      if(xn297_scramble_enabled)
-        msg[i] ^= bit_reverse(xn297_scramble[i+xn297_addr_len]);
+u8 XN297_ReadPayload(u8* msg, u8 len)
+{  // !!! Don't forget if using CRC to do a +2 on any of the used NRF24L01_11_RX_PW_Px !!!
+    u8 buf[32];
+    if (xn297_crc)
+        NRF24L01_ReadPayload(buf, len+2);   // Read payload + CRC
+    else
+        NRF24L01_ReadPayload(buf, len);
+    // Decode payload
+    for (u8 i = 0; i < len; i++)
+    {
+        u8 b_in = buf[i];
+        if (xn297_scramble_enabled)
+            b_in ^= xn297_scramble[i+xn297_addr_len];
+        msg[i] = bit_reverse(b_in);
     }
-    return res;
+    if (!xn297_crc)
+        return 1;   // No CRC so OK by default...
+
+    // Calculate CRC
+    u16 crc = 0xb5d2;
+    // process address
+    for (u8 i = 0; i < xn297_addr_len; ++i)
+    {
+        u8 b_in = xn297_rx_addr[xn297_addr_len-i-1];
+        if (xn297_scramble_enabled)
+            b_in ^=  xn297_scramble[i];
+        crc = crc16_update(crc, b_in, 8);
+    }
+    // process payload
+    for (uint8_t i = 0; i < len; ++i)
+        crc = crc16_update(crc, buf[i], 8);
+    // xorout
+    if (xn297_scramble_enabled)
+        crc ^= xn297_crc_xorout_scrambled[xn297_addr_len - 3 + len];
+    else
+        crc ^= xn297_crc_xorout[xn297_addr_len - 3 + len];
+    // test
+    if ((crc >> 8) == buf[len] && (crc & 0xff) == buf[len+1])
+        return 1;   // CRC  OK
+    return 0;       // CRC NOK
 }
 
-u8 XN297_ReadEnhancedPayload(u8* msg, int len)
-{
+u8 XN297_ReadEnhancedPayload(u8* msg, u8 len)
+{  //!!! Don't forget do a +2 and if using CRC add +4 on any of the used NRF24L01_11_RX_PW_Px !!!
     u8 buffer[32];
     u8 pcf_size; // pcf payload size
-    NRF24L01_ReadPayload(buffer, len+2); // pcf + payload
+    if (xn297_crc)
+        NRF24L01_ReadPayload(buffer, len+4);    // Read pcf + payload + CRC
+    else
+        NRF24L01_ReadPayload(buffer, len+2);    // Read pcf + payload
     pcf_size = buffer[0];
-    if(xn297_scramble_enabled)
+    if (xn297_scramble_enabled)
         pcf_size ^= xn297_scramble[xn297_addr_len];
     pcf_size = pcf_size >> 1;
-    for(int i=0; i<len; i++) {
+    for (u8 i=0; i < len; i++)
+    {
         msg[i] = bit_reverse((buffer[i+1] << 2) | (buffer[i+2] >> 6));
-        if(xn297_scramble_enabled)
+        if (xn297_scramble_enabled)
             msg[i] ^= bit_reverse((xn297_scramble[xn297_addr_len+i+1] << 2) |
                                   (xn297_scramble[xn297_addr_len+i+2] >> 6));
     }
-    return pcf_size;
+
+    if (!xn297_crc)
+        return pcf_size;    // No CRC so OK by default...
+
+    // Calculate CRC
+    u16 crc = 0xb5d2;
+    // process address
+    for (u8 i = 0; i < xn297_addr_len; ++i)
+    {
+        u8 b_in = xn297_rx_addr[xn297_addr_len-i-1];
+        if (xn297_scramble_enabled)
+            b_in ^=  xn297_scramble[i];
+        crc = crc16_update(crc, b_in, 8);
+    }
+    // process payload
+    for (u8 i = 0; i < len+1; ++i)
+        crc = crc16_update(crc, buffer[i], 8);
+    crc = crc16_update(crc, buffer[len+1] & 0xc0, 2);
+    // xorout
+    if (xn297_scramble_enabled)
+        crc ^= xn297_crc_xorout_scrambled_enhanced[xn297_addr_len-3+len];
+
+    u16 crcxored = (buffer[len+1] << 10)|(buffer[len+2] << 2)|(buffer[len+3] >> 6);
+    if (crc == crcxored)
+        return pcf_size;    // CRC  OK
+    return 0;               // CRC NOK
 }
+
 //
 // End of XN297 emulation
 ///////////////////////////

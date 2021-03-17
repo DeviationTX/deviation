@@ -106,6 +106,7 @@ e010_tx_rf_map[] = { {{0x4F, 0x1C}, {0x3A, 0x35, 0x4A, 0x45}},
                     {{0xFD, 0x4F}, {0x33, 0x3B, 0x43, 0x4B}},
                     {{0x86, 0x3C}, {0x34, 0x3E, 0x44, 0x4E}} };
 
+/*
 // xn297 emulation
 ////////////////////
 static u8 xn297_addr_len;
@@ -213,6 +214,7 @@ static void XN297L_WritePayload(const u8* msg, u8 len)
 
 // end of xn297 emulation
 ///////////////////////////
+*/
 
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
@@ -300,7 +302,7 @@ static void send_packet(u8 bind)
 static void e010_init()
 {
     u8 rx_tx_addr[ADDRESS_LENGTH];
-    XN297L_init();  // setup cc2500 for xn297L@250kbps emulation
+    XN297L_Configure(XN297L_SCRAMBLED, XN297L_CRC, PACKET_SIZE+8);  // setup cc2500 for xn297L@250kbps emulation  packet_size(16) + 5byte address +  + 2byte crc + 1byte preamble (0x55）
     CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);
     memcpy(rx_tx_addr, "\x6d\x6a\x77\x77\x77", sizeof(rx_tx_addr));
     memcpy(rf_channels, "\x36\x3e\x46\x2e", sizeof(rf_channels));

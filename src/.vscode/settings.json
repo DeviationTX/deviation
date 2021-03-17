@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "limits": "cpp",
+        "protocol.h": "c",
+        "interface.h": "c",
+        "mixer.h": "c",
+        "model.h": "c",
+        "tx.h": "c",
+        "*.tcc": "c"
+    }
+}
