@@ -29,6 +29,116 @@
 #define CRSF_CHANNELS             16
 #define CRSF_PACKET_SIZE          26
 
+static u8 currentPktRate = 0;
+static u8 currentTlmRatio = 0;
+static u8 currentPower = 0;
+static u8 currentBind = 0;
+static u8 currentWiFi = 0;
+static u8 getParamsCounter = 0;
+
+static const char * const expresslrs_opts_24[] = {
+  _tr_noop("Bad Pkts"), "0", "1000", "1", NULL,
+  _tr_noop("Good Pkts"), "0", "1000", "1", NULL,
+    //                      0        1      3        5       6
+  _tr_noop("Pkt. Rate"),  "500Hz", "250Hz", "150Hz", "50Hz", "25Hz", NULL,
+  //                      0      1        2       3       4       5      6      7
+  _tr_noop("TLM Ratio"),  "OFF", "1:128", "1:64", "1:32", "1:16", "1:8", "1:4", "1:2", NULL,
+  //                  0       1       2       3        4        5        6         7
+  _tr_noop("Power"),  "10mW", "25mW", "50mW", "100mW", "250mW", "500mW", "1000mW", "2000mW", NULL,
+  //                   0    1         2          3         4         5         6
+  _tr_noop("Rf Freq"), "?", "915 AU", "915 FCC", "868 EU", "433 AU", "433 EU", "2.4G ISM", NULL,
+  _tr_noop("Bind"),  "OFF", "ON", NULL,
+  _tr_noop("WiFi Update"),  "OFF", "ON", NULL,
+  NULL
+};
+
+static const char * const expresslrs_opts_900[] = {
+  _tr_noop("Bad Pkts"), "0", "1000", "1", NULL,
+  _tr_noop("Good Pkts"), "0", "1000", "1", NULL,
+    //                    2        4        5       6
+  _tr_noop("Pkt. Rate"),  "200Hz", "100Hz", "50Hz", "25Hz", NULL,
+  //                      0      1        2       3       4       5      6      7
+  _tr_noop("TLM Ratio"),  "OFF", "1:128", "1:64", "1:32", "1:16", "1:8", "1:4", "1:2", NULL,
+  //                  0       1       2       3        4        5        6         7
+  _tr_noop("Power"),  "10mW", "25mW", "50mW", "100mW", "250mW", "500mW", "1000mW", "2000mW", NULL,
+  //                   0    1         2          3         4         5         6
+  _tr_noop("Rf Freq"), "?", "915 AU", "915 FCC", "868 EU", "433 AU", "433 EU", "2.4G ISM", NULL,
+  _tr_noop("Bind"),  "OFF", "ON", NULL,
+  _tr_noop("WiFi Update"),  "OFF", "ON", NULL,
+  NULL
+};
+
+static u8 convertPktRateToElrs(u8 rfFreq, u8 rate)
+{
+  switch (rate) {
+    case 0:
+      if (rfFreq == 6) return 0;
+      return 2;
+    case 1:
+      if (rfFreq == 6) return 1;
+      return 4;
+    case 2:
+      if (rfFreq == 6) return 3;
+      return 5;
+    case 3:
+      if (rfFreq == 6) return 5;
+      return 6;
+    case 4: return 6;
+  }
+  return 6;
+}
+
+static u8 convertElrsToPktRate(u8 rfFreq, u8 elrsRate)
+{
+  switch (elrsRate) {
+    case 0: return 0;   // 2.4
+    case 1: return 1;   // 2.4
+    case 2: return 0;   // 900
+    case 3: return 2;   // 2.4
+    case 4: return 1;   // 900
+    case 5:
+      if (rfFreq == 6) return 3;
+      return 2;
+    case 6:
+      if (rfFreq == 6) return 4;
+      return 3;
+  }
+  return 0;
+}
+
+static u16 convertPktRateToPeriod(u8 rfFreq, u8 rate)
+{
+  if (rfFreq == 0) return CRSF_FRAME_PERIOD;
+  switch (rate) {
+    case 0:
+      if (rfFreq == 6) return 2000;
+      return 5000;
+    case 1:
+      if (rfFreq == 6) return 4000;
+      return 10000;
+    case 2:
+      if (rfFreq == 6) return 6666;
+      return 20000;
+    case 3:
+      if (rfFreq == 6) return 20000;
+      return 40000;
+    case 4: return 40000;
+  }
+  return CRSF_FRAME_PERIOD;
+}
+
+enum {
+    PROTO_OPTS_BAD_PKTS,
+    PROTO_OPTS_GOOD_PKTS,
+    PROTO_OPTS_PKT_RATE,
+    PROTO_OPTS_TLM_RATIO,
+    PROTO_OPTS_POWER,
+    PROTO_OPTS_RF_FREQ,
+    PROTO_OPTS_BIND,
+    PROTO_OPTS_WIFI_UPDATE,
+    LAST_PROTO_OPT,
+};
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 // crc implementation from CRSF protocol document rev7
 static u8 crsf_crc8tab[256] = {
@@ -163,6 +273,35 @@ static void processCrossfireTelemetryFrame()
   }
 }
 
+static void processElrsParamsData()
+{
+  if (telemetryRxBuffer[2] == TYPE_SETTINGS_WRITE && telemetryRxBuffer[3] == ADDR_RADIO && telemetryRxBuffer[4] == ADDR_MODULE && telemetryRxBuffer[5] == 0xFF) {
+    if (telemetryRxBuffer[6] == 0x01) {
+      currentBind = 1;
+    } else {
+      currentBind = 0;
+    }
+
+    if (telemetryRxBuffer[6] == 0x02) {
+      currentWiFi = 1;
+    } else {
+      currentWiFi = 0;
+    }
+
+    currentPktRate = convertElrsToPktRate(telemetryRxBuffer[10], telemetryRxBuffer[7]);
+    currentTlmRatio = telemetryRxBuffer[8];
+    currentPower = telemetryRxBuffer[9];
+    Model.proto_opts[PROTO_OPTS_BIND] = currentBind;
+    Model.proto_opts[PROTO_OPTS_WIFI_UPDATE] = currentWiFi;
+    Model.proto_opts[PROTO_OPTS_PKT_RATE] = currentPktRate;
+    Model.proto_opts[PROTO_OPTS_TLM_RATIO] = currentTlmRatio;
+    Model.proto_opts[PROTO_OPTS_POWER] = currentPower;
+    Model.proto_opts[PROTO_OPTS_RF_FREQ] = telemetryRxBuffer[10];
+    Model.proto_opts[PROTO_OPTS_BAD_PKTS] = telemetryRxBuffer[11];
+    Model.proto_opts[PROTO_OPTS_GOOD_PKTS] = telemetryRxBuffer[12] * 256 + telemetryRxBuffer[13];
+  }
+}
+
 // serial data receive ISR callback
 static void processCrossfireTelemetryData(u8 data, u8 status) {
   (void)status;
@@ -188,6 +327,9 @@ static void processCrossfireTelemetryData(u8 data, u8 status) {
       if (telemetryRxBuffer[2] < TYPE_PING_DEVICES) {
         processCrossfireTelemetryFrame();     // Broadcast frame
 #if SUPPORT_CRSF_CONFIG
+      } else if (telemetryRxBuffer[2] == TYPE_SETTINGS_WRITE && getParamsCounter >= 100) {
+        getParamsCounter = 0;
+        processElrsParamsData();
       } else {
         CRSF_serial_rcv(telemetryRxBuffer+2, telemetryRxBuffer[1]-1);  // Extended frame
 #endif
@@ -200,7 +342,56 @@ static void processCrossfireTelemetryData(u8 data, u8 status) {
 
 static u8 packet[CRSF_PACKET_SIZE];
 
+#define ELRS_ADDRESS 0xEE
+#define ELRS_BIND_COMMAND 0xFF
+#define ELRS_WIFI_COMMAND 0xFE
+#define ELRS_PKT_RATE_COMMAND 1
+#define ELRS_TLM_RATIO_COMMAND 2
+#define ELRS_POWER_COMMAND 3
 
+static u8 buildElrsPacket(u8 command, u8 value)
+{
+  packet[0] = ADDR_MODULE;
+  packet[1] = 6;
+  packet[2] = TYPE_SETTINGS_WRITE;
+  packet[3] = ELRS_ADDRESS;
+  packet[4] = ADDR_RADIO;
+  packet[5] = command;
+  packet[6] = value;
+  packet[7] = crsf_crc8(&packet[2], packet[1]-1);
+
+  return 8;
+}
+
+static u8 setElrsOptions()
+{
+  if (Model.proto_opts[PROTO_OPTS_BIND] == 1 && currentBind == 0) {
+    currentBind = Model.proto_opts[PROTO_OPTS_BIND];
+    getParamsCounter = 0;
+    return buildElrsPacket(ELRS_BIND_COMMAND, 0x01);
+  }
+  if (Model.proto_opts[PROTO_OPTS_WIFI_UPDATE] == 1 && currentWiFi == 0) {
+    currentWiFi = Model.proto_opts[PROTO_OPTS_WIFI_UPDATE];
+    getParamsCounter = 0;
+    return buildElrsPacket(ELRS_WIFI_COMMAND, 0x01);
+  }
+  if (Model.proto_opts[PROTO_OPTS_PKT_RATE] != currentPktRate) {
+    currentPktRate = Model.proto_opts[PROTO_OPTS_PKT_RATE];
+    getParamsCounter = 0;
+    return buildElrsPacket(ELRS_PKT_RATE_COMMAND, convertPktRateToElrs(Model.proto_opts[PROTO_OPTS_RF_FREQ], Model.proto_opts[PROTO_OPTS_PKT_RATE]));
+  }
+  if (Model.proto_opts[PROTO_OPTS_TLM_RATIO] != currentTlmRatio) {
+    currentTlmRatio = Model.proto_opts[PROTO_OPTS_TLM_RATIO];
+    getParamsCounter = 0;
+    return buildElrsPacket(ELRS_TLM_RATIO_COMMAND, Model.proto_opts[PROTO_OPTS_TLM_RATIO]);
+  }
+  if (Model.proto_opts[PROTO_OPTS_POWER] != currentPower) {
+    currentPower = Model.proto_opts[PROTO_OPTS_POWER];
+    getParamsCounter = 0;
+    return buildElrsPacket(ELRS_POWER_COMMAND, Model.proto_opts[PROTO_OPTS_POWER]);
+  }
+  return 0;
+}
 
 /* from CRSF document
 Center (1500us) = 992
@@ -267,6 +458,8 @@ static u16 serial_cb()
 {
     u8 length;
 
+    getParamsCounter++;
+
     switch (state) {
     case ST_DATA1:
         CLOCK_RunMixer();    // clears mixer_sync, which is then set when mixer update complete
@@ -276,7 +469,11 @@ static u16 serial_cb()
     case ST_DATA2:
         if (mixer_sync != MIX_DONE && mixer_runtime < 2000) mixer_runtime += 50;
 #if SUPPORT_CRSF_CONFIG
-        length = CRSF_serial_txd(packet, sizeof packet);
+        if (Model.proto_opts[PROTO_OPTS_RF_FREQ] == 0) {
+            length = CRSF_serial_txd(packet, sizeof packet);
+        } else {
+            length = setElrsOptions();
+        }
         if (length == 0) {
             length = build_rcdata_pkt();
         }
@@ -286,7 +483,7 @@ static u16 serial_cb()
         UART_Send(packet, length);
         state = ST_DATA1;
 
-        return CRSF_FRAME_PERIOD - mixer_runtime;
+        return convertPktRateToPeriod(Model.proto_opts[PROTO_OPTS_RF_FREQ], currentPktRate) - mixer_runtime;
     }
 
     return CRSF_FRAME_PERIOD;   // avoid compiler warning
@@ -328,7 +525,15 @@ uintptr_t CRSF_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_DEFAULT_NUMCHAN: return 8;
         case PROTOCMD_CHANNELMAP: return UNCHG;
 #if SUPPORT_CRSF_CONFIG
-        case PROTOCMD_OPTIONSPAGE: return PAGEID_CRSFCFG;
+        case PROTOCMD_OPTIONSPAGE:
+            if (Model.proto_opts[PROTO_OPTS_RF_FREQ] == 0) return PAGEID_CRSFCFG;
+            break;
+        case PROTOCMD_GETOPTIONS:
+            if (Model.proto_opts[PROTO_OPTS_RF_FREQ] == 6)
+              return (uintptr_t)expresslrs_opts_24;
+            else if (Model.proto_opts[PROTO_OPTS_RF_FREQ] > 0)
+              return (uintptr_t)expresslrs_opts_900;
+            break;
 #endif  // SUPPORT_CRSF_CONFIG
 #if HAS_EXTENDED_TELEMETRY
         case PROTOCMD_TELEMETRYSTATE:
