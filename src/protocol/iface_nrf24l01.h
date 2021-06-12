@@ -145,7 +145,10 @@ enum {
 extern const u8 xn297_scramble[];
 extern const u16 xn297_crc_xorout_scrambled[];
 extern const u16 xn297_crc_xorout[];
-uint8_t bit_reverse(uint8_t b_in);
+extern const u16 xn297_crc_xorout_scrambled_enhanced[];
+extern const u16 xn297_crc_xorout_enhanced[];
+
+// uint8_t bit_reverse(uint8_t b_in);
 
 void XN297_SetTXAddr(const u8* addr, int len);
 void XN297_SetRXAddr(const u8* addr, int len);
@@ -155,7 +158,7 @@ u8 XN297_WritePayload(u8* msg, int len);
 u8 XN297_WriteEnhancedPayload(u8* msg, int len, int noack, u16 crc_xorout);
 u8 XN297_ReadPayload(u8* msg, int len);
 u8 XN297_ReadEnhancedPayload(u8* msg, int len);
-u16 crc16_update(u16 crc, u8 a, u8 bits);
+// u16 crc16_update(u16 crc, u8 a, u8 bits);
 
 // HS6200 emulation layer
 void HS6200_SetTXAddr(const u8* addr, u8 len);

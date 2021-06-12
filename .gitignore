@@ -44,3 +44,6 @@ src/target/common/filesystems/devofs/tests/blib
 src/target/common/filesystems/devofs/tests/pm_to_blib
 src/target/common/filesystems/devofs/tests/Makefile.old
 
+src/protocol/bak/gd00x_cc2500.c
+src/protocol/bak/v911s_cc2500.c
+src/.vscode/settings.json
