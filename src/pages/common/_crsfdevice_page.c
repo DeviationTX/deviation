@@ -440,11 +440,11 @@ static void parse_bytes(enum data_type type, char **buffer, void *dest) {
         *buffer += 1;
         break;
     case UINT16:
-        *(u16 *)dest = (u16) (((*buffer)[0] << 16) | (*buffer)[1]);
+        *(u16 *)dest = (u16) (((*buffer)[0] << 8) | (*buffer)[1]);
         *buffer += 2;
         break;
     case INT16:
-        *(s16 *)dest = (s16) (((*buffer)[0] << 16) | (*buffer)[1]);
+        *(s16 *)dest = (s16) (((*buffer)[0] << 8) | (*buffer)[1]);
         *buffer += 2;
         break;
     case FLOAT:
