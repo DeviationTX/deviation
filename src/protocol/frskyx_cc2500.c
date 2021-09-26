@@ -200,10 +200,14 @@ static void frskyX_build_bind_packet()
     } else {
         // packet 1D 03 01 0E 1C 02 00 00 32 0B 00 00 A8 26 28 01 A1 00 00 00 3E F6 87 C7 00 00 00 00 C9 C9
         // Unknown bytes
+#ifndef MODULAR
         if (state & 0x01)
             memcpy(&packet[7], "\x00\x18\x0A\x00\x00\xE0\x02\x0B\x01\xD3\x08\x00\x00\x4C\xFE\x87\xC7", 17);
         else
             memcpy(&packet[7], "\x27\xAD\x02\x00\x00\x64\xC8\x46\x00\x64\x00\x00\x00\xFB\xF6\x87\xC7", 17);
+#else
+        memcpy(&packet[7], "\x00\x32\x0B\x00\x00\xA8\x26\x28\x01\xA1\x00\x00\x00\x3E\xF6\x87\xC7", 17);
+#endif
         packet[5] = 0x02;                   // ID
         packet[6] = RXNUM;
         // Bind flags
