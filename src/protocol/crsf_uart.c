@@ -28,7 +28,7 @@
 
 #define CRSF_DATARATE             400000
 #define CRSF_FRAME_PERIOD         4000   // 250Hz 4ms
-#define CRSF_FRAME_PERIOD_MIN     2000   // 500Hz 2ms
+#define CRSF_FRAME_PERIOD_MIN     1750   // 500Hz 2ms, but allow shorter for offset cancellation
 #define CRSF_FRAME_PERIOD_MAX     40000  // 25Hz  40ms
 #define CRSF_CHANNELS             16
 #define CRSF_PACKET_SIZE          26
@@ -61,11 +61,11 @@ u8 crsf_crc8(const u8 *ptr, u8 len) {
     return crc;
 }
 
-static u32 updateInterval = CRSF_FRAME_PERIOD;
-
 #if HAS_EXTENDED_TELEMETRY
 static u8 telemetryRxBuffer[TELEMETRY_RX_PACKET_SIZE];
 static u8 telemetryRxBufferCount;
+static u32 updateInterval = CRSF_FRAME_PERIOD;
+static s32 offset;
 
 static void set_telemetry(crossfire_telem_t offset, s32 value) {
     Telemetry.value[offset] = value;
@@ -168,11 +168,10 @@ static void processCrossfireTelemetryFrame()
 
     case TYPE_RADIO_ID:
       if (telemetryRxBuffer[3] == ADDR_RADIO && telemetryRxBuffer[5] == SUBTYPE_TIMING_UPDATE) {
-        if (getCrossfireTelemetryValue(6, (s32 *)&updateInterval, 4)) {
-          // offset is not used since deviationTX handles the offset by itself (mixer_runtime)
-          // values are in 10th of micro-seconds
-          updateInterval /= 10;
-        }
+        if (getCrossfireTelemetryValue(6, (s32 *)&updateInterval, 4))
+          updateInterval /= 10;  // values are in 10th of micro-seconds
+        if (getCrossfireTelemetryValue(10, (s32 *)&offset, 4))
+          offset /= 10;  // values are in 10th of micro-seconds
       }
   }
 }
@@ -211,6 +210,22 @@ static void processCrossfireTelemetryData(u8 data, u8 status) {
   }
 }
 #endif  // HAS_EXTENDED_TELEMETRY
+
+#if HAS_EXTENDED_TELEMETRY
+static u32 get_update_interval() {
+    if (offset == 0) return updateInterval;
+
+    u32 update = updateInterval + offset;
+    update = constrain(update, CRSF_FRAME_PERIOD_MIN, CRSF_FRAME_PERIOD_MAX);
+    offset -= update - updateInterval;
+    return update;
+}
+#else
+static u32 get_update_interval() {
+    return CRSF_FRAME_PERIOD;
+}
+#endif  // HAS_EXTENDED_TELEMETRY
+
 
 static u8 packet[CRSF_PACKET_SIZE];
 
@@ -300,7 +315,7 @@ static u16 serial_cb()
         UART_Send(packet, length);
         state = ST_DATA1;
 
-        return constrain(updateInterval, CRSF_FRAME_PERIOD_MIN, CRSF_FRAME_PERIOD_MAX) - mixer_runtime;
+        return get_update_interval() - mixer_runtime;
     }
 
     return CRSF_FRAME_PERIOD;   // avoid compiler warning
