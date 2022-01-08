@@ -34,6 +34,10 @@
 #define TYPE_SETTINGS_ENTRY   0x2B
 #define TYPE_SETTINGS_READ    0x2C
 #define TYPE_SETTINGS_WRITE   0x2D
+#define TYPE_RADIO_ID         0x3A
+
+// Frame Subtype
+#define SUBTYPE_TIMING_UPDATE 0x10
 
 #define TELEMETRY_RX_PACKET_SIZE   64
 

@@ -24,8 +24,12 @@
 #include "telemetry.h"
 #endif
 
+#define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
+
 #define CRSF_DATARATE             400000
-#define CRSF_FRAME_PERIOD         4000   // 4ms
+#define CRSF_FRAME_PERIOD         4000   // 250Hz 4ms
+#define CRSF_FRAME_PERIOD_MIN     2000   // 500Hz 2ms
+#define CRSF_FRAME_PERIOD_MAX     40000  // 25Hz  40ms
 #define CRSF_CHANNELS             16
 #define CRSF_PACKET_SIZE          26
 
@@ -57,6 +61,7 @@ u8 crsf_crc8(const u8 *ptr, u8 len) {
     return crc;
 }
 
+static u32 updateInterval = CRSF_FRAME_PERIOD;
 
 #if HAS_EXTENDED_TELEMETRY
 static u8 telemetryRxBuffer[TELEMETRY_RX_PACKET_SIZE];
@@ -128,7 +133,7 @@ static void processCrossfireTelemetryFrame()
       for (i=1; i <= TELEM_CRSF_TX_SNR; i++) {
         if (getCrossfireTelemetryValue(2+i, &value, 1)) {   // payload starts at third byte of rx packet
           if (i == TELEM_CRSF_TX_POWER) {
-            static const s32 power_values[] = { 0, 10, 25, 100, 500, 1000, 2000, 250 };
+            static const s32 power_values[] = { 0, 10, 25, 100, 500, 1000, 2000, 250, 50 };
             if ((u8)value >= (sizeof power_values / sizeof (s32)))
               continue;
             value = power_values[value];
@@ -160,6 +165,15 @@ static void processCrossfireTelemetryFrame()
       memcpy(&value, &telemetryRxBuffer[3], 4);
       set_telemetry(TELEM_CRSF_FLIGHT_MODE, value);
       break;
+
+    case TYPE_RADIO_ID:
+      if (telemetryRxBuffer[3] == ADDR_RADIO && telemetryRxBuffer[5] == SUBTYPE_TIMING_UPDATE) {
+        if (getCrossfireTelemetryValue(6, (s32 *)&updateInterval, 4)) {
+          // offset is not used since deviationTX handles the offset by itself (mixer_runtime)
+          // values are in 10th of micro-seconds
+          updateInterval /= 10;
+        }
+      }
   }
 }
 
@@ -185,7 +199,7 @@ static void processCrossfireTelemetryData(u8 data, u8 status) {
   
   if ((telemetryRxBuffer[1] + 2) == telemetryRxBufferCount) {
     if (checkCrossfireTelemetryFrameCRC()) {
-      if (telemetryRxBuffer[2] < TYPE_PING_DEVICES) {
+      if (telemetryRxBuffer[2] < TYPE_PING_DEVICES || telemetryRxBuffer[2] == TYPE_RADIO_ID) {
         processCrossfireTelemetryFrame();     // Broadcast frame
 #if SUPPORT_CRSF_CONFIG
       } else {
@@ -286,7 +300,7 @@ static u16 serial_cb()
         UART_Send(packet, length);
         state = ST_DATA1;
 
-        return CRSF_FRAME_PERIOD - mixer_runtime;
+        return constrain(updateInterval, CRSF_FRAME_PERIOD_MIN, CRSF_FRAME_PERIOD_MAX) - mixer_runtime;
     }
 
     return CRSF_FRAME_PERIOD;   // avoid compiler warning
