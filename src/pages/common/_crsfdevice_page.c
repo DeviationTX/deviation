@@ -473,7 +473,8 @@ static void add_device(u8 *buffer) {
             //  not found, add to table
             buffer += 2;
             crsf_devices[i].address = (u8) *buffer++;
-            buffer += strlcpy(crsf_devices[i].name, (const char *)buffer, CRSF_MAX_NAME_LEN) + 1;
+            strlcpy(crsf_devices[i].name, (const char *)buffer, CRSF_MAX_NAME_LEN);
+            buffer += strlen((const char*)buffer) + 1;
             crsf_devices[i].serial_number = parse_u32(buffer);
             buffer += 4;
             crsf_devices[i].hardware_id = parse_u32(buffer);
@@ -529,8 +530,9 @@ static void add_param(u8 *buffer, u8 num_bytes) {
             if (!update) {
                 parameter->hidden = *recv_param_ptr++ & 0x80;
                 parameter->name = alloc_string(strlen(recv_param_ptr)+1);
-                recv_param_ptr += strlcpy(parameter->name, (const char *)recv_param_ptr,
-                                      CRSF_STRING_BYTES_AVAIL(parameter->name)) + 1;
+                strlcpy(parameter->name, (const char *)recv_param_ptr,
+                        CRSF_STRING_BYTES_AVAIL(parameter->name));
+                recv_param_ptr += strlen(recv_param_ptr) + 1;
             } else {
                 if (parameter->hidden != (*recv_param_ptr & 0x80))
                     params_loaded = 0;   // if item becomes hidden others may also, so reload all params
@@ -561,9 +563,10 @@ static void add_param(u8 *buffer, u8 num_bytes) {
             case TEXT_SELECTION:
                 if (!update) {
                     parameter->value = alloc_string(strlen(recv_param_ptr)+1);
-                    recv_param_ptr += strlcpy(parameter->value,
-                                         (const char *)recv_param_ptr,
-                                         CRSF_STRING_BYTES_AVAIL(parameter->value)) + 1;
+                    strlcpy(parameter->value,
+                            (const char *)recv_param_ptr,
+                            CRSF_STRING_BYTES_AVAIL(parameter->value));
+                    recv_param_ptr += strlen(recv_param_ptr) + 1;
                     // put null between selection options
                     // find max choice string length to adjust textselectplate size
                     char *start = (char *)parameter->value;
@@ -593,9 +596,10 @@ static void add_param(u8 *buffer, u8 num_bytes) {
             case INFO:
                 if (!update) {
                     parameter->value = alloc_string(strlen(recv_param_ptr)+1);
-                    recv_param_ptr += strlcpy(parameter->value,
-                                         (const char *)recv_param_ptr,
-                                         CRSF_STRING_BYTES_AVAIL(parameter->value)) + 1;
+                    strlcpy(parameter->value,
+                            (const char *)recv_param_ptr,
+                            CRSF_STRING_BYTES_AVAIL(parameter->value));
+                    recv_param_ptr += strlen(recv_param_ptr) + 1;
                 }
                 break;
 
