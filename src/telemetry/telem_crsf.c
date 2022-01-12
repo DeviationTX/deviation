@@ -128,7 +128,7 @@ s32 _crsf_get_max_value(u8 telem)
     case TELEM_CRSF_RX_QUALITY: return 150; break;
     case TELEM_CRSF_TX_QUALITY: return 150; break;
     case TELEM_CRSF_BATT_VOLTAGE: return 500; break;
-    case TELEM_CRSF_BATT_CURRENT: return 100; break;
+    case TELEM_CRSF_BATT_CURRENT: return 1000; break;
     case TELEM_CRSF_BATT_CAPACITY: return 500000; break;
     case TELEM_CRSF_ATTITUDE_PITCH:
     case TELEM_CRSF_ATTITUDE_ROLL:
