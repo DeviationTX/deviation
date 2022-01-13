@@ -178,7 +178,12 @@ static void processCrossfireTelemetryFrame()
 
 // serial data receive ISR callback
 static void processCrossfireTelemetryData(u8 data, u8 status) {
-  (void)status;
+//  (void)status;
+if (status == 0x20) Telemetry.gps.altitude |= 0x80;
+if (status == 0x22) Telemetry.gps.altitude |= 0x40;
+if (status == 0x26) Telemetry.gps.altitude |= 0x20;
+if (status & 0x08)  Telemetry.gps.altitude |= 0x08;
+TELEMETRY_SetUpdated(TELEM_GPS_ALT);
 
   if (telemetryRxBufferCount == 0 && data != ADDR_RADIO) {
     return;
