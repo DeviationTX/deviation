@@ -186,6 +186,7 @@ static void processCrossfireTelemetryData(u8 data, u8 status) {
 
   if (telemetryRxBufferCount == 1 && (data < 2 || data > TELEMETRY_RX_PACKET_SIZE-2)) {
     telemetryRxBufferCount = 0;
+    memset(telemetryRxBuffer, 0, TELEMETRY_RX_PACKET_SIZE);  // clear buff for device ping data detection
     return;
   }
   
@@ -193,6 +194,7 @@ static void processCrossfireTelemetryData(u8 data, u8 status) {
     telemetryRxBuffer[telemetryRxBufferCount++] = data;
   } else {
     telemetryRxBufferCount = 0;
+    memset(telemetryRxBuffer, 0, TELEMETRY_RX_PACKET_SIZE);  // clear buff for device ping data detection
     return;
   }
   
@@ -207,6 +209,7 @@ static void processCrossfireTelemetryData(u8 data, u8 status) {
       }
     }
     telemetryRxBufferCount = 0;
+    memset(telemetryRxBuffer, 0, TELEMETRY_RX_PACKET_SIZE);  // clear buff for device ping data detection
   }
 }
 #endif  // HAS_EXTENDED_TELEMETRY

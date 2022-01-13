@@ -115,7 +115,8 @@ void PAGE_CrsfdeviceInit(int page)
     device_idx = page;
     crsfdevice_init();
     current_folder = 0;
-    CRSF_read_param(device_idx, next_param, next_chunk);
+    if (crsf_devices[device_idx].number_of_params)
+        CRSF_read_param(device_idx, next_param, next_chunk);
 
     show_page(current_folder);
     PAGE_SetActionCB(action_cb);

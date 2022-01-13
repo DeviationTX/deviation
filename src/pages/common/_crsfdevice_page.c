@@ -328,12 +328,12 @@ void PAGE_CRSFDeviceEvent() {
 
 // Following functions queue a CRSF message for sending
 // Broadcast for device info responses
-void CRSF_ping_devices() {
+void CRSF_ping_devices(u8 address) {
     if (!send_msg_buf_count) {
         send_msg_buffer[0] = ADDR_MODULE;
         send_msg_buffer[1] = 4;
         send_msg_buffer[2] = TYPE_PING_DEVICES;
-        send_msg_buffer[3] = ADDR_BROADCAST;
+        send_msg_buffer[3] = address;
         send_msg_buffer[4] = ADDR_RADIO;
         send_msg_buffer[5] = crsf_crc8(&send_msg_buffer[2], send_msg_buffer[1]-1);
         send_msg_buf_count = 6;
@@ -466,24 +466,30 @@ static char *alloc_string(s32 bytes) {
     return p;
 }
 
+static void parse_device(u8* buffer, crsf_device_t *device) {
+    buffer += 2;
+    device->address = (u8) *buffer++;
+    strlcpy(device->name, (const char *)buffer, CRSF_MAX_NAME_LEN);
+    buffer += strlen((const char*)buffer) + 1;
+    device->serial_number = parse_u32(buffer);
+    buffer += 4;
+    device->hardware_id = parse_u32(buffer);
+    buffer += 4;
+    device->firmware_id = parse_u32(buffer);
+    buffer += 4;
+    device->number_of_params = *buffer;
+    buffer += 1;
+    device->params_version = *buffer;
+}
+
 static void add_device(u8 *buffer) {
     for (int i=0; i < CRSF_MAX_DEVICES; i++) {
-        if (crsf_devices[i].address == buffer[2]) return;  //  device already in table
-        if (crsf_devices[i].address == 0) {
-            //  not found, add to table
-            buffer += 2;
-            crsf_devices[i].address = (u8) *buffer++;
-            strlcpy(crsf_devices[i].name, (const char *)buffer, CRSF_MAX_NAME_LEN);
-            buffer += strlen((const char*)buffer) + 1;
-            crsf_devices[i].serial_number = parse_u32(buffer);
-            buffer += 4;
-            crsf_devices[i].hardware_id = parse_u32(buffer);
-            buffer += 4;
-            crsf_devices[i].firmware_id = parse_u32(buffer);
-            buffer += 4;
-            crsf_devices[i].number_of_params = *buffer;
-            buffer += 1;
-            crsf_devices[i].params_version = *buffer;
+        if (crsf_devices[i].address == buffer[2]        //  device already in table
+         || crsf_devices[i].address == 0) {             //  not found, add to table
+            parse_device(buffer, &crsf_devices[i]);
+            // some modules only send details if device direct ping?  ELRS
+            if (crsf_devices[i].number_of_params == 0)
+                CRSF_ping_devices(crsf_devices[i].address);
             break;
         }
     }
