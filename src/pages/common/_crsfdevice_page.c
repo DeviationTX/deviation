@@ -486,9 +486,10 @@ static void add_device(u8 *buffer) {
     for (int i=0; i < CRSF_MAX_DEVICES; i++) {
         if (crsf_devices[i].address == buffer[2]        //  device already in table
          || crsf_devices[i].address == 0) {             //  not found, add to table
+            u8 first_time = !crsf_devices[i].address;
             parse_device(buffer, &crsf_devices[i]);
             // some modules only send details if device direct ping?  ELRS
-            if (crsf_devices[i].number_of_params == 0)
+            if (first_time)
                 CRSF_ping_devices(crsf_devices[i].address);
             break;
         }
