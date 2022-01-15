@@ -22,10 +22,14 @@
 
 // Frame Type
 #define TYPE_GPS              0x02
+#define TYPE_VARIO            0x07
 #define TYPE_BATTERY          0x08
-#define TYPE_VIDEO            0x08
+#define TYPE_HEARTBEAT        0x0b
+#define TYPE_VIDEO            0x0F
 #define TYPE_LINK             0x14
 #define TYPE_CHANNELS         0x16
+#define TYPE_RX_ID            0x1C
+#define TYPE_TX_ID            0x1D
 #define TYPE_ATTITUDE         0x1E
 #define TYPE_FLIGHT_MODE      0x21
 #define TYPE_PING_DEVICES     0x28
@@ -34,10 +38,13 @@
 #define TYPE_SETTINGS_ENTRY   0x2B
 #define TYPE_SETTINGS_READ    0x2C
 #define TYPE_SETTINGS_WRITE   0x2D
+#define TYPE_COMMAND_ID       0x32
 #define TYPE_RADIO_ID         0x3A
 
 // Frame Subtype
 #define SUBTYPE_TIMING_UPDATE 0x10
+// MultiModule? #define UART_SYNC                      0xC8
+#define COMMAND_MODEL_SELECT_ID        0x05
 
 #define TELEMETRY_RX_PACKET_SIZE   64
 
@@ -122,6 +129,7 @@ void CRSF_ping_devices(u8 address);
 void CRSF_read_param(u8 device, u8 id, u8 chunk);
 void CRSF_set_param(crsf_param_t *param);
 void CRSF_send_command(crsf_param_t *param, enum cmd_status status);
+u32 CRSF_read_timeout();
 
 #endif  // SUPPORT_CRSF_CONFIG
 
