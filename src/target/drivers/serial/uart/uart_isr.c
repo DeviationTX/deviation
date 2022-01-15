@@ -42,6 +42,9 @@ void __attribute__((__used__)) _UART_ISR(void)
     u8 status = USART_SR(UART_CFG.uart) & (USART_SR_RXNE | USART_SR_PE | USART_SR_FE | USART_SR_NE | USART_SR_ORE);
     u8 data = usart_recv(UART_CFG.uart);       // read unconditionally to reset interrupt and error flags
 
+//  if (status & (USART_SR_PE | USART_SR_FE | USART_SR_NE | USART_SR_ORE))
+//      return;
+
     if (rx_callback) rx_callback(data, status);
 
     // interrupt cleared by reading data register
