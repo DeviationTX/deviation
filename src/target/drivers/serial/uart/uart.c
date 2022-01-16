@@ -178,10 +178,13 @@ void UART_StopReceive()
 void UART_SetDuplex(uart_duplex duplex)
 {
     // no libopencm3 function for duplex
-    if (duplex == UART_DUPLEX_FULL)
+    if (duplex == UART_DUPLEX_FULL) {
         USART_CR3(UART_CFG.uart) &= ~USART_CR3_HDSEL;
-    else
+        usart_set_mode(UART_CFG.uart, USART_MODE_TX_RX);
+    } else {
         USART_CR3(UART_CFG.uart) |= USART_CR3_HDSEL;
+        usart_set_mode(UART_CFG.uart, USART_MODE_RX);
+    }
 }
 
 void UART_SendByte(u8 x)

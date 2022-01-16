@@ -144,7 +144,6 @@ static void processCrossfireTelemetryFrame()
       break;
 
     case TYPE_BATTERY:
-break;
       if (getCrossfireTelemetryValue(3, &value, 2))
         set_telemetry(TELEM_CRSF_BATT_VOLTAGE, value);
       if (getCrossfireTelemetryValue(5, &value, 2))
@@ -177,26 +176,15 @@ break;
   }
 }
 
-static u8 err_uart;
-static u8 err_start;
 // serial data receive ISR callback
 static void processCrossfireTelemetryData(u8 data, u8 status) {
   (void)status;
-u8 value = Telemetry.value[TELEM_CRSF_BATT_VOLTAGE];
-if (status & 0x20) set_telemetry(TELEM_CRSF_BATT_VOLTAGE, value |= 0x80);
-if (status & 0x02) set_telemetry(TELEM_CRSF_BATT_VOLTAGE, value |= 0x40);
-if (status & 0x04) set_telemetry(TELEM_CRSF_BATT_VOLTAGE, value |= 0x20);
-if (status & 0x08) set_telemetry(TELEM_CRSF_BATT_VOLTAGE, value |= 0x10);
-if (status & 0x0f) { set_telemetry(TELEM_CRSF_BATT_CURRENT, err_uart++); return; }
 
   if (telemetryRxBufferCount == 0 && data != ADDR_RADIO) {
-set_telemetry(TELEM_CRSF_BATT_CAPACITY, err_start++);
     return;
   }
 
   if (telemetryRxBufferCount == 1 && (data < 2 || data > TELEMETRY_RX_PACKET_SIZE-2)) {
-set_telemetry(TELEM_CRSF_BATT_VOLTAGE, value |= 0x04);
-//set_telemetry(TELEM_CRSF_BATT_CAPACITY, *((u8*)(0x40013808U))); /// USART_BRR(UART_CFG.uart));
     telemetryRxBufferCount = 0;
     return;
   }
@@ -204,7 +192,6 @@ set_telemetry(TELEM_CRSF_BATT_VOLTAGE, value |= 0x04);
   if (telemetryRxBufferCount < TELEMETRY_RX_PACKET_SIZE) {
     telemetryRxBuffer[telemetryRxBufferCount++] = data;
   } else {
-set_telemetry(TELEM_CRSF_BATT_VOLTAGE, value |= 0x02);
     telemetryRxBufferCount = 0;
     return;
   }
@@ -216,12 +203,9 @@ set_telemetry(TELEM_CRSF_BATT_VOLTAGE, value |= 0x02);
 #if SUPPORT_CRSF_CONFIG
       } else {
         CRSF_serial_rcv(telemetryRxBuffer+2, telemetryRxBuffer[1]-1);  // Extended frame
-set_telemetry(TELEM_CRSF_BATT_VOLTAGE, 0);
 #endif
       }
     }
-else { set_telemetry(TELEM_CRSF_BATT_VOLTAGE, value |= 0x01); }
-
     telemetryRxBufferCount = 0;
   }
 }
@@ -324,8 +308,6 @@ static u16 serial_cb()
         length = CRSF_serial_txd(packet, sizeof packet);
         if (length) {
             UART_Send(packet, length);
-            state = ST_DATA1;
-            return 6000;
         } else {
             length = build_rcdata_pkt();
             UART_Send(packet, length);
