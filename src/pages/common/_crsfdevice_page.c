@@ -23,7 +23,6 @@ crsf_param_t crsf_params[CRSF_MAX_PARAMS];
 static struct crsfdevice_page * const mp = &pagemem.u.crsfdevice_page;
 static struct crsfdevice_obj * const gui = &gui_objs.u.crsfdevice;
 
-static u32 last_update;
 static u32 read_timeout;
 static u8 current_folder = 0;
 static u8 params_loaded;     // if not zero, number displayed so far for current device
@@ -293,13 +292,10 @@ static unsigned action_cb(u32 button, unsigned flags, void *data)
 void PAGE_CRSFDeviceEvent() {
     // update page as parameter info is received
     // until all parameters loaded
-    if (CLOCK_getms() - last_update > 300) {
-        u8 params_count = count_params_loaded();
-        if (params_loaded != params_count) {
-            params_loaded = params_count;
-            show_page(current_folder);
-        }
-        last_update = CLOCK_getms();
+    u8 params_count = count_params_loaded();
+    if (params_loaded != params_count) {
+        params_loaded = params_count;
+        show_page(current_folder);
     }
 
     // commands may require interaction through dialog
