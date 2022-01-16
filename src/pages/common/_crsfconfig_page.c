@@ -54,16 +54,12 @@ static const char *crsfconfig_str_cb(guiObject_t *obj, const void *data)
 
 void PAGE_CRSFConfigEvent()
 {
-    if (CLOCK_getms() - mp->last_update > 500) {
-        mp->last_update = CLOCK_getms();
-        u8 device_count = CRSF_number_of_devices();
-        if (number_of_devices != device_count) {
-            number_of_devices = device_count;
-            for (int i=0; i < device_count; i++)
-                GUI_Redraw(&gui->name[i]);
-        }
+    u8 device_count = CRSF_number_of_devices();
+    if (number_of_devices != device_count) {
+        number_of_devices = device_count;
+        for (int i=0; i < device_count; i++)
+            GUI_Redraw(&gui->name[i]);
     }
-    mp->last_update = CLOCK_getms();
 }
 
 #endif
