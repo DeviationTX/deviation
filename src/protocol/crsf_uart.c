@@ -306,18 +306,15 @@ static u16 serial_cb()
         if (mixer_sync != MIX_DONE && mixer_runtime < 2000) mixer_runtime += 50;
 #if SUPPORT_CRSF_CONFIG
         length = CRSF_serial_txd(packet, sizeof packet);
-        if (length) {
-            UART_Send(packet, length);
-        } else {
+        if (length == 0) {
             length = build_rcdata_pkt();
-            UART_Send(packet, length);
         }
 #else
         length = build_rcdata_pkt();
-        UART_Send(packet, length);
 #endif
-
+        UART_Send(packet, length);
         state = ST_DATA1;
+
         return get_update_interval() - mixer_runtime;
     }
 
