@@ -44,11 +44,11 @@ void __attribute__((__used__)) _UART_ISR(void)
 
     // handle transmit complete at end of DMA transfer
     if (status & USART_SR_TC) {
-        busy = 0;
         USART_CR1(UART_CFG.uart) &= ~USART_CR1_TCIE;
         if (USART_CR3(UART_CFG.uart) & USART_CR3_HDSEL) {   // change to receiver if half-duplex
             usart_set_mode(UART_CFG.uart, USART_MODE_RX);
         }
+        busy = 0;
     }
         
     if (status & (USART_SR_PE | USART_SR_FE | USART_SR_NE | USART_SR_ORE))
