@@ -23,7 +23,6 @@ crsf_param_t crsf_params[CRSF_MAX_PARAMS];
 static struct crsfdevice_page * const mp = &pagemem.u.crsfdevice_page;
 static struct crsfdevice_obj * const gui = &gui_objs.u.crsfdevice;
 
-static u32 last_update;
 static u32 read_timeout;
 static u8 current_folder = 0;
 static u8 params_loaded;     // if not zero, number displayed so far for current device
@@ -293,13 +292,10 @@ static unsigned action_cb(u32 button, unsigned flags, void *data)
 void PAGE_CRSFDeviceEvent() {
     // update page as parameter info is received
     // until all parameters loaded
-    if (CLOCK_getms() - last_update > 300) {
-        u8 params_count = count_params_loaded();
-        if (params_loaded != params_count) {
-            params_loaded = params_count;
-            show_page(current_folder);
-        }
-        last_update = CLOCK_getms();
+    u8 params_count = count_params_loaded();
+    if (params_loaded != params_count) {
+        params_loaded = params_count;
+        show_page(current_folder);
     }
 
     // commands may require interaction through dialog
@@ -328,12 +324,12 @@ void PAGE_CRSFDeviceEvent() {
 
 // Following functions queue a CRSF message for sending
 // Broadcast for device info responses
-void CRSF_ping_devices() {
+void CRSF_ping_devices(u8 address) {
     if (!send_msg_buf_count) {
         send_msg_buffer[0] = ADDR_MODULE;
         send_msg_buffer[1] = 4;
         send_msg_buffer[2] = TYPE_PING_DEVICES;
-        send_msg_buffer[3] = ADDR_BROADCAST;
+        send_msg_buffer[3] = address;
         send_msg_buffer[4] = ADDR_RADIO;
         send_msg_buffer[5] = crsf_crc8(&send_msg_buffer[2], send_msg_buffer[1]-1);
         send_msg_buf_count = 6;
@@ -466,23 +462,31 @@ static char *alloc_string(s32 bytes) {
     return p;
 }
 
+static void parse_device(u8* buffer, crsf_device_t *device) {
+    buffer += 2;
+    device->address = (u8) *buffer++;
+    strlcpy(device->name, (const char *)buffer, CRSF_MAX_NAME_LEN);
+    buffer += strlen((const char*)buffer) + 1;
+    device->serial_number = parse_u32(buffer);
+    buffer += 4;
+    device->hardware_id = parse_u32(buffer);
+    buffer += 4;
+    device->firmware_id = parse_u32(buffer);
+    buffer += 4;
+    device->number_of_params = *buffer;
+    buffer += 1;
+    device->params_version = *buffer;
+}
+
 static void add_device(u8 *buffer) {
     for (int i=0; i < CRSF_MAX_DEVICES; i++) {
-        if (crsf_devices[i].address == buffer[2]) return;  //  device already in table
-        if (crsf_devices[i].address == 0) {
-            //  not found, add to table
-            buffer += 2;
-            crsf_devices[i].address = (u8) *buffer++;
-            buffer += strlcpy(crsf_devices[i].name, (const char *)buffer, CRSF_MAX_NAME_LEN) + 1;
-            crsf_devices[i].serial_number = parse_u32(buffer);
-            buffer += 4;
-            crsf_devices[i].hardware_id = parse_u32(buffer);
-            buffer += 4;
-            crsf_devices[i].firmware_id = parse_u32(buffer);
-            buffer += 4;
-            crsf_devices[i].number_of_params = *buffer;
-            buffer += 1;
-            crsf_devices[i].params_version = *buffer;
+        if (crsf_devices[i].address == buffer[2]        //  device already in table
+         || crsf_devices[i].address == 0) {             //  not found, add to table
+            u8 first_time = !crsf_devices[i].address;
+            parse_device(buffer, &crsf_devices[i]);
+            // some modules only send details if device direct ping?  ELRS
+            if (first_time)
+                CRSF_ping_devices(crsf_devices[i].address);
             break;
         }
     }
@@ -529,8 +533,9 @@ static void add_param(u8 *buffer, u8 num_bytes) {
             if (!update) {
                 parameter->hidden = *recv_param_ptr++ & 0x80;
                 parameter->name = alloc_string(strlen(recv_param_ptr)+1);
-                recv_param_ptr += strlcpy(parameter->name, (const char *)recv_param_ptr,
-                                      CRSF_STRING_BYTES_AVAIL(parameter->name)) + 1;
+                strlcpy(parameter->name, (const char *)recv_param_ptr,
+                        CRSF_STRING_BYTES_AVAIL(parameter->name));
+                recv_param_ptr += strlen(recv_param_ptr) + 1;
             } else {
                 if (parameter->hidden != (*recv_param_ptr & 0x80))
                     params_loaded = 0;   // if item becomes hidden others may also, so reload all params
@@ -561,9 +566,10 @@ static void add_param(u8 *buffer, u8 num_bytes) {
             case TEXT_SELECTION:
                 if (!update) {
                     parameter->value = alloc_string(strlen(recv_param_ptr)+1);
-                    recv_param_ptr += strlcpy(parameter->value,
-                                         (const char *)recv_param_ptr,
-                                         CRSF_STRING_BYTES_AVAIL(parameter->value)) + 1;
+                    strlcpy(parameter->value,
+                            (const char *)recv_param_ptr,
+                            CRSF_STRING_BYTES_AVAIL(parameter->value));
+                    recv_param_ptr += strlen(recv_param_ptr) + 1;
                     // put null between selection options
                     // find max choice string length to adjust textselectplate size
                     char *start = (char *)parameter->value;
@@ -593,9 +599,10 @@ static void add_param(u8 *buffer, u8 num_bytes) {
             case INFO:
                 if (!update) {
                     parameter->value = alloc_string(strlen(recv_param_ptr)+1);
-                    recv_param_ptr += strlcpy(parameter->value,
-                                         (const char *)recv_param_ptr,
-                                         CRSF_STRING_BYTES_AVAIL(parameter->value)) + 1;
+                    strlcpy(parameter->value,
+                            (const char *)recv_param_ptr,
+                            CRSF_STRING_BYTES_AVAIL(parameter->value));
+                    recv_param_ptr += strlen(recv_param_ptr) + 1;
                 }
                 break;
 
