@@ -100,15 +100,13 @@ static void processCrossfireTelemetryFrame()
   switch(id) {
     case TYPE_GPS:
       if (getCrossfireTelemetryValue(3, &value, 4)) {
-        Telemetry.gps.latitude = value / 10;
-        if (value & (1 << 30))
-            Telemetry.gps.latitude = -Telemetry.gps.latitude;   // south negative
+        // convert degrees * 1M to seconds * 1000
+        // (degree * 10,000,000) / 100 * 36
+        Telemetry.gps.latitude = value / 25 * 9;
         TELEMETRY_SetUpdated(TELEM_GPS_LAT);
       }
       if (getCrossfireTelemetryValue(7, &value, 4)) {
-        Telemetry.gps.longitude = value / 10;
-        if (value & (1 << 30))
-            Telemetry.gps.longitude = -Telemetry.gps.longitude;   // west negative
+        Telemetry.gps.longitude = value / 25 * 9;
         TELEMETRY_SetUpdated(TELEM_GPS_LONG);
       }
       if (getCrossfireTelemetryValue(11, &value, 2)) {
@@ -281,10 +279,6 @@ static u8 build_rcdata_pkt()
 
     return CRSF_PACKET_SIZE;
 }
-
-#ifdef EMULATOR
-static const u8 rxframes[][64];
-#endif //EMULATOR
 
 static enum {
     ST_DATA1,
