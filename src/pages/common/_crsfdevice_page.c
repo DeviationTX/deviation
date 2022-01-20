@@ -493,6 +493,18 @@ static void add_device(u8 *buffer) {
     //  no new device added if no more space in table
 }
 
+static void parse_elrs_info(u8 *buffer) {
+  if (buffer[2] != crsf_devices[device_idx].address) return;
+
+  // currently not doing anything with these values
+  //u8 bad_packet = buffer[3];                      // bad packet rate (should be 0)
+  //u8 good_packet = (buffer[4] << 8) + buffer[5];  // good packet rate (configured rate)
+  // flags bit 0 indicates receiver connected
+  // other bits indicated errors - title in flags_info
+  //u8 elrs_flags = buffer[6];
+  //char *elrs_flags_info = buffer[7];  // null-terminated title of flags
+}
+
 static void add_param(u8 *buffer, u8 num_bytes) {
     // abort if wrong device, or not enough buffer space
     if (buffer[2] != crsf_devices[device_idx].address
@@ -677,6 +689,10 @@ void CRSF_serial_rcv(u8 *buffer, u8 num_bytes) {
     switch (buffer[0]) {
     case TYPE_DEVICE_INFO:
         add_device(buffer);
+        break;
+
+    case TYPE_ELRS_INFO:
+        parse_elrs_info(buffer);
         break;
 
     case TYPE_SETTINGS_ENTRY:
