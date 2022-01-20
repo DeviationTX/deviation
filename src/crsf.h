@@ -38,6 +38,7 @@
 #define TYPE_SETTINGS_ENTRY   0x2B
 #define TYPE_SETTINGS_READ    0x2C
 #define TYPE_SETTINGS_WRITE   0x2D
+#define TYPE_ELRS_INFO        0x2E
 #define TYPE_COMMAND_ID       0x32
 #define TYPE_RADIO_ID         0x3A
 
