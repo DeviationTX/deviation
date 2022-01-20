@@ -43,8 +43,12 @@ static int row_cb(int absrow, int relrow, int y, void *data) {
     void (*lbl_press_cb)(struct guiObject *obj, s8 press_type, const void *data) = NULL;
 
     // draw name first so value on top
-    if (param->type == COMMAND) lbl_press_cb = command_press;
-    else if (param->type == FOLDER) lbl_press_cb = folder_cb;
+    switch (param->type) {
+        case COMMAND: lbl_press_cb = command_press; break;
+        case FOLDER: lbl_press_cb = folder_cb; break;
+        case INFO: lbl_press_cb = noop_press; break;
+        default: break;
+    }
     GUI_CreateLabelBox(&gui->name[relrow], LABEL_X, y,
         LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT,
         crsf_name_cb, lbl_press_cb, (void *)param);
@@ -68,9 +72,6 @@ static int row_cb(int absrow, int relrow, int y, void *data) {
         lbl_press_cb = command_press;
         break;
     case INFO:
-        GUI_CreateLabelBox(&gui->value[relrow].lbl, EDIT_VALUE_X, y,
-            EDIT_VALUE_WIDTH, LINE_HEIGHT, &LABEL_FONT,
-            crsf_value_cb, NULL, (void *)param);
         break;
     case FOLDER:
         lbl_press_cb = folder_cb;

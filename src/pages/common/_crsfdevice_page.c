@@ -77,17 +77,6 @@ static const char *current_text(crsf_param_t *param) {
     return p;
 }
 
-static const char *crsf_name_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-
-    crsf_param_t *param = (crsf_param_t *)data;
-
-    if (param->id == 0) return "--";
-
-    return (const char *)param->name;
-}
-
 static const char *crsf_value_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
@@ -114,7 +103,7 @@ static const char *crsf_value_cb(guiObject_t *obj, const void *data)
             return (const char *)param->default_value;
         break;
     case INFO:
-        return (const char *)param->value;
+        snprintf(tempstring, sizeof tempstring, "%s   %s", param->name, param->value);
         break;
     case COMMAND:
         return (const char *)param->s.info;
@@ -124,6 +113,19 @@ static const char *crsf_value_cb(guiObject_t *obj, const void *data)
         break;
     }
     return (const char *)tempstring;
+}
+
+static const char *crsf_name_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+
+    crsf_param_t *param = (crsf_param_t *)data;
+
+    if (param->id == 0) return "--";
+    if (param->type == INFO)
+        return crsf_value_cb(obj, data);
+
+    return (const char *)param->name;
 }
 
 static u8 count_params_loaded() {
@@ -220,6 +222,14 @@ static void folder_cb(struct guiObject *obj, s8 press_type, const void *data)
 
     current_folder = param->id;
     show_page(current_folder);
+}
+
+static void noop_press(struct guiObject *obj, s8 press_type, const void *data)
+{
+    (void)obj;
+    (void)press_type;
+    (void)data;
+    return;
 }
 
 static void stredit_done_cb(guiObject_t *obj, void *data)  // devo8 doesn't handle cancel/discard properly,
