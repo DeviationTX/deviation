@@ -72,6 +72,8 @@ static int row_cb(int absrow, int relrow, int y, void *data) {
         lbl_press_cb = command_press;
         break;
     case INFO:
+        // value combined with selectable name to
+        // workaround issue with scrolling non-selectable items
         break;
     case FOLDER:
         lbl_press_cb = folder_cb;
