@@ -27,11 +27,13 @@
 #define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
 
 #define CRSF_DATARATE             400000
+#define CRSF_ELRS_DATARATE        1870000U  // fastest ELRS rate that works on t8sg v2 plus
 #define CRSF_FRAME_PERIOD         4000   // 250Hz 4ms
 #define CRSF_FRAME_PERIOD_MIN     1750   // 500Hz 2ms, but allow shorter for offset cancellation
 #define CRSF_FRAME_PERIOD_MAX     40000  // 25Hz  40ms
 #define CRSF_CHANNELS             16
 #define CRSF_PACKET_SIZE          26
+
 
 
 // crc implementation from CRSF protocol document rev7
@@ -176,6 +178,10 @@ static void processCrossfireTelemetryFrame()
   }
 }
 
+#if SUPPORT_CRSF_CONFIG
+static crsf_module_t crsf_module;
+#endif
+
 // serial data receive ISR callback
 static void processCrossfireTelemetryData(u8 data, u8 status) {
   (void)status;
@@ -203,6 +209,19 @@ static void processCrossfireTelemetryData(u8 data, u8 status) {
 #if SUPPORT_CRSF_CONFIG
       } else {
         CRSF_serial_rcv(telemetryRxBuffer+2, telemetryRxBuffer[1]-1);  // Extended frame
+        if (crsf_module == MODULE_NULL) {
+          crsf_module = CRSF_module_type();
+          switch (crsf_module) {
+          case MODULE_ELRS:
+            UART_SetDataRate(CRSF_ELRS_DATARATE);
+            break;
+          case MODULE_NULL:
+            // no device info response yet from radio module
+          case MODULE_UNKNOWN:
+            // module responded but not ELRS
+            break;
+          }
+        }
 #endif
       }
     }
@@ -228,7 +247,6 @@ static u32 get_update_interval() {
 
 
 static u8 packet[CRSF_PACKET_SIZE];
-
 
 
 /* from CRSF document
@@ -286,10 +304,12 @@ static u8 build_rcdata_pkt()
 static const u8 rxframes[][64];
 #endif //EMULATOR
 
-static enum {
+typedef enum {
+    ST_DATA0,
     ST_DATA1,
     ST_DATA2,
-} state;
+} state_t;
+static state_t state, start_state;
 
 static u16 mixer_runtime;
 static u16 serial_cb()
@@ -297,6 +317,19 @@ static u16 serial_cb()
     u8 length;
 
     switch (state) {
+    case ST_DATA0:
+#if SUPPORT_CRSF_CONFIG
+        if (crsf_module == MODULE_NULL) {
+            CRSF_ping_devices(ADDR_MODULE);  // ask for device info from radio module
+            start_state = ST_DATA0;
+        } else
+#endif
+        {
+            start_state = ST_DATA1;
+        }
+        state = ST_DATA2;
+        return 8000;
+
     case ST_DATA1:
         CLOCK_RunMixer();    // clears mixer_sync, which is then set when mixer update complete
         state = ST_DATA2;
@@ -313,8 +346,8 @@ static u16 serial_cb()
         length = build_rcdata_pkt();
 #endif
         UART_Send(packet, length);
-        state = ST_DATA1;
 
+        state = start_state;
         return get_update_interval() - mixer_runtime;
     }
 
@@ -340,7 +373,8 @@ static void initialize()
 #if HAS_EXTENDED_TELEMETRY
     UART_StartReceive(processCrossfireTelemetryData);
 #endif
-    state = ST_DATA1;
+    state = ST_DATA0;
+    start_state = ST_DATA0;
     mixer_runtime = 50;
 
     CLOCK_StartTimer(1000, serial_cb);
