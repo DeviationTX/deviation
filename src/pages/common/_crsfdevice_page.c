@@ -514,6 +514,18 @@ static void add_device(u8 *buffer) {
     //  no new device added if no more space in table
 }
 
+crsf_module_t CRSF_module_type(void) {
+    for (int i=0; i < CRSF_MAX_DEVICES; i++) {
+        if (crsf_devices[i].address == ADDR_MODULE) {
+            if (crsf_devices[i].serial_number == 0x454C5253)
+                // SerialNumber = 'E L R S' and ID is TX module
+                return MODULE_ELRS;
+            return MODULE_UNKNOWN;
+        }
+    }
+    return MODULE_NULL;
+}
+
 static void parse_elrs_info(u8 *buffer) {
   if (buffer[2] != crsf_devices[device_idx].address) return;
 
