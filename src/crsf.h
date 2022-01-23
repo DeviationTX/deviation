@@ -43,8 +43,8 @@
 #define TYPE_RADIO_ID         0x3A
 
 // Frame Subtype
-#define SUBTYPE_TIMING_UPDATE 0x10
-// MultiModule? #define UART_SYNC                      0xC8
+#define UART_SYNC                      0xC8
+#define CRSF_SUBCOMMAND                0x10
 #define COMMAND_MODEL_SELECT_ID        0x05
 
 #define TELEMETRY_RX_PACKET_SIZE   64
@@ -132,10 +132,12 @@ extern crsf_device_t crsf_devices[CRSF_MAX_DEVICES];
 void CRSF_serial_rcv(u8 *buffer, u8 num_bytes);
 u8 CRSF_serial_txd(u8 *buffer, u8 max_len);
 u8 crsf_crc8(const u8 *ptr, u8 len);
+u8 crsf_crc8_BA(const u8 *ptr, u8 len);
 void CRSF_ping_devices(u8 address);
 void CRSF_read_param(u8 device, u8 id, u8 chunk);
 void CRSF_set_param(crsf_param_t *param);
 void CRSF_send_command(crsf_param_t *param, enum cmd_status status);
+void CRSF_send_model_id(u8 fixed_id);
 u32 CRSF_read_timeout();
 crsf_module_t CRSF_module_type(void);
 

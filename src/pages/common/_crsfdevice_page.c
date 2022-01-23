@@ -346,6 +346,22 @@ void CRSF_ping_devices(u8 address) {
     }
 }
 
+void CRSF_send_model_id(u8 model_id) {
+    if (!send_msg_buf_count) {
+        send_msg_buffer[0] = ADDR_MODULE;
+        send_msg_buffer[1] = 8;
+        send_msg_buffer[2] = TYPE_COMMAND_ID;
+        send_msg_buffer[3] = ADDR_MODULE;
+        send_msg_buffer[4] = ADDR_RADIO;
+        send_msg_buffer[5] = CRSF_SUBCOMMAND;
+        send_msg_buffer[6] = COMMAND_MODEL_SELECT_ID;
+        send_msg_buffer[7] = model_id;
+        send_msg_buffer[8] = crsf_crc8_BA(&send_msg_buffer[2], send_msg_buffer[1]-2);
+        send_msg_buffer[9] = crsf_crc8(&send_msg_buffer[2], send_msg_buffer[1]-1);
+        send_msg_buf_count = 10;
+    }
+}
+
 static void param_msg_header(u8 type, u8 address, u8 id) {
         send_msg_buffer[0] = ADDR_MODULE;
         send_msg_buffer[1] = 6;
