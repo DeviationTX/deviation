@@ -409,7 +409,9 @@ uintptr_t CRSF_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_INIT:  initialize(); return 0;
         case PROTOCMD_DEINIT: UART_Stop(); UART_Initialize(); return 0;
         case PROTOCMD_CHECK_AUTOBIND: return 1;
-        case PROTOCMD_BIND:  initialize(); return 0;
+        case PROTOCMD_BIND:
+            CRSF_send_model_id(Model.fixed_id < 64 ? Model.fixed_id : 0xff);
+            return 0;
         case PROTOCMD_NUMCHAN: return 16;
         case PROTOCMD_DEFAULT_NUMCHAN: return 8;
         case PROTOCMD_CHANNELMAP: return UNCHG;
