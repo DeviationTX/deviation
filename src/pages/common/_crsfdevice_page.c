@@ -346,7 +346,7 @@ void CRSF_ping_devices(u8 address) {
     }
 }
 
-void CRSF_send_model_id(u8 model_id) {
+u8 CRSF_send_model_id(u8 model_id) {
     if (!send_msg_buf_count) {
         send_msg_buffer[0] = ADDR_MODULE;
         send_msg_buffer[1] = 8;
@@ -359,7 +359,9 @@ void CRSF_send_model_id(u8 model_id) {
         send_msg_buffer[8] = crsf_crc8_BA(&send_msg_buffer[2], send_msg_buffer[1]-2);
         send_msg_buffer[9] = crsf_crc8(&send_msg_buffer[2], send_msg_buffer[1]-1);
         send_msg_buf_count = 10;
+        return 1;
     }
+    return 0;
 }
 
 static void param_msg_header(u8 type, u8 address, u8 id) {

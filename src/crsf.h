@@ -137,7 +137,7 @@ void CRSF_ping_devices(u8 address);
 void CRSF_read_param(u8 device, u8 id, u8 chunk);
 void CRSF_set_param(crsf_param_t *param);
 void CRSF_send_command(crsf_param_t *param, enum cmd_status status);
-void CRSF_send_model_id(u8 fixed_id);
+u8 CRSF_send_model_id(u8 fixed_id);
 u32 CRSF_read_timeout();
 crsf_module_t CRSF_module_type(void);
 

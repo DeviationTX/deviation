@@ -204,6 +204,7 @@ static void processCrossfireTelemetryFrame()
 
 #if SUPPORT_CRSF_CONFIG
 static crsf_module_t crsf_module;
+static u8 model_id_send;
 #endif
 
 // serial data receive ISR callback
@@ -231,6 +232,10 @@ static void processCrossfireTelemetryData(u8 data, u8 status) {
       if (telemetryRxBuffer[2] < TYPE_PING_DEVICES || telemetryRxBuffer[2] == TYPE_RADIO_ID) {
         processCrossfireTelemetryFrame();     // Broadcast frame
 #if SUPPORT_CRSF_CONFIG
+        // wait for telemetry running before sending model id
+        if (model_id_send && CRSF_send_model_id(Model.fixed_id < 64 ? Model.fixed_id : 0xff)) {
+          model_id_send = 0;
+        }
       } else {
         CRSF_serial_rcv(telemetryRxBuffer+2, telemetryRxBuffer[1]-1);  // Extended frame
         if (crsf_module == MODULE_NULL) {
@@ -344,7 +349,6 @@ static u16 serial_cb()
             CRSF_ping_devices(ADDR_MODULE);  // ask for device info from radio module
             start_state = ST_DATA0;
         } else {
-            CRSF_send_model_id(Model.fixed_id < 64 ? Model.fixed_id : 0xff);
             start_state = ST_DATA1;
         }
 #endif
@@ -397,6 +401,9 @@ static void initialize()
     state = ST_DATA0;
     start_state = ST_DATA0;
     mixer_runtime = 50;
+#if SUPPORT_CRSF_CONFIG
+    model_id_send = 1;
+#endif
 
     CLOCK_StartTimer(1000, serial_cb);
 }
@@ -407,11 +414,12 @@ uintptr_t CRSF_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_INIT:  initialize(); return 0;
         case PROTOCMD_DEINIT: UART_Stop(); UART_Initialize(); return 0;
         case PROTOCMD_CHECK_AUTOBIND: return 1;
-        case PROTOCMD_BIND:
+        case PROTOCMD_CHANGED_ID:
 #if SUPPORT_CRSF_CONFIG
-            CRSF_send_model_id(Model.fixed_id < 64 ? Model.fixed_id : 0xff);
+            model_id_send = 1;
 #endif
             return 0;
+        case PROTOCMD_BIND: return 0;
         case PROTOCMD_NUMCHAN: return 16;
         case PROTOCMD_DEFAULT_NUMCHAN: return 8;
         case PROTOCMD_CHANNELMAP: return UNCHG;

@@ -323,6 +323,12 @@ u32 PROTOCOL_CurrentID()
     return id;
 }
 
+void PROTOCOL_ChangedID()
+{
+    if(Model.protocol != PROTOCOL_NONE && PROTOCOL_LOADED)
+        PROTO_Cmds(PROTOCMD_CHANGED_ID);
+}
+
 const char **PROTOCOL_GetOptions()
 {
     const char **data = NULL;
