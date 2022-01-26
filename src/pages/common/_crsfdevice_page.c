@@ -584,140 +584,140 @@ static void add_param(u8 *buffer, u8 num_bytes) {
 
     // received all chunks for current parameter
     recv_param_ptr = recv_param_buffer;
-    crsf_param_t *parameter = crsf_params;
-    for (int i=0; i < CRSF_MAX_PARAMS; i++, parameter++) {
-        int update = parameter->id == buffer[3];
+    // all devices so far start parameter id at 1...fingers crossed
+    if (buffer[3] >= CRSF_MAX_PARAMS) {
+        next_chunk = 0;
+        next_param = 0;
+        return;
+    }
+    crsf_param_t *parameter = &crsf_params[buffer[3]-1];
+    int update = parameter->id == buffer[3];
 
-        if (update || parameter->id == 0) {
-            parameter->device = device_idx;
-            parameter->id = buffer[3];
-            parameter->parent = *recv_param_ptr++;
-            parameter->type = *recv_param_ptr & 0x7f;
-            if (!update) {
-                parameter->hidden = *recv_param_ptr++ & 0x80;
-                parameter->name = alloc_string(strlen(recv_param_ptr)+1);
-                strlcpy(parameter->name, (const char *)recv_param_ptr,
-                        CRSF_STRING_BYTES_AVAIL(parameter->name));
-                recv_param_ptr += strlen(recv_param_ptr) + 1;
-            } else {
-                if (parameter->hidden != (*recv_param_ptr & 0x80))
-                    params_loaded = 0;   // if item becomes hidden others may also, so reload all params
-                parameter->hidden = *recv_param_ptr++ & 0x80;
-                recv_param_ptr += strlen(recv_param_ptr) + 1;
-            }
-            int count;
-            switch (parameter->type) {
-            case UINT8:
-            case INT8:
-            case UINT16:
-            case INT16:
-            case FLOAT:
-                parse_bytes(parameter->type, &recv_param_ptr, &parameter->value);
-                parse_bytes(parameter->type, &recv_param_ptr, &parameter->min_value);
-                parse_bytes(parameter->type, &recv_param_ptr, &parameter->max_value);
-                parse_bytes(parameter->type, &recv_param_ptr, &parameter->default_value);
-                if (parameter->type == FLOAT) {
-                    parse_bytes(UINT8, &recv_param_ptr, &parameter->u.point);
-                    parse_bytes(FLOAT, &recv_param_ptr, &parameter->step);
-                } else if (*recv_param_ptr) {
-                    if (!update) parameter->s.unit = alloc_string(strlen(recv_param_ptr)+1);
-                    strlcpy(parameter->s.unit, (const char *)recv_param_ptr,
-                            CRSF_STRING_BYTES_AVAIL(parameter->s.unit));
-                }
-                break;
-
-            case TEXT_SELECTION:
-                if (!update) {
-                    parameter->value = alloc_string(strlen(recv_param_ptr)+1);
-                    strlcpy(parameter->value,
-                            (const char *)recv_param_ptr,
-                            CRSF_STRING_BYTES_AVAIL(parameter->value));
-                    recv_param_ptr += strlen(recv_param_ptr) + 1;
-                    // put null between selection options
-                    // find max choice string length to adjust textselectplate size
-                    char *start = (char *)parameter->value;
-                    int max_len = 0;
-                    count = 0;
-                    for (char *p = (char *)parameter->value; *p; p++) {
-                        if (*p == ';') {
-                            *p = '\0';
-                            if (p - start > max_len) {
-                                parameter->max_str = start;  // save max to determine gui box size
-                                max_len = p - start;
-                            }
-                            start = p+1;
-                            count += 1;
-                        }
-                    }
-                    parameter->max_value = count;   // bug fix for incorrect max from device
-                } else {
-                    recv_param_ptr += strlen(recv_param_ptr) + 1;
-                }
-                parse_bytes(UINT8, &recv_param_ptr, &parameter->u.text_sel);
-                parse_bytes(UINT8, &recv_param_ptr, &parameter->min_value);
-                parse_bytes(UINT8, &recv_param_ptr, &count);  // don't use incorrect parameter->max_value
-                parse_bytes(UINT8, &recv_param_ptr, &parameter->default_value);
-                break;
-
-            case INFO:
-                if (!update) {
-                    parameter->value = alloc_string(strlen(recv_param_ptr)+1);
-                    strlcpy(parameter->value,
-                            (const char *)recv_param_ptr,
-                            CRSF_STRING_BYTES_AVAIL(parameter->value));
-                    recv_param_ptr += strlen(recv_param_ptr) + 1;
-                }
-                break;
-
-            case STRING:
-                {
-                    const char *value, *default_value;
-                    value = recv_param_ptr;
-                    recv_param_ptr += strlen(value) + 1;
-                    default_value = recv_param_ptr;
-                    recv_param_ptr += strlen(default_value) + 1;
-                    parse_bytes(UINT8, &recv_param_ptr, &parameter->u.string_max_len);
-
-                    // No string re-sizing so allocate max length for value
-                    if (!update) parameter->value = alloc_string(parameter->u.string_max_len+1);
-                    strlcpy(parameter->value, value,
-                            MIN(parameter->u.string_max_len+1,
-                                CRSF_STRING_BYTES_AVAIL(parameter->value)));
-                    if (!update) parameter->default_value = alloc_string(strlen(default_value)+1);
-                    strlcpy(parameter->default_value, default_value,
-                            CRSF_STRING_BYTES_AVAIL(parameter->default_value));
-                }
-                break;
-
-            case COMMAND:
-                parse_bytes(UINT8, &recv_param_ptr, &parameter->u.status);
-                parse_bytes(UINT8, &recv_param_ptr, &parameter->timeout);
-                if (!update) parameter->s.info = alloc_string(20);
-                strlcpy(parameter->s.info, (const char *)recv_param_ptr, 20);
-
-                command.param = parameter;
-                command.time = 0;
-                switch (parameter->u.status) {
-                case PROGRESS:
-                    command.time = CLOCK_getms();
-                    // FALLTHROUGH
-                case CONFIRMATION_NEEDED:
-                    command.dialog = 1;
-                    break;
-                case READY:
-                    command.dialog = 2;
-                    break;
-                }
-                break;
-
-            case FOLDER:
-            case OUT_OF_RANGE:
-            default:
-                break;
-            }
-
-            break;  // add or update completed
+    parameter->device = device_idx;
+    parameter->id = buffer[3];
+    parameter->parent = *recv_param_ptr++;
+    parameter->type = *recv_param_ptr & 0x7f;
+    if (!update) {
+        parameter->hidden = *recv_param_ptr++ & 0x80;
+        parameter->name = alloc_string(strlen(recv_param_ptr)+1);
+        strlcpy(parameter->name, (const char *)recv_param_ptr,
+                CRSF_STRING_BYTES_AVAIL(parameter->name));
+        recv_param_ptr += strlen(recv_param_ptr) + 1;
+    } else {
+        if (parameter->hidden != (*recv_param_ptr & 0x80))
+            params_loaded = 0;   // if item becomes hidden others may also, so reload all params
+        parameter->hidden = *recv_param_ptr++ & 0x80;
+        recv_param_ptr += strlen(recv_param_ptr) + 1;
+    }
+    int count;
+    switch (parameter->type) {
+    case UINT8:
+    case INT8:
+    case UINT16:
+    case INT16:
+    case FLOAT:
+        parse_bytes(parameter->type, &recv_param_ptr, &parameter->value);
+        parse_bytes(parameter->type, &recv_param_ptr, &parameter->min_value);
+        parse_bytes(parameter->type, &recv_param_ptr, &parameter->max_value);
+        parse_bytes(parameter->type, &recv_param_ptr, &parameter->default_value);
+        if (parameter->type == FLOAT) {
+            parse_bytes(UINT8, &recv_param_ptr, &parameter->u.point);
+            parse_bytes(FLOAT, &recv_param_ptr, &parameter->step);
+        } else if (*recv_param_ptr) {
+            if (!update) parameter->s.unit = alloc_string(strlen(recv_param_ptr)+1);
+            strlcpy(parameter->s.unit, (const char *)recv_param_ptr,
+                    CRSF_STRING_BYTES_AVAIL(parameter->s.unit));
         }
+        break;
+
+    case TEXT_SELECTION:
+        if (!update) {
+            parameter->value = alloc_string(strlen(recv_param_ptr)+1);
+            strlcpy(parameter->value,
+                    (const char *)recv_param_ptr,
+                    CRSF_STRING_BYTES_AVAIL(parameter->value));
+            recv_param_ptr += strlen(recv_param_ptr) + 1;
+            // put null between selection options
+            // find max choice string length to adjust textselectplate size
+            char *start = (char *)parameter->value;
+            int max_len = 0;
+            count = 0;
+            for (char *p = (char *)parameter->value; *p; p++) {
+                if (*p == ';') {
+                    *p = '\0';
+                    if (p - start > max_len) {
+                        parameter->max_str = start;  // save max to determine gui box size
+                        max_len = p - start;
+                    }
+                    start = p+1;
+                    count += 1;
+                }
+            }
+            parameter->max_value = count;   // bug fix for incorrect max from device
+        } else {
+            recv_param_ptr += strlen(recv_param_ptr) + 1;
+        }
+        parse_bytes(UINT8, &recv_param_ptr, &parameter->u.text_sel);
+        parse_bytes(UINT8, &recv_param_ptr, &parameter->min_value);
+        parse_bytes(UINT8, &recv_param_ptr, &count);  // don't use incorrect parameter->max_value
+        parse_bytes(UINT8, &recv_param_ptr, &parameter->default_value);
+        break;
+
+    case INFO:
+        if (!update) {
+            parameter->value = alloc_string(strlen(recv_param_ptr)+1);
+            strlcpy(parameter->value,
+                    (const char *)recv_param_ptr,
+                    CRSF_STRING_BYTES_AVAIL(parameter->value));
+            recv_param_ptr += strlen(recv_param_ptr) + 1;
+        }
+        break;
+
+    case STRING:
+        {
+            const char *value, *default_value;
+            value = recv_param_ptr;
+            recv_param_ptr += strlen(value) + 1;
+            default_value = recv_param_ptr;
+            recv_param_ptr += strlen(default_value) + 1;
+            parse_bytes(UINT8, &recv_param_ptr, &parameter->u.string_max_len);
+
+            // No string re-sizing so allocate max length for value
+            if (!update) parameter->value = alloc_string(parameter->u.string_max_len+1);
+            strlcpy(parameter->value, value,
+                    MIN(parameter->u.string_max_len+1,
+                        CRSF_STRING_BYTES_AVAIL(parameter->value)));
+            if (!update) parameter->default_value = alloc_string(strlen(default_value)+1);
+            strlcpy(parameter->default_value, default_value,
+                    CRSF_STRING_BYTES_AVAIL(parameter->default_value));
+        }
+        break;
+
+    case COMMAND:
+        parse_bytes(UINT8, &recv_param_ptr, &parameter->u.status);
+        parse_bytes(UINT8, &recv_param_ptr, &parameter->timeout);
+        if (!update) parameter->s.info = alloc_string(20);
+        strlcpy(parameter->s.info, (const char *)recv_param_ptr, 20);
+
+        command.param = parameter;
+        command.time = 0;
+        switch (parameter->u.status) {
+        case PROGRESS:
+            command.time = CLOCK_getms();
+            // FALLTHROUGH
+        case CONFIRMATION_NEEDED:
+            command.dialog = 1;
+            break;
+        case READY:
+            command.dialog = 2;
+            break;
+        }
+        break;
+
+    case FOLDER:
+    case OUT_OF_RANGE:
+    default:
+        break;
     }
 
     recv_param_ptr = recv_param_buffer;
