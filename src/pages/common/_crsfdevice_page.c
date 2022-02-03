@@ -327,7 +327,7 @@ void PAGE_CRSFDeviceEvent() {
     }
 
     // spec calls for 2 second timeout on requests. Retry on timeout.
-    if (read_timeout && (CLOCK_getms() - read_timeout > 2000)) {
+    if (read_timeout && (CLOCK_getms() - read_timeout > 500)) {
         CRSF_read_param(device_idx, next_param, next_chunk);
     }
 }
@@ -497,6 +497,9 @@ static void parse_bytes(enum data_type type, char **buffer, void *dest) {
 }
 
 static char *alloc_string(s32 bytes) {
+#ifdef EMULATOR
+  return calloc(1, bytes);
+#endif
     if (CRSF_STRING_BYTES_AVAIL(next_string) < bytes)
         return NULL;
 
@@ -566,6 +569,9 @@ static void add_param(u8 *buffer, u8 num_bytes) {
         return;
     }
 
+#ifdef EMULATOR
+if (!recv_param_ptr) recv_param_ptr = recv_param_buffer;
+#endif
     memcpy(recv_param_ptr, buffer+5, num_bytes-5);
     recv_param_ptr += num_bytes - 5;
 

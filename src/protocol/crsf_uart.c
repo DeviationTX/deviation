@@ -22,6 +22,8 @@
 #include "pages.h"
 #if HAS_EXTENDED_TELEMETRY
 #include "telemetry.h"
+#include "target/drivers/serial/usb_cdc/CBUF.h"
+#include "target/drivers/mcu/stm32/tim.h"
 #endif
 
 #define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
@@ -30,7 +32,7 @@
 #define CRSF_ELRS_DATARATE        1870000U  // fastest ELRS rate that works on t8sg v2 plus
 #define CRSF_FRAME_PERIOD         4000   // 250Hz 4ms
 #define CRSF_FRAME_PERIOD_MIN     1750   // 500Hz 2ms, but allow shorter for offset cancellation
-#define CRSF_FRAME_PERIOD_MAX     40000  // 25Hz  40ms
+#define CRSF_FRAME_PERIOD_MAX     50000  // 25Hz  40ms, but allow longer for offset cancellation
 #define CRSF_CHANNELS             16
 #define CRSF_PACKET_SIZE          26
 
@@ -90,10 +92,19 @@ u8 crsf_crc8_BA(const u8 *ptr, u8 len) {
 
 
 #if HAS_EXTENDED_TELEMETRY
+
+
+struct
+{
+    volatile uint8_t    m_get_idx;
+    volatile uint8_t    m_put_idx;
+    uint8_t             m_entry[512];  // must be power of 2
+} receive_buf;
+
 static u8 telemetryRxBuffer[TELEMETRY_RX_PACKET_SIZE];
 static u8 telemetryRxBufferCount;
 static u32 updateInterval = CRSF_FRAME_PERIOD;
-static s32 offset;
+static s32 correction;
 
 static void set_telemetry(crossfire_telem_t offset, s32 value) {
     Telemetry.value[offset] = value;
@@ -196,9 +207,19 @@ static void processCrossfireTelemetryFrame()
       if (telemetryRxBuffer[3] == ADDR_RADIO && telemetryRxBuffer[5] == CRSF_SUBCOMMAND) {
         if (getCrossfireTelemetryValue(6, (s32 *)&updateInterval, 4))
           updateInterval /= 10;  // values are in 10th of micro-seconds
-        if (getCrossfireTelemetryValue(10, (s32 *)&offset, 4))
-          offset /= 10;  // values are in 10th of micro-seconds
+        if (getCrossfireTelemetryValue(10, (s32 *)&correction, 4))
+          correction /= 10;  // values are in 10th of micro-seconds
       }
+      break;
+
+    case TYPE_VTX_TELEM:
+      if (getCrossfireTelemetryValue(3, &value, 2))
+        set_telemetry(TELEM_CRSF_VTX_FREQ, value);
+      if (getCrossfireTelemetryValue(5, &value, 1))
+        set_telemetry(TELEM_CRSF_VTX_PITMODE, value);
+      if (getCrossfireTelemetryValue(6, &value, 1))
+        set_telemetry(TELEM_CRSF_VTX_POWER, value);
+      break;
   }
 }
 
@@ -208,64 +229,77 @@ static u8 model_id_send;
 #endif
 
 // serial data receive ISR callback
-static void processCrossfireTelemetryData(u8 data, u8 status) {
-  (void)status;
+static void serial_rcv(u8 data, u8 status) {
+    (void)status;
 
-  if (telemetryRxBufferCount == 0 && data != ADDR_RADIO) {
-    return;
-  }
-
-  if (telemetryRxBufferCount == 1 && (data < 2 || data > TELEMETRY_RX_PACKET_SIZE-2)) {
-    telemetryRxBufferCount = 0;
-    return;
-  }
-  
-  if (telemetryRxBufferCount < TELEMETRY_RX_PACKET_SIZE) {
-    telemetryRxBuffer[telemetryRxBufferCount++] = data;
-  } else {
-    telemetryRxBufferCount = 0;
-    return;
-  }
-  
-  if ((telemetryRxBuffer[1] + 2) == telemetryRxBufferCount) {
-    if (checkCrossfireTelemetryFrameCRC()) {
-      if (telemetryRxBuffer[2] < TYPE_PING_DEVICES || telemetryRxBuffer[2] == TYPE_RADIO_ID) {
-        processCrossfireTelemetryFrame();     // Broadcast frame
-#if SUPPORT_CRSF_CONFIG
-        // wait for telemetry running before sending model id
-        if (model_id_send && CRSF_send_model_id(Model.fixed_id < 64 ? Model.fixed_id : 0xff)) {
-          model_id_send = 0;
-        }
-      } else {
-        CRSF_serial_rcv(telemetryRxBuffer+2, telemetryRxBuffer[1]-1);  // Extended frame
-        if (crsf_module == MODULE_NULL) {
-          crsf_module = CRSF_module_type();
-          switch (crsf_module) {
-          case MODULE_ELRS:
-            UART_SetDataRate(CRSF_ELRS_DATARATE);
-            break;
-          case MODULE_NULL:
-            // no device info response yet from radio module
-          case MODULE_UNKNOWN:
-            // module responded but not ELRS
-            break;
-          }
-        }
-#endif
-      }
-    }
-    telemetryRxBufferCount = 0;
-  }
+    CBUF_Push(receive_buf, data);
 }
-#endif  // HAS_EXTENDED_TELEMETRY
 
-#if HAS_EXTENDED_TELEMETRY
+static void processCrossfireTelemetryData() {
+    static u8 length;
+    u8 data;
+
+    while (!CBUF_IsEmpty(receive_buf)) {
+        data = CBUF_Pop(receive_buf);
+
+        if (telemetryRxBufferCount == 0) {
+            if (data != ADDR_RADIO) continue;
+            telemetryRxBuffer[telemetryRxBufferCount++] = data;
+            continue;
+        }
+
+        if (telemetryRxBufferCount == 1) {
+            if (data < 2 || data > TELEMETRY_RX_PACKET_SIZE-2) {
+                telemetryRxBufferCount = 0;
+            } else {
+                length = data;
+                telemetryRxBuffer[telemetryRxBufferCount++] = data;
+            }
+            continue;
+        }
+        
+        if (telemetryRxBufferCount <= length+1) {
+            telemetryRxBuffer[telemetryRxBufferCount] = data;
+        }
+        
+        if (telemetryRxBufferCount++ > length) {
+            if (checkCrossfireTelemetryFrameCRC()) {
+                if (telemetryRxBuffer[2] < TYPE_PING_DEVICES || telemetryRxBuffer[2] == TYPE_RADIO_ID) {
+                    processCrossfireTelemetryFrame();     // Broadcast frame
+#if SUPPORT_CRSF_CONFIG
+                    // wait for telemetry running before sending model id
+                    if (model_id_send && CRSF_send_model_id(Model.fixed_id < 64 ? Model.fixed_id : 0xff)) {
+                        model_id_send = 0;
+                    }
+                } else {
+                    CRSF_serial_rcv(telemetryRxBuffer+2, telemetryRxBuffer[1]-1);  // Extended frame
+                    if (crsf_module == MODULE_NULL) {
+                        crsf_module = CRSF_module_type();
+                        switch (crsf_module) {
+                        case MODULE_ELRS:
+                            UART_SetDataRate(CRSF_ELRS_DATARATE);
+                            break;
+                        case MODULE_NULL:
+                            // no device info response yet from radio module
+                        case MODULE_UNKNOWN:
+                            // module responded but not ELRS
+                            break;
+                        }
+                    }
+#endif
+                }
+            }
+            telemetryRxBufferCount = 0;
+        }
+    }
+}
+
 static u32 get_update_interval() {
-    if (offset == 0) return updateInterval;
+    if (correction == 0) return updateInterval;
 
-    u32 update = updateInterval + offset;
+    u32 update = updateInterval + correction;
     update = constrain(update, CRSF_FRAME_PERIOD_MIN, CRSF_FRAME_PERIOD_MAX);
-    offset -= update - updateInterval;
+    correction -= update - updateInterval;
     return update;
 }
 #else
@@ -337,10 +371,26 @@ typedef enum {
 } state_t;
 static state_t state, start_state;
 
+#ifdef EMULATOR
+//#include "../../crsf_telem_data._c"
+//#include "../../crsf_tx_params._c"
+#include "../../crossfire_tx._c"
+#endif
+
 static u16 mixer_runtime;
 static u16 serial_cb()
 {
     u8 length;
+
+#ifdef EMULATOR
+static u32 offset;
+for (int i=0; i < 60; i++) {
+    serial_rcv(crsf_telem_data[offset++], 0x20);
+    if (offset >= crsf_telem_data_len) offset = 0;
+}
+processCrossfireTelemetryData();
+return 600;
+#endif
 
     switch (state) {
     case ST_DATA0:
@@ -372,8 +422,15 @@ static u16 serial_cb()
 #endif
         UART_Send(packet, length);
 
+#if HAS_EXTENDED_TELEMETRY
+        // if serial data is available, process it
+        u32 telem_timer = timer_get_counter(SYSCLK_TIM.tim);
+        processCrossfireTelemetryData();
+        telem_timer = timer_get_counter(SYSCLK_TIM.tim) - telem_timer;
+#endif
+
         state = start_state;
-        return get_update_interval() - mixer_runtime;
+        return get_update_interval() - mixer_runtime - telem_timer;
     }
 
     return CRSF_FRAME_PERIOD;   // avoid compiler warning
@@ -396,7 +453,8 @@ static void initialize()
     UART_SetDataRate(CRSF_DATARATE);
     UART_SetDuplex(UART_DUPLEX_HALF);
 #if HAS_EXTENDED_TELEMETRY
-    UART_StartReceive(processCrossfireTelemetryData);
+    CBUF_Init(receive_buf);
+    UART_StartReceive(serial_rcv);
 #endif
     state = ST_DATA0;
     start_state = ST_DATA0;
@@ -413,7 +471,7 @@ uintptr_t CRSF_Cmds(enum ProtoCmds cmd)
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(); return 0;
         case PROTOCMD_DEINIT: UART_Stop(); UART_Initialize(); return 0;
-        case PROTOCMD_CHECK_AUTOBIND: return 1;
+        case PROTOCMD_CHECK_AUTOBIND: return 0;
         case PROTOCMD_CHANGED_ID:
 #if SUPPORT_CRSF_CONFIG
             model_id_send = 1;

@@ -54,6 +54,13 @@ static const char *crsfconfig_str_cb(guiObject_t *obj, const void *data)
 
 void PAGE_CRSFConfigEvent()
 {
+    static u32 time;
+    if (time == 0) time = CLOCK_getms();
+    if ((CLOCK_getms() - time) > 1000) {
+        CRSF_ping_devices(ADDR_BROADCAST);    // check for new devices every second
+        time = CLOCK_getms();
+    }
+
     u8 device_count = CRSF_number_of_devices();
     if (number_of_devices != device_count) {
         number_of_devices = device_count;

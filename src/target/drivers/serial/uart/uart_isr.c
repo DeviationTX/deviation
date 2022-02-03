@@ -23,7 +23,7 @@
 
 extern volatile u8 busy;
 
-static volatile u8 one_more;
+
 
 void __attribute__((__used__)) _USART_DMA_ISR(void)
 {
@@ -51,9 +51,6 @@ void __attribute__((__used__)) _UART_ISR(void)
         busy = 0;
     }
         
-    if (status & (USART_SR_PE | USART_SR_FE | USART_SR_NE | USART_SR_ORE))
-        return;
-
     if (!busy && (status & USART_SR_RXNE) && rx_callback) rx_callback(data, status);
 
     // interrupt cleared by reading data register

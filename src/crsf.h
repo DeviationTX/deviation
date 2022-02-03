@@ -7,6 +7,9 @@
 #define ADDR_BROADCAST  0x00  //  Broadcast address
 #define ADDR_USB        0x10  //  USB Device
 #define ADDR_BLUETOOTH  0x12  //  Bluetooth Module
+// Custom Telemetry Frames 0x7F,0x80
+#define CRSF_FRAMETYPE_AP_CUSTOM_TELEM_LEGACY  0x7F     // as suggested by Remo Masina for fw < 4.06 (Ardupilot)
+#define CRSF_FRAMETYPE_AP_CUSTOM_TELEM         0x80     // reserved for ArduPilot by TBS, requires fw >= 4.06 (conflict with next?)
 #define ADDR_PRO_CORE   0x80  //  TBS CORE PNP PRO
 //  #define ADDR_  0x8A       //  Reserved
 #define ADDR_PRO_CURR   0xC0  //  PNP PRO digital current sensor
@@ -19,13 +22,15 @@
 //  #define ADDR_       0xEB  //  Reserved
 #define ADDR_RECEIVER   0xEC  //  Crossfire / UHF receiver
 #define ADDR_MODULE     0xEE  //  Crossfire transmitter
+#define ADDR_ELRS_LUA   0xEF  //  ELRS
 
 // Frame Type
 #define TYPE_GPS              0x02
 #define TYPE_VARIO            0x07
 #define TYPE_BATTERY          0x08
 #define TYPE_HEARTBEAT        0x0b
-#define TYPE_VIDEO            0x0F
+#define TYPE_VTX              0x0F
+#define TYPE_VTX_TELEM        0x10
 #define TYPE_LINK             0x14
 #define TYPE_CHANNELS         0x16
 #define TYPE_RX_ID            0x1C
