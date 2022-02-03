@@ -384,13 +384,13 @@ void CRSF_read_param(u8 device, u8 id, u8 chunk) {
     }
 }
 
-void CRSF_get_elrs(u8 device) {
+void CRSF_get_elrs() {
     // request ELRS_info message
     if (!send_msg_buf_count) {
         send_msg_buffer[0] = ADDR_MODULE;
         send_msg_buffer[1] = 6;
         send_msg_buffer[2] = TYPE_SETTINGS_WRITE;
-        send_msg_buffer[3] = crsf_devices[device].address;
+        send_msg_buffer[3] = ADDR_MODULE;
         send_msg_buffer[4] = ADDR_RADIO;
         send_msg_buffer[5] = 0;
         send_msg_buffer[6] = 0;
