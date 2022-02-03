@@ -228,13 +228,6 @@ static crsf_module_t crsf_module;
 static u8 model_id_send;
 #endif
 
-// serial data receive ISR callback
-static void serial_rcv(u8 data, u8 status) {
-    (void)status;
-
-    CBUF_Push(receive_buf, data);
-}
-
 static void processCrossfireTelemetryData() {
     static u8 length;
     u8 data;
@@ -292,6 +285,14 @@ static void processCrossfireTelemetryData() {
             telemetryRxBufferCount = 0;
         }
     }
+}
+
+// serial data receive ISR callback
+static void serial_rcv(u8 data, u8 status) {
+    (void)status;
+
+    CBUF_Push(receive_buf, data);
+    processCrossfireTelemetryData();
 }
 
 static u32 get_update_interval() {
@@ -422,7 +423,7 @@ return 600;
 #endif
         UART_Send(packet, length);
 
-#if HAS_EXTENDED_TELEMETRY
+#if 0
         // if serial data is available, process it
         u32 telem_timer = timer_get_counter(SYSCLK_TIM.tim);
         processCrossfireTelemetryData();
@@ -430,7 +431,7 @@ return 600;
 #endif
 
         state = start_state;
-        return get_update_interval() - mixer_runtime - telem_timer;
+        return get_update_interval() - mixer_runtime ; // - telem_timer;
     }
 
     return CRSF_FRAME_PERIOD;   // avoid compiler warning
