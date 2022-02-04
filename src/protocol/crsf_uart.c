@@ -423,15 +423,8 @@ return 600;
 #endif
         UART_Send(packet, length);
 
-#if 0
-        // if serial data is available, process it
-        u32 telem_timer = timer_get_counter(SYSCLK_TIM.tim);
-        processCrossfireTelemetryData();
-        telem_timer = timer_get_counter(SYSCLK_TIM.tim) - telem_timer;
-#endif
-
         state = start_state;
-        return get_update_interval() - mixer_runtime ; // - telem_timer;
+        return get_update_interval() - mixer_runtime ;
     }
 
     return CRSF_FRAME_PERIOD;   // avoid compiler warning
