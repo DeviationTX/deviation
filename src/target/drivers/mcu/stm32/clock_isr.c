@@ -55,6 +55,14 @@ void __attribute__((__used__)) exti1_isr()
     if (mixer_sync == MIX_NOT_DONE) mixer_sync = MIX_DONE;
 }
 
+extern void (*task_callback)(void);
+void __attribute__((__used__)) exti3_isr()
+{
+    if (task_callback) task_callback();
+    task_callback = NULL;
+    nvic_disable_irq(NVIC_EXTI3_IRQ);
+}
+
 void __attribute__((__used__)) sys_tick_handler(void)
 {
     msecs++;
