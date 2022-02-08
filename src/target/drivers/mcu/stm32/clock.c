@@ -140,7 +140,7 @@ void CLOCK_Init()
 // run a function one time at low priority
 // used for serial receive data processing outside serial receive ISR
 void (*task_callback)();
-void CLOCK_RunTask(void (*cb)(void)) {
+void CLOCK_RunOnce(void (*cb)(void)) {
     if (cb) {
         task_callback = cb;
         nvic_set_pending_irq(NVIC_EXTI3_IRQ);

@@ -292,7 +292,7 @@ static void serial_rcv(u8 data, u8 status) {
     (void)status;
 
     CBUF_Push(receive_buf, data);
-    CLOCK_RunTask(processCrossfireTelemetryData);
+    CLOCK_RunOnce(processCrossfireTelemetryData);
 }
 
 static u32 get_update_interval() {
