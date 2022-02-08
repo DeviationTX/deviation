@@ -126,12 +126,6 @@ typedef struct {
     } s;
 } crsf_param_t;
 
-typedef enum {
-    MODULE_NULL = 0,
-    MODULE_UNKNOWN,  // Crossfire, Ghost?
-    MODULE_ELRS
-} crsf_module_t;
-
 extern crsf_device_t crsf_devices[CRSF_MAX_DEVICES];
 
 void CRSF_serial_rcv(u8 *buffer, u8 num_bytes);
@@ -144,7 +138,6 @@ void CRSF_set_param(crsf_param_t *param);
 void CRSF_send_command(crsf_param_t *param, enum cmd_status status);
 u8 CRSF_send_model_id(u8 fixed_id);
 u32 CRSF_read_timeout();
-crsf_module_t CRSF_module_type(void);
 
 #endif  // SUPPORT_CRSF_CONFIG
 

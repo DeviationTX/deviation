@@ -224,7 +224,6 @@ static void processCrossfireTelemetryFrame()
 }
 
 #if SUPPORT_CRSF_CONFIG
-static crsf_module_t crsf_module;
 static u8 model_id_send;
 #endif
 
@@ -266,19 +265,6 @@ static void processCrossfireTelemetryData() {
                     }
                 } else {
                     CRSF_serial_rcv(telemetryRxBuffer+2, telemetryRxBuffer[1]-1);  // Extended frame
-                    if (crsf_module == MODULE_NULL) {
-                        crsf_module = CRSF_module_type();
-                        switch (crsf_module) {
-                        case MODULE_ELRS:
-                            UART_SetDataRate(CRSF_ELRS_DATARATE);
-                            break;
-                        case MODULE_NULL:
-                            // no device info response yet from radio module
-                        case MODULE_UNKNOWN:
-                            // module responded but not ELRS
-                            break;
-                        }
-                    }
 #endif
                 }
             }
@@ -368,9 +354,8 @@ static u8 build_rcdata_pkt()
 typedef enum {
     ST_DATA0,
     ST_DATA1,
-    ST_DATA2,
 } state_t;
-static state_t state, start_state;
+static state_t state;
 
 #ifdef EMULATOR
 //#include "../../crsf_telem_data._c"
@@ -395,23 +380,11 @@ return 600;
 
     switch (state) {
     case ST_DATA0:
-#if SUPPORT_CRSF_CONFIG
-        if (crsf_module == MODULE_NULL) {
-            CRSF_ping_devices(ADDR_MODULE);  // ask for device info from radio module
-            start_state = ST_DATA0;
-        } else {
-            start_state = ST_DATA1;
-        }
-#endif
-        state = ST_DATA2;
-        return 8000;
-
-    case ST_DATA1:
         CLOCK_RunMixer();    // clears mixer_sync, which is then set when mixer update complete
-        state = ST_DATA2;
+        state = ST_DATA1;
         return mixer_runtime;
 
-    case ST_DATA2:
+    case ST_DATA1:
         if (mixer_sync != MIX_DONE && mixer_runtime < 2000) mixer_runtime += 50;
 #if SUPPORT_CRSF_CONFIG
         length = CRSF_serial_txd(packet, sizeof packet);
@@ -423,8 +396,8 @@ return 600;
 #endif
         UART_Send(packet, length);
 
-        state = start_state;
-        return get_update_interval() - mixer_runtime ;
+        state = ST_DATA0;
+        return get_update_interval() - mixer_runtime;
     }
 
     return CRSF_FRAME_PERIOD;   // avoid compiler warning
@@ -444,14 +417,16 @@ static void initialize()
     Transmitter.audio_player = AUDIO_DISABLED; // disable voice commands on serial port
 #endif
     UART_Initialize();
-    UART_SetDataRate(CRSF_DATARATE);
+    if (Model.protocol == PROTOCOL_ELRS)
+        UART_SetDataRate(CRSF_ELRS_DATARATE);
+    else
+        UART_SetDataRate(CRSF_DATARATE);
     UART_SetDuplex(UART_DUPLEX_HALF);
 #if HAS_EXTENDED_TELEMETRY
     CBUF_Init(receive_buf);
     UART_StartReceive(serial_rcv);
 #endif
     state = ST_DATA0;
-    start_state = ST_DATA0;
     mixer_runtime = 50;
 #if SUPPORT_CRSF_CONFIG
     model_id_send = 1;
