@@ -127,11 +127,6 @@ void CLOCK_Init()
     // nvic_enable_irq(_NVIC_DMA_CHANNEL_IRQ);
     // nvic_set_priority(_NVIC_DMA_CHANNEL_IRQ, 65); // Medium priority
 
-    // enable EXTI3 to execute function one time at low priority
-    // used in serial receive code
-//    nvic_set_priority(NVIC_EXTI3_IRQ, 44);
-//    nvic_enable_irq(NVIC_EXTI3_IRQ);
-
     /* wait for system to start up and stabilize */
     while(msecs < 100)
         ;
