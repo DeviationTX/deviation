@@ -99,14 +99,29 @@ static int row_cb(int absrow, int relrow, int y, void *data) {
     return 1;
 }
 
-void show_page(int folder) {
-    GUI_RemoveAllObjects();
-    if (count_params_loaded() == crsf_devices[device_idx].number_of_params) {
-        PAGE_ShowHeader(crsf_devices[device_idx].name);
-    } else {
+static const char *hdr_str_cb(guiObject_t *obj, const void *data) {
+    (void)obj;
+    (void)data;
+
+    if (count_params_loaded() != crsf_devices[device_idx].number_of_params) {
         snprintf(tempstring, sizeof tempstring, "%s %s", crsf_devices[device_idx].name, _tr_noop("LOADING"));
-        PAGE_ShowHeader(tempstring);
+    } else if (Model.protocol == PROTOCOL_ELRS) {
+        snprintf(tempstring, sizeof tempstring, "%s  %d/%d  %c",
+                 crsf_devices[device_idx].name, elrs_info.bad_pkts, elrs_info.good_pkts,
+                 (elrs_info.flags & 1) ? 'C' : '-');
+    } else  {
+        return crsf_devices[device_idx].name;
     }
+    return tempstring;
+}
+
+static void show_header() {
+    GUI_Redraw(&gui->msg);
+}
+
+static void show_page(int folder) {
+    GUI_RemoveAllObjects();
+    GUI_CreateLabelBox(&gui->msg, 0, 0, LCD_WIDTH, HEADER_HEIGHT, &TITLE_FONT, hdr_str_cb, NULL, NULL);
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH,
         LCD_HEIGHT - HEADER_HEIGHT, LINE_SPACE, folder_rows(folder),
         row_cb, NULL, NULL, NULL);

@@ -18,6 +18,7 @@
 #include "crsf.h"
 
 crsf_device_t crsf_devices[CRSF_MAX_DEVICES];
+elrs_info_t elrs_info;
 
 static struct crsfconfig_page * const mp = &pagemem.u.crsfconfig_page;
 static struct crsfconfig_obj * const gui = &gui_objs.u.crsfconfig;
@@ -27,8 +28,9 @@ static u8 number_of_devices;    // total known
 
 static u8 CRSF_number_of_devices() {
     int i;
-    for (i=0; i < CRSF_MAX_DEVICES; i++)
+    for (i=0; i < CRSF_MAX_DEVICES; i++) {
         if (crsf_devices[i].address == 0) break;
+    }
 
     return i;
 }
@@ -40,8 +42,10 @@ static void press_cb(struct guiObject *obj, s8 press_type, const void *data)
     if (press_type != -1) {
         return;
     }
-    if ((intptr_t)data < CRSF_number_of_devices())
+    if ((intptr_t)data < CRSF_number_of_devices()) {
+//        if (Model.protocol == PROTOCOL_ELRS) CRSF_get_elrs();
         PAGE_PushByID(PAGEID_CRSFDEVICE, (intptr_t)data);
+    }
 }
 
 static const char *crsfconfig_str_cb(guiObject_t *obj, const void *data)
@@ -57,7 +61,7 @@ void PAGE_CRSFConfigEvent()
     static u32 time;
     if (time == 0) time = CLOCK_getms();
     if ((CLOCK_getms() - time) > 1000) {
-        CRSF_ping_devices(ADDR_BROADCAST);    // check for new devices every second
+        CRSF_ping_devices(ADDR_BROADCAST);    // check for new devices
         time = CLOCK_getms();
     }
 

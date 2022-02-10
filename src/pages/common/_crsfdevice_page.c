@@ -209,7 +209,8 @@ static const char *value_numsel(guiObject_t *obj, int dir, void *data)
     return tempstring;
 }
 
-void show_page(int folder);
+static void show_page(int folder);
+static void show_header();
 
 static void folder_cb(struct guiObject *obj, s8 press_type, const void *data)
 {
@@ -306,6 +307,9 @@ void PAGE_CRSFDeviceEvent() {
     if (params_loaded != params_count) {
         params_loaded = params_count;
         show_page(current_folder);
+    } else if (elrs_info.update > 0) {
+        elrs_info.update = 0;
+        show_header();
     }
 
     // commands may require interaction through dialog
@@ -320,6 +324,7 @@ void PAGE_CRSFDeviceEvent() {
         if (command.param->u.status != READY) {
             CRSF_send_command(command.param, POLL);
             command.time = CLOCK_getms();
+            return;
         } else {
             PAGE_CRSFdialogClose();
             command.time = 0;
@@ -327,8 +332,15 @@ void PAGE_CRSFDeviceEvent() {
     }
 
     // spec calls for 2 second timeout on requests. Retry on timeout.
-    if (read_timeout && (CLOCK_getms() - read_timeout > 500)) {
+    if (read_timeout && (CLOCK_getms() - read_timeout > 2000)) {
         CRSF_read_param(device_idx, next_param, next_chunk);
+        return;
+    }
+
+    static u32 time;
+    if (Model.protocol == PROTOCOL_ELRS && (CLOCK_getms() - time) > 500) {
+        CRSF_get_elrs();     // ask for ELRS info message
+        time = CLOCK_getms();
     }
 }
 
@@ -536,15 +548,21 @@ static void add_device(u8 *buffer) {
 }
 
 static void parse_elrs_info(u8 *buffer) {
-  if (buffer[2] != crsf_devices[device_idx].address) return;
+    elrs_info_t local_info;
 
-  // currently not doing anything with these values
-  //u8 bad_packet = buffer[3];                      // bad packet rate (should be 0)
-  //u8 good_packet = (buffer[4] << 8) + buffer[5];  // good packet rate (configured rate)
-  // flags bit 0 indicates receiver connected
-  // other bits indicated errors - title in flags_info
-  //u8 elrs_flags = buffer[6];
-  //char *elrs_flags_info = buffer[7];  // null-terminated title of flags
+    local_info.bad_pkts = buffer[3];                      // bad packet rate (should be 0)
+    local_info.good_pkts = (buffer[4] << 8) + buffer[5];  // good packet rate (configured rate)
+    // flags bit 0 indicates receiver connected
+    // other bits indicate errors - error text in flags_info
+    local_info.flags = buffer[6];
+    strlcpy(local_info.flag_info, (const char*)&buffer[7], CRSF_MAX_NAME_LEN);  // null-terminated text of flags
+
+    // save in global for use in UI
+    local_info.update = elrs_info.update;
+    if (memcmp((void*)&elrs_info, (void*)&local_info, sizeof(elrs_info_t)-CRSF_MAX_NAME_LEN)) {
+        memcpy((void*)&elrs_info, (void*)&local_info, sizeof(elrs_info_t)-CRSF_MAX_NAME_LEN);
+        elrs_info.update += 1;
+    }
 }
 
 static void add_param(u8 *buffer, u8 num_bytes) {

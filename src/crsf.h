@@ -97,6 +97,14 @@ typedef struct {
 } crsf_device_t;
 
 typedef struct {
+    u8 update;
+    u8 bad_pkts;
+    u16 good_pkts;
+    u8 flags;
+    char flag_info[CRSF_MAX_NAME_LEN];
+} elrs_info_t;
+
+typedef struct {
     // common fields
     u8 device;            // device index of device parameter belongs to
     u8 id;                // Parameter number (starting from 1)
@@ -127,6 +135,7 @@ typedef struct {
 } crsf_param_t;
 
 extern crsf_device_t crsf_devices[CRSF_MAX_DEVICES];
+extern elrs_info_t elrs_info;
 
 void CRSF_serial_rcv(u8 *buffer, u8 num_bytes);
 u8 CRSF_serial_txd(u8 *buffer, u8 max_len);
@@ -138,6 +147,7 @@ void CRSF_set_param(crsf_param_t *param);
 void CRSF_send_command(crsf_param_t *param, enum cmd_status status);
 u8 CRSF_send_model_id(u8 fixed_id);
 u32 CRSF_read_timeout();
+void CRSF_get_elrs();
 
 #endif  // SUPPORT_CRSF_CONFIG
 
