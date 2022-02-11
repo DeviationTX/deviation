@@ -15,6 +15,7 @@
 
 #if SUPPORT_CRSF_CONFIG
 
+#include "target/drivers/serial/usb_cdc/CBUF.h"
 #include "crsf.h"
 
 #define CRSF_MAX_PARAMS  55   // one extra required, max observed is 47 in Diversity Nano RX
@@ -37,14 +38,18 @@ static struct {
     u8  dialog;
 } command;
 
+static struct {
+    volatile uint8_t    m_get_idx;
+    volatile uint8_t    m_put_idx;
+    uint8_t             m_entry[128];  // must be power of 2
+} send_buf;
+
 #define CRSF_MAX_CHUNK_SIZE   58   // 64 - header - type - destination - origin
 #define CRSF_MAX_CHUNKS        5   // not in specification. Max observed is 3 for Nano RX
 static char recv_param_buffer[CRSF_MAX_CHUNKS * CRSF_MAX_CHUNK_SIZE];
 static char *recv_param_ptr;
 
 #define SEND_MSG_BUF_SIZE  64      // don't send more than one chunk
-static u8 send_msg_buffer[SEND_MSG_BUF_SIZE];
-static volatile int send_msg_buf_count;     // tx data available semaphore with CRSF protocol
 
 static char *next_string;
 
@@ -57,6 +62,7 @@ static void crsfdevice_init() {
     params_loaded = 0;
     next_string = mp->strings;
     memset(crsf_params, 0, sizeof crsf_params);
+    CBUF_Init(send_buf);
 }
 
 crsf_param_t *current_param(int absrow) {
@@ -345,137 +351,191 @@ void PAGE_CRSFDeviceEvent() {
 }
 
 // Following functions queue a CRSF message for sending
-// Broadcast for device info responses
+
+// start with crc=0
+static void buf_push_crc(u8 *crc, u8 val) {
+    CBUF_Push(send_buf, val);
+    crsf_crc8_acc(crc, val);
+}
+static void buf_push_crc2(u8 *crc, u8 *crc_BA, u8 val) {
+    CBUF_Push(send_buf, val);
+    crsf_crc8_acc(crc, val);
+    crsf_crc8_BA_acc(crc_BA, val);
+}
+
 void CRSF_ping_devices(u8 address) {
-    if (!send_msg_buf_count) {
-        send_msg_buffer[0] = ADDR_MODULE;
-        send_msg_buffer[1] = 4;
-        send_msg_buffer[2] = TYPE_PING_DEVICES;
-        send_msg_buffer[3] = address;
-        send_msg_buffer[4] = ADDR_RADIO;
-        send_msg_buffer[5] = crsf_crc8(&send_msg_buffer[2], send_msg_buffer[1]-1);
-        send_msg_buf_count = 6;
-    }
+    if (CBUF_Space(send_buf) < 6) return;
+    u8 crc = 0;
+    CBUF_Push(send_buf, ADDR_MODULE);
+    CBUF_Push(send_buf, 4);
+    buf_push_crc(&crc, TYPE_PING_DEVICES);
+    buf_push_crc(&crc, address);
+    buf_push_crc(&crc, ADDR_RADIO);
+    CBUF_Push(send_buf, crc);
 }
 
 u8 CRSF_send_model_id(u8 model_id) {
-    if (!send_msg_buf_count) {
-        send_msg_buffer[0] = ADDR_MODULE;
-        send_msg_buffer[1] = 8;
-        send_msg_buffer[2] = TYPE_COMMAND_ID;
-        send_msg_buffer[3] = ADDR_MODULE;
-        send_msg_buffer[4] = ADDR_RADIO;
-        send_msg_buffer[5] = CRSF_SUBCOMMAND;
-        send_msg_buffer[6] = COMMAND_MODEL_SELECT_ID;
-        send_msg_buffer[7] = model_id;
-        send_msg_buffer[8] = crsf_crc8_BA(&send_msg_buffer[2], send_msg_buffer[1]-2);
-        send_msg_buffer[9] = crsf_crc8(&send_msg_buffer[2], send_msg_buffer[1]-1);
-        send_msg_buf_count = 10;
-        return 1;
-    }
-    return 0;
-}
-
-static void param_msg_header(u8 type, u8 address, u8 id) {
-        send_msg_buffer[0] = ADDR_MODULE;
-        send_msg_buffer[1] = 6;
-        send_msg_buffer[2] = type;
-        send_msg_buffer[3] = address;
-        send_msg_buffer[4] = ADDR_RADIO;
-        send_msg_buffer[5] = id;
+    if (CBUF_Space(send_buf) < 10) return 0;
+    u8 crc = 0;
+    u8 crc_BA = 0;
+    CBUF_Push(send_buf, ADDR_MODULE);
+    CBUF_Push(send_buf, 8);
+    buf_push_crc2(&crc, &crc_BA, TYPE_COMMAND_ID);
+    buf_push_crc2(&crc, &crc_BA, ADDR_MODULE);
+    buf_push_crc2(&crc, &crc_BA, ADDR_RADIO);
+    buf_push_crc2(&crc, &crc_BA, CRSF_SUBCOMMAND);
+    buf_push_crc2(&crc, &crc_BA, COMMAND_MODEL_SELECT_ID);
+    buf_push_crc2(&crc, &crc_BA, model_id);
+    buf_push_crc(&crc, crc_BA);
+    CBUF_Push(send_buf, crc);
+    return 1;
 }
 
 // Request parameter info from known device
 void CRSF_read_param(u8 device, u8 id, u8 chunk) {
-    if (!send_msg_buf_count) {
-        param_msg_header(TYPE_SETTINGS_READ, crsf_devices[device].address, id);
-        send_msg_buffer[6] = chunk;
-        send_msg_buffer[7] = crsf_crc8(&send_msg_buffer[2], send_msg_buffer[1]-1);
-        send_msg_buf_count = 8;
-        read_timeout = CLOCK_getms();
-    }
+    if (CBUF_Space(send_buf) < 8) return;
+    u8 crc = 0;
+    CBUF_Push(send_buf, ADDR_MODULE);
+    CBUF_Push(send_buf, 6);
+    buf_push_crc(&crc, TYPE_SETTINGS_READ);
+    buf_push_crc(&crc, crsf_devices[device].address);
+    buf_push_crc(&crc, ADDR_RADIO);
+    buf_push_crc(&crc, id);
+    buf_push_crc(&crc, chunk);
+    CBUF_Push(send_buf, crc);
+    read_timeout = CLOCK_getms();
 }
 
 void CRSF_get_elrs() {
     // request ELRS_info message
-    if (!send_msg_buf_count) {
-        send_msg_buffer[0] = ADDR_MODULE;
-        send_msg_buffer[1] = 6;
-        send_msg_buffer[2] = TYPE_SETTINGS_WRITE;
-        send_msg_buffer[3] = ADDR_MODULE;
-        send_msg_buffer[4] = ADDR_RADIO;
-        send_msg_buffer[5] = 0;
-        send_msg_buffer[6] = 0;
-        send_msg_buffer[7] = crsf_crc8(&send_msg_buffer[2], send_msg_buffer[1]-1);
-        send_msg_buf_count = 8;
-    }
+    if (CBUF_Space(send_buf) < 8) return;
+    u8 crc = 0;
+    CBUF_Push(send_buf, ADDR_MODULE);
+    CBUF_Push(send_buf, 6);
+    buf_push_crc(&crc, TYPE_SETTINGS_WRITE);
+    buf_push_crc(&crc, ADDR_MODULE);
+    buf_push_crc(&crc, ADDR_RADIO);
+    buf_push_crc(&crc, 0);
+    buf_push_crc(&crc, 0);
+    CBUF_Push(send_buf, crc);
 }
 
-void CRSF_set_param(crsf_param_t *param) {
-    if (!send_msg_buf_count) {
-        next_param = param->id;    // device responds with parameter info so prepare to receive
-        next_chunk = 0;
-        recv_param_ptr = recv_param_buffer;
-
-        param_msg_header(TYPE_SETTINGS_WRITE, crsf_devices[param->device].address, param->id);
-
-        int i = 6;
+static u8 param_len(crsf_param_t *param) {
         switch (param->type) {
         case UINT8:
-            send_msg_buffer[i++] = (u8)(uintptr_t)param->value;
-            break;
         case INT8:
-            send_msg_buffer[i++] = (s8)(intptr_t)param->value;
-            break;
-        case UINT16:
-            send_msg_buffer[i++] = (u16)(uintptr_t)param->value >> 8;
-            send_msg_buffer[i++] = (u16)(uintptr_t)param->value;
-            break;
-        case INT16:
-            send_msg_buffer[i++] = (s16)(intptr_t)param->value >> 8;
-            send_msg_buffer[i++] = (s16)(intptr_t)param->value;
-            break;
-        case FLOAT:
-            send_msg_buffer[i++] = (intptr_t)param->value >> 24;
-            send_msg_buffer[i++] = (intptr_t)param->value >> 16;
-            send_msg_buffer[i++] = (intptr_t)param->value >> 8;
-            send_msg_buffer[i++] = (intptr_t)param->value;
-            break;
         case TEXT_SELECTION:
-            send_msg_buffer[i++] = (u8)param->u.text_sel;
-            break;
+            return 1;
+        case UINT16:
+        case INT16:
+            return 2;
+        case FLOAT:
+            return 4;
         case STRING:
-            i += strlcpy((char *)&send_msg_buffer[i], (char *)param->value, SEND_MSG_BUF_SIZE);
+            return strlen(param->value) + 1;
         case OUT_OF_RANGE:
         default:
             break;
         }
+        return 0;
+}
 
-        send_msg_buffer[1] = i - 1;
-        send_msg_buffer[i++] = crsf_crc8(&send_msg_buffer[2], send_msg_buffer[1]-1);
-        send_msg_buf_count = i;
-        read_timeout = CLOCK_getms();
+void CRSF_set_param(crsf_param_t *param) {
+    u16 length = param_len(param) + 5;
+    if ((u16)CBUF_Space(send_buf) < length+2) return;
+
+    next_param = param->id;    // device responds with parameter info so prepare to receive
+    next_chunk = 0;
+    recv_param_ptr = recv_param_buffer;
+
+    u8 crc = 0;
+    CBUF_Push(send_buf, ADDR_MODULE);
+    CBUF_Push(send_buf, length);
+    buf_push_crc(&crc, TYPE_SETTINGS_WRITE);
+    buf_push_crc(&crc, crsf_devices[param->device].address);
+    buf_push_crc(&crc, ADDR_RADIO);
+    buf_push_crc(&crc, param->id);
+
+    switch (param->type) {
+    case UINT8:
+        buf_push_crc(&crc, (u8)(uintptr_t)param->value);
+        break;
+    case INT8:
+        buf_push_crc(&crc, (s8)(intptr_t)param->value);
+        break;
+    case UINT16:
+        buf_push_crc(&crc, (u16)(uintptr_t)param->value >> 8);
+        buf_push_crc(&crc, (u16)(uintptr_t)param->value);
+        break;
+    case INT16:
+        buf_push_crc(&crc, (s16)(intptr_t)param->value >> 8);
+        buf_push_crc(&crc, (s16)(intptr_t)param->value);
+        break;
+    case FLOAT:
+        buf_push_crc(&crc, (intptr_t)param->value >> 24);
+        buf_push_crc(&crc, (intptr_t)param->value >> 16);
+        buf_push_crc(&crc, (intptr_t)param->value >> 8);
+        buf_push_crc(&crc, (intptr_t)param->value);
+        break;
+    case TEXT_SELECTION:
+        buf_push_crc(&crc, (u8)param->u.text_sel);
+        break;
+    case STRING:
+        {  char *p = (char*)param->value;
+        for (size_t i=0; i <= strlen((char *)param->value); i++)
+            buf_push_crc(&crc, *p++);
+        }
+        break;
+    case OUT_OF_RANGE:
+    default:
+        break;
     }
+    CBUF_Push(send_buf, crc);
+    read_timeout = CLOCK_getms();
 }
 
 void CRSF_send_command(crsf_param_t *param, enum cmd_status status) {
-    if (!send_msg_buf_count) {
-        next_param = param->id;    // device responds with parameter info so prepare to receive
-        next_chunk = 0;
-        recv_param_ptr = recv_param_buffer;
+    if (CBUF_Space(send_buf) < 8) return;
 
-        param_msg_header(TYPE_SETTINGS_WRITE, crsf_devices[param->device].address, param->id);
-        send_msg_buffer[6] = status;
-        send_msg_buffer[7] = crsf_crc8(&send_msg_buffer[2], send_msg_buffer[1]-1);
-        send_msg_buf_count = 8;
-        if (param->u.status != CONFIRMATION_NEEDED)
-            command.time = CLOCK_getms();
-    }
+    next_param = param->id;    // device responds with parameter info so prepare to receive
+    next_chunk = 0;
+    recv_param_ptr = recv_param_buffer;
+
+    u8 crc = 0;
+    CBUF_Push(send_buf, ADDR_MODULE);
+    CBUF_Push(send_buf, 6);
+    buf_push_crc(&crc, TYPE_SETTINGS_WRITE);
+    buf_push_crc(&crc, crsf_devices[param->device].address);
+    buf_push_crc(&crc, ADDR_RADIO);
+    buf_push_crc(&crc, param->id);
+    buf_push_crc(&crc, status);
+    CBUF_Push(send_buf, crc);
+
+    if (param->u.status != CONFIRMATION_NEEDED)
+        command.time = CLOCK_getms();
 }
 
 /**************************************************************************/
-// Code in this section runs in serial port rx interrupt context
+// Called from CRSF protocol callback to send data if available
+// Copy send data to transmit buffer. Buffer must be large enough (64 bytes)
+// Return number of bytes to send. Must be complete CRSF packet.
+u8 CRSF_serial_txd(u8 *buffer) {
+    u8 len = CBUF_Len(send_buf);
+    if (len < 2) return 0;
+
+    u8 pkt_size = CBUF_Get(send_buf, 1) + 2;
+    if (len >= pkt_size) {
+        for (int i=0; i < pkt_size; i++)
+            buffer[i] = CBUF_Pop(send_buf);
+        return pkt_size;
+    }
+    return 0;
+}
 /**************************************************************************/
+
+/*****************************************************************************************/
+// Code in this section runs in CLOCK_RunOnce interrupt context (software initiated EXTI3)
+/*****************************************************************************************/
 static u32 parse_u32(const u8 *buffer) {
     return (buffer[0] << 24) | (buffer[1] << 16) | (buffer[2] << 8) | buffer[3];
 }
@@ -562,6 +622,7 @@ static void parse_elrs_info(u8 *buffer) {
     if (memcmp((void*)&elrs_info, (void*)&local_info, sizeof(elrs_info_t)-CRSF_MAX_NAME_LEN)) {
         if (local_info.flag_info[0] && strncmp(local_info.flag_info, elrs_info.flag_info, CRSF_MAX_NAME_LEN)) {
             PAGE_ShowWarning(NULL, local_info.flag_info);       // show warning if new flag info string
+            MUSIC_Beep("d2", 100, 100, 5);
         }
 
         memcpy((void*)&elrs_info, (void*)&local_info, sizeof(elrs_info_t)-CRSF_MAX_NAME_LEN);
@@ -770,20 +831,6 @@ void CRSF_serial_rcv(u8 *buffer, u8 num_bytes) {
     default:
         break;
     }
-}
-
-/**************************************************************************/
-// Called from CRSF protocol callback to send data if available
-// Copy send data to transmit buffer
-// Return number of bytes to send. Must be complete CRSF packet.
-u8 CRSF_serial_txd(u8 *buffer, u8 max_len) {
-    u8 bytes_to_send = 0;
-    if (send_msg_buf_count) {
-        bytes_to_send = send_msg_buf_count < max_len ? send_msg_buf_count : max_len;
-        memcpy(buffer, send_msg_buffer, bytes_to_send);
-        send_msg_buf_count -= bytes_to_send;
-    }
-    return bytes_to_send;
 }
 
 #endif

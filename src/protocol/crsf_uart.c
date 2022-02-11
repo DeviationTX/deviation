@@ -89,11 +89,18 @@ u8 crsf_crc8(const u8 *ptr, u8 len) {
 u8 crsf_crc8_BA(const u8 *ptr, u8 len) {
     return crsf_crc(crc8tab_BA, ptr, len);
 }
+// crc accumulator format - start with crc=0
+void crsf_crc8_acc(u8 *crc, const u8 val) {
+    *crc = crc8tab[*crc ^ val];
+}
+void crsf_crc8_BA_acc(u8 *crc, const u8 val) {
+    *crc = crc8tab_BA[*crc ^ val];
+}
 
 
 #if HAS_EXTENDED_TELEMETRY
 
-struct {
+static struct {
     volatile uint8_t    m_get_idx;
     volatile uint8_t    m_put_idx;
     uint8_t             m_entry[512];  // must be power of 2
@@ -254,7 +261,6 @@ static void processCrossfireTelemetryData() {
         }
         
         if (telemetryRxBufferCount++ > length) {
-            telemetryRxBufferCount = 0;
             if (checkCrossfireTelemetryFrameCRC()) {
                 if (telemetryRxBuffer[2] < TYPE_PING_DEVICES || telemetryRxBuffer[2] == TYPE_RADIO_ID) {
                     processCrossfireTelemetryFrame();     // Broadcast frame
@@ -276,6 +282,7 @@ static void processCrossfireTelemetryData() {
                     elrs_info_time = CLOCK_getms();
                 }
             }
+            telemetryRxBufferCount = 0;
         }
     }
 }
@@ -394,7 +401,7 @@ return 600;
     case ST_DATA1:
         if (mixer_sync != MIX_DONE && mixer_runtime < 2000) mixer_runtime += 50;
 #if SUPPORT_CRSF_CONFIG
-        length = CRSF_serial_txd(packet, sizeof packet);
+        length = CRSF_serial_txd(packet);
         if (length == 0) {
             length = build_rcdata_pkt();
         }

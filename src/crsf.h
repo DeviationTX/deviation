@@ -138,9 +138,11 @@ extern crsf_device_t crsf_devices[CRSF_MAX_DEVICES];
 extern elrs_info_t elrs_info;
 
 void CRSF_serial_rcv(u8 *buffer, u8 num_bytes);
-u8 CRSF_serial_txd(u8 *buffer, u8 max_len);
+u8 CRSF_serial_txd(u8 *buffer);
 u8 crsf_crc8(const u8 *ptr, u8 len);
 u8 crsf_crc8_BA(const u8 *ptr, u8 len);
+void crsf_crc8_acc(u8 *crc, const u8 val);
+void crsf_crc8_BA_acc(u8 *crc, const u8 val);
 void CRSF_ping_devices(u8 address);
 void CRSF_read_param(u8 device, u8 id, u8 chunk);
 void CRSF_set_param(crsf_param_t *param);
