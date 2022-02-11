@@ -93,9 +93,7 @@ u8 crsf_crc8_BA(const u8 *ptr, u8 len) {
 
 #if HAS_EXTENDED_TELEMETRY
 
-
-struct
-{
+struct {
     volatile uint8_t    m_get_idx;
     volatile uint8_t    m_put_idx;
     uint8_t             m_entry[512];  // must be power of 2
@@ -229,6 +227,7 @@ static u8 model_id_send;
 
 static void processCrossfireTelemetryData() {
     static u8 length;
+    static u32 elrs_info_time;
     u8 data;
 
     while (!CBUF_IsEmpty(receive_buf)) {
@@ -255,6 +254,7 @@ static void processCrossfireTelemetryData() {
         }
         
         if (telemetryRxBufferCount++ > length) {
+            telemetryRxBufferCount = 0;
             if (checkCrossfireTelemetryFrameCRC()) {
                 if (telemetryRxBuffer[2] < TYPE_PING_DEVICES || telemetryRxBuffer[2] == TYPE_RADIO_ID) {
                     processCrossfireTelemetryFrame();     // Broadcast frame
@@ -262,13 +262,20 @@ static void processCrossfireTelemetryData() {
                     // wait for telemetry running before sending model id
                     if (model_id_send && CRSF_send_model_id(Model.fixed_id < 64 ? Model.fixed_id : 0xff)) {
                         model_id_send = 0;
+                        return;
                     }
                 } else {
                     CRSF_serial_rcv(telemetryRxBuffer+2, telemetryRxBuffer[1]-1);  // Extended frame
 #endif
                 }
+                if (Model.protocol == PROTOCOL_ELRS
+                    && Channels[4] < 1350       // disarmed
+                    && (CLOCK_getms() - elrs_info_time) > 200)
+                {
+                    CRSF_get_elrs();
+                    elrs_info_time = CLOCK_getms();
+                }
             }
-            telemetryRxBufferCount = 0;
         }
     }
 }

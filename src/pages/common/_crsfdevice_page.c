@@ -339,7 +339,7 @@ void PAGE_CRSFDeviceEvent() {
 
     static u32 time;
     if (Model.protocol == PROTOCOL_ELRS && (CLOCK_getms() - time) > 500) {
-        CRSF_get_elrs();     // ask for ELRS info message
+//        CRSF_get_elrs();     // ask for ELRS info message
         time = CLOCK_getms();
     }
 }
@@ -560,6 +560,10 @@ static void parse_elrs_info(u8 *buffer) {
     // save in global for use in UI
     local_info.update = elrs_info.update;
     if (memcmp((void*)&elrs_info, (void*)&local_info, sizeof(elrs_info_t)-CRSF_MAX_NAME_LEN)) {
+        if (local_info.flag_info[0] && strncmp(local_info.flag_info, elrs_info.flag_info, CRSF_MAX_NAME_LEN)) {
+            PAGE_ShowWarning(NULL, local_info.flag_info);       // show warning if new flag info string
+        }
+
         memcpy((void*)&elrs_info, (void*)&local_info, sizeof(elrs_info_t)-CRSF_MAX_NAME_LEN);
         elrs_info.update += 1;
     }
