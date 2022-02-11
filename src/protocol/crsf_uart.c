@@ -230,11 +230,11 @@ static void processCrossfireTelemetryFrame()
 
 #if SUPPORT_CRSF_CONFIG
 static u8 model_id_send;
+static u32 elrs_info_time;
 #endif
 
 static void processCrossfireTelemetryData() {
     static u8 length;
-    static u32 elrs_info_time;
     u8 data;
 
     while (!CBUF_IsEmpty(receive_buf)) {
@@ -272,7 +272,6 @@ static void processCrossfireTelemetryData() {
                     }
                 } else {
                     CRSF_serial_rcv(telemetryRxBuffer+2, telemetryRxBuffer[1]-1);  // Extended frame
-#endif
                 }
                 if (Model.protocol == PROTOCOL_ELRS
                     && Channels[4] < 1350       // disarmed
@@ -280,6 +279,7 @@ static void processCrossfireTelemetryData() {
                 {
                     CRSF_get_elrs();
                     elrs_info_time = CLOCK_getms();
+#endif
                 }
             }
             telemetryRxBufferCount = 0;
