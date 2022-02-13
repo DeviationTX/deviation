@@ -42,10 +42,8 @@ static void press_cb(struct guiObject *obj, s8 press_type, const void *data)
     if (press_type != -1) {
         return;
     }
-    if ((intptr_t)data < CRSF_number_of_devices()) {
-//        if (Model.protocol == PROTOCOL_ELRS) CRSF_get_elrs();
+    if ((intptr_t)data < CRSF_number_of_devices())
         PAGE_PushByID(PAGEID_CRSFDEVICE, (intptr_t)data);
-    }
 }
 
 static const char *crsfconfig_str_cb(guiObject_t *obj, const void *data)

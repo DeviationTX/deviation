@@ -310,8 +310,8 @@ static u32 get_update_interval() {
 #endif  // HAS_EXTENDED_TELEMETRY
 
 
-
 static u8 packet[CRSF_PACKET_SIZE];
+
 
 
 /* from CRSF document
@@ -365,32 +365,15 @@ static u8 build_rcdata_pkt()
     return CRSF_PACKET_SIZE;
 }
 
-typedef enum {
+static enum {
     ST_DATA0,
     ST_DATA1,
-} state_t;
-static state_t state;
-
-#ifdef EMULATOR
-//#include "../../crsf_telem_data._c"
-//#include "../../crsf_tx_params._c"
-#include "../../crossfire_tx._c"
-#endif
+} state;
 
 static u16 mixer_runtime;
 static u16 serial_cb()
 {
     u8 length;
-
-#ifdef EMULATOR
-static u32 offset;
-for (int i=0; i < 60; i++) {
-    serial_rcv(crsf_telem_data[offset++], 0x20);
-    if (offset >= crsf_telem_data_len) offset = 0;
-}
-processCrossfireTelemetryData();
-return 600;
-#endif
 
     switch (state) {
     case ST_DATA0:
