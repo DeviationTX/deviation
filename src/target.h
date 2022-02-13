@@ -135,6 +135,7 @@ enum MsecCallback {
 void CLOCK_Init(void);
 u32 CLOCK_getms(void);
 void CLOCK_StartTimer(unsigned us, u16 (*cb)(void));
+void CLOCK_RunOnce(void (*cb)(void));
 void CLOCK_StopTimer();
 void CLOCK_SetMsecCallback(int cb, u32 msec);
 void CLOCK_ClearMsecCallback(int cb);

@@ -54,6 +54,7 @@ void UART_Initialize()
     /* Finally enable the USART. */
     usart_enable(UART_CFG.uart);
     /* USART irq always needed for DMA completion, sometimes for serial receive */
+    nvic_set_priority(get_nvic_irq(UART_CFG.uart), 4);
     nvic_enable_irq(get_nvic_irq(UART_CFG.uart));
 
     nvic_set_priority(get_nvic_dma_irq(USART_DMA), 3);

@@ -22,20 +22,24 @@
 #include "pages.h"
 #if HAS_EXTENDED_TELEMETRY
 #include "telemetry.h"
+#include "target/drivers/serial/usb_cdc/CBUF.h"
+#include "target/drivers/mcu/stm32/tim.h"
 #endif
 
 #define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
 
 #define CRSF_DATARATE             400000
+#define CRSF_ELRS_DATARATE        1870000U  // fastest ELRS rate that works on t8sg v2 plus
 #define CRSF_FRAME_PERIOD         4000   // 250Hz 4ms
 #define CRSF_FRAME_PERIOD_MIN     1750   // 500Hz 2ms, but allow shorter for offset cancellation
-#define CRSF_FRAME_PERIOD_MAX     40000  // 25Hz  40ms
+#define CRSF_FRAME_PERIOD_MAX     50000  // 25Hz  40ms, but allow longer for offset cancellation
 #define CRSF_CHANNELS             16
 #define CRSF_PACKET_SIZE          26
 
 
+
 // crc implementation from CRSF protocol document rev7
-static u8 crsf_crc8tab[256] = {
+static const u8 crc8tab[256] = {
     0x00, 0xD5, 0x7F, 0xAA, 0xFE, 0x2B, 0x81, 0x54, 0x29, 0xFC, 0x56, 0x83, 0xD7, 0x02, 0xA8, 0x7D,
     0x52, 0x87, 0x2D, 0xF8, 0xAC, 0x79, 0xD3, 0x06, 0x7B, 0xAE, 0x04, 0xD1, 0x85, 0x50, 0xFA, 0x2F,
     0xA4, 0x71, 0xDB, 0x0E, 0x5A, 0x8F, 0x25, 0xF0, 0x8D, 0x58, 0xF2, 0x27, 0x73, 0xA6, 0x0C, 0xD9,
@@ -53,19 +57,59 @@ static u8 crsf_crc8tab[256] = {
     0xD6, 0x03, 0xA9, 0x7C, 0x28, 0xFD, 0x57, 0x82, 0xFF, 0x2A, 0x80, 0x55, 0x01, 0xD4, 0x7E, 0xAB,
     0x84, 0x51, 0xFB, 0x2E, 0x7A, 0xAF, 0x05, 0xD0, 0xAD, 0x78, 0xD2, 0x07, 0x53, 0x86, 0x2C, 0xF9};
 
-u8 crsf_crc8(const u8 *ptr, u8 len) {
+// CRC8 implementation with polynom = 0xBA
+static const u8 crc8tab_BA[256] = {
+    0x00, 0xBA, 0xCE, 0x74, 0x26, 0x9C, 0xE8, 0x52, 0x4C, 0xF6, 0x82, 0x38, 0x6A, 0xD0, 0xA4, 0x1E,
+    0x98, 0x22, 0x56, 0xEC, 0xBE, 0x04, 0x70, 0xCA, 0xD4, 0x6E, 0x1A, 0xA0, 0xF2, 0x48, 0x3C, 0x86,
+    0x8A, 0x30, 0x44, 0xFE, 0xAC, 0x16, 0x62, 0xD8, 0xC6, 0x7C, 0x08, 0xB2, 0xE0, 0x5A, 0x2E, 0x94,
+    0x12, 0xA8, 0xDC, 0x66, 0x34, 0x8E, 0xFA, 0x40, 0x5E, 0xE4, 0x90, 0x2A, 0x78, 0xC2, 0xB6, 0x0C,
+    0xAE, 0x14, 0x60, 0xDA, 0x88, 0x32, 0x46, 0xFC, 0xE2, 0x58, 0x2C, 0x96, 0xC4, 0x7E, 0x0A, 0xB0,
+    0x36, 0x8C, 0xF8, 0x42, 0x10, 0xAA, 0xDE, 0x64, 0x7A, 0xC0, 0xB4, 0x0E, 0x5C, 0xE6, 0x92, 0x28,
+    0x24, 0x9E, 0xEA, 0x50, 0x02, 0xB8, 0xCC, 0x76, 0x68, 0xD2, 0xA6, 0x1C, 0x4E, 0xF4, 0x80, 0x3A,
+    0xBC, 0x06, 0x72, 0xC8, 0x9A, 0x20, 0x54, 0xEE, 0xF0, 0x4A, 0x3E, 0x84, 0xD6, 0x6C, 0x18, 0xA2,
+    0xE6, 0x5C, 0x28, 0x92, 0xC0, 0x7A, 0x0E, 0xB4, 0xAA, 0x10, 0x64, 0xDE, 0x8C, 0x36, 0x42, 0xF8,
+    0x7E, 0xC4, 0xB0, 0x0A, 0x58, 0xE2, 0x96, 0x2C, 0x32, 0x88, 0xFC, 0x46, 0x14, 0xAE, 0xDA, 0x60,
+    0x6C, 0xD6, 0xA2, 0x18, 0x4A, 0xF0, 0x84, 0x3E, 0x20, 0x9A, 0xEE, 0x54, 0x06, 0xBC, 0xC8, 0x72,
+    0xF4, 0x4E, 0x3A, 0x80, 0xD2, 0x68, 0x1C, 0xA6, 0xB8, 0x02, 0x76, 0xCC, 0x9E, 0x24, 0x50, 0xEA,
+    0x48, 0xF2, 0x86, 0x3C, 0x6E, 0xD4, 0xA0, 0x1A, 0x04, 0xBE, 0xCA, 0x70, 0x22, 0x98, 0xEC, 0x56,
+    0xD0, 0x6A, 0x1E, 0xA4, 0xF6, 0x4C, 0x38, 0x82, 0x9C, 0x26, 0x52, 0xE8, 0xBA, 0x00, 0x74, 0xCE,
+    0xC2, 0x78, 0x0C, 0xB6, 0xE4, 0x5E, 0x2A, 0x90, 0x8E, 0x34, 0x40, 0xFA, 0xA8, 0x12, 0x66, 0xDC,
+    0x5A, 0xE0, 0x94, 0x2E, 0x7C, 0xC6, 0xB2, 0x08, 0x16, 0xAC, 0xD8, 0x62, 0x30, 0x8A, 0xFE, 0x44};
+
+static u8 crsf_crc(const u8 crctab[], const u8 *ptr, u8 len) {
     u8 crc = 0;
     for (u8 i=0; i < len; i++) {
-        crc = crsf_crc8tab[crc ^ *ptr++];
+        crc = crctab[crc ^ *ptr++];
     }
     return crc;
 }
+u8 crsf_crc8(const u8 *ptr, u8 len) {
+    return crsf_crc(crc8tab, ptr, len);
+}
+u8 crsf_crc8_BA(const u8 *ptr, u8 len) {
+    return crsf_crc(crc8tab_BA, ptr, len);
+}
+// crc accumulator format - start with crc=0
+void crsf_crc8_acc(u8 *crc, const u8 val) {
+    *crc = crc8tab[*crc ^ val];
+}
+void crsf_crc8_BA_acc(u8 *crc, const u8 val) {
+    *crc = crc8tab_BA[*crc ^ val];
+}
+
 
 #if HAS_EXTENDED_TELEMETRY
+
+static struct {
+    volatile uint8_t    m_get_idx;
+    volatile uint8_t    m_put_idx;
+    uint8_t             m_entry[512];  // must be power of 2
+} receive_buf;
+
 static u8 telemetryRxBuffer[TELEMETRY_RX_PACKET_SIZE];
 static u8 telemetryRxBufferCount;
 static u32 updateInterval = CRSF_FRAME_PERIOD;
-static s32 offset;
+static s32 correction;
 
 static void set_telemetry(crossfire_telem_t offset, s32 value) {
     Telemetry.value[offset] = value;
@@ -165,57 +209,98 @@ static void processCrossfireTelemetryFrame()
       break;
 
     case TYPE_RADIO_ID:
-      if (telemetryRxBuffer[3] == ADDR_RADIO && telemetryRxBuffer[5] == SUBTYPE_TIMING_UPDATE) {
+      if (telemetryRxBuffer[3] == ADDR_RADIO && telemetryRxBuffer[5] == CRSF_SUBCOMMAND) {
         if (getCrossfireTelemetryValue(6, (s32 *)&updateInterval, 4))
           updateInterval /= 10;  // values are in 10th of micro-seconds
-        if (getCrossfireTelemetryValue(10, (s32 *)&offset, 4))
-          offset /= 10;  // values are in 10th of micro-seconds
+        if (getCrossfireTelemetryValue(10, (s32 *)&correction, 4))
+          correction /= 10;  // values are in 10th of micro-seconds
       }
+      break;
+
+    case TYPE_VTX_TELEM:
+      if (getCrossfireTelemetryValue(3, &value, 2))
+        set_telemetry(TELEM_CRSF_VTX_FREQ, value);
+      if (getCrossfireTelemetryValue(5, &value, 1))
+        set_telemetry(TELEM_CRSF_VTX_PITMODE, value);
+      if (getCrossfireTelemetryValue(6, &value, 1))
+        set_telemetry(TELEM_CRSF_VTX_POWER, value);
+      break;
   }
+}
+
+#if SUPPORT_CRSF_CONFIG
+static u8 model_id_send;
+static u32 elrs_info_time;
+#endif
+
+static void processCrossfireTelemetryData() {
+    static u8 length;
+    u8 data;
+
+    while (!CBUF_IsEmpty(receive_buf)) {
+        data = CBUF_Pop(receive_buf);
+
+        if (telemetryRxBufferCount == 0) {
+            if (data != ADDR_RADIO) continue;
+            telemetryRxBuffer[telemetryRxBufferCount++] = data;
+            continue;
+        }
+
+        if (telemetryRxBufferCount == 1) {
+            if (data < 2 || data > TELEMETRY_RX_PACKET_SIZE-2) {
+                telemetryRxBufferCount = 0;
+            } else {
+                length = data;
+                telemetryRxBuffer[telemetryRxBufferCount++] = data;
+            }
+            continue;
+        }
+        
+        if (telemetryRxBufferCount <= length+1) {
+            telemetryRxBuffer[telemetryRxBufferCount] = data;
+        }
+        
+        if (telemetryRxBufferCount++ > length) {
+            if (checkCrossfireTelemetryFrameCRC()) {
+                if (telemetryRxBuffer[2] < TYPE_PING_DEVICES || telemetryRxBuffer[2] == TYPE_RADIO_ID) {
+                    processCrossfireTelemetryFrame();     // Broadcast frame
+#if SUPPORT_CRSF_CONFIG
+                    // wait for telemetry running before sending model id
+                    if (model_id_send && CRSF_send_model_id(Model.fixed_id < 64 ? Model.fixed_id : 0xff)) {
+                        model_id_send = 0;
+                        return;
+                    }
+                } else {
+                    CRSF_serial_rcv(telemetryRxBuffer+2, telemetryRxBuffer[1]-1);  // Extended frame
+                }
+                if (Model.protocol == PROTOCOL_ELRS
+                    && Channels[4] < 1350       // disarmed
+                    && (CLOCK_getms() - elrs_info_time) > 200)
+                {
+                    CRSF_get_elrs();
+                    elrs_info_time = CLOCK_getms();
+#endif
+                }
+            }
+            telemetryRxBufferCount = 0;
+        }
+    }
 }
 
 // serial data receive ISR callback
-static void processCrossfireTelemetryData(u8 data, u8 status) {
-  (void)status;
+static void serial_rcv(u8 data, u8 status) {
+    (void)status;
 
-  if (telemetryRxBufferCount == 0 && data != ADDR_RADIO) {
-    return;
-  }
-
-  if (telemetryRxBufferCount == 1 && (data < 2 || data > TELEMETRY_RX_PACKET_SIZE-2)) {
-    telemetryRxBufferCount = 0;
-    return;
-  }
-  
-  if (telemetryRxBufferCount < TELEMETRY_RX_PACKET_SIZE) {
-    telemetryRxBuffer[telemetryRxBufferCount++] = data;
-  } else {
-    telemetryRxBufferCount = 0;
-    return;
-  }
-  
-  if ((telemetryRxBuffer[1] + 2) == telemetryRxBufferCount) {
-    if (checkCrossfireTelemetryFrameCRC()) {
-      if (telemetryRxBuffer[2] < TYPE_PING_DEVICES || telemetryRxBuffer[2] == TYPE_RADIO_ID) {
-        processCrossfireTelemetryFrame();     // Broadcast frame
-#if SUPPORT_CRSF_CONFIG
-      } else {
-        CRSF_serial_rcv(telemetryRxBuffer+2, telemetryRxBuffer[1]-1);  // Extended frame
-#endif
-      }
-    }
-    telemetryRxBufferCount = 0;
-  }
+    CBUF_Push(receive_buf, data);
+    CLOCK_RunOnce(processCrossfireTelemetryData);
 }
-#endif  // HAS_EXTENDED_TELEMETRY
 
-#if HAS_EXTENDED_TELEMETRY
 static u32 get_update_interval() {
-    if (offset == 0) return updateInterval;
+    if (correction == 0) return updateInterval;
 
-    u32 update = updateInterval + offset;
+    u32 update = updateInterval + correction;
     update = constrain(update, CRSF_FRAME_PERIOD_MIN, CRSF_FRAME_PERIOD_MAX);
-    offset -= update - updateInterval;
+    correction -= update - updateInterval;
     return update;
 }
 #else
@@ -281,8 +366,8 @@ static u8 build_rcdata_pkt()
 }
 
 static enum {
+    ST_DATA0,
     ST_DATA1,
-    ST_DATA2,
 } state;
 
 static u16 mixer_runtime;
@@ -291,15 +376,15 @@ static u16 serial_cb()
     u8 length;
 
     switch (state) {
-    case ST_DATA1:
+    case ST_DATA0:
         CLOCK_RunMixer();    // clears mixer_sync, which is then set when mixer update complete
-        state = ST_DATA2;
+        state = ST_DATA1;
         return mixer_runtime;
 
-    case ST_DATA2:
+    case ST_DATA1:
         if (mixer_sync != MIX_DONE && mixer_runtime < 2000) mixer_runtime += 50;
 #if SUPPORT_CRSF_CONFIG
-        length = CRSF_serial_txd(packet, sizeof packet);
+        length = CRSF_serial_txd(packet);
         if (length == 0) {
             length = build_rcdata_pkt();
         }
@@ -307,8 +392,8 @@ static u16 serial_cb()
         length = build_rcdata_pkt();
 #endif
         UART_Send(packet, length);
-        state = ST_DATA1;
 
+        state = ST_DATA0;
         return get_update_interval() - mixer_runtime;
     }
 
@@ -329,13 +414,20 @@ static void initialize()
     Transmitter.audio_player = AUDIO_DISABLED; // disable voice commands on serial port
 #endif
     UART_Initialize();
-    UART_SetDataRate(CRSF_DATARATE);
+    if (Model.protocol == PROTOCOL_ELRS)
+        UART_SetDataRate(CRSF_ELRS_DATARATE);
+    else
+        UART_SetDataRate(CRSF_DATARATE);
     UART_SetDuplex(UART_DUPLEX_HALF);
 #if HAS_EXTENDED_TELEMETRY
-    UART_StartReceive(processCrossfireTelemetryData);
+    CBUF_Init(receive_buf);
+    UART_StartReceive(serial_rcv);
 #endif
-    state = ST_DATA1;
+    state = ST_DATA0;
     mixer_runtime = 50;
+#if SUPPORT_CRSF_CONFIG
+    model_id_send = 1;
+#endif
 
     CLOCK_StartTimer(1000, serial_cb);
 }
@@ -345,14 +437,19 @@ uintptr_t CRSF_Cmds(enum ProtoCmds cmd)
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(); return 0;
         case PROTOCMD_DEINIT: UART_Stop(); UART_Initialize(); return 0;
-        case PROTOCMD_CHECK_AUTOBIND: return 1;
-        case PROTOCMD_BIND:  initialize(); return 0;
+        case PROTOCMD_CHECK_AUTOBIND: return 0;
+        case PROTOCMD_CHANGED_ID:
+#if SUPPORT_CRSF_CONFIG
+            model_id_send = 1;
+#endif
+            return 0;
+        case PROTOCMD_BIND: return 0;
         case PROTOCMD_NUMCHAN: return 16;
         case PROTOCMD_DEFAULT_NUMCHAN: return 8;
         case PROTOCMD_CHANNELMAP: return UNCHG;
 #if SUPPORT_CRSF_CONFIG
         case PROTOCMD_OPTIONSPAGE: return PAGEID_CRSFCFG;
-#endif  // SUPPORT_CRSF_CONFIG
+#endif
 #if HAS_EXTENDED_TELEMETRY
         case PROTOCMD_TELEMETRYSTATE:
             return PROTO_TELEM_ON;

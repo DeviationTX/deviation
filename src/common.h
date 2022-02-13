@@ -162,6 +162,7 @@ u8 PROTOCOL_GetTelemCapability();
 int PROTOCOL_DefaultNumChannels();
 void PROTOCOL_CheckDialogs();
 u32 PROTOCOL_CurrentID();
+void PROTOCOL_ChangedID();
 const char * PROTOCOL_Name();
 const char * PROTOCOL_GetName(u16 idx);
 const char **PROTOCOL_GetOptions();

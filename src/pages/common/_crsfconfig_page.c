@@ -18,6 +18,7 @@
 #include "crsf.h"
 
 crsf_device_t crsf_devices[CRSF_MAX_DEVICES];
+elrs_info_t elrs_info;
 
 static struct crsfconfig_page * const mp = &pagemem.u.crsfconfig_page;
 static struct crsfconfig_obj * const gui = &gui_objs.u.crsfconfig;
@@ -27,8 +28,9 @@ static u8 number_of_devices;    // total known
 
 static u8 CRSF_number_of_devices() {
     int i;
-    for (i=0; i < CRSF_MAX_DEVICES; i++)
+    for (i=0; i < CRSF_MAX_DEVICES; i++) {
         if (crsf_devices[i].address == 0) break;
+    }
 
     return i;
 }
@@ -54,6 +56,13 @@ static const char *crsfconfig_str_cb(guiObject_t *obj, const void *data)
 
 void PAGE_CRSFConfigEvent()
 {
+    static u32 time;
+    if (time == 0) time = CLOCK_getms();
+    if ((CLOCK_getms() - time) > 1000) {
+        CRSF_ping_devices(ADDR_BROADCAST);    // check for new devices
+        time = CLOCK_getms();
+    }
+
     u8 device_count = CRSF_number_of_devices();
     if (number_of_devices != device_count) {
         number_of_devices = device_count;

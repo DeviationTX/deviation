@@ -97,6 +97,7 @@ static void fixedid_done_cb(guiObject_t *obj, void *data)
     (void)data;
     if (callback_result == 1) {
         Model.fixed_id = atoi(mp->fixed_id);
+        PROTOCOL_ChangedID();
     }
     GUI_RemoveObj(obj);
     PAGE_ModelInit(-1); // must be -1 for devo10 to get back to correct page
