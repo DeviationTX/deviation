@@ -26,7 +26,6 @@ crsf_device_t deviation = {
     .serial_number = 1,
     .hardware_id = 0,
     .firmware_id = 0,
-    .name = "Deviation",
 };
 
 static struct crsfconfig_page * const mp = &pagemem.u.crsfconfig_page;
