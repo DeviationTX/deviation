@@ -434,6 +434,11 @@ static u8 param_len(crsf_param_t *param) {
 }
 
 void CRSF_set_param(crsf_param_t *param) {
+    if (crsf_devices[param->device].address == ADDR_RADIO) {
+        protocol_set_param((u8)param->u.text_sel);  // only one radio param so don't need id
+        return;
+    }
+
     u16 length = param_len(param) + 5;
     if ((u16)CBUF_Space(send_buf) < length+2) return;
 
@@ -587,12 +592,19 @@ static void parse_device(u8* buffer, crsf_device_t *device) {
     device->number_of_params = *buffer;
     buffer += 1;
     device->params_version = *buffer;
+    if (device->address == ADDR_MODULE) {
+        if (device->serial_number == 0x454C5253)
+            protocol_module_type(MODULE_ELRS);
+        else
+            protocol_module_type(MODULE_OTHER);
+    }
 }
 
 static void add_device(u8 *buffer) {
     for (int i=0; i < CRSF_MAX_DEVICES; i++) {
         if (crsf_devices[i].address == buffer[2]        //  device already in table
-         || crsf_devices[i].address == 0) {             //  not found, add to table
+         || crsf_devices[i].address == 0                //  not found, add to table
+         || crsf_devices[i].address == ADDR_RADIO) {    //  replace deviation device if necessary
             parse_device(buffer, &crsf_devices[i]);
             break;
         }

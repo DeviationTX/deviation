@@ -46,6 +46,7 @@ void PAGE_CrsfconfigInit(int page)
     PAGE_SetModal(0);
 
     memset(crsf_devices, 0, sizeof crsf_devices);
+    memcpy((void *)&crsf_devices[CRSF_MAX_DEVICES-1], (void *)&deviation, sizeof (crsf_device_t));
     CRSF_ping_devices(ADDR_BROADCAST);    // ask all TBS devices to respond with device info
 
     PAGE_ShowHeader(PAGE_GetName(PAGEID_CRSFCFG));

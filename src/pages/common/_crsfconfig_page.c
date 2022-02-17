@@ -19,6 +19,15 @@
 
 crsf_device_t crsf_devices[CRSF_MAX_DEVICES];
 elrs_info_t elrs_info;
+crsf_device_t deviation = {
+    .address = ADDR_RADIO,
+    .number_of_params = 1,
+    .params_version = 0,
+    .serial_number = 1,
+    .hardware_id = 0,
+    .firmware_id = 0,
+    .name = "Deviation",
+};
 
 static struct crsfconfig_page * const mp = &pagemem.u.crsfconfig_page;
 static struct crsfconfig_obj * const gui = &gui_objs.u.crsfconfig;
@@ -27,12 +36,12 @@ static u8 number_of_devices;    // total known
 
 
 static u8 CRSF_number_of_devices() {
-    int i;
-    for (i=0; i < CRSF_MAX_DEVICES; i++) {
-        if (crsf_devices[i].address == 0) break;
+    u8 count = 0;
+    for (int i=0; i < CRSF_MAX_DEVICES; i++) {
+        if (crsf_devices[i].address) count += 1;
     }
 
-    return i;
+    return count;
 }
 
 
@@ -42,7 +51,7 @@ static void press_cb(struct guiObject *obj, s8 press_type, const void *data)
     if (press_type != -1) {
         return;
     }
-    if ((intptr_t)data < CRSF_number_of_devices())
+    if (crsf_devices[(intptr_t)data].address)
         PAGE_PushByID(PAGEID_CRSFDEVICE, (intptr_t)data);
 }
 
@@ -66,8 +75,9 @@ void PAGE_CRSFConfigEvent()
     u8 device_count = CRSF_number_of_devices();
     if (number_of_devices != device_count) {
         number_of_devices = device_count;
-        for (int i=0; i < device_count; i++)
-            GUI_Redraw(&gui->name[i]);
+        for (int i=0; i < CRSF_MAX_DEVICES; i++)
+            if (crsf_devices[i].address) 
+                GUI_Redraw(&gui->name[i]);
     }
 }
 

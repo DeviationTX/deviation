@@ -23,19 +23,26 @@
 #if HAS_EXTENDED_TELEMETRY
 #include "telemetry.h"
 #include "target/drivers/serial/usb_cdc/CBUF.h"
-#include "target/drivers/mcu/stm32/tim.h"
 #endif
 
 #define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
 
-#define CRSF_DATARATE             400000
-#define CRSF_ELRS_DATARATE        1870000U  // fastest ELRS rate that works on t8sg v2 plus
 #define CRSF_FRAME_PERIOD         4000   // 250Hz 4ms
 #define CRSF_FRAME_PERIOD_MIN     1750   // 500Hz 2ms, but allow shorter for offset cancellation
 #define CRSF_FRAME_PERIOD_MAX     50000  // 25Hz  40ms, but allow longer for offset cancellation
 #define CRSF_CHANNELS             16
 #define CRSF_PACKET_SIZE          26
 
+static const u32 bitrates[] = { 400000, 1870000, 2250000 };
+static const char * const crsf_opts[] = {
+  _tr_noop("Bit Rate"), "400000", "1870000", "2250000", NULL,
+  NULL
+};
+enum {
+    PROTO_OPTS_BITRATE,
+    LAST_PROTO_OPT,
+};
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 
 // crc implementation from CRSF protocol document rev7
@@ -96,6 +103,19 @@ void crsf_crc8_acc(u8 *crc, const u8 val) {
 void crsf_crc8_BA_acc(u8 *crc, const u8 val) {
     *crc = crc8tab_BA[*crc ^ val];
 }
+
+#if SUPPORT_CRSF_CONFIG
+static u8 model_id_send;
+static u32 elrs_info_time;
+static module_type_t module_type;
+
+#define MODULE_IS_ELRS     (module_type == MODULE_ELRS)
+#define MODULE_IS_UNKNOWN  (module_type == MODULE_UNKNOWN)
+void protocol_module_type(module_type_t type) {
+    module_type = type;
+};
+u8 protocol_module_is_elrs() { return MODULE_IS_ELRS; }
+#endif
 
 
 #if HAS_EXTENDED_TELEMETRY
@@ -215,6 +235,7 @@ static void processCrossfireTelemetryFrame()
         if (getCrossfireTelemetryValue(10, (s32 *)&correction, 4))
           correction /= 10;  // values are in 10th of micro-seconds
       }
+      if (MODULE_IS_UNKNOWN) CRSF_ping_devices(ADDR_MODULE);
       break;
 
     case TYPE_VTX_TELEM:
@@ -228,10 +249,6 @@ static void processCrossfireTelemetryFrame()
   }
 }
 
-#if SUPPORT_CRSF_CONFIG
-static u8 model_id_send;
-static u32 elrs_info_time;
-#endif
 
 static void processCrossfireTelemetryData() {
     static u8 length;
@@ -273,7 +290,7 @@ static void processCrossfireTelemetryData() {
                 } else {
                     CRSF_serial_rcv(telemetryRxBuffer+2, telemetryRxBuffer[1]-1);  // Extended frame
                 }
-                if (Model.protocol == PROTOCOL_ELRS
+                if (MODULE_IS_ELRS
                     && Channels[4] < 1350       // disarmed
                     && (CLOCK_getms() - elrs_info_time) > 200)
                 {
@@ -414,10 +431,7 @@ static void initialize()
     Transmitter.audio_player = AUDIO_DISABLED; // disable voice commands on serial port
 #endif
     UART_Initialize();
-    if (Model.protocol == PROTOCOL_ELRS)
-        UART_SetDataRate(CRSF_ELRS_DATARATE);
-    else
-        UART_SetDataRate(CRSF_DATARATE);
+    UART_SetDataRate(bitrates[Model.proto_opts[PROTO_OPTS_BITRATE]]);
     UART_SetDuplex(UART_DUPLEX_HALF);
 #if HAS_EXTENDED_TELEMETRY
     CBUF_Init(receive_buf);
@@ -430,6 +444,28 @@ static void initialize()
 #endif
 
     CLOCK_StartTimer(1000, serial_cb);
+}
+
+void protocol_read_param(u8 device_idx, crsf_param_t *param) {
+    // only protocol parameter is bitrate
+    param->device = device_idx;            // device index of device parameter belongs to
+    param->id = 1;                // Parameter number (starting from 1)
+    param->parent = 0;            // Parent folder parameter number of the parent folder, 0 means root
+    param->type = TEXT_SELECTION;  // (Parameter type definitions and hidden bit)
+    param->hidden = 0;            // set if hidden
+    param->name = (char*)crsf_opts[0];           // Null-terminated string
+    param->value = "400000\0001870000\0002250000";    // must match crsf_opts TODO
+    param->default_value = 0;  // size depending on data type. Not present for COMMAND.
+    param->min_value = 0;        // not sent for string type
+    param->max_value = 2;        // not sent for string type
+    param->changed = 0;           // flag if set needed when edit element is de-selected
+    param->max_str = &((char*)param->value)[15];        // Longest choice length for text select
+    param->u.text_sel = Model.proto_opts[PROTO_OPTS_BITRATE];
+}
+
+void protocol_set_param(u8 value) {
+    Model.proto_opts[PROTO_OPTS_BITRATE] = value;
+    UART_SetDataRate(bitrates[value]);
 }
 
 uintptr_t CRSF_Cmds(enum ProtoCmds cmd)
@@ -450,6 +486,9 @@ uintptr_t CRSF_Cmds(enum ProtoCmds cmd)
 #if SUPPORT_CRSF_CONFIG
         case PROTOCMD_OPTIONSPAGE: return PAGEID_CRSFCFG;
 #endif
+        // this case is only used to load/save options when PROTOCMD_OPTIONSPAGE is defined
+        case PROTOCMD_GETOPTIONS:
+            return (uintptr_t)crsf_opts;
 #if HAS_EXTENDED_TELEMETRY
         case PROTOCMD_TELEMETRYSTATE:
             return PROTO_TELEM_ON;

@@ -105,7 +105,7 @@ static const char *hdr_str_cb(guiObject_t *obj, const void *data) {
 
     if (count_params_loaded() != crsf_devices[device_idx].number_of_params) {
         snprintf(tempstring, sizeof tempstring, "%s %s", crsf_devices[device_idx].name, _tr_noop("LOADING"));
-    } else if (Model.protocol == PROTOCOL_ELRS) {
+    } else if (protocol_module_is_elrs()) {
         snprintf(tempstring, sizeof tempstring, "%s  %d/%d  %c",
                  crsf_devices[device_idx].name, elrs_info.bad_pkts, elrs_info.good_pkts,
                  (elrs_info.flags & 1) ? 'C' : '-');
@@ -133,8 +133,12 @@ void PAGE_CrsfdeviceInit(int page)
     device_idx = page;
     crsfdevice_init();
     current_folder = 0;
-    if (crsf_devices[device_idx].number_of_params)
-        CRSF_read_param(device_idx, next_param, next_chunk);
+    if (crsf_devices[device_idx].number_of_params) {
+        if (crsf_devices[device_idx].address == ADDR_RADIO)
+            protocol_read_param(device_idx, &crsf_params[0]);    // only one param now
+        else 
+            CRSF_read_param(device_idx, next_param, next_chunk);
+    }
 
     show_page(current_folder);
     PAGE_SetActionCB(action_cb);
