@@ -138,9 +138,9 @@ void (*func_callback)();
 void CLOCK_RunOnce(void (*cb)(void)) {
     if (cb) {
         func_callback = cb;
-        nvic_set_pending_irq(NVIC_EXTI3_IRQ);
         nvic_set_priority(NVIC_EXTI3_IRQ, 44);
         nvic_enable_irq(NVIC_EXTI3_IRQ);
+        nvic_set_pending_irq(NVIC_EXTI3_IRQ);
     }
 }
 

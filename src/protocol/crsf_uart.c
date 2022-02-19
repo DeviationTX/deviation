@@ -277,7 +277,7 @@ static void processCrossfireTelemetryData() {
     static u8 length;
     u8 data;
 
-    while (!CBUF_IsEmpty(receive_buf)) {
+    while (CBUF_Len(receive_buf)) {
         data = CBUF_Pop(receive_buf);
 
         if (telemetryRxBufferCount == 0) {
@@ -432,6 +432,8 @@ static u16 serial_cb()
         length = build_rcdata_pkt();
 #endif
         UART_Send(packet, length);
+
+        if (CBUF_Len(receive_buf)) CLOCK_RunOnce(processCrossfireTelemetryData);
 
         state = ST_DATA0;
         return get_update_interval() - mixer_runtime;
