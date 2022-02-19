@@ -433,7 +433,9 @@ static u16 serial_cb()
 #endif
         UART_Send(packet, length);
 
+#if SUPPORT_CRSF_CONFIG
         if (CBUF_Len(receive_buf)) CLOCK_RunOnce(processCrossfireTelemetryData);
+#endif
 
         state = ST_DATA0;
         return get_update_interval() - mixer_runtime;
