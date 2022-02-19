@@ -61,6 +61,7 @@ static void crsfdevice_init() {
     next_chunk = 0;
     recv_param_ptr = recv_param_buffer;
     params_loaded = 0;
+    params_displayed = 0;
     next_string = mp->strings;
     memset(crsf_params, 0, sizeof crsf_params);
     CBUF_Init(send_buf);
