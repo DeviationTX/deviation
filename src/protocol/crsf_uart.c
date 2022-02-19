@@ -35,7 +35,7 @@
 
 static const u32 bitrates[] = { 400000, 1870000, 2250000 };
 static const char * const crsf_opts[] = {
-  _tr_noop("Bit Rate"), "400000", "1870000", "2250000", NULL,
+  _tr_noop("Bit Rate"), "400K", "1.87M", "2.25M", NULL,
   NULL
 };
 enum {
@@ -123,12 +123,12 @@ void protocol_read_param(u8 device_idx, crsf_param_t *param) {
     param->type = TEXT_SELECTION;  // (Parameter type definitions and hidden bit)
     param->hidden = 0;            // set if hidden
     param->name = (char*)crsf_opts[0];           // Null-terminated string
-    param->value = "400000\0001870000\0002250000";    // must match crsf_opts
+    param->value = "400K\0001.87M\0002.25M";    // must match crsf_opts
     param->default_value = 0;  // size depending on data type. Not present for COMMAND.
     param->min_value = 0;        // not sent for string type
     param->max_value = 2;        // not sent for string type
     param->changed = 0;           // flag if set needed when edit element is de-selected
-    param->max_str = &((char*)param->value)[15];        // Longest choice length for text select
+    param->max_str = &((char*)param->value)[11];        // Longest choice length for text select
     param->u.text_sel = Model.proto_opts[PROTO_OPTS_BITRATE];
 }
 
