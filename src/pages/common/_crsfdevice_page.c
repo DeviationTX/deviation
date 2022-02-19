@@ -26,7 +26,8 @@ static struct crsfdevice_obj * const gui = &gui_objs.u.crsfdevice;
 
 static u32 read_timeout;
 static u8 current_folder = 0;
-static u8 params_loaded;     // if not zero, number displayed so far for current device
+static u8 params_loaded;     // if not zero, number received so far for current device
+static u8 params_displayed;  // if not zero, number displayed so far for current device
 static u8 device_idx;   // current device index
 static u8 next_param;   // parameter and chunk currently being read
 static u8 next_chunk;
@@ -310,8 +311,8 @@ void PAGE_CRSFDeviceEvent() {
     // update page as parameter info is received
     // until all parameters loaded
     u8 params_count = count_params_loaded();
-    if (params_loaded != params_count) {
-        params_loaded = params_count;
+    if (params_displayed != params_count) {
+        params_displayed = params_count;
         show_page(current_folder);
     } else if (elrs_info.update > 0) {
         elrs_info.update = 0;
@@ -801,6 +802,7 @@ static void add_param(u8 *buffer, u8 num_bytes) {
 
     recv_param_ptr = recv_param_buffer;
     next_chunk = 0;
+    params_loaded = count_params_loaded();
 
     // read all params when needed
     if (params_loaded < crsf_devices[device_idx].number_of_params) {
