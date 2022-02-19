@@ -115,6 +115,27 @@ void protocol_module_type(module_type_t type) {
     module_type = type;
 };
 u8 protocol_module_is_elrs() { return MODULE_IS_ELRS; }
+void protocol_read_param(u8 device_idx, crsf_param_t *param) {
+    // only protocol parameter is bitrate
+    param->device = device_idx;            // device index of device parameter belongs to
+    param->id = 1;                // Parameter number (starting from 1)
+    param->parent = 0;            // Parent folder parameter number of the parent folder, 0 means root
+    param->type = TEXT_SELECTION;  // (Parameter type definitions and hidden bit)
+    param->hidden = 0;            // set if hidden
+    param->name = (char*)crsf_opts[0];           // Null-terminated string
+    param->value = "400000\0001870000\0002250000";    // must match crsf_opts
+    param->default_value = 0;  // size depending on data type. Not present for COMMAND.
+    param->min_value = 0;        // not sent for string type
+    param->max_value = 2;        // not sent for string type
+    param->changed = 0;           // flag if set needed when edit element is de-selected
+    param->max_str = &((char*)param->value)[15];        // Longest choice length for text select
+    param->u.text_sel = Model.proto_opts[PROTO_OPTS_BITRATE];
+}
+
+void protocol_set_param(u8 value) {
+    Model.proto_opts[PROTO_OPTS_BITRATE] = value;
+    UART_SetDataRate(bitrates[value]);
+}
 #endif
 
 
@@ -235,7 +256,9 @@ static void processCrossfireTelemetryFrame()
         if (getCrossfireTelemetryValue(10, (s32 *)&correction, 4))
           correction /= 10;  // values are in 10th of micro-seconds
       }
+#if SUPPORT_CRSF_CONFIG
       if (MODULE_IS_UNKNOWN) CRSF_ping_devices(ADDR_MODULE);
+#endif
       break;
 
     case TYPE_VTX_TELEM:
@@ -444,28 +467,6 @@ static void initialize()
 #endif
 
     CLOCK_StartTimer(1000, serial_cb);
-}
-
-void protocol_read_param(u8 device_idx, crsf_param_t *param) {
-    // only protocol parameter is bitrate
-    param->device = device_idx;            // device index of device parameter belongs to
-    param->id = 1;                // Parameter number (starting from 1)
-    param->parent = 0;            // Parent folder parameter number of the parent folder, 0 means root
-    param->type = TEXT_SELECTION;  // (Parameter type definitions and hidden bit)
-    param->hidden = 0;            // set if hidden
-    param->name = (char*)crsf_opts[0];           // Null-terminated string
-    param->value = "400000\0001870000\0002250000";    // must match crsf_opts TODO
-    param->default_value = 0;  // size depending on data type. Not present for COMMAND.
-    param->min_value = 0;        // not sent for string type
-    param->max_value = 2;        // not sent for string type
-    param->changed = 0;           // flag if set needed when edit element is de-selected
-    param->max_str = &((char*)param->value)[15];        // Longest choice length for text select
-    param->u.text_sel = Model.proto_opts[PROTO_OPTS_BITRATE];
-}
-
-void protocol_set_param(u8 value) {
-    Model.proto_opts[PROTO_OPTS_BITRATE] = value;
-    UART_SetDataRate(bitrates[value]);
 }
 
 uintptr_t CRSF_Cmds(enum ProtoCmds cmd)
