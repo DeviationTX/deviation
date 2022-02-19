@@ -28,7 +28,7 @@
 #define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
 
 #define CRSF_FRAME_PERIOD         4000   // 250Hz 4ms
-#define CRSF_FRAME_PERIOD_MIN     1750   // 500Hz 2ms, but allow shorter for offset cancellation
+#define CRSF_FRAME_PERIOD_MIN     850    // 1000Hz 1ms, but allow shorter for offset cancellation
 #define CRSF_FRAME_PERIOD_MAX     50000  // 25Hz  40ms, but allow longer for offset cancellation
 #define CRSF_CHANNELS             16
 #define CRSF_PACKET_SIZE          26
