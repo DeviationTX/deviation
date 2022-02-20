@@ -253,8 +253,14 @@ static void processCrossfireTelemetryFrame()
       if (telemetryRxBuffer[3] == ADDR_RADIO && telemetryRxBuffer[5] == CRSF_SUBCOMMAND) {
         if (getCrossfireTelemetryValue(6, (s32 *)&updateInterval, 4))
           updateInterval /= 10;  // values are in 10th of micro-seconds
-        if (getCrossfireTelemetryValue(10, (s32 *)&correction, 4))
+        if (getCrossfireTelemetryValue(10, (s32 *)&correction, 4)) {
           correction /= 10;  // values are in 10th of micro-seconds
+          // truncate - can be greater than interval
+          if (correction >= 0)
+              correction %= updateInterval;
+          else
+              correction = -((-correction) % updateInterval);
+        }
       }
 #if SUPPORT_CRSF_CONFIG
       if (MODULE_IS_UNKNOWN) CRSF_ping_devices(ADDR_MODULE);
