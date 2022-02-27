@@ -104,6 +104,12 @@ typedef struct {
     char flag_info[CRSF_MAX_NAME_LEN];
 } elrs_info_t;
 
+typedef enum {
+    MODULE_UNKNOWN,
+    MODULE_ELRS,
+    MODULE_OTHER,
+} module_type_t;
+
 typedef struct {
     // common fields
     u8 device;            // device index of device parameter belongs to
@@ -150,6 +156,10 @@ void CRSF_send_command(crsf_param_t *param, enum cmd_status status);
 u8 CRSF_send_model_id(u8 fixed_id);
 u32 CRSF_read_timeout();
 void CRSF_get_elrs();
+void protocol_read_param(u8 device_idx, crsf_param_t *param);
+void protocol_set_param(u8 value);
+void protocol_module_type(module_type_t type);
+u8 protocol_module_is_elrs();
 
 #endif  // SUPPORT_CRSF_CONFIG
 

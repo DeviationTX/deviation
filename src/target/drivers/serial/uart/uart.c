@@ -94,7 +94,7 @@ void UART_Stop()
 void UART_SetDataRate(u32 bps)
 {
     if (bps == 0) bps = 115200;
-    if (bps > 2000000) bps = 2000000;
+    if (bps > 4500000) bps = 4500000;
 
     usart_set_baudrate(UART_CFG.uart, bps);
 }

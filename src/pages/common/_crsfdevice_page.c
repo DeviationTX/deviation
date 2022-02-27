@@ -26,7 +26,8 @@ static struct crsfdevice_obj * const gui = &gui_objs.u.crsfdevice;
 
 static u32 read_timeout;
 static u8 current_folder = 0;
-static u8 params_loaded;     // if not zero, number displayed so far for current device
+static u8 params_loaded;     // if not zero, number received so far for current device
+static u8 params_displayed;  // if not zero, number displayed so far for current device
 static u8 device_idx;   // current device index
 static u8 next_param;   // parameter and chunk currently being read
 static u8 next_chunk;
@@ -60,6 +61,7 @@ static void crsfdevice_init() {
     next_chunk = 0;
     recv_param_ptr = recv_param_buffer;
     params_loaded = 0;
+    params_displayed = 0;
     next_string = mp->strings;
     memset(crsf_params, 0, sizeof crsf_params);
     CBUF_Init(send_buf);
@@ -310,8 +312,8 @@ void PAGE_CRSFDeviceEvent() {
     // update page as parameter info is received
     // until all parameters loaded
     u8 params_count = count_params_loaded();
-    if (params_loaded != params_count) {
-        params_loaded = params_count;
+    if (params_displayed != params_count) {
+        params_displayed = params_count;
         show_page(current_folder);
     } else if (elrs_info.update > 0) {
         elrs_info.update = 0;
@@ -434,6 +436,11 @@ static u8 param_len(crsf_param_t *param) {
 }
 
 void CRSF_set_param(crsf_param_t *param) {
+    if (crsf_devices[param->device].address == ADDR_RADIO) {
+        protocol_set_param((u8)param->u.text_sel);  // only one radio param so don't need id
+        return;
+    }
+
     u16 length = param_len(param) + 5;
     if ((u16)CBUF_Space(send_buf) < length+2) return;
 
@@ -587,12 +594,19 @@ static void parse_device(u8* buffer, crsf_device_t *device) {
     device->number_of_params = *buffer;
     buffer += 1;
     device->params_version = *buffer;
+    if (device->address == ADDR_MODULE) {
+        if (device->serial_number == 0x454C5253)
+            protocol_module_type(MODULE_ELRS);
+        else
+            protocol_module_type(MODULE_OTHER);
+    }
 }
 
 static void add_device(u8 *buffer) {
     for (int i=0; i < CRSF_MAX_DEVICES; i++) {
         if (crsf_devices[i].address == buffer[2]        //  device already in table
-         || crsf_devices[i].address == 0) {             //  not found, add to table
+         || crsf_devices[i].address == 0                //  not found, add to table
+         || crsf_devices[i].address == ADDR_RADIO) {    //  replace deviation device if necessary
             parse_device(buffer, &crsf_devices[i]);
             break;
         }
@@ -789,6 +803,7 @@ static void add_param(u8 *buffer, u8 num_bytes) {
 
     recv_param_ptr = recv_param_buffer;
     next_chunk = 0;
+    params_loaded = count_params_loaded();
 
     // read all params when needed
     if (params_loaded < crsf_devices[device_idx].number_of_params) {
