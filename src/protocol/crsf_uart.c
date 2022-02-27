@@ -312,7 +312,7 @@ static void processCrossfireTelemetryData() {
                     processCrossfireTelemetryFrame();     // Broadcast frame
 #if SUPPORT_CRSF_CONFIG
                     // wait for telemetry running before sending model id
-                    if (model_id_send && CRSF_send_model_id(Model.fixed_id < 64 ? Model.fixed_id : 0xff)) {
+                    if (model_id_send && CRSF_send_model_id(Model.fixed_id < 64 ? Model.fixed_id : 0)) {
                         model_id_send = 0;
                         return;
                     }
