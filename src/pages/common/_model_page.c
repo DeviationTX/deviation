@@ -116,7 +116,7 @@ static void fixedid_cb(guiObject_t *obj, const void *data)
     }
     PAGE_RemoveAllObjects();
     callback_result = 1;
-    GUI_CreateKeyboard(&gui->keyboard, KEYBOARD_NUM, mp->fixed_id, 999999, fixedid_done_cb, &callback_result);
+    GUI_CreateKeyboard(&gui->keyboard, KEYBOARD_NUM, mp->fixed_id, PROTOCOL_MaximumID(), fixedid_done_cb, &callback_result);
 }
 
 static void bind_cb(guiObject_t *obj, const void *data)

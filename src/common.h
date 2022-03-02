@@ -163,6 +163,7 @@ int PROTOCOL_DefaultNumChannels();
 void PROTOCOL_CheckDialogs();
 u32 PROTOCOL_CurrentID();
 void PROTOCOL_ChangedID();
+u32 PROTOCOL_MaximumID();
 const char * PROTOCOL_Name();
 const char * PROTOCOL_GetName(u16 idx);
 const char **PROTOCOL_GetOptions();

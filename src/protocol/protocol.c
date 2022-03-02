@@ -328,6 +328,13 @@ void PROTOCOL_ChangedID()
     if(Model.protocol != PROTOCOL_NONE && PROTOCOL_LOADED)
         PROTO_Cmds(PROTOCMD_CHANGED_ID);
 }
+u32 PROTOCOL_MaximumID()
+{
+    u32 max_id = 0;
+    if(Model.protocol != PROTOCOL_NONE && PROTOCOL_LOADED)
+        max_id = (u32)PROTO_Cmds(PROTOCMD_MAX_ID);
+    return max_id ? max_id : 999999;
+}
 
 const char **PROTOCOL_GetOptions()
 {

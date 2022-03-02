@@ -490,6 +490,12 @@ uintptr_t CRSF_Cmds(enum ProtoCmds cmd)
             model_id_send = 1;
 #endif
             return 0;
+        case PROTOCMD_MAX_ID:
+#if SUPPORT_CRSF_CONFIG
+            return CRSF_MAX_FIXEDID;
+#else
+            return 0;
+#endif
         case PROTOCMD_BIND: return 0;
         case PROTOCMD_NUMCHAN: return 16;
         case PROTOCMD_DEFAULT_NUMCHAN: return 8;
