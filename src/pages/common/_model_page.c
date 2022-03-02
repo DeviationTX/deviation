@@ -125,8 +125,14 @@ static void bind_cb(guiObject_t *obj, const void *data)
     (void)obj;
     if (PROTOCOL_AutoBindEnabled())
         PROTOCOL_Init(0);
-    else
+    else {
         PROTOCOL_Bind();
+        // Protocols (e.g. CRSF) may limit fixed ID on bind
+        sprintf(mp->fixed_id, "%d", (int)Model.fixed_id);
+        guiObject_t *obj = _get_obj(ITEM_FIXEDID, 1);
+        if(obj) GUI_Redraw(obj);
+    }
+        
 }
 
 static void configure_bind_button()
