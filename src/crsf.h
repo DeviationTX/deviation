@@ -53,6 +53,7 @@
 #define COMMAND_MODEL_SELECT_ID        0x05
 
 #define TELEMETRY_RX_PACKET_SIZE   64
+#define CRSF_MAX_FIXEDID          63
 
 #if SUPPORT_CRSF_CONFIG
 

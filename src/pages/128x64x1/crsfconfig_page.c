@@ -45,6 +45,7 @@ void PAGE_CrsfconfigInit(int page)
     (void)page;
     PAGE_SetModal(0);
 
+    if (Model.fixed_id > CRSF_MAX_FIXEDID) Model.fixed_id = 0;
     memset(crsf_devices, 0, sizeof crsf_devices);
     strlcpy(deviation.name, Model.name, CRSF_MAX_NAME_LEN);
     memcpy((void *)&crsf_devices[CRSF_MAX_DEVICES-1], (void *)&deviation, sizeof (crsf_device_t));
