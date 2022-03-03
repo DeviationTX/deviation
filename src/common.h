@@ -19,6 +19,7 @@ int ltassert();  // This function does not exist, and if called will throw an er
                              //Maybe move this to target_defs.h
 extern char tempstring[TEMPSTRINGLENGTH];
 
+#define MAX_FIXED_ID   999999
 
 typedef int8_t s8;
 typedef int16_t s16;
