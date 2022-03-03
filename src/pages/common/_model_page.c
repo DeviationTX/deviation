@@ -109,7 +109,7 @@ static void fixedid_cb(guiObject_t *obj, const void *data)
     PAGE_SetModal(1);
     if(Model.fixed_id == 0) {
         u32 id = PROTOCOL_CurrentID();
-        if (id)
+        if (id || PROTOCOL_MaximumID() < MAX_FIXED_ID)
             sprintf(mp->fixed_id, "%d", (int)id);
         else
             mp->fixed_id[0] = 0;
