@@ -106,9 +106,15 @@ static const char *hdr_str_cb(guiObject_t *obj, const void *data) {
     if (count_params_loaded() != crsf_devices[device_idx].number_of_params) {
         snprintf(tempstring, sizeof tempstring, "%s %s", crsf_devices[device_idx].name, _tr_noop("LOADING"));
     } else if (protocol_module_is_elrs()) {
-        snprintf(tempstring, sizeof tempstring, "%s  %d/%d  %c",
-                 crsf_devices[device_idx].name, elrs_info.bad_pkts, elrs_info.good_pkts,
-                 (elrs_info.flags & 1) ? 'C' : '-');
+        if (protocol_elrs_is_armed()) {
+            snprintf(tempstring, sizeof tempstring, "%s  ! Armed !", crsf_devices[device_idx].name);
+        } else if (elrs_info.flag_info[0]) {
+            snprintf(tempstring, sizeof tempstring, "%s", elrs_info.flag_info);
+        } else {
+            snprintf(tempstring, sizeof tempstring, "%s  %d/%d  %c",
+                     crsf_devices[device_idx].name, elrs_info.bad_pkts, elrs_info.good_pkts,
+                     (elrs_info.flags & 1) ? 'C' : '-');
+        }
     } else  {
         return crsf_devices[device_idx].name;
     }

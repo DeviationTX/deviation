@@ -311,12 +311,14 @@ static unsigned action_cb(u32 button, unsigned flags, void *data)
 void PAGE_CRSFDeviceEvent() {
     // update page as parameter info is received
     // until all parameters loaded
+    static u8 armed_state;
     u8 params_count = count_params_loaded();
     if (params_displayed != params_count) {
         params_displayed = params_count;
         show_page(current_folder);
-    } else if (elrs_info.update > 0) {
+    } else if (elrs_info.update > 0 || armed_state != protocol_elrs_is_armed()) {
         elrs_info.update = 0;
+        armed_state = protocol_elrs_is_armed();
         show_header();
     }
 
