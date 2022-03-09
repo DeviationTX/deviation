@@ -634,7 +634,7 @@ static void parse_elrs_info(u8 *buffer) {
             MUSIC_Beep("d2", 100, 100, 5);
         }
 
-        memcpy((void*)&elrs_info, (void*)&local_info, sizeof(elrs_info_t)-CRSF_MAX_NAME_LEN);
+        memcpy((void*)&elrs_info, (void*)&local_info, sizeof(elrs_info_t));
         elrs_info.update += 1;
     }
 }

@@ -58,7 +58,7 @@
 #if SUPPORT_CRSF_CONFIG
 
 #define CRSF_MAX_DEVICES       4
-#define CRSF_MAX_NAME_LEN      16
+#define CRSF_MAX_NAME_LEN      20
 #define CRSF_MAX_STRING_BYTES  2500     // max observed is 2010 in Nano RX
 #define CRSF_STRING_BYTES_AVAIL(current)  (CRSF_MAX_STRING_BYTES-((char *)(current)-mp->strings))
 
