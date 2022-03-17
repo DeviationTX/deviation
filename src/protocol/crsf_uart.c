@@ -297,6 +297,8 @@ static void processCrossfireTelemetryData() {
         if (telemetryRxBufferCount == 1) {
             if (data < 2 || data > TELEMETRY_RX_PACKET_SIZE-2) {
                 telemetryRxBufferCount = 0;
+                if (data == ADDR_RADIO)
+                    telemetryRxBuffer[telemetryRxBufferCount++] = data;
             } else {
                 length = data;
                 telemetryRxBuffer[telemetryRxBufferCount++] = data;
@@ -305,10 +307,10 @@ static void processCrossfireTelemetryData() {
         }
         
         if (telemetryRxBufferCount <= length+1) {
-            telemetryRxBuffer[telemetryRxBufferCount] = data;
+            telemetryRxBuffer[telemetryRxBufferCount++] = data;
         }
         
-        if (telemetryRxBufferCount++ > length) {
+        if (telemetryRxBufferCount >= length+2) {
             if (checkCrossfireTelemetryFrameCRC()) {
                 if (telemetryRxBuffer[2] < TYPE_PING_DEVICES || telemetryRxBuffer[2] == TYPE_RADIO_ID) {
                     processCrossfireTelemetryFrame();     // Broadcast frame
