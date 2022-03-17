@@ -18,7 +18,7 @@
 #include "target/drivers/serial/usb_cdc/CBUF.h"
 #include "crsf.h"
 
-#define CRSF_MAX_PARAMS  55   // one extra required, max observed is 47 in Diversity Nano RX
+#define CRSF_MAX_PARAMS  100   // one extra required, max observed is 47 in Diversity Nano RX
 crsf_param_t crsf_params[CRSF_MAX_PARAMS];
 
 static struct crsfdevice_page * const mp = &pagemem.u.crsfdevice_page;
@@ -46,7 +46,7 @@ static struct {
 } send_buf;
 
 #define CRSF_MAX_CHUNK_SIZE   58   // 64 - header - type - destination - origin
-#define CRSF_MAX_CHUNKS        5   // not in specification. Max observed is 3 for Nano RX
+#define CRSF_MAX_CHUNKS        8   // not in specification. Max observed is 5 for ELRS 2.3 (HappyModel ES2400TX)
 static char recv_param_buffer[CRSF_MAX_CHUNKS * CRSF_MAX_CHUNK_SIZE];
 static char *recv_param_ptr;
 
