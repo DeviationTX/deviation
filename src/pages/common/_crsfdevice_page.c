@@ -616,6 +616,21 @@ static void add_device(u8 *buffer) {
     //  no new device added if no more space in table
 }
 
+/*  ELRS flag meanings as of 17 March 2022
+enum lua_Flags{
+      //bit 0 and 1 are status flags, show up as the little icon in the lua top right corner
+      LUA_FLAG_CONNECTED = 0,
+      LUA_FLAG_STATUS1,
+      //bit 2,3,4 are warning flags, change the tittle bar every 0.5s
+      LUA_FLAG_MODEL_MATCH,
+      LUA_FLAG_ISARMED,
+      LUA_FLAG_WARNING1,
+      //bit 5,6,7 are critical warning flag, block the lua screen until user confirm to suppress the warning.
+      LUA_FLAG_ERROR_CONNECTED,
+      LUA_FLAG_CRITICAL_WARNING1,
+      LUA_FLAG_CRITICAL_WARNING2,
+  };
+*/
 static void parse_elrs_info(u8 *buffer) {
     elrs_info_t local_info;
 
@@ -630,7 +645,8 @@ static void parse_elrs_info(u8 *buffer) {
     local_info.update = elrs_info.update;
     if (memcmp((void*)&elrs_info, (void*)&local_info, sizeof(elrs_info_t)-CRSF_MAX_NAME_LEN)) {
         if (local_info.flag_info[0] && strncmp(local_info.flag_info, elrs_info.flag_info, CRSF_MAX_NAME_LEN)) {
-            PAGE_ShowWarning(NULL, local_info.flag_info);       // show warning if new flag info string
+            if (local_info.flags & 0x4)
+                PAGE_ShowWarning(NULL, local_info.flag_info);       // show warning dialog if model mismatch
             MUSIC_Beep("d2", 100, 100, 5);
         }
 
