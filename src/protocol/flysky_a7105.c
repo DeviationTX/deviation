@@ -369,7 +369,7 @@ static void initialize(u8 bind) {
     if (Model.fixed_id) {
         id = Model.fixed_id;
     } else {
-        id = (Crc(&Model, sizeof(Model)) + Crc(&Transmitter, sizeof(Transmitter))) % 999999;
+        id = (Crc(&Model, sizeof(Model)) + Crc(&Transmitter, sizeof(Transmitter))) % MAX_FIXED_ID;
     }
     if ((id & 0xf0) > 0x90) // limit offset to 9 as higher values don't work with some RX (ie V912)
         id = id - 0x70;

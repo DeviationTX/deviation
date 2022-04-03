@@ -53,11 +53,12 @@
 #define COMMAND_MODEL_SELECT_ID        0x05
 
 #define TELEMETRY_RX_PACKET_SIZE   64
+#define CRSF_MAX_FIXEDID          63
 
 #if SUPPORT_CRSF_CONFIG
 
 #define CRSF_MAX_DEVICES       4
-#define CRSF_MAX_NAME_LEN      16
+#define CRSF_MAX_NAME_LEN      20
 #define CRSF_MAX_STRING_BYTES  2500     // max observed is 2010 in Nano RX
 #define CRSF_STRING_BYTES_AVAIL(current)  (CRSF_MAX_STRING_BYTES-((char *)(current)-mp->strings))
 
@@ -160,6 +161,7 @@ void protocol_read_param(u8 device_idx, crsf_param_t *param);
 void protocol_set_param(u8 value);
 void protocol_module_type(module_type_t type);
 u8 protocol_module_is_elrs();
+u8 protocol_elrs_is_armed();
 
 #endif  // SUPPORT_CRSF_CONFIG
 

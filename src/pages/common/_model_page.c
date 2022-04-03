@@ -109,14 +109,14 @@ static void fixedid_cb(guiObject_t *obj, const void *data)
     PAGE_SetModal(1);
     if(Model.fixed_id == 0) {
         u32 id = PROTOCOL_CurrentID();
-        if (id)
+        if (id || PROTOCOL_MaximumID() < MAX_FIXED_ID)
             sprintf(mp->fixed_id, "%d", (int)id);
         else
             mp->fixed_id[0] = 0;
     }
     PAGE_RemoveAllObjects();
     callback_result = 1;
-    GUI_CreateKeyboard(&gui->keyboard, KEYBOARD_NUM, mp->fixed_id, 999999, fixedid_done_cb, &callback_result);
+    GUI_CreateKeyboard(&gui->keyboard, KEYBOARD_NUM, mp->fixed_id, PROTOCOL_MaximumID(), fixedid_done_cb, &callback_result);
 }
 
 static void bind_cb(guiObject_t *obj, const void *data)
@@ -125,8 +125,14 @@ static void bind_cb(guiObject_t *obj, const void *data)
     (void)obj;
     if (PROTOCOL_AutoBindEnabled())
         PROTOCOL_Init(0);
-    else
+    else {
         PROTOCOL_Bind();
+        // Protocols (e.g. CRSF) may limit fixed ID on bind
+        sprintf(mp->fixed_id, "%d", (int)Model.fixed_id);
+        guiObject_t *obj = _get_obj(ITEM_FIXEDID, 1);
+        if(obj) GUI_Redraw(obj);
+    }
+        
 }
 
 static void configure_bind_button()

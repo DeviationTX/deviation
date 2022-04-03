@@ -111,10 +111,12 @@ static module_type_t module_type;
 
 #define MODULE_IS_ELRS     (module_type == MODULE_ELRS)
 #define MODULE_IS_UNKNOWN  (module_type == MODULE_UNKNOWN)
+#define ELRS_IS_ARMED      (Channels[4] > 1500)
 void protocol_module_type(module_type_t type) {
     module_type = type;
 };
 u8 protocol_module_is_elrs() { return MODULE_IS_ELRS; }
+u8 protocol_elrs_is_armed() { return ELRS_IS_ARMED; }
 void protocol_read_param(u8 device_idx, crsf_param_t *param) {
     // only protocol parameter is bitrate
     param->device = device_idx;            // device index of device parameter belongs to
@@ -295,6 +297,8 @@ static void processCrossfireTelemetryData() {
         if (telemetryRxBufferCount == 1) {
             if (data < 2 || data > TELEMETRY_RX_PACKET_SIZE-2) {
                 telemetryRxBufferCount = 0;
+                if (data == ADDR_RADIO)
+                    telemetryRxBuffer[telemetryRxBufferCount++] = data;
             } else {
                 length = data;
                 telemetryRxBuffer[telemetryRxBufferCount++] = data;
@@ -303,16 +307,17 @@ static void processCrossfireTelemetryData() {
         }
         
         if (telemetryRxBufferCount <= length+1) {
-            telemetryRxBuffer[telemetryRxBufferCount] = data;
+            telemetryRxBuffer[telemetryRxBufferCount++] = data;
         }
         
-        if (telemetryRxBufferCount++ > length) {
+        if (telemetryRxBufferCount >= length+2) {
             if (checkCrossfireTelemetryFrameCRC()) {
                 if (telemetryRxBuffer[2] < TYPE_PING_DEVICES || telemetryRxBuffer[2] == TYPE_RADIO_ID) {
                     processCrossfireTelemetryFrame();     // Broadcast frame
 #if SUPPORT_CRSF_CONFIG
                     // wait for telemetry running before sending model id
-                    if (model_id_send && CRSF_send_model_id(Model.fixed_id < 64 ? Model.fixed_id : 0)) {
+                    if (model_id_send) {
+                        CRSF_send_model_id(Model.fixed_id);
                         model_id_send = 0;
                         return;
                     }
@@ -320,7 +325,7 @@ static void processCrossfireTelemetryData() {
                     CRSF_serial_rcv(telemetryRxBuffer+2, telemetryRxBuffer[1]-1);  // Extended frame
                 }
                 if (MODULE_IS_ELRS
-                    && Channels[4] < 1350       // disarmed
+                    && !ELRS_IS_ARMED       // disarmed
                     && (CLOCK_getms() - elrs_info_time) > 200)
                 {
                     CRSF_get_elrs();
@@ -475,6 +480,8 @@ static void initialize()
 #if SUPPORT_CRSF_CONFIG
     model_id_send = 1;
 #endif
+    if (Model.fixed_id > CRSF_MAX_FIXEDID)
+        Model.fixed_id = 0;
 
     CLOCK_StartTimer(1000, serial_cb);
 }
@@ -490,6 +497,12 @@ uintptr_t CRSF_Cmds(enum ProtoCmds cmd)
             model_id_send = 1;
 #endif
             return 0;
+        case PROTOCMD_MAX_ID:
+#if SUPPORT_CRSF_CONFIG
+            return CRSF_MAX_FIXEDID;
+#else
+            return 0;
+#endif
         case PROTOCMD_BIND: return 0;
         case PROTOCMD_NUMCHAN: return 16;
         case PROTOCMD_DEFAULT_NUMCHAN: return 8;
