@@ -53,6 +53,9 @@ void UART_Initialize()
 
     /* Finally enable the USART. */
     usart_enable(UART_CFG.uart);
+    /* USART irq always needed for DMA completion, sometimes for serial receive */
+    nvic_set_priority(get_nvic_irq(UART_CFG.uart), 4);
+    nvic_enable_irq(get_nvic_irq(UART_CFG.uart));
 
     nvic_set_priority(get_nvic_dma_irq(USART_DMA), 3);
     nvic_enable_irq(get_nvic_dma_irq(USART_DMA));
@@ -81,6 +84,7 @@ void UART_Stop()
 {
     UART_StopReceive();
     nvic_disable_irq(get_nvic_dma_irq(USART_DMA));
+    nvic_disable_irq(get_nvic_irq(UART_CFG.uart));
     usart_set_mode(UART_CFG.uart, 0);
     usart_disable(UART_CFG.uart);
     rcc_periph_clock_disable(get_rcc_from_port(UART_CFG.uart));
@@ -90,7 +94,7 @@ void UART_Stop()
 void UART_SetDataRate(u32 bps)
 {
     if (bps == 0) bps = 115200;
-    if (bps > 2000000) bps = 2000000;
+    if (bps > 4500000) bps = 4500000;
 
     usart_set_baudrate(UART_CFG.uart, bps);
 }
@@ -161,13 +165,10 @@ void UART_StartReceive(usart_callback_t *isr_callback)
 {
     rx_callback = isr_callback;
 
-    if (isr_callback) {
-        nvic_enable_irq(get_nvic_irq(UART_CFG.uart));
+    if (isr_callback)
         usart_enable_rx_interrupt(UART_CFG.uart);
-    } else {
+    else
         usart_disable_rx_interrupt(UART_CFG.uart);
-        nvic_disable_irq(get_nvic_irq(UART_CFG.uart));
-    }
 }
 
 void UART_StopReceive()
@@ -178,10 +179,13 @@ void UART_StopReceive()
 void UART_SetDuplex(uart_duplex duplex)
 {
     // no libopencm3 function for duplex
-    if (duplex == UART_DUPLEX_FULL)
+    if (duplex == UART_DUPLEX_FULL) {
         USART_CR3(UART_CFG.uart) &= ~USART_CR3_HDSEL;
-    else
+        usart_set_mode(UART_CFG.uart, USART_MODE_TX_RX);
+    } else {
         USART_CR3(UART_CFG.uart) |= USART_CR3_HDSEL;
+        usart_set_mode(UART_CFG.uart, USART_MODE_RX);
+    }
 }
 
 void UART_SendByte(u8 x)

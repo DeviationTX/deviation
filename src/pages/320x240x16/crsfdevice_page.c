@@ -60,7 +60,7 @@ static int row_cb(int absrow, int relrow, int y, void *data) {
         break;
     case INFO:
         GUI_CreateLabelBox(&gui->value[relrow].lbl, LCD_WIDTH - 199, y,
-            199, LINE_HEIGHT, &LABEL_FONT, crsf_value_cb, NULL, (void *)param);
+            199, LINE_HEIGHT, &LABEL_FONT, crsf_value_cb, noop_press, (void *)param);
         break;
     case FOLDER:
         lbl_press_cb = folder_cb;
@@ -87,6 +87,8 @@ static int row_cb(int absrow, int relrow, int y, void *data) {
 
     return 1;
 }
+
+static void show_header() {}
 
 void show_page(int folder) {
     GUI_RemoveAllObjects();

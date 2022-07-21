@@ -7,6 +7,9 @@
 #define ADDR_BROADCAST  0x00  //  Broadcast address
 #define ADDR_USB        0x10  //  USB Device
 #define ADDR_BLUETOOTH  0x12  //  Bluetooth Module
+// Custom Telemetry Frames 0x7F,0x80
+#define CRSF_FRAMETYPE_AP_CUSTOM_TELEM_LEGACY  0x7F     // as suggested by Remo Masina for fw < 4.06 (Ardupilot)
+#define CRSF_FRAMETYPE_AP_CUSTOM_TELEM         0x80     // reserved for ArduPilot by TBS, requires fw >= 4.06 (conflict with next?)
 #define ADDR_PRO_CORE   0x80  //  TBS CORE PNP PRO
 //  #define ADDR_  0x8A       //  Reserved
 #define ADDR_PRO_CURR   0xC0  //  PNP PRO digital current sensor
@@ -19,13 +22,19 @@
 //  #define ADDR_       0xEB  //  Reserved
 #define ADDR_RECEIVER   0xEC  //  Crossfire / UHF receiver
 #define ADDR_MODULE     0xEE  //  Crossfire transmitter
+#define ADDR_ELRS_LUA   0xEF  //  ELRS
 
 // Frame Type
 #define TYPE_GPS              0x02
+#define TYPE_VARIO            0x07
 #define TYPE_BATTERY          0x08
-#define TYPE_VIDEO            0x08
+#define TYPE_HEARTBEAT        0x0b
+#define TYPE_VTX              0x0F
+#define TYPE_VTX_TELEM        0x10
 #define TYPE_LINK             0x14
 #define TYPE_CHANNELS         0x16
+#define TYPE_RX_ID            0x1C
+#define TYPE_TX_ID            0x1D
 #define TYPE_ATTITUDE         0x1E
 #define TYPE_FLIGHT_MODE      0x21
 #define TYPE_PING_DEVICES     0x28
@@ -34,13 +43,22 @@
 #define TYPE_SETTINGS_ENTRY   0x2B
 #define TYPE_SETTINGS_READ    0x2C
 #define TYPE_SETTINGS_WRITE   0x2D
+#define TYPE_ELRS_INFO        0x2E
+#define TYPE_COMMAND_ID       0x32
+#define TYPE_RADIO_ID         0x3A
+
+// Frame Subtype
+#define UART_SYNC                      0xC8
+#define CRSF_SUBCOMMAND                0x10
+#define COMMAND_MODEL_SELECT_ID        0x05
 
 #define TELEMETRY_RX_PACKET_SIZE   64
+#define CRSF_MAX_FIXEDID          63
 
 #if SUPPORT_CRSF_CONFIG
 
 #define CRSF_MAX_DEVICES       4
-#define CRSF_MAX_NAME_LEN      16
+#define CRSF_MAX_NAME_LEN      20
 #define CRSF_MAX_STRING_BYTES  2500     // max observed is 2010 in Nano RX
 #define CRSF_STRING_BYTES_AVAIL(current)  (CRSF_MAX_STRING_BYTES-((char *)(current)-mp->strings))
 
@@ -80,6 +98,20 @@ typedef struct {
 } crsf_device_t;
 
 typedef struct {
+    u8 update;
+    u8 bad_pkts;
+    u16 good_pkts;
+    u8 flags;
+    char flag_info[CRSF_MAX_NAME_LEN];
+} elrs_info_t;
+
+typedef enum {
+    MODULE_UNKNOWN,
+    MODULE_ELRS,
+    MODULE_OTHER,
+} module_type_t;
+
+typedef struct {
     // common fields
     u8 device;            // device index of device parameter belongs to
     u8 id;                // Parameter number (starting from 1)
@@ -110,14 +142,26 @@ typedef struct {
 } crsf_param_t;
 
 extern crsf_device_t crsf_devices[CRSF_MAX_DEVICES];
+extern elrs_info_t elrs_info;
 
 void CRSF_serial_rcv(u8 *buffer, u8 num_bytes);
-u8 CRSF_serial_txd(u8 *buffer, u8 max_len);
+u8 CRSF_serial_txd(u8 *buffer);
 u8 crsf_crc8(const u8 *ptr, u8 len);
-void CRSF_ping_devices();
+u8 crsf_crc8_BA(const u8 *ptr, u8 len);
+void crsf_crc8_acc(u8 *crc, const u8 val);
+void crsf_crc8_BA_acc(u8 *crc, const u8 val);
+void CRSF_ping_devices(u8 address);
 void CRSF_read_param(u8 device, u8 id, u8 chunk);
 void CRSF_set_param(crsf_param_t *param);
 void CRSF_send_command(crsf_param_t *param, enum cmd_status status);
+u8 CRSF_send_model_id(u8 fixed_id);
+u32 CRSF_read_timeout();
+void CRSF_get_elrs();
+void protocol_read_param(u8 device_idx, crsf_param_t *param);
+void protocol_set_param(u8 value);
+void protocol_module_type(module_type_t type);
+u8 protocol_module_is_elrs();
+u8 protocol_elrs_is_armed();
 
 #endif  // SUPPORT_CRSF_CONFIG
 

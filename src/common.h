@@ -19,6 +19,7 @@ int ltassert();  // This function does not exist, and if called will throw an er
                              //Maybe move this to target_defs.h
 extern char tempstring[TEMPSTRINGLENGTH];
 
+#define MAX_FIXED_ID   999999
 
 typedef int8_t s8;
 typedef int16_t s16;
@@ -162,6 +163,8 @@ u8 PROTOCOL_GetTelemCapability();
 int PROTOCOL_DefaultNumChannels();
 void PROTOCOL_CheckDialogs();
 u32 PROTOCOL_CurrentID();
+void PROTOCOL_ChangedID();
+u32 PROTOCOL_MaximumID();
 const char * PROTOCOL_Name();
 const char * PROTOCOL_GetName(u16 idx);
 const char **PROTOCOL_GetOptions();

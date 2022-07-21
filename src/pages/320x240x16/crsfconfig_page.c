@@ -50,7 +50,7 @@ void PAGE_CrsfconfigInit(int page)
     PAGE_SetModal(0);
 
     memset(crsf_devices, 0, sizeof crsf_devices);
-    CRSF_ping_devices();    // ask all TBS devices to respond with device info
+    CRSF_ping_devices(ADDR_BROADCAST);    // ask all TBS devices to respond with device info
 
     PAGE_ShowHeader(PAGE_GetName(PAGEID_CRSFCFG));
     GUI_CreateScrollable(&gui->scrollable, LCD_WIDTH/2-100, HEADER_HEIGHT, LCD_WIDTH,

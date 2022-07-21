@@ -174,12 +174,12 @@ static void set_start(u8 ch) {
 #define RXNUM 16
 static void frskyX_build_bind_packet()
 {
-    packet[0] = packet_size;
-    packet[1] = 0x03;
-    packet[2] = 0x01;
+    packet[0] = packet_size;                // Number of bytes in the packet (after this one)
+    packet[1] = 0x03;                       // Bind packet
+    packet[2] = 0x01;                       // Bind packet
 
-    packet[3] = fixed_id;
-    packet[4] = fixed_id >> 8;
+    packet[3] = fixed_id;                   // ID
+    packet[4] = fixed_id >> 8;              // ID
 
     if (!Model.proto_opts[PROTO_OPTS_VERSION]) {
         int idx = ((state - FRSKY_BIND) % 10) * 5;
@@ -189,7 +189,7 @@ static void frskyX_build_bind_packet()
         packet[8] = hop_data[idx++];
         packet[9] = hop_data[idx++];
         packet[10] = hop_data[idx++];
-        packet[11] = 0x02;
+        packet[11] = 0x02;                  // ID
         packet[12] = RXNUM;
 
         memset(&packet[13], 0, packet_size - 14);
@@ -199,16 +199,23 @@ static void frskyX_build_bind_packet()
             memcpy(&packet[17], (void *)"\x55\xAA\x5A\xA5", 4);   // CH9-16
     } else {
         // packet 1D 03 01 0E 1C 02 00 00 32 0B 00 00 A8 26 28 01 A1 00 00 00 3E F6 87 C7 00 00 00 00 C9 C9
-        packet[5] = 0x02;                   // Unknown but constant ID?
+        // Unknown bytes
+#ifndef MODULAR
+        if (state & 0x01)
+            memcpy(&packet[7], "\x00\x18\x0A\x00\x00\xE0\x02\x0B\x01\xD3\x08\x00\x00\x4C\xFE\x87\xC7", 17);
+        else
+            memcpy(&packet[7], "\x27\xAD\x02\x00\x00\x64\xC8\x46\x00\x64\x00\x00\x00\xFB\xF6\x87\xC7", 17);
+#else
+        memcpy(&packet[7], "\x00\x32\x0B\x00\x00\xA8\x26\x28\x01\xA1\x00\x00\x00\x3E\xF6\x87\xC7", 17);
+#endif
+        packet[5] = 0x02;                   // ID
         packet[6] = RXNUM;
         // Bind flags
-        packet[7] = 0;
         if (binding_idx & 0x01)
             packet[7] |= 0x40;              // Telem off
         if (binding_idx & 0x02)
             packet[7] |= 0x80;              // CH9-16
         // Unknown bytes
-        memcpy(&packet[8], "\x32\x0B\x00\x00\xA8\x26\x28\x01\xA1\x00\x00\x00\x3E\xF6\x87\xC7", 16);
         packet[20]^= 0x0E ^ fixed_id;       // Update the ID
         packet[21]^= 0x1C ^ fixed_id >> 8;  // Update the ID
         // Xor

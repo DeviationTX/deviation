@@ -155,7 +155,7 @@ void PAGE_ModelInit(int page)
     mp->last_txpower = Model.tx_power;
     PAGE_ShowHeader(_tr_noop("Model setup"));  // using the same name as related menu item to reduce language strings
 
-    if(Model.fixed_id == 0)
+    if(Model.fixed_id == 0 && PROTOCOL_MaximumID() == MAX_FIXED_ID)
         strlcpy(mp->fixed_id, _tr("None"), sizeof(mp->fixed_id));
     else
         sprintf(mp->fixed_id, "%d", (int)Model.fixed_id);

@@ -45,8 +45,11 @@ void PAGE_CrsfconfigInit(int page)
     (void)page;
     PAGE_SetModal(0);
 
+    if (Model.fixed_id > CRSF_MAX_FIXEDID) Model.fixed_id = 0;
     memset(crsf_devices, 0, sizeof crsf_devices);
-    CRSF_ping_devices();    // ask all TBS devices to respond with device info
+    strlcpy(deviation.name, Model.name, CRSF_MAX_NAME_LEN);
+    memcpy((void *)&crsf_devices[CRSF_MAX_DEVICES-1], (void *)&deviation, sizeof (crsf_device_t));
+    CRSF_ping_devices(ADDR_BROADCAST);    // ask all TBS devices to respond with device info
 
     PAGE_ShowHeader(PAGE_GetName(PAGEID_CRSFCFG));
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,

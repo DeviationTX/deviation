@@ -132,6 +132,18 @@ void CLOCK_Init()
         ;
 }
 
+// run a function one time at low priority
+// used for serial receive data processing outside serial receive ISR
+void (*func_callback)();
+void CLOCK_RunOnce(void (*cb)(void)) {
+    if (cb) {
+        func_callback = cb;
+        nvic_set_priority(NVIC_EXTI3_IRQ, 44);
+        nvic_enable_irq(NVIC_EXTI3_IRQ);
+        nvic_set_pending_irq(NVIC_EXTI3_IRQ);
+    }
+}
+
 void CLOCK_StartTimer(unsigned us, u16 (*cb)(void))
 {
     if(! cb)

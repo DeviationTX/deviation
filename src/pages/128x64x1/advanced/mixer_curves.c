@@ -58,8 +58,7 @@ void PAGE_EditCurvesInit(int page)
     }
     edit->curve = *curve;
 
-    // GUI_CreateTextSelectPlate(&gui->name, NAME_X, 0, NAME_W, HEADER_HEIGHT, &TEXTSEL_FONT, NULL, set_curvename_cb, NULL);
-    GUI_CreateLabelBox(&gui->title, NAME_X, 0 , NAME_W, HEADER_HEIGHT, &LABEL_FONT, GUI_Localize, NULL, _tr(CURVE_GetName(tempstring, curve)));
+    GUI_CreateTextSelectPlate(&gui->name, NAME_X, 0, NAME_W, HEADER_HEIGHT, &TEXTSEL_FONT, NULL, set_curvename_cb, NULL);
     GUI_CreateButtonPlateText(&gui->save, SAVE_X, 0, SAVE_W, HEADER_WIDGET_HEIGHT, &BUTTON_FONT , GUI_Localize, okcancel_cb, _tr_noop("Save"));
     // Draw a line
     if (UNDERLINE)
@@ -90,7 +89,7 @@ void PAGE_EditCurvesInit(int page)
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
                               0, 0, //CHAN_MAX_VALUE / 4, CHAN_MAX_VALUE / 4,
                               show_curve_cb, NULL, touch_cb, &edit->curve);
-    GUI_SetSelected((guiObject_t *)&gui->value);
+    GUI_SetSelected((guiObject_t *)&gui->point);
 }
 
 static unsigned action_cb(u32 button, unsigned flags, void *data)
@@ -98,7 +97,7 @@ static unsigned action_cb(u32 button, unsigned flags, void *data)
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS) || (flags & BUTTON_RELEASE)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            if (flags & BUTTON_RELEASE) 
+            if (flags & BUTTON_RELEASE)
                 PAGE_Pop();
         } else if (CHAN_ButtonIsPressed(button, BUT_ENTER) && (flags & BUTTON_LONGPRESS)) {
             // long press enter = save without exiting
