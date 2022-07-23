@@ -51,7 +51,7 @@
 
 static const char * const cx10_opts[] = {
     _tr_noop("Format"), _tr_noop("Green"), _tr_noop("Blue-A"), "DM007", "Q282", "JC3015-1", "JC3015-2", "MK33041", "Q242", "Q222", 
-    NULL
+    NULL, NULL
 };
 
 enum {
@@ -403,14 +403,15 @@ static void initialize_txid()
     case FORMAT_Q282:
     case FORMAT_Q242:
     case FORMAT_Q222:
-      		uint8_t offset=0;	//F_Q282
-		      if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q242)
-	   		     offset=2;
-		      if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q222)
-			        offset=3;
-		      for(u8 i=0; i < 4; i++)
-			        rf_chans[i] = 0x46 + 2*i + offset;
-      
+        {
+      	uint8_t offset=0;	//F_Q282
+	if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q242)
+	   	offset=2;
+	if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q222)
+		offset=3;
+	for(u8 i=0; i < 4; i++)
+		rf_chans[i] = 0x46 + 2*i + offset;
+        }
 //        rf_chans[0] = 0x46;
 //        rf_chans[1] = 0x48;
 //        rf_chans[2] = 0x4a;
