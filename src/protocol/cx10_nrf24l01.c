@@ -404,7 +404,7 @@ static void initialize_txid()
     case FORMAT_Q242:
     case FORMAT_Q222:
         {
-      	uint8_t offset=0;	//F_Q282
+      	u8 offset=0;	//F_Q282
 	if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q242)
 	   	offset=2;
 	if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q222)
