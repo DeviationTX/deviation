@@ -5,7 +5,7 @@ static inline void _pwr_init()
 {
     SCB_VTOR = VECTOR_TABLE_LOCATION;
     SCB_SCR  &= ~SCB_SCR_SLEEPONEXIT;  // sleep immediate on WFI
-    rcc_clock_setup_in_hse_8mhz_out_72mhz();
+    rcc_clock_setup_pll(&rcc_hse_configs[RCC_CLOCK_HSE8_72MHZ]);
 }
 
 static inline void _pwr_shutdown()
