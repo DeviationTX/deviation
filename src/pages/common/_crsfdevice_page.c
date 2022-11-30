@@ -18,7 +18,6 @@
 #include "target/drivers/serial/usb_cdc/CBUF.h"
 #include "crsf.h"
 
-#define CRSF_MAX_PARAMS  100   // one extra required, max observed is 47 in Diversity Nano RX
 crsf_param_t crsf_params[CRSF_MAX_PARAMS];
 
 static struct crsfdevice_page * const mp = &pagemem.u.crsfdevice_page;
@@ -751,6 +750,10 @@ static void add_param(u8 *buffer, u8 num_bytes) {
                     start = p+1;
                     count += 1;
                 }
+                // handle "Lua up arrow and down arrow - replace with u and d
+                else if (*p == 0xc0) *p = 'u';
+                else if (*p == 0xc1) *p = 'd';
+                else if (*p &  0x80) *p = ' ';
             }
             parameter->max_value = count;   // bug fix for incorrect max from device
         } else {
