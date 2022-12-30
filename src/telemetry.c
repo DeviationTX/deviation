@@ -245,7 +245,7 @@ const char * TELEMETRY_ShortName(char *str, int idx)
         case TELEM_GPS_ALT:     strcpy(str, _tr("Altitude")); break;
         case TELEM_GPS_SPEED:   strcpy(str, _tr("Speed")); break;
         case TELEM_GPS_TIME:    strcpy(str, _tr("Time")); break;
-        case TELEM_GPS_SATCOUNT:strcpy(str, _tr("SatCount")); break;
+        case TELEM_GPS_SATCOUNT:strcpy(str, _tr("Sats")); break;
         case TELEM_GPS_HEADING: strcpy(str, _tr("Heading")); break;
         default:
             switch (TELEMETRY_Type()) {

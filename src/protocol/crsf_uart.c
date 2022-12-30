@@ -214,6 +214,11 @@ static void processCrossfireTelemetryFrame()
       }
       break;
 
+    case TYPE_VARIO:
+      if (getCrossfireTelemetryValue(3, &value, 2))
+        set_telemetry(TELEM_CRSF_VERTSPD, value);
+      break;
+
     case TYPE_LINK:
       for (i=1; i <= TELEM_CRSF_TX_SNR; i++) {
         if (getCrossfireTelemetryValue(2+i, &value, 1)) {   // payload starts at third byte of rx packet
@@ -228,6 +233,22 @@ static void processCrossfireTelemetryFrame()
       }
       break;
 
+    case TYPE_RX_ID:
+      if (getCrossfireTelemetryValue(4, &value, 1))
+        set_telemetry(TELEM_CRSF_RX_RSSI_PERC, value);
+      if (getCrossfireTelemetryValue(7, &value, 1))
+        set_telemetry(TELEM_CRSF_TX_RF_POWER, value);
+      break;
+
+    case TYPE_TX_ID:
+      if (getCrossfireTelemetryValue(4, &value, 1))
+        set_telemetry(TELEM_CRSF_TX_RSSI_PERC, value);
+      if (getCrossfireTelemetryValue(7, &value, 1))
+        set_telemetry(TELEM_CRSF_RX_RF_POWER, value);
+      if (getCrossfireTelemetryValue(8, &value, 1))
+        set_telemetry(TELEM_CRSF_TX_FPS, value * 10);
+      break;
+
     case TYPE_BATTERY:
       if (getCrossfireTelemetryValue(3, &value, 2))
         set_telemetry(TELEM_CRSF_BATT_VOLTAGE, value);
@@ -235,6 +256,26 @@ static void processCrossfireTelemetryFrame()
         set_telemetry(TELEM_CRSF_BATT_CURRENT, value);
       if (getCrossfireTelemetryValue(7, &value, 3))
         set_telemetry(TELEM_CRSF_BATT_CAPACITY, value);
+      if (getCrossfireTelemetryValue(10, &value, 1))
+        set_telemetry(TELEM_CRSF_BATT_REMAINING, value);
+      break;
+
+    case TYPE_BARO_ALT:
+      if (getCrossfireTelemetryValue(3, &value, 2)) {
+        if (value & 0x8000) {
+          // Altitude in meters
+          value &= ~(0x8000);
+          value *= 100; // cm
+        } else {
+          // Altitude in decimeters + 10000dm
+          value -= 10000;
+          value *= 10;
+        }
+        set_telemetry(TELEM_CRSF_ALTITUDE, value);
+      }
+      // if length greater than 4 then vario info is included
+      if (telemetryRxBuffer[1] > 5 && getCrossfireTelemetryValue(5, &value, 2))
+        set_telemetry(TELEM_CRSF_VERTSPD, value);
       break;
 
     case TYPE_ATTITUDE:

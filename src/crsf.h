@@ -28,6 +28,7 @@
 #define TYPE_GPS              0x02
 #define TYPE_VARIO            0x07
 #define TYPE_BATTERY          0x08
+#define TYPE_BARO_ALT         0x09
 #define TYPE_HEARTBEAT        0x0b
 #define TYPE_VTX              0x0F
 #define TYPE_VTX_TELEM        0x10

@@ -64,10 +64,19 @@ const char * _crsf_str_by_value(char *str, u8 telem, s32 value)
     case TELEM_CRSF_TX_POWER: _get_value_str(str, value, 0, 'w'); break;
     case TELEM_CRSF_BATT_VOLTAGE: _get_value_str(str, value, 1, 'V'); break;
     case TELEM_CRSF_BATT_CURRENT: _get_value_str(str, value, 1, 'A'); break;
+    case TELEM_CRSF_BATT_REMAINING:
     case TELEM_CRSF_BATT_CAPACITY: _get_value_str(str, value, 1, 'a'); break;
     case TELEM_CRSF_ATTITUDE_PITCH:
     case TELEM_CRSF_ATTITUDE_ROLL:
     case TELEM_CRSF_ATTITUDE_YAW: _get_value_str(str, value, 3, 'R'); break;
+    case TELEM_CRSF_ALTITUDE: _get_value_str(str, value, 3, 'm'); break;
+    case TELEM_CRSF_VERTSPD: _get_value_str(str, value, 3, 'v'); break;
+    case TELEM_CRSF_RX_RSSI_PERC:
+    case TELEM_CRSF_TX_RSSI_PERC: _get_value_str(str, value, 0, '%'); break;
+    case TELEM_CRSF_RX_RF_POWER:
+    case TELEM_CRSF_TX_RF_POWER: _get_value_str(str, value, 3, 'w'); break;
+    case TELEM_CRSF_TX_FPS: _get_value_str(str, value, 0, 's'); break;
+
     default:
         return "";
     }
@@ -92,9 +101,18 @@ const char * _crsf_short_name(char *str, u8 telem)
     case TELEM_CRSF_BATT_VOLTAGE: strcpy(str, _tr("Volt")); break;
     case TELEM_CRSF_BATT_CURRENT: strcpy(str, _tr("Curr")); break;
     case TELEM_CRSF_BATT_CAPACITY: strcpy(str, _tr("Cap")); break;
+    case TELEM_CRSF_BATT_REMAINING: strcpy(str, _tr("Remain")); break;
     case TELEM_CRSF_ATTITUDE_PITCH: strcpy(str, _tr("Pitch")); break;
     case TELEM_CRSF_ATTITUDE_ROLL: strcpy(str, _tr("Roll")); break;
     case TELEM_CRSF_ATTITUDE_YAW: strcpy(str, _tr("Yaw")); break;
+    case TELEM_CRSF_ALTITUDE: strcpy(str, _tr("Alt")); break;
+    case TELEM_CRSF_VERTSPD: strcpy(str, _tr("Vario")); break;
+    case TELEM_CRSF_RX_RSSI_PERC: strcpy(str, _tr("RxR%")); break;
+    case TELEM_CRSF_RX_RF_POWER: strcpy(str, _tr("RxRfP")); break;
+    case TELEM_CRSF_TX_FPS: strcpy(str, _tr("Fps")); break;
+    case TELEM_CRSF_TX_RF_POWER: strcpy(str, _tr("TxRfP")); break;
+    case TELEM_CRSF_TX_RSSI_PERC: strcpy(str, _tr("TxR%")); break;
+
     default: sprintf(str, "CRSF%d", telem); break;
     }
     return str;
@@ -109,6 +127,13 @@ const char * _crsf_name(char *str, u8 telem)
     case TELEM_CRSF_RX_QUALITY: strcpy(str, _tr("rx Quality")); break;
     case TELEM_CRSF_TX_QUALITY: strcpy(str, _tr("tx Quality")); break;
     case TELEM_CRSF_BATT_CAPACITY: strcpy(str, _tr("Capacity")); break;
+    case TELEM_CRSF_ALTITUDE: strcpy(str, _tr("Altitude")); break;
+    case TELEM_CRSF_VERTSPD: strcpy(str, _tr("Vario")); break;
+    case TELEM_CRSF_RX_RSSI_PERC: strcpy(str, _tr("RxRSSI%")); break;
+    case TELEM_CRSF_RX_RF_POWER: strcpy(str, _tr("RxRfPower")); break;
+    case TELEM_CRSF_TX_FPS: strcpy(str, _tr("Fps")); break;
+    case TELEM_CRSF_TX_RF_POWER: strcpy(str, _tr("TxRfPower")); break;
+    case TELEM_CRSF_TX_RSSI_PERC: strcpy(str, _tr("TxRSSI%")); break;
     default: _crsf_short_name(str, telem); break;
     }
     return str;
