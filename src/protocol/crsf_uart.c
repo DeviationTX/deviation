@@ -265,7 +265,7 @@ static void processCrossfireTelemetryFrame()
         if (value & 0x8000) {
           // Altitude in meters
           value &= ~(0x8000);
-          value *= 100; // cm
+          value *= 100;        // cm
         } else {
           // Altitude in decimeters + 10000dm
           value -= 10000;
