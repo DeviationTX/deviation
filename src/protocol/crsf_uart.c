@@ -214,11 +214,6 @@ static void processCrossfireTelemetryFrame()
       }
       break;
 
-    case TYPE_VARIO:
-      if (getCrossfireTelemetryValue(3, &value, 2))
-        set_telemetry(TELEM_CRSF_VERTSPD, value);
-      break;
-
     case TYPE_LINK:
       for (i=1; i <= TELEM_CRSF_TX_SNR; i++) {
         if (getCrossfireTelemetryValue(2+i, &value, 1)) {   // payload starts at third byte of rx packet
@@ -233,6 +228,23 @@ static void processCrossfireTelemetryFrame()
       }
       break;
 
+    case TYPE_BATTERY:
+      if (getCrossfireTelemetryValue(3, &value, 2))
+        set_telemetry(TELEM_CRSF_BATT_VOLTAGE, value);
+      if (getCrossfireTelemetryValue(5, &value, 2))
+        set_telemetry(TELEM_CRSF_BATT_CURRENT, value);
+      if (getCrossfireTelemetryValue(7, &value, 3))
+        set_telemetry(TELEM_CRSF_BATT_CAPACITY, value);
+      if (getCrossfireTelemetryValue(10, &value, 1))
+        set_telemetry(TELEM_CRSF_BATT_REMAINING, value);
+      break;
+
+    case TYPE_VARIO:
+      if (getCrossfireTelemetryValue(3, &value, 2))
+        set_telemetry(TELEM_CRSF_VERTSPD, value);
+      break;
+
+#if SUPPORT_CRSF_CONFIG
     case TYPE_RX_ID:
       if (getCrossfireTelemetryValue(4, &value, 1))
         set_telemetry(TELEM_CRSF_RX_RSSI_PERC, value);
@@ -247,17 +259,6 @@ static void processCrossfireTelemetryFrame()
         set_telemetry(TELEM_CRSF_RX_RF_POWER, value);
       if (getCrossfireTelemetryValue(8, &value, 1))
         set_telemetry(TELEM_CRSF_TX_FPS, value * 10);
-      break;
-
-    case TYPE_BATTERY:
-      if (getCrossfireTelemetryValue(3, &value, 2))
-        set_telemetry(TELEM_CRSF_BATT_VOLTAGE, value);
-      if (getCrossfireTelemetryValue(5, &value, 2))
-        set_telemetry(TELEM_CRSF_BATT_CURRENT, value);
-      if (getCrossfireTelemetryValue(7, &value, 3))
-        set_telemetry(TELEM_CRSF_BATT_CAPACITY, value);
-      if (getCrossfireTelemetryValue(10, &value, 1))
-        set_telemetry(TELEM_CRSF_BATT_REMAINING, value);
       break;
 
     case TYPE_BARO_ALT:
@@ -286,6 +287,7 @@ static void processCrossfireTelemetryFrame()
       if (getCrossfireTelemetryValue(7, &value, 2))
         set_telemetry(TELEM_CRSF_ATTITUDE_YAW, value/10);
       break;
+#endif
 
     case TYPE_FLIGHT_MODE:  // string - save first four bytes for now
       memcpy(&value, &telemetryRxBuffer[3], 4);

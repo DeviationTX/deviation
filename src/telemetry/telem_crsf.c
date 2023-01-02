@@ -67,9 +67,11 @@ const char * _crsf_str_by_value(char *str, u8 telem, s32 value)
     case TELEM_CRSF_FLIGHT_MODE: memcpy(str, &value, 4); str[4]=0; break;       // ascii value
     case TELEM_CRSF_RF_MODE:
     case TELEM_CRSF_RX_ANTENNA: _get_value_str(str, value, 0, '\0'); break;     // raw
-    case TELEM_CRSF_BATT_REMAINING:
+#if SUPPORT_CRSF_CONFIG
     case TELEM_CRSF_RX_RSSI_PERC:
     case TELEM_CRSF_TX_RSSI_PERC:
+#endif
+    case TELEM_CRSF_BATT_REMAINING:
     case TELEM_CRSF_TX_QUALITY:
     case TELEM_CRSF_RX_QUALITY: _get_value_str(str, value, 0, '%'); break;      // percentage
     case TELEM_CRSF_TX_POWER: _get_value_str(str, value, 0, 'w'); break;        // milliWatts
@@ -79,11 +81,13 @@ const char * _crsf_str_by_value(char *str, u8 telem, s32 value)
     case TELEM_CRSF_ATTITUDE_PITCH:
     case TELEM_CRSF_ATTITUDE_ROLL:
     case TELEM_CRSF_ATTITUDE_YAW: _get_value_str(str, value, 3, 'R'); break;    // radians
-    case TELEM_CRSF_ALTITUDE: _get_value_str(str, value, 2, 'm'); break;        // meters
     case TELEM_CRSF_VERTSPD: _get_value_str(str, value, 2, 's'); break;         // meters per second
+#if SUPPORT_CRSF_CONFIG
+    case TELEM_CRSF_ALTITUDE: _get_value_str(str, value, 2, 'm'); break;        // meters
     case TELEM_CRSF_RX_RF_POWER:
     case TELEM_CRSF_TX_RF_POWER: _get_value_str(str, value, 3, 'w'); break;
     case TELEM_CRSF_TX_FPS: _get_value_str(str, value, 0, 'H'); break;          // hertz
+#endif
 
     default:
         return "";
@@ -108,21 +112,23 @@ const char * _crsf_short_name(char *str, u8 telem)
     case TELEM_CRSF_BATT_VOLTAGE: strcpy(str, _tr("Volt")); break;
     case TELEM_CRSF_BATT_CURRENT: strcpy(str, _tr("Curr")); break;
     case TELEM_CRSF_BATT_CAPACITY: strcpy(str, _tr("Cap")); break;
-    case TELEM_CRSF_BATT_REMAINING: strcpy(str, _tr("Remain")); break;
     case TELEM_CRSF_ATTITUDE_PITCH: strcpy(str, _tr("Pitch")); break;
     case TELEM_CRSF_ATTITUDE_ROLL: strcpy(str, _tr("Roll")); break;
     case TELEM_CRSF_ATTITUDE_YAW: strcpy(str, _tr("Yaw")); break;
-    case TELEM_CRSF_ALTITUDE: strcpy(str, _tr("Alt")); break;
-    case TELEM_CRSF_VERTSPD: strcpy(str, _tr("Vario")); break;
     case TELEM_CRSF_FLIGHT_MODE: strcpy(str, _tr("FMode")); break;
     case TELEM_CRSF_VTX_FREQ: strcpy(str, _tr("VtxFreq")); break;
     case TELEM_CRSF_VTX_PITMODE: strcpy(str, _tr("VtxMode")); break;
     case TELEM_CRSF_VTX_POWER: strcpy(str, _tr("VtxPwr")); break;
+    case TELEM_CRSF_VERTSPD: strcpy(str, _tr("Vario")); break;
+    case TELEM_CRSF_BATT_REMAINING: strcpy(str, _tr("Remain")); break;
+#if SUPPORT_CRSF_CONFIG
+    case TELEM_CRSF_ALTITUDE: strcpy(str, _tr("Alt")); break;
     case TELEM_CRSF_RX_RSSI_PERC: strcpy(str, _tr("RxR%")); break;
     case TELEM_CRSF_RX_RF_POWER: strcpy(str, _tr("RxRfP")); break;
     case TELEM_CRSF_TX_FPS: strcpy(str, _tr("Fps")); break;
     case TELEM_CRSF_TX_RF_POWER: strcpy(str, _tr("TxRfP")); break;
     case TELEM_CRSF_TX_RSSI_PERC: strcpy(str, _tr("TxR%")); break;
+#endif
 
     default: sprintf(str, "CRSF%d", telem); break;
     }
@@ -138,13 +144,15 @@ const char * _crsf_name(char *str, u8 telem)
     case TELEM_CRSF_RX_QUALITY: strcpy(str, _tr("rx Quality")); break;
     case TELEM_CRSF_TX_QUALITY: strcpy(str, _tr("tx Quality")); break;
     case TELEM_CRSF_BATT_CAPACITY: strcpy(str, _tr("Capacity")); break;
-    case TELEM_CRSF_ALTITUDE: strcpy(str, _tr("Altitude")); break;
     case TELEM_CRSF_VERTSPD: strcpy(str, _tr("Vario")); break;
+#if SUPPORT_CRSF_CONFIG
+    case TELEM_CRSF_ALTITUDE: strcpy(str, _tr("Altitude")); break;
     case TELEM_CRSF_RX_RSSI_PERC: strcpy(str, _tr("RxRSSI%")); break;
     case TELEM_CRSF_RX_RF_POWER: strcpy(str, _tr("RxRfPower")); break;
     case TELEM_CRSF_TX_FPS: strcpy(str, _tr("Fps")); break;
     case TELEM_CRSF_TX_RF_POWER: strcpy(str, _tr("TxRfPower")); break;
     case TELEM_CRSF_TX_RSSI_PERC: strcpy(str, _tr("TxRSSI%")); break;
+#endif
     default: _crsf_short_name(str, telem); break;
     }
     return str;
@@ -169,8 +177,10 @@ s32 _crsf_get_max_value(u8 telem)
     case TELEM_CRSF_ATTITUDE_PITCH:
     case TELEM_CRSF_ATTITUDE_ROLL:
     case TELEM_CRSF_ATTITUDE_YAW: return 7; break;
-    case TELEM_CRSF_ALTITUDE: return 10000; break;
     case TELEM_CRSF_VERTSPD: return 10000; break;
+#if SUPPORT_CRSF_CONFIG
+    case TELEM_CRSF_ALTITUDE: return 10000; break;
+#endif
     default: return 0;
     }
 }
@@ -185,8 +195,10 @@ s32 _crsf_get_min_value(u8 telem)
     case TELEM_CRSF_RX_RSSI2: return -100; break;
     case TELEM_CRSF_ATTITUDE_PITCH:
     case TELEM_CRSF_ATTITUDE_ROLL:
-    case TELEM_CRSF_ATTITUDE_YAW: return -7; break;
     case TELEM_CRSF_VERTSPD: return -10000; break;
+#if SUPPORT_CRSF_CONFIG
+    case TELEM_CRSF_ATTITUDE_YAW: return -7; break;
+#endif
     default: return 0;
     }
 }

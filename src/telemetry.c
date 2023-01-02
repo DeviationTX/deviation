@@ -479,7 +479,9 @@ void TELEMETRY_Alarm()
             switch (alarm->src) {
                 case TELEM_CRSF_BATT_VOLTAGE: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_VOLT,1); break;
                 case TELEM_CRSF_BATT_CURRENT: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_AMPS,1); break;
+#if SUPPORT_CRSF_CONFIG
                 case TELEM_CRSF_ALTITUDE: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_ALTITUDE,3); break;
+#endif
                 case TELEM_CRSF_TX_SNR:
                 case TELEM_CRSF_TX_RSSI:
                 case TELEM_CRSF_RX_SNR:
