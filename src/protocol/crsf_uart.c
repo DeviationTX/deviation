@@ -239,12 +239,12 @@ static void processCrossfireTelemetryFrame()
         set_telemetry(TELEM_CRSF_BATT_REMAINING, value);
       break;
 
+#if SUPPORT_CRSF_CONFIG
     case TYPE_VARIO:
       if (getCrossfireTelemetryValue(3, &value, 2))
         set_telemetry(TELEM_CRSF_VERTSPD, value);
       break;
 
-#if SUPPORT_CRSF_CONFIG
     case TYPE_RX_ID:
       if (getCrossfireTelemetryValue(4, &value, 1))
         set_telemetry(TELEM_CRSF_RX_RSSI_PERC, value);
@@ -278,6 +278,7 @@ static void processCrossfireTelemetryFrame()
       if (telemetryRxBuffer[1] > 5 && getCrossfireTelemetryValue(5, &value, 2))
         set_telemetry(TELEM_CRSF_VERTSPD, value);
       break;
+#endif
 
     case TYPE_ATTITUDE:
       if (getCrossfireTelemetryValue(3, &value, 2))
@@ -287,7 +288,6 @@ static void processCrossfireTelemetryFrame()
       if (getCrossfireTelemetryValue(7, &value, 2))
         set_telemetry(TELEM_CRSF_ATTITUDE_YAW, value/10);
       break;
-#endif
 
     case TYPE_FLIGHT_MODE:  // string - save first four bytes for now
       memcpy(&value, &telemetryRxBuffer[3], 4);
