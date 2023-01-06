@@ -58,21 +58,16 @@ enum {
 };
 
 
-uint32_t pps_timer;
-uint16_t pps_counter;
-uint16_t bind_counter;
-uint8_t  hopping_frequency[50];
-uint8_t  rx_tx_addr[5];
-uint8_t  rx_id[5];
-uint8_t  phase;
-uint8_t  rf_ch_num;
-uint8_t  packet[50];
-uint8_t  packet_count;
+static uint32_t pps_timer;
+static uint16_t pps_counter;
+static uint8_t  hopping_frequency[50];
+static uint8_t  rx_tx_addr[5];
+static uint8_t  phase;
+static uint8_t  rf_ch_num;
+static uint8_t  packet[50];
+static uint8_t  packet_count;
 #define TELEMETRY_BUFFER_SIZE 32
-uint8_t packet_in[TELEMETRY_BUFFER_SIZE];   //telemetry receiving packets
-
-
-
+static uint8_t packet_in[TELEMETRY_BUFFER_SIZE];   //telemetry receiving packets
 static uint32_t RLINK_rand1;
 static uint32_t RLINK_rand2;
 
@@ -117,6 +112,20 @@ static void RLINK_shuffle_freqs(uint32_t seed)
         hopping_frequency[r] = hopping_frequency[i];
         hopping_frequency[i] = tmp;
     }
+}
+
+static uint32_t random(uint32_t max)
+{
+    u32 lfsr = 0x7649eca9ul;
+
+    u8 var[12];
+    MCU_SerialNumber(var, 12);
+    for (int i = 0; i < 12; ++i) {
+        rand32_r(&lfsr, var[i]);
+    }
+    for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
+        rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
+    return rand32_r(&lfsr, 0) % max ;   // use modulo because uniformity not important
 }
 
 static void RLINK_hop()
@@ -186,6 +195,16 @@ static void RLINK_rf_init()
     CC2500_SetTxRxMode(TX_EN);
 }
 
+// Channel value -125%<->125% is scaled to 16bit value with no limit
+#define CHANNEL_MAX_100 1844    //  100%
+#define CHANNEL_MIN_100 204     //  100%
+static u16 convert_channel_16b_nolimit(uint8_t num, int16_t min, int16_t max)
+{
+    s32 val = Channels[num] * 1024 / CHAN_MAX_VALUE + 1024;    // 0<->2047
+    val=(val-CHANNEL_MIN_100)*(max-min)/(CHANNEL_MAX_100-CHANNEL_MIN_100)+min;
+    return (u16)val;
+}
+
 static void RLINK_send_packet()
 {
     static uint32_t pseudo=0;
@@ -224,7 +243,7 @@ static void RLINK_send_packet()
     // pack 16 channels on 11 bits values between 170 and 1876, 1023 middle. The last 8 channels are failsafe values associated to the first 8 values.
     for (uint8_t i = 0; i < 16; i++)
     {
-        uint32_t val = convert_channel_16b_nolimit(i,170,1876,false);       // allow extended limits
+        uint32_t val = convert_channel_16b_nolimit(i,170,1876);       // allow extended limits
         if (val & 0x8000)
             val = 0;
         else if (val > 2047)
@@ -267,11 +286,6 @@ static void RLINK_send_packet()
     //  debug(" 0x%02X",packet[i]);
     //debugln("");
 }
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-function"
-#include "frsky_d_telem._c"
-#pragma GCC diagnostic pop
 
 #define RLINK_TIMING_PROTO  20000-100       // -100 for compatibility with R8EF
 #define RLINK_TIMING_RFSEND 10500
@@ -329,13 +343,13 @@ uint16_t radiolink_callback()
                 }
                 //debugln("");
             }
-            if (millis() - pps_timer >= 2000)
-            {//1 telemetry packet every 100ms
-                pps_timer = millis();
-                if(pps_counter<20)
-                    pps_counter*=5;
+            if (CLOCK_getms() - pps_timer >= 2000)
+            {   // 1 telemetry packet every 100ms
+                pps_timer = CLOCK_getms();
+                if (pps_counter < 20)
+                    pps_counter *= 5;
                 else
-                    pps_counter=100;
+                    pps_counter = 100;
                 //debugln("%d pps", pps_counter);
                 Telemetry.value[TELEM_FRSKY_LQI] = pps_counter;                       //0..100%
                 TELEMETRY_SetUpdated(TELEM_FRSKY_LQI);
@@ -384,11 +398,6 @@ uintptr_t RADIOLINK_Cmds(enum ProtoCmds cmd)
             return PROTO_TELEM_ON;
         case PROTOCMD_TELEMETRYTYPE:
             return TELEM_FRSKY;
-#if HAS_EXTENDED_TELEMETRY
-        case PROTOCMD_TELEMETRYRESET:
-            frsky_telem_reset();
-            return 0;
-#endif
         case PROTOCMD_RESET:
         case PROTOCMD_DEINIT:
             CLOCK_StopTimer();
