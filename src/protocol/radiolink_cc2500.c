@@ -391,7 +391,7 @@ uintptr_t RADIOLINK_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_GETOPTIONS:
             return (uintptr_t)radiolink_opts;
         case PROTOCMD_TELEMETRYSTATE:
-            return Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_DUMBO ? PROTO_TELEM_OFF : PROTO_TELEM_ON;
+            return Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_DUMBO ? PROTO_TELEM_UNSUPPORTED : PROTO_TELEM_ON;
         case PROTOCMD_TELEMETRYTYPE:
             return TELEM_FRSKY;
         case PROTOCMD_RESET:
