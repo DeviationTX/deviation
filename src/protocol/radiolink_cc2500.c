@@ -22,34 +22,40 @@
 
 #ifdef PROTO_HAS_CC2500
 
-enum {
-    PROTOOPTS_TELEMETRY = 0,
-    PROTOOPTS_FORMAT = 1,
-    LAST_PROTO_OPT,
-};
-enum {
-    FORMAT_SURFACE,
-    FORMAT_AIR,
-    FORMAT_DUMBORC,
-};
-ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
-
-#define TELEM_OFF 0
-#define TELEM_ON  1
-
 static const char * const radiolink_opts[] = {
   _tr_noop("Format"),  "Surface", "Air", "Dumbo", NULL,
-  _tr_noop("Telemetry"),  "Off", "On", NULL,
   _tr_noop("Freq-Fine"),  "-127", "127", NULL,
   NULL
 };
 
-//#define RLINK_FORCE_ID
+enum {
+    PROTOOPTS_FORMAT,
+    PROTOOPTS_FREQ,
+    LAST_PROTO_OPT,
+};
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
+
+enum {
+    FORMAT_SURFACE,
+    FORMAT_AIR,
+    FORMAT_DUMBO,
+};
+
 
 #define RLINK_TX_PACKET_LEN 33
 #define RLINK_RX_PACKET_LEN 15
 #define RLINK_TX_ID_LEN     4
 #define RLINK_HOP           16
+#ifdef EMULATOR
+    #define dbgprintf printf
+    #define RLINK_TIMING_PROTO  2000
+    #define RLINK_TIMING_RFSEND 1050
+    #define RLINK_TIMING_CHECK  200
+#else
+    #define RLINK_TIMING_PROTO  20000-100       // -100 for compatibility with R8EF
+    #define RLINK_TIMING_RFSEND 10500
+    #define RLINK_TIMING_CHECK  2000
+#endif
 
 enum {
     RLINK_DATA  = 0x00,
@@ -68,6 +74,7 @@ static uint8_t  packet[50];
 static uint8_t  packet_count;
 #define TELEMETRY_BUFFER_SIZE 32
 static uint8_t packet_in[TELEMETRY_BUFFER_SIZE];   //telemetry receiving packets
+static s8 freq_offset;
 static uint32_t RLINK_rand1;
 static uint32_t RLINK_rand2;
 
@@ -114,7 +121,17 @@ static void RLINK_shuffle_freqs(uint32_t seed)
     }
 }
 
-static uint32_t random(uint32_t max)
+// Convert 32b id to rx_tx_addr
+static void set_rx_tx_addr(u32 id)
+{
+  rx_tx_addr[0] = (id >> 24) & 0xFF;
+  rx_tx_addr[1] = (id >> 16) & 0xFF;
+  rx_tx_addr[2] = (id >>  8) & 0xFF;
+  rx_tx_addr[3] = (id >>  0) & 0xFF;
+  rx_tx_addr[4] = (rx_tx_addr[2]&0xF0)|(rx_tx_addr[3]&0x0F);
+}
+
+static uint32_t get_tx_id()
 {
     u32 lfsr = 0x7649eca9ul;
 
@@ -125,7 +142,7 @@ static uint32_t random(uint32_t max)
     }
     for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
         rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
-    return rand32_r(&lfsr, 0) % max ;   // use modulo because uniformity not important
+    return rand32_r(&lfsr, 0);
 }
 
 static void RLINK_hop()
@@ -141,9 +158,9 @@ static void RLINK_hop()
     RLINK_shuffle_freqs(RLINK_compute_start_id(rx_tx_addr[2] + (rx_tx_addr[3] << 8)));
 
     // replace one of the channel randomely
-    rf_ch_num=random(0xfefefefe)%0x11;      // 0x00..0x10
-    if(inc==9) inc=6;                       // frequency exception
-    hopping_frequency[rf_ch_num]=12*16+inc;
+    rf_ch_num = rx_tx_addr[4] % 0x11;      // 0x00..0x10
+    if (inc == 9) inc = 6;                 // frequency exception
+    hopping_frequency[rf_ch_num] = 12 * 16 + inc;
 }
 
 static void RLINK_TXID_init()
@@ -154,19 +171,11 @@ static void RLINK_TXID_init()
         //air T8FB
         //memcpy(rx_tx_addr,"\xFC\x11\x0D\x20",RLINK_TX_ID_LEN);
     #endif
+
+    set_rx_tx_addr(get_tx_id());
+
     // channels order depend on ID
     RLINK_hop();
-
-    #if 0
-        debug("ID:");
-        for(uint8_t i=0;i<RLINK_TX_ID_LEN;i++)
-            debug(" 0x%02X",rx_tx_addr[i]);
-        debugln("");
-        debug("Hop(%d):", rf_ch_num);
-        for(uint8_t i=0;i<RLINK_HOP;i++)
-            debug(" 0x%02X",hopping_frequency[i]);
-        debugln("");
-    #endif
  }
 
 static const uint8_t RLINK_init_values[] = {
@@ -184,13 +193,14 @@ static void RLINK_rf_init()
     for (uint8_t i = 0; i < 39; ++i)
         CC2500_WriteReg(i, RLINK_init_values[i]);
 
-    if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_DUMBORC)
+    if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_DUMBO)
     {
         CC2500_WriteReg(4, 0xBA);
         CC2500_WriteReg(5, 0xDC);
     }
 
-    CC2500_WriteReg(CC2500_0C_FSCTRL0, Model.tx_power);
+    freq_offset = (s8)Model.proto_opts[PROTOOPTS_FREQ];
+    CC2500_WriteReg(CC2500_0C_FSCTRL0, freq_offset);
     
     CC2500_SetTxRxMode(TX_EN);
 }
@@ -222,7 +232,7 @@ static void RLINK_send_packet()
     else
         packet[1] = 0x00;                   // no telemetry
 
-    switch(Model.proto_opts[PROTOOPTS_FORMAT])
+    switch (Model.proto_opts[PROTOOPTS_FORMAT])
     {
         case FORMAT_SURFACE:
             packet[1] |= 0x01;
@@ -230,10 +240,10 @@ static void RLINK_send_packet()
             //if(RX_num) packet[1] |= ((RX_num+2)<<4)+4;    // RX number limited to 10 values, 0 is a wildcard
             break;
         case FORMAT_AIR:
-            packet[1] |= 0x21;                  //air 0x21 on dump but it looks to support telemetry at least RSSI
+            packet[1] |= 0x21;                  // air 0x21 on dump but it looks to support telemetry at least RSSI
             break;
-        case FORMAT_DUMBORC:
-            packet[1]  = 0x00;                  //always 0x00 on dump
+        case FORMAT_DUMBO:
+            packet[1] = 0x00;                   // always 0x00 on dump
             break;
     }
     
@@ -269,47 +279,44 @@ static void RLINK_send_packet()
     
     // check
     uint8_t sum=0;
-    for(uint8_t i=1;i<33;i++)
-        sum+=packet[i];
-    packet[33]=sum;
+    for (uint8_t i=1; i < 33; i++)
+        sum += packet[i];
+    packet[33] = sum;
 
     // send packet
     CC2500_WriteData(packet, RLINK_TX_PACKET_LEN+1);
     
     // packets type
     packet_count++;
-    if(packet_count>5) packet_count=0;
+    if (packet_count > 5) packet_count = 0; // restart count till next telem check
 
-    //debugln("C= 0x%02X",hopping_frequency[pseudo & 0x0F]);
-    //debug("P=");
-    //for(uint8_t i=1;i<RLINK_TX_PACKET_LEN+1;i++)
-    //  debug(" 0x%02X",packet[i]);
-    //debugln("");
+#ifdef EMULATOR
+    dbgprintf("chan 0x%02x, data %02x", hopping_frequency[pseudo & 0x0f], packet[0]);
+    for(int i=1; i < RLINK_TX_PACKET_LEN-1; i++) dbgprintf(" %02x", packet[i]);
+    dbgprintf("\n");
+#endif
 }
 
-#define RLINK_TIMING_PROTO  20000-100       // -100 for compatibility with R8EF
-#define RLINK_TIMING_RFSEND 10500
-#define RLINK_TIMING_CHECK  2000
-uint16_t radiolink_callback()
+static uint16_t radiolink_callback()
 {
     uint8_t len;
 
     switch(phase)
     {
         case RLINK_DATA:
-            #ifdef MULTI_SYNC
-                telemetry_set_input_sync(RLINK_TIMING_PROTO);
-            #endif
             CC2500_SetPower(Model.tx_power);
-            CC2500_WriteReg(CC2500_0C_FSCTRL0, Model.tx_power);
+            if (freq_offset != (s8)Model.proto_opts[PROTOOPTS_FREQ]) {
+                freq_offset = (s8)Model.proto_opts[PROTOOPTS_FREQ];
+                CC2500_WriteReg(CC2500_0C_FSCTRL0, freq_offset);
+            }
+
             RLINK_send_packet();
-#if 0
-            return RLINK_TIMING_PROTO;
-#else
-            if(!(packet[1]&0x02))
-                return RLINK_TIMING_PROTO;                  //Normal packet
-                                                            //Telemetry packet
-            phase++;                                        // RX1
+
+            if(!(packet[1] & 0x02))
+                return RLINK_TIMING_PROTO;                  // Normal packet
+
+            // telemetry requested - check for telemetry packet
+            phase++;
             return RLINK_TIMING_RFSEND;
         case RLINK_RX1:
             CC2500_Strobe(CC2500_SIDLE);
@@ -322,13 +329,9 @@ uint16_t radiolink_callback()
             len = CC2500_ReadReg(CC2500_3B_RXBYTES | CC2500_READ_BURST) & 0x7F; 
             if (len == RLINK_RX_PACKET_LEN + 1 + 2)         //Telemetry frame is 15 bytes + 1 byte for length + 2 bytes for RSSI&LQI&CRC
             {
-                //debug("Telem:");
                 CC2500_ReadData(packet_in, len);
                 if(packet_in[0]==RLINK_RX_PACKET_LEN && (packet_in[len-1] & 0x80) && memcmp(&packet[2],rx_tx_addr,RLINK_TX_ID_LEN)==0 && packet_in[6]==packet[1])
-                {//Correct telemetry received: length, CRC, ID and type
-                    //Debug
-                    //for(uint8_t i=0;i<len;i++)
-                    //  debug(" %02X",packet_in[i]);
+                {   // Correct telemetry received: length, CRC, ID and type
                     Telemetry.value[TELEM_FRSKY_LRSSI] = packet_in[len-2] ^ 0x80;
                     TELEMETRY_SetUpdated(TELEM_FRSKY_LRSSI);
                     Telemetry.value[TELEM_FRSKY_RSSI] = packet_in[7] & 0x7F;
@@ -339,9 +342,8 @@ uint16_t radiolink_callback()
                     TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT2);
 
                     pps_counter++;
-                    packet_count=0;
+                    packet_count = 0;
                 }
-                //debugln("");
             }
             if (CLOCK_getms() - pps_timer >= 2000)
             {   // 1 telemetry packet every 100ms
@@ -350,37 +352,31 @@ uint16_t radiolink_callback()
                     pps_counter *= 5;
                 else
                     pps_counter = 100;
-                //debugln("%d pps", pps_counter);
+
                 Telemetry.value[TELEM_FRSKY_LQI] = pps_counter;                       //0..100%
                 TELEMETRY_SetUpdated(TELEM_FRSKY_LQI);
                 pps_counter = 0;
             }
             CC2500_SetTxRxMode(TX_EN);
-            phase=RLINK_DATA;                               // DATA
+            phase = RLINK_DATA;                               // DATA
             return RLINK_TIMING_CHECK;
-#endif
     }
     return 0;
 }
 
 
-void RLINK_init()
-{
-    RLINK_TXID_init();
-    RLINK_rf_init();
-    packet_count = 0;
-    phase = RLINK_DATA;
-}
-
 static void initialize()
 {
     CLOCK_StopTimer();
-    CC2500_SetPower(Model.tx_power);
     RLINK_TXID_init();
     RLINK_rf_init();
 
-    PROTOCOL_SetBindState(0xFFFFFFFF);
-    CLOCK_StartTimer(RLINK_TIMING_RFSEND*5, radiolink_callback);
+    CC2500_SetPower(Model.tx_power);
+    packet_count = 0;
+    phase = RLINK_DATA;
+
+//    PROTOCOL_SetBindState(0);
+    CLOCK_StartTimer(RLINK_TIMING_PROTO*2, radiolink_callback);
 }
 
 uintptr_t RADIOLINK_Cmds(enum ProtoCmds cmd)
@@ -395,7 +391,7 @@ uintptr_t RADIOLINK_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_GETOPTIONS:
             return (uintptr_t)radiolink_opts;
         case PROTOCMD_TELEMETRYSTATE:
-            return PROTO_TELEM_ON;
+            return Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_DUMBO ? PROTO_TELEM_OFF : PROTO_TELEM_ON;
         case PROTOCMD_TELEMETRYTYPE:
             return TELEM_FRSKY;
         case PROTOCMD_RESET:
