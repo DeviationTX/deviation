@@ -165,14 +165,16 @@ static void RLINK_hop()
 
 static void RLINK_TXID_init()
 {
+    set_rx_tx_addr(get_tx_id());
+
     #ifdef RLINK_FORCE_ID
         //surface RC6GS
-        memcpy(rx_tx_addr,"\x3A\x99\x22\x3A",RLINK_TX_ID_LEN);
+        //memcpy(rx_tx_addr,"\x3A\x99\x22\x3A",RLINK_TX_ID_LEN);
         //air T8FB
         //memcpy(rx_tx_addr,"\xFC\x11\x0D\x20",RLINK_TX_ID_LEN);
+        // hexfet's am-x12
+        // memcpy(rx_tx_addr,"\x8a\xda\xf5\xcc\x02",RLINK_TX_ID_LEN+1);
     #endif
-
-    set_rx_tx_addr(get_tx_id());
 
     // channels order depend on ID
     RLINK_hop();
