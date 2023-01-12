@@ -173,7 +173,7 @@ static void RLINK_TXID_init()
         //air T8FB
         //memcpy(rx_tx_addr,"\xFC\x11\x0D\x20",RLINK_TX_ID_LEN);
         // hexfet's am-x12
-        // memcpy(rx_tx_addr,"\x8a\xda\xf5\xcc\x02",RLINK_TX_ID_LEN+1);
+        // memcpy(rx_tx_addr,"\x8a\xda\xf5\xcc",RLINK_TX_ID_LEN);
     #endif
 
     // channels order depend on ID
