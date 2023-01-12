@@ -630,7 +630,7 @@ static const struct struct_map _secppm[] = {
 };
 static int ini_handler(void* user, const char* section, const char* name, const char* value)
 {
-    int value_int = atoi(value);
+    u32 value_int = strtoul(value, NULL, 0);
     struct Model *m = (struct Model *)user;
 int assign_int(void* ptr, const struct struct_map *map, int map_size)
 {
