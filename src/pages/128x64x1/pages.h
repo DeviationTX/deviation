@@ -83,6 +83,6 @@ void PAGE_VideoSetupInit(int page);
 void PAGE_LayoutEditInit(int page);
 void PAGE_ExternalOSDInit(int page);
 
-void PAGE_CRSFdialog(int type, void *param);
+void PAGE_CRSFdialog(void *param);
 void PAGE_CRSFdialogClose();
 #endif

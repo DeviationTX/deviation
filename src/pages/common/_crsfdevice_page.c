@@ -324,7 +324,7 @@ void PAGE_CRSFDeviceEvent() {
     // commands may require interaction through dialog
     if (command.dialog == 1) {
         command.dialog = 0;
-        PAGE_CRSFdialog(command.param->u.status, (void *)command.param);
+        PAGE_CRSFdialog((void *)command.param);
     } else if (command.dialog == 2) {
         command.dialog = 0;
         PAGE_CRSFdialogClose();
@@ -798,8 +798,8 @@ static void add_param(u8 *buffer, u8 num_bytes) {
     case COMMAND:
         parse_bytes(UINT8, &recv_param_ptr, &parameter->u.status);
         parse_bytes(UINT8, &recv_param_ptr, &parameter->timeout);
-        if (!update) parameter->s.info = alloc_string(20);
-        strlcpy(parameter->s.info, (const char *)recv_param_ptr, 20);
+        if (!update) parameter->s.info = alloc_string(40);
+        strlcpy(parameter->s.info, (const char *)recv_param_ptr, 40);
 
         command.param = parameter;
         command.time = 0;

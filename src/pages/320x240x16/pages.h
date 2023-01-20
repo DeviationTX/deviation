@@ -66,6 +66,6 @@ void PAGE_ModelMenuInit(int page);
 //Touch
 void PAGE_TouchInit(int page);
 void PAGE_TouchEvent();
-void PAGE_CRSFdialog(int type, void *param);
+void PAGE_CRSFdialog(void *param);
 void PAGE_CRSFdialogClose();
 #endif
