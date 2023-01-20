@@ -146,7 +146,12 @@ static const char *cmd_info_cb(guiObject_t *obj, void *data) {
     (void)obj;
     crsf_param_t *param = (crsf_param_t *)data;
 
-    return (const char *)param->s.info;
+    // info max string length is 39
+    if (strlen(param->s.info) > 20)
+        snprintf(tempstring, sizeof(tempstring), "%20s\n%s", param->s.info, &param->s.info[20]);
+    else
+        snprintf(tempstring, sizeof(tempstring), "%s", param->s.info);
+    return tempstring;
 }
 
 static void crsf_confirm_cb(u8 state, void *data) {

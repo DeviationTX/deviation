@@ -162,7 +162,7 @@ void PAGE_ShowModuleDialog(const char **missing)
 /*********************************/
 /*   CRSF configuration dialog   */
 /*********************************/
-void PAGE_CRSFdialog(int status, void *param) {
+void PAGE_CRSFdialog(void *param) {
     if (dialog) {
         GUI_Redraw(dialog);
         return;
@@ -170,7 +170,7 @@ void PAGE_CRSFdialog(int status, void *param) {
 
     dialog = GUI_CreateDialog(&gui->dialog, 10 + DLG_XOFFSET, 42 + DLG_YOFFSET, 300, 188,
                 NULL, cmd_info_cb, crsf_confirm_cb,
-                status == CONFIRMATION_NEEDED ? dtOkCancel : dtCancel, param);
+                ((crsf_param_t *)param)->u.status == CONFIRMATION_NEEDED ? dtOkCancel : dtCancel, param);
 }
 
 void PAGE_CRSFdialogClose() {
