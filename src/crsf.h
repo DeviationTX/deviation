@@ -28,6 +28,7 @@
 #define TYPE_GPS              0x02
 #define TYPE_VARIO            0x07
 #define TYPE_BATTERY          0x08
+#define TYPE_BARO_ALT         0x09
 #define TYPE_HEARTBEAT        0x0b
 #define TYPE_VTX              0x0F
 #define TYPE_VTX_TELEM        0x10
@@ -60,7 +61,7 @@
 #define CRSF_MAX_DEVICES       4
 #define CRSF_MAX_NAME_LEN      20
 #define CRSF_MAX_PARAMS        100     // one extra required, max observed is 47 in Diversity Nano RX
-#define CRSF_MAX_STRING_BYTES  7500    // max observed is 2010 in Nano RX
+#define CRSF_MAX_STRING_BYTES  5000    // max observed is 2010 in Nano RX
 #define CRSF_STRING_BYTES_AVAIL(current)  (CRSF_MAX_STRING_BYTES-((char *)(current)-mp->strings))
 
 

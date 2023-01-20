@@ -110,13 +110,20 @@ const struct telem_layout crsf_layout[] = {
           {{210, 100, 40, 18}, {253, 100, 40, 18}, TELEM_CRSF_FLIGHT_MODE},
           {{210, 120, 40, 18}, {253, 120, 40, 18}, TELEM_CRSF_ATTITUDE_YAW},
           {{210, 140, 40, 18}, {253, 140, 40, 18}, TELEM_CRSF_RF_MODE},
+          {{210, 180, 40, 18}, {253, 180, 40, 18}, TELEM_CRSF_BATT_REMAINING},
+#if SUPPORT_CRSF_CONFIG
+          {{210, 160, 40, 18}, {253, 160, 40, 18}, TELEM_CRSF_VERTSPD},
+          {{210, 200, 40, 18}, {253, 200, 40, 18}, TELEM_CRSF_RX_RF_POWER},
+          {{210, 220, 40, 18}, {253, 220, 40, 18}, TELEM_CRSF_TX_RF_POWER},
+#endif
 
           {{0, 140, 55, 18}, {60, 140, 140, 18}, TELEM_GPS_LAT},
           {{0, 160, 55, 18}, {60, 160, 140, 18}, TELEM_GPS_LONG},
-          {{0, 180, 55, 18}, {60, 180, 140, 18}, TELEM_GPS_ALT},
+          {{0, 180, 55, 18}, {60, 180, 90, 18}, TELEM_GPS_ALT},
           {{0, 200, 55, 18}, {60, 200, 140, 18}, TELEM_GPS_SPEED},
           {{0, 220, 55, 18}, {60, 220, 140, 18}, TELEM_GPS_TIME},
-          {{210, 180, 55, 18}, {258, 180, 30, 18}, TELEM_GPS_SATCOUNT},
+          {{150, 180, 25, 18}, {170, 180, 30, 18}, TELEM_GPS_SATCOUNT},
+
           {{0, 0, 0, 0}, {0, 0, 0, 0}, 0},
 };
 const struct telem_layout dsm_layout[] = {
