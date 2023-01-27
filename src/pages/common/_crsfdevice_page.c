@@ -698,8 +698,7 @@ static void add_param(u8 *buffer, u8 num_bytes) {
     if (!update) {
         parameter->hidden = *recv_param_ptr++ & 0x80;
         parameter->name = alloc_string(strlen(recv_param_ptr)+1);
-        strlcpy(parameter->name, (const char *)recv_param_ptr,
-                CRSF_STRING_BYTES_AVAIL(parameter->name));
+        strlcpy(parameter->name, (const char *)recv_param_ptr, strlen(recv_param_ptr)+1);
         recv_param_ptr += strlen(recv_param_ptr) + 1;
     } else {
         if (parameter->hidden != (*recv_param_ptr & 0x80))
@@ -723,17 +722,14 @@ static void add_param(u8 *buffer, u8 num_bytes) {
             parse_bytes(FLOAT, &recv_param_ptr, &parameter->step);
         } else if (*recv_param_ptr) {
             if (!update) parameter->s.unit = alloc_string(strlen(recv_param_ptr)+1);
-            strlcpy(parameter->s.unit, (const char *)recv_param_ptr,
-                    CRSF_STRING_BYTES_AVAIL(parameter->s.unit));
+            strlcpy(parameter->s.unit, (const char *)recv_param_ptr, strlen(recv_param_ptr)+1);
         }
         break;
 
     case TEXT_SELECTION:
         if (!update) {
             parameter->value = alloc_string(strlen(recv_param_ptr)+1);
-            strlcpy(parameter->value,
-                    (const char *)recv_param_ptr,
-                    CRSF_STRING_BYTES_AVAIL(parameter->value));
+            strlcpy(parameter->value, (const char *)recv_param_ptr, strlen(recv_param_ptr)+1);
             recv_param_ptr += strlen(recv_param_ptr) + 1;
             // put null between selection options
             // find max choice string length to adjust textselectplate size
@@ -768,9 +764,7 @@ static void add_param(u8 *buffer, u8 num_bytes) {
     case INFO:
         if (!update) {
             parameter->value = alloc_string(strlen(recv_param_ptr)+1);
-            strlcpy(parameter->value,
-                    (const char *)recv_param_ptr,
-                    CRSF_STRING_BYTES_AVAIL(parameter->value));
+            strlcpy(parameter->value, (const char *)recv_param_ptr, strlen(recv_param_ptr+1));
             recv_param_ptr += strlen(recv_param_ptr) + 1;
         }
         break;
@@ -786,12 +780,11 @@ static void add_param(u8 *buffer, u8 num_bytes) {
 
             // No string re-sizing so allocate max length for value
             if (!update) parameter->value = alloc_string(parameter->u.string_max_len+1);
-            strlcpy(parameter->value, value,
-                    MIN(parameter->u.string_max_len+1,
-                        CRSF_STRING_BYTES_AVAIL(parameter->value)));
-            if (!update) parameter->default_value = alloc_string(strlen(default_value)+1);
-            strlcpy(parameter->default_value, default_value,
-                    CRSF_STRING_BYTES_AVAIL(parameter->default_value));
+            strlcpy(parameter->value, value, parameter->u.string_max_len+1);
+            if (!update) {
+                parameter->default_value = alloc_string(strlen(default_value)+1);
+                strlcpy(parameter->default_value, default_value, strlen(default_value)+1);
+            }
         }
         break;
 
