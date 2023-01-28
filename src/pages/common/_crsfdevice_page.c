@@ -769,27 +769,19 @@ static void add_param(u8 *buffer, u8 num_bytes) {
             const u8 length = strlen(recv_param_ptr) + 1;
             parameter->value = alloc_string(length);
             strlcpy(parameter->value, (const char *)recv_param_ptr, length);
-            recv_param_ptr += length;
         }
         break;
 
     case STRING:
         {
-            const char *value, *default_value;
+            const char *value;
             value = recv_param_ptr;
             recv_param_ptr += strlen(value) + 1;
-            default_value = recv_param_ptr;
-            recv_param_ptr += strlen(default_value) + 1;
             parse_bytes(UINT8, &recv_param_ptr, &parameter->u.string_max_len);
 
             // No string re-sizing so allocate max length for value
             if (!update) parameter->value = alloc_string(parameter->u.string_max_len+1);
             strlcpy(parameter->value, value, parameter->u.string_max_len+1);
-            if (!update) {
-                const u8 length = strlen(default_value) + 1;
-                parameter->default_value = alloc_string(length);
-                strlcpy(parameter->default_value, default_value, length);
-            }
         }
         break;
 
