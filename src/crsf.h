@@ -60,8 +60,8 @@
 
 #define CRSF_MAX_DEVICES       4
 #define CRSF_MAX_NAME_LEN      20
-#define CRSF_MAX_PARAMS        100     // one extra required, max observed is 47 in Diversity Nano RX
-#define CRSF_MAX_STRING_BYTES  5000    // max observed is 2010 in Nano RX
+#define CRSF_MAX_PARAMS        100     // one extra required, max observed is 50 in XF Transmitter
+#define CRSF_MAX_STRING_BYTES  5000    // max observed is 2010 in Nano RX, TBS WiFi depends on number of networks
 #define CRSF_STRING_BYTES_AVAIL(current)  (CRSF_MAX_STRING_BYTES-((char *)(current)-mp->strings))
 
 
