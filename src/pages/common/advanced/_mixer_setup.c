@@ -185,7 +185,7 @@ void toggle_link_cb(guiObject_t *obj, const void *data)
 static const char *show_rate_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    return (long)data == 0 ? _tr_noop("Mid-Rate") : _tr_noop("Low-Rate");
+    return (long)data == 0 ? _tr("Mid-Rate") : _tr("Low-Rate");
 }
 
 s32 eval_mixer_cb(s32 xval, void * data)
