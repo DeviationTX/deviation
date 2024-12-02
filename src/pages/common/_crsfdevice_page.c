@@ -387,6 +387,46 @@ u8 CRSF_send_model_id(u8 model_id) {
     return 1;
 }
 
+u8 CRSF_speed_proposal(u32 bitrate) {
+    if (CBUF_Space(send_buf) < 14) return 0;
+    u8 crc = 0;
+    u8 crc_BA = 0;
+    CBUF_Push(send_buf, ADDR_MODULE);
+    CBUF_Push(send_buf, 12);
+    buf_push_crc2(&crc, &crc_BA, TYPE_COMMAND_ID);
+    buf_push_crc2(&crc, &crc_BA, ADDR_MODULE);
+    buf_push_crc2(&crc, &crc_BA, ADDR_RADIO);
+    buf_push_crc2(&crc, &crc_BA, GENERAL_SUBCMD);
+    buf_push_crc2(&crc, &crc_BA, SUBCMD_SPD_PROPOSAL);
+    buf_push_crc2(&crc, &crc_BA, 0);
+    buf_push_crc2(&crc, &crc_BA, bitrate >> 24);
+    buf_push_crc2(&crc, &crc_BA, bitrate >> 16);
+    buf_push_crc2(&crc, &crc_BA, bitrate >> 8);
+    buf_push_crc2(&crc, &crc_BA, bitrate);
+    buf_push_crc(&crc, crc_BA);
+    CBUF_Push(send_buf, crc);
+    return 1;
+}
+
+u8 CRSF_speed_response(u8 accept, usart_callback_t tx_callback) {
+    if (CBUF_Space(send_buf) < 11) return 0;
+    if (accept) UART_TxCallback(tx_callback);
+    u8 crc = 0;
+    u8 crc_BA = 0;
+    CBUF_Push(send_buf, ADDR_MODULE);
+    CBUF_Push(send_buf, 9);
+    buf_push_crc2(&crc, &crc_BA, TYPE_COMMAND_ID);
+    buf_push_crc2(&crc, &crc_BA, ADDR_MODULE);
+    buf_push_crc2(&crc, &crc_BA, ADDR_RADIO);
+    buf_push_crc2(&crc, &crc_BA, GENERAL_SUBCMD);
+    buf_push_crc2(&crc, &crc_BA, SUBCMD_SPD_RESPONSE);
+    buf_push_crc2(&crc, &crc_BA, 0);
+    buf_push_crc2(&crc, &crc_BA, accept ? 1 : 0);
+    buf_push_crc(&crc, crc_BA);
+    CBUF_Push(send_buf, crc);
+    return 1;
+}
+
 // Request parameter info from known device
 void CRSF_read_param(u8 device, u8 id, u8 chunk) {
     if (CBUF_Space(send_buf) < 8) return;

@@ -33,9 +33,10 @@
 #define CRSF_CHANNELS             16
 #define CRSF_PACKET_SIZE          26
 
-static const u32 bitrates[] = { 400000, 1870000, 2250000 };
+static const u32 bitrates[] = { 400000, 1870000, 1000000, 2250000 };
+static s8 new_bitrate_index = -1;
 static const char * const crsf_opts[] = {
-  _tr_noop("Bit Rate"), "400K", "1.87M", "2.25M", NULL,
+  _tr_noop("Bit Rate"), "400K", "1.87M", "1.00M", "2.25M", NULL,
   NULL
 };
 enum {
@@ -43,6 +44,22 @@ enum {
     LAST_PROTO_OPT,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
+
+void set_bitrate(u8 data, u8 status) {
+    (void)data;
+    (void)status;
+    if (new_bitrate_index >= 0) UART_SetDataRate(bitrates[new_bitrate_index]);
+    new_bitrate_index = -1;
+    UART_TxCallback(NULL);
+}
+
+s8 check_bitrate(u32 rate) {
+    if (rate == bitrates[0]) return 0;
+    if (rate == bitrates[1]) return 1;
+    if (rate == bitrates[2]) return 2;
+    if (rate == bitrates[3]) return 3;
+    return -1;
+}
 
 
 // crc implementation from CRSF protocol document rev7
@@ -294,6 +311,18 @@ static void processCrossfireTelemetryFrame()
       set_telemetry(TELEM_CRSF_FLIGHT_MODE, value);
       break;
 
+    case TYPE_COMMAND_ID:  // various commands
+      if (telemetryRxBuffer[3] == ADDR_RADIO && telemetryRxBuffer[5] == GENERAL_SUBCMD) {
+          if (telemetryRxBuffer[6] == SUBCMD_SPD_PROPOSAL) {
+              if (telemetryRxBuffer[7] != 0) break;
+              getCrossfireTelemetryValue(8, &value, 4);
+              new_bitrate_index = check_bitrate((u32)value);
+              if (new_bitrate_index >= 0) CRSF_speed_proposal(bitrates[new_bitrate_index]);
+              CRSF_speed_response(new_bitrate_index >= 0 ? 1 : 0, set_bitrate);
+          }
+      }
+      break;
+
     case TYPE_RADIO_ID:
       if (telemetryRxBuffer[3] == ADDR_RADIO && telemetryRxBuffer[5] == CRSF_SUBCOMMAND) {
         if (getCrossfireTelemetryValue(6, (s32 *)&updateInterval, 4))
@@ -355,7 +384,9 @@ static void processCrossfireTelemetryData() {
         
         if (telemetryRxBufferCount >= length+2) {
             if (checkCrossfireTelemetryFrameCRC()) {
-                if (telemetryRxBuffer[2] < TYPE_PING_DEVICES || telemetryRxBuffer[2] == TYPE_RADIO_ID) {
+                if (telemetryRxBuffer[2] < TYPE_PING_DEVICES
+                 || telemetryRxBuffer[2] == TYPE_RADIO_ID
+                 || telemetryRxBuffer[2] == TYPE_COMMAND_ID) {
                     processCrossfireTelemetryFrame();     // Broadcast frame
 #if SUPPORT_CRSF_CONFIG
                     // wait for telemetry running before sending model id

@@ -50,8 +50,11 @@
 
 // Frame Subtype
 #define UART_SYNC                      0xC8
+#define GENERAL_SUBCMD                 0x0A
+#define   SUBCMD_SPD_PROPOSAL            0x70
+#define   SUBCMD_SPD_RESPONSE            0x71
 #define CRSF_SUBCOMMAND                0x10
-#define COMMAND_MODEL_SELECT_ID        0x05
+#define   COMMAND_MODEL_SELECT_ID        0x05
 
 #define TELEMETRY_RX_PACKET_SIZE   64
 #define CRSF_MAX_FIXEDID          63
@@ -164,6 +167,8 @@ void protocol_set_param(u8 value);
 void protocol_module_type(module_type_t type);
 u8 protocol_module_is_elrs();
 u8 protocol_elrs_is_armed();
+u8 CRSF_speed_response(u8 accept, usart_callback_t tx_callback);
+u8 CRSF_speed_proposal(u32 bitrate);
 
 #endif  // SUPPORT_CRSF_CONFIG
 
