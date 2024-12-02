@@ -684,6 +684,7 @@ static u16 afhds2a_cb()
             packet_count++;
             state |= WAIT_WRITE;
             return 1700;
+
         case DATA1|WAIT_WRITE:
             state &= ~WAIT_WRITE;
             A7105_SetTxRxMode(RX_EN);

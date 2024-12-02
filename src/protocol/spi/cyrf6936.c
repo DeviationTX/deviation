@@ -209,6 +209,14 @@ void CYRF_SetTxRxMode(enum TXRX_State mode)
 /*
  *
  */
+void CYRF_TuneFreq(s16 offset)
+{
+    // default value is 0x555
+    u16 tune = 0x555 + offset;
+    CYRF_WriteRegister(CYRF_1B_TX_OFFSET_LSB, tune & 0xFF);
+    CYRF_WriteRegister(CYRF_1C_TX_OFFSET_MSB, tune >> 8);
+}
+
 void CYRF_ConfigRFChannel(u8 ch)
 {
     CYRF_WriteRegister(CYRF_00_CHANNEL, ch);

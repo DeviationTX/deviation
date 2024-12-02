@@ -31,12 +31,14 @@ void LCD_DrawFastVLine(int16_t x, int16_t y,
     LCD_DrawStop();
 }
 
+#if !defined(_DEVO12_TARGET_H_) || defined(EMULATOR)
 void LCD_DrawFastHLine(u16 x, u16 y, u16 w, u16 color) {
-    LCD_DrawStart(x, y, x + w -1, y, DRAW_NWSE);
+    LCD_DrawStart(x, y, x + w - 1, y, DRAW_NWSE);
     while(w--)
         LCD_DrawPixel(color);
     LCD_DrawStop();
 }
+#endif
 
 void LCD_DrawDashedHLine(int16_t x, int16_t y, 
              int16_t w, int16_t space, uint16_t color)
@@ -204,14 +206,16 @@ void LCD_DrawRect(u16 x, u16 y, u16 w, u16 h, u16 color)
   LCD_DrawFastVLine(x+w-1, y, h, color);
 }
 
+#if !defined(_DEVO12_TARGET_H_) || defined(EMULATOR)
 void LCD_FillRect(u16 x, u16 y, u16 w, u16 h, u16 color)
 {
     u32 bytes = (u32)w * h;
-    LCD_DrawStart(x, y, x + w - 1, y + h -1, DRAW_NWSE); // Bug fix: should be y+h-1 instead of y+h
+    LCD_DrawStart(x, y, x + w - 1, y + h - 1, DRAW_NWSE);  // Bug fix: should be y+h-1 instead of y+h
     while(bytes--)
         LCD_DrawPixel(color);
     LCD_DrawStop();
 }
+#endif
 
 // draw a rounded rectangle!
 void LCD_DrawRoundRect(u16 x, u16 y, u16 w, u16 h, u16 r, u16 color)

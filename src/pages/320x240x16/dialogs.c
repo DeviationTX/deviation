@@ -18,6 +18,7 @@
 #include "gui/gui.h"
 #include "config/model.h"
 #include "config/ini.h"
+#include "crsf.h"
 
 #define MAX_CONCURRENT_SAFETY_MSGS 5
 
@@ -157,3 +158,24 @@ void PAGE_ShowModuleDialog(const char **missing)
     PAGE_ShowWarning(_tr("Module Error"), tempstring);
 }
 
+#if SUPPORT_CRSF_CONFIG
+/*********************************/
+/*   CRSF configuration dialog   */
+/*********************************/
+void PAGE_CRSFdialog(void *param) {
+    if (dialog) {
+        GUI_Redraw(dialog);
+        return;
+    }
+
+    dialog = GUI_CreateDialog(&gui->dialog, 10 + DLG_XOFFSET, 42 + DLG_YOFFSET, 300, 188,
+                NULL, cmd_info_cb, crsf_confirm_cb,
+                ((crsf_param_t *)param)->u.status == CONFIRMATION_NEEDED ? dtOkCancel : dtCancel, param);
+}
+
+void PAGE_CRSFdialogClose() {
+    if (dialog) {
+        DialogClose(dialog, 0);
+    }
+}
+#endif  // SUPPORT_CRSF_CONFIG

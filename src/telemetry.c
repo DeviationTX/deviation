@@ -245,7 +245,7 @@ const char * TELEMETRY_ShortName(char *str, int idx)
         case TELEM_GPS_ALT:     strcpy(str, _tr("Altitude")); break;
         case TELEM_GPS_SPEED:   strcpy(str, _tr("Speed")); break;
         case TELEM_GPS_TIME:    strcpy(str, _tr("Time")); break;
-        case TELEM_GPS_SATCOUNT:strcpy(str, _tr("SatCount")); break;
+        case TELEM_GPS_SATCOUNT:strcpy(str, _tr("Sats")); break;
         case TELEM_GPS_HEADING: strcpy(str, _tr("Heading")); break;
         default:
             switch (TELEMETRY_Type()) {
@@ -477,10 +477,11 @@ void TELEMETRY_Alarm()
 #if HAS_EXTENDED_TELEMETRY
         if (TELEMETRY_Type() == TELEM_CRSF) {
             switch (alarm->src) {
-                case TELEM_CRSF_BATT_VOLTAGE:
-                    MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_VOLT,2); break;
-                case TELEM_CRSF_BATT_CURRENT: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_AMPS,2); break;
-                case TELEM_CRSF_GPS_ALTITUDE: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_ALTITUDE,2); break;
+                case TELEM_CRSF_BATT_VOLTAGE: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_VOLT,1); break;
+                case TELEM_CRSF_BATT_CURRENT: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_AMPS,1); break;
+#if SUPPORT_CRSF_CONFIG
+                case TELEM_CRSF_ALTITUDE: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_ALTITUDE,3); break;
+#endif
                 case TELEM_CRSF_TX_SNR:
                 case TELEM_CRSF_TX_RSSI:
                 case TELEM_CRSF_RX_SNR:
@@ -510,6 +511,8 @@ void TELEMETRY_ResetValues(void)
     // Reset cumulative values, altitude ground level, etc.
     // Exact values are protocol depenedent
     PROTOCOL_ResetTelemetry();
+    SOUND_SetFrequency(3951, Transmitter.volume * 10);
+    SOUND_StartWithoutVibrating(100, NULL);
 }
 
 void TELEMETRY_MuteAlarm()

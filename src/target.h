@@ -135,6 +135,7 @@ enum MsecCallback {
 void CLOCK_Init(void);
 u32 CLOCK_getms(void);
 void CLOCK_StartTimer(unsigned us, u16 (*cb)(void));
+void CLOCK_RunOnce(void (*cb)(void));
 void CLOCK_StopTimer();
 void CLOCK_SetMsecCallback(int cb, u32 msec);
 void CLOCK_ClearMsecCallback(int cb);
@@ -293,8 +294,11 @@ void USB_Disable();
 void USB_HandleISR();
 void USB_Connect();
 
+void HID_SetInterval(u8 interval);
 void HID_Enable();
 void HID_Disable();
+void HID_Write(s8 *packet, u8 size);
+extern volatile u8 HID_prevXferComplete;
 
 void MSC_Enable();
 void MSC_Disable();

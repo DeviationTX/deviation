@@ -60,9 +60,16 @@ PROTO_MODULES += $(ODIR)/protocol/pxx.mod
 PROTO_MODULES += $(ODIR)/protocol/loli.mod
 PROTO_MODULES += $(ODIR)/protocol/e016h.mod
 PROTO_MODULES += $(ODIR)/protocol/sumd.mod
+ifeq "$(SUPPORT_SCANNER)" "1"
 PROTO_MODULES += $(ODIR)/protocol/scancyrf.mod
+endif
+ifeq "$(SUPPORT_XN297DUMP)" "1"
 PROTO_MODULES += $(ODIR)/protocol/xn297dmp.mod
+endif
 PROTO_MODULES += $(ODIR)/protocol/e010.mod
+PROTO_MODULES += $(ODIR)/protocol/radiolink.mod
+PROTO_MODULES += $(ODIR)/protocol/v761.mod
+PROTO_MODULES += $(ODIR)/protocol/redpine.mod
 
 ALL += $(PROTO_MODULES)
 else #BUILD_TARGET
@@ -306,15 +313,31 @@ $(ODIR)/protocol/sumd.mod : $(ODIR)/sumd_uart.bin
 	@echo Building 'sumd' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
+ifeq "$(SUPPORT_SCANNER)" "1"
 $(ODIR)/protocol/scancyrf.mod : $(ODIR)/scanner_cyrf6936.bin
 	@echo Building 'scancyrf' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
+endif
 
+ifeq "$(SUPPORT_XN297DUMP)" "1"
 $(ODIR)/protocol/xn297dmp.mod : $(ODIR)/xn297dump_nrf24l01.bin
 	@echo Building 'xn297dmp' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
+endif
 
 $(ODIR)/protocol/e010.mod : $(ODIR)/e010_cc2500.bin
 	@echo Building 'e010' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
+
+$(ODIR)/protocol/radiolink.mod : $(ODIR)/radiolink_cc2500.bin
+	@echo Building 'radiolink' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
+
+$(ODIR)/protocol/v761.mod : $(ODIR)/v761_nrf24l01.bin
+	@echo Building 'v761' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
+
+$(ODIR)/protocol/redpine.mod : $(ODIR)/redpine_cc2500.bin
+	@echo Building 'redpine' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 endif #BUILD_TARGET

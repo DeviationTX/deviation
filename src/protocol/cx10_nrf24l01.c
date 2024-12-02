@@ -50,8 +50,8 @@
 #define FLAG_SNAPSHOT   0x0004
 
 static const char * const cx10_opts[] = {
-    _tr_noop("Format"), _tr_noop("Green"), _tr_noop("Blue-A"), "DM007", "Q282", "JC3015-1", "JC3015-2", "MK33041", "Q242", NULL, 
-    NULL
+    _tr_noop("Format"), _tr_noop("Green"), _tr_noop("Blue-A"), "DM007", "Q282", "JC3015-1", "JC3015-2", "MK33041", "Q242", "Q222", 
+    NULL, NULL
 };
 
 enum {
@@ -68,6 +68,7 @@ enum {
     FORMAT_JC3015_2,
     FORMAT_MK33041,
     FORMAT_Q242,
+    FORMAT_Q222,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
@@ -157,6 +158,7 @@ static void send_packet(u8 bind)
             break;
         case FORMAT_Q282:
         case FORMAT_Q242:
+        case FORMAT_Q222:
             aileron = 3000 - aileron;
             rudder = 3000 - rudder;
             break;
@@ -206,22 +208,23 @@ static void send_packet(u8 bind)
 
         case FORMAT_Q282:
         case FORMAT_Q242:
+        case FORMAT_Q222:
             packet[14] = GET_FLAG(CHANNEL_FLIP, 0x80)
                        | GET_FLAG(CHANNEL_LED, 0x40)
                        | GET_FLAG(CHANNEL_HEADLESS, 0x08)
                        | GET_FLAG(CHANNEL_XCAL, 0x04)
                        | GET_FLAG(CHANNEL_YCAL, 0x02);
 
-            if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q282) {
-                packet[13] = 0x03 | GET_FLAG(CHANNEL_RTH, 0x80);
-                packet[14] |= GET_FLAG(CHANNEL_PICTURE, 0x10)
-                            | set_video(CHANNEL_VIDEO, packet[14] & 0x21);
-                memcpy(&packet[15], "\x10\x10\xaa\xaa\x00\x00", 6);
-            } else {
+            if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q242) {
                 packet[13] = 0x02 | GET_FLAG(CHANNEL_RTH, 0x80);
                 packet[14] |= GET_FLAG(CHANNEL_PICTURE, 0x01)
                             | GET_FLAG(CHANNEL_VIDEO, 0x10);
                 memcpy(&packet[15], "\x10\x10\x00\x00\x00\x00", 6);
+            } else {
+                packet[13] = 0x03 | GET_FLAG(CHANNEL_RTH, 0x80);
+                packet[14] |= GET_FLAG(CHANNEL_PICTURE, 0x10)
+                            | set_video(CHANNEL_VIDEO, packet[14] & 0x21);
+                memcpy(&packet[15], "\x10\x10\xaa\xaa\x00\x00", 6);
             }
             break;
 
@@ -399,13 +402,23 @@ static void initialize_txid()
     switch(Model.proto_opts[PROTOOPTS_FORMAT]) {
     case FORMAT_Q282:
     case FORMAT_Q242:
-        rf_chans[0] = 0x46;
-        rf_chans[1] = 0x48;
-        rf_chans[2] = 0x4a;
-        rf_chans[3] = 0x4c;
-        if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q242)
-            for (u8 i=0; i < 4; i++)
-                rf_chans[i] += 2;
+    case FORMAT_Q222:
+        {
+      	u8 offset=0;	//F_Q282
+	if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q242)
+	   	offset=2;
+	if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q222)
+		offset=3;
+	for(u8 i=0; i < 4; i++)
+		rf_chans[i] = 0x46 + 2*i + offset;
+        }
+//        rf_chans[0] = 0x46;
+//        rf_chans[1] = 0x48;
+//        rf_chans[2] = 0x4a;
+//        rf_chans[3] = 0x4c;
+//        if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q242)
+//            for (u8 i=0; i < 4; i++)
+//                rf_chans[i] += 2;
         break;
 
     default:
@@ -424,6 +437,7 @@ static void initialize()
     switch( Model.proto_opts[PROTOOPTS_FORMAT]) {
         case FORMAT_Q282:
         case FORMAT_Q242:
+        case FORMAT_Q222:
             packet_size = Q282_PACKET_SIZE - CX10_PACKET_SIZE;  // difference in packet size
             /* FALLTHROUGH */
         case FORMAT_CX10_GREEN:

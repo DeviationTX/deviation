@@ -14,7 +14,6 @@ LANGUAGE     = devo10
 
 OPTIMIZE_DFU     := 1
 MODULAR          := 0x20004000
-ENABLE_LTO       := 1
 
 include $(SDIR)/target/tx/devo/common/Makefile.inc
 

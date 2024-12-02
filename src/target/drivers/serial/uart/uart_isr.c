@@ -23,6 +23,8 @@
 
 extern volatile u8 busy;
 
+
+
 void __attribute__((__used__)) _USART_DMA_ISR(void)
 {
     DMA_IFCR(USART_DMA.dma) |= DMA_IFCR_CTCIF(USART_DMA.stream);
@@ -31,16 +33,25 @@ void __attribute__((__used__)) _USART_DMA_ISR(void)
     usart_disable_tx_dma(UART_CFG.uart);
     DMA_disable_stream(USART_DMA);
 
-    busy = 0;
+    USART_CR1(UART_CFG.uart) |= USART_CR1_TCIE;     // wait for last byte send complete
 }
 
 extern usart_callback_t *rx_callback;
 void __attribute__((__used__)) _UART_ISR(void)
 {
-    u8 status = USART_SR(UART_CFG.uart) & (USART_SR_RXNE | USART_SR_PE | USART_SR_FE | USART_SR_NE | USART_SR_ORE);
+    u8 status = USART_SR(UART_CFG.uart);
     u8 data = usart_recv(UART_CFG.uart);       // read unconditionally to reset interrupt and error flags
 
-    if (rx_callback) rx_callback(data, status);
+    // handle transmit complete at end of DMA transfer
+    if (status & USART_SR_TC) {
+        USART_CR1(UART_CFG.uart) &= ~USART_CR1_TCIE;
+        if (USART_CR3(UART_CFG.uart) & USART_CR3_HDSEL) {   // change to receiver if half-duplex
+            usart_set_mode(UART_CFG.uart, USART_MODE_RX);
+        }
+        busy = 0;
+    }
+        
+    if (!busy && (status & USART_SR_RXNE) && rx_callback) rx_callback(data, status);
 
     // interrupt cleared by reading data register
 }

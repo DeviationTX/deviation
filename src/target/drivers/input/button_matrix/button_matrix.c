@@ -38,7 +38,11 @@ void Initialize_ButtonMatrix()
     rcc_periph_clock_enable(get_rcc_from_pin(BUTTON_MATRIX_ROW_OD));
     rcc_periph_clock_enable(get_rcc_from_pin(BUTTON_MATRIX_COL_PU));
 
+#if defined(HAS_BUTTON_MATRIX_PULLUP) && !HAS_BUTTON_MATRIX_PULLUP
+    GPIO_setup_output(BUTTON_MATRIX_ROW_OD, OTYPE_PUSHPULL);
+#else
     GPIO_setup_output(BUTTON_MATRIX_ROW_OD, OTYPE_OPENDRAIN);
+#endif
     GPIO_pin_set(BUTTON_MATRIX_ROW_OD);
     GPIO_setup_input(BUTTON_MATRIX_COL_PU, ITYPE_PULLUP);
 }

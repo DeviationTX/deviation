@@ -18,6 +18,28 @@
 #include "mixer.h"
 #include "config/model.h"
 
+static const char * const usbhid_opts[] = {
+  _tr_noop("Period (Hz)"),  "125", "250", "500", "1000", NULL,
+  NULL
+};
+enum {
+    PROTO_OPTS_PERIOD,
+    LAST_PROTO_OPT,
+};
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
+
+# define USBHID_PERIOD_MAX_INDEX 3
+static u16 period_index_to_ms(s16 idx)
+{
+    switch (idx) {
+        case 3: return 1;
+        case 2: return 2;
+        case 1: return 4;
+        default: return 8;
+    }
+    return 8;
+}
+
 //To change USBHID_MAX_CHANNELS you must change the Report_Descriptor in hid_usb_desc.c as well
 #define USBHID_ANALOG_CHANNELS 8
 #define USBHID_DIGITAL_CHANNELS 4
@@ -29,7 +51,6 @@
 //if sizeof(packet) changes, must change wMaxPacketSize to match in Joystick_ConfigDescriptor
 static s8 packet[USBHID_ANALOG_CHANNELS + 1];
 static u8 num_channels;
-extern void HID_Write(s8 *packet, u8 size);
 
 static void build_data_pkt()
 {
@@ -57,13 +78,47 @@ static void build_data_pkt()
     packet[USBHID_ANALOG_CHANNELS] = digital;
 }
 
+static enum {
+    ST_DATA1,
+    ST_DATA2,
+} state;
+
+static u16 mixer_runtime;
+// ms suffix on usbhid_period_ms to indicate that it's in milliseconds not microseconds like other protocols
+static u16 usbhid_period_ms;
 static u16 usbhid_cb()
 {
-    build_data_pkt();
-        
-    HID_Write(packet, sizeof(packet));
+    // wait until endpoint is ready for writing before preparing data
+    // if the host is polling slower than our clock, this will just delay us a bit
+    // it does increase the chance of mixers not completing in time for 1ms period though...
+    if (!HID_prevXferComplete) return 100;
 
-    return 50000;
+    u16 protoopts_period = period_index_to_ms(Model.proto_opts[PROTO_OPTS_PERIOD]);
+    if (usbhid_period_ms != protoopts_period) {
+        usbhid_period_ms = protoopts_period;
+        // HID should be restarted when period changes
+        // this lets us update the endpoint descriptor's bInterval field
+        HID_Disable();
+        HID_SetInterval(usbhid_period_ms);
+        HID_Enable();
+    }
+    switch (state) {
+        case ST_DATA1:
+            CLOCK_RunMixer();    // clears mixer_sync, which is then set when mixer update complete
+            state = ST_DATA2;
+            return mixer_runtime;
+
+        case ST_DATA2:
+            if (mixer_sync != MIX_DONE && mixer_runtime < 2000) mixer_runtime += 50;
+            build_data_pkt();
+            HID_Write(packet, sizeof(packet));
+            state = ST_DATA1;
+            // return with - 200 in case host is polling slightly faster than our clock
+            // this doesn't guarantee perfect timing, but it should be sufficient to
+            // catch most variations and get us back to waiting for the host
+            return usbhid_period_ms * 1000 - mixer_runtime - 200;
+    }
+    return usbhid_period_ms * 1000 - 200;   // avoid compiler warning
 }
 
 static void deinit()
@@ -75,7 +130,11 @@ static void deinit()
 static void initialize()
 {
     CLOCK_StopTimer();
+    state = ST_DATA1;
+    mixer_runtime = 50;
     num_channels = Model.num_channels;
+    usbhid_period_ms = period_index_to_ms(Model.proto_opts[PROTO_OPTS_PERIOD]);
+    HID_SetInterval(usbhid_period_ms);
     HID_Enable();
     CLOCK_StartTimer(1000, usbhid_cb);
 }
@@ -91,6 +150,10 @@ uintptr_t USBHID_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_DEFAULT_NUMCHAN: return 6;
         case PROTOCMD_CHANNELMAP: return UNCHG;
         case PROTOCMD_TELEMETRYSTATE: return PROTO_TELEM_UNSUPPORTED;
+        case PROTOCMD_GETOPTIONS:
+            if (Model.proto_opts[PROTO_OPTS_PERIOD] > USBHID_PERIOD_MAX_INDEX)
+                Model.proto_opts[PROTO_OPTS_PERIOD] = USBHID_PERIOD_MAX_INDEX;
+            return (uintptr_t)usbhid_opts;
         default: break;
     }
     return 0;

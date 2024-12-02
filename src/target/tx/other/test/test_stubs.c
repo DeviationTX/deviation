@@ -105,12 +105,16 @@ void TxName(u8 *var, int len) {
 }
 void MSC_Enable() {}
 void MSC_Disable() {}
+void HID_SetInterval(u8 interval) {
+    (void)interval;
+}
 void HID_Enable() {}
 void HID_Disable() {}
 void HID_Write(s8 *pkt, u8 size) {
     (void)pkt;
     (void)size;
 }
+volatile u8 HID_prevXferComplete;
 void Initialize_ButtonMatrix() {}
 void PWR_Init(void) {}
 unsigned  PWR_ReadVoltage() { return (DEFAULT_BATTERY_ALARM + 1000); }

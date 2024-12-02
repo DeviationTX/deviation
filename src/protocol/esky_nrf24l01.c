@@ -325,7 +325,7 @@ static void initialize(u8 bind)
         id ^= *stm32id++;
         id ^= *stm32id;
         */
-        id = (Crc(&Model, sizeof(Model)) + Crc(&Transmitter, sizeof(Transmitter))) % 999999;
+        id = (Crc(&Model, sizeof(Model)) + Crc(&Transmitter, sizeof(Transmitter))) % MAX_FIXED_ID;
     }
     set_tx_id(id);
     esky_init(bind);

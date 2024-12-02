@@ -57,8 +57,6 @@ int main() {
     if (CHAN_ButtonIsPressed(buttons, BUT_ENTER) || !FS_Init()) {
         LCD_DrawUSBLogo(LCD_WIDTH, LCD_HEIGHT);
         USB_Connect();
-        LCD_Clear(0x0000);
-        FS_Init();
     }
 
     CONFIG_LoadTx();
@@ -157,10 +155,6 @@ void Init() {
     printf("Start\n");
     Initialize_ButtonMatrix();
     STORAGE_Init();  // This must come before LCD_Init() for 7e
-
-#ifdef MEDIA_DRIVE
-    MEDIA_Init();
-#endif
 
     LCD_Init();
     CHAN_Init();

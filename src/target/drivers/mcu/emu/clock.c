@@ -54,3 +54,6 @@ u32 RTC_GetValue()
     return time(NULL) - delta;
 }
 
+void CLOCK_RunOnce(void (*cb)(void)) {
+    cb();
+}

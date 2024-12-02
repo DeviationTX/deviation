@@ -136,3 +136,32 @@ int PAGE_DialogVisible()
 {
    return dialog ? 1 : 0;
 }
+
+
+#if SUPPORT_CRSF_CONFIG
+/*********************************/
+/*   CRSF configuration dialog   */
+/*********************************/
+static const char *cmd_info_cb(guiObject_t *obj, void *data) {
+    (void)obj;
+    crsf_param_t *param = (crsf_param_t *)data;
+
+    // info max string length is 39
+    if (strlen(param->s.info) > 20)
+        snprintf(tempstring, sizeof(tempstring), "%20s\n%s", param->s.info, &param->s.info[20]);
+    else
+        snprintf(tempstring, sizeof(tempstring), "%s", param->s.info);
+    return tempstring;
+}
+
+static void crsf_confirm_cb(u8 state, void *data) {
+    crsf_param_t *param = (crsf_param_t *)data;
+
+    dialog = NULL;
+    if (param->u.status == CONFIRMATION_NEEDED) {
+        CRSF_send_command(param, state == 1 ? CONFIRM : CANCEL);
+    } else if (param->u.status == PROGRESS && state == 0) {
+        CRSF_send_command(param, CANCEL);
+    }
+}
+#endif  // SUPPORT_CRSF_CONFIG

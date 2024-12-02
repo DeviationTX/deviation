@@ -19,6 +19,7 @@
 #include "pages.h"
 #include "config/model.h"
 #include "config/ini.h"
+#include "crsf.h"
 
 enum {
     DIALOG1_X      = 2,
@@ -193,3 +194,31 @@ void PAGE_ShowModuleDialog(const char **missing)
     } 
     PAGE_ShowWarning(NULL, tempstring);
 }
+
+#if SUPPORT_CRSF_CONFIG
+/*********************************/
+/*   CRSF configuration dialog   */
+/*********************************/
+void PAGE_CRSFdialog(void *param) {
+    enum DialogType dg_type = ((crsf_param_t *)param)->u.status == CONFIRMATION_NEEDED ? dtOkCancel : dtCancel;
+
+    guiDialog_t *dlg = (guiDialog_t *)dialog;
+
+    if (dialog) {
+        if (((dg_type == dtOkCancel) && (dlg->but2.header.box.x != 0))  // somewhat kludgy test to see if current dialog has two buttons
+         || ((dg_type != dtOkCancel) && (dlg->but2.header.box.x == 0))) {
+            GUI_Redraw(dialog);
+            return;
+        }
+    }
+
+    dialog = GUI_CreateDialog(&gui->dialog, DIALOG2_X, DIALOG2_Y, DIALOG2_WIDTH, DIALOG2_HEIGHT,
+                              NULL, cmd_info_cb, crsf_confirm_cb, dg_type, param);
+}
+
+void PAGE_CRSFdialogClose() {
+    if (dialog) {
+        DialogClose(dialog, 0);
+    }
+}
+#endif  // SUPPORT_CRSF_CONFIG

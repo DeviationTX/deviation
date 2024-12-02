@@ -25,6 +25,8 @@
 #include "voiceconfig_page.h"
 #include "scanner_page.h"
 #include "xn297dump_page.h"
+#include "crsfconfig_page.h"
+#include "crsfdevice_page.h"
 
 #define PAGE_NAME_MAX 10
 
@@ -171,6 +173,12 @@ void PAGE_DebuglogExit();
 void PAGE_VoiceconfigInit();
 void PAGE_VoiceconfigEvent();
 void PAGE_VoiceconfigExit();
+
+/* CRSF config */
+void PAGE_CrsfconfigInit();
+void PAGE_CrsfdeviceInit();
+void PAGE_CRSFConfigEvent();
+void PAGE_CRSFDeviceEvent();
 
 void PAGE_ChangeByID(enum PageID id, s8 menuPage);
 void PAGE_PushByID(enum PageID id, int page);

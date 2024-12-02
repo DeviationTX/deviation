@@ -601,6 +601,26 @@ struct stdtravel_obj {
     guiScrollbar_t scrollbar;
 };
 
+#if SUPPORT_CRSF_CONFIG
+struct crsfconfig_obj {
+    guiLabel_t msg;
+    guiScrollable_t scrollable;
+    guiLabel_t name[4];
+};
+
+struct crsfdevice_obj {
+    guiLabel_t msg;
+    guiKeyboard_t keyboard;
+    guiScrollable_t scrollable;
+    guiLabel_t name[10];
+    union {
+        guiTextSelect_t ts;
+        guiButton_t     but;
+        guiLabel_t      lbl;
+    } value[10];
+};
+#endif
+
 struct _gui_objs {
     struct page_obj page;
     struct dialog_obj dialog;
@@ -637,6 +657,10 @@ struct _gui_objs {
         struct debuglog_obj debuglog;
 #ifdef HAS_MUSIC_CONFIG
         struct voiceconfig_obj voiceconfig;
+#endif
+#if SUPPORT_CRSF_CONFIG
+        struct crsfconfig_obj crsfconfig;
+        struct crsfdevice_obj crsfdevice;
 #endif
 
         struct advcurve_obj advcurve;

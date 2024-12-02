@@ -323,12 +323,34 @@ u32 PROTOCOL_CurrentID()
     return id;
 }
 
+void PROTOCOL_ChangedID()
+{
+    if(Model.protocol != PROTOCOL_NONE && PROTOCOL_LOADED)
+        PROTO_Cmds(PROTOCMD_CHANGED_ID);
+}
+u32 PROTOCOL_MaximumID()
+{
+    u32 max_id = 0;
+    if(Model.protocol != PROTOCOL_NONE && PROTOCOL_LOADED)
+        max_id = (u32)PROTO_Cmds(PROTOCMD_MAX_ID);
+    return max_id ? max_id : MAX_FIXED_ID;
+}
+
 const char **PROTOCOL_GetOptions()
 {
     const char **data = NULL;
     if(Model.protocol != PROTOCOL_NONE && PROTOCOL_LOADED)
         data = (const char **)PROTO_Cmds(PROTOCMD_GETOPTIONS);
     return data;
+}
+
+int PROTOCOL_OptionsPage()
+{
+    int id = 0;
+
+    if (Model.protocol != PROTOCOL_NONE && PROTOCOL_LOADED)
+        id = (int)PROTO_Cmds(PROTOCMD_OPTIONSPAGE);
+    return id;
 }
 
 void PROTOCOL_SetOptions()
