@@ -344,15 +344,17 @@ static void update_telemetry()
 
     u8 voltage_index = 0;
     u8 index = 9;   // first sensor ID in telemetry packet
-    u16 data16 = packet[index+3] << 8 | packet[index+2];
 #if HAS_EXTENDED_TELEMETRY
-    s32 data32 = packet[index+6] << 24 | packet[index+5] << 16 | packet[index+4] << 8 | packet[index+3];
     u8 cell_index = 0;
     u16 cell_total = 0;
     u8 temp_index;
 #endif
 
     while (index <= 32 && packet[index] != 0xff) {
+        u16 data16 = packet[index+3] << 8 | packet[index+2];
+#if HAS_EXTENDED_TELEMETRY
+        s32 data32 = packet[index+6] << 24 | packet[index+5] << 16 | packet[index+4] << 8 | packet[index+3];
+#endif
         switch(packet[index]) {
         case SENSOR_VOLTAGE:
             voltage_index++;
