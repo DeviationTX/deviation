@@ -279,6 +279,7 @@ enum{
     SENSOR_MOT            = 0x02,    // RPM
     SENSOR_EXTV           = 0x03,    // External Voltage
     SENSOR_CELL_VOLTAGE   = 0x04,    // Avg Cell voltage
+// TODO edgetx script says SENSOR_TYPE_GYROSCOPE_1_AXIS = 0x04,    // signed short in 0.1 degrees per second, 0x8000 if unknown
     SENSOR_BAT_CURR       = 0x05,    // battery current A * 100
     SENSOR_FUEL           = 0x06,    // remaining battery percentage / mah drawn otherwise or fuel level no unit!
     SENSOR_RPM            = 0x07,    // throttle value / battery capacity
@@ -347,13 +348,12 @@ static void update_telemetry()
 #if HAS_EXTENDED_TELEMETRY
     u8 cell_index = 0;
     u16 cell_total = 0;
-    u8 temp_index;
 #endif
 
     while (index <= 32 && packet[index] != 0xff) {
         u16 data16 = packet[index+3] << 8 | packet[index+2];
 #if HAS_EXTENDED_TELEMETRY
-        s32 data32 = packet[index+6] << 24 | packet[index+5] << 16 | packet[index+4] << 8 | packet[index+3];
+//        s32 data32 = packet[index+6] << 24 | packet[index+5] << 16 | packet[index+4] << 8 | packet[index+3];
 #endif
         switch(packet[index]) {
         case SENSOR_VOLTAGE:
@@ -373,15 +373,22 @@ static void update_telemetry()
             }
 #endif
             break;
+        case SENSOR_EXTV:
+            voltage_index++;
+            set_telemetry(TELEM_FRSKY_VOLT2, data16);
+            break;
+#if 0
 #if HAS_EXTENDED_TELEMETRY
         case SENSOR_TEMPERATURE:
-            temp_index = packet[index+1];
+        {
+            u8 temp_index = packet[index+1];
             if (temp_index == 0) {
                 set_telemetry(TELEM_FRSKY_TEMP1, (data16 - 400)/10);
             } else if (temp_index == 1) {
                 set_telemetry(TELEM_FRSKY_TEMP2, (data16 - 400)/10);
             }
             break;
+        }
         case SENSOR_PRES:
             set_telemetry(TELEM_FRSKY_TEMP1, ((data32 >> 19) - 400)/10);
             // simplified pressure to altitude calculation, since very linear
@@ -454,6 +461,7 @@ static void update_telemetry()
         case SENSOR_RX_ERR_RATE:
             set_telemetry(TELEM_FRSKY_LQI, 100 - packet[index+2]);
             break;
+#endif
         default:
             // unknown sensor ID or end of list
             break;
