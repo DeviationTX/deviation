@@ -336,6 +336,62 @@ static void set_telemetry(frsky_telem_t offset, s32 value) {
     TELEMETRY_SetUpdated(offset);
 }
 
+// copied from edgetx
+const int16_t tAltitude[225]=
+{ // In half meter unit
+    20558, 20357, 20158, 19962, 19768, 19576, 19387, 19200, 19015,  18831, 18650, 18471, 18294, 18119, 17946, 17774,
+    17604, 17436, 17269, 17105, 16941, 16780, 16619, 16461, 16304,  16148, 15993, 15841, 15689, 15539, 15390, 15242,
+    15096, 14950, 14806, 14664, 14522, 14381, 14242, 14104, 13966,  13830, 13695, 13561, 13428, 13296, 13165, 13035,
+    12906, 12777, 12650, 12524, 12398, 12273, 12150, 12027, 11904,  11783, 11663, 11543, 11424, 11306, 11189, 11072,
+    10956, 10841, 10726, 10613, 10500, 10387, 10276, 10165, 10054,   9945,  9836,  9727,  9620,  9512,  9406,  9300,
+    9195,  9090,  8986,  8882,  8779,  8677,   8575,  8474,  8373,   8273,  8173,  8074,  7975,  7877,  7779,  7682,
+    7585,  7489,  7394,  7298,  7204,  7109,   7015,  6922,  6829,   6737,  6645,  6553,  6462,  6371,  6281,  6191,
+    6102,  6012,  5924,  5836,  5748,  5660,   5573,  5487,  5400,   5314,  5229,  5144,  5059,  4974,  4890,  4807,
+    4723,  4640,  4557,  4475,  4393,  4312,   4230,  4149,  4069,   3988,  3908,  3829,  3749,  3670,  3591,  3513,
+    3435,  3357,  3280,  3202,  3125,  3049,   2972,  2896,  2821,   2745,  2670,  2595,  2520,  2446,  2372,  2298,
+    2224,  2151,  2078,  2005,  1933,   1861,  1789,  1717,  1645,   1574,  1503,  1432,  1362,  1292,  1222,  1152,
+    1082,  1013,   944,   875,   806,   738,    670,   602,   534,    467,   399,   332,   265,   199,   132,    66,
+     0,     -66,  -131,  -197,  -262,  -327,   -392,  -456,  -521,   -585,  -649,  -713,  -776,  -840,  -903,  -966,
+    -1029,-1091, -1154, -1216, -1278, -1340,  -1402, -1463,  -1525, -1586, -1647, -1708, -1769, -1829, -1889, -1950,
+    -2010
+};
+#define PRESSURE_MASK 0x7FFFF
+int32_t getALT(uint32_t Pressure)
+{
+    uint32_t Index;
+    int32_t Altitude1;
+    int32_t Altitude2;
+    uint32_t Decimal;
+    uint64_t Ratio;
+    uint32_t SeaLevelPressure=101320;
+    Pressure = Pressure & PRESSURE_MASK;
+    Ratio = ( ( ( unsigned long long ) Pressure << 16 ) + ( SeaLevelPressure / 2 ) ) / SeaLevelPressure;
+    if( Ratio < ( ( 1 << 16 ) * 250 / 1000 ) )// 0.250 inclusive
+    {
+        Ratio = ( 1 << 16 ) * 250 / 1000;
+    }
+    else if( Ratio > ( 1 << 16 ) * 1125 / 1000 - 1 ) // 1.125 non-inclusive
+    {
+        Ratio = ( 1 << 16 ) * 1125 / 1000 - 1;
+    }
+
+    Ratio -= ( 1 << 16 ) * 250 / 1000; // from 0.000 (inclusive) to 0.875 (non-inclusive)
+    Index = Ratio >> 8;
+    Decimal = Ratio & ( ( 1 << 8 ) - 1 );
+    Altitude1 = tAltitude[Index];
+    Altitude2 = Altitude1 - tAltitude[Index + 1];
+    Altitude1 = Altitude1 - ( Altitude2 * Decimal + ( 1 << 7 ) ) / ( 1 << 8 );
+    Altitude1 *= 100;
+    if( Altitude1 >= 0 )
+    {
+        return( ( Altitude1 + 1 ) / 2 );
+    }
+    else
+    {
+        return( ( Altitude1 - 1 ) / 2 );
+    }
+}
+
 static void update_telemetry()
 {
     // 0    1234   5678   9           10         11       12
@@ -344,21 +400,21 @@ static void update_telemetry()
     // max 7 sensors per packet
 
     u8 voltage_index = 0;
-    u8 index = 9;   // first sensor ID in telemetry packet
+    u8 *sensor = packet + 9;   // first sensor ID in telemetry packet
 #if HAS_EXTENDED_TELEMETRY
     u8 cell_index = 0;
     u16 cell_total = 0;
 #endif
 
-    while (index <= 32 && packet[index] != 0xff) {
-        u16 data16 = packet[index+3] << 8 | packet[index+2];
+    while (sensor[0] != 0xff && (sensor+9 < packet+RXPACKET_SIZE-6)) {
+        u16 data16 = sensor[3] << 8 | sensor[2];
 #if HAS_EXTENDED_TELEMETRY
-//        s32 data32 = packet[index+6] << 24 | packet[index+5] << 16 | packet[index+4] << 8 | packet[index+3];
+        s32 data32 = sensor[6] << 24 | sensor[5] << 16 | sensor[4] << 8 | sensor[3];
 #endif
-        switch(packet[index]) {
+        switch(sensor[0]) {
         case SENSOR_VOLTAGE:
             voltage_index++;
-            if (packet[index+1] == 0)  // Rx voltage
+            if (sensor[1] == 0)  // Rx voltage
             {
                 set_telemetry(TELEM_FRSKY_VOLT1, data16);
             }
@@ -377,11 +433,10 @@ static void update_telemetry()
             voltage_index++;
             set_telemetry(TELEM_FRSKY_VOLT2, data16);
             break;
-#if 0
 #if HAS_EXTENDED_TELEMETRY
         case SENSOR_TEMPERATURE:
         {
-            u8 temp_index = packet[index+1];
+            u8 temp_index = sensor[1];
             if (temp_index == 0) {
                 set_telemetry(TELEM_FRSKY_TEMP1, (data16 - 400)/10);
             } else if (temp_index == 1) {
@@ -395,7 +450,8 @@ static void update_telemetry()
             // below 2000m and display is relative (AGL)
             // linear approximation of barometric formula in ISA at low altitude
             // y = -0.079x + 1513, scaled to centimeters
-            int altitude = (int)(-0.08 * (uint32_t)(data32 & 0x7ffff) + 1513) * 100;
+            //int altitude = (int)(-0.08 * (uint32_t)(data32 & 0x7ffff) + 1513) * 100;
+            int altitude = getALT(data32);
             if (Model.ground_level == 0) Model.ground_level = altitude;
             set_telemetry(TELEM_FRSKY_ALTITUDE, altitude - Model.ground_level);
             break;
@@ -435,41 +491,40 @@ static void update_telemetry()
             break;
         case SENSOR_GPS_FULL: {
             u8 tmp = index + 5;     // skip GPS status
-            data32 = packet[tmp+3] << 24 | packet[tmp+2] << 16 | packet[tmp+1] << 8 | packet[tmp];
+            data32 = sensor[3] << 24 | sensor[2] << 16 | sensor[1] << 8 | sensor[0];
             Telemetry.gps.latitude = data32;
             TELEMETRY_SetUpdated(TELEM_GPS_LAT);
-            tmp += 4;
-            data32 = packet[tmp+3] << 24 | packet[tmp+2] << 16 | packet[tmp+1] << 8 | packet[tmp];
+            sensor += 4;
+            data32 = sensor[3] << 24 | sensor[2] << 16 | sensor[1] << 8 | sensor[0];
             Telemetry.gps.longitude = data32;
             TELEMETRY_SetUpdated(TELEM_GPS_LONG);
-            tmp += 4;
-            data32 = packet[tmp+3] << 24 | packet[tmp+2] << 16 | packet[tmp+1] << 8 | packet[tmp];
+            sensor += 4;
+            data32 = sensor[3] << 24 | sensor[2] << 16 | sensor[1] << 8 | sensor[0];
             Telemetry.gps.altitude = data32;
             TELEMETRY_SetUpdated(TELEM_GPS_ALT);
         }
             break;
 #endif
         case SENSOR_RX_SNR:
-//            set_telemetry(TELEM_FRSKY_LQI, 100 - packet[index+2]);
+//            set_telemetry(TELEM_FRSKY_LQI, 100 - sensor[2]);
             break;
         case SENSOR_RX_NOISE:
-//            set_telemetry(TELEM_FRSKY_LQI, 100 - packet[index+2]);
+//            set_telemetry(TELEM_FRSKY_LQI, 100 - sensor[2]);
             break;
         case SENSOR_RX_RSSI:
-            set_telemetry(TELEM_FRSKY_RSSI, packet[index+2]);
+            set_telemetry(TELEM_FRSKY_RSSI, sensor[2]);
             break;
         case SENSOR_RX_ERR_RATE:
-            set_telemetry(TELEM_FRSKY_LQI, 100 - packet[index+2]);
+            set_telemetry(TELEM_FRSKY_LQI, 100 - sensor[2]);
             break;
-#endif
         default:
             // unknown sensor ID or end of list
             break;
         }
         if (packet[0] == 0xaa)
-            index += ((packet[index] & 0xf0) == 0x80 ? 6 : 4);
+            sensor += ((sensor[0] & 0xf0) == 0x80 ? 6 : 4);
         else
-            index += packet[index + 2] + 3;
+            sensor += sensor[2] + 3;
     }
 #if HAS_EXTENDED_TELEMETRY
     if(cell_index > 0) {
