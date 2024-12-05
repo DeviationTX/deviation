@@ -410,7 +410,7 @@ u8 CRSF_speed_proposal(u32 bitrate) {
 
 u8 CRSF_speed_response(u8 accept, usart_callback_t tx_callback) {
     if (CBUF_Space(send_buf) < 11) return 0;
-    if (accept) UART_TxCallback(tx_callback);
+    if (tx_callback) UART_TxCallback(tx_callback);
     u8 crc = 0;
     u8 crc_BA = 0;
     CBUF_Push(send_buf, ADDR_MODULE);
@@ -422,6 +422,25 @@ u8 CRSF_speed_response(u8 accept, usart_callback_t tx_callback) {
     buf_push_crc2(&crc, &crc_BA, SUBCMD_SPD_RESPONSE);
     buf_push_crc2(&crc, &crc_BA, 0);
     buf_push_crc2(&crc, &crc_BA, accept ? 1 : 0);
+    buf_push_crc(&crc, crc_BA);
+    CBUF_Push(send_buf, crc);
+    return 1;
+}
+
+u8 CRSF_command_ack(u8 cmd_id, u8 sub_cmd_id, u8 action) {
+    if (CBUF_Space(send_buf) < 12) return 0;
+    u8 crc = 0;
+    u8 crc_BA = 0;
+    CBUF_Push(send_buf, ADDR_MODULE);
+    CBUF_Push(send_buf, 10);
+    buf_push_crc2(&crc, &crc_BA, TYPE_COMMAND_ID);
+    buf_push_crc2(&crc, &crc_BA, ADDR_MODULE);
+    buf_push_crc2(&crc, &crc_BA, ADDR_RADIO);
+    buf_push_crc2(&crc, &crc_BA, ACK_SUBCMD);
+    buf_push_crc2(&crc, &crc_BA, cmd_id);
+    buf_push_crc2(&crc, &crc_BA, sub_cmd_id);
+    buf_push_crc2(&crc, &crc_BA, action ? 1 : 0);
+    buf_push_crc2(&crc, &crc_BA, 0);     // optional null terminated string
     buf_push_crc(&crc, crc_BA);
     CBUF_Push(send_buf, crc);
     return 1;
