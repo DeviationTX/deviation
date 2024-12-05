@@ -3,6 +3,8 @@
 
 #include <telemetry.h>
 
+#define UART_SYNC       0xC8
+
 // Device addresses
 #define ADDR_BROADCAST  0x00  //  Broadcast address
 #define ADDR_USB        0x10  //  USB Device
@@ -49,10 +51,12 @@
 #define TYPE_RADIO_ID         0x3A
 
 // Frame Subtype
-#define UART_SYNC                      0xC8
+#define ACK_SUBCMD                     0xFF
+// Command ID Subcommands
 #define GENERAL_SUBCMD                 0x0A
 #define   SUBCMD_SPD_PROPOSAL            0x70
 #define   SUBCMD_SPD_RESPONSE            0x71
+// Radio ID Subcommands
 #define CRSF_SUBCOMMAND                0x10
 #define   COMMAND_MODEL_SELECT_ID        0x05
 
@@ -169,6 +173,7 @@ u8 protocol_module_is_elrs();
 u8 protocol_elrs_is_armed();
 u8 CRSF_speed_response(u8 accept, usart_callback_t tx_callback);
 u8 CRSF_speed_proposal(u32 bitrate);
+u8 CRSF_command_ack(u8 cmd_id, u8 sub_cmd_id, u8 accept);
 
 #endif  // SUPPORT_CRSF_CONFIG
 
