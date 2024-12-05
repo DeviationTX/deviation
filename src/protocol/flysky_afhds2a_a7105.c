@@ -490,7 +490,7 @@ static void update_telemetry()
             TELEMETRY_SetUpdated(TELEM_GPS_ALT);
             break;
         case SENSOR_GPS_FULL: {
-            u8 tmp = index + 5;     // skip GPS status
+            sensor += 5;     // skip GPS status
             data32 = sensor[3] << 24 | sensor[2] << 16 | sensor[1] << 8 | sensor[0];
             Telemetry.gps.latitude = data32;
             TELEMETRY_SetUpdated(TELEM_GPS_LAT);
