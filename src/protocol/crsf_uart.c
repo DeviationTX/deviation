@@ -297,6 +297,28 @@ static void processCrossfireTelemetryFrame()
       if (telemetryRxBuffer[1] > 5 && getCrossfireTelemetryValue(5, &value, 2))
         set_telemetry(TELEM_CRSF_VERTSPD, value);
       break;
+
+// Leave this disabled for backwards compatibility with TBS XF Transmitter firmware
+// version 6.19.  This 2022 version is the last Public release.  The code below works
+// with latest Beta release 6.42.  The 6.19 firmware switches to inverted serial when
+// changing bitrates by this command, so will stay disabled until compatible Public release.
+//  case TYPE_COMMAND_ID:
+//    if (telemetryRxBuffer[3] == ADDR_RADIO && telemetryRxBuffer[5] == GENERAL_SUBCMD) {
+//        if (telemetryRxBuffer[6] == SUBCMD_SPD_PROPOSAL) {
+//            if (telemetryRxBuffer[7] != 0) break;
+//            getCrossfireTelemetryValue(8, &value, 4);
+//            new_bitrate_index = check_bitrate((u32)value);
+//            if (new_bitrate_index >= 0)
+//                if (new_bitrate_index == Model.proto_opts[PROTO_OPTS_BITRATE])
+//                    CRSF_speed_response(1, NULL);
+//                else
+//                    CRSF_speed_response(1, set_bitrate);
+//            else
+//                CRSF_speed_response(0, NULL);
+
+//        }
+//    }
+//    break;
 #endif
 
     case TYPE_ATTITUDE:
@@ -311,24 +333,6 @@ static void processCrossfireTelemetryFrame()
     case TYPE_FLIGHT_MODE:  // string - save first four bytes for now
       memcpy(&value, &telemetryRxBuffer[3], 4);
       set_telemetry(TELEM_CRSF_FLIGHT_MODE, value);
-      break;
-
-    case TYPE_COMMAND_ID:  // various commands
-      if (telemetryRxBuffer[3] == ADDR_RADIO && telemetryRxBuffer[5] == GENERAL_SUBCMD) {
-          if (telemetryRxBuffer[6] == SUBCMD_SPD_PROPOSAL) {
-              if (telemetryRxBuffer[7] != 0) break;
-              getCrossfireTelemetryValue(8, &value, 4);
-              new_bitrate_index = check_bitrate((u32)value);
-              if (new_bitrate_index >= 0)
-                  if (new_bitrate_index == Model.proto_opts[PROTO_OPTS_BITRATE])
-                      CRSF_speed_response(1, NULL);
-                  else
-                      CRSF_speed_response(1, set_bitrate);
-              else
-                  CRSF_speed_response(0, NULL);
-
-          }
-      }
       break;
 
     case TYPE_RADIO_ID:
