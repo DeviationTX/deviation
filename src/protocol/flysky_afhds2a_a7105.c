@@ -445,20 +445,11 @@ static void update_telemetry()
             break;
         }
         case SENSOR_PRES:
-// TODO            set_telemetry(TELEM_FRSKY_TEMP1, ((data32 >> 19) - 400)/10);
-set_telemetry(TELEM_FRSKY_TEMP1, data32 & 0xffff);
-            // simplified pressure to altitude calculation, since very linear
-            // below 2000m and display is relative (AGL)
-            // linear approximation of barometric formula in ISA at low altitude
-            // y = -0.079x + 1513, scaled to centimeters
-            //int altitude = (int)(-0.08 * (uint32_t)(data32 & 0x7ffff) + 1513) * 100;
-// TODO
-set_telemetry(TELEM_FRSKY_ALTITUDE, data32 >> 16);
-#if 0
-            int altitude = getALT(data32);
+            set_telemetry(TELEM_FRSKY_TEMP1, ((data32 >> 19) - 400)/10);
+            s32 altitude = getALT(data32);
             if (Model.ground_level == 0) Model.ground_level = altitude;
-            set_telemetry(TELEM_FRSKY_ALTITUDE, altitude - Model.ground_level);
-#endif
+//TODO            set_telemetry(TELEM_FRSKY_ALTITUDE, altitude - Model.ground_level);
+            set_telemetry(TELEM_FRSKY_ALTITUDE, altitude);
             break;
         case SENSOR_CELL_VOLTAGE:
             if (cell_index < 6) {
