@@ -45,6 +45,7 @@ enum {
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
+// this function called from UART TX DMA send complete ISR
 void set_bitrate(u8 data, u8 status) {
     (void)data;
     (void)status;
@@ -298,27 +299,29 @@ static void processCrossfireTelemetryFrame()
         set_telemetry(TELEM_CRSF_VERTSPD, value);
       break;
 
-// Leave this disabled for backwards compatibility with TBS XF Transmitter firmware
-// version 6.19.  This 2022 version is the last Public release.  The code below works
+// Leave this mostly disabled for backwards compatibility with TBS XF Transmitter firmware
+// version 6.19.  This 2022 version is the last Public release.  The full code below works
 // with latest Beta release 6.42.  The 6.19 firmware switches to inverted serial when
 // changing bitrates by this command, so will stay disabled until compatible Public release.
-//  case TYPE_COMMAND_ID:
-//    if (telemetryRxBuffer[3] == ADDR_RADIO && telemetryRxBuffer[5] == GENERAL_SUBCMD) {
-//        if (telemetryRxBuffer[6] == SUBCMD_SPD_PROPOSAL) {
-//            if (telemetryRxBuffer[7] != 0) break;
-//            getCrossfireTelemetryValue(8, &value, 4);
-//            new_bitrate_index = check_bitrate((u32)value);
-//            if (new_bitrate_index >= 0)
-//                if (new_bitrate_index == Model.proto_opts[PROTO_OPTS_BITRATE])
-//                    CRSF_speed_response(1, NULL);
-//                else
-//                    CRSF_speed_response(1, set_bitrate);
-//            else
-//                CRSF_speed_response(0, NULL);
+// The code is left in to respond positively if the requested speed is the same as the current
+// speed.  This keeps the XF from repeating the request forever.
+    case TYPE_COMMAND_ID:
+      if (telemetryRxBuffer[3] == ADDR_RADIO && telemetryRxBuffer[5] == GENERAL_SUBCMD) {
+          if (telemetryRxBuffer[6] == SUBCMD_SPD_PROPOSAL) {
+              if (telemetryRxBuffer[7] != 0) break;
+              getCrossfireTelemetryValue(8, &value, 4);
+              new_bitrate_index = check_bitrate((u32)value);
+              if (new_bitrate_index >= 0)
+                  if (new_bitrate_index == Model.proto_opts[PROTO_OPTS_BITRATE])
+                      CRSF_speed_response(1, NULL);
+                  else
+                      CRSF_speed_response(0, NULL); // enable speed change if necessary   CRSF_speed_response(1, set_bitrate);
+              else
+                  CRSF_speed_response(0, NULL);
 
-//        }
-//    }
-//    break;
+          }
+      }
+      break;
 #endif
 
     case TYPE_ATTITUDE:
