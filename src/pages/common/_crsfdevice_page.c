@@ -201,8 +201,6 @@ static const char *value_numsel(guiObject_t *obj, int dir, void *data)
     crsf_param_t *param = (crsf_param_t *)data;
     u8 changed = 0;
 
-    if(param->step == 0) param->step = 1;
- 
     param->value = (void *)(intptr_t)GUI_TextSelectHelper((intptr_t)param->value,
                                         param->min_value, param->max_value,
                                         dir, param->step, 10*param->step, &changed);
@@ -782,10 +780,13 @@ static void add_param(u8 *buffer, u8 num_bytes) {
         if (parameter->type == FLOAT) {
             parse_bytes(UINT8, &recv_param_ptr, &parameter->u.point);
             parse_bytes(FLOAT, &recv_param_ptr, &parameter->step);
-        } else if (*recv_param_ptr) {
-            const u8 length = strlen(recv_param_ptr) + 1;
-            if (!update) parameter->s.unit = alloc_string(length);
-            strlcpy(parameter->s.unit, (const char *)recv_param_ptr, length);
+        } else {
+            parameter->step = parameter->min_value == parameter->max_value ? 0 : 1;
+            if (*recv_param_ptr) {
+                const u8 length = strlen(recv_param_ptr) + 1;
+                if (!update) parameter->s.unit = alloc_string(length);
+                strlcpy(parameter->s.unit, (const char *)recv_param_ptr, length);
+            }
         }
         break;
 
