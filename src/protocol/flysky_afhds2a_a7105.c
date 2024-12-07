@@ -69,6 +69,7 @@ static const char * const afhds2a_opts[] = {
     _tr_noop("Freq Tune"), "-300", "300", "655361", NULL, // big step 10, little step 1
     "RX ID", "-32768", "32767", "1", NULL, // todo: store that elsewhere
     "RX ID2","-32768", "32767", "1", NULL, // ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    _tr_noop("Telem Out"), _tr_noop("Disabled"), _tr_noop("Enabled"), NULL,
     NULL
 };
 
@@ -86,6 +87,7 @@ enum {
     PROTOOPTS_FREQTUNE,
     PROTOOPTS_RXID, // todo: store that elsewhere
     PROTOOPTS_RXID2,// ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    PROTO_OPTS_TELEMOUT,
     LAST_PROTO_OPT,
 };
 
@@ -336,6 +338,29 @@ static void set_telemetry(frsky_telem_t offset, s32 value) {
     TELEMETRY_SetUpdated(offset);
 }
 
+#if HAS_EXTENDED_TELEMETRY
+
+static void setup_serial_port() {
+    if ( Model.proto_opts[PROTO_OPTS_TELEMOUT] ) {
+        UART_SetDataRate(57600);
+#if HAS_EXTENDED_AUDIO
+#if HAS_AUDIO_UART
+        if (Transmitter.audio_uart) return;
+#endif
+        Transmitter.audio_player = AUDIO_DISABLED; // disable voice commands on serial port
+#endif
+    }
+}
+
+static void serial_echo(u8 *packet) {
+  static u8 outbuf[RXPACKET_SIZE];
+
+  if (PPMin_Mode() || !Model.proto_opts[PROTO_OPTS_TELEMOUT]) return;
+
+  memcpy(outbuf, packet, RXPACKET_SIZE);
+  UART_Send(outbuf, RXPACKET_SIZE);
+}
+
 // copied from edgetx
 const int16_t tAltitude[225]=
 { // In half meter unit
@@ -391,6 +416,7 @@ int32_t getALT(uint32_t Pressure)
         return( ( Altitude1 - 1 ) / 2 );
     }
 }
+#endif  // HAS_EXTENDED_TELEMETRY
 
 static void update_telemetry()
 {
@@ -404,6 +430,7 @@ static void update_telemetry()
 #if HAS_EXTENDED_TELEMETRY
     u8 cell_index = 0;
     u16 cell_total = 0;
+    serial_echo(packet);
 #endif
 
     while (sensor[0] != 0xff && (sensor+9 < packet+RXPACKET_SIZE-6)) {
@@ -762,6 +789,9 @@ static void initialize(u8 bind)
         if (afhds2a_init())
             break;
     }
+#if HAS_EXTENDED_TELEMETRY
+    setup_serial_port();
+#endif
     initialize_tx_id();
     packet_type = PACKET_STICKS;
     packet_count = 0;
@@ -787,6 +817,11 @@ uintptr_t AFHDS2A_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_INIT:  initialize(0); return 0;
         case PROTOCMD_DEINIT:
         case PROTOCMD_RESET:
+#if HAS_EXTENDED_TELEMETRY
+            if (Model.proto_opts[PROTO_OPTS_TELEMOUT]) {
+                UART_SetDataRate(0);  // restore default rate, voice will be reset on next model's load anyways
+            }
+#endif
             CLOCK_StopTimer();
             return (A7105_Reset() ? 1 : -1);
         case PROTOCMD_CHECK_AUTOBIND: return 0;
