@@ -201,6 +201,8 @@ static const char *value_numsel(guiObject_t *obj, int dir, void *data)
     crsf_param_t *param = (crsf_param_t *)data;
     u8 changed = 0;
 
+    if(param->step == 0) param->step = 1;
+ 
     param->value = (void *)(intptr_t)GUI_TextSelectHelper((intptr_t)param->value,
                                         param->min_value, param->max_value,
                                         dir, param->step, 10*param->step, &changed);
