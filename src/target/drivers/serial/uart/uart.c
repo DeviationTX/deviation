@@ -156,6 +156,7 @@ u8 UART_Send(u8 *data, u16 len) {
 }
 
 usart_callback_t *rx_callback;
+usart_callback_t *tx_callback;
 
 /* Enable serial data reception by providing a callback function
    to accept received character and status. Disable by calling with argument NULL.
@@ -169,6 +170,11 @@ void UART_StartReceive(usart_callback_t *isr_callback)
         usart_enable_rx_interrupt(UART_CFG.uart);
     else
         usart_disable_rx_interrupt(UART_CFG.uart);
+}
+
+void UART_TxCallback(usart_callback_t *isr_callback)
+{
+    tx_callback = isr_callback;
 }
 
 void UART_StopReceive()

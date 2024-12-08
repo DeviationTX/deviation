@@ -37,6 +37,7 @@ void __attribute__((__used__)) _USART_DMA_ISR(void)
 }
 
 extern usart_callback_t *rx_callback;
+extern usart_callback_t *tx_callback;
 void __attribute__((__used__)) _UART_ISR(void)
 {
     u8 status = USART_SR(UART_CFG.uart);
@@ -45,6 +46,7 @@ void __attribute__((__used__)) _UART_ISR(void)
     // handle transmit complete at end of DMA transfer
     if (status & USART_SR_TC) {
         USART_CR1(UART_CFG.uart) &= ~USART_CR1_TCIE;
+        if (tx_callback) tx_callback(data, status);
         if (USART_CR3(UART_CFG.uart) & USART_CR3_HDSEL) {   // change to receiver if half-duplex
             usart_set_mode(UART_CFG.uart, USART_MODE_RX);
         }
