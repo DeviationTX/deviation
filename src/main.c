@@ -228,9 +228,11 @@ void EventLoop()
 #if HAS_EXTENDED_AUDIO
         if(AUDIO_VoiceAvailable()) {
             MUSIC_Play(MUSIC_SHUTDOWN);
+            AUDIO_CheckQueue();
             while (CLOCK_getms() < audio_queue_time) {
                 // Wait for voice to finished
                 CLOCK_ResetWatchdog();
+                AUDIO_CheckQueue();
             }
         } else {
 #else
