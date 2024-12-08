@@ -475,8 +475,7 @@ static void update_telemetry()
             set_telemetry(TELEM_FRSKY_TEMP1, ((data32 >> 19) - 400)/10);
             s32 altitude = getALT(data32);
             if (Model.ground_level == 0) Model.ground_level = altitude;
-//TODO            set_telemetry(TELEM_FRSKY_ALTITUDE, altitude - Model.ground_level);
-            set_telemetry(TELEM_FRSKY_ALTITUDE, altitude);
+            set_telemetry(TELEM_FRSKY_ALTITUDE, altitude - Model.ground_level);
             break;
         case SENSOR_CELL_VOLTAGE:
             if (cell_index < 6) {
