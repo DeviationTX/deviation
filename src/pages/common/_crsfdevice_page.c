@@ -781,7 +781,7 @@ static void add_param(u8 *buffer, u8 num_bytes) {
             parse_bytes(UINT8, &recv_param_ptr, &parameter->u.point);
             parse_bytes(FLOAT, &recv_param_ptr, &parameter->step);
         } else {
-            parameter->step = parameter->min_value == parameter->max_value ? 0 : 1;
+            parameter->step = parameter->min_value != parameter->max_value;
             if (*recv_param_ptr) {
                 const u8 length = strlen(recv_param_ptr) + 1;
                 if (!update) parameter->s.unit = alloc_string(length);
