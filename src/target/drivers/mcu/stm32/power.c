@@ -25,11 +25,6 @@ void PWR_Init(void)
 {
     _pwr_init();
 
-    /* Disable SWD and set SWD pins as I/O for programable switch */
-#if !defined(USE_JTAG) || !USE_JTAG
-    DisableJTAG();
-#endif
-
     if (HAS_PIN(PWR_ENABLE_PIN)) {
         rcc_periph_clock_enable(get_rcc_from_pin(PWR_SWITCH_PIN));
         rcc_periph_clock_enable(get_rcc_from_pin(PWR_ENABLE_PIN));
@@ -42,6 +37,12 @@ void PWR_Init(void)
         /* When Pin goes high, the user turned off the Tx */
         GPIO_setup_input(PWR_SWITCH_PIN, ITYPE_FLOAT);
     }
+
+    /* Disable SWD and set SWD pins as I/O for programable switch */
+#if !defined(USE_JTAG) || !USE_JTAG
+    // Disable JTAG needs to be done after rcc_periph_clock_enable
+    DisableJTAG();
+#endif
 }
 
 void PWR_Shutdown()
