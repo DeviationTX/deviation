@@ -19,5 +19,6 @@ void UART_StartReceive(usart_callback_t *isr_callback) {
 
 void UART_StopReceive() {}
 void UART_SetDuplex(uart_duplex duplex) { (void)duplex; }
+void UART_TxCallback(usart_callback_t isr_callback) {(void) isr_callback;}
 
 
