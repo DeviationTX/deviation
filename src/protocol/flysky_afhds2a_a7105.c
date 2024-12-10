@@ -361,60 +361,41 @@ static void serial_echo(u8 *packet) {
   UART_Send(outbuf, RXPACKET_SIZE);
 }
 
-// copied from edgetx
-const int16_t tAltitude[225]=
-{ // In half meter unit
-    20558, 20357, 20158, 19962, 19768, 19576, 19387, 19200, 19015,  18831, 18650, 18471, 18294, 18119, 17946, 17774,
-    17604, 17436, 17269, 17105, 16941, 16780, 16619, 16461, 16304,  16148, 15993, 15841, 15689, 15539, 15390, 15242,
-    15096, 14950, 14806, 14664, 14522, 14381, 14242, 14104, 13966,  13830, 13695, 13561, 13428, 13296, 13165, 13035,
-    12906, 12777, 12650, 12524, 12398, 12273, 12150, 12027, 11904,  11783, 11663, 11543, 11424, 11306, 11189, 11072,
-    10956, 10841, 10726, 10613, 10500, 10387, 10276, 10165, 10054,   9945,  9836,  9727,  9620,  9512,  9406,  9300,
-    9195,  9090,  8986,  8882,  8779,  8677,   8575,  8474,  8373,   8273,  8173,  8074,  7975,  7877,  7779,  7682,
-    7585,  7489,  7394,  7298,  7204,  7109,   7015,  6922,  6829,   6737,  6645,  6553,  6462,  6371,  6281,  6191,
-    6102,  6012,  5924,  5836,  5748,  5660,   5573,  5487,  5400,   5314,  5229,  5144,  5059,  4974,  4890,  4807,
-    4723,  4640,  4557,  4475,  4393,  4312,   4230,  4149,  4069,   3988,  3908,  3829,  3749,  3670,  3591,  3513,
-    3435,  3357,  3280,  3202,  3125,  3049,   2972,  2896,  2821,   2745,  2670,  2595,  2520,  2446,  2372,  2298,
-    2224,  2151,  2078,  2005,  1933,   1861,  1789,  1717,  1645,   1574,  1503,  1432,  1362,  1292,  1222,  1152,
-    1082,  1013,   944,   875,   806,   738,    670,   602,   534,    467,   399,   332,   265,   199,   132,    66,
-     0,     -66,  -131,  -197,  -262,  -327,   -392,  -456,  -521,   -585,  -649,  -713,  -776,  -840,  -903,  -966,
-    -1029,-1091, -1154, -1216, -1278, -1340,  -1402, -1463,  -1525, -1586, -1647, -1708, -1769, -1829, -1889, -1950,
-    -2010
+// Piecewise linear approximation table for altitudes from -50m to 200m
+// {pressure (Pa), altitude (cm)}
+#define NUM_POINTS   11
+const int pressure_altitude_table[NUM_POINTS][2] = {
+    {101927, -5000}, // Pressure at -50 meters
+    {101625, -2500}, // Pressure at -25 meters
+    {101325, 0},   // Sea-level pressure
+    {101025, 2500},   // Pressure at 25 meters
+    {100725, 5000},   // Pressure at 50 meters
+    {100427, 7500},   // Pressure at 75 meters
+    {100129, 10000},  // Pressure at 100 meters
+    {99832, 12500},  // Pressure at 125 meters
+    {99535, 15000},  // Pressure at 150 meters
+    {99240, 17500},  // Pressure at 175 meters
+    {98945, 20000}   // Pressure at 200 meters
 };
-#define PRESSURE_MASK 0x7FFFF
-int32_t getALT(uint32_t Pressure)
-{
-    uint32_t Index;
-    int32_t Altitude1;
-    int32_t Altitude2;
-    uint32_t Decimal;
-    uint64_t Ratio;
-    uint32_t SeaLevelPressure=101320;
-    Pressure = Pressure & PRESSURE_MASK;
-    Ratio = ( ( ( unsigned long long ) Pressure << 16 ) + ( SeaLevelPressure / 2 ) ) / SeaLevelPressure;
-    if( Ratio < ( ( 1 << 16 ) * 250 / 1000 ) )// 0.250 inclusive
-    {
-        Ratio = ( 1 << 16 ) * 250 / 1000;
-    }
-    else if( Ratio > ( 1 << 16 ) * 1125 / 1000 - 1 ) // 1.125 non-inclusive
-    {
-        Ratio = ( 1 << 16 ) * 1125 / 1000 - 1;
+
+int getALT(uint32_t pressure) {
+    if (pressure > (uint32_t)pressure_altitude_table[0][0]) return -5000;
+    if (pressure < (uint32_t)pressure_altitude_table[NUM_POINTS - 1][0]) return 20000;
+
+    for (int i = 0; i < NUM_POINTS - 1; ++i) {
+        if (pressure <= (uint32_t)pressure_altitude_table[i][0]
+         && pressure >  (uint32_t)pressure_altitude_table[i + 1][0]) {
+            int p1 = pressure_altitude_table[i][0];
+            int a1 = pressure_altitude_table[i][1];
+            int p2 = pressure_altitude_table[i+1][0];
+            int a2 = pressure_altitude_table[i+1][1];
+
+            int altitude = a1 + ((a2 - a1) * (p1 - pressure)) / (p1 - p2);
+            return altitude;
+        }
     }
 
-    Ratio -= ( 1 << 16 ) * 250 / 1000; // from 0.000 (inclusive) to 0.875 (non-inclusive)
-    Index = Ratio >> 8;
-    Decimal = Ratio & ( ( 1 << 8 ) - 1 );
-    Altitude1 = tAltitude[Index];
-    Altitude2 = Altitude1 - tAltitude[Index + 1];
-    Altitude1 = Altitude1 - ( Altitude2 * Decimal + ( 1 << 7 ) ) / ( 1 << 8 );
-    Altitude1 *= 100;
-    if( Altitude1 >= 0 )
-    {
-        return( ( Altitude1 + 1 ) / 2 );
-    }
-    else
-    {
-        return( ( Altitude1 - 1 ) / 2 );
-    }
+    return -1;
 }
 #endif  // HAS_EXTENDED_TELEMETRY
 
@@ -473,7 +454,7 @@ static void update_telemetry()
         }
         case SENSOR_PRES:
             set_telemetry(TELEM_FRSKY_TEMP1, ((data32 >> 19) - 400)/10);
-            s32 altitude = getALT(data32);
+            s32 altitude = getALT(data32 & 0x7ffff);
             if (Model.ground_level == 0) Model.ground_level = altitude;
             set_telemetry(TELEM_FRSKY_ALTITUDE, altitude - Model.ground_level);
             break;
