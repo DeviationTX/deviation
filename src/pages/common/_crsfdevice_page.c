@@ -201,8 +201,6 @@ static const char *value_numsel(guiObject_t *obj, int dir, void *data)
     crsf_param_t *param = (crsf_param_t *)data;
     u8 changed = 0;
 
-    if(param->step == 0) param->step = 1;
- 
     param->value = (void *)(intptr_t)GUI_TextSelectHelper((intptr_t)param->value,
                                         param->min_value, param->max_value,
                                         dir, param->step, 10*param->step, &changed);
@@ -384,6 +382,65 @@ u8 CRSF_send_model_id(u8 model_id) {
     buf_push_crc2(&crc, &crc_BA, CRSF_SUBCOMMAND);
     buf_push_crc2(&crc, &crc_BA, COMMAND_MODEL_SELECT_ID);
     buf_push_crc2(&crc, &crc_BA, model_id);
+    buf_push_crc(&crc, crc_BA);
+    CBUF_Push(send_buf, crc);
+    return 1;
+}
+
+u8 CRSF_speed_proposal(u32 bitrate) {
+    if (CBUF_Space(send_buf) < 14) return 0;
+    u8 crc = 0;
+    u8 crc_BA = 0;
+    CBUF_Push(send_buf, ADDR_MODULE);
+    CBUF_Push(send_buf, 12);
+    buf_push_crc2(&crc, &crc_BA, TYPE_COMMAND_ID);
+    buf_push_crc2(&crc, &crc_BA, ADDR_MODULE);
+    buf_push_crc2(&crc, &crc_BA, ADDR_RADIO);
+    buf_push_crc2(&crc, &crc_BA, GENERAL_SUBCMD);
+    buf_push_crc2(&crc, &crc_BA, SUBCMD_SPD_PROPOSAL);
+    buf_push_crc2(&crc, &crc_BA, 0);
+    buf_push_crc2(&crc, &crc_BA, bitrate >> 24);
+    buf_push_crc2(&crc, &crc_BA, bitrate >> 16);
+    buf_push_crc2(&crc, &crc_BA, bitrate >> 8);
+    buf_push_crc2(&crc, &crc_BA, bitrate);
+    buf_push_crc(&crc, crc_BA);
+    CBUF_Push(send_buf, crc);
+    return 1;
+}
+
+u8 CRSF_speed_response(u8 accept, usart_callback_t tx_callback) {
+    if (CBUF_Space(send_buf) < 11) return 0;
+    if (tx_callback) UART_TxCallback(tx_callback);
+    u8 crc = 0;
+    u8 crc_BA = 0;
+    CBUF_Push(send_buf, ADDR_MODULE);
+    CBUF_Push(send_buf, 9);
+    buf_push_crc2(&crc, &crc_BA, TYPE_COMMAND_ID);
+    buf_push_crc2(&crc, &crc_BA, ADDR_MODULE);
+    buf_push_crc2(&crc, &crc_BA, ADDR_RADIO);
+    buf_push_crc2(&crc, &crc_BA, GENERAL_SUBCMD);
+    buf_push_crc2(&crc, &crc_BA, SUBCMD_SPD_RESPONSE);
+    buf_push_crc2(&crc, &crc_BA, 0);
+    buf_push_crc2(&crc, &crc_BA, accept ? 1 : 0);
+    buf_push_crc(&crc, crc_BA);
+    CBUF_Push(send_buf, crc);
+    return 1;
+}
+
+u8 CRSF_command_ack(u8 cmd_id, u8 sub_cmd_id, u8 action) {
+    if (CBUF_Space(send_buf) < 12) return 0;
+    u8 crc = 0;
+    u8 crc_BA = 0;
+    CBUF_Push(send_buf, ADDR_MODULE);
+    CBUF_Push(send_buf, 10);
+    buf_push_crc2(&crc, &crc_BA, TYPE_COMMAND_ID);
+    buf_push_crc2(&crc, &crc_BA, ADDR_MODULE);
+    buf_push_crc2(&crc, &crc_BA, ADDR_RADIO);
+    buf_push_crc2(&crc, &crc_BA, ACK_SUBCMD);
+    buf_push_crc2(&crc, &crc_BA, cmd_id);
+    buf_push_crc2(&crc, &crc_BA, sub_cmd_id);
+    buf_push_crc2(&crc, &crc_BA, action ? 1 : 0);
+    buf_push_crc2(&crc, &crc_BA, 0);     // optional null terminated string
     buf_push_crc(&crc, crc_BA);
     CBUF_Push(send_buf, crc);
     return 1;
@@ -723,10 +780,13 @@ static void add_param(u8 *buffer, u8 num_bytes) {
         if (parameter->type == FLOAT) {
             parse_bytes(UINT8, &recv_param_ptr, &parameter->u.point);
             parse_bytes(FLOAT, &recv_param_ptr, &parameter->step);
-        } else if (*recv_param_ptr) {
-            const u8 length = strlen(recv_param_ptr) + 1;
-            if (!update) parameter->s.unit = alloc_string(length);
-            strlcpy(parameter->s.unit, (const char *)recv_param_ptr, length);
+        } else {
+            parameter->step = parameter->min_value != parameter->max_value;
+            if (*recv_param_ptr) {
+                const u8 length = strlen(recv_param_ptr) + 1;
+                if (!update) parameter->s.unit = alloc_string(length);
+                strlcpy(parameter->s.unit, (const char *)recv_param_ptr, length);
+            }
         }
         break;
 

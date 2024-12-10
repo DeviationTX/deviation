@@ -280,6 +280,7 @@ typedef void usart_callback_t(u8 ch, u8 status);
 #define UART_SR_FE   (1 << 1)  //USART_SR_FE   - framing error
 #define UART_SR_PE   (1 << 0)  //USART_SR_PE   - parity error
 void UART_StartReceive(usart_callback_t isr_callback);
+void UART_TxCallback(usart_callback_t isr_callback);
 void UART_StopReceive();
 void UART_SetDuplex(uart_duplex duplex);
 void UART_SendByte(u8 x);
