@@ -102,21 +102,30 @@ static int row_cb(int absrow, int relrow, int y, void *data) {
 static const char *hdr_str_cb(guiObject_t *obj, const void *data) {
     (void)obj;
     (void)data;
+    static u8 need_show_folder;
 
     if (count_params_loaded() != crsf_devices[device_idx].number_of_params) {
-        snprintf(tempstring, sizeof tempstring, "%s %s", crsf_devices[device_idx].name, _tr_noop("LOADING"));
-    } else if (protocol_module_is_elrs()) {
-        if (protocol_elrs_is_armed()) {
-            snprintf(tempstring, sizeof tempstring, "%s  ! Armed !", crsf_devices[device_idx].name);
-        } else if (elrs_info.flag_info[0]) {
-            snprintf(tempstring, sizeof tempstring, "%s", elrs_info.flag_info);
-        } else {
-            snprintf(tempstring, sizeof tempstring, "%s  %d/%d  %c",
-                     crsf_devices[device_idx].name, elrs_info.bad_pkts, elrs_info.good_pkts,
-                     (elrs_info.flags & 1) ? 'C' : '-');
+        need_show_folder = 1;
+        //snprintf(tempstring, sizeof tempstring, "%s %s", crsf_devices[device_idx].name, _tr_noop("LOADING"));
+        snprintf(tempstring, sizeof tempstring, "L %d N %d F %d", count_params_loaded(), crsf_devices[device_idx].number_of_params, current_folder);
+    } else {
+        if (need_show_folder) {
+            need_show_folder = 0;
+            show_page(current_folder);
         }
-    } else  {
-        return crsf_devices[device_idx].name;
+        if (protocol_module_is_elrs()) {
+            if (protocol_elrs_is_armed()) {
+                snprintf(tempstring, sizeof tempstring, "%s  ! Armed !", crsf_devices[device_idx].name);
+            } else if (elrs_info.flag_info[0]) {
+                snprintf(tempstring, sizeof tempstring, "%s", elrs_info.flag_info);
+            } else {
+                snprintf(tempstring, sizeof tempstring, "%s  %d/%d  %c",
+                         crsf_devices[device_idx].name, elrs_info.bad_pkts, elrs_info.good_pkts,
+                         (elrs_info.flags & 1) ? 'C' : '-');
+            }
+        } else {
+            return crsf_devices[device_idx].name;
+        }
     }
     return tempstring;
 }

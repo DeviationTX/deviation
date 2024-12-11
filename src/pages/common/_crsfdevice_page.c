@@ -136,10 +136,10 @@ static const char *crsf_name_cb(guiObject_t *obj, const void *data)
 }
 
 static u8 count_params_loaded() {
-    int i;
-    for (i=0; i < CRSF_MAX_PARAMS; i++)
-        if (crsf_params[i].id == 0) break;
-    return i;
+    u8 count = crsf_params[0].loaded;
+    for (int i=1; i < crsf_devices[device_idx].number_of_params; i++)
+        count += crsf_params[i].loaded;
+    return count;
 }
 
 static int folder_rows(int folder) {
@@ -495,6 +495,36 @@ static u8 param_len(crsf_param_t *param) {
         return 0;
 }
 
+static void param_reload(u8 param_id) {
+    // param_id of 0 indicates root folder
+    if (param_id != 0) crsf_params[param_id-1].loaded = 0;
+    if (param_id == 0 || crsf_params[param_id-1].type == FOLDER) {
+        for (int i=0; i < crsf_devices[device_idx].number_of_params; i++) {
+            if (crsf_params[i].parent == param_id) {
+                crsf_params[i].loaded = 0;
+            }
+        }
+    }
+    params_loaded = count_params_loaded();
+    // kick off the update
+//TODO    next_param = param_id;
+//TODO    next_chunk = 0;
+//TODO    CRSF_read_param(device_idx, next_param, next_chunk);
+}
+
+static u8 param_next(u8 param) {
+    int break_count = 0;
+    while (crsf_params[param-1].loaded) {
+        if (param < crsf_devices[device_idx].number_of_params)
+            param += 1;
+        else
+            param = 1;
+        if (break_count++ >= crsf_devices[device_idx].number_of_params)
+            return 0;
+    }
+    return param;
+}
+
 void CRSF_set_param(crsf_param_t *param) {
     if (crsf_devices[param->device].address == ADDR_RADIO) {
         protocol_set_param((u8)param->u.text_sel);  // only one radio param so don't need id
@@ -551,7 +581,12 @@ void CRSF_set_param(crsf_param_t *param) {
         break;
     }
     CBUF_Push(send_buf, crc);
-    read_timeout = CLOCK_getms();
+    read_timeout = CLOCK_getms() + 1800;    // trigger reload in 200ms
+    
+    // ELRS does not echo parameters that are changed, or other parameters
+    // that change as a consequence of a different parameter being changed.
+    // As a workaround, reload folder on every update.
+    param_reload(param->parent);
 }
 
 void CRSF_send_command(crsf_param_t *param, enum cmd_status status) {
@@ -754,17 +789,17 @@ static void add_param(u8 *buffer, u8 num_bytes) {
     parameter->id = buffer[3];
     parameter->parent = *recv_param_ptr++;
     parameter->type = *recv_param_ptr & 0x7f;
+    parameter->loaded = 1;
+    parameter->hidden = *recv_param_ptr++ & 0x80;
     if (!update) {
-        parameter->hidden = *recv_param_ptr++ & 0x80;
-        const u8 length = strlen(recv_param_ptr) + 1;
-        parameter->name = alloc_string(length);
-        strlcpy(parameter->name, (const char *)recv_param_ptr, length);
-        recv_param_ptr += length;
+        parameter->name_size = strlen(recv_param_ptr) + 1;
+        parameter->name = alloc_string(parameter->name_size);
+        strlcpy(parameter->name, (const char *)recv_param_ptr, parameter->name_size);
+        recv_param_ptr += parameter->name_size;
     } else {
-        if (parameter->hidden != (*recv_param_ptr & 0x80))
-            params_loaded = 0;   // if item becomes hidden others may also, so reload all params
-        parameter->hidden = *recv_param_ptr++ & 0x80;
-        recv_param_ptr += strlen(recv_param_ptr) + 1;
+        // always copy instead of taking time to compare first
+        // can't resize strings so limit to initial allocation size
+        recv_param_ptr += strlcpy(parameter->name, (const char *)recv_param_ptr, parameter->name_size) + 1;
     }
     int count;
     switch (parameter->type) {
@@ -878,15 +913,10 @@ static void add_param(u8 *buffer, u8 num_bytes) {
     next_chunk = 0;
     params_loaded = count_params_loaded();
 
-    // read all params when needed
+    // read params when needed
     if (params_loaded < crsf_devices[device_idx].number_of_params) {
-        if (next_param < crsf_devices[device_idx].number_of_params)
-            next_param += 1;
-        else
-            next_param = 1;
-        CRSF_read_param(device_idx, next_param, next_chunk);
-    } else {
-        next_param = 0;
+        next_param = param_next(next_param);
+        if (next_param > 0) CRSF_read_param(device_idx, next_param, next_chunk);
     }
 }
 

@@ -126,7 +126,9 @@ typedef struct {
     u8 id;                // Parameter number (starting from 1)
     u8 parent;            // Parent folder parameter number of the parent folder, 0 means root
     enum data_type type;  // (Parameter type definitions and hidden bit)
-    u8 hidden;            // set if hidden
+    u8 hidden:1;          // set if hidden
+    u8 loaded:1;          // clear to force reload
+    u8 name_size:6;       // initial size of name string - can't be resized
     char *name;           // Null-terminated string
     void *value;          // size depending on data type
 
