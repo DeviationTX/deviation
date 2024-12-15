@@ -391,6 +391,8 @@ int getALT(uint32_t pressure) {
             int a2 = pressure_altitude_table[i+1][1];
 
             int altitude = a1 + ((a2 - a1) * (p1 - pressure)) / (p1 - p2);
+            if (altitude < 0) altitude -= 50; else altitude += 50;
+            altitude = (altitude / 100) * 100;
             return altitude;
         }
     }
