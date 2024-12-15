@@ -22,13 +22,14 @@
 
 #ifdef PROTO_HAS_A7105
 
+#define MAX(A, B) (A > B ? A : B)
 #define TXPACKET_SIZE 38
-#define RXPACKET_SIZE 37
+#define RXPACKET_SIZE (9 + 7 * 6)
 #define NUMFREQ       16
 #define TXID_SIZE     4
 #define RXID_SIZE     4
 
-static u8 packet[TXPACKET_SIZE];
+static u8 packet[MAX(TXPACKET_SIZE, RXPACKET_SIZE)];
 static u8 txid[TXID_SIZE];
 static u8 rxid[RXID_SIZE];
 static u8 hopping_frequency[NUMFREQ];
@@ -68,6 +69,7 @@ static const char * const afhds2a_opts[] = {
     _tr_noop("Freq Tune"), "-300", "300", "655361", NULL, // big step 10, little step 1
     "RX ID", "-32768", "32767", "1", NULL, // todo: store that elsewhere
     "RX ID2","-32768", "32767", "1", NULL, // ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    _tr_noop("Telem Out"), _tr_noop("Disabled"), _tr_noop("Enabled"), NULL,
     NULL
 };
 
@@ -85,6 +87,7 @@ enum {
     PROTOOPTS_FREQTUNE,
     PROTOOPTS_RXID, // todo: store that elsewhere
     PROTOOPTS_RXID2,// ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    PROTO_OPTS_TELEMOUT,
     LAST_PROTO_OPT,
 };
 
@@ -273,87 +276,260 @@ static void build_packet(u8 type)
 
 // telemetry sensors ID
 enum{
-    SENSOR_VOLTAGE      = 0x00,
-    SENSOR_TEMPERATURE  = 0x01,
-    SENSOR_RPM          = 0x02,
-    SENSOR_CELL_VOLTAGE = 0x03,
-    SENSOR_RX_ERR_RATE  = 0xfe,
-    SENSOR_RX_RSSI      = 0xfc,
-    SENSOR_RX_NOISE     = 0xfb,
-    SENSOR_RX_SNR       = 0xfa,
+    SENSOR_VOLTAGE        = 0x00,    // Internal Voltage
+    SENSOR_TEMPERATURE    = 0x01,    // Temperature
+    SENSOR_MOT            = 0x02,    // RPM
+    SENSOR_EXTV           = 0x03,    // External Voltage
+    SENSOR_CELL_VOLTAGE   = 0x04,    // Avg Cell voltage
+// TODO edgetx script says SENSOR_TYPE_GYROSCOPE_1_AXIS = 0x04,    // signed short in 0.1 degrees per second, 0x8000 if unknown
+    SENSOR_BAT_CURR       = 0x05,    // battery current A * 100
+    SENSOR_FUEL           = 0x06,    // remaining battery percentage / mah drawn otherwise or fuel level no unit!
+    SENSOR_RPM            = 0x07,    // throttle value / battery capacity
+    SENSOR_CMP_HEAD       = 0x08,    // Heading  0..360 deg, 0=north 2bytes
+    SENSOR_CLIMB_RATE     = 0x09,    // 2 bytes m/s *100
+    SENSOR_COG            = 0x0a,    // 2 bytes  Course over ground(NOT heading, but direction of movement) in degrees * 100, 0.0..359.99 degrees. unknown max uint
+    SENSOR_GPS_STATUS     = 0x0b,    // 2 bytes
+    SENSOR_ACC_X          = 0x0c,    // 2 bytes m/s *100 signed
+    SENSOR_ACC_Y          = 0x0d,    // 2 bytes m/s *100 signed
+    SENSOR_ACC_Z          = 0x0e,    // 2 bytes m/s *100 signed
+    SENSOR_ROLL           = 0x0f,    // 2 bytes deg *100 signed
+    SENSOR_PITCH          = 0x10,    // 2 bytes deg *100 signed
+    SENSOR_YAW            = 0x11,    // 2 bytes deg *100 signed
+    SENSOR_VERTICAL_SPEED = 0x12,    // 2 bytes m/s *100
+    SENSOR_GROUND_SPEED   = 0x13,    // 2 bytes m/s *100 different unit than build-in sensor
+    SENSOR_GPS_DIST       = 0x14,    // 2 bytes dist from home m unsigned
+    SENSOR_ARMED          = 0x15,    // 2 bytes
+    SENSOR_FLIGHT_MODE    = 0x16,    // 2 bytes simple index listed below
+
+    SENSOR_PRES           = 0x41,    // Pressure
+    SENSOR_ODO1           = 0x7c,    // Odometer1
+    SENSOR_ODO2           = 0x7d,    // Odometer2
+    SENSOR_SPE            = 0x7e,    // Speed            //2byte km/h
+    SENSOR_TX_V           = 0x7f,    // TX Voltage
+
+    // 4 byte sensors
+    SENSOR_GPS_LAT        = 0x80,    // 4bytes signed WGS84 in degrees * 1E7
+    SENSOR_GPS_LON        = 0x81,    // 4bytes signed WGS84 in degrees * 1E7
+    SENSOR_GPS_ALT        = 0x82,    // 4bytes signed!!! GPS alt m*100
+    SENSOR_ALT            = 0x83,    // 4bytes signed!!! Alt m*100
+    SENSOR_S84            = 0x84,
+    SENSOR_S85            = 0x85,
+    SENSOR_S86            = 0x86,
+    SENSOR_S87            = 0x87,
+    SENSOR_S88            = 0x88,
+    SENSOR_S89            = 0x89,
+    SENSOR_S8a            = 0x8a,
+
+// commented out in MAVLink    SENSOR_ALT_FLYSKY     = 0xf9,    // Altitude         //2 bytes signed in m
+    SENSOR_RX_SNR         = 0xfa,    // SNR
+    SENSOR_RX_NOISE       = 0xfb,    // Noise
+    SENSOR_RX_RSSI        = 0xfc,    // RSSI
+    SENSOR_RX_ERR_RATE    = 0xfe,    // Error rate
+    SENSOR_UNKNOWN        = 0xff,
+
+// AC type telemetry with multiple values in one packet
+    SENSOR_GPS_FULL       = 0xfd,
+    SENSOR_VOLT_FULL      = 0xf0,
+    SENSOR_ACC_FULL       = 0xef,
 };
+
+static void set_telemetry(frsky_telem_t offset, s32 value) {
+    Telemetry.value[offset] = value;
+    TELEMETRY_SetUpdated(offset);
+}
+
+#if HAS_EXTENDED_TELEMETRY
+
+static void setup_serial_port() {
+    if ( Model.proto_opts[PROTO_OPTS_TELEMOUT] ) {
+        UART_SetDataRate(57600);
+#if HAS_EXTENDED_AUDIO
+#if HAS_AUDIO_UART
+        if (Transmitter.audio_uart) return;
+#endif
+        Transmitter.audio_player = AUDIO_DISABLED; // disable voice commands on serial port
+#endif
+    }
+}
+
+static void serial_echo(u8 *packet) {
+  static u8 outbuf[RXPACKET_SIZE];
+
+  if (PPMin_Mode() || !Model.proto_opts[PROTO_OPTS_TELEMOUT]) return;
+
+  memcpy(outbuf, packet, RXPACKET_SIZE);
+  UART_Send(outbuf, RXPACKET_SIZE);
+}
+
+// Piecewise linear approximation table for altitudes from -50m to 200m
+// {pressure (Pa), altitude (cm)}
+#define NUM_POINTS   11
+const int pressure_altitude_table[NUM_POINTS][2] = {
+    {101927, -5000}, // Pressure at -50 meters
+    {101625, -2500}, // Pressure at -25 meters
+    {101325, 0},   // Sea-level pressure
+    {101025, 2500},   // Pressure at 25 meters
+    {100725, 5000},   // Pressure at 50 meters
+    {100427, 7500},   // Pressure at 75 meters
+    {100129, 10000},  // Pressure at 100 meters
+    {99832, 12500},  // Pressure at 125 meters
+    {99535, 15000},  // Pressure at 150 meters
+    {99240, 17500},  // Pressure at 175 meters
+    {98945, 20000}   // Pressure at 200 meters
+};
+
+int getALT(uint32_t pressure) {
+    if (pressure > (uint32_t)pressure_altitude_table[0][0]) return -5000;
+    if (pressure < (uint32_t)pressure_altitude_table[NUM_POINTS - 1][0]) return 20000;
+
+    for (int i = 0; i < NUM_POINTS - 1; ++i) {
+        if (pressure <= (uint32_t)pressure_altitude_table[i][0]
+         && pressure >  (uint32_t)pressure_altitude_table[i + 1][0]) {
+            int p1 = pressure_altitude_table[i][0];
+            int a1 = pressure_altitude_table[i][1];
+            int p2 = pressure_altitude_table[i+1][0];
+            int a2 = pressure_altitude_table[i+1][1];
+
+            int altitude = a1 + ((a2 - a1) * (p1 - pressure)) / (p1 - p2);
+            if (altitude < 0) altitude -= 50; else altitude += 50;
+            altitude = (altitude / 100) * 100;
+            return altitude;
+        }
+    }
+
+    return -1;
+}
+#endif  // HAS_EXTENDED_TELEMETRY
 
 static void update_telemetry()
 {
+    // 0    1234   5678   9           10         11       12
     // AA | TXID | RXID | sensor id | sensor # | value 16 bit big endian | sensor id ......
+    // AC | TXID | RXID | sensor id | sensor # | length | value 32 bit big endian | sensor id ......
     // max 7 sensors per packet
 
     u8 voltage_index = 0;
+    u8 *sensor = packet + 9;   // first sensor ID in telemetry packet
 #if HAS_EXTENDED_TELEMETRY
     u8 cell_index = 0;
     u16 cell_total = 0;
-    u8 temp_index;
+    serial_echo(packet);
 #endif
 
-    for (u8 sensor = 0; sensor < 7; sensor++) {
-        u8 index = 9+(4*sensor);
-        switch(packet[index]) {
-            case SENSOR_VOLTAGE:
-                voltage_index++;
-                if (packet[index+1] == 0)  // Rx voltage
-                {
-                    Telemetry.value[TELEM_FRSKY_VOLT1] = packet[index+3] << 8 | packet[index+2];
-                    TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT1);
-                }
-                else if (voltage_index == 2)  // external voltage sensor #1
-                {
-                    Telemetry.value[TELEM_FRSKY_VOLT2] = packet[index+3] << 8 | packet[index+2];
-                    TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT2);
-                }
+    while (sensor[0] != 0xff && (sensor+9 < packet+RXPACKET_SIZE-6)) {
+        u16 data16 = sensor[3] << 8 | sensor[2];
 #if HAS_EXTENDED_TELEMETRY
-                else if (voltage_index == 3)  // external voltage sensor #2
-                {
-                    Telemetry.value[TELEM_FRSKY_VOLT3] = packet[index+3] << 8 | packet[index+2];
-                    TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT3);
-                }
+        s32 data32 = sensor[6] << 24 | sensor[5] << 16 | sensor[4] << 8 | sensor[3];
 #endif
-                break;
-#if HAS_EXTENDED_TELEMETRY
-            case SENSOR_TEMPERATURE:
-                temp_index = packet[index+1];
-                if (temp_index == 0) {
-                    Telemetry.value[TELEM_FRSKY_TEMP1] = ((packet[index+3] << 8 | packet[index+2]) - 400)/10;
-                    TELEMETRY_SetUpdated(TELEM_FRSKY_TEMP1);
-                } else if (temp_index == 1) {
-                    Telemetry.value[TELEM_FRSKY_TEMP2] = ((packet[index+3] << 8 | packet[index+2]) - 400)/10;
-                    TELEMETRY_SetUpdated(TELEM_FRSKY_TEMP2);
-                }
-                break;
-            case SENSOR_CELL_VOLTAGE:
-                if (cell_index < 6) {
-                    Telemetry.value[TELEM_FRSKY_CELL1 + cell_index] = packet[index+3] << 8 | packet[index+2];
-                    TELEMETRY_SetUpdated(TELEM_FRSKY_CELL1 + cell_index);
-                    cell_total += packet[index+3] << 8 | packet[index+2];
-                }
-                cell_index++;
-                break;
-            case SENSOR_RPM:
-                Telemetry.value[TELEM_FRSKY_RPM] = packet[index+3] << 8 | packet[index+2];
-                TELEMETRY_SetUpdated(TELEM_FRSKY_RPM);
-                break;
-#endif
-            case SENSOR_RX_ERR_RATE:
-                Telemetry.value[TELEM_FRSKY_LQI] = 100 - packet[index+2];
-                TELEMETRY_SetUpdated(TELEM_FRSKY_LQI);
-                break;
-            case SENSOR_RX_RSSI:
-                Telemetry.value[TELEM_FRSKY_RSSI] = packet[index+2];
-                TELEMETRY_SetUpdated(TELEM_FRSKY_RSSI);
-                break;
-            default:
-                // unknown sensor ID or end of list
-                break;
+        switch(sensor[0]) {
+        case SENSOR_VOLTAGE:
+            voltage_index++;
+            if (sensor[1] == 0)  // Rx voltage
+            {
+                set_telemetry(TELEM_FRSKY_VOLT1, data16);
             }
+            else if (voltage_index == 2)  // external voltage sensor #1
+            {
+                set_telemetry(TELEM_FRSKY_VOLT2, data16);
+            }
+#if HAS_EXTENDED_TELEMETRY
+            else if (voltage_index == 3)  // external voltage sensor #2
+            {
+                set_telemetry(TELEM_FRSKY_VOLT3, data16);
+            }
+#endif
+            break;
+        case SENSOR_EXTV:
+            voltage_index++;
+            set_telemetry(TELEM_FRSKY_VOLT2, data16);
+            break;
+#if HAS_EXTENDED_TELEMETRY
+        case SENSOR_TEMPERATURE:
+        {
+            u8 temp_index = sensor[1];
+            if (temp_index == 0) {
+                set_telemetry(TELEM_FRSKY_TEMP1, (data16 - 400)/10);
+            } else if (temp_index == 1) {
+                set_telemetry(TELEM_FRSKY_TEMP2, (data16 - 400)/10);
+            }
+            break;
+        }
+        case SENSOR_PRES:
+            set_telemetry(TELEM_FRSKY_TEMP1, ((data32 >> 19) - 400)/10);
+            s32 altitude = getALT(data32 & 0x7ffff);
+            if (Model.ground_level == 0) Model.ground_level = altitude;
+            set_telemetry(TELEM_FRSKY_ALTITUDE, altitude - Model.ground_level);
+            break;
+        case SENSOR_CELL_VOLTAGE:
+            if (cell_index < 6) {
+                set_telemetry(TELEM_FRSKY_CELL1 + cell_index, data16);
+                cell_total += data16;
+            }
+            cell_index++;
+            break;
+        case SENSOR_CLIMB_RATE:
+            set_telemetry(TELEM_FRSKY_VARIO, data16);
+            break;
+        case SENSOR_ALT:
+            set_telemetry(TELEM_FRSKY_ALTITUDE, data32);
+            break;
+        case SENSOR_FUEL:
+            set_telemetry(TELEM_FRSKY_FUEL, data16);
+            break;
+        case SENSOR_BAT_CURR:
+            set_telemetry(TELEM_FRSKY_CURRENT, data16 * 10);
+            break;
+        case SENSOR_MOT:
+            set_telemetry(TELEM_FRSKY_RPM, data16);
+            break;
+        case SENSOR_GPS_LON:
+            Telemetry.gps.longitude = data32;
+            TELEMETRY_SetUpdated(TELEM_GPS_LONG);
+            break;
+        case SENSOR_GPS_LAT:
+            Telemetry.gps.latitude = data32;
+            TELEMETRY_SetUpdated(TELEM_GPS_LAT);
+            break;
+        case SENSOR_GPS_ALT:
+            Telemetry.gps.altitude = data32;
+            TELEMETRY_SetUpdated(TELEM_GPS_ALT);
+            break;
+        case SENSOR_GPS_FULL: {
+            sensor += 5;     // skip GPS status
+            data32 = sensor[3] << 24 | sensor[2] << 16 | sensor[1] << 8 | sensor[0];
+            Telemetry.gps.latitude = data32;
+            TELEMETRY_SetUpdated(TELEM_GPS_LAT);
+            sensor += 4;
+            data32 = sensor[3] << 24 | sensor[2] << 16 | sensor[1] << 8 | sensor[0];
+            Telemetry.gps.longitude = data32;
+            TELEMETRY_SetUpdated(TELEM_GPS_LONG);
+            sensor += 4;
+            data32 = sensor[3] << 24 | sensor[2] << 16 | sensor[1] << 8 | sensor[0];
+            Telemetry.gps.altitude = data32;
+            TELEMETRY_SetUpdated(TELEM_GPS_ALT);
+        }
+            break;
+#endif
+        case SENSOR_RX_SNR:
+//            set_telemetry(TELEM_FRSKY_LQI, 100 - sensor[2]);
+            break;
+        case SENSOR_RX_NOISE:
+//            set_telemetry(TELEM_FRSKY_LQI, 100 - sensor[2]);
+            break;
+        case SENSOR_RX_RSSI:
+            set_telemetry(TELEM_FRSKY_RSSI, sensor[2]);
+            break;
+        case SENSOR_RX_ERR_RATE:
+            set_telemetry(TELEM_FRSKY_LQI, 100 - sensor[2]);
+            break;
+        default:
+            // unknown sensor ID or end of list
+            break;
+        }
+        if (packet[0] == 0xaa)
+            sensor += ((sensor[0] & 0xf0) == 0x80 ? 6 : 4);
+        else
+            sensor += sensor[2] + 3;
     }
 #if HAS_EXTENDED_TELEMETRY
     if(cell_index > 0) {
@@ -563,7 +739,7 @@ static u16 afhds2a_cb()
                 A7105_Strobe(A7105_RST_RDPTR);
                 u8 check;
                 A7105_ReadData(&check,1);
-                if (check == 0xaa) {
+                if (check == 0xaa || check == 0xac) {
                     A7105_Strobe(A7105_RST_RDPTR);
                     A7105_ReadData(packet, RXPACKET_SIZE);
                     if (packet[9] == 0xfc) {  // rx is asking for settings
@@ -595,6 +771,9 @@ static void initialize(u8 bind)
         if (afhds2a_init())
             break;
     }
+#if HAS_EXTENDED_TELEMETRY
+    setup_serial_port();
+#endif
     initialize_tx_id();
     packet_type = PACKET_STICKS;
     packet_count = 0;
@@ -620,6 +799,11 @@ uintptr_t AFHDS2A_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_INIT:  initialize(0); return 0;
         case PROTOCMD_DEINIT:
         case PROTOCMD_RESET:
+#if HAS_EXTENDED_TELEMETRY
+            if (Model.proto_opts[PROTO_OPTS_TELEMOUT]) {
+                UART_SetDataRate(0);  // restore default rate, voice will be reset on next model's load anyways
+            }
+#endif
             CLOCK_StopTimer();
             return (A7105_Reset() ? 1 : -1);
         case PROTOCMD_CHECK_AUTOBIND: return 0;
@@ -635,6 +819,11 @@ uintptr_t AFHDS2A_Cmds(enum ProtoCmds cmd)
             return PROTO_TELEM_ON;
         case PROTOCMD_TELEMETRYTYPE:
             return TELEM_FRSKY;
+#if HAS_EXTENDED_TELEMETRY
+        case PROTOCMD_TELEMETRYRESET:
+            Model.ground_level = 0;
+            return 0;
+#endif
         case PROTOCMD_CHANNELMAP: return AETRG;
         default: break;
     }
