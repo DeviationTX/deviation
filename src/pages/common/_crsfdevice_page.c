@@ -25,8 +25,8 @@ static struct crsfdevice_obj * const gui = &gui_objs.u.crsfdevice;
 
 static u32 read_timeout;
 static u8 current_folder = 0;
-static u8 params_loaded;     // if not zero, number received so far for current device
-static u8 params_displayed;  // if not zero, number displayed so far for current device
+static volatile u8 params_loaded;     // if not zero, number received so far for current device
+static volatile u8 params_displayed;  // if not zero, number displayed so far for current device
 static u8 device_idx;   // current device index
 static u8 next_param;   // parameter and chunk currently being read
 static u8 next_chunk;
@@ -164,6 +164,7 @@ void button_press(guiObject_t *obj, const void *data)
         param->u.text_sel = param->min_value;
 
     param->changed = 1;
+    CRSF_set_param(param);
 }
 
 static void command_press(guiObject_t *obj, s8 press_type, const void *data)
@@ -191,7 +192,10 @@ static const char *value_textsel(guiObject_t *obj, int dir, void *data)
                             param->min_value, param->max_value,
                             dir, 1, 1, &changed);
 
-    if (changed) param->changed = 1;
+    if (changed) {
+        param->changed = 1;
+        CRSF_set_param(param);
+    }
     return current_text(param);
 }
 
@@ -205,7 +209,10 @@ static const char *value_numsel(guiObject_t *obj, int dir, void *data)
                                         param->min_value, param->max_value,
                                         dir, param->step, 10*param->step, &changed);
 
-    if (changed) param->changed = 1;
+    if (changed) {
+        param->changed = 1;
+        CRSF_set_param(param);
+    }
 
     snprintf(tempstring, sizeof tempstring, "%d", (intptr_t)param->value);
     if (param->type == FLOAT && param->u.point > 0) {
@@ -219,6 +226,42 @@ static const char *value_numsel(guiObject_t *obj, int dir, void *data)
 static void show_page(int folder);
 static void show_header();
 
+static u8 param_next(u8 param) {
+    int break_count = 0;
+    if (param == 0) param = 1;  // exception for root folder
+    while (crsf_params[param-1].loaded) {
+        if (param < crsf_devices[device_idx].number_of_params)
+            param += 1;
+        else
+            param = 1;
+        if (break_count++ >= crsf_devices[device_idx].number_of_params)
+            return 0;
+    }
+    return param;
+}
+
+static void folder_load(u8 param_id) {
+    // param_id of 0 indicates root folder
+    if (param_id != 0) {
+        crsf_params[param_id-1].loaded = 0;
+        params_loaded -= 1;
+        need_show_folder = 1;
+    }
+    if (param_id == 0 || crsf_params[param_id-1].type == FOLDER) {
+        for (int i=0; i < crsf_devices[device_idx].number_of_params; i++) {
+            if (crsf_params[i].parent == param_id) {
+                crsf_params[i].loaded = 0;
+                params_loaded -= 1;
+                need_show_folder = 1;
+            }
+        }
+    }
+    next_string = mp->strings;      // re-allocate all strings
+    next_param = param_next(param_id);
+    next_chunk = 0;
+    CRSF_read_param(device_idx, next_param, next_chunk);
+}
+
 static void folder_cb(struct guiObject *obj, s8 press_type, const void *data)
 {
     (void)obj;
@@ -229,7 +272,7 @@ static void folder_cb(struct guiObject *obj, s8 press_type, const void *data)
     crsf_param_t *param = (crsf_param_t *)data;
 
     current_folder = param->id;
-    show_page(current_folder);
+    folder_load(current_folder);
 }
 
 static void noop_press(struct guiObject *obj, s8 press_type, const void *data)
@@ -248,8 +291,9 @@ static void stredit_done_cb(guiObject_t *obj, void *data)  // devo8 doesn't hand
     if (param) {  // Keyboard sets to null if changes discarded
         strlcpy((char *)param->value, (const char *)tempstring, param->u.string_max_len);
         param->changed = 1;
+        CRSF_set_param(param);
     }
-    show_page(current_folder);
+    folder_load(current_folder);
 }
 
 static void stredit_cb(struct guiObject *obj, s8 press_type, const void *data)
@@ -293,14 +337,18 @@ static unsigned action_cb(u32 button, unsigned flags, void *data)
 
         if (param->type <= STRING && param->changed) {
             param->changed = 0;
-            CRSF_set_param(param);
+
+            // ELRS does not echo parameters that are changed, or other parameters
+            // that change as a consequence of a different parameter being changed.
+            // As a workaround, reload folder on every update.
+            folder_load(param->parent);
         }
     }
 
     if (current_folder != 0 && CHAN_ButtonIsPressed(button, BUT_EXIT)) {
         if (flags & BUTTON_RELEASE) {
             current_folder = param_by_id(current_folder)->parent;
-            show_page(current_folder);
+            folder_load(current_folder);
         }
         return 1;
     }
@@ -342,7 +390,8 @@ void PAGE_CRSFDeviceEvent() {
 
     // spec calls for 2 second timeout on requests. Retry on timeout.
     if (read_timeout && (CLOCK_getms() - read_timeout > 2000)) {
-        CRSF_read_param(device_idx, next_param, next_chunk);
+        if (next_param) CRSF_read_param(device_idx, next_param, next_chunk);
+        else read_timeout = 0;
     }
 }
 
@@ -448,7 +497,7 @@ u8 CRSF_command_ack(u8 cmd_id, u8 sub_cmd_id, u8 action) {
 
 // Request parameter info from known device
 void CRSF_read_param(u8 device, u8 id, u8 chunk) {
-    if (CBUF_Space(send_buf) < 8) return;
+    if (CBUF_Space(send_buf) < 8 || id == 0) return;
     u8 crc = 0;
     CBUF_Push(send_buf, ADDR_MODULE);
     CBUF_Push(send_buf, 6);
@@ -495,36 +544,6 @@ static u8 param_len(crsf_param_t *param) {
         return 0;
 }
 
-static void param_reload(u8 param_id) {
-    // param_id of 0 indicates root folder
-    if (param_id != 0) crsf_params[param_id-1].loaded = 0;
-    if (param_id == 0 || crsf_params[param_id-1].type == FOLDER) {
-        for (int i=0; i < crsf_devices[device_idx].number_of_params; i++) {
-            if (crsf_params[i].parent == param_id) {
-                crsf_params[i].loaded = 0;
-            }
-        }
-    }
-    params_loaded = count_params_loaded();
-    // kick off the update
-//TODO    next_param = param_id;
-//TODO    next_chunk = 0;
-//TODO    CRSF_read_param(device_idx, next_param, next_chunk);
-}
-
-static u8 param_next(u8 param) {
-    int break_count = 0;
-    while (crsf_params[param-1].loaded) {
-        if (param < crsf_devices[device_idx].number_of_params)
-            param += 1;
-        else
-            param = 1;
-        if (break_count++ >= crsf_devices[device_idx].number_of_params)
-            return 0;
-    }
-    return param;
-}
-
 void CRSF_set_param(crsf_param_t *param) {
     if (crsf_devices[param->device].address == ADDR_RADIO) {
         protocol_set_param((u8)param->u.text_sel);  // only one radio param so don't need id
@@ -533,10 +552,6 @@ void CRSF_set_param(crsf_param_t *param) {
 
     u16 length = param_len(param) + 5;
     if ((u16)CBUF_Space(send_buf) < length+2) return;
-
-    next_param = param->id;    // device responds with parameter info so prepare to receive
-    next_chunk = 0;
-    recv_param_ptr = recv_param_buffer;
 
     u8 crc = 0;
     CBUF_Push(send_buf, ADDR_MODULE);
@@ -581,12 +596,6 @@ void CRSF_set_param(crsf_param_t *param) {
         break;
     }
     CBUF_Push(send_buf, crc);
-    read_timeout = CLOCK_getms() + 1800;    // trigger reload in 200ms
-    
-    // ELRS does not echo parameters that are changed, or other parameters
-    // that change as a consequence of a different parameter being changed.
-    // As a workaround, reload folder on every update.
-    param_reload(param->parent);
 }
 
 void CRSF_send_command(crsf_param_t *param, enum cmd_status status) {
@@ -749,6 +758,8 @@ static void parse_elrs_info(u8 *buffer) {
 }
 
 static void add_param(u8 *buffer, u8 num_bytes) {
+    u8 length;
+
     // abort if wrong device, or not enough buffer space
     if (buffer[2] != crsf_devices[device_idx].address
      || ((int)((sizeof recv_param_buffer) - (recv_param_ptr - recv_param_buffer)) < (num_bytes-4))) {
@@ -783,7 +794,6 @@ static void add_param(u8 *buffer, u8 num_bytes) {
         return;
     }
     crsf_param_t *parameter = &crsf_params[buffer[3]-1];
-    int update = parameter->id == buffer[3];
 
     parameter->device = device_idx;
     parameter->id = buffer[3];
@@ -791,16 +801,12 @@ static void add_param(u8 *buffer, u8 num_bytes) {
     parameter->type = *recv_param_ptr & 0x7f;
     parameter->loaded = 1;
     parameter->hidden = *recv_param_ptr++ & 0x80;
-    if (!update) {
-        parameter->name_size = strlen(recv_param_ptr) + 1;
-        parameter->name = alloc_string(parameter->name_size);
-        strlcpy(parameter->name, (const char *)recv_param_ptr, parameter->name_size);
-        recv_param_ptr += parameter->name_size;
-    } else {
-        // always copy instead of taking time to compare first
-        // can't resize strings so limit to initial allocation size
-        recv_param_ptr += strlcpy(parameter->name, (const char *)recv_param_ptr, parameter->name_size) + 1;
-    }
+    // reallocate name string
+    parameter->name_size = strlen(recv_param_ptr) + 1;
+    parameter->name = alloc_string(parameter->name_size);
+    strlcpy(parameter->name, (const char *)recv_param_ptr, parameter->name_size);
+    recv_param_ptr += parameter->name_size;
+
     int count;
     switch (parameter->type) {
     case UINT8:
@@ -818,43 +824,39 @@ static void add_param(u8 *buffer, u8 num_bytes) {
         } else {
             parameter->step = parameter->min_value != parameter->max_value;
             if (*recv_param_ptr) {
-                const u8 length = strlen(recv_param_ptr) + 1;
-                if (!update) parameter->s.unit = alloc_string(length);
+                length = strlen(recv_param_ptr) + 1;
+                parameter->s.unit = alloc_string(length);
                 strlcpy(parameter->s.unit, (const char *)recv_param_ptr, length);
             }
         }
         break;
 
     case TEXT_SELECTION:
-        if (!update) {
-            const u8 length = strlen(recv_param_ptr) + 1;
-            parameter->value = alloc_string(length);
-            strlcpy(parameter->value, (const char *)recv_param_ptr, length);
-            recv_param_ptr += length;
-            // put null between selection options
-            // find max choice string length to adjust textselectplate size
-            char *start = (char *)parameter->value;
-            int max_len = 0;
-            count = 0;
-            for (char *p = (char *)parameter->value; *p; p++) {
-                if (*p == ';') {
-                    *p = '\0';
-                    if (p - start > max_len) {
-                        parameter->max_str = start;  // save max to determine gui box size
-                        max_len = p - start;
-                    }
-                    start = p+1;
-                    count += 1;
+        length = strlen(recv_param_ptr) + 1;
+        parameter->value = alloc_string(length);
+        strlcpy(parameter->value, (const char *)recv_param_ptr, length);
+        recv_param_ptr += length;
+        // put null between selection options
+        // find max choice string length to adjust textselectplate size
+        char *start = (char *)parameter->value;
+        int max_len = 0;
+        count = 0;
+        for (char *p = (char *)parameter->value; *p; p++) {
+            if (*p == ';') {
+                *p = '\0';
+                if (p - start > max_len) {
+                    parameter->max_str = start;  // save max to determine gui box size
+                    max_len = p - start;
                 }
-                // handle "Lua up arrow and down arrow - replace with u and d
-                else if (*p == 0xc0) *p = 'u';
-                else if (*p == 0xc1) *p = 'd';
-                else if (*p &  0x80) *p = '?';
+                start = p+1;
+                count += 1;
             }
-            parameter->max_value = count;   // bug fix for incorrect max from device
-        } else {
-            recv_param_ptr += strlen(recv_param_ptr) + 1;
+            // handle "Lua up arrow and down arrow - replace with u and d
+            else if (*p == 0xc0) *p = 'u';
+            else if (*p == 0xc1) *p = 'd';
+            else if (*p &  0x80) *p = '?';
         }
+        parameter->max_value = count;   // bug fix for incorrect max from device
         parse_bytes(UINT8, &recv_param_ptr, &parameter->u.text_sel);
         parse_bytes(UINT8, &recv_param_ptr, &parameter->min_value);
         parse_bytes(UINT8, &recv_param_ptr, &count);  // don't use incorrect parameter->max_value
@@ -862,11 +864,9 @@ static void add_param(u8 *buffer, u8 num_bytes) {
         break;
 
     case INFO:
-        if (!update) {
-            const u8 length = strlen(recv_param_ptr) + 1;
-            parameter->value = alloc_string(length);
-            strlcpy(parameter->value, (const char *)recv_param_ptr, length);
-        }
+        length = strlen(recv_param_ptr) + 1;
+        parameter->value = alloc_string(length);
+        strlcpy(parameter->value, (const char *)recv_param_ptr, length);
         break;
 
     case STRING:
@@ -876,8 +876,7 @@ static void add_param(u8 *buffer, u8 num_bytes) {
             recv_param_ptr += strlen(value) + 1;
             parse_bytes(UINT8, &recv_param_ptr, &parameter->u.string_max_len);
 
-            // No string re-sizing so allocate max length for value
-            if (!update) parameter->value = alloc_string(parameter->u.string_max_len+1);
+            parameter->value = alloc_string(parameter->u.string_max_len+1);
             strlcpy(parameter->value, value, parameter->u.string_max_len+1);
         }
         break;
@@ -885,7 +884,7 @@ static void add_param(u8 *buffer, u8 num_bytes) {
     case COMMAND:
         parse_bytes(UINT8, &recv_param_ptr, &parameter->u.status);
         parse_bytes(UINT8, &recv_param_ptr, &parameter->timeout);
-        if (!update) parameter->s.info = alloc_string(40);
+        parameter->s.info = alloc_string(40);
         strlcpy(parameter->s.info, (const char *)recv_param_ptr, 40);
 
         command.param = parameter;
@@ -913,11 +912,9 @@ static void add_param(u8 *buffer, u8 num_bytes) {
     next_chunk = 0;
     params_loaded = count_params_loaded();
 
-    // read params when needed
-    if (params_loaded < crsf_devices[device_idx].number_of_params) {
-        next_param = param_next(next_param);
-        if (next_param > 0) CRSF_read_param(device_idx, next_param, next_chunk);
-    }
+    // read params until all loaded
+    next_param = param_next(next_param);
+    if (next_param > 0) CRSF_read_param(device_idx, next_param, next_chunk);
 }
 
 // called from UART receive ISR when extended packet received

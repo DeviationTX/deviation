@@ -31,6 +31,7 @@ enum {
 #endif
 
 #if SUPPORT_CRSF_CONFIG
+static u8 need_show_folder;
 
 #include "../common/_crsfdevice_page.c"
 
@@ -102,12 +103,10 @@ static int row_cb(int absrow, int relrow, int y, void *data) {
 static const char *hdr_str_cb(guiObject_t *obj, const void *data) {
     (void)obj;
     (void)data;
-    static u8 need_show_folder;
 
-    if (count_params_loaded() != crsf_devices[device_idx].number_of_params) {
-        need_show_folder = 1;
+    if (params_loaded != crsf_devices[device_idx].number_of_params) {
         //snprintf(tempstring, sizeof tempstring, "%s %s", crsf_devices[device_idx].name, _tr_noop("LOADING"));
-        snprintf(tempstring, sizeof tempstring, "L %d N %d F %d", count_params_loaded(), crsf_devices[device_idx].number_of_params, current_folder);
+        snprintf(tempstring, sizeof tempstring, "L %d N %d F %d, X %d", count_params_loaded(), crsf_devices[device_idx].number_of_params, current_folder, next_param);
     } else {
         if (need_show_folder) {
             need_show_folder = 0;
