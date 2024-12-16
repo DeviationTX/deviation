@@ -31,7 +31,6 @@ enum {
 #endif
 
 #if SUPPORT_CRSF_CONFIG
-static u8 need_show_folder;
 
 #include "../common/_crsfdevice_page.c"
 
@@ -105,12 +104,11 @@ static const char *hdr_str_cb(guiObject_t *obj, const void *data) {
     (void)data;
 
     if (params_loaded != crsf_devices[device_idx].number_of_params) {
-        //snprintf(tempstring, sizeof tempstring, "%s %s", crsf_devices[device_idx].name, _tr_noop("LOADING"));
-        snprintf(tempstring, sizeof tempstring, "L %d N %d F %d, X %d", count_params_loaded(), crsf_devices[device_idx].number_of_params, current_folder, next_param);
+        snprintf(tempstring, sizeof tempstring, "%s %s", crsf_devices[device_idx].name, _tr_noop("LOADING"));
     } else {
-        if (need_show_folder) {
-            need_show_folder = 0;
-            show_page(current_folder);
+        if (need_show_folder < 255) {
+            show_page(need_show_folder);
+            need_show_folder = 255;
         }
         if (protocol_module_is_elrs()) {
             if (protocol_elrs_is_armed()) {
@@ -133,20 +131,27 @@ static void show_header() {
     GUI_Redraw(&gui->msg);
 }
 
-static void show_page(int folder) {
+static void show_page(u8 folder) {
+    int row_idx = 0;
+    int row_count = folder_rows(folder);
+
+    if (folder == current_folder)
+        row_idx = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
+    else
+        current_folder = folder;
+    if (row_idx > row_count) row_idx = 0;
     GUI_RemoveAllObjects();
     GUI_CreateLabelBox(&gui->msg, 0, 0, LCD_WIDTH, HEADER_HEIGHT, &TITLE_FONT, hdr_str_cb, NULL, NULL);
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH,
-        LCD_HEIGHT - HEADER_HEIGHT, LINE_SPACE, folder_rows(folder),
+        LCD_HEIGHT - HEADER_HEIGHT, LINE_SPACE, row_count,
         row_cb, NULL, NULL, NULL);
-    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
+    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, row_idx));
 }
 
 void PAGE_CrsfdeviceInit(int page)
 {
     device_idx = page;
     crsfdevice_init();
-    current_folder = 0;
     if (crsf_devices[device_idx].number_of_params) {
         if (crsf_devices[device_idx].address == ADDR_RADIO)
             protocol_read_param(device_idx, &crsf_params[0]);    // only one param now
@@ -154,7 +159,8 @@ void PAGE_CrsfdeviceInit(int page)
             CRSF_read_param(device_idx, next_param, next_chunk);
     }
 
-    show_page(current_folder);
+    current_folder = 255;
+    show_page(0);
     PAGE_SetActionCB(action_cb);
 }
 #endif

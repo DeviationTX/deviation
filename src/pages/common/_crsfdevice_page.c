@@ -24,7 +24,8 @@ static struct crsfdevice_page * const mp = &pagemem.u.crsfdevice_page;
 static struct crsfdevice_obj * const gui = &gui_objs.u.crsfdevice;
 
 static u32 read_timeout;
-static u8 current_folder = 0;
+static u8 current_folder = 255;
+static u8 need_show_folder = 255;
 static volatile u8 params_loaded;     // if not zero, number received so far for current device
 static volatile u8 params_displayed;  // if not zero, number displayed so far for current device
 static u8 device_idx;   // current device index
@@ -223,7 +224,7 @@ static const char *value_numsel(guiObject_t *obj, int dir, void *data)
     return tempstring;
 }
 
-static void show_page(int folder);
+static void show_page(u8 folder);
 static void show_header();
 
 static u8 param_next(u8 param) {
@@ -245,14 +246,14 @@ static void folder_load(u8 param_id) {
     if (param_id != 0) {
         crsf_params[param_id-1].loaded = 0;
         params_loaded -= 1;
-        need_show_folder = 1;
+        need_show_folder = param_id;
     }
     if (param_id == 0 || crsf_params[param_id-1].type == FOLDER) {
         for (int i=0; i < crsf_devices[device_idx].number_of_params; i++) {
             if (crsf_params[i].parent == param_id) {
                 crsf_params[i].loaded = 0;
                 params_loaded -= 1;
-                need_show_folder = 1;
+                need_show_folder = param_id;
             }
         }
     }
@@ -271,8 +272,7 @@ static void folder_cb(struct guiObject *obj, s8 press_type, const void *data)
 
     crsf_param_t *param = (crsf_param_t *)data;
 
-    current_folder = param->id;
-    folder_load(current_folder);
+    folder_load(param->id);
 }
 
 static void noop_press(struct guiObject *obj, s8 press_type, const void *data)
@@ -347,8 +347,7 @@ static unsigned action_cb(u32 button, unsigned flags, void *data)
 
     if (current_folder != 0 && CHAN_ButtonIsPressed(button, BUT_EXIT)) {
         if (flags & BUTTON_RELEASE) {
-            current_folder = param_by_id(current_folder)->parent;
-            folder_load(current_folder);
+            folder_load(param_by_id(current_folder)->parent);
         }
         return 1;
     }
