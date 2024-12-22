@@ -800,11 +800,11 @@ static void add_param(u8 *buffer, u8 num_bytes) {
     parameter->type = *recv_param_ptr & 0x7f;
     parameter->loaded = 1;
     parameter->hidden = *recv_param_ptr++ & 0x80;
-    // reallocate name string
-    parameter->name_size = strlen(recv_param_ptr) + 1;
-    parameter->name = alloc_string(parameter->name_size);
-    strlcpy(parameter->name, (const char *)recv_param_ptr, parameter->name_size);
-    recv_param_ptr += parameter->name_size;
+
+    u8 name_size = strlen(recv_param_ptr) + 1;
+    parameter->name = alloc_string(name_size);
+    strlcpy(parameter->name, (const char *)recv_param_ptr, name_size);
+    recv_param_ptr += name_size;
 
     int count;
     switch (parameter->type) {
