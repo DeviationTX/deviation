@@ -58,6 +58,7 @@ static void frsky_telem_reset() {
     Model.ground_level = 0;
     discharge_dAms = 0;
     update_min_cell(last_cell+1);
+    set_telemetry(TELEM_FRSKY_MAX_ALTITUDE, 0);
 }
 
 static void processHubPacket(u8 id, u16 value) {
@@ -113,7 +114,10 @@ static void processHubPacket(u8 id, u16 value) {
         s32 altitude = (s16)last_value * 100 + (((s16)last_value < 0) ? -value : value);
 
         if (Model.ground_level == 0) Model.ground_level = altitude;
-        set_telemetry(TELEM_FRSKY_ALTITUDE, altitude - Model.ground_level);
+        s32 agl = altitude - Model.ground_level;
+        set_telemetry(TELEM_FRSKY_ALTITUDE, agl);
+        if (Telemetry.value[TELEM_FRSKY_MAX_ALTITUDE] < agl) Telemetry.value[TELEM_FRSKY_MAX_ALTITUDE] = agl;
+        TELEMETRY_SetUpdated(TELEM_FRSKY_MAX_ALTITUDE);
         break;
     case 0x11: //GPS Speed (whole number and sign) in Knots
         fr_gps.velocity_bp = value;
