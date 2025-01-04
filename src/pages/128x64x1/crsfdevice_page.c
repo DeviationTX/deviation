@@ -56,7 +56,7 @@ static int row_cb(int absrow, int relrow, int y, void *data) {
     switch (param->type) {
     case TEXT_SELECTION:
         LCD_GetStringDimensions((const u8 *)param->max_str, &width, &height);
-        if (param->max_value - param->min_value > 1) {
+        if (non_null_values(param) > 1 && (param->max_value - param->min_value > 1)) {
             GUI_CreateTextSelectPlate(&gui->value[relrow].ts,
                 LCD_WIDTH - width - 18, y,
                 width + 13, LINE_HEIGHT, &TEXTSEL_FONT,

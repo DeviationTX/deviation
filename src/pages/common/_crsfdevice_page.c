@@ -85,6 +85,19 @@ static const char *current_text(crsf_param_t *param) {
     return p;
 }
 
+static u8 non_null_values(crsf_param_t *param) {
+    const char *p = (const char *)param->value;
+    u8 count = 0;
+    u8 idx = 0;
+
+    while (idx <= param->max_value) {
+        if (*p) count++;
+        while (*p++);
+        idx += 1;
+    }
+    return count;
+}
+
 static const char *crsf_value_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
@@ -158,6 +171,8 @@ void button_press(guiObject_t *obj, const void *data)
 {
     (void)obj;
     crsf_param_t *param = (crsf_param_t *)data;
+
+    if (non_null_values(param) <= 1) return;
 
     if (param->u.text_sel == param->min_value)
         param->u.text_sel = param->max_value;
@@ -840,25 +855,34 @@ static void add_param(u8 *buffer, u8 num_bytes) {
         char *start = (char *)parameter->value;
         int max_len = 0;
         count = 0;
-        for (char *p = (char *)parameter->value; *p; p++) {
+
+        char *p = (char *)parameter->value;
+        while (*p) {
             if (*p == ';') {
                 *p = '\0';
                 if (p - start > max_len) {
                     parameter->max_str = start;  // save max to determine gui box size
                     max_len = p - start;
                 }
-                start = p+1;
                 count += 1;
+                start = p+1;
             }
             // handle "Lua up arrow and down arrow - replace with u and d
             else if (*p == 0xc0) *p = 'u';
             else if (*p == 0xc1) *p = 'd';
             else if (*p &  0x80) *p = '?';
+
+            p += 1;
         }
-        parameter->max_value = count;   // bug fix for incorrect max from device
+        if (p - start > max_len) {
+            parameter->max_str = start;  // save max to determine gui box size
+            max_len = p - start;
+        }
+        count += 1;
+
         parse_bytes(UINT8, &recv_param_ptr, &parameter->u.text_sel);
         parse_bytes(UINT8, &recv_param_ptr, &parameter->min_value);
-        parse_bytes(UINT8, &recv_param_ptr, &count);  // don't use incorrect parameter->max_value
+        parse_bytes(UINT8, &recv_param_ptr, &parameter->max_value);
         parse_bytes(UINT8, &recv_param_ptr, &parameter->default_value);
         break;
 
