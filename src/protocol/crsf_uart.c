@@ -144,6 +144,7 @@ void protocol_read_param(u8 device_idx, crsf_param_t *param) {
     param->parent = 0;            // Parent folder parameter number of the parent folder, 0 means root
     param->type = TEXT_SELECTION;  // (Parameter type definitions and hidden bit)
     param->hidden = 0;            // set if hidden
+    param->loaded = 1;
     param->name = (char*)crsf_opts[0];           // Null-terminated string
     param->value = "400K\0001.87M\0002.00M";    // must match crsf_opts
     param->default_value = 0;  // size depending on data type. Not present for COMMAND.
