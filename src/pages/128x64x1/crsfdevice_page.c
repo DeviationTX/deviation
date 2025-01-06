@@ -157,10 +157,6 @@ static const char *hdr_str_cb(guiObject_t *obj, const void *data) {
     if (params_loaded != crsf_devices[device_idx].number_of_params) {
         snprintf(tempstring, sizeof tempstring, "%s %s", crsf_devices[device_idx].name, _tr_noop("LOADING"));
     } else {
-        if (need_show_folder < 255) {
-            show_page(need_show_folder);
-            need_show_folder = 255;
-        }
         if (protocol_module_is_elrs()) {
             if (protocol_elrs_is_armed()) {
                 snprintf(tempstring, sizeof tempstring, "%s  ! Armed !", crsf_devices[device_idx].name);

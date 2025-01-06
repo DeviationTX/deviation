@@ -24,8 +24,8 @@ static struct crsfdevice_page * const mp = &pagemem.u.crsfdevice_page;
 static struct crsfdevice_obj * const gui = &gui_objs.u.crsfdevice;
 
 static u32 read_timeout;
-static u8 current_folder = 255;
-static u8 need_show_folder = 255;
+static volatile u8 current_folder;
+static volatile u8 need_show_folder = 255;
 static volatile u8 params_loaded;     // if not zero, number received so far for current device
 static volatile u8 params_displayed;  // if not zero, number displayed so far for current device
 static u8 device_idx;   // current device index
