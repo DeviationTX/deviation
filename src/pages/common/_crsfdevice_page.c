@@ -158,12 +158,13 @@ static u8 count_params_loaded() {
 
 static int folder_rows(int folder) {
     int count = 0;
-    crsf_param_t *param = crsf_params;
 
-    while (param->id) {
-        if (param->parent == folder && !param->hidden) count += 1;
-        param += 1;
-    }
+    for (int i=0; i < crsf_devices[device_idx].number_of_params; i++)
+        if (crsf_params[i].loaded
+         && crsf_params[i].parent == folder
+         && !crsf_params[i].hidden)
+            count += 1;
+
     return count;
 }
 
@@ -615,7 +616,6 @@ void CRSF_set_param(crsf_param_t *param) {
 void CRSF_send_command(crsf_param_t *param, enum cmd_status status) {
     if (CBUF_Space(send_buf) < 8) return;
 
-    next_param = param->id;    // device responds with parameter info so prepare to receive
     next_chunk = 0;
     recv_param_ptr = recv_param_buffer;
 
@@ -794,7 +794,7 @@ static void add_param(u8 *buffer, u8 num_bytes) {
             return;
         } else {
             next_chunk += 1;
-            CRSF_read_param(device_idx, next_param, next_chunk);
+            CRSF_read_param(device_idx, buffer[3], next_chunk);
         }
         return;
     }
@@ -821,7 +821,6 @@ static void add_param(u8 *buffer, u8 num_bytes) {
     strlcpy(parameter->name, (const char *)recv_param_ptr, name_size);
     recv_param_ptr += name_size;
 
-    int count;
     switch (parameter->type) {
     case UINT8:
     case INT8:
@@ -854,7 +853,6 @@ static void add_param(u8 *buffer, u8 num_bytes) {
         // find max choice string length to adjust textselectplate size
         char *start = (char *)parameter->value;
         int max_len = 0;
-        count = 0;
 
         char *p = (char *)parameter->value;
         while (*p) {
@@ -864,7 +862,6 @@ static void add_param(u8 *buffer, u8 num_bytes) {
                     parameter->max_str = start;  // save max to determine gui box size
                     max_len = p - start;
                 }
-                count += 1;
                 start = p+1;
             }
             // handle "Lua up arrow and down arrow - replace with u and d
@@ -878,7 +875,6 @@ static void add_param(u8 *buffer, u8 num_bytes) {
             parameter->max_str = start;  // save max to determine gui box size
             max_len = p - start;
         }
-        count += 1;
 
         parse_bytes(UINT8, &recv_param_ptr, &parameter->u.text_sel);
         parse_bytes(UINT8, &recv_param_ptr, &parameter->min_value);
