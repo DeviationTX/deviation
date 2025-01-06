@@ -466,6 +466,7 @@ void TELEMETRY_Alarm()
                 case TELEM_FRSKY_TEMP2: MUSIC_PlayValue(telem_music, telem_value-20,VOICE_UNIT_TEMP,0); break;
                 case TELEM_FRSKY_RPM: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_RPM,0); break;
                 case TELEM_FRSKY_CURRENT: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_AMPS,2); break;
+                case TELEM_FRSKY_MAX_ALTITUDE:
                 case TELEM_FRSKY_ALTITUDE: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_ALTITUDE,2); break;
 #endif
                 case TELEM_FRSKY_LRSSI:

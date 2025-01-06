@@ -266,6 +266,9 @@ const struct telem_layout frsky_layout_basic[] = {
     {TYPE_VALUE | 8, FRSKY1_X, FRSKY1_WIDTH, TELEM_FRSKY_ACCX},
     {TYPE_VALUE | 8, FRSKY2_X, FRSKY1_WIDTH, TELEM_FRSKY_ACCY},
     {TYPE_VALUE | 8, FRSKY3_X, FRSKY1_WIDTH, TELEM_FRSKY_ACCZ},
+
+    {TYPE_INDEX | 9, LBL1_X, LBL1_WIDTH, 10},
+    {TYPE_VALUE | 9, FRSKY1_X, FRSKY1_WIDTH, TELEM_FRSKY_MAX_ALTITUDE},
 #endif
 
     {0, 0, 0, 0},
@@ -338,7 +341,7 @@ const struct telem_layout2 dsm_page[] = {
 };
 const struct telem_layout2 frsky_page[] = {
 #if HAS_EXTENDED_TELEMETRY
-    {frsky_header_basic, frsky_layout_basic, 9, 1},
+    {frsky_header_basic, frsky_layout_basic, 10, 1},
 #else
     {frsky_header_basic, frsky_layout_basic, 2, 1},
 #endif

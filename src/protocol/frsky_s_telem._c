@@ -148,7 +148,10 @@ static void processSportPacket(u8 *packet) {
     switch (id & 0xfff0) {
     case ALT_FIRST_ID & 0xfff0:
         if (Model.ground_level == 0) Model.ground_level = data;
-        set_telemetry(TELEM_FRSKY_ALTITUDE, data - Model.ground_level);
+        s32 agl = data - Model.ground_level;
+        set_telemetry(TELEM_FRSKY_ALTITUDE, agl);
+        if (Telemetry.value[TELEM_FRSKY_MAX_ALTITUDE] < agl) Telemetry.value[TELEM_FRSKY_MAX_ALTITUDE] = agl;
+        TELEMETRY_SetUpdated(TELEM_FRSKY_MAX_ALTITUDE);
         break;
     case VARIO_FIRST_ID & 0xfff0:
         set_telemetry(TELEM_FRSKY_VARIO, data);
