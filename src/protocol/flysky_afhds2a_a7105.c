@@ -458,7 +458,10 @@ static void update_telemetry()
             set_telemetry(TELEM_FRSKY_TEMP1, ((data32 >> 19) - 400)/10);
             s32 altitude = getALT(data32 & 0x7ffff);
             if (Model.ground_level == 0) Model.ground_level = altitude;
-            set_telemetry(TELEM_FRSKY_ALTITUDE, altitude - Model.ground_level);
+            s32 agl = altitude - Model.ground_level;
+            set_telemetry(TELEM_FRSKY_ALTITUDE, agl);
+            if (Telemetry.value[TELEM_FRSKY_MAX_ALTITUDE] < agl) Telemetry.value[TELEM_FRSKY_MAX_ALTITUDE] = agl;
+            TELEMETRY_SetUpdated(TELEM_FRSKY_MAX_ALTITUDE);
             break;
         case SENSOR_CELL_VOLTAGE:
             if (cell_index < 6) {
@@ -822,6 +825,7 @@ uintptr_t AFHDS2A_Cmds(enum ProtoCmds cmd)
 #if HAS_EXTENDED_TELEMETRY
         case PROTOCMD_TELEMETRYRESET:
             Model.ground_level = 0;
+            set_telemetry(TELEM_FRSKY_MAX_ALTITUDE, 0);
             return 0;
 #endif
         case PROTOCMD_CHANNELMAP: return AETRG;

@@ -145,9 +145,9 @@ struct telemcfg_obj {
 
 struct telemtest_obj {
     guiLabel_t msg;
-    guiLabel_t header[7];
+    guiLabel_t header[10];
 #if HAS_EXTENDED_TELEMETRY
-    guiLabel_t box[36];
+    guiLabel_t box[39];
 #else
     guiLabel_t box[20];
 #endif

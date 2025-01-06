@@ -140,6 +140,7 @@ typedef enum {
     TELEM_FRSKY_ACCY,
     TELEM_FRSKY_ACCZ,
     TELEM_FRSKY_SPEED,
+    TELEM_FRSKY_MAX_ALTITUDE,
 #endif
     TELEM_FRSKY_LAST
 } frsky_telem_t;
