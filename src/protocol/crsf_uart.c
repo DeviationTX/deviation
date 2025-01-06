@@ -152,6 +152,7 @@ void protocol_read_param(u8 device_idx, crsf_param_t *param) {
     param->max_value = 2;        // not sent for string type
     param->changed = 0;           // flag if set needed when edit element is de-selected
     param->max_str = &((char*)param->value)[11];        // Longest choice length for text select
+    param->lines_per_row = 1;
     param->u.text_sel = Model.proto_opts[PROTO_OPTS_BITRATE];
 }
 

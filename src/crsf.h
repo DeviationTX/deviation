@@ -150,6 +150,7 @@ typedef struct {
         char *info;
         char *unit;         // Unit ( Null-terminated string / not sent for type string and folder )
     } s;
+    u8 lines_per_row;     // GUI optimization
 } crsf_param_t;
 
 extern crsf_device_t crsf_devices[CRSF_MAX_DEVICES];

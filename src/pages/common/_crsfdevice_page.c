@@ -261,18 +261,18 @@ static void folder_load(u8 param_id) {
     // param_id of 0 indicates root folder
     if (param_id != 0) {
         crsf_params[param_id-1].loaded = 0;
-        params_loaded -= 1;
-        need_show_folder = param_id;
+        crsf_params[param_id-1].lines_per_row = 0;
     }
     if (param_id == 0 || crsf_params[param_id-1].type == FOLDER) {
         for (int i=0; i < crsf_devices[device_idx].number_of_params; i++) {
             if (crsf_params[i].parent == param_id) {
                 crsf_params[i].loaded = 0;
-                params_loaded -= 1;
-                need_show_folder = param_id;
+                crsf_params[i].lines_per_row = 0;
             }
         }
     }
+    need_show_folder = param_id;
+    params_loaded = count_params_loaded();
     next_string = mp->strings;      // re-allocate all strings
     next_param = param_next(param_id);
     next_chunk = 0;
@@ -375,13 +375,20 @@ void PAGE_CRSFDeviceEvent() {
     // until all parameters loaded
     static u8 armed_state;
     u8 params_count = count_params_loaded();
+
     if (params_displayed != params_count) {
         params_displayed = params_count;
         show_page(current_folder);
-    } else if (elrs_info.update > 0 || armed_state != protocol_elrs_is_armed()) {
-        elrs_info.update = 0;
-        armed_state = protocol_elrs_is_armed();
-        show_header();
+    } else {
+        if (need_show_folder < 255) {
+            show_page(need_show_folder);
+            need_show_folder = 255;
+        }
+        if (elrs_info.update > 0 || armed_state != protocol_elrs_is_armed()) {
+            elrs_info.update = 0;
+            armed_state = protocol_elrs_is_armed();
+            show_header();
+        }
     }
 
     // commands may require interaction through dialog

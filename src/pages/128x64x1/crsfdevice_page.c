@@ -27,12 +27,62 @@ enum {
     EDIT_LABEL_WIDTH = 60,
     EDIT_VALUE_X     = 66,
     EDIT_VALUE_WIDTH = 56,
+    ROW_SPLIT_WIDTH  = 110,
 };
 #endif
 
 #if SUPPORT_CRSF_CONFIG
 
 #include "../common/_crsfdevice_page.c"
+
+static int gui_lines(crsf_param_t *param) {
+    if (param->lines_per_row)
+        return (int)param->lines_per_row;
+
+    u16 label_width, value_width=0, _unused;
+
+    LCD_GetStringDimensions((const u8 *)param->name, &label_width, &_unused);
+
+    const u8 *max_string = (const u8 *)tempstring;
+    switch (param->type) {
+    case TEXT_SELECTION:
+        LCD_GetStringDimensions((const u8 *)param->max_str, &value_width, &_unused);
+        snprintf(tempstring, sizeof tempstring, "%s", param->max_str);
+        break;
+    case UINT8:
+    case UINT16:
+    case INT8:
+    case INT16:
+        snprintf(tempstring, sizeof tempstring, "%d", param->max_value);
+        LCD_GetStringDimensions((const u8 *)tempstring, &value_width, &_unused);
+        break;
+    case FLOAT:
+        snprintf(tempstring, sizeof tempstring, "%f", param->max_value);
+        LCD_GetStringDimensions((const u8 *)tempstring, &value_width, &_unused);
+        break;
+    case STRING:
+        snprintf(tempstring, sizeof tempstring, "%s*", "", param->u.string_max_len);
+        LCD_GetStringDimensions((const u8 *)tempstring, &value_width, &_unused);
+        break;
+    case COMMAND:
+    case INFO:
+    case FOLDER:
+    case OUT_OF_RANGE:
+        max_string = NULL;
+        break;
+    }
+
+    if (max_string) LCD_GetStringDimensions((const u8 *)tempstring, &value_width, &_unused);
+    param->lines_per_row = (label_width + value_width > ROW_SPLIT_WIDTH) ? 2 : 1;
+    return (int)param->lines_per_row;
+}
+
+static int size_cb(int absrow, void *data) {
+    (void)data;
+    crsf_param_t *param = current_param(absrow);
+
+    return gui_lines(param);
+}
 
 static int row_cb(int absrow, int relrow, int y, void *data) {
     (void)data;
@@ -53,17 +103,18 @@ static int row_cb(int absrow, int relrow, int y, void *data) {
         LABEL_WIDTH, LINE_HEIGHT, &LABEL_FONT,
         crsf_name_cb, lbl_press_cb, (void *)param);
 
+
     switch (param->type) {
     case TEXT_SELECTION:
         LCD_GetStringDimensions((const u8 *)param->max_str, &width, &height);
         if (non_null_values(param) > 1 && (param->max_value - param->min_value > 1)) {
             GUI_CreateTextSelectPlate(&gui->value[relrow].ts,
-                LCD_WIDTH - width - 18, y,
+                LCD_WIDTH - width - 18, y + (gui_lines(param) - 1) * LINE_SPACE,
                 width + 13, LINE_HEIGHT, &TEXTSEL_FONT,
                 NULL, value_textsel, (void *)param);
         } else {
             GUI_CreateButtonPlateText(&gui->value[relrow].but,
-                LCD_WIDTH - width - 18, y,
+                LCD_WIDTH - width - 18, y + (gui_lines(param) - 1) * LINE_SPACE,
                 width + 13, LINE_HEIGHT, &BUTTON_FONT,
                 crsf_value_cb, button_press, (void *)param);
         }
@@ -83,12 +134,12 @@ static int row_cb(int absrow, int relrow, int y, void *data) {
     case INT8:
     case INT16:
     case FLOAT:
-        GUI_CreateTextSelectPlate(&gui->value[relrow].ts, EDIT_VALUE_X, y,
+        GUI_CreateTextSelectPlate(&gui->value[relrow].ts, EDIT_VALUE_X, y + (gui_lines(param) - 1) * LINE_SPACE,
             EDIT_VALUE_WIDTH, LINE_HEIGHT, &TEXTSEL_FONT,
             NULL, value_numsel, (void *)param);
         break;
     case STRING:
-        GUI_CreateLabelBox(&gui->value[relrow].lbl, EDIT_VALUE_X, y,
+        GUI_CreateLabelBox(&gui->value[relrow].lbl, EDIT_VALUE_X, y + (gui_lines(param) - 1) * LINE_SPACE,
             EDIT_VALUE_WIDTH, LINE_HEIGHT, &LABEL_FONT,
             crsf_value_cb, stredit_cb, (void *)param);
         break;
