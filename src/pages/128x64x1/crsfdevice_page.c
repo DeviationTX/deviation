@@ -154,8 +154,9 @@ static const char *hdr_str_cb(guiObject_t *obj, const void *data) {
     (void)obj;
     (void)data;
 
-    if (params_loaded != crsf_devices[device_idx].number_of_params) {
-        snprintf(tempstring, sizeof tempstring, "%s %s", crsf_devices[device_idx].name, _tr_noop("LOADING"));
+    int params_left = crsf_devices[device_idx].number_of_params - count_params_loaded();
+    if (params_left != 0) {
+        snprintf(tempstring, sizeof tempstring, "%s %s %d", crsf_devices[device_idx].name, _tr_noop("LOADING"), params_left);
     } else {
         if (protocol_module_is_elrs()) {
             if (protocol_elrs_is_armed()) {
@@ -179,19 +180,27 @@ static void show_header() {
 }
 
 static void show_page(u8 folder) {
-    int row_idx = 0;
     int row_count = folder_rows(folder);
+    int row_idx = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
 
-    if (folder == current_folder)
-        row_idx = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
-    else
-        current_folder = folder;
-    if (row_idx > row_count) row_idx = 0;
+    if (current_folder && crsf_params[current_folder-1].parent == folder) {
+        crsf_params[current_folder-1].child_row_idx = row_idx;     // save row when leaving child
+        row_idx = crsf_params[current_folder-1].parent_row_idx;    // use row when returning to parent
+    } else if (folder && current_folder != folder) {
+        crsf_params[folder-1].parent_row_idx = row_idx;            // save row when entering child
+        row_idx = crsf_params[folder-1].child_row_idx;             // use row when returning to child
+    }
+
+    int absrow = (row_idx >> 8) + (row_idx & 0xff);
+    if (absrow >= row_count) row_idx = 0;
+
+    current_folder = folder;
+
     GUI_RemoveAllObjects();
     GUI_CreateLabelBox(&gui->msg, 0, 0, LCD_WIDTH, HEADER_HEIGHT, &TITLE_FONT, hdr_str_cb, NULL, NULL);
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH,
         LCD_HEIGHT - HEADER_HEIGHT, LINE_SPACE, row_count,
-        row_cb, NULL, NULL, NULL);
+        row_cb, NULL, size_cb, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, row_idx));
 }
 
@@ -199,11 +208,12 @@ void PAGE_CrsfdeviceInit(int page)
 {
     device_idx = page;
     crsfdevice_init();
+    next_param = 1;
     if (crsf_devices[device_idx].number_of_params) {
         if (crsf_devices[device_idx].address == ADDR_RADIO)
             protocol_read_param(device_idx, &crsf_params[0]);    // only one param now
         else 
-            CRSF_read_param(device_idx, next_param, next_chunk);
+            CRSF_read_param(device_idx, next_param, 0);
     }
 
     current_folder = 255;

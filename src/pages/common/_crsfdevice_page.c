@@ -26,8 +26,6 @@ static struct crsfdevice_obj * const gui = &gui_objs.u.crsfdevice;
 static u32 read_timeout;
 static volatile u8 current_folder;
 static volatile u8 need_show_folder = 255;
-static volatile u8 params_loaded;     // if not zero, number received so far for current device
-static volatile u8 params_displayed;  // if not zero, number displayed so far for current device
 static u8 device_idx;   // current device index
 static u8 next_param;   // parameter and chunk currently being read
 static u8 next_chunk;
@@ -57,11 +55,9 @@ static char *next_string;
 #define MIN(a, b) ((a) < (b) ? a : b)
 
 static void crsfdevice_init() {
-    next_param = 1;
+    next_param = 0;
     next_chunk = 0;
     recv_param_ptr = recv_param_buffer;
-    params_loaded = 0;
-    params_displayed = 0;
     next_string = mp->strings;
     memset(crsf_params, 0, sizeof crsf_params);
     CBUF_Init(send_buf);
@@ -272,11 +268,9 @@ static void folder_load(u8 param_id) {
         }
     }
     need_show_folder = param_id;
-    params_loaded = count_params_loaded();
     next_string = mp->strings;      // re-allocate all strings
     next_param = param_next(param_id);
-    next_chunk = 0;
-    CRSF_read_param(device_idx, next_param, next_chunk);
+    CRSF_read_param(device_idx, next_param, 0);
 }
 
 static void folder_cb(struct guiObject *obj, s8 press_type, const void *data)
@@ -374,11 +368,10 @@ void PAGE_CRSFDeviceEvent() {
     // update page as parameter info is received
     // until all parameters loaded
     static u8 armed_state;
-    u8 params_count = count_params_loaded();
 
-    if (params_displayed != params_count) {
-        params_displayed = params_count;
-        show_page(current_folder);
+    if (count_params_loaded() != crsf_devices[device_idx].number_of_params) {
+        if (need_show_folder == 255) need_show_folder = current_folder;
+        show_header();
     } else {
         if (need_show_folder < 255) {
             show_page(need_show_folder);
@@ -412,7 +405,7 @@ void PAGE_CRSFDeviceEvent() {
 
     // spec calls for 2 second timeout on requests. Retry on timeout.
     if (read_timeout && (CLOCK_getms() - read_timeout > 2000)) {
-        if (next_param) CRSF_read_param(device_idx, next_param, next_chunk);
+        if (next_param) CRSF_read_param(device_idx, next_param, 0);
         else read_timeout = 0;
     }
 }
@@ -519,6 +512,7 @@ u8 CRSF_command_ack(u8 cmd_id, u8 sub_cmd_id, u8 action) {
 
 // Request parameter info from known device
 void CRSF_read_param(u8 device, u8 id, u8 chunk) {
+    if (chunk == 0) next_chunk = 0;
     if (CBUF_Space(send_buf) < 8 || id == 0) return;
     u8 crc = 0;
     CBUF_Push(send_buf, ADDR_MODULE);
@@ -623,7 +617,6 @@ void CRSF_set_param(crsf_param_t *param) {
 void CRSF_send_command(crsf_param_t *param, enum cmd_status status) {
     if (CBUF_Space(send_buf) < 8) return;
 
-    next_chunk = 0;
     recv_param_ptr = recv_param_buffer;
 
     u8 crc = 0;
@@ -785,7 +778,6 @@ static void add_param(u8 *buffer, u8 num_bytes) {
     if (buffer[2] != crsf_devices[device_idx].address
      || ((int)((sizeof recv_param_buffer) - (recv_param_ptr - recv_param_buffer)) < (num_bytes-4))) {
         recv_param_ptr = recv_param_buffer;
-        next_chunk = 0;
         next_param = 0;
         return;
     }
@@ -796,7 +788,6 @@ static void add_param(u8 *buffer, u8 num_bytes) {
     if (buffer[4] > 0) {
         if (buffer[4] >= CRSF_MAX_CHUNKS) {
             recv_param_ptr = recv_param_buffer;
-            next_chunk = 0;
             next_param = 0;
             return;
         } else {
@@ -810,7 +801,6 @@ static void add_param(u8 *buffer, u8 num_bytes) {
     recv_param_ptr = recv_param_buffer;
     // all devices so far start parameter id at 1...fingers crossed
     if (buffer[3] >= CRSF_MAX_PARAMS) {
-        next_chunk = 0;
         next_param = 0;
         return;
     }
@@ -935,12 +925,10 @@ static void add_param(u8 *buffer, u8 num_bytes) {
     }
 
     recv_param_ptr = recv_param_buffer;
-    next_chunk = 0;
-    params_loaded = count_params_loaded();
 
     // read params until all loaded
     next_param = param_next(next_param);
-    if (next_param > 0) CRSF_read_param(device_idx, next_param, next_chunk);
+    if (next_param > 0) CRSF_read_param(device_idx, next_param, 0);
 }
 
 // called from UART receive ISR when extended packet received
