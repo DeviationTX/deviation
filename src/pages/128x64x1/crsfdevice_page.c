@@ -156,7 +156,9 @@ static const char *hdr_str_cb(guiObject_t *obj, const void *data) {
 
     int params_left = crsf_devices[device_idx].number_of_params - count_params_loaded();
     if (params_left != 0) {
-        snprintf(tempstring, sizeof tempstring, "%s %s %d", crsf_devices[device_idx].name, _tr_noop("LOADING"), params_left);
+        char short_name[10];
+        strlcpy(short_name, crsf_devices[device_idx].name, 10);
+        snprintf(tempstring, sizeof tempstring, "%s %s %d", short_name, _tr_noop("LOADING"), params_left);
     } else {
         if (protocol_module_is_elrs()) {
             if (protocol_elrs_is_armed()) {
