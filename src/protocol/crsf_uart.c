@@ -168,7 +168,7 @@ void protocol_set_param(u8 value) {
 static struct {
     volatile uint8_t    m_get_idx;
     volatile uint8_t    m_put_idx;
-    uint8_t             m_entry[512];  // must be power of 2
+    uint8_t             m_entry[1024];  // must be power of 2
 } receive_buf;
 
 static u8 telemetryRxBuffer[TELEMETRY_RX_PACKET_SIZE];
