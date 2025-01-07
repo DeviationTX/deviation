@@ -127,7 +127,7 @@ typedef struct {
     u8 parent;            // Parent folder parameter number of the parent folder, 0 means root
     enum data_type type;  // (Parameter type definitions and hidden bit)
     u8 hidden:1;          // set if hidden
-    u8 loaded:1;          // clear to force reload
+    volatile u8 loaded:1;          // clear to force reload
     u8 lines_per_row:2;   // GUI optimization
     char *name;           // Null-terminated string
     void *value;          // size depending on data type

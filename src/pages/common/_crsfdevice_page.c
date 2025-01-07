@@ -810,7 +810,6 @@ static void add_param(u8 *buffer, u8 num_bytes) {
     parameter->id = buffer[3];
     parameter->parent = *recv_param_ptr++;
     parameter->type = *recv_param_ptr & 0x7f;
-    parameter->loaded = 1;
     parameter->hidden = *recv_param_ptr++ & 0x80;
 
     u8 name_size = strlen(recv_param_ptr) + 1;
@@ -923,6 +922,7 @@ static void add_param(u8 *buffer, u8 num_bytes) {
     default:
         break;
     }
+    parameter->loaded = 1;
 
     recv_param_ptr = recv_param_buffer;
 
