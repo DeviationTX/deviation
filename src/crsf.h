@@ -126,7 +126,9 @@ typedef struct {
     u8 id;                // Parameter number (starting from 1)
     u8 parent;            // Parent folder parameter number of the parent folder, 0 means root
     enum data_type type;  // (Parameter type definitions and hidden bit)
-    u8 hidden;            // set if hidden
+    u8 hidden:1;          // set if hidden
+    volatile u8 loaded:1;          // clear to force reload
+    u8 lines_per_row:2;   // GUI optimization
     char *name;           // Null-terminated string
     void *value;          // size depending on data type
 
@@ -148,6 +150,8 @@ typedef struct {
         char *info;
         char *unit;         // Unit ( Null-terminated string / not sent for type string and folder )
     } s;
+    int parent_row_idx;   // GUI optimization
+    int child_row_idx;    // GUI optimization
 } crsf_param_t;
 
 extern crsf_device_t crsf_devices[CRSF_MAX_DEVICES];

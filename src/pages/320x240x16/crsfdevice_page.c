@@ -90,7 +90,7 @@ static int row_cb(int absrow, int relrow, int y, void *data) {
 
 static void show_header() {}
 
-void show_page(int folder) {
+static void show_page(u8 folder) {
     GUI_RemoveAllObjects();
     if (count_params_loaded() == crsf_devices[device_idx].number_of_params) {
         PAGE_ShowHeader(crsf_devices[device_idx].name);

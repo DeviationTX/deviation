@@ -144,6 +144,7 @@ void protocol_read_param(u8 device_idx, crsf_param_t *param) {
     param->parent = 0;            // Parent folder parameter number of the parent folder, 0 means root
     param->type = TEXT_SELECTION;  // (Parameter type definitions and hidden bit)
     param->hidden = 0;            // set if hidden
+    param->loaded = 1;
     param->name = (char*)crsf_opts[0];           // Null-terminated string
     param->value = "400K\0001.87M\0002.00M";    // must match crsf_opts
     param->default_value = 0;  // size depending on data type. Not present for COMMAND.
@@ -151,6 +152,7 @@ void protocol_read_param(u8 device_idx, crsf_param_t *param) {
     param->max_value = 2;        // not sent for string type
     param->changed = 0;           // flag if set needed when edit element is de-selected
     param->max_str = &((char*)param->value)[11];        // Longest choice length for text select
+    param->lines_per_row = 1;
     param->u.text_sel = Model.proto_opts[PROTO_OPTS_BITRATE];
 }
 
@@ -166,7 +168,7 @@ void protocol_set_param(u8 value) {
 static struct {
     volatile uint8_t    m_get_idx;
     volatile uint8_t    m_put_idx;
-    uint8_t             m_entry[512];  // must be power of 2
+    uint8_t             m_entry[1024];  // must be power of 2
 } receive_buf;
 
 static u8 telemetryRxBuffer[TELEMETRY_RX_PACKET_SIZE];
