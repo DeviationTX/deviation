@@ -27,7 +27,7 @@ enum {
     EDIT_LABEL_WIDTH = 60,
     EDIT_VALUE_X     = 66,
     EDIT_VALUE_WIDTH = 56,
-    ROW_SPLIT_WIDTH  = 110,
+    ROW_SPLIT_WIDTH  = 105,
 };
 #endif
 
