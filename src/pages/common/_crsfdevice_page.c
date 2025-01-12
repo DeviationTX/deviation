@@ -19,6 +19,7 @@
 #include "crsf.h"
 
 crsf_param_t crsf_params[CRSF_MAX_PARAMS];
+u8 show_hidden;
 
 static struct crsfdevice_page * const mp = &pagemem.u.crsfdevice_page;
 static struct crsfdevice_obj * const gui = &gui_objs.u.crsfdevice;
@@ -68,7 +69,7 @@ crsf_param_t *current_param(int absrow) {
 
     for (int i=0; i < crsf_devices[device_idx].number_of_params; i++) {
         if (!crsf_params[i].id) break;
-        if (crsf_params[i].parent != current_folder || crsf_params[i].hidden) continue;
+        if (crsf_params[i].parent != current_folder || (!show_hidden && crsf_params[i].hidden)) continue;
         if (idx++ == absrow) return &crsf_params[i];
     }
     return NULL;
@@ -158,7 +159,7 @@ static int folder_rows(int folder) {
     for (int i=0; i < crsf_devices[device_idx].number_of_params; i++)
         if (crsf_params[i].loaded
          && crsf_params[i].parent == folder
-         && !crsf_params[i].hidden)
+         && (show_hidden || !crsf_params[i].hidden))
             count += 1;
 
     return count;
@@ -562,7 +563,7 @@ static u8 param_len(crsf_param_t *param) {
 
 void CRSF_set_param(crsf_param_t *param) {
     if (crsf_devices[param->device].address == ADDR_RADIO) {
-        protocol_set_param((u8)param->u.text_sel);  // only one radio param so don't need id
+        protocol_set_param(param);
         return;
     }
 
