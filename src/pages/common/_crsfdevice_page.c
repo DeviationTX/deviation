@@ -782,6 +782,9 @@ static void add_param(u8 *buffer, u8 num_bytes) {
         return;
     }
 
+    // ignore unsolicited update from TBS
+    if (next_param == 0) return;
+
     memcpy(recv_param_ptr, buffer+5, num_bytes-5);
     recv_param_ptr += num_bytes - 5;
 
@@ -810,7 +813,7 @@ static void add_param(u8 *buffer, u8 num_bytes) {
     parameter->id = buffer[3];
     parameter->parent = *recv_param_ptr++;
     parameter->type = *recv_param_ptr & 0x7f;
-    parameter->hidden = *recv_param_ptr++ & 0x80;
+    parameter->hidden = *recv_param_ptr++ >> 7;
 
     u8 name_size = strlen(recv_param_ptr) + 1;
     parameter->name = alloc_string(name_size);
