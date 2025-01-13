@@ -126,8 +126,8 @@ typedef struct {
     u8 id;                // Parameter number (starting from 1)
     u8 parent;            // Parent folder parameter number of the parent folder, 0 means root
     enum data_type type;  // (Parameter type definitions and hidden bit)
-    u8 hidden:1;          // set if hidden
-    volatile u8 loaded:1;          // clear to force reload
+    volatile u8 hidden:1; // set if hidden
+    volatile u8 loaded:1; // clear to force reload
     u8 lines_per_row:2;   // GUI optimization
     char *name;           // Null-terminated string
     void *value;          // size depending on data type
@@ -156,6 +156,7 @@ typedef struct {
 
 extern crsf_device_t crsf_devices[CRSF_MAX_DEVICES];
 extern elrs_info_t elrs_info;
+extern u8 show_hidden;
 
 void CRSF_serial_rcv(u8 *buffer, u8 num_bytes);
 u8 CRSF_serial_txd(u8 *buffer);
@@ -170,8 +171,8 @@ void CRSF_send_command(crsf_param_t *param, enum cmd_status status);
 u8 CRSF_send_model_id(u8 fixed_id);
 u32 CRSF_read_timeout();
 void CRSF_get_elrs();
-void protocol_read_param(u8 device_idx, crsf_param_t *param);
-void protocol_set_param(u8 value);
+void protocol_read_params(u8 device_idx, crsf_param_t param[]);
+void protocol_set_param(crsf_param_t *param);
 void protocol_module_type(module_type_t type);
 u8 protocol_module_is_elrs();
 u8 protocol_elrs_is_armed();

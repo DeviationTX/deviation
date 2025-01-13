@@ -27,7 +27,7 @@ enum {
     EDIT_LABEL_WIDTH = 60,
     EDIT_VALUE_X     = 66,
     EDIT_VALUE_WIDTH = 56,
-    ROW_SPLIT_WIDTH  = 110,
+    ROW_SPLIT_WIDTH  = 105,
 };
 #endif
 
@@ -213,7 +213,7 @@ void PAGE_CrsfdeviceInit(int page)
     next_param = 1;
     if (crsf_devices[device_idx].number_of_params) {
         if (crsf_devices[device_idx].address == ADDR_RADIO)
-            protocol_read_param(device_idx, &crsf_params[0]);    // only one param now
+            protocol_read_params(device_idx, crsf_params);
         else 
             CRSF_read_param(device_idx, next_param, 0);
     }
