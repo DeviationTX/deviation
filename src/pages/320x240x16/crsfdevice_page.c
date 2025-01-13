@@ -47,7 +47,7 @@ static int row_cb(int absrow, int relrow, int y, void *data) {
 
     switch (param->type) {
     case TEXT_SELECTION:
-        if (param->max_value - param->min_value > 1) {
+        if (non_null_values(param) > 1 && (param->max_value - param->min_value > 1)) {
             GUI_CreateTextSelect(&gui->value[relrow].ts, LCD_WIDTH - 199, y,
                 TEXTSELECT_128, NULL, value_textsel, (void *)param);
         } else {
@@ -91,17 +91,27 @@ static int row_cb(int absrow, int relrow, int y, void *data) {
 static void show_header() {}
 
 static void show_page(u8 folder) {
-    GUI_RemoveAllObjects();
-    if (count_params_loaded() == crsf_devices[device_idx].number_of_params) {
-        PAGE_ShowHeader(crsf_devices[device_idx].name);
-    } else {
-        snprintf(tempstring, sizeof tempstring, "%s %s", crsf_devices[device_idx].name, _tr_noop("LOADING"));
-        PAGE_ShowHeader(tempstring);
+    int row_count = folder_rows(folder);
+    int row_idx = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
+
+    if (current_folder && crsf_params[current_folder-1].parent == folder) {
+        crsf_params[current_folder-1].child_row_idx = row_idx;     // save row when leaving child
+        row_idx = crsf_params[current_folder-1].parent_row_idx;    // use row when returning to parent
+    } else if (folder && current_folder != folder) {
+        crsf_params[folder-1].parent_row_idx = row_idx;            // save row when entering child
+        row_idx = crsf_params[folder-1].child_row_idx;             // use row when returning to child
     }
+
+    int absrow = (row_idx >> 8) + (row_idx & 0xff);
+    if (absrow >= row_count) row_idx = 0;
+
+    current_folder = folder;
+
+    GUI_RemoveAllObjects();
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH,
-                     LISTBOX_ITEMS * LINE_HEIGHT, LINE_HEIGHT,
-                     folder_rows(folder), row_cb, NULL, NULL, NULL);
-    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
+                         LISTBOX_ITEMS * LINE_HEIGHT, LINE_HEIGHT,
+                         row_count, row_cb, NULL, NULL, NULL);
+    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, row_idx));
 }
 
 
@@ -109,10 +119,16 @@ void PAGE_CrsfdeviceInit(int page)
 {
     device_idx = page;
     crsfdevice_init();
-    current_folder = 0;
-    CRSF_read_param(device_idx, next_param, next_chunk);
+    next_param = 1;
+    if (crsf_devices[device_idx].number_of_params) {
+        if (crsf_devices[device_idx].address == ADDR_RADIO)
+            protocol_read_params(device_idx, crsf_params);
+        else 
+            CRSF_read_param(device_idx, next_param, 0);
+    }
 
-    show_page(current_folder);
+    current_folder = 255;
+    show_page(0);
     PAGE_SetActionCB(action_cb);
 }
 #endif
