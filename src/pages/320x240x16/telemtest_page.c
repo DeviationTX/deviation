@@ -81,7 +81,8 @@ const struct telem_layout frsky_layout[] = {
           {{215, 140, 40, 18}, {260, 140, 40, 18}, TELEM_FRSKY_CURRENT},
           {{215, 160, 40, 18}, {260, 160, 40, 18}, TELEM_FRSKY_DISCHARGE},
           {{215, 180, 40, 18}, {260, 180, 40, 18}, TELEM_FRSKY_VOLTA},
-          {{215, 200, 40, 18}, {260, 200, 40, 18}, TELEM_FRSKY_ALTITUDE},
+          {{215, 200, 40, 18}, {238, 200, 40, 18}, TELEM_FRSKY_ALTITUDE},
+          {{0, 0, 0, 0},       {280, 200, 40, 18}, TELEM_FRSKY_MAX_ALTITUDE},
           {{215, 220, 40, 18}, {260, 220, 40, 18}, TELEM_FRSKY_VARIO},
 
           {{0, 140, 55, 18}, {60, 140, 140, 18}, TELEM_GPS_LAT},

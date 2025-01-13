@@ -590,7 +590,6 @@ static void initialize()
     UART_Initialize();
     UART_SetDataRate(bitrates[Model.proto_opts[PROTO_OPTS_BITRATE]]);
     UART_SetDuplex(UART_DUPLEX_HALF);
-    show_hidden = Model.proto_opts[PROTO_OPTS_HIDDEN];
 #if HAS_EXTENDED_TELEMETRY
     CBUF_Init(receive_buf);
     UART_StartReceive(serial_rcv);
@@ -599,6 +598,7 @@ static void initialize()
     mixer_runtime = 50;
 #if SUPPORT_CRSF_CONFIG
     model_id_send = 1;
+    show_hidden = Model.proto_opts[PROTO_OPTS_HIDDEN];
 #endif
     if (Model.fixed_id > CRSF_MAX_FIXEDID)
         Model.fixed_id = 0;
