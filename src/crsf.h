@@ -154,9 +154,15 @@ typedef struct {
     int child_row_idx;    // GUI optimization
 } crsf_param_t;
 
+enum {
+    PROTO_OPTS_BITRATE,
+    PROTO_OPTS_HIDDEN,
+    LAST_PROTO_OPT,
+};
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
+
 extern crsf_device_t crsf_devices[CRSF_MAX_DEVICES];
 extern elrs_info_t elrs_info;
-extern u8 show_hidden;
 
 void CRSF_serial_rcv(u8 *buffer, u8 num_bytes);
 u8 CRSF_serial_txd(u8 *buffer);
