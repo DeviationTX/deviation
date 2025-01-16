@@ -19,7 +19,6 @@
 #include "crsf.h"
 
 crsf_param_t crsf_params[CRSF_MAX_PARAMS];
-u8 show_hidden;
 
 static struct crsfdevice_page * const mp = &pagemem.u.crsfdevice_page;
 static struct crsfdevice_obj * const gui = &gui_objs.u.crsfdevice;
@@ -69,7 +68,7 @@ crsf_param_t *current_param(int absrow) {
 
     for (int i=0; i < crsf_devices[device_idx].number_of_params; i++) {
         if (!crsf_params[i].id) break;
-        if (crsf_params[i].parent != current_folder || (!show_hidden && crsf_params[i].hidden)) continue;
+        if (crsf_params[i].parent != current_folder || (!Model.proto_opts[PROTO_OPTS_HIDDEN] && crsf_params[i].hidden)) continue;
         if (idx++ == absrow) return &crsf_params[i];
     }
     return NULL;
@@ -159,7 +158,7 @@ static int folder_rows(int folder) {
     for (int i=0; i < crsf_devices[device_idx].number_of_params; i++)
         if (crsf_params[i].loaded
          && crsf_params[i].parent == folder
-         && (show_hidden || !crsf_params[i].hidden))
+         && (Model.proto_opts[PROTO_OPTS_HIDDEN] || !crsf_params[i].hidden))
             count += 1;
 
     return count;
@@ -254,22 +253,28 @@ static u8 param_next(u8 param) {
     return param;
 }
 
+static void clear_param(u8 param_id) {
+    crsf_params[param_id-1].loaded = 0;
+    crsf_params[param_id-1].lines_per_row = 0;
+    crsf_params[param_id-1].name = NULL;
+    crsf_params[param_id-1].value = NULL;
+    crsf_params[param_id-1].s.info = NULL;
+}
+
 static void folder_load(u8 param_id) {
     // param_id of 0 indicates root folder
     if (param_id != 0) {
-        crsf_params[param_id-1].loaded = 0;
-        crsf_params[param_id-1].lines_per_row = 0;
+        clear_param(param_id);
     }
     if (param_id == 0 || crsf_params[param_id-1].type == FOLDER) {
         for (int i=0; i < crsf_devices[device_idx].number_of_params; i++) {
             if (crsf_params[i].parent == param_id) {
-                crsf_params[i].loaded = 0;
-                crsf_params[i].lines_per_row = 0;
+                clear_param(crsf_params[i].id);
             }
         }
     }
     need_show_folder = param_id;
-    next_string = mp->strings;      // re-allocate all strings
+    next_string = mp->strings;      // re-allocate all strings, requires clear_param
     next_param = param_next(param_id);
     CRSF_read_param(device_idx, next_param, 0);
 }
@@ -773,7 +778,7 @@ static void parse_elrs_info(u8 *buffer) {
 }
 
 static void add_param(u8 *buffer, u8 num_bytes) {
-    u8 length;
+    u32 length;
 
     // abort if wrong device, or not enough buffer space
     if (buffer[2] != crsf_devices[device_idx].address
@@ -784,7 +789,15 @@ static void add_param(u8 *buffer, u8 num_bytes) {
     }
 
     // ignore unsolicited update from TBS
-    if (next_param == 0) return;
+    if (next_param == 0) {
+        if ((buffer[6] & 0x7f) <= TEXT_SELECTION) return;
+
+        next_param = buffer[3];
+        next_chunk = 0;
+        recv_param_ptr = recv_param_buffer;
+        crsf_params[next_param-1].loaded = 0;
+        crsf_params[next_param-1].lines_per_row = 0;
+    }
 
     memcpy(recv_param_ptr, buffer+5, num_bytes-5);
     recv_param_ptr += num_bytes - 5;
@@ -816,10 +829,11 @@ static void add_param(u8 *buffer, u8 num_bytes) {
     parameter->type = *recv_param_ptr & 0x7f;
     parameter->hidden = *recv_param_ptr++ >> 7;
 
-    u8 name_size = strlen(recv_param_ptr) + 1;
-    parameter->name = alloc_string(name_size);
-    strlcpy(parameter->name, (const char *)recv_param_ptr, name_size);
-    recv_param_ptr += name_size;
+    length = strlen(recv_param_ptr) + 1;
+    if (!parameter->name || strlen(parameter->name) <= length-1)
+        parameter->name = alloc_string(length);
+    strlcpy(parameter->name, (const char *)recv_param_ptr, length);
+    recv_param_ptr += length;
 
     switch (parameter->type) {
     case UINT8:
@@ -838,7 +852,8 @@ static void add_param(u8 *buffer, u8 num_bytes) {
             parameter->step = parameter->min_value != parameter->max_value;
             if (*recv_param_ptr) {
                 length = strlen(recv_param_ptr) + 1;
-                parameter->s.unit = alloc_string(length);
+                if (!parameter->s.unit || strlen(parameter->s.unit) < length-1)
+                    parameter->s.unit = alloc_string(length);
                 strlcpy(parameter->s.unit, (const char *)recv_param_ptr, length);
             }
         }
@@ -846,7 +861,8 @@ static void add_param(u8 *buffer, u8 num_bytes) {
 
     case TEXT_SELECTION:
         length = strlen(recv_param_ptr) + 1;
-        parameter->value = alloc_string(length);
+        if (!parameter->value || strlen(parameter->value) < length-1)
+            parameter->value = alloc_string(length);
         strlcpy(parameter->value, (const char *)recv_param_ptr, length);
         recv_param_ptr += length;
         // put null between selection options
@@ -884,7 +900,8 @@ static void add_param(u8 *buffer, u8 num_bytes) {
 
     case INFO:
         length = strlen(recv_param_ptr) + 1;
-        parameter->value = alloc_string(length);
+        if (!parameter->value || strlen(parameter->value) < length-1)
+            parameter->value = alloc_string(length);
         strlcpy(parameter->value, (const char *)recv_param_ptr, length);
         break;
 
@@ -895,7 +912,8 @@ static void add_param(u8 *buffer, u8 num_bytes) {
             recv_param_ptr += strlen(value) + 1;
             parse_bytes(UINT8, &recv_param_ptr, &parameter->u.string_max_len);
 
-            parameter->value = alloc_string(parameter->u.string_max_len+1);
+            if (!parameter->value || strlen(parameter->value) < (u32)parameter->u.string_max_len+1)
+                parameter->value = alloc_string(parameter->u.string_max_len+1);
             strlcpy(parameter->value, value, parameter->u.string_max_len+1);
         }
         break;
@@ -903,7 +921,8 @@ static void add_param(u8 *buffer, u8 num_bytes) {
     case COMMAND:
         parse_bytes(UINT8, &recv_param_ptr, &parameter->u.status);
         parse_bytes(UINT8, &recv_param_ptr, &parameter->timeout);
-        parameter->s.info = alloc_string(40);
+        if (!parameter->s.info)
+            parameter->s.info = alloc_string(40);
         strlcpy(parameter->s.info, (const char *)recv_param_ptr, 40);
 
         command.param = parameter;

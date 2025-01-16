@@ -73,7 +73,7 @@ static int gui_lines(crsf_param_t *param) {
     }
 
     if (max_string) LCD_GetStringDimensions((const u8 *)tempstring, &value_width, &_unused);
-    param->lines_per_row = (label_width + value_width > ROW_SPLIT_WIDTH) ? 2 : 1;
+    param->lines_per_row = (value_width && (label_width + value_width > ROW_SPLIT_WIDTH)) ? 2 : 1;
     return (int)param->lines_per_row;
 }
 

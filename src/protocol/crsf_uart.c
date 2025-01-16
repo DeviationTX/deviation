@@ -41,12 +41,6 @@ static const char * const crsf_opts[] = {
   _tr_noop("Show Hidden"), "No", "Yes", NULL,
   NULL
 };
-enum {
-    PROTO_OPTS_BITRATE,
-    PROTO_OPTS_HIDDEN,
-    LAST_PROTO_OPT,
-};
-ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 // this function called from UART TX DMA send complete ISR
 void set_bitrate(u8 data, u8 status) {
@@ -184,7 +178,6 @@ void protocol_set_param(crsf_param_t *param) {
         break;
     case 2:
         Model.proto_opts[PROTO_OPTS_HIDDEN] = value;
-        show_hidden = value;
         break;
     }
 }
@@ -598,7 +591,6 @@ static void initialize()
     mixer_runtime = 50;
 #if SUPPORT_CRSF_CONFIG
     model_id_send = 1;
-    show_hidden = Model.proto_opts[PROTO_OPTS_HIDDEN];
 #endif
     if (Model.fixed_id > CRSF_MAX_FIXEDID)
         Model.fixed_id = 0;
