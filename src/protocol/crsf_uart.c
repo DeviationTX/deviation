@@ -493,7 +493,7 @@ static u32 get_update_interval() {
 #endif  // HAS_EXTENDED_TELEMETRY
 
 
-static u8 packet[CRSF_PACKET_SIZE];
+static u8 packet[CRSF_PACKET_SIZE+1];   // plus 1 for ELRS Arming extension
 
 
 
@@ -543,9 +543,16 @@ static u8 build_rcdata_pkt()
     packet[23] = (u8) ((channels[14] & 0x07FF)>>6  | (channels[15] & 0x07FF)<<5);
     packet[24] = (u8) ((channels[15] & 0x07FF)>>3);
 
-    packet[25] = crsf_crc8(&packet[2], CRSF_PACKET_SIZE-3);
+    u8 *p = &packet[25];
+#if SUPPORT_CRSF_CONFIG
+    if (MODULE_IS_ELRS && Model.proto_opts[PROTO_OPTS_ELRSARM] > 0) {
+        packet[1] = 25;
+        *p++ = MIXER_GetChannel(NUM_OUT_CHANNELS + Model.proto_opts[PROTO_OPTS_ELRSARM] - 1, 0) > 0 ? 1 : 0;
+    }
+#endif
+    *p = crsf_crc8(&packet[2], packet[1]-1);
 
-    return CRSF_PACKET_SIZE;
+    return packet[1] + 2;
 }
 
 static enum {
