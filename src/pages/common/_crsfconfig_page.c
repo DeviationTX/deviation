@@ -21,7 +21,7 @@ crsf_device_t crsf_devices[CRSF_MAX_DEVICES];
 elrs_info_t elrs_info;
 crsf_device_t deviation = {
     .address = ADDR_RADIO,
-    .number_of_params = 2,
+    .number_of_params = 3,
     .params_version = 0,
     .serial_number = 1,
     .hardware_id = 0,

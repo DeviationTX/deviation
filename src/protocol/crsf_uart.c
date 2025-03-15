@@ -39,6 +39,7 @@ static s8 new_bitrate_index = -1;
 static const char * const crsf_opts[] = {
   _tr_noop("Bit Rate"), "400K", "1.87M", "2.00M", NULL,
   _tr_noop("Show Hidden"), "No", "Yes", NULL,
+  _tr_noop("ELRS Arm"), "CH5", "Virt1", "Virt2", "Virt3", "Virt4", "Virt5", "Virt6", "Virt7", "Virt8", "Virt9", "Virt10", NULL,
   NULL
 };
 
@@ -167,6 +168,22 @@ void protocol_read_params(u8 device_idx, crsf_param_t params[]) {
     params[1].max_str = &((char*)params[1].value)[3];        // Longest choice length for text select
     params[1].lines_per_row = 1;
     params[1].u.text_sel = Model.proto_opts[PROTO_OPTS_HIDDEN];
+
+    params[2].device = device_idx;            // device index of device parameter belongs to
+    params[2].id = 3;                // Parameter number (starting from 1)
+    params[2].parent = 0;            // Parent folder parameter number of the parent folder, 0 means root
+    params[2].type = TEXT_SELECTION;  // (Parameter type definitions and hidden bit)
+    params[2].hidden = 0;            // set if hidden
+    params[2].loaded = 1;
+    params[2].name = (char*)crsf_opts[9];           // Null-terminated string
+    params[2].value = "CH5\000Virt1\000Virt2\000Virt3\000Virt4\000Virt5\000Virt6\000Virt7\000Virt8\000Virt9\000Virt10";
+    params[2].default_value = 0;  // size depending on data type. Not present for COMMAND.
+    params[2].min_value = 0;        // not sent for string type
+    params[2].max_value = 10;       // not sent for string type
+    params[2].changed = 0;           // flag if set needed when edit element is de-selected
+    params[2].max_str = &((char*)params[2].value)[58];        // Longest choice length for text select
+    params[2].lines_per_row = 1;
+    params[2].u.text_sel = Model.proto_opts[PROTO_OPTS_ELRSARM];
 }
 
 void protocol_set_param(crsf_param_t *param) {
@@ -178,6 +195,9 @@ void protocol_set_param(crsf_param_t *param) {
         break;
     case 2:
         Model.proto_opts[PROTO_OPTS_HIDDEN] = value;
+        break;
+    case 3:
+        Model.proto_opts[PROTO_OPTS_ELRSARM] = value;
         break;
     }
 }

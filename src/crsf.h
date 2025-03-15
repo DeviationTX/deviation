@@ -66,6 +66,7 @@
 enum {
     PROTO_OPTS_BITRATE,
     PROTO_OPTS_HIDDEN,
+    PROTO_OPTS_ELRSARM,
     LAST_PROTO_OPT,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
