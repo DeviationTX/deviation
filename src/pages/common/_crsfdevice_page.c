@@ -519,6 +519,13 @@ u8 CRSF_command_ack(u8 cmd_id, u8 sub_cmd_id, u8 action) {
 // Request parameter info from known device
 void CRSF_read_param(u8 device, u8 id, u8 chunk) {
     if (chunk == 0) next_chunk = 0;
+
+    // intercept tx parameter read
+    if (crsf_devices[device].address == ADDR_RADIO) {
+        protocol_read_params(device_idx, crsf_params);  // loads all params at once
+        return;
+    }
+
     if (CBUF_Space(send_buf) < 8 || id == 0) return;
     u8 crc = 0;
     CBUF_Push(send_buf, ADDR_MODULE);

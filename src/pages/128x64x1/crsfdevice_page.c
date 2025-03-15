@@ -211,12 +211,8 @@ void PAGE_CrsfdeviceInit(int page)
     device_idx = page;
     crsfdevice_init();
     next_param = 1;
-    if (crsf_devices[device_idx].number_of_params) {
-        if (crsf_devices[device_idx].address == ADDR_RADIO)
-            protocol_read_params(device_idx, crsf_params);
-        else 
-            CRSF_read_param(device_idx, next_param, 0);
-    }
+    if (crsf_devices[device_idx].number_of_params)
+        CRSF_read_param(device_idx, next_param, 0);
 
     current_folder = 255;
     show_page(0);
