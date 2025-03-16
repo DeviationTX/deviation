@@ -457,9 +457,8 @@ static void processCrossfireTelemetryData() {
                 } else {
                     CRSF_serial_rcv(telemetryRxBuffer+2, telemetryRxBuffer[1]-1);  // Extended frame
                 }
-                if (MODULE_IS_ELRS
-                    && !protocol_elrs_is_armed()       // disarmed
-                    && (CLOCK_getms() - elrs_info_time) > 200)
+                if (protocol_module_is_elrs(3)
+                    && (CLOCK_getms() - elrs_info_time) > (protocol_elrs_is_armed() ? 500 : 200))
                 {
                     CRSF_get_elrs();
                     elrs_info_time = CLOCK_getms();
