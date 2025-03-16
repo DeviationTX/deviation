@@ -133,13 +133,7 @@ void protocol_module_type(module_type_t type) {
     module_type = type;
 };
 u8 protocol_module_is_elrs() { return MODULE_IS_ELRS; }
-u8 protocol_elrs_is_armed() {
-    if (MODULE_IS_ELRS && Model.proto_opts[PROTO_OPTS_ELRSARM] > 0) {
-        return MIXER_GetChannel(NUM_OUT_CHANNELS + Model.proto_opts[PROTO_OPTS_ELRSARM] - 1, 0) > 0;
-    } else {
-        return Channels[4] > 1500;
-    }
-}
+inline u8 protocol_elrs_is_armed() { return elrs_info.flags & FLAG_ARMD; }
 void protocol_read_params(u8 device_idx, crsf_param_t params[]) {
     // protocol parameters are bitrate and show hidden UI options
     params[0].device = device_idx;            // device index of device parameter belongs to

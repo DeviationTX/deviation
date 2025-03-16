@@ -114,11 +114,21 @@ typedef struct {
     char name[CRSF_MAX_NAME_LEN];
 } crsf_device_t;
 
+typedef enum {
+// Higher values have higher priority
+    FLAG_NONE = 0x00,    // No flags
+    FLAG_CONN = 0x01,    // Connected
+    FLAG_MMIS = 0x04,    // Model Mismatch
+    FLAG_ARMD = 0x08,    // Armed
+    FLAG_UNU0 = 0x20,    // Not while connected (not used)
+    FLAG_UNU1 = 0x40,    // Baud rate too low (not used)
+} elrs_info_flags_t; 
+
 typedef struct {
     u8 update;
     u8 bad_pkts;
     u16 good_pkts;
-    u8 flags;
+    elrs_info_flags_t flags;
     char flag_info[CRSF_MAX_NAME_LEN];
 } elrs_info_t;
 

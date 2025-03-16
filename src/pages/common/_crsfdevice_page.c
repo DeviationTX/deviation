@@ -774,7 +774,7 @@ static void parse_elrs_info(u8 *buffer) {
     local_info.update = elrs_info.update;
     if (memcmp((void*)&elrs_info, (void*)&local_info, sizeof(elrs_info_t)-CRSF_MAX_NAME_LEN)) {
         if (local_info.flag_info[0] && strncmp(local_info.flag_info, elrs_info.flag_info, CRSF_MAX_NAME_LEN)) {
-            if (local_info.flags & 0x4)
+            if (local_info.flags & FLAG_MMIS)
                 PAGE_ShowWarning(NULL, local_info.flag_info);       // show warning dialog if model mismatch
             MUSIC_Beep("d2", 100, 100, 5);
         }

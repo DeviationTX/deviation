@@ -168,7 +168,7 @@ static const char *hdr_str_cb(guiObject_t *obj, const void *data) {
             } else {
                 snprintf(tempstring, sizeof tempstring, "%s  %d/%d  %c",
                          crsf_devices[device_idx].name, elrs_info.bad_pkts, elrs_info.good_pkts,
-                         (elrs_info.flags & 1) ? 'C' : '-');
+                         (elrs_info.flags & FLAG_CONN) ? 'C' : '-');
             }
         } else {
             return crsf_devices[device_idx].name;
