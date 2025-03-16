@@ -129,12 +129,17 @@ static module_type_t module_type;
 
 #define MODULE_IS_ELRS     (module_type == MODULE_ELRS)
 #define MODULE_IS_UNKNOWN  (module_type == MODULE_UNKNOWN)
-#define ELRS_IS_ARMED      (Channels[4] > 1500)
 void protocol_module_type(module_type_t type) {
     module_type = type;
 };
 u8 protocol_module_is_elrs() { return MODULE_IS_ELRS; }
-u8 protocol_elrs_is_armed() { return ELRS_IS_ARMED; }
+u8 protocol_elrs_is_armed() {
+    if (MODULE_IS_ELRS && Model.proto_opts[PROTO_OPTS_ELRSARM] > 0) {
+        return MIXER_GetChannel(NUM_OUT_CHANNELS + Model.proto_opts[PROTO_OPTS_ELRSARM] - 1, 0) > 0;
+    } else {
+        return Channels[4] > 1500;
+    }
+}
 void protocol_read_params(u8 device_idx, crsf_param_t params[]) {
     // protocol parameters are bitrate and show hidden UI options
     params[0].device = device_idx;            // device index of device parameter belongs to
@@ -457,7 +462,7 @@ static void processCrossfireTelemetryData() {
                     CRSF_serial_rcv(telemetryRxBuffer+2, telemetryRxBuffer[1]-1);  // Extended frame
                 }
                 if (MODULE_IS_ELRS
-                    && !ELRS_IS_ARMED       // disarmed
+                    && !protocol_elrs_is_armed()       // disarmed
                     && (CLOCK_getms() - elrs_info_time) > 200)
                 {
                     CRSF_get_elrs();
