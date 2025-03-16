@@ -160,7 +160,7 @@ static const char *hdr_str_cb(guiObject_t *obj, const void *data) {
         strlcpy(short_name, crsf_devices[device_idx].name, 10);
         snprintf(tempstring, sizeof tempstring, "%s %s %d", short_name, _tr_noop("LOADING"), params_left);
     } else {
-        if (protocol_module_is_elrs()) {
+        if (protocol_module_is_elrs(3)) {
             if (protocol_elrs_is_armed()) {
                 snprintf(tempstring, sizeof tempstring, "%s  ! Armed !", crsf_devices[device_idx].name);
             } else if (elrs_info.flag_info[0]) {

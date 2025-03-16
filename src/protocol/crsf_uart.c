@@ -126,13 +126,15 @@ void crsf_crc8_BA_acc(u8 *crc, const u8 val) {
 static u8 model_id_send;
 static u32 elrs_info_time;
 static module_type_t module_type;
+static u32 module_firmware_id;
 
 #define MODULE_IS_ELRS     (module_type == MODULE_ELRS)
 #define MODULE_IS_UNKNOWN  (module_type == MODULE_UNKNOWN)
-void protocol_module_type(module_type_t type) {
+void protocol_module_info(module_type_t type, u32 firmware_id) {
     module_type = type;
+    module_firmware_id = firmware_id;
 };
-u8 protocol_module_is_elrs() { return MODULE_IS_ELRS; }
+inline u8 protocol_module_is_elrs(u8 maj_version) { return MODULE_IS_ELRS && (((module_firmware_id >> 16) & 0xff) >= maj_version); }
 inline u8 protocol_elrs_is_armed() { return elrs_info.flags & FLAG_ARMD; }
 void protocol_read_params(u8 device_idx, crsf_param_t params[]) {
     // protocol parameters are bitrate and show hidden UI options
@@ -544,7 +546,7 @@ static u8 build_rcdata_pkt()
 
     u8 *p = &packet[25];
 #if SUPPORT_CRSF_CONFIG
-    if (MODULE_IS_ELRS && Model.proto_opts[PROTO_OPTS_ELRSARM] > 0) {
+    if (protocol_module_is_elrs(4) && Model.proto_opts[PROTO_OPTS_ELRSARM] > 0) {
         packet[1] = 25;
         *p++ = MIXER_GetChannel(NUM_OUT_CHANNELS + Model.proto_opts[PROTO_OPTS_ELRSARM] - 1, 0) > 0 ? 1 : 0;
     }

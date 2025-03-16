@@ -727,9 +727,9 @@ static void parse_device(u8* buffer, crsf_device_t *device) {
     device->params_version = *buffer;
     if (device->address == ADDR_MODULE) {
         if (device->serial_number == 0x454C5253)
-            protocol_module_type(MODULE_ELRS);
+            protocol_module_info(MODULE_ELRS, device->firmware_id);
         else
-            protocol_module_type(MODULE_OTHER);
+            protocol_module_info(MODULE_OTHER, device->firmware_id);
     }
 }
 
