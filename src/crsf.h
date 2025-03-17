@@ -66,6 +66,7 @@
 enum {
     PROTO_OPTS_BITRATE,
     PROTO_OPTS_HIDDEN,
+    PROTO_OPTS_ELRSARM,
     LAST_PROTO_OPT,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
@@ -113,11 +114,21 @@ typedef struct {
     char name[CRSF_MAX_NAME_LEN];
 } crsf_device_t;
 
+typedef enum {
+// Higher values have higher priority
+    FLAG_NONE = 0x00,    // No flags
+    FLAG_CONN = 0x01,    // Connected
+    FLAG_MMIS = 0x04,    // Model Mismatch
+    FLAG_ARMD = 0x08,    // Armed
+    FLAG_UNU0 = 0x20,    // Not while connected (not used)
+    FLAG_UNU1 = 0x40,    // Baud rate too low (not used)
+} elrs_info_flags_t; 
+
 typedef struct {
     u8 update;
     u8 bad_pkts;
     u16 good_pkts;
-    u8 flags;
+    elrs_info_flags_t flags;
     char flag_info[CRSF_MAX_NAME_LEN];
 } elrs_info_t;
 
@@ -179,8 +190,8 @@ u32 CRSF_read_timeout();
 void CRSF_get_elrs();
 void protocol_read_params(u8 device_idx, crsf_param_t param[]);
 void protocol_set_param(crsf_param_t *param);
-void protocol_module_type(module_type_t type);
-u8 protocol_module_is_elrs();
+void protocol_module_info(module_type_t type, u32 firmware_id);
+u8 protocol_module_is_elrs(u8 maj_version);
 u8 protocol_elrs_is_armed();
 u8 CRSF_speed_response(u8 accept, usart_callback_t tx_callback);
 u8 CRSF_speed_proposal(u32 bitrate);

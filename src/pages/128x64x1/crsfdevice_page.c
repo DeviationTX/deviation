@@ -160,7 +160,7 @@ static const char *hdr_str_cb(guiObject_t *obj, const void *data) {
         strlcpy(short_name, crsf_devices[device_idx].name, 10);
         snprintf(tempstring, sizeof tempstring, "%s %s %d", short_name, _tr_noop("LOADING"), params_left);
     } else {
-        if (protocol_module_is_elrs()) {
+        if (protocol_module_is_elrs(3)) {
             if (protocol_elrs_is_armed()) {
                 snprintf(tempstring, sizeof tempstring, "%s  ! Armed !", crsf_devices[device_idx].name);
             } else if (elrs_info.flag_info[0]) {
@@ -168,7 +168,7 @@ static const char *hdr_str_cb(guiObject_t *obj, const void *data) {
             } else {
                 snprintf(tempstring, sizeof tempstring, "%s  %d/%d  %c",
                          crsf_devices[device_idx].name, elrs_info.bad_pkts, elrs_info.good_pkts,
-                         (elrs_info.flags & 1) ? 'C' : '-');
+                         (elrs_info.flags & FLAG_CONN) ? 'C' : '-');
             }
         } else {
             return crsf_devices[device_idx].name;
@@ -211,12 +211,8 @@ void PAGE_CrsfdeviceInit(int page)
     device_idx = page;
     crsfdevice_init();
     next_param = 1;
-    if (crsf_devices[device_idx].number_of_params) {
-        if (crsf_devices[device_idx].address == ADDR_RADIO)
-            protocol_read_params(device_idx, crsf_params);
-        else 
-            CRSF_read_param(device_idx, next_param, 0);
-    }
+    if (crsf_devices[device_idx].number_of_params)
+        CRSF_read_param(device_idx, next_param, 0);
 
     current_folder = 255;
     show_page(0);

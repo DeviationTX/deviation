@@ -39,6 +39,7 @@ static s8 new_bitrate_index = -1;
 static const char * const crsf_opts[] = {
   _tr_noop("Bit Rate"), "400K", "1.87M", "2.00M", NULL,
   _tr_noop("Show Hidden"), "No", "Yes", NULL,
+  _tr_noop("ELRS Arm"), "CH5", "Virt1", "Virt2", "Virt3", "Virt4", "Virt5", "Virt6", "Virt7", "Virt8", "Virt9", "Virt10", NULL,
   NULL
 };
 
@@ -125,15 +126,16 @@ void crsf_crc8_BA_acc(u8 *crc, const u8 val) {
 static u8 model_id_send;
 static u32 elrs_info_time;
 static module_type_t module_type;
+static u32 module_firmware_id;
 
 #define MODULE_IS_ELRS     (module_type == MODULE_ELRS)
 #define MODULE_IS_UNKNOWN  (module_type == MODULE_UNKNOWN)
-#define ELRS_IS_ARMED      (Channels[4] > 1500)
-void protocol_module_type(module_type_t type) {
+void protocol_module_info(module_type_t type, u32 firmware_id) {
     module_type = type;
+    module_firmware_id = firmware_id;
 };
-u8 protocol_module_is_elrs() { return MODULE_IS_ELRS; }
-u8 protocol_elrs_is_armed() { return ELRS_IS_ARMED; }
+inline u8 protocol_module_is_elrs(u8 maj_version) { return MODULE_IS_ELRS && (((module_firmware_id >> 16) & 0xff) >= maj_version); }
+inline u8 protocol_elrs_is_armed() { return elrs_info.flags & FLAG_ARMD; }
 void protocol_read_params(u8 device_idx, crsf_param_t params[]) {
     // protocol parameters are bitrate and show hidden UI options
     params[0].device = device_idx;            // device index of device parameter belongs to
@@ -167,6 +169,22 @@ void protocol_read_params(u8 device_idx, crsf_param_t params[]) {
     params[1].max_str = &((char*)params[1].value)[3];        // Longest choice length for text select
     params[1].lines_per_row = 1;
     params[1].u.text_sel = Model.proto_opts[PROTO_OPTS_HIDDEN];
+
+    params[2].device = device_idx;            // device index of device parameter belongs to
+    params[2].id = 3;                // Parameter number (starting from 1)
+    params[2].parent = 0;            // Parent folder parameter number of the parent folder, 0 means root
+    params[2].type = TEXT_SELECTION;  // (Parameter type definitions and hidden bit)
+    params[2].hidden = 0;            // set if hidden
+    params[2].loaded = 1;
+    params[2].name = (char*)crsf_opts[9];           // Null-terminated string
+    params[2].value = "CH5\000Virt1\000Virt2\000Virt3\000Virt4\000Virt5\000Virt6\000Virt7\000Virt8\000Virt9\000Virt10";
+    params[2].default_value = 0;  // size depending on data type. Not present for COMMAND.
+    params[2].min_value = 0;        // not sent for string type
+    params[2].max_value = 10;       // not sent for string type
+    params[2].changed = 0;           // flag if set needed when edit element is de-selected
+    params[2].max_str = &((char*)params[2].value)[58];        // Longest choice length for text select
+    params[2].lines_per_row = 1;
+    params[2].u.text_sel = Model.proto_opts[PROTO_OPTS_ELRSARM];
 }
 
 void protocol_set_param(crsf_param_t *param) {
@@ -178,6 +196,9 @@ void protocol_set_param(crsf_param_t *param) {
         break;
     case 2:
         Model.proto_opts[PROTO_OPTS_HIDDEN] = value;
+        break;
+    case 3:
+        Model.proto_opts[PROTO_OPTS_ELRSARM] = value;
         break;
     }
 }
@@ -436,9 +457,8 @@ static void processCrossfireTelemetryData() {
                 } else {
                     CRSF_serial_rcv(telemetryRxBuffer+2, telemetryRxBuffer[1]-1);  // Extended frame
                 }
-                if (MODULE_IS_ELRS
-                    && !ELRS_IS_ARMED       // disarmed
-                    && (CLOCK_getms() - elrs_info_time) > 200)
+                if (protocol_module_is_elrs(3)
+                    && (CLOCK_getms() - elrs_info_time) > (protocol_elrs_is_armed() ? 500 : 200))
                 {
                     CRSF_get_elrs();
                     elrs_info_time = CLOCK_getms();
@@ -473,7 +493,7 @@ static u32 get_update_interval() {
 #endif  // HAS_EXTENDED_TELEMETRY
 
 
-static u8 packet[CRSF_PACKET_SIZE];
+static u8 packet[CRSF_PACKET_SIZE+1];   // plus 1 for ELRS Arming extension
 
 
 
@@ -523,9 +543,16 @@ static u8 build_rcdata_pkt()
     packet[23] = (u8) ((channels[14] & 0x07FF)>>6  | (channels[15] & 0x07FF)<<5);
     packet[24] = (u8) ((channels[15] & 0x07FF)>>3);
 
-    packet[25] = crsf_crc8(&packet[2], CRSF_PACKET_SIZE-3);
+    u8 *p = &packet[25];
+#if SUPPORT_CRSF_CONFIG
+    if (protocol_module_is_elrs(4) && Model.proto_opts[PROTO_OPTS_ELRSARM] > 0) {
+        packet[1] = 25;
+        *p++ = MIXER_GetChannel(NUM_OUT_CHANNELS + Model.proto_opts[PROTO_OPTS_ELRSARM] - 1, 0) > 0 ? 1 : 0;
+    }
+#endif
+    *p = crsf_crc8(&packet[2], packet[1]-1);
 
-    return CRSF_PACKET_SIZE;
+    return packet[1] + 2;
 }
 
 static enum {

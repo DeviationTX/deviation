@@ -519,6 +519,13 @@ u8 CRSF_command_ack(u8 cmd_id, u8 sub_cmd_id, u8 action) {
 // Request parameter info from known device
 void CRSF_read_param(u8 device, u8 id, u8 chunk) {
     if (chunk == 0) next_chunk = 0;
+
+    // intercept tx parameter read
+    if (crsf_devices[device].address == ADDR_RADIO) {
+        protocol_read_params(device_idx, crsf_params);  // loads all params at once
+        return;
+    }
+
     if (CBUF_Space(send_buf) < 8 || id == 0) return;
     u8 crc = 0;
     CBUF_Push(send_buf, ADDR_MODULE);
@@ -720,9 +727,9 @@ static void parse_device(u8* buffer, crsf_device_t *device) {
     device->params_version = *buffer;
     if (device->address == ADDR_MODULE) {
         if (device->serial_number == 0x454C5253)
-            protocol_module_type(MODULE_ELRS);
+            protocol_module_info(MODULE_ELRS, device->firmware_id);
         else
-            protocol_module_type(MODULE_OTHER);
+            protocol_module_info(MODULE_OTHER, device->firmware_id);
     }
 }
 
@@ -767,7 +774,7 @@ static void parse_elrs_info(u8 *buffer) {
     local_info.update = elrs_info.update;
     if (memcmp((void*)&elrs_info, (void*)&local_info, sizeof(elrs_info_t)-CRSF_MAX_NAME_LEN)) {
         if (local_info.flag_info[0] && strncmp(local_info.flag_info, elrs_info.flag_info, CRSF_MAX_NAME_LEN)) {
-            if (local_info.flags & 0x4)
+            if (local_info.flags & FLAG_MMIS)
                 PAGE_ShowWarning(NULL, local_info.flag_info);       // show warning dialog if model mismatch
             MUSIC_Beep("d2", 100, 100, 5);
         }
