@@ -30,10 +30,12 @@
 #define BIND_COUNT 20
 #define PACKET_PERIOD    150
 #define FQ777_PACKET_PERIOD 150
+#define XKK170_PACKET_PERIOD	150
 #define dbgprintf printf
 #else
 #define BIND_COUNT 80
 #define PACKET_PERIOD    13500 // Timeout for callback in uSec
+#define XKK170_PACKET_PERIOD 8085
 #define FQ777_PACKET_PERIOD 10000
 //printf inside an interrupt handler is really dangerous
 //this shouldn't be enabled even in debug builds without explicitly
@@ -45,9 +47,10 @@
 #define BIND_PACKET_SIZE   10
 #define PACKET_SIZE        12
 #define RF_BIND_CHANNEL    0
+#define XKK170_RF_BIND_CHANNEL 20
 
 static const char * const hontai_opts[] = {
-  _tr_noop("Format"), "Hontai", "JJRCX1", "FQ777-951", NULL,
+  _tr_noop("Format"), "Hontai", "JJRCX1", "FQ777-951", "XKK170", NULL,
   NULL
 };
 enum {
@@ -58,6 +61,7 @@ enum {
     FORMAT_HONTAI = 0,
     FORMAT_JJRCX1,
     FORMAT_FQ777,
+    FORMAT_XKK170,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
@@ -110,7 +114,8 @@ static u16 counter;
 static u16 packet_period;
 static const u8 rf_channels[][3] = {{0x05, 0x19, 0x28},     // Hontai
                                     {0x0a, 0x1e, 0x2d},     // JJRC X1
-                                    {0x05, 0x19, 0x28}};    // FQ777-951
+                                    {0x05, 0x19, 0x28},     // FQ777-951
+                                    {0x60, 0x70, 0x80}};    // XKK170
 static const u8 rx_tx_addr[] = {0xd2, 0xb5, 0x99, 0xb3, 0x4a};
 static const u8 addr_vals[4][16] = {
                     {0x24, 0x26, 0x2a, 0x2c, 0x32, 0x34, 0x36, 0x4a,
@@ -180,9 +185,15 @@ static void send_packet(u8 bind)
     } else {
         memset(packet,0,PACKET_SIZE);
         packet[3] = scale_channel(CHANNEL3, 0x00, 0x7f) << 1; // throttle
-        packet[4] = scale_channel(CHANNEL1, 0x3f, 0x01); // aileron   
-        packet[5] = scale_channel(CHANNEL2, 0x01, 0x3f); // elevator
-        packet[6] = scale_channel(CHANNEL4, 0x3f, 0x01); // rudder  
+        if (Model.proto_opts[PROTOOPTS_FORMAT] != FORMAT_XKK170) {
+            packet[4] = scale_channel(CHANNEL1, 0x3f, 0x01); // aileron   
+            packet[5] = scale_channel(CHANNEL2, 0x01, 0x3f); // elevator
+            packet[6] = scale_channel(CHANNEL4, 0x3f, 0x01); // rudder  
+        } else {
+            packet[4] = scale_channel(CHANNEL1, 0x28, 0xd8); // aileron   
+            packet[5] = scale_channel(CHANNEL2, 0xd8, 0x28); // elevator
+            packet[6] = scale_channel(CHANNEL4, 0x28, 0xd8); // rudder  
+        }
         packet[7] = scale_channel(CHANNEL1, -16, 16); // aileron trim
         packet[8] = scale_channel(CHANNEL4, -16, 16); // rudder trim
         packet[9] = scale_channel(CHANNEL2, -16, 16); // elevator trim
@@ -219,11 +230,22 @@ static void send_packet(u8 bind)
                 if((packet[4] & 0x3f) > 0x3d && (packet[5] & 0x3f) < 3)
                     packet[5] |= 0x80; // accelerometer recalibration
                 break;
+            case FORMAT_XKK170:
+                packet[1] = GET_FLAG(CHANNEL5, 0x04);	// gyro calibration (momentary)
+                packet[8] = 0xc0                        // high rate (mid=0xa0, low=0x60)
+                          | GET_FLAG(CHANNEL6, 0x10)    // emergency (momentary)
+                          | GET_FLAG(CHANNEL7, 0x04);   // takeoff/landing (momentary)
+                break;
         }
     }
-    
-    crc16(packet, bind ? BIND_PACKET_SIZE : PACKET_SIZE);
-    
+
+    u8 packet_length = bind ? BIND_PACKET_SIZE : PACKET_SIZE;
+    if (Model.proto_opts[PROTOOPTS_FORMAT] != FORMAT_XKK170) {
+        crc16(packet, packet_length);
+    } else {
+        memset(&packet[packet_length-2], 0xAA, 2);
+    }
+
     // Power on, TX mode, 2byte CRC
     if ( Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_HONTAI
       || Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_FQ777 ) {
@@ -232,7 +254,8 @@ static void send_packet(u8 bind)
         NRF24L01_SetTxRxMode(TX_EN);
     }
 
-    NRF24L01_WriteReg(NRF24L01_05_RF_CH, bind ? RF_BIND_CHANNEL : rf_channels[Model.proto_opts[PROTOOPTS_FORMAT]][rf_chan++]);
+    u8 rf_bind_channel = Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_XKK170 ? XKK170_RF_BIND_CHANNEL : RF_BIND_CHANNEL;
+    NRF24L01_WriteReg(NRF24L01_05_RF_CH, bind ? rf_bind_channel : rf_channels[Model.proto_opts[PROTOOPTS_FORMAT]][rf_chan++]);
     rf_chan %= sizeof(rf_channels[0]);
 
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
@@ -240,9 +263,9 @@ static void send_packet(u8 bind)
 
     if ( Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_HONTAI
       || Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_FQ777 ) {
-        XN297_WritePayload(packet, bind ? BIND_PACKET_SIZE : PACKET_SIZE);
+        XN297_WritePayload(packet, packet_length);
     } else {
-        NRF24L01_WritePayload(packet, bind ? BIND_PACKET_SIZE : PACKET_SIZE);
+        NRF24L01_WritePayload(packet, packet_length);
     }
 
     // Check and adjust transmission power. We do this after
@@ -256,8 +279,8 @@ static void send_packet(u8 bind)
     }
 
 #ifdef EMULATOR
-    dbgprintf("next chan 0x%02x, bind %d, data %02x", bind ? RF_BIND_CHANNEL : rf_channels[Model.proto_opts[PROTOOPTS_FORMAT]][rf_chan], bind, packet[0]);
-    for(int i=1; i < (bind ? BIND_PACKET_SIZE : PACKET_SIZE); i++) dbgprintf(" %02x", packet[i]);
+    dbgprintf("next chan 0x%02x, bind %d, data %02x", bind ? rf_bind_channel : rf_channels[Model.proto_opts[PROTOOPTS_FORMAT]][rf_chan], bind, packet[0]);
+    for(int i=1; i < packet_length; i++) dbgprintf(" %02x", packet[i]);
     dbgprintf("\n");
 #endif
 }
@@ -274,11 +297,10 @@ static void ht_init()
     // NRF24L01_WriteRegisterMulti(0x3e, "\xc9\x9a\xb0,\x61,\xbb,\xab,\x9c", 7); 
     // NRF24L01_WriteRegisterMulti(0x39, "\x0b\xdf\xc4,\xa7,\x03,\xab,\x9c", 7); 
 
-    if ( Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_HONTAI
-      || Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_FQ777 ) {
-        XN297_SetTXAddr(rx_tx_addr, sizeof(rx_tx_addr));
-    } else {
+    if ( Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_JJRCX1 ) {
         NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, rx_tx_addr, sizeof(rx_tx_addr));
+    } else {
+        XN297_SetTXAddr(rx_tx_addr, sizeof(rx_tx_addr));
     }
 
     NRF24L01_FlushTx();
@@ -288,8 +310,7 @@ static void ht_init()
     NRF24L01_SetBitrate(NRF24L01_BR_1M);             // 1Mbps
     NRF24L01_SetPower(Model.tx_power);
     NRF24L01_Activate(0x73);                              // Activate feature register
-    if ( Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_HONTAI
-      || Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_FQ777 ) {
+    if ( Model.proto_opts[PROTOOPTS_FORMAT] != FORMAT_JJRCX1 ) {
         NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0x00);  // no retransmits
         NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 0x00);       // Disable dynamic payload length on all pipes
         NRF24L01_WriteReg(NRF24L01_1D_FEATURE, 0x00);
@@ -365,14 +386,13 @@ static void initialize_txid()
     // Pump zero bytes for LFSR to diverge more
     for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
 
-    if ( Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_HONTAI 
-      || Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_FQ777 ) {
-        txid[0] = 0x4c; // first three bytes some kind of model id? - set same as stock tx
-        txid[1] = 0x4b;
-        txid[2] = 0x3a;
-    } else {
+    if ( Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_JJRCX1 ) {
         txid[0] = 0x4b; // JJRC X1
         txid[1] = 0x59;
+        txid[2] = 0x3a;
+    } else {
+        txid[0] = 0x4c; // first three bytes some kind of model id? - set same as stock tx
+        txid[1] = 0x4b;
         txid[2] = 0x3a;
     }
     txid[3] = (lfsr >> 8 ) & 0xff;
@@ -385,6 +405,8 @@ static void initialize()
     tx_power = Model.tx_power;
     if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_FQ777)
         packet_period = FQ777_PACKET_PERIOD;
+    else if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_XKK170)
+        packet_period = XKK170_PACKET_PERIOD;
     else
         packet_period = PACKET_PERIOD;
     counter = BIND_COUNT;
