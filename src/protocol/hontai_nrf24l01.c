@@ -189,14 +189,15 @@ static void send_packet(u8 bind)
             packet[4] = scale_channel(CHANNEL1, 0x3f, 0x01); // aileron   
             packet[5] = scale_channel(CHANNEL2, 0x01, 0x3f); // elevator
             packet[6] = scale_channel(CHANNEL4, 0x3f, 0x01); // rudder  
+            // drive trims for extra control throw
+            packet[7] = scale_channel(CHANNEL1, -16, 16); // aileron trim
+            packet[8] = scale_channel(CHANNEL4, -16, 16); // rudder trim
+            packet[9] = scale_channel(CHANNEL2, -16, 16); // elevator trim
         } else {
             packet[4] = scale_channel(CHANNEL1, 0x28, 0xd8); // aileron   
-            packet[5] = scale_channel(CHANNEL2, 0xd8, 0x28); // elevator
-            packet[6] = scale_channel(CHANNEL4, 0x28, 0xd8); // rudder  
+            packet[5] = scale_channel(CHANNEL2, 0x28, 0xd8); // elevator
+            packet[6] = scale_channel(CHANNEL4, 0xd8, 0x28); // rudder  
         }
-        packet[7] = scale_channel(CHANNEL1, -16, 16); // aileron trim
-        packet[8] = scale_channel(CHANNEL4, -16, 16); // rudder trim
-        packet[9] = scale_channel(CHANNEL2, -16, 16); // elevator trim
         
         // feature flags
         switch(Model.proto_opts[PROTOOPTS_FORMAT]) {
