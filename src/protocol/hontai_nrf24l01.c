@@ -243,15 +243,15 @@ static void send_packet(u8 bind)
     if (Model.proto_opts[PROTOOPTS_FORMAT] != FORMAT_XKK170) {
         crc16(packet, packet_length);
     } else {
-        memset(&packet[packet_length-2], 0xAA, 2);
+        packet[packet_length-2] = 0xaa;
+        packet[packet_length-1] = 0xaa;
     }
 
     // Power on, TX mode, 2byte CRC
-    if ( Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_HONTAI
-      || Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_FQ777 ) {
-        XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
-    } else {
+    if ( Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_JJRCX1 ) {
         NRF24L01_SetTxRxMode(TX_EN);
+    } else {
+        XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
     }
 
     u8 rf_bind_channel = Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_XKK170 ? XKK170_RF_BIND_CHANNEL : RF_BIND_CHANNEL;
@@ -261,11 +261,10 @@ static void send_packet(u8 bind)
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
     NRF24L01_FlushTx();
 
-    if ( Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_HONTAI
-      || Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_FQ777 ) {
-        XN297_WritePayload(packet, packet_length);
-    } else {
+    if ( Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_JJRCX1 ) {
         NRF24L01_WritePayload(packet, packet_length);
+    } else {
+        XN297_WritePayload(packet, packet_length);
     }
 
     // Check and adjust transmission power. We do this after
@@ -310,15 +309,15 @@ static void ht_init()
     NRF24L01_SetBitrate(NRF24L01_BR_1M);             // 1Mbps
     NRF24L01_SetPower(Model.tx_power);
     NRF24L01_Activate(0x73);                              // Activate feature register
-    if ( Model.proto_opts[PROTOOPTS_FORMAT] != FORMAT_JJRCX1 ) {
+    if ( Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_JJRCX1 ) {
+        NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0xff);  // JJRC uses dynamic payload length
+        NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 0x3f);       // match other stock settings even though AA disabled...
+        NRF24L01_WriteReg(NRF24L01_1D_FEATURE, 0x07);
+    } else {
         NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0x00);  // no retransmits
         NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 0x00);       // Disable dynamic payload length on all pipes
         NRF24L01_WriteReg(NRF24L01_1D_FEATURE, 0x00);
         NRF24L01_Activate(0x73);                          // Deactivate feature register
-    } else {
-        NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0xff);  // JJRC uses dynamic payload length
-        NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 0x3f);       // match other stock settings even though AA disabled...
-        NRF24L01_WriteReg(NRF24L01_1D_FEATURE, 0x07);
     }
 }
 
@@ -331,11 +330,10 @@ static void ht_init2()
     data_tx_addr[2] = addr_vals[2][ txid[4]       & 0x0f];
     data_tx_addr[3] = addr_vals[3][(txid[4] >> 4) & 0x0f];
 
-    if ( Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_HONTAI
-      || Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_FQ777 ) {
-        XN297_SetTXAddr(data_tx_addr, sizeof(data_tx_addr));
-    } else {
+    if ( Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_JJRCX1 ) {
         NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, data_tx_addr, sizeof(data_tx_addr));
+    } else {
+        XN297_SetTXAddr(data_tx_addr, sizeof(data_tx_addr));
     }
 }
 
