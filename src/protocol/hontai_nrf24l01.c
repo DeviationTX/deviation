@@ -163,7 +163,7 @@ static u16 crc16(u8 *data_p, u32 length)
 }
 
 #define CHAN_RANGE (CHAN_MAX_VALUE - CHAN_MIN_VALUE)
-static s8 scale_channel(u8 ch, s8 start, s8 end)
+static s8 scale_channel_s8(u8 ch, s8 start, s8 end)
 {
     s32 range = end - start;
     s32 chanval = Channels[ch];
@@ -177,7 +177,7 @@ static s8 scale_channel(u8 ch, s8 start, s8 end)
 }
 
 // k170 uses unsigned channel values
-static u8 scale_chan_k170(u8 ch, u8 start, u8 end)
+static u8 scale_channel_u8(u8 ch, u8 start, u8 end)
 {
     s32 range = end - start;
     s32 chanval = Channels[ch];
@@ -196,20 +196,19 @@ static void send_packet(u8 bind)
         memset(&packet[5], 0, 3);
     } else {
         memset(packet,0,PACKET_SIZE);
+        packet[3] = scale_channel_u8(CHANNEL3, 0x00, 0xff); // throttle
         if (Model.proto_opts[PROTOOPTS_FORMAT] != FORMAT_XKK170) {
-            packet[3] = scale_channel(CHANNEL3, 0x00, 0x7f) << 1; // throttle
-            packet[4] = scale_channel(CHANNEL1, 0x3f, 0x01); // aileron   
-            packet[5] = scale_channel(CHANNEL2, 0x01, 0x3f); // elevator
-            packet[6] = scale_channel(CHANNEL4, 0x3f, 0x01); // rudder  
+            packet[4] = scale_channel_u8(CHANNEL1, 0x3f, 0x01); // aileron   
+            packet[5] = scale_channel_u8(CHANNEL2, 0x01, 0x3f); // elevator
+            packet[6] = scale_channel_u8(CHANNEL4, 0x3f, 0x01); // rudder  
             // drive trims for extra control throw
-            packet[7] = scale_channel(CHANNEL1, -16, 16); // aileron trim
-            packet[8] = scale_channel(CHANNEL4, -16, 16); // rudder trim
-            packet[9] = scale_channel(CHANNEL2, -16, 16); // elevator trim
+            packet[7] = scale_channel_s8(CHANNEL1, -16, 16); // aileron trim
+            packet[8] = scale_channel_s8(CHANNEL4, -16, 16); // rudder trim
+            packet[9] = scale_channel_s8(CHANNEL2, -16, 16); // elevator trim
         } else {
-            packet[3] = scale_chan_k170(CHANNEL3, 0x00, 0xff); // throttle
-            packet[4] = scale_chan_k170(CHANNEL1, 0x28, 0xd8); // aileron
-            packet[5] = scale_chan_k170(CHANNEL2, 0x28, 0xd8); // elevator
-            packet[6] = scale_chan_k170(CHANNEL4, 0xd8, 0x28); // rudder
+            packet[4] = scale_channel_u8(CHANNEL1, 0x28, 0xd8); // aileron
+            packet[5] = scale_channel_u8(CHANNEL2, 0x28, 0xd8); // elevator
+            packet[6] = scale_channel_u8(CHANNEL4, 0xd8, 0x28); // rudder
         }
         
         // feature flags
