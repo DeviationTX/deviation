@@ -176,7 +176,6 @@ static s8 scale_channel_s8(u8 ch, s8 start, s8 end)
     return (range * (chanval - CHAN_MIN_VALUE + round)) / CHAN_RANGE + start;
 }
 
-// k170 uses unsigned channel values
 static u8 scale_channel_u8(u8 ch, u8 start, u8 end)
 {
     s32 range = end - start;
@@ -209,6 +208,9 @@ static void send_packet(u8 bind)
             packet[4] = scale_channel_u8(CHANNEL1, 0x28, 0xd8); // aileron
             packet[5] = scale_channel_u8(CHANNEL2, 0x28, 0xd8); // elevator
             packet[6] = scale_channel_u8(CHANNEL4, 0xd8, 0x28); // rudder
+            // drive trims for extra control throw
+            packet[7] = scale_channel_s8(CHANNEL1,  32, -32); // aileron trim
+            packet[9] = scale_channel_s8(CHANNEL2, -32,  32); // elevator trim
         }
         
         // feature flags
