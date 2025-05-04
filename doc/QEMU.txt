@@ -1,0 +1,35 @@
+Note:  The following procedure has only been tested using a x86-64 Linux host. Your luck may vary with any other setup
+
+It is possible to do debugging and profiling using the STM32 QEMU fork here:
+https://github.com/DeviationTX/deviation/files/2743535/errors_master_gcc8.2.txt
+
+Build from scratch:
+    git submodule update --init dtc
+    ./configure --enable-debug --target-list="arm-softmmu" --disable-werror
+    make
+Using docker may be easier (but it is untested):
+    docker build . -t qemu_stm32
+
+You will need arm-none-eabi-gdb-py for profiling.  This will require a more recent Embedded GCC (recommended GCC 8):
+https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads
+
+The image is built using:
+    cd src
+    make qemu
+The target is an STMF103RB (same as in devo7e).  running on an Olimex P103 board.  this is mostly irrelevant unless
+peripheral support is added in the future
+
+Once built, it can be started in qemu using:
+    qemu-system-arm -S -s -M stm32-p103 -kernel qemu.bin
+    or if you use the docker image (you're responsible for mounting your devo build area):
+    docker run --rm qemu_stm32 /usr/local/bin/qemu-system-arm -M stm32-p103 -kernel qemu
+    
+And finally the profiler can be run via gdb:
+   arm-none-eabi-gdb-py
+   source ../utils/qemu.py
+
+The code to profile can be found in target/qemu/target_main.c
+The profiler will run only on the 'run_profile()' function.  All other code in main() will run 1st.
+
+Be aware that the STM32 QEMU is not feature complete.  It does not support SPI, and the Clock and Timer support is limited.
+Trying to run a full image is likely to be futile.
