@@ -181,6 +181,11 @@ typedef enum {
     TELEM_CRSF_TX_RF_POWER,
     TELEM_CRSF_TX_RSSI_PERC,
 #endif
+    TELEM_CRSF_AIRSPEED,
+    TELEM_CRSF_RPM_SRC,
+    TELEM_CRSF_RPM_1,
+    TELEM_CRSF_TEMP_SRC,
+    TELEM_CRSF_TEMP_1,
     TELEM_CRSF_LAST
 } crossfire_telem_t;
 

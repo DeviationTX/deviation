@@ -88,6 +88,11 @@ const char * _crsf_str_by_value(char *str, u8 telem, s32 value)
     case TELEM_CRSF_TX_RF_POWER: _get_value_str(str, value, 0, 'd'); break;     // dBm
     case TELEM_CRSF_TX_FPS: _get_value_str(str, value, 0, 'H'); break;          // hertz
 #endif
+    case TELEM_CRSF_AIRSPEED: _get_value_str(str, value, 0, 'k'); break;        // km/h
+    case TELEM_CRSF_RPM_SRC: _get_value_str(str, value, 0, '\0'); break;
+    case TELEM_CRSF_RPM_1: _get_value_str(str, value, 0, '\0'); break;          // rpm
+    case TELEM_CRSF_TEMP_SRC: _get_value_str(str, value, 0, '\0'); break;
+    case TELEM_CRSF_TEMP_1: _get_value_str(str, value, 0, 'C'); break;          // celsius
 
     default:
         return "";
@@ -129,6 +134,11 @@ const char * _crsf_short_name(char *str, u8 telem)
     case TELEM_CRSF_TX_RF_POWER: strcpy(str, _tr("TxRfP")); break;
     case TELEM_CRSF_TX_RSSI_PERC: strcpy(str, _tr("TxR%")); break;
 #endif
+    case TELEM_CRSF_AIRSPEED: strcpy(str, _tr("AirSpd")); break;
+    case TELEM_CRSF_RPM_SRC: strcpy(str, _tr("RPMsrc")); break;
+    case TELEM_CRSF_RPM_1: strcpy(str, _tr("RPM1")); break;
+    case TELEM_CRSF_TEMP_SRC: strcpy(str, _tr("TmpSrc")); break;
+    case TELEM_CRSF_TEMP_1: strcpy(str, _tr("TEMP1")); break;
 
     default: sprintf(str, "CRSF%d", telem); break;
     }
@@ -153,6 +163,8 @@ const char * _crsf_name(char *str, u8 telem)
     case TELEM_CRSF_TX_RF_POWER: strcpy(str, _tr("TxRfPower")); break;
     case TELEM_CRSF_TX_RSSI_PERC: strcpy(str, _tr("TxRSSI%")); break;
 #endif
+    case TELEM_CRSF_AIRSPEED: strcpy(str, _tr("Air Speed")); break;
+    case TELEM_CRSF_TEMP_SRC: strcpy(str, _tr("Temp Src")); break;
 
     default: _crsf_short_name(str, telem); break;
     }

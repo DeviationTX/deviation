@@ -488,6 +488,9 @@ void TELEMETRY_Alarm()
                 case TELEM_CRSF_RX_SNR:
                 case TELEM_CRSF_RX_RSSI1:
                 case TELEM_CRSF_RX_RSSI2: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_DB,0); break;
+                case TELEM_CRSF_AIRSPEED: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_KMH,1); break;
+                case TELEM_CRSF_TEMP_1: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_CELSIUS,1); break;
+                case TELEM_CRSF_RPM_1: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_RPM,0); break;
                 default: MUSIC_PlayValue(telem_music, telem_value,VOICE_UNIT_NONE,0);
             }
         }

@@ -31,7 +31,11 @@
 #define TYPE_VARIO            0x07
 #define TYPE_BATTERY          0x08
 #define TYPE_BARO_ALT         0x09
+#define TYPE_AIRSPEED         0x0a
 #define TYPE_HEARTBEAT        0x0b
+#define TYPE_RPM              0x0c
+#define TYPE_TEMPERATURE      0x0d
+#define TYPE_VOLTAGES         0x0e  // currently unsupported
 #define TYPE_VTX              0x0F
 #define TYPE_VTX_TELEM        0x10
 #define TYPE_LINK             0x14
