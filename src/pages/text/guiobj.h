@@ -140,7 +140,7 @@ struct telemcfg_obj {
 struct telemtest_obj {
     guiLabel_t msg;
     guiLabel_t header[SCROLLABLE_ROWS];
-    guiLabel_t box[31];
+    guiLabel_t box[39];
     guiScrollable_t scrollable;
 };
 
