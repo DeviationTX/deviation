@@ -235,7 +235,7 @@ static u8 getCrossfireTelemetryValue(u8 index, s32 *value, u8 len) {
   *value = (*byte & 0x80) ? -1 : 0;
   for (u8 i=0; i < len; i++) {
     *value <<= 8;
-    if (*byte != 0xff) result = 1;
+//    if (*byte != 0xff) result = 1;
     *value += *byte++;
   }
   return result;
@@ -408,6 +408,26 @@ static void processCrossfireTelemetryFrame()
       if (getCrossfireTelemetryValue(6, &value, 1))
         set_telemetry(TELEM_CRSF_VTX_POWER, value);
       break;
+
+    case TYPE_AIRSPEED:
+      if (getCrossfireTelemetryValue(3, &value, 2))
+        set_telemetry(TELEM_CRSF_AIRSPEED, value/10);
+      break;
+
+    case TYPE_RPM:  // ignore source id and display only first value
+      if (getCrossfireTelemetryValue(3, &value, 1))
+        set_telemetry(TELEM_CRSF_RPM_SRC, value);
+      if (getCrossfireTelemetryValue(4, &value, 3))
+        set_telemetry(TELEM_CRSF_RPM_1, value);
+      break;
+
+    case TYPE_TEMPERATURE:  // ignore source id and display only first value
+      if (getCrossfireTelemetryValue(3, &value, 1))
+        set_telemetry(TELEM_CRSF_TEMP_SRC, value);
+      if (getCrossfireTelemetryValue(4, &value, 2))
+        set_telemetry(TELEM_CRSF_TEMP_1, value/10);
+      break;
+
   }
 }
 
