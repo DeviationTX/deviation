@@ -36,9 +36,6 @@ enum {
 #include "../common/_crsfdevice_page.c"
 
 static int gui_lines(crsf_param_t *param) {
-    if (param->lines_per_row)
-        return (int)param->lines_per_row;
-
     u16 label_width, value_width=0, _unused;
 
     LCD_GetStringDimensions((const u8 *)param->name, &label_width, &_unused);
