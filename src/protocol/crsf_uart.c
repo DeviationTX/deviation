@@ -235,7 +235,7 @@ static u8 getCrossfireTelemetryValue(u8 index, s32 *value, u8 len) {
   *value = (*byte & 0x80) ? -1 : 0;
   for (u8 i=0; i < len; i++) {
     *value <<= 8;
-//    if (*byte != 0xff) result = 1;
+    if (*byte != 0xff) result = 1;
     *value += *byte++;
   }
   return result;
