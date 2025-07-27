@@ -447,6 +447,20 @@ static u32 pkt32_to_coord(u8 *ptr)
          + bcd_to_int(((u32)ptr[2] << 16) | ((u32)ptr[1] << 8) | ptr[0]) * 6;
 }
 
+#if HAS_EXTENDED_TELEMETRY
+static void update_volt2() {
+    static const u8 update_smartbat[] = { I2C_SMART_BAT_CELL_1, I2C_SMART_BAT_CELL_2, I2C_SMART_BAT_CELL_3, I2C_SMART_BAT_CELL_4, I2C_SMART_BAT_CELL_5,
+                                          I2C_SMART_BAT_CELL_6, I2C_SMART_BAT_CELL_7, I2C_SMART_BAT_CELL_8, I2C_SMART_BAT_CELL_9, I2C_SMART_BAT_CELL_10, 0};
+    s32 volt2 = 0;
+    int i = 0;
+
+    while (update_smartbat[i]) volt2 += Telemetry.value[update_smartbat[i]];
+
+    Telemetry.value[TELEM_DSM_FLOG_VOLT2] = volt2;
+    TELEMETRY_SetUpdated(TELEM_DSM_FLOG_VOLT2);
+}
+#endif
+
 NO_INLINE static void parse_telemetry_packet()
 {
     static u8 altitude; // byte from first GPS packet
@@ -651,6 +665,38 @@ NO_INLINE static void parse_telemetry_packet()
             Telemetry.gps.satcount = bcd_to_int(packet[8]);
             altitude = packet[9];
             break;
+#if HAS_EXTENDED_TELEMETRY
+        case 0x42:  // I2C_SMART_BAT_REALTIME,  // Spektrum SMART Battery
+            break;     // ignore for now
+        case 0x43:  // I2C_SMART_BAT_CELLS_1_6
+        {
+            Telemetry.value[TELEM_DSM_FLOG_TEMP1] = packet[2];
+            TELEMETRY_SetUpdated(TELEM_DSM_FLOG_TEMP1);
+
+            s32 *telem_data = &Telemetry.value[I2C_SMART_BAT_CELL_1];
+            for (int i = 0; i < 6; i++)
+                *telem_data++ = (packet[i*2+3] << 8) | packet[i*2+4];
+            update_volt2();
+        }
+            break;
+        case 0x44:  // I2C_SMART_BAT_CELLS_7_12
+        {
+            Telemetry.value[TELEM_DSM_FLOG_TEMP1] = packet[2];
+            TELEMETRY_SetUpdated(TELEM_DSM_FLOG_TEMP1);
+
+            s32 *telem_data = &Telemetry.value[I2C_SMART_BAT_CELL_7];
+            for (int i = 0; i < 4; i++)
+                *telem_data++ = (packet[i*2+3] << 8) | packet[i*2+4];
+            update_volt2();
+        }
+            break;
+        case 0x45:  // I2C_SMART_BAT_CELLS_13_18
+            break;
+        case 0x4a:  // I2C_SMART_BAT_ID
+            break;     // ignore for now
+        case 0x4b:  // I2C_SMART_BAT_LIMITS
+            break;     // ignore for now
+#endif
     }
     idx = 0;
     while (*update) {
