@@ -627,12 +627,15 @@ NO_INLINE static void parse_telemetry_packet()
 #endif //HAS_EXTENDED_TELEMETRY
         case 0x7e: //TM1000
         case 0xfe: //TM1100
+            (void)update7e;
+#if 0   // TODO testing for telem_dsm_smart branch
             update = update7e;
             Telemetry.value[TELEM_DSM_FLOG_RPM1]  = (pktTelem[1] == 0xffff || pktTelem[1] < 200) ?  0 : (120000000 / 2 / pktTelem[1]);
             Telemetry.value[TELEM_DSM_FLOG_VOLT2] =  pktTelem[2];
             Telemetry.value[TELEM_DSM_FLOG_TEMP1] = (pktTelem[3] == 0x7fff) ? 0 : (pktTelem[3] - 32) * 5 / 9; //Convert to C
 #if HAS_EXTENDED_TELEMETRY
             Telemetry.value[TELEM_DSM_FLOG_RSSI_DBM] = (pktTelem[4] == 0xffff) ? 0 : (s8)packet[8];  // Average signal for A antenna in dBm
+#endif
 #endif
             break;
         case 0x16: //GPS sensor (always second GPS packet)
