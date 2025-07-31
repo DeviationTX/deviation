@@ -36,7 +36,7 @@ void TOUCH_Handler(); // temporarily in main()
 void VIDEO_Update();
 void PAGE_Test();
 
-#ifdef TEST
+#if defined (TEST) || defined (PROFILE)
 #define main _main
 #endif
 
