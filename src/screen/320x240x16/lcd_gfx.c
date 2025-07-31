@@ -498,11 +498,12 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
 {
     int i, j;
     FILE *fh;
+#define FILEBUF_SIZE 128
     unsigned transparent = 0;
     unsigned row_has_transparency = 0;
     (void)row_has_transparency;
 
-    u8 buf[480 * 2];
+    u8 buf[FILEBUF_SIZE * 2];
 
     if (w == 0 || h == 0)
         return;
@@ -570,13 +571,20 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
     LCD_DrawStart(x, y, x + w - 1, y + h - 1, DRAW_SWNE);
     /* Bitmap start is at lower-left corner */
     for (j = 0; j < h; j++) {
-        if (fread(buf, 2 * w, 1, fh) != 1)
-            break;
-        u16 *color = (u16 *)buf;
-        if(transparent) {
+        u16 *color = NULL;
+#ifndef TRANSPARENT_COLOR
+        unsigned last_pixel_transparent = row_has_transparency;
+        row_has_transparency = 0;
+#endif
+        for (i = 0; i < w; i++) {
+            if (i % FILEBUF_SIZE == 0) {
+                fread(buf, w - i > FILEBUF_SIZE? FILEBUF_SIZE: w - i, 2, fh);
+                color = (u16 *)buf;
+            }
+
+            if (transparent) {
 #ifdef TRANSPARENT_COLOR
-            //Display supports a transparent color
-            for (i = 0; i < w; i++ ) {
+                //  Display supports a transparent color
                 u32 c;
                 if((*color & 0x8000)) {
                     //convert 1555 -> 565
@@ -586,11 +594,7 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
                 }
                 LCD_DrawPixel(c);
                 color++;
-            }
 #else
-            unsigned last_pixel_transparent = row_has_transparency;
-            row_has_transparency = 0;
-            for (i = 0; i < w; i++ ) {
                 if((*color & 0x8000)) {
                     //convert 1555 -> 565
                     unsigned c = ((*color & 0x7fe0) << 1) | (*color & 0x1f);
@@ -607,10 +611,8 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
                     last_pixel_transparent = 1;
                 }
                 color++;
-            }
 #endif
-        } else {
-            for (i = 0; i < w; i++ ) {
+            } else {
                 if (LCD_DEPTH == 1)
                     *color = (*color & 0x8410) == 0x8410 ?  0 : 0xffff;
                 LCD_DrawPixel(*color++);
