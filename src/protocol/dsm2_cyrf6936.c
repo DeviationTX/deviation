@@ -449,12 +449,14 @@ static u32 pkt32_to_coord(u8 *ptr)
 
 #if HAS_EXTENDED_TELEMETRY
 static void update_volt2() {
-    static const u8 update_smartbat[] = { I2C_SMART_BAT_CELL_1, I2C_SMART_BAT_CELL_2, I2C_SMART_BAT_CELL_3, I2C_SMART_BAT_CELL_4, I2C_SMART_BAT_CELL_5,
-                                          I2C_SMART_BAT_CELL_6, I2C_SMART_BAT_CELL_7, I2C_SMART_BAT_CELL_8, I2C_SMART_BAT_CELL_9, I2C_SMART_BAT_CELL_10, 0};
+    static const u8 update_smartbat[] = { I2C_SMART_BAT_CELL_1, I2C_SMART_BAT_CELL_2, I2C_SMART_BAT_CELL_3,
+                                          I2C_SMART_BAT_CELL_4, I2C_SMART_BAT_CELL_5, I2C_SMART_BAT_CELL_6,
+                                          I2C_SMART_BAT_CELL_7, I2C_SMART_BAT_CELL_8, I2C_SMART_BAT_CELL_9,
+                                          I2C_SMART_BAT_CELL_10, 0};
     s32 volt2 = 0;
     int i = 0;
 
-    while (update_smartbat[i]) volt2 += Telemetry.value[update_smartbat[i]];
+    while (update_smartbat[i]) volt2 += Telemetry.value[update_smartbat[i++]];
 
     Telemetry.value[TELEM_DSM_FLOG_VOLT2] = volt2;
     TELEMETRY_SetUpdated(TELEM_DSM_FLOG_VOLT2);
@@ -673,23 +675,23 @@ NO_INLINE static void parse_telemetry_packet()
             break;     // ignore for now
         case 0x43:  // I2C_SMART_BAT_CELLS_1_6
         {
-            Telemetry.value[TELEM_DSM_FLOG_TEMP1] = packet[2];
+            Telemetry.value[TELEM_DSM_FLOG_TEMP1] = packet[1];
             TELEMETRY_SetUpdated(TELEM_DSM_FLOG_TEMP1);
 
             s32 *telem_data = &Telemetry.value[I2C_SMART_BAT_CELL_1];
             for (int i = 0; i < 6; i++)
-                *telem_data++ = (packet[i*2+3] << 8) | packet[i*2+4];
+                *telem_data++ = (packet[i*2+2] << 8) | packet[i*2+3];
             update_volt2();
         }
             break;
         case 0x44:  // I2C_SMART_BAT_CELLS_7_12
         {
-            Telemetry.value[TELEM_DSM_FLOG_TEMP1] = packet[2];
+            Telemetry.value[TELEM_DSM_FLOG_TEMP1] = packet[1];
             TELEMETRY_SetUpdated(TELEM_DSM_FLOG_TEMP1);
 
             s32 *telem_data = &Telemetry.value[I2C_SMART_BAT_CELL_7];
             for (int i = 0; i < 4; i++)
-                *telem_data++ = (packet[i*2+3] << 8) | packet[i*2+4];
+                *telem_data++ = (packet[i*2+2] << 8) | packet[i*2+3];
             update_volt2();
         }
             break;
@@ -717,6 +719,28 @@ static u16 dsm2_cb()
 #define WRITE_DELAY   1550  // Time after write to verify write complete
 #define READ_DELAY     600  // Time before write to check read state, and switch channels.
                             // Telemetry read+processing =~200us and switch channels =~300us
+
+// TODO remove test code below here
+// simulate smart battery telemetry
+//    packet[0] = 0x43;
+//    packet[1] = 0x20;
+//    packet[2] = 0x01;
+//    packet[3] = 0x02;
+//    packet[4] = 0x03;
+//    packet[5] = 0x04;
+//    packet[6] = 0x05;
+//    packet[7] = 0x06;
+//    packet[8] = 0x07;
+//    packet[9] = 0x08;
+//    packet[10] = 0x09;
+//    packet[11] = 0x0a;
+//    packet[12] = 0x0b;
+//    packet[13] = 0x0c;
+//    packet[14] = 0x0d;
+//    packet[15] = 0xaa;
+//    parse_telemetry_packet();
+//    return 100;
+// TODO remove test code above here
 
 #ifndef MODULAR
     // keep frequency tuning updated
