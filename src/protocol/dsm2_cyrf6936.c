@@ -675,23 +675,23 @@ NO_INLINE static void parse_telemetry_packet()
             break;     // ignore for now
         case 0x43:  // I2C_SMART_BAT_CELLS_1_6
         {
-            Telemetry.value[TELEM_DSM_FLOG_TEMP1] = packet[1];
+            Telemetry.value[TELEM_DSM_FLOG_TEMP1] = packet[2];
             TELEMETRY_SetUpdated(TELEM_DSM_FLOG_TEMP1);
 
             s32 *telem_data = &Telemetry.value[I2C_SMART_BAT_CELL_1];
             for (int i = 0; i < 6; i++)
-                *telem_data++ = (packet[i*2+2] << 8) | packet[i*2+3];
+                *telem_data++ = (packet[i*2+3] << 8) | packet[i*2+4];
             update_volt2();
         }
             break;
         case 0x44:  // I2C_SMART_BAT_CELLS_7_12
         {
-            Telemetry.value[TELEM_DSM_FLOG_TEMP1] = packet[1];
+            Telemetry.value[TELEM_DSM_FLOG_TEMP1] = packet[2];
             TELEMETRY_SetUpdated(TELEM_DSM_FLOG_TEMP1);
 
             s32 *telem_data = &Telemetry.value[I2C_SMART_BAT_CELL_7];
             for (int i = 0; i < 4; i++)
-                *telem_data++ = (packet[i*2+2] << 8) | packet[i*2+3];
+                *telem_data++ = (packet[i*2+3] << 8) | packet[i*2+4];
             update_volt2();
         }
             break;
