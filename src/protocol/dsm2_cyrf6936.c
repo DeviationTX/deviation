@@ -448,11 +448,20 @@ static u32 pkt32_to_coord(u8 *ptr)
 }
 
 #if HAS_EXTENDED_TELEMETRY
-static void update_volt2() {
     static const u8 update_smartbat[] = { I2C_SMART_BAT_CELL_1, I2C_SMART_BAT_CELL_2, I2C_SMART_BAT_CELL_3,
                                           I2C_SMART_BAT_CELL_4, I2C_SMART_BAT_CELL_5, I2C_SMART_BAT_CELL_6,
                                           I2C_SMART_BAT_CELL_7, I2C_SMART_BAT_CELL_8, I2C_SMART_BAT_CELL_9,
                                           I2C_SMART_BAT_CELL_10, 0};
+static void update_6cells(start_cell) {
+    u16 value;
+    for (int i = 0; i < 6; i++) {
+        value = (u16) ((packet[i*2+5] << 8) | packet[i*2+4]);
+        if (value != 0xffff)
+            Telemetry.value[start_cell + i] = value;
+    }
+}
+
+static void update_volt2() {
     s32 volt2 = 0;
     int i = 0;
 
@@ -512,6 +521,8 @@ NO_INLINE static void parse_telemetry_packet()
 #define LSB_1st    ((data_type >= 0x15 && data_type <= 0x18) || (data_type == 0x34))
 
     static u16 pktTelem[8];
+
+DATALOG_RawWrite(packet, 16); // TODO
 
     // Convert 8bit packet into 16bit equivalent
     if (LSB_1st) {
@@ -671,29 +682,26 @@ NO_INLINE static void parse_telemetry_packet()
             altitude = packet[9];
             break;
 #if HAS_EXTENDED_TELEMETRY
-        case 0x42:  // I2C_SMART_BAT_REALTIME,  // Spektrum SMART Battery
-            // experiment based on edgetx code
+        case 0x42:  // I2C_SMART_BAT_BASE_ADDRESS,  // Spektrum SMART Battery
             data_type = 0x42 + (packet[2] >> 4);
             switch (data_type) {
+            case 0x42:  // I2C_SMART_BAT_REALTIME
+                break;
             case 0x43:  // I2C_SMART_BAT_CELLS_1_6
             {
-                Telemetry.value[TELEM_DSM_FLOG_TEMP1] = packet[3];
+                Telemetry.value[TELEM_DSM_FLOG_TEMP1] = (s8)packet[3];
                 TELEMETRY_SetUpdated(TELEM_DSM_FLOG_TEMP1);
 
-                s32 *telem_data = &Telemetry.value[I2C_SMART_BAT_CELL_1];
-                for (int i = 0; i < 6; i++)
-                    *telem_data++ = (packet[i*2+4] << 8) | packet[i*2+5];
+                update_6cells(I2C_SMART_BAT_CELL_1);
                 update_volt2();
             }
                 break;
             case 0x44:  // I2C_SMART_BAT_CELLS_7_12
             {
-                Telemetry.value[TELEM_DSM_FLOG_TEMP1] = packet[3];
+                Telemetry.value[TELEM_DSM_FLOG_TEMP1] = (s8)packet[3];
                 TELEMETRY_SetUpdated(TELEM_DSM_FLOG_TEMP1);
 
-                s32 *telem_data = &Telemetry.value[I2C_SMART_BAT_CELL_7];
-                for (int i = 0; i < 4; i++)
-                    *telem_data++ = (packet[i*2+4] << 8) | packet[i*2+5];
+                update_6cells(I2C_SMART_BAT_CELL_7);
                 update_volt2();
             }
                 break;
@@ -706,36 +714,6 @@ NO_INLINE static void parse_telemetry_packet()
 
             }
             break;
-// TODO see above case 0x42
-//        case 0x43:  // I2C_SMART_BAT_CELLS_1_6
-//        {
-//            Telemetry.value[TELEM_DSM_FLOG_TEMP1] = packet[2];
-//            TELEMETRY_SetUpdated(TELEM_DSM_FLOG_TEMP1);
-//
-//            s32 *telem_data = &Telemetry.value[I2C_SMART_BAT_CELL_1];
-//            for (int i = 0; i < 6; i++)
-//                *telem_data++ = (packet[i*2+3] << 8) | packet[i*2+4];
-//            update_volt2();
-//        }
-//            break;
-//        case 0x44:  // I2C_SMART_BAT_CELLS_7_12
-//        {
-//            Telemetry.value[TELEM_DSM_FLOG_TEMP1] = packet[2];
-//            TELEMETRY_SetUpdated(TELEM_DSM_FLOG_TEMP1);
-//
-//            s32 *telem_data = &Telemetry.value[I2C_SMART_BAT_CELL_7];
-//            for (int i = 0; i < 4; i++)
-//                *telem_data++ = (packet[i*2+3] << 8) | packet[i*2+4];
-//            update_volt2();
-//        }
-//            break;
-//        case 0x45:  // I2C_SMART_BAT_CELLS_13_18
-//            break;
-//        case 0x4a:  // I2C_SMART_BAT_ID
-//            break;     // ignore for now
-//        case 0x4b:  // I2C_SMART_BAT_LIMITS
-//            break;     // ignore for now
-// TODO
 #endif
     }
     idx = 0;
@@ -757,22 +735,22 @@ static u16 dsm2_cb()
 
 // TODO remove test code below here
 // simulate smart battery telemetry
-//    packet[0] = 0x43;
-//    packet[1] = 0x20;
-//    packet[2] = 0x01;
-//    packet[3] = 0x02;
-//    packet[4] = 0x03;
-//    packet[5] = 0x04;
-//    packet[6] = 0x05;
-//    packet[7] = 0x06;
-//    packet[8] = 0x07;
-//    packet[9] = 0x08;
-//    packet[10] = 0x09;
-//    packet[11] = 0x0a;
-//    packet[12] = 0x0b;
-//    packet[13] = 0x0c;
-//    packet[14] = 0x0d;
-//    packet[15] = 0xaa;
+//    packet[0] = 0x42;
+//    packet[1] = 0x00;
+//    packet[2] = 0x10;
+//    packet[3] = 0x80;
+//    packet[4] = 0x90;
+//    packet[5] = 0x01;
+//    packet[6] = 0x90;
+//    packet[7] = 0x01;
+//    packet[8] = 0xff;
+//    packet[9] = 0xff;
+//    packet[10] = 0xff;
+//    packet[11] = 0xff;
+//    packet[12] = 0xff;
+//    packet[13] = 0xff;
+//    packet[14] = 0xff;
+//    packet[15] = 0xff;
 //    parse_telemetry_packet();
 //    return 100;
 // TODO remove test code above here

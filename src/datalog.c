@@ -30,7 +30,7 @@
 //ctassert((DLOG_LAST == 67), dlog_api_changed); // DATALOG_VERSION = 0x01
 //ctassert((DLOG_LAST == 116), dlog_api_changed); // DATALOG_VERSION = 0x02
 //ctassert((DLOG_LAST == 120), dlog_api_changed); // DATALOG_VERSION = 0x03
-//ctassert((DLOG_LAST == 121), dlog_api_changed); // DATALOG_VERSION = 0x04
+// TODO ctassert((DLOG_LAST == 121), dlog_api_changed); // DATALOG_VERSION = 0x04
 #endif
 
 #define UPDATE_DELAY 4000 //wiat 4 seconds after changing enable before sample start
@@ -213,6 +213,7 @@ void DATALOG_Write()
 
 void DATALOG_Update()
 {
+    return; //TODO
     if (! fh)
         return;
     if(MIXER_SourceAsBoolean(Model.datalog.enable) && ((int)dlog_size - ftell(fh) >= data_size)) {
@@ -257,7 +258,8 @@ void DATALOG_Init()
     fh = fopen2(&DatalogFAT, "datalog.bin", "r+");
     if (fh) {
         setbuf(fh, 0);
-        long pos = _find_fpos();
+        // TODO long pos = _find_fpos();
+        long pos = 0L; // TODO for using RawWrite
         fseek(fh, 0, SEEK_END);
         dlog_size = ftell(fh);
         fseek(fh, pos, SEEK_SET);
@@ -266,4 +268,13 @@ void DATALOG_Init()
         next_update = CLOCK_getms();
     }
 } 
+
+void DATALOG_RawWrite(u8 *data, int length) {
+    if (!fh || length <= 0)
+        return;
+
+    if (DATALOG_Remaining() >= length)
+        for (int i=0; i < length; i++)
+            _write_8(*data++);
+}
 #endif //HAS_DATALOG
