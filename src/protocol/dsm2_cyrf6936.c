@@ -452,12 +452,12 @@ static u32 pkt32_to_coord(u8 *ptr)
                                           I2C_SMART_BAT_CELL_4, I2C_SMART_BAT_CELL_5, I2C_SMART_BAT_CELL_6,
                                           I2C_SMART_BAT_CELL_7, I2C_SMART_BAT_CELL_8, I2C_SMART_BAT_CELL_9,
                                           I2C_SMART_BAT_CELL_10, 0};
-static void update_6cells(start_cell) {
+static void update_6cells(unsigned start_cell) {
     u16 value;
     for (int i = 0; i < 6; i++) {
         value = (u16) ((packet[i*2+5] << 8) | packet[i*2+4]);
         if (value != 0xffff)
-            Telemetry.value[start_cell + i] = value;
+            Telemetry.value[start_cell + i] = value / 10;
     }
 }
 
