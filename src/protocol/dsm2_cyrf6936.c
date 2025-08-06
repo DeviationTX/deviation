@@ -522,7 +522,7 @@ NO_INLINE static void parse_telemetry_packet()
 
     static u16 pktTelem[8];
 
-DATALOG_RawWrite(packet, 16); // TODO
+// DATALOG_RawWrite(packet, 16); // TODO
 
     // Convert 8bit packet into 16bit equivalent
     if (LSB_1st) {
@@ -628,8 +628,12 @@ DATALOG_RawWrite(packet, 16); // TODO
         case 0x20: //Electronic Speed Control
             update = update20;
             Telemetry.value[TELEM_DSM_ESC_RPM]   = pktTelem[1] * 10; //In rpm, 0-655340 (0xFFFF --> No data)
+            if (pktTelem[1] != 0xffff) 
+                Telemetry.value[TELEM_DSM_FLOG_RPM1] = pktTelem[1];
             Telemetry.value[TELEM_DSM_ESC_VOLT1] = pktTelem[2];      //Batt in 1/100 of Volts (Volt2) (0-655.34V) (0xFFFF --> No data)
             Telemetry.value[TELEM_DSM_ESC_TEMP1] = pktTelem[3];      //FET Temp in 1/10 of C degree (0-999.8C) (0xFFFF --> No data)
+            if (pktTelem[3] != 0xffff) 
+                Telemetry.value[TELEM_DSM_FLOG_TEMP1] = pktTelem[3] / 10 ;
             Telemetry.value[TELEM_DSM_ESC_AMPS1] = pktTelem[4];      //In 1/100 Amp (0-655.34A) (0xFFFF --> No data)
             Telemetry.value[TELEM_DSM_ESC_TEMP2] = pktTelem[5];      //BEC Temp in 1/10 of C degree (0-999.8C) (0xFFFF --> No data)
             Telemetry.value[TELEM_DSM_ESC_AMPS2] = packet[12];       //BEC current in 1/10 Amp (0-25.4A) (0xFF ----> No data)
@@ -641,14 +645,16 @@ DATALOG_RawWrite(packet, 16); // TODO
         case 0x7e: //TM1000
         case 0xfe: //TM1100
             (void)update7e;
-#if 0   // TODO testing for telem_dsm_smart branch
             update = update7e;
-            Telemetry.value[TELEM_DSM_FLOG_RPM1]  = (pktTelem[1] == 0xffff || pktTelem[1] < 200) ?  0 : (120000000 / 2 / pktTelem[1]);
-            Telemetry.value[TELEM_DSM_FLOG_VOLT2] =  pktTelem[2];
-            Telemetry.value[TELEM_DSM_FLOG_TEMP1] = (pktTelem[3] == 0x7fff) ? 0 : (pktTelem[3] - 32) * 5 / 9; //Convert to C
+            if (pktTelem[1] != 0xffff) 
+                Telemetry.value[TELEM_DSM_FLOG_RPM1] = pktTelem[1] < 200 ?  0 : (120000000 / 2 / pktTelem[1]);
+            if (pktTelem[2] != 0xffff) 
+                Telemetry.value[TELEM_DSM_FLOG_VOLT2] =  pktTelem[2];
+            if (pktTelem[3] != 0x7fff) 
+                Telemetry.value[TELEM_DSM_FLOG_TEMP1] = (pktTelem[3] - 32) * 5 / 9; //Convert to C
 #if HAS_EXTENDED_TELEMETRY
-            Telemetry.value[TELEM_DSM_FLOG_RSSI_DBM] = (pktTelem[4] == 0xffff) ? 0 : (s8)packet[8];  // Average signal for A antenna in dBm
-#endif
+            if (pktTelem[4] != 0xffff) 
+                Telemetry.value[TELEM_DSM_FLOG_RSSI_DBM] = (s8)packet[8];  // Average signal for A antenna in dBm
 #endif
             break;
         case 0x16: //GPS sensor (always second GPS packet)
@@ -689,8 +695,10 @@ DATALOG_RawWrite(packet, 16); // TODO
                 break;
             case 0x43:  // I2C_SMART_BAT_CELLS_1_6
             {
-                Telemetry.value[TELEM_DSM_FLOG_TEMP1] = (s8)packet[3];
-                TELEMETRY_SetUpdated(TELEM_DSM_FLOG_TEMP1);
+                if ((s8)packet[3] != -128) {
+                    Telemetry.value[TELEM_DSM_FLOG_TEMP1] = (s8)packet[3];
+                    TELEMETRY_SetUpdated(TELEM_DSM_FLOG_TEMP1);
+                }
 
                 update_6cells(I2C_SMART_BAT_CELL_1);
                 update_volt2();
@@ -698,8 +706,10 @@ DATALOG_RawWrite(packet, 16); // TODO
                 break;
             case 0x44:  // I2C_SMART_BAT_CELLS_7_12
             {
-                Telemetry.value[TELEM_DSM_FLOG_TEMP1] = (s8)packet[3];
-                TELEMETRY_SetUpdated(TELEM_DSM_FLOG_TEMP1);
+                if ((s8)packet[3] != -128) {
+                    Telemetry.value[TELEM_DSM_FLOG_TEMP1] = (s8)packet[3];
+                    TELEMETRY_SetUpdated(TELEM_DSM_FLOG_TEMP1);
+                }
 
                 update_6cells(I2C_SMART_BAT_CELL_7);
                 update_volt2();
@@ -739,12 +749,12 @@ static u16 dsm2_cb()
 //    packet[1] = 0x00;
 //    packet[2] = 0x10;
 //    packet[3] = 0x80;
-//    packet[4] = 0x90;
-//    packet[5] = 0x01;
-//    packet[6] = 0x90;
-//    packet[7] = 0x01;
-//    packet[8] = 0xff;
-//    packet[9] = 0xff;
+//    packet[4] = 0xdc;
+//    packet[5] = 0x0f;
+//    packet[6] = 0xdc;
+//    packet[7] = 0x0f;
+//    packet[8] = 0xdc;
+//    packet[9] = 0x0f;
 //    packet[10] = 0xff;
 //    packet[11] = 0xff;
 //    packet[12] = 0xff;
