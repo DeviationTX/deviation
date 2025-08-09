@@ -447,12 +447,12 @@ static u32 pkt32_to_coord(u8 *ptr)
          + bcd_to_int(((u32)ptr[2] << 16) | ((u32)ptr[1] << 8) | ptr[0]) * 6;
 }
 
-#if HAS_EXTENDED_TELEMETRY
 static void set_telemetry(crossfire_telem_t offset, s32 value) {
     Telemetry.value[offset] = value;
     TELEMETRY_SetUpdated(offset);
 }
 
+#if HAS_EXTENDED_TELEMETRY
 static const u8 update_smartbat[] = { I2C_SMART_BAT_CELL_1, I2C_SMART_BAT_CELL_2, I2C_SMART_BAT_CELL_3,
                                       I2C_SMART_BAT_CELL_4, I2C_SMART_BAT_CELL_5, I2C_SMART_BAT_CELL_6,
                                       I2C_SMART_BAT_CELL_7, I2C_SMART_BAT_CELL_8, I2C_SMART_BAT_CELL_9,
@@ -632,11 +632,11 @@ NO_INLINE static void parse_telemetry_packet()
             update = update20;
             Telemetry.value[TELEM_DSM_ESC_RPM]   = pktTelem[1] * 10; //In rpm, 0-655340 (0xFFFF --> No data)
             if (pktTelem[1] != 0xffff) 
-                Telemetry.value[TELEM_DSM_FLOG_RPM1] = pktTelem[1];
+                set_telemetry(TELEM_DSM_FLOG_RPM1, pktTelem[1]);
             Telemetry.value[TELEM_DSM_ESC_VOLT1] = pktTelem[2];      //Batt in 1/100 of Volts (Volt2) (0-655.34V) (0xFFFF --> No data)
             Telemetry.value[TELEM_DSM_ESC_TEMP1] = pktTelem[3];      //FET Temp in 1/10 of C degree (0-999.8C) (0xFFFF --> No data)
             if (pktTelem[3] != 0xffff) 
-                Telemetry.value[TELEM_DSM_FLOG_TEMP1] = pktTelem[3] / 10 ;
+                set_telemetry(TELEM_DSM_FLOG_TEMP1, pktTelem[3] / 10);
             Telemetry.value[TELEM_DSM_ESC_AMPS1] = pktTelem[4];      //In 1/100 Amp (0-655.34A) (0xFFFF --> No data)
             Telemetry.value[TELEM_DSM_ESC_TEMP2] = pktTelem[5];      //BEC Temp in 1/10 of C degree (0-999.8C) (0xFFFF --> No data)
             Telemetry.value[TELEM_DSM_ESC_AMPS2] = packet[12];       //BEC current in 1/10 Amp (0-25.4A) (0xFF ----> No data)
