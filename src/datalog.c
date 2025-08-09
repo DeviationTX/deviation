@@ -21,6 +21,9 @@
 
 #if HAS_DATALOG
 
+// Set to 1 to enable DATALOG_RawWrite function for debugging
+#define ENABLE_RAW_WRITE 0
+
 // version check by utils/datalog2csv.py
 #define DATALOG_VERSION 0x04
 // version 4: add dsm rssi telemetry
@@ -213,7 +216,9 @@ void DATALOG_Write()
 
 void DATALOG_Update()
 {
-    return; //TODO
+#if ENABLE_RAW_WRITE
+    return;
+#endif
     if (! fh)
         return;
     if(MIXER_SourceAsBoolean(Model.datalog.enable) && ((int)dlog_size - ftell(fh) >= data_size)) {
@@ -258,8 +263,11 @@ void DATALOG_Init()
     fh = fopen2(&DatalogFAT, "datalog.bin", "r+");
     if (fh) {
         setbuf(fh, 0);
-        // TODO long pos = _find_fpos();
-        long pos = 0L; // TODO for using RawWrite
+#if ENABLE_RAW_WRITE
+        long pos = 0L;
+#else
+        long pos = _find_fpos();
+#endif
         fseek(fh, 0, SEEK_END);
         dlog_size = ftell(fh);
         fseek(fh, pos, SEEK_SET);
@@ -269,6 +277,7 @@ void DATALOG_Init()
     }
 } 
 
+#if ENABLE_RAW_WRITE
 void DATALOG_RawWrite(u8 *data, int length) {
     if (!fh || length <= 0)
         return;
@@ -277,4 +286,5 @@ void DATALOG_RawWrite(u8 *data, int length) {
         for (int i=0; i < length; i++)
             _write_8(*data++);
 }
+#endif
 #endif //HAS_DATALOG

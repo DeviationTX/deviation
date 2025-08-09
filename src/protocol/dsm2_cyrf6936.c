@@ -448,10 +448,15 @@ static u32 pkt32_to_coord(u8 *ptr)
 }
 
 #if HAS_EXTENDED_TELEMETRY
-    static const u8 update_smartbat[] = { I2C_SMART_BAT_CELL_1, I2C_SMART_BAT_CELL_2, I2C_SMART_BAT_CELL_3,
-                                          I2C_SMART_BAT_CELL_4, I2C_SMART_BAT_CELL_5, I2C_SMART_BAT_CELL_6,
-                                          I2C_SMART_BAT_CELL_7, I2C_SMART_BAT_CELL_8, I2C_SMART_BAT_CELL_9,
-                                          I2C_SMART_BAT_CELL_10, 0};
+static void set_telemetry(crossfire_telem_t offset, s32 value) {
+    Telemetry.value[offset] = value;
+    TELEMETRY_SetUpdated(offset);
+}
+
+static const u8 update_smartbat[] = { I2C_SMART_BAT_CELL_1, I2C_SMART_BAT_CELL_2, I2C_SMART_BAT_CELL_3,
+                                      I2C_SMART_BAT_CELL_4, I2C_SMART_BAT_CELL_5, I2C_SMART_BAT_CELL_6,
+                                      I2C_SMART_BAT_CELL_7, I2C_SMART_BAT_CELL_8, I2C_SMART_BAT_CELL_9,
+                                      I2C_SMART_BAT_CELL_10, 0};
 static void update_6cells(unsigned start_cell) {
     u16 value;
     for (int i = 0; i < 6; i++) {
@@ -465,10 +470,10 @@ static void update_volt2() {
     s32 volt2 = 0;
     int i = 0;
 
-    while (update_smartbat[i]) volt2 += Telemetry.value[update_smartbat[i++]];
+    while (update_smartbat[i])
+        volt2 += Telemetry.value[update_smartbat[i++]];
 
-    Telemetry.value[TELEM_DSM_FLOG_VOLT2] = volt2;
-    TELEMETRY_SetUpdated(TELEM_DSM_FLOG_VOLT2);
+    set_telemetry(TELEM_DSM_FLOG_VOLT2, volt2);
 }
 #endif
 
@@ -521,8 +526,6 @@ NO_INLINE static void parse_telemetry_packet()
 #define LSB_1st    ((data_type >= 0x15 && data_type <= 0x18) || (data_type == 0x34))
 
     static u16 pktTelem[8];
-
-// DATALOG_RawWrite(packet, 16); // TODO
 
     // Convert 8bit packet into 16bit equivalent
     if (LSB_1st) {
@@ -645,16 +648,15 @@ NO_INLINE static void parse_telemetry_packet()
         case 0x7e: //TM1000
         case 0xfe: //TM1100
             (void)update7e;
-            update = update7e;
             if (pktTelem[1] != 0xffff) 
-                Telemetry.value[TELEM_DSM_FLOG_RPM1] = pktTelem[1] < 200 ?  0 : (120000000 / 2 / pktTelem[1]);
+                set_telemetry(TELEM_DSM_FLOG_RPM1, pktTelem[1] < 200 ?  0 : (120000000 / 2 / pktTelem[1]));
             if (pktTelem[2] != 0xffff) 
-                Telemetry.value[TELEM_DSM_FLOG_VOLT2] =  pktTelem[2];
+                set_telemetry(TELEM_DSM_FLOG_VOLT2,  pktTelem[2]);
             if (pktTelem[3] != 0x7fff) 
-                Telemetry.value[TELEM_DSM_FLOG_TEMP1] = (pktTelem[3] - 32) * 5 / 9; //Convert to C
+                set_telemetry(TELEM_DSM_FLOG_TEMP1, (pktTelem[3] - 32) * 5 / 9); //Convert to C
 #if HAS_EXTENDED_TELEMETRY
             if (pktTelem[4] != 0xffff) 
-                Telemetry.value[TELEM_DSM_FLOG_RSSI_DBM] = (s8)packet[8];  // Average signal for A antenna in dBm
+                set_telemetry(TELEM_DSM_FLOG_RSSI_DBM, (s8)packet[8]);  // Average signal for A antenna in dBm
 #endif
             break;
         case 0x16: //GPS sensor (always second GPS packet)
@@ -695,10 +697,8 @@ NO_INLINE static void parse_telemetry_packet()
                 break;
             case 0x43:  // I2C_SMART_BAT_CELLS_1_6
             {
-                if ((s8)packet[3] != -128) {
-                    Telemetry.value[TELEM_DSM_FLOG_TEMP1] = (s8)packet[3];
-                    TELEMETRY_SetUpdated(TELEM_DSM_FLOG_TEMP1);
-                }
+                if ((s8)packet[3] != -128)
+                    set_telemetry(TELEM_DSM_FLOG_TEMP1, (s8)packet[3]);
 
                 update_6cells(I2C_SMART_BAT_CELL_1);
                 update_volt2();
@@ -706,10 +706,8 @@ NO_INLINE static void parse_telemetry_packet()
                 break;
             case 0x44:  // I2C_SMART_BAT_CELLS_7_12
             {
-                if ((s8)packet[3] != -128) {
-                    Telemetry.value[TELEM_DSM_FLOG_TEMP1] = (s8)packet[3];
-                    TELEMETRY_SetUpdated(TELEM_DSM_FLOG_TEMP1);
-                }
+                if ((s8)packet[3] != -128)
+                    set_telemetry(TELEM_DSM_FLOG_TEMP1, (s8)packet[3]);
 
                 update_6cells(I2C_SMART_BAT_CELL_7);
                 update_volt2();
@@ -733,6 +731,21 @@ NO_INLINE static void parse_telemetry_packet()
     }
 }
 
+// Sample telemetry capture from EFlite UMX plane (with Smart Battery telemetry)
+//  7E 00 FF FF FF FF 7F FF E4 64 00 00 00 00 00 00
+//  FF 00 00 2D FF FF FF FF FF FF 00 06 00 01 01 AB
+//  42 00 80 01 03 01 00 00 C4 D2 94 01 00 00 00 00
+//  7E 00 FF FF FF FF 7F FF E4 64 00 00 00 00 00 00
+//  FF 00 00 2D FF FF FF FF FF FF 00 06 00 01 01 AB
+//  42 00 10 80 DF 0F DF 0F DF 0F FF FF FF FF FF FF
+//  7E 00 FF FF FF FF 7F FF E4 64 00 00 00 00 00 00
+//  FF 00 00 2D FF FF FF FF FF FF 00 06 00 01 01 AB
+//  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+//  7E 00 FF FF FF FF 7F FF E4 64 00 00 00 00 00 00
+//  FF 00 00 2D FF FF FF FF FF FF 00 06 00 01 01 AB
+//  20 00 00 00 04 C2 00 FA 00 00 FF FF FF FF 00 00
+
+
 #ifndef MODULAR
 static u16 mixer_runtime;
 #endif
@@ -742,28 +755,6 @@ static u16 dsm2_cb()
 #define WRITE_DELAY   1550  // Time after write to verify write complete
 #define READ_DELAY     600  // Time before write to check read state, and switch channels.
                             // Telemetry read+processing =~200us and switch channels =~300us
-
-// TODO remove test code below here
-// simulate smart battery telemetry
-//    packet[0] = 0x42;
-//    packet[1] = 0x00;
-//    packet[2] = 0x10;
-//    packet[3] = 0x80;
-//    packet[4] = 0xdc;
-//    packet[5] = 0x0f;
-//    packet[6] = 0xdc;
-//    packet[7] = 0x0f;
-//    packet[8] = 0xdc;
-//    packet[9] = 0x0f;
-//    packet[10] = 0xff;
-//    packet[11] = 0xff;
-//    packet[12] = 0xff;
-//    packet[13] = 0xff;
-//    packet[14] = 0xff;
-//    packet[15] = 0xff;
-//    parse_telemetry_packet();
-//    return 100;
-// TODO remove test code above here
 
 #ifndef MODULAR
     // keep frequency tuning updated
