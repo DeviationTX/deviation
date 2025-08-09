@@ -157,6 +157,16 @@ const char * _dsm_str_by_value(char *str, u8 telem, s32 value)
         case TELEM_DSM_JETCAT_PUMPVOLT:
         case TELEM_DSM_ESC_VOLT1:
         case TELEM_DSM_ESC_VOLT2:
+    	case I2C_SMART_BAT_CELL_1:
+    	case I2C_SMART_BAT_CELL_2:
+    	case I2C_SMART_BAT_CELL_3:
+    	case I2C_SMART_BAT_CELL_4:
+    	case I2C_SMART_BAT_CELL_5:
+    	case I2C_SMART_BAT_CELL_6:
+    	case I2C_SMART_BAT_CELL_7:
+    	case I2C_SMART_BAT_CELL_8:
+    	case I2C_SMART_BAT_CELL_9:
+    	case I2C_SMART_BAT_CELL_10:
         case TELEM_DSM_RXPCAP_VOLT:     _get_value_str(str, value, 2, 'V'); break;
         case TELEM_DSM_JETCAT_THROTTLE: _get_value_str(str, value, 0, '%'); break;
         case TELEM_DSM_JETCAT_TEMPEGT:  _get_temp_str(str, value, 0, 'C'); break;
@@ -241,6 +251,16 @@ const char * _dsm_name(char *str, u8 telem)
         case TELEM_DSM_FPCAP_AMPS:      strcpy(str, "BtCap.A"); break;
         case TELEM_DSM_FPCAP_CAPACITY:  strcpy(str, "BtCap.C"); break;
         case TELEM_DSM_FPCAP_TEMP:      strcpy(str, "BtCap.T"); break;
+    	case I2C_SMART_BAT_CELL_1:
+    	case I2C_SMART_BAT_CELL_2:
+    	case I2C_SMART_BAT_CELL_3:
+    	case I2C_SMART_BAT_CELL_4:
+    	case I2C_SMART_BAT_CELL_5:
+    	case I2C_SMART_BAT_CELL_6:
+    	case I2C_SMART_BAT_CELL_7:
+    	case I2C_SMART_BAT_CELL_8:
+    	case I2C_SMART_BAT_CELL_9:
+    	case I2C_SMART_BAT_CELL_10:		sprintf(str, "%s%d", "SmBt.Cel", telem - I2C_SMART_BAT_CELL_1 + 1); break;
 #endif
         case TELEM_DSM_VARIO_ALTITUDE:  strcpy(str, "Var.Alt"); break;
         case TELEM_DSM_VARIO_CLIMBRATE1:
