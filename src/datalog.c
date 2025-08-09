@@ -25,15 +25,17 @@
 #define ENABLE_RAW_WRITE 0
 
 // version check by utils/datalog2csv.py
-#define DATALOG_VERSION 0x04
+#define DATALOG_VERSION 0x05
 // version 4: add dsm rssi telemetry
+// version 5: add dsm Smart Bat cell voltages
 
 //This is pretty crude.  need a more robust check
 #if TXID == 10
 //ctassert((DLOG_LAST == 67), dlog_api_changed); // DATALOG_VERSION = 0x01
 //ctassert((DLOG_LAST == 116), dlog_api_changed); // DATALOG_VERSION = 0x02
 //ctassert((DLOG_LAST == 120), dlog_api_changed); // DATALOG_VERSION = 0x03
-// TODO ctassert((DLOG_LAST == 121), dlog_api_changed); // DATALOG_VERSION = 0x04
+//ctassert((DLOG_LAST == 121), dlog_api_changed); // DATALOG_VERSION = 0x04
+ctassert((DLOG_LAST == 131), dlog_api_changed); // DATALOG_VERSION = 0x05
 #endif
 
 #define UPDATE_DELAY 4000 //wiat 4 seconds after changing enable before sample start
