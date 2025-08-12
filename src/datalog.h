@@ -49,4 +49,5 @@ extern void DATALOG_Reset();
 extern void DATALOG_UpdateState();
 extern const char *DATALOG_RateString(int idx);
 extern void DATALOG_ApplyMask(int idx, int set);
+extern void DATALOG_RawWrite(unsigned char *data, int length);
 #endif

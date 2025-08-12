@@ -21,16 +21,21 @@
 
 #if HAS_DATALOG
 
+// Set to 1 to enable DATALOG_RawWrite function for debugging
+#define ENABLE_RAW_WRITE 0
+
 // version check by utils/datalog2csv.py
-#define DATALOG_VERSION 0x04
+#define DATALOG_VERSION 0x05
 // version 4: add dsm rssi telemetry
+// version 5: add dsm Smart Bat cell voltages
 
 //This is pretty crude.  need a more robust check
 #if TXID == 10
 //ctassert((DLOG_LAST == 67), dlog_api_changed); // DATALOG_VERSION = 0x01
 //ctassert((DLOG_LAST == 116), dlog_api_changed); // DATALOG_VERSION = 0x02
 //ctassert((DLOG_LAST == 120), dlog_api_changed); // DATALOG_VERSION = 0x03
-ctassert((DLOG_LAST == 121), dlog_api_changed); // DATALOG_VERSION = 0x04
+//ctassert((DLOG_LAST == 121), dlog_api_changed); // DATALOG_VERSION = 0x04
+ctassert((DLOG_LAST == 131), dlog_api_changed); // DATALOG_VERSION = 0x05
 #endif
 
 #define UPDATE_DELAY 4000 //wiat 4 seconds after changing enable before sample start
@@ -213,6 +218,9 @@ void DATALOG_Write()
 
 void DATALOG_Update()
 {
+#if ENABLE_RAW_WRITE
+    return;
+#endif
     if (! fh)
         return;
     if(MIXER_SourceAsBoolean(Model.datalog.enable) && ((int)dlog_size - ftell(fh) >= data_size)) {
@@ -257,7 +265,11 @@ void DATALOG_Init()
     fh = fopen2(&DatalogFAT, "datalog.bin", "r+");
     if (fh) {
         setbuf(fh, 0);
+#if ENABLE_RAW_WRITE
+        long pos = 0L;
+#else
         long pos = _find_fpos();
+#endif
         fseek(fh, 0, SEEK_END);
         dlog_size = ftell(fh);
         fseek(fh, pos, SEEK_SET);
@@ -266,4 +278,15 @@ void DATALOG_Init()
         next_update = CLOCK_getms();
     }
 } 
+
+#if ENABLE_RAW_WRITE
+void DATALOG_RawWrite(u8 *data, int length) {
+    if (!fh || length <= 0)
+        return;
+
+    if (DATALOG_Remaining() >= length)
+        for (int i=0; i < length; i++)
+            _write_8(*data++);
+}
+#endif
 #endif //HAS_DATALOG
