@@ -48,6 +48,7 @@ enum {
 
 //#define SLT_Q200_FORCE_ID
 #define SLT_PAYLOADSIZE_V1 7
+#define SLT_PAYLOADSIZE_V1_4 5
 #define SLT_PAYLOADSIZE_V2 11
 #define SLT_NFREQCHANNELS 15
 #define SLT_TXID_SIZE 4
@@ -66,7 +67,7 @@ static u8 tx_power;
 static u8 phase;
 
 static const char * const slt_opts[] = {
-    _tr_noop("Format"), "V1", "V2", "Q100", "Q200", "MR100", NULL,
+    _tr_noop("Format"), "V1", "V2", "Q100", "Q200", "MR100", "V1_4CH", NULL,
     NULL
 };
 
@@ -81,7 +82,8 @@ enum {
     FORMAT_V2,
     FORMAT_Q100,
     FORMAT_Q200,
-    FORMAT_MR100
+    FORMAT_MR100,
+    FORMAT_V1_4
 };
 
 enum{
@@ -160,15 +162,21 @@ static void set_tx_id(u32 id)
         id >>= 8;
     }
 
+    if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_V1_4) {
+        //Force high part of the ID otherwise the RF frequencies do not match, only tested the 2 last bytes...
+        tx_id[0]=0xF4;
+        tx_id[1]=0x71;
+    }
+
     if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q200) { //Q200: Force high part of the ID otherwise it won't bind
         tx_id[0]=0x01;
         tx_id[1]=0x02;
         #ifdef SLT_Q200_FORCE_ID    // ID taken from TX dumps
             tx_id[0]=0x01;tx_id[1]=0x02;tx_id[2]=0x6A;tx_id[3]=0x31;
         /*  tx_id[0]=0x01;tx_id[1]=0x02;tx_id[2]=0x0B;tx_id[3]=0x57;*/
-        #endif  
+        #endif
     }
-    
+
     // Frequency hopping sequence generation
 
     for (int i = 0; i < 4; ++i) {
@@ -287,7 +295,7 @@ static void build_packet()
     packet[5] = (long) controls[4] * 255 / 20000L + 128;
     packet[6] = (long) controls[5] * 255 / 20000L + 128;
     if(Model.proto_opts[PROTOOPTS_FORMAT] != FORMAT_V1) {
-        if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q200) 
+        if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q200)
             packet[6] = GET_FLAG(CHANNEL_FMODE , FLAG_Q200_FMODE)
                       | GET_FLAG(CHANNEL_FLIP, FLAG_Q200_FLIP)
                       | GET_FLAG(CHANNEL_VIDEON, FLAG_Q200_VIDON)
@@ -301,7 +309,7 @@ static void build_packet()
         packet[8]=(long) controls[7] * 255 / 20000L + 128;
         packet[9]=0xAA;     //unknown
         packet[10]=0x00;    //unknown
-        
+
         if((Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q100 || Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q200) && GET_FLAG(CHANNEL_CALIBRATE, 1))
         {//Calibrate
             packet[9]=0x77;         //enter calibration
@@ -366,6 +374,7 @@ void checkTxPower()
 
 #define SLT_TIMING_BUILD        1000
 #define SLT_V1_TIMING_PACKET    1000
+#define SLT_V1_4_TIMING_PACKET	1643
 #define SLT_V2_TIMING_PACKET    2042
 #define SLT_V1_TIMING_BIND2     1000
 #define SLT_V2_TIMING_BIND1     6507
@@ -386,6 +395,12 @@ static u16 SLT_callback()
                 send_packet(SLT_PAYLOADSIZE_V1);
                 return SLT_V1_TIMING_PACKET;
             }
+            else if(Model.proto_opts[PROTOOPTS_FORMAT]==FORMAT_V1_4)
+            {
+                send_packet(SLT_PAYLOADSIZE_V1_4);
+                phase++;						//Packets are sent two times only
+				return SLT_V1_4_TIMING_PACKET;
+            }
             else //V2
             {
                 send_packet(SLT_PAYLOADSIZE_V2);
@@ -394,12 +409,14 @@ static u16 SLT_callback()
         case SLT_DATA3:
             if(Model.proto_opts[PROTOOPTS_FORMAT]==FORMAT_V1)
                 send_packet(SLT_PAYLOADSIZE_V1);
+            else if(Model.proto_opts[PROTOOPTS_FORMAT]==FORMAT_V1_4)
+                send_packet(SLT_PAYLOADSIZE_V1_4);
             else //V2
                 send_packet(SLT_PAYLOADSIZE_V2);
             if (++packet_count >= 100)
             {// Send bind packet
                 packet_count = 0;
-                if(Model.proto_opts[PROTOOPTS_FORMAT]==FORMAT_V1)
+                if(Model.proto_opts[PROTOOPTS_FORMAT]==FORMAT_V1 || Model.proto_opts[PROTOOPTS_FORMAT]==FORMAT_V1_4)
                 {
                     phase=SLT_BIND2;
                     return SLT_V1_TIMING_BIND2;
@@ -416,6 +433,8 @@ static u16 SLT_callback()
                 phase = SLT_BUILD;
                 if(Model.proto_opts[PROTOOPTS_FORMAT]==FORMAT_V1)
                     return 20000-SLT_TIMING_BUILD;
+                if(Model.proto_opts[PROTOOPTS_FORMAT]==FORMAT_V1_4)
+                    return 18000-SLT_TIMING_BUILD-SLT_V1_4_TIMING_PACKET;
                 else //V2
                     return 13730-SLT_TIMING_BUILD;
             }
@@ -428,8 +447,10 @@ static u16 SLT_callback()
             phase = SLT_BUILD;
             if(Model.proto_opts[PROTOOPTS_FORMAT]==FORMAT_V1)
                 return 20000-SLT_TIMING_BUILD-SLT_V1_TIMING_BIND2;
-            else //V2
-                return 13730-SLT_TIMING_BUILD-SLT_V2_TIMING_BIND1-SLT_V2_TIMING_BIND2;
+            if(Model.proto_opts[PROTOOPTS_FORMAT]==FORMAT_V1_4)
+                return 18000-SLT_TIMING_BUILD-SLT_V1_TIMING_BIND2-SLT_V1_4_TIMING_PACKET;
+            //V2
+            return 13730-SLT_TIMING_BUILD-SLT_V2_TIMING_BIND1-SLT_V2_TIMING_BIND2;
     }
     return 19000;
 }
@@ -469,7 +490,7 @@ static void initialize()
     phase = SLT_BIND1;
     initialize_tx_id();
     SLT_init2();
-    
+
     CLOCK_StartTimer(50000, SLT_callback);
 }
 
