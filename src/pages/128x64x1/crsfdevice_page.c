@@ -151,7 +151,7 @@ static const char *hdr_str_cb(guiObject_t *obj, const void *data) {
     (void)obj;
     (void)data;
 
-    int params_left = crsf_devices[device_idx].number_of_params - count_params_loaded();
+    int params_left = params_needed();
     if (params_left != 0) {
         char short_name[10];
         strlcpy(short_name, crsf_devices[device_idx].name, 10);

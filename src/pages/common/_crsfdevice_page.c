@@ -145,11 +145,11 @@ static const char *crsf_name_cb(guiObject_t *obj, const void *data)
     return (const char *)param->name;
 }
 
-static u8 count_params_loaded() {
+static u8 params_needed() {
     u8 count = crsf_params[0].loaded;
     for (int i=1; i < crsf_devices[device_idx].number_of_params; i++)
         count += crsf_params[i].loaded;
-    return count;
+    return crsf_devices[device_idx].number_of_params - count;
 }
 
 static int folder_rows(int folder) {
@@ -375,7 +375,7 @@ void PAGE_CRSFDeviceEvent() {
     // until all parameters loaded
     static u8 armed_state;
 
-    if (count_params_loaded() != crsf_devices[device_idx].number_of_params) {
+    if (params_needed()) {
         if (need_show_folder == 255) need_show_folder = current_folder;
         show_header();
     } else {
@@ -541,7 +541,7 @@ void CRSF_read_param(u8 device, u8 id, u8 chunk) {
 
 void CRSF_get_elrs() {
     // request ELRS_info message
-    if (CBUF_Space(send_buf) < 8) return;
+    if (CBUF_Space(send_buf) < 8 || params_needed()) return;
     u8 crc = 0;
     CBUF_Push(send_buf, ADDR_MODULE);
     CBUF_Push(send_buf, 6);
