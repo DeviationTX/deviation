@@ -411,8 +411,8 @@ void PAGE_CRSFDeviceEvent() {
 
     // spec calls for 2 second timeout on requests. Retry on timeout.
     if (read_timeout && (CLOCK_getms() - read_timeout > 2000)) {
+        read_timeout = 0;
         if (next_param) CRSF_read_param(device_idx, next_param, 0);
-        else read_timeout = 0;
     }
 }
 
@@ -526,7 +526,7 @@ void CRSF_read_param(u8 device, u8 id, u8 chunk) {
         return;
     }
 
-    if (CBUF_Space(send_buf) < 8 || id == 0) return;
+    if (CBUF_Space(send_buf) < 8 || id == 0 || read_timeout) return;
     u8 crc = 0;
     CBUF_Push(send_buf, ADDR_MODULE);
     CBUF_Push(send_buf, 6);
