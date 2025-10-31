@@ -33,8 +33,15 @@ Multiprotocol is distributed in the hope that it will be useful,
 
 //#define PROPEL_FORCE_ID
 
+#ifdef EMULATOR
+    #define PROPEL_PACKET_PERIOD	250
+    #define dbgprintf printf
+#else
+    #define PROPEL_PACKET_PERIOD	10000
+    #define dbgprintf if(0) printf
+#endif
+
 #define PROPEL_INITIAL_WAIT		500
-#define PROPEL_PACKET_PERIOD	10000
 #define PROPEL_BIND_RF_CHANNEL	0x23
 #define PROPEL_PAYLOAD_SIZE		16
 #define PROPEL_SEARCH_PERIOD	50	//*10ms
@@ -152,6 +159,13 @@ static void PROPEL_bind_packet(bool valid_rx_id)
 	NRF24L01_FlushTx();
 	NRF24L01_FlushRx();
 	NRF24L01_WritePayload(packet, PROPEL_PACKET_SIZE);
+
+#ifdef EMULATOR
+    dbgprintf("bind %d: rf_ch_num 0x%02x, data %02x", phase, rf_ch_num, packet[0]);
+    for (int i = 1; i < PROPEL_PACKET_SIZE; i++)
+        dbgprintf(" %02x", packet[i]);
+    dbgprintf("\n");
+#endif
 }
 
 #define CHAN_RANGE (CHAN_MAX_VALUE - CHAN_MIN_VALUE)
@@ -209,6 +223,13 @@ static void PROPEL_data_packet()
 	NRF24L01_WriteReg(NRF24L01_07_STATUS, (_BV(NRF24L01_07_RX_DR) | _BV(NRF24L01_07_TX_DS) | _BV(NRF24L01_07_MAX_RT)));
 	NRF24L01_FlushTx();
 	NRF24L01_WritePayload(packet, PROPEL_PACKET_SIZE);
+
+#ifdef EMULATOR
+    dbgprintf("data: freq 0x%02x, data %02x", hopping_frequency[hopping_frequency_no-1], packet[0]);
+    for (int i = 1; i < PROPEL_PACKET_SIZE; i++)
+        dbgprintf(" %02x", packet[i]);
+    dbgprintf("\n");
+#endif
 }
 
 static void PROPEL_RF_init()
@@ -236,6 +257,11 @@ static void PROPEL_initialize_txid()
 	
 	//random hopping channel table
     u32 lfsr = 0xb2c54a2ful;
+
+    u8 var[12];
+    MCU_SerialNumber(var, 12);
+    for (int i = 0; i < 12; ++i) rand32_r(&lfsr, var[i]);
+
     if (Model.fixed_id) {
        for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
            rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
@@ -280,8 +306,16 @@ uint16_t PROPEL_callback()
 			status=NRF24L01_ReadReg(NRF24L01_07_STATUS);
 			if (status & _BV(NRF24L01_07_MAX_RT))
 			{// Max retry (6) reached
+#ifdef EMULATOR
+                phase = PROPEL_DATA1;
+                bind_phase=PROPEL_DEFAULT_PERIOD;
+                packet_count=0;
+                PROTOCOL_SetBindState(0);
+                break;
+#else
 				phase = PROPEL_BIND1;
 				return PROPEL_BIND_PERIOD;
+#endif
 			}
 			if (!(_BV(NRF24L01_07_RX_DR) & status))
 				return PROPEL_BIND_PERIOD;		// nothing received
@@ -354,7 +388,7 @@ void PROPEL_init()
 	phase = PROPEL_BIND1;
     PROTOCOL_SetBindState(0xFFFFFFFF);
     packet_count=0;
-    CLOCK_StartTimer(PROPEL_PACKET_PERIOD, PROPEL_callback);
+    CLOCK_StartTimer(PROPEL_INITIAL_WAIT, PROPEL_callback);
 }
 
 uintptr_t Propel_Cmds(enum ProtoCmds cmd)
