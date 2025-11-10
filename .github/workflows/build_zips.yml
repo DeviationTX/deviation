@@ -14,8 +14,8 @@ jobs:
           image: deviationtx/deviation-docker
           options: -v ${{ github.workspace }}:/git
           run: |
-            cd /git/deviation/src
-            make zips
+            pwd
+            tree
       - name: Verify build
         run: ls -l /git/deviation/src/*zips
         
