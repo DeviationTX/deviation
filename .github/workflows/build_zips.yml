@@ -12,12 +12,10 @@ jobs:
         uses: addnab/docker-run-action@v3 
         with:
           image: deviationtx/deviation-docker
-          options: -v ${{ github.workspace }}:/git
+          options: -v ${{ github.workspace }}:/git/deviation
           run: |
-            pwd
-            ls -l
-            cd /git
-            ls -l
+            cd /git/deviation
+            make zips
       - name: Verify build
-        run: ls -l /git/deviation/src/*zips
+        run: ls -l /git/deviation/*zips
         
