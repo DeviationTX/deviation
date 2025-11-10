@@ -1,0 +1,21 @@
+name: Build zips
+on: push
+
+jobs:
+  build:
+    name: Build all zips
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Run Docker container
+        uses: addnab/docker-run-action@v3 
+        with:
+          image: deviationtx/deviation-docker
+          options: -v ${{ github.workspace }}:/git
+          run: /
+            cd /git/deviation/src
+            make zips
+      - name: Verify build
+        run: ls -l /git/deviation/src/*zips
+        
