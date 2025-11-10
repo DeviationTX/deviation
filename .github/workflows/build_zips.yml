@@ -18,9 +18,11 @@ jobs:
           run: |
             sudo /root/build.py --arm-prereq
             sudo /root/build.py --linux-prereq
+            export PATH=$PATH:/opt/gcc-arm-none-eabi-8-2018-q4-major/bin
             cd /git/deviation/src
             ls /opt
             env
+            make zips
       - name: Verify build
         run: ls -l /git/deviation/src/*zips
         
