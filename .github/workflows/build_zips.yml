@@ -15,7 +15,9 @@ jobs:
           options: -v ${{ github.workspace }}:/git
           run: |
             pwd
-            tree
+            ls -l
+            cd /git
+            ls -l
       - name: Verify build
         run: ls -l /git/deviation/src/*zips
         
