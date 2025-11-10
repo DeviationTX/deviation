@@ -19,7 +19,8 @@ jobs:
             sudo /root/build.py --arm-prereq
             sudo /root/build.py --linux-prereq
             cd /git/deviation/src
-            make zips
+            ls /opt
+            env
       - name: Verify build
         run: ls -l /git/deviation/src/*zips
         
