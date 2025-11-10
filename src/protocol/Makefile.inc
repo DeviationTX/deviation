@@ -56,6 +56,7 @@ PROTO_MODULES += $(ODIR)/protocol/v911s.mod
 PROTO_MODULES += $(ODIR)/protocol/gd00x.mod
 PROTO_MODULES += $(ODIR)/protocol/sbus.mod
 PROTO_MODULES += $(ODIR)/protocol/pxx.mod
+PROTO_MODULES += $(ODIR)/protocol/loli.mod
 PROTO_MODULES += $(ODIR)/protocol/e016h.mod
 PROTO_MODULES += $(ODIR)/protocol/sumd.mod
 ifeq "$(SUPPORT_SCANNER)" "1"
@@ -293,6 +294,10 @@ $(ODIR)/protocol/sbus.mod : $(ODIR)/sbus_uart.bin
 
 $(ODIR)/protocol/pxx.mod : $(ODIR)/pxxout.bin
 	@echo Building 'pxx' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
+
+$(ODIR)/protocol/loli.mod : $(ODIR)/loli_nrf24l01.bin
+	@echo Building 'loli' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
 $(ODIR)/protocol/e016h.mod : $(ODIR)/e016h_nrf24l01.bin
