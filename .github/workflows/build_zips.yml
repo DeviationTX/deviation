@@ -8,8 +8,10 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
+        with:
+          submodules: recursive        
       - name: Run Docker container
-        uses: addnab/docker-run-action@v3 
+        uses: addnab/docker-run-action@v3
         with:
           image: deviationtx/deviation-docker
           options: -v ${{ github.workspace }}:/git/deviation
