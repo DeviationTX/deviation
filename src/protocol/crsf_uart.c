@@ -241,6 +241,46 @@ static u8 getCrossfireTelemetryValue(u8 index, s32 *value, u8 len) {
   return result;
 }
 
+#if SUPPORT_CRSF_CONFIG
+// use interpolation to approximate exponentiation used in CRSF specification
+typedef struct {
+    int8_t x;
+    int16_t y;
+} breakpoint_t;
+
+// max error 4.35% at 8 (optimized with Ramer-Douglas-Peucker from full table)
+static const breakpoint_t breakpoints[] = {
+    {0, 0}, {7, 19}, {14, 43}, {23, 81}, {36, 154}, {46, 230}, {56, 328},
+    {65, 441}, {79, 679}, {94, 1051}, {106, 1473}, {117, 1994}, {127, 2616}
+};
+
+static int16_t get_vertical_speed_cm_s(int8_t vertical_speed_packed) {
+    if (vertical_speed_packed == 0) return 0;
+
+    const int8_t num_breakpoints = sizeof(breakpoints)/sizeof(breakpoint_t);
+    const int8_t abs_val = abs(vertical_speed_packed);
+    const int8_t sign_val = (vertical_speed_packed > 0) ? 1 : -1;
+
+    int8_t segment = 0;
+    for (int8_t i = 0; i < num_breakpoints - 1; i++) {
+        if (abs_val <= breakpoints[i + 1].x) {
+            segment = i;
+            break;
+        }
+    }
+
+    const int8_t x0 = breakpoints[segment].x;
+    const int8_t x1 = breakpoints[segment + 1].x;
+    const int16_t y0 = breakpoints[segment].y;
+    const int16_t y1 = breakpoints[segment + 1].y;
+    // Linear interpolation: y = y0 + (y1 - y0) * (x - x0) / (x1 - x0)
+    const int32_t numerator = (int32_t)(y1 - y0) * (abs_val - x0);
+
+    return sign_val * (y0 + (int16_t)(numerator / (x1 - x0)));
+}
+#endif
+
+
 static void processCrossfireTelemetryFrame()
 {
 
@@ -338,9 +378,16 @@ static void processCrossfireTelemetryFrame()
         }
         set_telemetry(TELEM_CRSF_ALTITUDE, value);
       }
-      // if length greater than 4 then vario info is included
-      if (telemetryRxBuffer[1] > 5 && getCrossfireTelemetryValue(5, &value, 2))
-        set_telemetry(TELEM_CRSF_VERTSPD, value);
+      // if packet length greater than 4 then vario info is included
+      // if packet length = 5, vertical speed is log encoded as per spec
+      // if 6, vertical speed is 16bit linear (ELRS, Rotorflight)
+      if (telemetryRxBuffer[1] == 5) {
+          set_telemetry(TELEM_CRSF_VERTSPD, get_vertical_speed_cm_s(telemetryRxBuffer[5]));
+      } else if (telemetryRxBuffer[1] == 6) {
+          if (getCrossfireTelemetryValue(5, &value, 2))
+              set_telemetry(TELEM_CRSF_VERTSPD, value);
+      }
+
       break;
 
 // Leave this mostly disabled for backwards compatibility with TBS XF Transmitter firmware
