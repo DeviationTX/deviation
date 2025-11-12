@@ -21,6 +21,7 @@
 #include "config/tx.h"  // for Transmitter
 
 
+#if SUPPORT_CRSF_CONFIG == 0
 #ifdef PROTO_HAS_NRF24L01
 
 #include "iface_nrf24l01.h"
@@ -453,4 +454,5 @@ uintptr_t LOLI_Cmds(enum ProtoCmds cmd)
     return 0;
 }
 
+#endif
 #endif
