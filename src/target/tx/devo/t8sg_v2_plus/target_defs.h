@@ -34,7 +34,7 @@
 #define HAS_OLED_DISPLAY    1
 #define HAS_USB_DRIVE_ERASE 1
 
-#ifdef BUILD_CRSF_CONFIG
+#if BUILD_CRSF_CONFIG
   #define SUPPORT_CRSF_CONFIG 1
 #endif
 
