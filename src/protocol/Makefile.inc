@@ -58,6 +58,7 @@ PROTO_MODULES += $(ODIR)/protocol/sbus.mod
 PROTO_MODULES += $(ODIR)/protocol/pxx.mod
 ifeq "$(BUILD_CRSF_CONFIG)" "0"
 PROTO_MODULES += $(ODIR)/protocol/loli.mod
+PROTO_MODULES += $(ODIR)/protocol/ne260.mod
 endif
 PROTO_MODULES += $(ODIR)/protocol/e016h.mod
 PROTO_MODULES += $(ODIR)/protocol/sumd.mod
@@ -301,6 +302,10 @@ $(ODIR)/protocol/pxx.mod : $(ODIR)/pxxout.bin
 ifeq "$(BUILD_CRSF_CONFIG)" "0"
 $(ODIR)/protocol/loli.mod : $(ODIR)/loli_nrf24l01.bin
 	@echo Building 'loli' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
+
+$(ODIR)/protocol/ne260.mod : $(ODIR)/ne260_nrf24l01.bin
+	@echo Building 'ne260' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 endif
 
