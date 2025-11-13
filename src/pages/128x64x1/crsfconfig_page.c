@@ -15,6 +15,8 @@
 
 
 #include "common.h"
+
+#if SUPPORT_CRSF_CONFIG
 #include "pages.h"
 #include "gui/gui.h"
 
@@ -27,7 +29,6 @@ enum {
 };
 #endif
 
-#if SUPPORT_CRSF_CONFIG
 
 #include "../common/_crsfconfig_page.c"
 
