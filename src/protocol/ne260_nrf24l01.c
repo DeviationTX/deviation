@@ -25,7 +25,6 @@
 #include "telemetry.h"
 
 
-#if SUPPORT_CRSF_CONFIG == 0
 #ifdef PROTO_HAS_NRF24L01
 
 #include "iface_nrf24l01.h"
@@ -167,14 +166,14 @@
 #define vRX_FULL		(1<<(RX_FULL))
 #define vRX_EMPTY		(1<<(RX_EMPTY))
 ////////////////////////////////////////////////////////////
-uint8_t		neChannel = 10;
-uint8_t		neChannelOffset = 0;
+static uint8_t		neChannel;
+static uint8_t		neChannelOffset;
 #define PACKET_LENGTH	7
 
 static u8 packet[20];
 static u32 state;
 static u32 bind_count;
-static u16 model_id = 0xA04A;
+static u16 model_id;
 
 const uint8_t NEAddr[] = {0x34, 0x43, 0x10, 0x10, 0x01};
 enum {
@@ -249,7 +248,8 @@ static u16 ne260_cb()
             NRF24L01_ReadPayload(packet, PACKET_LENGTH);
 
             // is this the bind response packet?
-            if (strncmp("\x55\x55\x55\x55\x55", (char*) (packet + 1), 5) == 0
+            // if (strcmp("\x55\x55\x55\x55\x55\x00", (char*) (packet + 1)) == 0
+            if (memcmp("\x55\x55\x55\x55\x55", (char*) (packet + 1), 5) == 0
                 &&  *((uint16_t*)(packet + 6)) == model_id)
             {
                 // exit the bind loop
@@ -293,6 +293,9 @@ static void initialize()
     ne260_init();
     bind_count = 10000;
     state = NE260_BINDTX;
+    model_id = 0xA04A;
+    neChannel = 10;
+    neChannelOffset = 0;
 
     CLOCK_StartTimer(10000, ne260_cb);
 }
@@ -316,5 +319,4 @@ uintptr_t NE260_Cmds(enum ProtoCmds cmd)
     }
     return 0;
 }
-#endif
 #endif
