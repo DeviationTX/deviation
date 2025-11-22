@@ -58,7 +58,8 @@ void PAGE_EditCurvesInit(int page)
     }
     edit->curve = *curve;
 
-    GUI_CreateTextSelectPlate(&gui->name, NAME_X, 0, NAME_W, HEADER_HEIGHT, &TEXTSEL_FONT, NULL, set_curvename_cb, NULL);
+    // GUI_CreateTextSelectPlate(&gui->name, NAME_X, 0, NAME_W, HEADER_HEIGHT, &TEXTSEL_FONT, NULL, set_curvename_cb, NULL);
+    GUI_CreateLabelBox(&gui->title, NAME_X, 0 , NAME_W, HEADER_HEIGHT, &LABEL_FONT, GUI_Localize, NULL, _tr(CURVE_GetName(tempstring, curve)));
     GUI_CreateButtonPlateText(&gui->save, SAVE_X, 0, SAVE_W, HEADER_WIDGET_HEIGHT, &BUTTON_FONT , GUI_Localize, okcancel_cb, _tr_noop("Save"));
     // Draw a line
     if (UNDERLINE)
@@ -89,7 +90,7 @@ void PAGE_EditCurvesInit(int page)
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
                               0, 0, //CHAN_MAX_VALUE / 4, CHAN_MAX_VALUE / 4,
                               show_curve_cb, NULL, touch_cb, &edit->curve);
-    GUI_SetSelected((guiObject_t *)&gui->point);
+    GUI_SetSelected((guiObject_t *)&gui->value);
 }
 
 static unsigned action_cb(u32 button, unsigned flags, void *data)
