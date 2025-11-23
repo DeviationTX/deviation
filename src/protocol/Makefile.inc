@@ -5,7 +5,6 @@ PROTO_MODULES += $(ODIR)/protocol/dsm2.mod
 PROTO_MODULES += $(ODIR)/protocol/dsmx.mod
 PROTO_MODULES += $(ODIR)/protocol/flysky.mod
 PROTO_MODULES += $(ODIR)/protocol/afhds-2a.mod
-PROTO_MODULES += $(ODIR)/protocol/hubsan4.mod
 PROTO_MODULES += $(ODIR)/protocol/joysway.mod
 PROTO_MODULES += $(ODIR)/protocol/j6pro.mod
 PROTO_MODULES += $(ODIR)/protocol/ppm.mod
@@ -66,6 +65,7 @@ ifeq "$(BUILD_TYPE)" "1"
 PROTO_MODULES += $(ODIR)/protocol/bluefly.mod
 PROTO_MODULES += $(ODIR)/protocol/ne260.mod
 PROTO_MODULES += $(ODIR)/protocol/e016h.mod
+PROTO_MODULES += $(ODIR)/protocol/hubsan4.mod
 endif
 PROTO_MODULES += $(ODIR)/protocol/sumd.mod
 ifeq "$(SUPPORT_SCANNER)" "1"
@@ -108,10 +108,6 @@ $(ODIR)/protocol/frsky-v8.mod : $(ODIR)/frsky1way_cc2500.bin
 
 $(ODIR)/protocol/frsky.mod : $(ODIR)/frsky2way_cc2500.bin
 	@echo Building 'frsky2way' module
-	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
-
-$(ODIR)/protocol/hubsan4.mod : $(ODIR)/hubsan_a7105.bin
-	@echo Building 'hubsan4' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
 $(ODIR)/protocol/joysway.mod : $(ODIR)/joysway_a7105.bin
@@ -336,6 +332,10 @@ $(ODIR)/protocol/ne260.mod : $(ODIR)/ne260_nrf24l01.bin
 
 $(ODIR)/protocol/e016h.mod : $(ODIR)/e016h_nrf24l01.bin
 	@echo Building 'e016h' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
+
+$(ODIR)/protocol/hubsan4.mod : $(ODIR)/hubsan_a7105.bin
+	@echo Building 'hubsan4' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 endif
 
