@@ -60,6 +60,7 @@ PROTO_MODULES += $(ODIR)/protocol/v761.mod
 PROTO_MODULES += $(ODIR)/protocol/redpine.mod
 ifeq "$(BUILD_TYPE)" "0"
 PROTO_MODULES += $(ODIR)/protocol/loli.mod
+PROTO_MODULES += $(ODIR)/protocol/propel.mod
 endif
 ifeq "$(BUILD_TYPE)" "1"
 PROTO_MODULES += $(ODIR)/protocol/bluefly.mod
@@ -78,7 +79,6 @@ PROTO_MODULES += $(ODIR)/protocol/e010.mod
 PROTO_MODULES += $(ODIR)/protocol/radiolink.mod
 PROTO_MODULES += $(ODIR)/protocol/v761.mod
 PROTO_MODULES += $(ODIR)/protocol/redpine.mod
-PROTO_MODULES += $(ODIR)/protocol/propel.mod
 
 ALL += $(PROTO_MODULES)
 else #BUILD_TARGET
@@ -319,6 +319,9 @@ $(ODIR)/protocol/loli.mod : $(ODIR)/loli_nrf24l01.bin
 	@echo Building 'loli' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
+$(ODIR)/protocol/propel.mod : $(ODIR)/propel_nrf24l01.bin
+	@echo Building 'propel' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 endif
 
 ifeq "$(BUILD_TYPE)" "1"
@@ -369,9 +372,5 @@ $(ODIR)/protocol/v761.mod : $(ODIR)/v761_nrf24l01.bin
 
 $(ODIR)/protocol/redpine.mod : $(ODIR)/redpine_cc2500.bin
 	@echo Building 'redpine' module
-
-$(ODIR)/protocol/propel.mod : $(ODIR)/propel_nrf24l01.bin
-	@echo Building 'propel' module
-	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
 endif #BUILD_TARGET
