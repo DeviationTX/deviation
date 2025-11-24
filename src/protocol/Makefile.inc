@@ -358,19 +358,4 @@ $(ODIR)/protocol/xn297dmp.mod : $(ODIR)/xn297dump_nrf24l01.bin
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 endif
 
-$(ODIR)/protocol/e010.mod : $(ODIR)/e010_cc2500.bin
-	@echo Building 'e010' module
-	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
-
-$(ODIR)/protocol/radiolink.mod : $(ODIR)/radiolink_cc2500.bin
-	@echo Building 'radiolink' module
-	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
-
-$(ODIR)/protocol/v761.mod : $(ODIR)/v761_nrf24l01.bin
-	@echo Building 'v761' module
-	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
-
-$(ODIR)/protocol/redpine.mod : $(ODIR)/redpine_cc2500.bin
-	@echo Building 'redpine' module
-
 endif #BUILD_TARGET
