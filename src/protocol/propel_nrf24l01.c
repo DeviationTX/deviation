@@ -1,0 +1,453 @@
+/*
+ This project is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+Multiprotocol is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with Multiprotocol.  If not, see <http://www.gnu.org/licenses/>.
+ */
+// Compatible with PROPEL 74-Z Speeder Bike.
+
+#ifdef MODULAR
+  //Allows the linker to properly relocate
+  #define Propel_Cmds PROTO_Cmds
+  #pragma long_calls
+#endif
+
+#include <stdint.h>
+#include <stdbool.h>
+
+#include "common.h"
+#include "interface.h"
+#include "mixer.h"
+#include "config/model.h"
+#include "telemetry.h"
+
+#ifdef PROTO_HAS_NRF24L01
+
+//#define PROPEL_FORCE_ID
+
+#ifdef EMULATOR
+    #define PROPEL_PACKET_PERIOD	250
+    #define dbgprintf printf
+#else
+    #define PROPEL_PACKET_PERIOD	10000
+    #define dbgprintf if(0) printf
+#endif
+
+#define PROPEL_INITIAL_WAIT		500
+#define PROPEL_BIND_RF_CHANNEL	0x23
+#define PROPEL_PAYLOAD_SIZE		16
+#define PROPEL_SEARCH_PERIOD	50	//*10ms
+#define PROPEL_BIND_PERIOD		1500
+#define PROPEL_PACKET_SIZE		14
+#define PROPEL_RF_NUM_CHANNELS	4
+#define PROPEL_ADDRESS_LENGTH	5
+#define PROPEL_DEFAULT_PERIOD	20
+
+#define _BV(bit) (1 << bit)
+#define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
+
+enum {
+	PROPEL_BIND1 = 0,
+	PROPEL_BIND2,
+	PROPEL_BIND3,
+	PROPEL_DATA1,
+};
+
+enum {
+    AILERON = 0,  // Aileron
+    ELEVATOR,     // Elevator
+    THROTTLE,     // Throttle
+    RUDDER,       // Rudder
+    CHANNEL5,     // LEDS
+    CHANNEL6,     // Roll CW
+    CHANNEL7,     // Roll CCW
+    CHANNEL8,     // Fire
+    CHANNEL9,     // Weapon system activted
+    CHANNEL10,    // Calibrate
+    CHANNEL11,    // Altitude hold
+    CHANNEL12,    // Take off
+    CHANNEL13,    // Land
+    CHANNEL14,    // Flight training mode
+};
+
+
+static uint8_t  rx_tx_addr[5];
+static uint8_t  packet[50];
+static uint8_t  bind_phase;
+static uint8_t  rx_id[5];
+static uint8_t  rf_ch_num;
+static uint8_t  hopping_frequency[50];
+static uint8_t  hopping_frequency_no;
+static uint8_t  phase;
+static uint8_t  packet_count;
+#define TELEMETRY_BUFFER_SIZE 32
+static uint8_t packet_in[TELEMETRY_BUFFER_SIZE];
+
+static uint16_t PROPEL_checksum() {
+	typedef union {
+		struct {
+			uint8_t h:1;
+			uint8_t g:1;
+			uint8_t f:1;
+			uint8_t e:1;
+			uint8_t d:1;
+			uint8_t c:1;
+			uint8_t b:1;
+			uint8_t a:1;
+		} bits;
+		uint8_t byte:8;
+	} byte_bits_t;
+
+    uint8_t sum = packet[0];
+    for (uint8_t i = 1; i < PROPEL_PACKET_SIZE - 2; i++)
+        sum += packet[i];
+
+    byte_bits_t in  = { .byte = sum };
+    byte_bits_t out = { .byte = sum };
+	out.byte ^= 0x0a;
+    out.bits.d = !(in.bits.d ^ in.bits.h);
+    out.bits.c = (!in.bits.c && !in.bits.d &&  in.bits.g)
+              ||  (in.bits.c && !in.bits.d && !in.bits.g)
+              || (!in.bits.c &&  in.bits.g && !in.bits.h)
+              ||  (in.bits.c && !in.bits.g && !in.bits.h)
+              ||  (in.bits.c &&  in.bits.d &&  in.bits.g &&  in.bits.h)
+              || (!in.bits.c &&  in.bits.d && !in.bits.g &&  in.bits.h);
+    out.bits.b = (!in.bits.b && !in.bits.c && !in.bits.d)
+              ||  (in.bits.b &&  in.bits.c &&  in.bits.g)
+              || (!in.bits.b && !in.bits.c && !in.bits.g)
+              || (!in.bits.b && !in.bits.d && !in.bits.g)
+              || (!in.bits.b && !in.bits.c && !in.bits.h)
+              || (!in.bits.b && !in.bits.g && !in.bits.h)
+              ||  (in.bits.b &&  in.bits.c &&  in.bits.d &&  in.bits.h)
+              ||  (in.bits.b &&  in.bits.d &&  in.bits.g &&  in.bits.h);
+    out.bits.a =  (in.bits.a && !in.bits.b)
+              ||  (in.bits.a && !in.bits.c && !in.bits.d)
+              ||  (in.bits.a && !in.bits.c && !in.bits.g)
+              ||  (in.bits.a && !in.bits.d && !in.bits.g)
+              ||  (in.bits.a && !in.bits.c && !in.bits.h)
+              ||  (in.bits.a && !in.bits.g && !in.bits.h)
+              || (!in.bits.a &&  in.bits.b &&  in.bits.c &&  in.bits.g)
+              || (!in.bits.a &&  in.bits.b &&  in.bits.c &&  in.bits.d &&  in.bits.h)
+              || (!in.bits.a &&  in.bits.b &&  in.bits.d &&  in.bits.g &&  in.bits.h);
+
+    return (sum << 8) | (out.byte & 0xff);
+}
+
+static void PROPEL_bind_packet(bool valid_rx_id)
+{
+	memset(packet, 0, PROPEL_PACKET_SIZE);
+
+	packet[0] = 0xD0;
+	memcpy(&packet[1], rx_tx_addr, 4);  // only 4 bytes sent of 5-byte address
+	if (valid_rx_id) memcpy(&packet[5], rx_id, 4);
+	packet[9] = rf_ch_num;				// hopping table to be used when switching to normal mode
+	packet[11] = 0x05;					// unknown, 0x01 on TX2??
+
+	uint16_t check = PROPEL_checksum();
+	packet[12] = check >> 8;
+	packet[13] = check & 0xff;
+
+	NRF24L01_WriteReg(NRF24L01_07_STATUS, (_BV(NRF24L01_07_RX_DR) | _BV(NRF24L01_07_TX_DS) | _BV(NRF24L01_07_MAX_RT)));
+	NRF24L01_FlushTx();
+	NRF24L01_FlushRx();
+	NRF24L01_WritePayload(packet, PROPEL_PACKET_SIZE);
+
+#ifdef EMULATOR
+    dbgprintf("bind %d: rf_ch_num 0x%02x, data %02x", phase, rf_ch_num, packet[0]);
+    for (int i = 1; i < PROPEL_PACKET_SIZE; i++)
+        dbgprintf(" %02x", packet[i]);
+    dbgprintf("\n");
+#endif
+}
+
+#define CHAN_RANGE (CHAN_MAX_VALUE - CHAN_MIN_VALUE)
+static s16 scale_channel(u8 ch, s16 destMin, s16 destMax)
+{
+    s32 chanval = Channels[ch];
+    s32 range = destMax - destMin;
+
+    if      (chanval < CHAN_MIN_VALUE) chanval = CHAN_MIN_VALUE;
+    else if (chanval > CHAN_MAX_VALUE) chanval = CHAN_MAX_VALUE;
+    return (range * (chanval - CHAN_MIN_VALUE)) / CHAN_RANGE + destMin;
+}
+
+static void PROPEL_data_packet()
+{
+	memset(packet, 0, PROPEL_PACKET_SIZE);
+
+	packet[0] = 0xC0;
+	packet[1] = scale_channel(THROTTLE, 0x2f, 0xcf);
+	packet[2] = scale_channel(RUDDER  , 0xcf, 0x2f);
+	packet[3] = scale_channel(ELEVATOR, 0x2f, 0xcf);
+	packet[4] = scale_channel(AILERON , 0xcf, 0x2f);
+	packet[5] = 0x40;							//might be trims but unsused
+	packet[6] = 0x40;							//might be trims but unsused
+	packet[7] = 0x40;							//might be trims but unsused
+	packet[8] = 0x40;							//might be trims but unsused
+	if (bind_phase)
+	{//need to send a couple of default packets after bind
+		bind_phase--;
+		packet[10] = 0x80;	// LEDs
+	}
+	else
+	{
+		packet[9] = 0x02    					// Always fast speed, slow=0x00, medium=0x01, fast=0x02, 0x03=flight training mode
+					| GET_FLAG( CHANNEL14, 0x03)	// Flight training mode
+					| GET_FLAG( CHANNEL10, 0x04)	// Calibrate
+					| GET_FLAG( CHANNEL12, 0x08)	// Take off
+					| GET_FLAG( CHANNEL8,  0x10)	// Fire
+					| GET_FLAG( CHANNEL11, 0x20)	// Altitude hold=0x20
+					| GET_FLAG( CHANNEL6,  0x40)	// Roll CW
+					| GET_FLAG( CHANNEL7,  0x80);	// Roll CCW
+		packet[10] =  GET_FLAG( CHANNEL13, 0x20)	// Land
+					| GET_FLAG( CHANNEL9,  0x40)	// Weapon system activted=0x40
+					| GET_FLAG(!CHANNEL5,  0x80);	// LEDs
+	}
+	packet[11] = 5;								// unknown, 0x01 on TX2??
+
+	uint16_t check = PROPEL_checksum();
+	packet[12] = check >> 8;
+	packet[13] = check & 0xff;
+
+	NRF24L01_WriteReg(NRF24L01_05_RF_CH, hopping_frequency[hopping_frequency_no++]);
+	hopping_frequency_no &= 0x03;
+	NRF24L01_SetPower(Model.tx_power);
+	NRF24L01_WriteReg(NRF24L01_07_STATUS, (_BV(NRF24L01_07_RX_DR) | _BV(NRF24L01_07_TX_DS) | _BV(NRF24L01_07_MAX_RT)));
+	NRF24L01_FlushTx();
+	NRF24L01_WritePayload(packet, PROPEL_PACKET_SIZE);
+
+#ifdef EMULATOR
+    dbgprintf("data: freq 0x%02x, data %02x", hopping_frequency[hopping_frequency_no-1], packet[0]);
+    for (int i = 1; i < PROPEL_PACKET_SIZE; i++)
+        dbgprintf(" %02x", packet[i]);
+    dbgprintf("\n");
+#endif
+}
+
+static void PROPEL_RF_init()
+{
+	NRF24L01_Initialize();
+
+	NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x7f);
+	NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x3f);			// AA on all pipes
+	NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x3f);		// Enable all pipes
+	NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0x36);	// retransmit 1ms, 6 times
+	NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, (uint8_t *)"\x99\x77\x55\x33\x11", PROPEL_ADDRESS_LENGTH);	//Bind address
+	NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR,    (uint8_t *)"\x99\x77\x55\x33\x11", PROPEL_ADDRESS_LENGTH);	//Bind address
+	NRF24L01_WriteReg(NRF24L01_05_RF_CH, PROPEL_BIND_RF_CHANNEL);
+	NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 0x3f);			// Enable dynamic payload length
+	NRF24L01_WriteReg(NRF24L01_1D_FEATURE, 0x07);		// Enable all features
+
+	NRF24L01_SetTxRxMode(TX_EN);						// Clear data ready, data sent, retransmit and enable CRC 16bits, ready for TX
+}
+
+static const uint8_t PROPEL_hopping[] = { 0x47,0x36,0x27,0x44,0x33,0x0D,0x3C,0x2E,0x1B,0x39,0x2A,0x18 };
+static void PROPEL_initialize_txid()
+{
+	//address last byte
+	rx_tx_addr[4]=0x11;
+	
+	//random hopping channel table
+    u32 lfsr = 0xb2c54a2ful;
+
+    u8 var[12];
+    MCU_SerialNumber(var, 12);
+    for (int i = 0; i < 12; ++i) rand32_r(&lfsr, var[i]);
+
+    if (Model.fixed_id) {
+       for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
+           rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
+    }
+    // Pump zero bytes for LFSR to diverge more
+    for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
+
+	rf_ch_num = lfsr & 0x03;
+        
+	for(uint8_t i=0; i<3; i++)
+		hopping_frequency[i]= PROPEL_hopping[i + 3*rf_ch_num];
+	hopping_frequency[3]=0x23;
+
+#ifdef PROPEL_FORCE_ID
+	if(RX_num&1)
+		memcpy(rx_tx_addr, (uint8_t *)"\x73\xd3\x31\x30\x11", PROPEL_ADDRESS_LENGTH);	//TX1: 73 d3 31 30 11
+	else
+		memcpy(rx_tx_addr, (uint8_t *)"\x94\xc5\x31\x30\x11", PROPEL_ADDRESS_LENGTH);	//TX2: 94 c5 31 30 11
+	rf_ch_num = 0x03; //TX1
+	memcpy(hopping_frequency,(uint8_t *)"\x39\x2A\x18\x23",PROPEL_RF_NUM_CHANNELS);		//TX1: 57,42,24,35
+	rf_ch_num = 0x00; //TX2
+	memcpy(hopping_frequency,(uint8_t *)"\x47\x36\x27\x23",PROPEL_RF_NUM_CHANNELS); 	//TX2: 71,54,39,35
+	rf_ch_num = 0x01; // Manual search
+	memcpy(hopping_frequency,(uint8_t *)"\x44\x33\x0D\x23",PROPEL_RF_NUM_CHANNELS); 	//Manual: 68,51,13,35
+	rf_ch_num = 0x02; // Manual search
+	memcpy(hopping_frequency,(uint8_t *)"\x3C\x2E\x1B\x23",PROPEL_RF_NUM_CHANNELS); 	//Manual: 60,46,27,35
+#endif
+}
+
+uint16_t PROPEL_callback()
+{
+	uint8_t status;
+
+	switch (phase)
+	{
+		case PROPEL_BIND1:
+			PROPEL_bind_packet(false);		//rx_id unknown
+			phase++;						//BIND2
+			return PROPEL_BIND_PERIOD;
+
+		case PROPEL_BIND2:
+			status=NRF24L01_ReadReg(NRF24L01_07_STATUS);
+			if (status & _BV(NRF24L01_07_MAX_RT))
+			{// Max retry (6) reached
+#ifdef EMULATOR
+                phase = PROPEL_DATA1;
+                bind_phase=PROPEL_DEFAULT_PERIOD;
+                packet_count=0;
+                PROTOCOL_SetBindState(0);
+                break;
+#else
+				phase = PROPEL_BIND1;
+				return PROPEL_BIND_PERIOD;
+#endif
+			}
+			if (!(_BV(NRF24L01_07_RX_DR) & status))
+				return PROPEL_BIND_PERIOD;		// nothing received
+			// received frame, got rx_id, save it
+			NRF24L01_ReadPayload(packet_in, PROPEL_PACKET_SIZE);
+			memcpy(rx_id, &packet_in[1], 4);
+			PROPEL_bind_packet(true);		//send bind packet with rx_id
+			phase++;						//BIND3
+			break;
+
+		case PROPEL_BIND3:
+			if (_BV(NRF24L01_07_RX_DR) & NRF24L01_ReadReg(NRF24L01_07_STATUS))
+			{
+				NRF24L01_ReadPayload(packet_in, PROPEL_PACKET_SIZE);
+				if (packet_in[0] == 0xa3 && memcmp(&packet_in[1],rx_id,4)==0)
+				{//confirmation from the model
+					phase++;				//PROPEL_DATA1
+					bind_phase=PROPEL_DEFAULT_PERIOD;
+					packet_count=0;
+                    PROTOCOL_SetBindState(0);
+					break;
+				}
+			}
+			NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, rx_tx_addr, PROPEL_ADDRESS_LENGTH);
+			NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, rx_tx_addr, PROPEL_ADDRESS_LENGTH);
+			PROPEL_bind_packet(true);		//send bind packet with rx_id
+			break;
+
+		case PROPEL_DATA1:
+			#ifdef PROPEL_HUB_TELEMETRY
+				if (_BV(NRF24L01_07_RX_DR) & NRF24L01_ReadReg(NRF24L01_07_STATUS))
+				{// data received from the model
+					NRF24L01_ReadPayload(packet_in, PROPEL_PACKET_SIZE);
+					#if 1
+						for(uint8_t i=0; i<PROPEL_PACKET_SIZE; i++)
+							debug("%02X ",packet_in[i]);
+						debugln("");
+					#endif
+					if (packet_in[0] == 0xa3 && memcmp(&packet_in[1],rx_id,3)==0)
+					{
+						telemetry_counter++;	//LQI
+						v_lipo1=packet_in[5];	//number of life left?
+						v_lipo2=packet_in[4];	//bit mask: 0x80=flying, 0x08=taking off, 0x04=landing, 0x00=landed/crashed
+						if(telemetry_lost==0)
+							telemetry_link=1;
+					}
+				}
+				packet_count++;
+				if(packet_count>=100)
+				{//LQI calculation
+					packet_count=0;
+					TX_LQI=telemetry_counter;
+					RX_RSSI=telemetry_counter;
+					telemetry_counter = 0;
+					telemetry_lost=0;
+				}
+			#endif
+			PROPEL_data_packet();
+			break;
+	}
+	return PROPEL_PACKET_PERIOD;
+}
+
+void PROPEL_init()
+{
+    CLOCK_StopTimer();
+	PROPEL_initialize_txid();
+	PROPEL_RF_init();
+	hopping_frequency_no = 0;
+	phase = PROPEL_BIND1;
+    PROTOCOL_SetBindState(0xFFFFFFFF);
+    packet_count=0;
+    CLOCK_StartTimer(PROPEL_INITIAL_WAIT, PROPEL_callback);
+}
+
+uintptr_t Propel_Cmds(enum ProtoCmds cmd)
+{
+    switch(cmd) {
+        case PROTOCMD_INIT:  PROPEL_init(); return 0;
+        case PROTOCMD_DEINIT:
+        case PROTOCMD_RESET:
+            CLOCK_StopTimer();
+            return (NRF24L01_Reset() ? 1 : -1);
+        case PROTOCMD_CHECK_AUTOBIND: return 1;  // always Autobind
+        case PROTOCMD_BIND: PROPEL_init(); return 0;
+        case PROTOCMD_NUMCHAN: return 14;
+        case PROTOCMD_DEFAULT_NUMCHAN: return 14;
+        case PROTOCMD_CURRENT_ID: return Model.fixed_id;
+        case PROTOCMD_GETOPTIONS: return 0;
+        case PROTOCMD_TELEMETRYSTATE: return PROTO_TELEM_UNSUPPORTED;
+        case PROTOCMD_CHANNELMAP: return AETRG;
+        default: break;
+    }
+    return 0;
+}
+
+#endif
+
+// equations for checksum check byte from truth table
+// (1)  z =  a && !b
+//       ||  a && !c && !d
+//       ||  a && !c && !g
+//       ||  a && !d && !g
+//       ||  a && !c && !h
+//       ||  a && !g && !h
+//       || !a &&  b &&  c &&  g
+//       || !a &&  b &&  c &&  d &&  h
+//       || !a &&  b &&  d &&  g &&  h;
+//
+// (2)  y = !b && !c && !d
+//       ||  b &&  c &&  g
+//       || !b && !c && !g
+//       || !b && !d && !g
+//       || !b && !c && !h
+//       || !b && !g && !h
+//       ||  b &&  c &&  d &&  h
+//       ||  b &&  d &&  g &&  h;
+//
+// (3)  x = !c && !d &&  g
+//       ||  c && !d && !g
+//       || !c &&  g && !h
+//       ||  c && !g && !h
+//       ||  c &&  d &&  g &&  h
+//       || !c &&  d && !g &&  h;
+//
+// (4)  w =  d &&  h
+//       || !d && !h;
+//
+// (5)  v = !e;
+//
+// (6)  u =  f;
+//
+// (7)  t = !g;
+//
+// (8)  s =  h;

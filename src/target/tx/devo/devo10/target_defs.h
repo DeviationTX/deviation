@@ -27,7 +27,9 @@
 #define HAS_AUDIO_UART      0
 #define HAS_MUSIC_CONFIG    1
 
-#define SUPPORT_CRSF_CONFIG 1
+#if BUILD_TYPE == 0
+  #define SUPPORT_CRSF_CONFIG 1
+#endif
 
 #ifdef BUILDTYPE_DEV
    #define DEBUG_WINDOW_SIZE 200

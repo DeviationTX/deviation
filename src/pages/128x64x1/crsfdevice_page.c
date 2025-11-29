@@ -15,6 +15,8 @@
 
 
 #include "common.h"
+
+#if SUPPORT_CRSF_CONFIG
 #include "pages.h"
 #include "gui/gui.h"
 
@@ -30,8 +32,6 @@ enum {
     ROW_SPLIT_WIDTH  = 105,
 };
 #endif
-
-#if SUPPORT_CRSF_CONFIG
 
 #include "../common/_crsfdevice_page.c"
 
