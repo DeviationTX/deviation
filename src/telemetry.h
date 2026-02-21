@@ -195,6 +195,9 @@ typedef enum {
     TELEM_CRSF_RPM_1,
     TELEM_CRSF_TEMP_SRC,
     TELEM_CRSF_TEMP_1,
+    TELEM_CRSF_VTX_SRC,
+    TELEM_CRSF_VTX_PITCTRL,
+    TELEM_CRSF_VTX_PITSW,
     TELEM_CRSF_LAST
 } crossfire_telem_t;
 

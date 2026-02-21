@@ -56,6 +56,9 @@ const CrossfireSensor crossfireSensors[] = {
 };
 #endif
 
+static char *vtx_pitmode[] = { "Off", "On" };
+static char *vtx_pmcontrol[] = { "Off", "On", "SW", "FS" };
+
 const char * _crsf_str_by_value(char *str, u8 telem, s32 value)
 {
     switch(telem) {
@@ -66,7 +69,7 @@ const char * _crsf_str_by_value(char *str, u8 telem, s32 value)
     case TELEM_CRSF_RX_RSSI2: _get_value_str(str, value, 0, 'D'); break;        // DB
     case TELEM_CRSF_FLIGHT_MODE: memcpy(str, &value, 4); str[4]=0; break;       // ascii value
     case TELEM_CRSF_RF_MODE:
-    case TELEM_CRSF_RX_ANTENNA: _get_value_str(str, value, 0, '\0'); break;     // raw
+    case TELEM_CRSF_RX_ANTENNA:
     case TELEM_CRSF_RX_RSSI_PERC:
     case TELEM_CRSF_TX_RSSI_PERC:
     case TELEM_CRSF_BATT_REMAINING:
@@ -76,6 +79,12 @@ const char * _crsf_str_by_value(char *str, u8 telem, s32 value)
     case TELEM_CRSF_BATT_VOLTAGE: _get_value_str(str, value, 1, 'V'); break;    // volts
     case TELEM_CRSF_BATT_CURRENT: _get_value_str(str, value, 1, 'A'); break;    // amps
     case TELEM_CRSF_BATT_CAPACITY: _get_value_str(str, value, 0, 'a'); break;   // milliamp-hours
+    case TELEM_CRSF_VTX_FREQ: _get_value_str(str, value, 0, 'M'); break;        // MHz
+    case TELEM_CRSF_VTX_POWER: _get_value_str(str, value, 0, 'd'); break;       // dBm
+    case TELEM_CRSF_VTX_PITMODE: strcpy(str, vtx_pitmode[value]); break;
+    case TELEM_CRSF_VTX_PITCTRL: strcpy(str, vtx_pmcontrol[value]); break;
+    case TELEM_CRSF_VTX_SRC:
+    case TELEM_CRSF_VTX_PITSW: _get_value_str(str, value, 0, '\0'); break;      // raw
     case TELEM_CRSF_ATTITUDE_PITCH:
     case TELEM_CRSF_ATTITUDE_ROLL:
     case TELEM_CRSF_ATTITUDE_YAW: _get_value_str(str, value, 3, 'R'); break;    // radians
@@ -120,6 +129,9 @@ const char * _crsf_short_name(char *str, u8 telem)
     case TELEM_CRSF_VTX_FREQ: strcpy(str, _tr("VtxFreq")); break;
     case TELEM_CRSF_VTX_PITMODE: strcpy(str, _tr("VtxMode")); break;
     case TELEM_CRSF_VTX_POWER: strcpy(str, _tr("VtxPwr")); break;
+    case TELEM_CRSF_VTX_SRC: strcpy(str, _tr("VtxSrc")); break;
+    case TELEM_CRSF_VTX_PITCTRL: strcpy(str, _tr("PitCtl")); break;
+    case TELEM_CRSF_VTX_PITSW: strcpy(str, _tr("PitSw")); break;
     case TELEM_CRSF_BATT_REMAINING: strcpy(str, _tr("Remain")); break;
     case TELEM_CRSF_VERTSPD: strcpy(str, _tr("Vario")); break;
     case TELEM_CRSF_ALTITUDE: strcpy(str, _tr("Alt")); break;
@@ -157,6 +169,9 @@ const char * _crsf_name(char *str, u8 telem)
     case TELEM_CRSF_TX_RSSI_PERC: strcpy(str, _tr("TxRSSI%")); break;
     case TELEM_CRSF_AIRSPEED: strcpy(str, _tr("Air Speed")); break;
     case TELEM_CRSF_TEMP_SRC: strcpy(str, _tr("Temp Src")); break;
+    case TELEM_CRSF_VTX_SRC: strcpy(str, _tr("Vtx Source")); break;
+    case TELEM_CRSF_VTX_PITCTRL: strcpy(str, _tr("Pit Ctrl")); break;
+    case TELEM_CRSF_VTX_PITSW: strcpy(str, _tr("Pit Switch")); break;
 
     default: _crsf_short_name(str, telem); break;
     }
@@ -179,6 +194,12 @@ s32 _crsf_get_max_value(u8 telem)
     case TELEM_CRSF_BATT_VOLTAGE: return 500; break;
     case TELEM_CRSF_BATT_CURRENT: return 1000; break;
     case TELEM_CRSF_BATT_CAPACITY: return 500000; break;
+    case TELEM_CRSF_VTX_FREQ: return 10000; break;
+    case TELEM_CRSF_VTX_POWER: return 255; break;
+    case TELEM_CRSF_VTX_PITMODE: return 1; break;
+    case TELEM_CRSF_VTX_SRC: return 255; break;
+    case TELEM_CRSF_VTX_PITCTRL: return 3; break;
+    case TELEM_CRSF_VTX_PITSW: return 15; break;
     case TELEM_CRSF_ATTITUDE_PITCH:
     case TELEM_CRSF_ATTITUDE_ROLL:
     case TELEM_CRSF_ATTITUDE_YAW: return 7; break;
