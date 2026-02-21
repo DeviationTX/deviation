@@ -474,18 +474,16 @@ static void processCrossfireTelemetryFrame()
     case TYPE_VTX_TELEM:
       // Payload layout per CRSF spec:
       // origin_address (1), power_dBm (1), frequency_MHz (2), pitmode (1)
-      if (telemetryRxBuffer[1] >= 7) {
-        u8 source = telemetryRxBuffer[3];
-        u8 power_dBm = telemetryRxBuffer[4];
-        u16 frequency = ((u16)telemetryRxBuffer[5] << 8) | telemetryRxBuffer[6];
-        u8 pitmode = telemetryRxBuffer[7];
-
-        set_telemetry(TELEM_CRSF_VTX_SRC, source);
-        set_telemetry(TELEM_CRSF_VTX_POWER, power_dBm);
-        set_telemetry(TELEM_CRSF_VTX_FREQ, frequency);
-        set_telemetry(TELEM_CRSF_VTX_PITMODE, pitmode & 0x01);
-        set_telemetry(TELEM_CRSF_VTX_PITCTRL, (pitmode >> 1) & 0x03);
-        set_telemetry(TELEM_CRSF_VTX_PITSW, (pitmode >> 3) & 0x0F);
+      if (getCrossfireTelemetryValue(3, &value, 1))
+        set_telemetry(TELEM_CRSF_VTX_SRC, value);
+      if (getCrossfireTelemetryValue(4, &value, 1))
+        set_telemetry(TELEM_CRSF_VTX_POWER, value);
+      if (getCrossfireTelemetryValue(5, &value, 2))
+        set_telemetry(TELEM_CRSF_VTX_FREQ, value);
+      if (getCrossfireTelemetryValue(7, &value, 1)) {
+        set_telemetry(TELEM_CRSF_VTX_PITMODE, value & 0x01);
+        set_telemetry(TELEM_CRSF_VTX_PITCTRL, (value >> 1) & 0x03);
+        set_telemetry(TELEM_CRSF_VTX_PITSW, (value >> 3) & 0x0F);
       }
       break;
 
