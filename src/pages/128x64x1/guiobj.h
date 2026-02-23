@@ -147,7 +147,7 @@ struct telemtest_obj {
     guiLabel_t msg;
     guiLabel_t header[10];
 #if HAS_EXTENDED_TELEMETRY
-    guiLabel_t box[42];
+    guiLabel_t box[44];
 #else
     guiLabel_t box[20];
 #endif

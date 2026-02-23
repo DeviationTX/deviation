@@ -330,6 +330,16 @@ const struct telem_layout crsf_layout_basic[] = {
     {TYPE_VALUE | 8, FRSKY2_X, FRSKY1_WIDTH, TELEM_CRSF_RPM_1},
     {TYPE_VALUE | 8, FRSKY3_X, FRSKY1_WIDTH, TELEM_CRSF_TEMP_1},
 
+    {TYPE_INDEX | 9, LBL1_X, LBL1_WIDTH, 10},
+    {TYPE_VALUE | 9, FRSKY1_X, FRSKY1_WIDTH, TELEM_CRSF_VTX_FREQ},
+    {TYPE_VALUE | 9, FRSKY2_X, FRSKY1_WIDTH, TELEM_CRSF_VTX_POWER},
+    {TYPE_VALUE | 9, FRSKY3_X, FRSKY1_WIDTH, TELEM_CRSF_VTX_PITMODE},
+
+    {TYPE_INDEX | 10, LBL1_X, LBL1_WIDTH, 11},
+    {TYPE_VALUE | 10, FRSKY1_X, FRSKY1_WIDTH, TELEM_CRSF_VTX_SRC},
+    {TYPE_VALUE | 10, FRSKY2_X, FRSKY1_WIDTH, TELEM_CRSF_VTX_PITCTRL},
+    {TYPE_VALUE | 10, FRSKY3_X, FRSKY1_WIDTH, TELEM_CRSF_VTX_PITSW},
+
     {0, 0, 0, 0},
 };
 #endif //HAS_EXTENDED_TELEMETRY
@@ -352,7 +362,7 @@ const struct telem_layout2 frsky_page[] = {
 };
 #if HAS_EXTENDED_TELEMETRY
 const struct telem_layout2 crsf_page[] = {
-    {crsf_header_basic, crsf_layout_basic, 10, 1},
+    {crsf_header_basic, crsf_layout_basic, 12, 1},
     {devo_header_gps, devo_layout_gps, 3, 4},
 };
 #endif //HAS_EXTENDED_TELEMETRY
