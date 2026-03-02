@@ -249,7 +249,28 @@ int AUDIO_AddQueue(u16 music) {
         return 0;
     }
 
-    audio_queue[num_audio++] = music;
+    int new_num_audio = -1;
+
+#if USE_NEW_CUSTOM_ALARM_MODE
+    u32 t = CLOCK_getms();
+
+    // Replace the last custom alarm id, if there is already one
+    if (voice_map[music].id >= CUSTOM_ALARM_ID)
+    {
+        u32 id = voice_map[audio_queue[next_audio-1]].id;
+        if (id == MUSIC_STARTUP || id >= CUSTOM_ALARM_ID)  // Only skip welcome message or custom alarms
+            audio_queue_time = t + CUSTOM_ALARM_IGNORE_MS;  // Do not consume the audio right away (prevent triggering transitional sounds)
+
+        for (u8 i = next_audio; i < num_audio; i++)
+            if (voice_map[audio_queue[i]].id >= CUSTOM_ALARM_ID)
+                new_num_audio = i;
+    }
+#endif
+
+    if (new_num_audio < 0)
+        audio_queue[num_audio++] = music;  // Add to queue
+    else
+        audio_queue[new_num_audio] = music;  // Replace queue item, do not enqueue custom sounds
     return 1;
 }
 
